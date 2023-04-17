@@ -3,7 +3,6 @@ services:
   hmpps-accredited-programmes-api:
     build:
       context: .
-    network_mode: "host"
     container_name: hmpps-accredited-programmes-api
     ports:
       - "8081:8080"
