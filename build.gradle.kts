@@ -1,6 +1,7 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.4"
   kotlin("plugin.spring") version "1.8.10"
+  id("org.openapi.generator") version "5.4.0"
 }
 
 configurations {
@@ -9,6 +10,9 @@ configurations {
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
+  implementation("org.springdoc:springdoc-openapi-data-rest:1.7.0")
+  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
+  implementation("org.springdoc:springdoc-openapi-kotlin:1.7.0")
 }
 
 java {
@@ -20,6 +24,9 @@ tasks {
     kotlinOptions {
       jvmTarget = "19"
     }
+
+    kotlin.sourceSets["main"].kotlin.srcDir("$buildDir/generated/src/main")
+    dependsOn("openApiGenerate")
   }
 }
 
@@ -32,4 +39,28 @@ tasks.register("bootRunLocal") {
     }
   }
   finalizedBy("bootRun")
+}
+
+openApiGenerate {
+  generatorName.set("kotlin-spring")
+  inputSpec.set("$rootDir/src/main/resources/static/api.yml")
+  outputDir.set("$buildDir/generated")
+  apiPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api")
+  modelPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model")
+  configOptions.apply {
+    put("basePackage", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi")
+    put("delegatePattern", "true")
+    put("gradleBuildFile", "false")
+    put("exceptionHandler", "false")
+    put("useBeanValidation", "false")
+    put("dateLibrary", "custom")
+  }
+  typeMappings.put("DateTime", "Instant")
+  importMappings.put("Instant", "java.time.Instant")
+}
+
+ktlint {
+  filter {
+    exclude { it.file.path.contains("$buildDir${File.separator}generated${File.separator}") }
+  }
 }

@@ -17,6 +17,11 @@ spring:
     group:
       test:
         - "stdout"
+springdoc:
+  swagger-ui:
+    urls:
+      - name: API
+        url: "api.yml"
 
 server:
   port: 8080
