@@ -8,6 +8,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Hello
 @Service
 class HelloController : HelloApiDelegate {
   override fun helloGet(): ResponseEntity<Hello> {
-    return ResponseEntity.ok(Hello(message = "Welcome to the Accredited Programs API"))
+    return ResponseEntity.ok(Hello(message = "Welcome to the Accredited Programmes API"))
   }
 }
