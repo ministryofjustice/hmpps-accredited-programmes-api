@@ -51,3 +51,9 @@ To run linting and tests, run:
 ```bash
 script/test
 ```
+
+## OpenAPI documentation
+
+The API which is offered to front-end UI apps is documented using Swagger/OpenAPI.
+
+This is available in development at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
