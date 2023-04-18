@@ -5,23 +5,52 @@ info:
 servers:
   - url: /
 paths:
-  /hello:
+  /programmes:
     get:
       tags:
-        - Test
-      summary: Test endpoint
+        - Programmes
+      summary: List all accredited programmes
       responses:
         200:
           description: successful operation
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Hello'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Programme'
 components:
   schemas:
-    Hello:
+    Programme:
       type: object
       properties:
-        message:
+        id:
           type: string
-          example: Hello!
+          format: uuid
+        name:
+          type: string
+          example: Thinking skills programme
+        programmeType:
+          type: string
+          example: TypeA
+        description:
+          type: string
+          example: Thinking Skills Programme (TSP) description
+        programmePrerequisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgrammePrerequisite'
+    ProgrammePrerequisite:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+      example:
+        - key: gender
+          value: female
+        - key: risk score
+          value: 'ORGS: 50+'
+        - key: offence type
+          value: some offence here
