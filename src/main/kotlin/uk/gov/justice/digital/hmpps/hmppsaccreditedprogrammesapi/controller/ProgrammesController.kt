@@ -21,7 +21,7 @@ class ProgrammesController : ProgrammesApiDelegate {
             ProgrammePrerequisite(key = "gender", value = "female"),
             ProgrammePrerequisite(key = "risk score", value = "ORGS: 50+"),
             ProgrammePrerequisite(key = "offence type", value = "some offence here"),
-          )
+          ),
         ),
         Programme(
           id = UUID.randomUUID(),
@@ -32,7 +32,7 @@ class ProgrammesController : ProgrammesApiDelegate {
             ProgrammePrerequisite(key = "gender", value = "female"),
             ProgrammePrerequisite(key = "risk score", value = "ORGS: 50+"),
             ProgrammePrerequisite(key = "offence type", value = "some offence here"),
-          )
+          ),
         ),
         Programme(
           id = UUID.randomUUID(),
@@ -43,9 +43,9 @@ class ProgrammesController : ProgrammesApiDelegate {
             ProgrammePrerequisite(key = "gender", value = "female"),
             ProgrammePrerequisite(key = "risk score", value = "ORGS: 50+"),
             ProgrammePrerequisite(key = "offence type", value = "some offence here"),
-            )
-        )
-      )
+          ),
+        ),
+      ),
     )
   }
 }
