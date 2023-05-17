@@ -5,11 +5,11 @@ info:
 servers:
   - url: /
 paths:
-  /programmes:
+  /courses:
     get:
       tags:
-        - Programmes
-      summary: List all accredited programmes
+        - Courses
+      summary: List all courses
       responses:
         200:
           description: successful operation
@@ -18,10 +18,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Programme'
+                  $ref: '#/components/schemas/Course'
 components:
   schemas:
-    Programme:
+    Course:
       type: object
       properties:
         id:
@@ -30,7 +30,7 @@ components:
         name:
           type: string
           example: Thinking skills programme
-        programmeType:
+        type:
           type: string
           example: TypeA
         description:
@@ -39,18 +39,18 @@ components:
         programmePrerequisites:
           type: array
           items:
-            $ref: '#/components/schemas/ProgrammePrerequisite'
-    ProgrammePrerequisite:
+            $ref: '#/components/schemas/CoursePrerequisite'
+    CoursePrerequisite:
       type: object
       properties:
-        key:
+        name:
           type: string
-        value:
+        description:
           type: string
       example:
-        - key: gender
-          value: female
-        - key: risk score
-          value: 'ORGS: 50+'
-        - key: offence type
-          value: some offence here
+        - name: gender
+          description: female
+        - name: risk score
+          description: 'ORGS: 50+'
+        - name: offence type
+          description: some offence here
