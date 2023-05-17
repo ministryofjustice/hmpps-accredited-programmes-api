@@ -1,6 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.4"
-  kotlin("plugin.spring") version "1.8.10"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.6"
+  kotlin("plugin.spring") version "1.8.21"
   id("org.openapi.generator") version "5.4.0"
 }
 
@@ -25,7 +25,7 @@ tasks {
       jvmTarget = "19"
     }
 
-    kotlin.sourceSets["main"].kotlin.srcDir("$buildDir/generated/src/main")
+    kotlin.sourceSets["main"].kotlin.srcDir("$buildDir/generated/src/main/kotlin")
     dependsOn("openApiGenerate")
   }
 }
@@ -63,4 +63,8 @@ ktlint {
   filter {
     exclude { it.file.path.contains("$buildDir${File.separator}generated${File.separator}") }
   }
+}
+
+tasks.runKtlintCheckOverMainSourceSet {
+  dependsOn("openApiGenerate")
 }
