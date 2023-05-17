@@ -19,6 +19,61 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Course'
+
+  /courses/{courseId}/offerings:
+    get:
+      tags:
+        - Course Offerings
+      summary: List all offerings for a course
+      parameters:
+        - name: courseId
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseOffering'
+
+  /courses/{courseId}/offerings/{offeringId}:
+    get:
+      tags:
+        - Course Offering
+      summary: Details for a single course offering
+
+      parameters:
+        - name: courseId
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+        - name: offeringId
+          in: path
+          description: A course offering identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                  $ref: '#/components/schemas/CourseOffering'
+
 components:
   schemas:
     Course:
@@ -40,6 +95,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CoursePrerequisite'
+
     CoursePrerequisite:
       type: object
       properties:
@@ -54,3 +110,32 @@ components:
           description: 'ORGS: 50+'
         - name: offence type
           description: some offence here
+
+    CourseOffering:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        organisationId:
+          type: string
+          example: "MDI"
+          description: "The unique HPMMS identifier associated with the prison hosting the offering"
+        contactEmail:
+          type: string
+          format: email
+          example: "ap-admin@digital.justice.gov.uk"
+          description: "The email address of a contact for this offering"
+        duration:
+          type: string
+          format: duration
+          example: "P10D"
+          description: "The duration of the offering in ISO 8601 format"
+        groupSize:
+          type: integer
+          example: 10
+      required:
+        - id
+        - organisationId
+        - duration
+        - groupSize
