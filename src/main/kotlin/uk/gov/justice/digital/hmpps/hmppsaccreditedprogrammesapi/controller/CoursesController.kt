@@ -17,7 +17,7 @@ class CoursesController : CoursesApiDelegate {
           name = "Thinking Skills Programme",
           type = "TypeA",
           description = "Thinking Skills Programme (TSP) is for adult men and women with a medium or high risk of re offending...",
-          programmePrerequisites = listOf(
+          coursePrerequisites = listOf(
             CoursePrerequisite(name = "gender", description = "female"),
             CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
             CoursePrerequisite(name = "offence type", description = "some offence here"),
@@ -28,7 +28,7 @@ class CoursesController : CoursesApiDelegate {
           name = "Becoming new me +",
           type = "TypeB",
           description = "Becoming new me + is for adult men and women with a medium or high risk of re offending...",
-          programmePrerequisites = listOf(
+          coursePrerequisites = listOf(
             CoursePrerequisite(name = "gender", description = "female"),
             CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
             CoursePrerequisite(name = "offence type", description = "some offence here"),
@@ -39,7 +39,7 @@ class CoursesController : CoursesApiDelegate {
           name = "New me strengths",
           type = "TypeA",
           description = "New me strengths is for adult men and women with a medium or high risk of re offending...",
-          programmePrerequisites = listOf(
+          coursePrerequisites = listOf(
             CoursePrerequisite(name = "gender", description = "female"),
             CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
             CoursePrerequisite(name = "offence type", description = "some offence here"),
