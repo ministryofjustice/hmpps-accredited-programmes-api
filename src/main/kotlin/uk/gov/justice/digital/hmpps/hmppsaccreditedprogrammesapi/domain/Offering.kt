@@ -1,17 +1,19 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
 import java.util.UUID
+import kotlin.time.Duration
 
-class CourseEntity(
+class Offering(
   val id: UUID = UUID.randomUUID(),
-  val name: String,
-  val type: String,
-  val description: String? = null,
-  val prerequisites: List<Prerequisite>,
+  val organisationId: String,
+  val duration: Duration,
+  val groupSize: Int,
+  val contactEmail: String,
+  val course: CourseEntity,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other == null || other !is CourseEntity) return false
+    if (other == null || other !is Offering) return false
     return this.id == other.id
   }
 

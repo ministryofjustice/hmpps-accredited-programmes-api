@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
-class PrerequisiteEntity(
+class Prerequisite(
   val name: String,
   val description: String,
 )

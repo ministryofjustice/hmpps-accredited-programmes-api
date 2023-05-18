@@ -6,8 +6,10 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.PrerequisiteEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 import java.util.UUID
+import kotlin.time.Duration
 
 class TransformerTest {
   @Test
@@ -50,8 +52,8 @@ class TransformerTest {
       name = "A Course",
       type = "A type",
       prerequisites = listOf(
-        PrerequisiteEntity(name = "gender", description = "female"),
-        PrerequisiteEntity(name = "risk score", description = "ORGS: 50+"),
+        Prerequisite(name = "gender", description = "female"),
+        Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
     )
 
@@ -65,7 +67,7 @@ class TransformerTest {
 
   @Test
   fun `transform a course prerequisite entity to api`() {
-    val entity = PrerequisiteEntity(
+    val entity = Prerequisite(
       name = "gender",
       description = "female",
     )
@@ -73,6 +75,31 @@ class TransformerTest {
     with(entity.toApi()) {
       name shouldBe entity.name
       description shouldBe description
+    }
+  }
+
+  @Test
+  fun `transform a domain offering to a api CourseOffering`() {
+    val offering = Offering(
+      id = UUID.randomUUID(),
+      organisationId = "BXI",
+      duration = Duration.parseIsoString("P5D"),
+      groupSize = 5,
+      contactEmail = "nobody-bwn@digital.justice.gov.uk",
+      course = CourseEntity(
+        id = UUID.randomUUID(),
+        name = "A Course",
+        type = "A type",
+        prerequisites = emptyList(),
+      ),
+    )
+
+    with(offering.toApi()) {
+      id shouldBe offering.id
+      organisationId shouldBe offering.organisationId
+      Duration.parseIsoString(duration) shouldBe offering.duration
+      groupSize shouldBe offering.groupSize
+      contactEmail shouldBe offering.contactEmail
     }
   }
 }

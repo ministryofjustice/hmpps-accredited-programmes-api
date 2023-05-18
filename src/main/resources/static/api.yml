@@ -137,5 +137,6 @@ components:
       required:
         - id
         - organisationId
+        - contactEmail
         - duration
         - groupSize
