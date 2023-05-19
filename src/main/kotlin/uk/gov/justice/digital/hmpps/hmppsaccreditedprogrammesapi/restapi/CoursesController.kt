@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.controller
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEn
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.transformer.toApi
+import java.util.UUID
 
 @Service
 class CoursesController(
@@ -22,11 +23,16 @@ class CoursesController(
           .map(CourseEntity::toApi),
       )
 
-  override fun coursesCourseIdOfferingsGet(courseId: java.util.UUID): ResponseEntity<List<CourseOffering>> =
+  override fun coursesCourseIdOfferingsGet(courseId: UUID): ResponseEntity<List<CourseOffering>> =
     ResponseEntity
       .ok(
         courseService
           .offeringsForCourse(courseId)
           .map(Offering::toApi),
       )
+
+  override fun coursesCourseIdOfferingsOfferingIdGet(courseId: UUID, offeringId: UUID): ResponseEntity<CourseOffering> =
+    courseService.courseOffering(courseId, offeringId)?.let {
+      ResponseEntity.ok(it.toApi())
+    } ?: throw NotFoundException("No CourseOffering  found at /courses/$courseId/offerings/$offeringId")
 }

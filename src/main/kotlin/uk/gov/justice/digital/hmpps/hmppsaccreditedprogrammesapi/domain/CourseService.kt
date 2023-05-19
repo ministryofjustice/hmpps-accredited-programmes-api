@@ -13,6 +13,9 @@ class CourseService {
       .filter { it.course.id == courseId }
       .toList()
 
+  fun courseOffering(courseId: UUID, offeringId: UUID): Offering? =
+    offerings.find { it.id == offeringId && it.course.id == courseId }
+
   companion object {
     private val tsp = CourseEntity(
       name = "Thinking Skills Programme",

@@ -73,6 +73,12 @@ paths:
             'application/json':
               schema:
                   $ref: '#/components/schemas/CourseOffering'
+        404:
+          description: invalid course and/or course offering id
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -140,3 +146,21 @@ components:
         - contactEmail
         - duration
         - groupSize
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 404
+        errorCode:
+          type: integer
+        userMessage:
+          type: string
+          example: "Course not found"
+        developerMessage:
+          type: string
+        moreInfo:
+          type: string
+      required:
+        - status
