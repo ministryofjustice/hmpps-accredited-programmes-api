@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# GET all courses from http://localhost:8080/courses and print formatted json to stdout
+# Requires the hmpps-auth app to be running and accessible to the application. (See docker-compose.yml)
+
+DIR="$(dirname "$(realpath "$0")")"
+TOKEN=$("$DIR"/get_token)
+curl -v --header "Authorization: Bearer $TOKEN" http://localhost:8080/courses | jq
