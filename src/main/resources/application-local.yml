@@ -1,0 +1,8 @@
+oauth:
+  client:
+    id: whereabouts-api-client
+    secret: clientsecret
+
+hmpps:
+  auth:
+    url: http://localhost:9090/auth

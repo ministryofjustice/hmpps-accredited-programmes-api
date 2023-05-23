@@ -17,6 +17,13 @@ spring:
     group:
       test:
         - "stdout"
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
+
 springdoc:
   swagger-ui:
     urls:
@@ -54,3 +61,5 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+log-client-credentials-jwt-info: false

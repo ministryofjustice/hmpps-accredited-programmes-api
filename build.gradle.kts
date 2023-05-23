@@ -9,14 +9,22 @@ configurations {
 }
 
 dependencies {
-  val kotestVersion = "5.6.0"
+  val kotestVersion = "5.6.2"
+  val springdocVersion = "1.7.0"
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springdoc:springdoc-openapi-data-rest:1.7.0")
-  implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
-  implementation("org.springdoc:springdoc-openapi-kotlin:1.7.0")
+  implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
+  implementation("org.springdoc:springdoc-openapi-data-rest:$springdocVersion")
+  implementation("org.springdoc:springdoc-openapi-ui:$springdocVersion")
+  implementation("org.springdoc:springdoc-openapi-kotlin:$springdocVersion")
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
+  testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
+  testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
 }
 
 java {
