@@ -9,7 +9,7 @@ configurations {
 }
 
 dependencies {
-  val kotestVersion = "5.6.0"
+  val kotestVersion = "5.6.2"
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springdoc:springdoc-openapi-data-rest:1.7.0")
