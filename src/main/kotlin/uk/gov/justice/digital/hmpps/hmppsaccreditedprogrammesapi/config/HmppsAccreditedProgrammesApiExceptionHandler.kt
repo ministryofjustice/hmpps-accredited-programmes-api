@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config
 
+import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.NotFoundException
-import javax.validation.ValidationException
 
 @RestControllerAdvice
 class HmppsAccreditedProgrammesApiExceptionHandler {

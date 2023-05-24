@@ -1,7 +1,7 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.7"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.4"
   kotlin("plugin.spring") version "1.8.21"
-  id("org.openapi.generator") version "5.4.0"
+  id("org.openapi.generator") version "6.6.0"
 }
 
 configurations {
@@ -60,6 +60,7 @@ openApiGenerate {
   apiPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api")
   modelPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model")
   configOptions.apply {
+    put("useSpringBoot3", "true")
     put("basePackage", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi")
     put("delegatePattern", "true")
     put("gradleBuildFile", "false")

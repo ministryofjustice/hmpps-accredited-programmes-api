@@ -22,11 +22,9 @@
                 <Pattern>${LOG_PATTERN}</Pattern>
             </layout>
         </appender>
-        <appender name="logAppender" class="com.microsoft.applicationinsights.logback.ApplicationInsightsAppender"/>
     </springProfile>
 
-    <logger name="uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.HmppsAccreditedProgrammesApiKt" additivity="false"
-            level="DEBUG">
+    <logger name="uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.Application" additivity="false" level="DEBUG">
         <appender-ref ref="logAppender"/>
         <appender-ref ref="consoleAppender"/>
     </logger>
