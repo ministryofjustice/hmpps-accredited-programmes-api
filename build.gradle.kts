@@ -25,6 +25,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.0")
 }
 
 java {
