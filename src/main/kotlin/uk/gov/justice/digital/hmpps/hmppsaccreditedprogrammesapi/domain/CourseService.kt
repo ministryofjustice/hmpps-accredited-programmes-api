@@ -8,13 +8,18 @@ import kotlin.time.Duration
 class CourseService {
   fun allCourses(): List<CourseEntity> = courses.toList()
 
+  fun course(courseId: UUID): CourseEntity? =
+    courses
+      .find { it.id == courseId }
+
   fun offeringsForCourse(courseId: UUID): List<Offering> =
     offerings
       .filter { it.course.id == courseId }
       .toList()
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? =
-    offerings.find { it.id == offeringId && it.course.id == courseId }
+    offerings
+      .find { it.id == offeringId && it.course.id == courseId }
 
   companion object {
     private val tsp = CourseEntity(

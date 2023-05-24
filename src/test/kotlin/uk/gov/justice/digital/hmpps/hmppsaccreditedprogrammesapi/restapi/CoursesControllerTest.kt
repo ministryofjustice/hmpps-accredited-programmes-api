@@ -51,6 +51,47 @@ class CoursesControllerTest(
   }
 
   @Test
+  fun `get a course - happy path`() {
+    val expectedCourse = coursesService.allCourses().first()
+
+    webTestClient.get().uri("/courses/${expectedCourse.id}")
+      .headers(jwtAuthHelper.clientCredentials())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.id").isEqualTo(expectedCourse.id.toString())
+  }
+
+  @Test
+  fun `get a course - not found`() {
+    val courseId = UUID.randomUUID()
+    webTestClient.get().uri("/courses/$courseId")
+      .headers(jwtAuthHelper.clientCredentials())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNotFound
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.status").isEqualTo(404)
+      .jsonPath("$.errorCode").isEmpty
+      .jsonPath("$.userMessage").value(startsWith("Not Found: No Course found at /courses/$courseId"))
+      .jsonPath("$.developerMessage").value(startsWith("No Course found at /courses/$courseId"))
+      .jsonPath("$.moreInfo").isEmpty
+  }
+
+  @Test
+  fun `get a course - no token`() {
+    val expectedCourse = coursesService.allCourses().first()
+
+    webTestClient.get().uri("/courses/${expectedCourse.id}")
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectUnauthenticatedResponse()
+  }
+
+  @Test
   fun `get all offerings for a course`() {
     val courseId = coursesService.allCourses().first().id
 

@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.beEmpty
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
@@ -17,6 +18,14 @@ class CourseServiceTest {
   @Test
   fun `all courses`() {
     service.allCourses() shouldHaveSize 3
+  }
+
+  @Test
+  fun `a course`() {
+    val aCourse = service.allCourses().first()
+    (service.course(aCourse.id))
+      .shouldNotBeNull()
+      .shouldBeEqualToComparingFields(aCourse)
   }
 
   @Test
