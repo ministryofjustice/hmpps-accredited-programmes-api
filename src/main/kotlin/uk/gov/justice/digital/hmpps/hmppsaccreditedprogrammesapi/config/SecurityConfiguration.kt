@@ -1,51 +1,47 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
-import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 
+@Configuration
 @EnableWebSecurity
-class OAuth2ResourceServerSecurityConfiguration {
+class SecurityConfiguration(
+  private val objectMapper: ObjectMapper,
+) {
   @Bean
-  @Throws(Exception::class)
-  fun securityFilterChain(http: HttpSecurity, @Autowired objectMapper: ObjectMapper): SecurityFilterChain {
-    http {
-      csrf { disable() }
-
-      authorizeHttpRequests {
-        authorize(HttpMethod.GET, "/health/**", permitAll)
-        authorize(HttpMethod.GET, "/swagger-ui/**", permitAll)
-        authorize(HttpMethod.GET, "/v3/api-docs/swagger-config", permitAll)
-        authorize(HttpMethod.GET, "/api.yml", permitAll)
-        authorize(HttpMethod.GET, "/info", permitAll)
-        authorize(anyRequest, authenticated)
-      }
-
-      anonymous { disable() }
-
-      oauth2ResourceServer {
-        jwt { jwtAuthenticationConverter = AuthAwareTokenConverter() }
-
-        authenticationEntryPoint = AuthenticationEntryPoint { _, response, _ ->
+  fun securityFilterChain(http: HttpSecurity): SecurityFilterChain? = http
+    .csrf { it.disable() }
+    .authorizeHttpRequests {
+      it
+        .requestMatchers(
+          "/health/**",
+          "/swagger-ui/**",
+          "/v3/api-docs/swagger-config",
+          "/api.yml",
+          "/info",
+        ).permitAll()
+        .anyRequest().authenticated()
+    }
+    .anonymous { it.disable() }
+    .oauth2ResourceServer { resourceServer ->
+      resourceServer.jwt { jwt -> jwt.jwtAuthenticationConverter(AuthAwareTokenConverter()) }
+        .authenticationEntryPoint { _, response, _ ->
           response.apply {
             status = 401
             contentType = "application/problem+json"
             characterEncoding = "UTF-8"
-
             writer.write(
               objectMapper.writeValueAsString(
                 object {
@@ -58,14 +54,9 @@ class OAuth2ResourceServerSecurityConfiguration {
             )
           }
         }
-      }
-      sessionManagement {
-        sessionCreationPolicy = SessionCreationPolicy.STATELESS
-      }
     }
-
-    return http.build()
-  }
+    .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+    .build()
 }
 
 class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
