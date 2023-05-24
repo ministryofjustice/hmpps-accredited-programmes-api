@@ -25,7 +25,7 @@ class CoursesControllerTest(
   @Test
   fun `get all courses`() {
     webTestClient.get().uri("/courses")
-      .headers(jwtAuthHelper.clientCredentials())
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -55,7 +55,7 @@ class CoursesControllerTest(
     val expectedCourse = coursesService.allCourses().first()
 
     webTestClient.get().uri("/courses/${expectedCourse.id}")
-      .headers(jwtAuthHelper.clientCredentials())
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -68,7 +68,7 @@ class CoursesControllerTest(
   fun `get a course - not found`() {
     val courseId = UUID.randomUUID()
     webTestClient.get().uri("/courses/$courseId")
-      .headers(jwtAuthHelper.clientCredentials())
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isNotFound
@@ -96,7 +96,7 @@ class CoursesControllerTest(
     val courseId = coursesService.allCourses().first().id
 
     webTestClient.get().uri("/courses/$courseId/offerings")
-      .headers(jwtAuthHelper.clientCredentials())
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -127,7 +127,7 @@ class CoursesControllerTest(
     val courseOfferingId = coursesService.offeringsForCourse(courseId).first().id
 
     webTestClient.get().uri("/courses/$courseId/offerings/$courseOfferingId")
-      .headers(jwtAuthHelper.clientCredentials())
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -146,7 +146,7 @@ class CoursesControllerTest(
 
     webTestClient.get().uri("/courses/$randomUuid/offerings/$randomUuid")
       .accept(MediaType.APPLICATION_JSON)
-      .headers(jwtAuthHelper.clientCredentials())
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .exchange()
       .expectStatus().isNotFound
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +174,7 @@ private fun (WebTestClient.ResponseSpec).expectUnauthenticatedResponse(): WebTes
     .expectHeader().contentType("application/problem+json;charset=UTF-8")
     .expectBody()
     .json(
-      """ 
+      """
       {
         "title": "Unauthenticated",
         "status": 401,
