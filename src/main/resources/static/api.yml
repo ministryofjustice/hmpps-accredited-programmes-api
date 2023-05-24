@@ -20,6 +20,27 @@ paths:
                 items:
                   $ref: '#/components/schemas/Course'
 
+  /courses/{courseId}:
+    get:
+      tags:
+        - Courses
+      summary: Details for a single course
+      parameters:
+        - name: courseId
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                  $ref: '#/components/schemas/Course'
+
   /courses/{courseId}/offerings:
     get:
       tags:
