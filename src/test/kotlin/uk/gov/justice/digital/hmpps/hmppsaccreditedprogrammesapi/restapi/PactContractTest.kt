@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 import au.com.dius.pact.provider.junit5.PactVerificationContext
 import au.com.dius.pact.provider.junitsupport.Provider
 import au.com.dius.pact.provider.junitsupport.State
+import au.com.dius.pact.provider.junitsupport.VerificationReports
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider
 import org.apache.hc.core5.http.HttpRequest
@@ -26,6 +27,7 @@ import java.util.*
 @Import(JwtAuthHelper::class)
 @PactBroker
 @Provider("Accredited Programmes API")
+@VerificationReports(value = ["markdown", "console"], reportDir = "build/pact")
 class PactContractTest {
   @Autowired
   lateinit var jwtAuthHelper: JwtAuthHelper
