@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.contract
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext
 import au.com.dius.pact.provider.junitsupport.Provider
@@ -8,12 +8,18 @@ import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider
 import org.apache.hc.core5.http.HttpRequest
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
@@ -24,8 +30,12 @@ class PactContractTest {
   @Autowired
   lateinit var jwtAuthHelper: JwtAuthHelper
 
+  @MockBean
+  lateinit var service: CourseService
   @State("Server is healthy")
-  fun healthy() {
+  fun programCourseServiceMock() {
+    `when`(service.allCourses())
+      .thenReturn(listOf(CourseEntity(UUID.randomUUID(), "", "", "", emptyList())))
   }
 
   @TestTemplate
@@ -33,5 +43,6 @@ class PactContractTest {
   fun template(context: PactVerificationContext, request: HttpRequest) {
     request.setHeader(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     context.verifyInteraction()
+    verify(service).allCourses()
   }
 }
