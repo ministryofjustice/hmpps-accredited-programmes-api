@@ -34,6 +34,7 @@ class PactContractTest {
 
   @MockBean
   lateinit var service: CourseService
+
   @State("Server is healthy")
   fun programCourseServiceMock() {
     `when`(service.allCourses())
