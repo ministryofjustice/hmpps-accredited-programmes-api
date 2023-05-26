@@ -8,12 +8,15 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import java.util.UUID
 
 class CourseServiceTest {
-  private val service = CourseService()
+  private val repository = mockk<CourseRepository>()
+  private val service = CourseService(repository)
 
   @Test
   fun `all courses`() {

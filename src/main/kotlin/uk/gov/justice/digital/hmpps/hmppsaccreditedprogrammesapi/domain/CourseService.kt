@@ -1,11 +1,15 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.UUID
 import kotlin.time.Duration
 
 @Service
-class CourseService {
+class CourseService(
+  @Autowired
+  courseRepository: CourseRepository,
+) {
   fun allCourses(): List<CourseEntity> = courses.toList()
 
   fun course(courseId: UUID): CourseEntity? =
