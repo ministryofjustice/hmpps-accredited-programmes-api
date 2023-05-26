@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.4"
   kotlin("plugin.spring") version "1.8.21"
@@ -25,6 +27,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.0")
 }
 
 java {
@@ -32,7 +35,7 @@ java {
 }
 
 tasks {
-  withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+  withType<KotlinCompile> {
     kotlinOptions {
       jvmTarget = "19"
     }
@@ -40,17 +43,32 @@ tasks {
     kotlin.sourceSets["main"].kotlin.srcDir("$buildDir/generated/src/main/kotlin")
     dependsOn("openApiGenerate")
   }
-}
 
-tasks.register("bootRunLocal") {
-  group = "application"
-  description = "Runs this project as a Spring Boot application with the local profile"
-  doFirst {
-    tasks.bootRun.configure {
-      systemProperty("spring.profiles.active", "local")
-    }
+  test {
+    useJUnitPlatform()
+
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
+
+    environment["pact_do_not_track"] = "true"
+    environment["pact.provider.tag"] = environment["PACT_PROVIDER_TAG"]
+    environment["pact.provider.version"] = environment["PACT_PROVIDER_VERSION"]
+    environment["pact.verifier.publishResults"] = environment["PACT_PUBLISH_RESULTS"] ?: "false"
   }
-  finalizedBy("bootRun")
+
+  register("bootRunLocal") {
+    group = "application"
+    description = "Runs this project as a Spring Boot application with the local profile"
+    doFirst {
+      bootRun.configure {
+        systemProperty("spring.profiles.active", "local")
+      }
+    }
+    finalizedBy("bootRun")
+  }
+
+  runKtlintCheckOverMainSourceSet {
+    dependsOn("openApiGenerate")
+  }
 }
 
 openApiGenerate {
@@ -76,8 +94,4 @@ ktlint {
   filter {
     exclude { it.file.path.contains("$buildDir${File.separator}generated${File.separator}") }
   }
-}
-
-tasks.runKtlintCheckOverMainSourceSet {
-  dependsOn("openApiGenerate")
 }

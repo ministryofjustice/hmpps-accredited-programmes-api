@@ -4,3 +4,7 @@ server:
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
+
+pactbroker:
+  host: 'pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk'
+  scheme: https
