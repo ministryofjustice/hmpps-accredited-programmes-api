@@ -19,6 +19,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
+  testImplementation("com.ninja-squad:springmockk:4.0.2")
+
   implementation("org.springdoc:springdoc-openapi-data-rest:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-ui:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-kotlin:$springdocVersion")
