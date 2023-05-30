@@ -31,6 +31,7 @@ class CourseService {
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
         Prerequisite(name = "offence type", description = "some offence here"),
       ),
+      audience = listOf(Audience("Sexual offence")),
     )
 
     private val bnm = CourseEntity(
@@ -42,6 +43,7 @@ class CourseService {
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
         Prerequisite(name = "offence type", description = "some offence here"),
       ),
+      audience = listOf(Audience("Extremism"), Audience("General violence")),
     )
 
     private val nms = CourseEntity(
@@ -54,6 +56,7 @@ class CourseService {
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
         Prerequisite(name = "offence type", description = "some offence here"),
       ),
+      audience = listOf(Audience("General violence")),
     )
 
     private val courses: Set<CourseEntity> = setOf(tsp, bnm, nms)

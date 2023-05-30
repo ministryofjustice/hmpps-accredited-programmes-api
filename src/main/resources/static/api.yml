@@ -122,6 +122,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CoursePrerequisite'
+        audience:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseAudience'
+      required:
+        - id
+        - name
+        - type
+        - type
+        - coursePrerequisites
+        - audience
 
     CoursePrerequisite:
       type: object
@@ -137,6 +148,9 @@ components:
           description: 'ORGS: 50+'
         - name: offence type
           description: some offence here
+      required:
+        - name
+        - description
 
     CourseOffering:
       type: object
@@ -167,6 +181,19 @@ components:
         - contactEmail
         - duration
         - groupSize
+
+    CourseAudience:
+      type: object
+      properties:
+        value:
+          type: string
+          example: "General Violence"
+        id:
+          type: string
+          format: uuid
+      required:
+        - id
+        - value
 
     ErrorResponse:
       type: object
