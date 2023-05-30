@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.4"
   kotlin("plugin.spring") version "1.8.21"
+  kotlin("plugin.jpa") version "1.8.21"
   id("org.openapi.generator") version "6.6.0"
 }
 
@@ -18,13 +19,13 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-
-  testImplementation("com.ninja-squad:springmockk:4.0.2")
+  implementation("org.flywaydb:flyway-core")
 
   implementation("org.springdoc:springdoc-openapi-data-rest:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-ui:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-kotlin:$springdocVersion")
 
+  testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
@@ -97,4 +98,12 @@ ktlint {
   filter {
     exclude { it.file.path.contains("$buildDir${File.separator}generated${File.separator}") }
   }
+}
+
+allOpen {
+  annotations(
+    "jakarta.persistence.Entity",
+    "jakarta.persistence.MappedSuperclass",
+    "jakarta.persistence.Embeddable"
+  )
 }
