@@ -123,7 +123,7 @@ class CoursesControllerTest(
   @Test
   fun `get a course offering - happy path`() {
     val courseId = coursesService.allCourses().first().id
-    val courseOfferingId = coursesService.offeringsForCourse(courseId).first().id
+    val courseOfferingId = coursesService.offeringsForCourse(courseId!!).first().id
 
     webTestClient.get().uri("/courses/$courseId/offerings/$courseOfferingId")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
