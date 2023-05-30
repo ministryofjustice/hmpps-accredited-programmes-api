@@ -28,6 +28,7 @@ class InMemoryCourseRepository : CourseRepository {
 
   private companion object {
     private val tsp = CourseEntity(
+      id = UUID.randomUUID(),
       name = "Thinking Skills Programme",
       type = "TypeA",
       description = "Thinking Skills Programme (TSP) is for adult men and women with a medium or high risk of re offending...",
@@ -39,6 +40,7 @@ class InMemoryCourseRepository : CourseRepository {
     )
 
     private val bnm = CourseEntity(
+      id = UUID.randomUUID(),
       name = "Becoming new me +",
       type = "TypeB",
       description = "Becoming new me + is for adult men and women with a medium or high risk of re offending...",
@@ -50,7 +52,7 @@ class InMemoryCourseRepository : CourseRepository {
     )
 
     private val nms = CourseEntity(
-
+      id = UUID.randomUUID(),
       name = "New me strengths",
       type = "TypeA",
       description = "New me strengths is for adult men and women with a medium or high risk of re offending...",

@@ -22,7 +22,7 @@ class InMemoryCourseRepositoryTest {
   @Test
   fun `a course`() {
     val aCourse = repository.allCourses().first()
-    (repository.course(aCourse.id))
+    (repository.course(aCourse.id!!))
       .shouldNotBeNull()
       .shouldBeEqualToComparingFields(aCourse)
   }
@@ -36,7 +36,7 @@ class InMemoryCourseRepositoryTest {
   fun `offerings for a known course should return the offerings`() {
     val course = repository.allCourses().find { it.name == "Thinking Skills Programme" }
     course.shouldNotBeNull()
-    val offerings = repository.offeringsForCourse(course.id)
+    val offerings = repository.offeringsForCourse(course.id!!)
 
     offerings.forAll { it.course.id shouldBe course.id }
     offerings shouldHaveSize 3
