@@ -32,7 +32,7 @@ class InMemoryCourseRepository : CourseRepository {
       name = "Thinking Skills Programme",
       type = "TypeA",
       description = "Thinking Skills Programme (TSP) is for adult men and women with a medium or high risk of re offending...",
-      prerequisites = listOf(
+      prerequisites = setOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
         Prerequisite(name = "offence type", description = "some offence here"),
@@ -44,7 +44,7 @@ class InMemoryCourseRepository : CourseRepository {
       name = "Becoming new me +",
       type = "TypeB",
       description = "Becoming new me + is for adult men and women with a medium or high risk of re offending...",
-      prerequisites = listOf(
+      prerequisites = setOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
         Prerequisite(name = "offence type", description = "some offence here"),
@@ -56,7 +56,7 @@ class InMemoryCourseRepository : CourseRepository {
       name = "New me strengths",
       type = "TypeA",
       description = "New me strengths is for adult men and women with a medium or high risk of re offending...",
-      prerequisites = listOf(
+      prerequisites = setOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
         Prerequisite(name = "offence type", description = "some offence here"),

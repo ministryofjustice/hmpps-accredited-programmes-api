@@ -5,7 +5,6 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
@@ -19,8 +18,7 @@ class TransformerTest {
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = emptyList(),
-      audience = emptyList(),
+      prerequisites = emptySet(),
     )
 
     with(entity.toApi()) {
@@ -39,8 +37,7 @@ class TransformerTest {
       name = "A Course",
       type = "A type",
       description = "A description",
-      prerequisites = emptyList(),
-      audience = emptyList(),
+      prerequisites = emptySet(),
     )
 
     with(entity.toApi()) {
@@ -49,19 +46,14 @@ class TransformerTest {
   }
 
   @Test
-  fun `transform course entity to api with prerequisites and audience`() {
+  fun `transform course entity to api with prerequisites`() {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = listOf(
+      prerequisites = setOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
-      ),
-      audience = listOf(
-        Audience("A"),
-        Audience("B"),
-        Audience("C"),
       ),
     )
 
@@ -70,7 +62,6 @@ class TransformerTest {
         CoursePrerequisite(name = "gender", description = "female"),
         CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
       )
-      audience.map { it.value } shouldContainExactlyInAnyOrder listOf("C", "B", "A")
     }
   }
 
@@ -99,8 +90,7 @@ class TransformerTest {
         id = UUID.randomUUID(),
         name = "A Course",
         type = "A type",
-        prerequisites = emptyList(),
-        audience = emptyList(),
+        prerequisites = emptySet(),
       ),
     )
 
@@ -110,15 +100,6 @@ class TransformerTest {
       Duration.parseIsoString(duration) shouldBe offering.duration
       groupSize shouldBe offering.groupSize
       contactEmail shouldBe offering.contactEmail
-    }
-  }
-
-  @Test
-  fun `transform domain Audience to a CourseAudience`() {
-    val audience = Audience("An audience")
-    with(audience.toApi()) {
-      id shouldBe audience.id
-      value shouldBe audience.value
     }
   }
 }
