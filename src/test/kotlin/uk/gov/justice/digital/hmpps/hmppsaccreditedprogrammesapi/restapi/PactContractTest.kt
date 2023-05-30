@@ -6,14 +6,14 @@ import au.com.dius.pact.provider.junitsupport.State
 import au.com.dius.pact.provider.junitsupport.VerificationReports
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.verify
 import org.apache.hc.core5.http.HttpRequest
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
@@ -32,13 +32,12 @@ class PactContractTest {
   @Autowired
   lateinit var jwtAuthHelper: JwtAuthHelper
 
-  @MockBean
+  @MockkBean
   lateinit var service: CourseService
 
   @State("Server is healthy")
   fun programCourseServiceMock() {
-    `when`(service.allCourses())
-      .thenReturn(listOf(CourseEntity(UUID.randomUUID(), "", "", "", emptyList(), emptyList())))
+    every { service.allCourses() } returns listOf(CourseEntity(UUID.randomUUID(), "", "", "", emptyList()))
   }
 
   @TestTemplate
@@ -46,6 +45,6 @@ class PactContractTest {
   fun template(context: PactVerificationContext, request: HttpRequest) {
     request.setHeader(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     context.verifyInteraction()
-    verify(service).allCourses()
+    verify { service.allCourses() }
   }
 }
