@@ -24,6 +24,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-kotlin:$springdocVersion")
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+  testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
