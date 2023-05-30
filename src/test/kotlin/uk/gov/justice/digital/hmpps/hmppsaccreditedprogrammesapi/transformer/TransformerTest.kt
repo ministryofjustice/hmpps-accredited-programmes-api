@@ -18,7 +18,7 @@ class TransformerTest {
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = emptyList(),
+      prerequisites = mutableSetOf(),
       audiences = emptyList(),
     )
 
@@ -38,7 +38,7 @@ class TransformerTest {
       name = "A Course",
       type = "A type",
       description = "A description",
-      prerequisites = emptyList(),
+      prerequisites = mutableSetOf(),
       audiences = emptyList(),
     )
 
@@ -53,7 +53,7 @@ class TransformerTest {
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = listOf(
+      prerequisites = mutableSetOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
@@ -96,7 +96,7 @@ class TransformerTest {
         id = UUID.randomUUID(),
         name = "A Course",
         type = "A type",
-        prerequisites = emptyList(),
+        prerequisites = mutableSetOf(),
         audiences = emptyList(),
       ),
     )

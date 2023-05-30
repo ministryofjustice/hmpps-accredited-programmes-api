@@ -32,7 +32,7 @@ class InMemoryCourseRepository : CourseRepository {
       name = "Lime Course",
       type = "Accredited Programme",
       description = "Explicabo exercitationem non asperiores corrupti accusamus quidem autem amet modi. Mollitia tenetur fugiat quo aperiam quasi error consectetur. Fugit neque rerum velit rem laboriosam. Atque nostrum quam aspernatur excepturi laborum harum officia eveniet porro.",
-      prerequisites = listOf(
+      prerequisites = mutableSetOf(
         Prerequisite(name = "Setting", description = "Custody"),
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
@@ -45,7 +45,7 @@ class InMemoryCourseRepository : CourseRepository {
       name = "Azure Course",
       type = "Accredited Programme",
       description = "Similique laborum incidunt sequi rem quidem incidunt incidunt dignissimos iusto. Explicabo nihil atque quod culpa animi quia aspernatur dolorem consequuntur.",
-      prerequisites = listOf(
+      prerequisites = mutableSetOf(
         Prerequisite(name = "Setting", description = "Custody"),
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
@@ -58,7 +58,7 @@ class InMemoryCourseRepository : CourseRepository {
       name = "Violet Course",
       type = "Accredited Programme",
       description = "Tenetur a quisquam facilis amet illum voluptas error. Eaque eum sunt odit dolor voluptatibus eius sint impedit. Illo voluptatem similique quod voluptate laudantium. Ratione suscipit tempore amet autem quam dolorum. Necessitatibus tenetur recusandae aliquam recusandae temporibus voluptate velit similique fuga. Id tempora doloremque.",
-      prerequisites = listOf(
+      prerequisites = mutableSetOf(
         Prerequisite(name = "Setting", description = "Custody"),
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
