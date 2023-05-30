@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo
 
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.beEmpty
@@ -9,36 +9,34 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo.InMemoryCourseRepository
-import java.util.UUID
+import java.util.*
 
-class CourseServiceTest {
-  private val service = CourseService(InMemoryCourseRepository())
+class InMemoryCourseRepositoryTest {
+  private val repository = InMemoryCourseRepository()
 
   @Test
   fun `all courses`() {
-    service.allCourses() shouldHaveSize 3
+    repository.allCourses() shouldHaveSize 3
   }
 
   @Test
   fun `a course`() {
-    val aCourse = service.allCourses().first()
-    (service.course(aCourse.id))
+    val aCourse = repository.allCourses().first()
+    (repository.course(aCourse.id))
       .shouldNotBeNull()
       .shouldBeEqualToComparingFields(aCourse)
   }
 
   @Test
   fun `offerings for unknown course should be empty`() {
-    service.offeringsForCourse(UUID.randomUUID()) should beEmpty()
+    repository.offeringsForCourse(UUID.randomUUID()) should beEmpty()
   }
 
   @Test
   fun `offerings for a known course should return the offerings`() {
-    val course = service.allCourses().find { it.name == "Lime Course" }
+    val course = repository.allCourses().find { it.name == "Lime Course" }
     course.shouldNotBeNull()
-    val offerings = service.offeringsForCourse(course.id)
+    val offerings = repository.offeringsForCourse(course.id)
 
     offerings.forAll { it.course.id shouldBe course.id }
     offerings shouldHaveSize 3
@@ -46,13 +44,13 @@ class CourseServiceTest {
 
   @Test
   fun `find an offering by known course id and offering id - success`() {
-    val courseId = service.allCourses().find { it.name == "Lime Course" }?.id
+    val courseId = repository.allCourses().find { it.name == "Lime Course" }?.id
     courseId.shouldNotBeNull()
 
-    val expectedOffering = service.offeringsForCourse(courseId).find { it.organisationId == "BXI" }
+    val expectedOffering = repository.offeringsForCourse(courseId).find { it.organisationId == "BXI" }
     expectedOffering.shouldNotBeNull()
 
-    val actualOffering = service.courseOffering(courseId = courseId, offeringId = expectedOffering.id)
+    val actualOffering = repository.courseOffering(courseId = courseId, offeringId = expectedOffering.id)
     actualOffering
       .shouldNotBeNull()
       .id shouldBe expectedOffering.id
@@ -60,14 +58,14 @@ class CourseServiceTest {
 
   @Test
   fun `find an offering by known course id and unknown offering id - fail`() {
-    val courseId = service.allCourses().find { it.name == "Lime Course" }?.id
+    val courseId = repository.allCourses().find { it.name == "Lime Course" }?.id
     courseId.shouldNotBeNull()
 
-    service.courseOffering(courseId = courseId, offeringId = UUID.randomUUID()).shouldBeNull()
+    repository.courseOffering(courseId = courseId, offeringId = UUID.randomUUID()).shouldBeNull()
   }
 
   @Test
   fun `find an offering by unknown course id and unknown offering id - fail`() {
-    service.courseOffering(courseId = UUID.randomUUID(), offeringId = UUID.randomUUID()).shouldBeNull()
+    repository.courseOffering(courseId = UUID.randomUUID(), offeringId = UUID.randomUUID()).shouldBeNull()
   }
 }
