@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
@@ -19,6 +20,7 @@ class TransformerTest {
       name = "A Course",
       type = "A type",
       prerequisites = emptySet(),
+      audience = emptySet(),
     )
 
     with(entity.toApi()) {
@@ -38,6 +40,7 @@ class TransformerTest {
       type = "A type",
       description = "A description",
       prerequisites = emptySet(),
+      audience = emptySet(),
     )
 
     with(entity.toApi()) {
@@ -46,7 +49,7 @@ class TransformerTest {
   }
 
   @Test
-  fun `transform course entity to api with prerequisites`() {
+  fun `transform course entity to api with prerequisites and audience`() {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
@@ -55,6 +58,11 @@ class TransformerTest {
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
+      audience = setOf(
+        Audience("A"),
+        Audience("B"),
+        Audience("C"),
+      ),
     )
 
     with(entity.toApi()) {
@@ -62,6 +70,7 @@ class TransformerTest {
         CoursePrerequisite(name = "gender", description = "female"),
         CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
       )
+      audience.map { it.value } shouldContainExactlyInAnyOrder listOf("C", "B", "A")
     }
   }
 

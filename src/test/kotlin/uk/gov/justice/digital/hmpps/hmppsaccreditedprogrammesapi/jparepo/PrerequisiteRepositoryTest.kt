@@ -34,10 +34,10 @@ class PrerequisiteRepositoryTest(
 
     TestTransaction.start()
 
-    val prerquisites: Iterable<Prerequisite> = repository.findAll()
-    prerquisites shouldHaveSize 1
+    val prerequisites: Iterable<Prerequisite> = repository.findAll()
+    prerequisites shouldHaveSize 1
 
-    val retrievedEntity = prerquisites.first()
+    val retrievedEntity = prerequisites.first()
     retrievedEntity shouldBeEqualToComparingFields persistentEntity
 
     repository.deleteAll()

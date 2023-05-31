@@ -23,6 +23,9 @@ class CourseEntity(
 
   @Transient
   var prerequisites: Set<Prerequisite> = emptySet(),
+
+  @Transient
+  var audience: Set<Audience> = emptySet(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

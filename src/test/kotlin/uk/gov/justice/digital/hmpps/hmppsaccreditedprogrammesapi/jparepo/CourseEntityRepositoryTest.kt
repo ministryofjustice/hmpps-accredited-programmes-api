@@ -40,7 +40,7 @@ class CourseEntityRepositoryTest(
     courses shouldHaveSize 1
 
     val retrievedCourse = courses.first()
-    retrievedCourse.shouldBeEqualToIgnoringFields(persistentEntity, CourseEntity::prerequisites)
+    retrievedCourse.shouldBeEqualToIgnoringFields(persistentEntity, CourseEntity::prerequisites, CourseEntity::audience)
 
     repository.deleteAll()
   }

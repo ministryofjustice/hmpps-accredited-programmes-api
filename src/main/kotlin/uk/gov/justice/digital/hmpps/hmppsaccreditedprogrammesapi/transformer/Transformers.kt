@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 
 fun CourseEntity.toApi(): Course = Course(
-  id = id,
+  id = id!!,
   name = name,
   type = type,
   description = description,
