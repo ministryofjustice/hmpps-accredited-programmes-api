@@ -81,7 +81,38 @@ class CoursePrerequisiteRelationshipTest
     allPrerequisites shouldHaveSize 4
     allPrerequisites.toSet() shouldHaveSize 3
 
+    prerequisiteRepo.count() shouldBe 3
+
     TestTransaction.flagForCommit()
     TestTransaction.end()
+  }
+
+  @Test
+  fun `Does not duplicate a persistent Prerequisite when used by a new course`() {
+    val pr = prerequisiteRepo.save(Prerequisite(name = "PR1", description = "PR1 Description"))
+
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+    TestTransaction.start()
+
+    prerequisiteRepo.count() shouldBe 1
+
+    val pr1 = prerequisiteRepo.findById(pr.id!!).get()
+    val pr2 = Prerequisite(name = "PR2", description = "PR2 Description")
+
+    val course = CourseEntity(
+      name = "C1",
+      type = "Approved Programme",
+      description = "C1 Desc",
+      prerequisites = mutableSetOf(pr1, pr2),
+    )
+
+    coursesRepo.save(course)
+
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+    TestTransaction.start()
+
+    prerequisiteRepo.count() shouldBe 2
   }
 }
