@@ -38,7 +38,7 @@ class PactContractTest {
   @State("Server is healthy")
   fun programCourseServiceMock() {
     every { service.allCourses() } returns listOf(
-      CourseEntity(UUID.randomUUID(), "", "", "", emptySet(), emptySet()),
+      CourseEntity(UUID.randomUUID(), "", "", "", mutableSetOf(), mutableSetOf()),
     )
   }
 

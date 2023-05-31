@@ -8,3 +8,7 @@ management.endpoint:
 pactbroker:
   host: 'pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk'
   scheme: https
+
+spring:
+  jpa:
+    show-sql: true

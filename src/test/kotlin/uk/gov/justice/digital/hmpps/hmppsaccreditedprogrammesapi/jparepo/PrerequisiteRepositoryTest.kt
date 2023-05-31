@@ -4,19 +4,17 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
+import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.transaction.TestTransaction
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 
-@SpringBootTest
-@Transactional
-class PrerequisiteRepositoryTest(
-  @Autowired
+class PrerequisiteRepositoryTest
+@Autowired constructor(
   val repository: PrerequisiteRepository,
-) {
+  entityManager: EntityManager,
+) : RepositoryTest(entityManager) {
   @Test
   fun `save and load behaves as expected`() {
     val transientEntity = Prerequisite(

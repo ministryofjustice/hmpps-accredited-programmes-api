@@ -24,6 +24,13 @@ spring:
         jwt:
           jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
 
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
 springdoc:
   swagger-ui:
     urls:

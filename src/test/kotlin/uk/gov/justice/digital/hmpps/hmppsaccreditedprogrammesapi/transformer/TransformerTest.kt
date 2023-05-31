@@ -19,8 +19,8 @@ class TransformerTest {
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = emptySet(),
-      audience = emptySet(),
+      prerequisites = mutableSetOf(),
+      audience = mutableSetOf(),
     )
 
     with(entity.toApi()) {
@@ -39,8 +39,8 @@ class TransformerTest {
       name = "A Course",
       type = "A type",
       description = "A description",
-      prerequisites = emptySet(),
-      audience = emptySet(),
+      prerequisites = mutableSetOf(),
+      audience = mutableSetOf(),
     )
 
     with(entity.toApi()) {
@@ -54,7 +54,7 @@ class TransformerTest {
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = setOf(
+      prerequisites = mutableSetOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
@@ -99,7 +99,7 @@ class TransformerTest {
         id = UUID.randomUUID(),
         name = "A Course",
         type = "A type",
-        prerequisites = emptySet(),
+        prerequisites = mutableSetOf(),
       ),
     )
 
