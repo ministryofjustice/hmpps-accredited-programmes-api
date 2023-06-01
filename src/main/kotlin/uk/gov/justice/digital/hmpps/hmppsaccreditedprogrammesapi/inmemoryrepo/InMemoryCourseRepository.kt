@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 import java.util.UUID
-import kotlin.time.Duration
 
 @Component
 class InMemoryCourseRepository : CourseRepository {
@@ -67,41 +66,36 @@ class InMemoryCourseRepository : CourseRepository {
 
     private val offerings: Set<Offering> = setOf(
       Offering(
+        id = UUID.randomUUID(),
         organisationId = "MDI",
-        duration = Duration.parse("P10D"),
-        groupSize = 10,
         contactEmail = "nobody-mdi@digital.justice.gov.uk",
         course = tsp,
       ),
 
       Offering(
+        id = UUID.randomUUID(),
         organisationId = "BWN",
-        duration = Duration.parse("P8D"),
-        groupSize = 6,
         contactEmail = "nobody-bwn@digital.justice.gov.uk",
         course = tsp,
       ),
 
       Offering(
+        id = UUID.randomUUID(),
         organisationId = "BXI",
-        duration = Duration.parse("P8D"),
-        groupSize = 6,
         contactEmail = "nobody-bxi@digital.justice.gov.uk",
         course = tsp,
       ),
 
       Offering(
+        id = UUID.randomUUID(),
         organisationId = "MDI",
-        duration = Duration.parse("P4D"),
-        groupSize = 2,
         contactEmail = "nobody-mdi@digital.justice.gov.uk",
         course = bnm,
       ),
 
       Offering(
+        id = UUID.randomUUID(),
         organisationId = "BWN",
-        duration = Duration.parse("P3D"),
-        groupSize = 12,
         contactEmail = "nobody-bwn@digital.justice.gov.uk",
         course = nms,
       ),

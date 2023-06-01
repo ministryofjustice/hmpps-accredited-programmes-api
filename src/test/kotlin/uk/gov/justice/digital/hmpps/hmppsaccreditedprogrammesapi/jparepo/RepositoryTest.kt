@@ -1,21 +1,35 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo
 
 import jakarta.persistence.EntityManager
+import jakarta.persistence.Query
 import org.junit.jupiter.api.BeforeEach
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.autoconfigure.domain.EntityScan
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.transaction.TestTransaction
 
-@SpringBootTest
+@DataJpaTest
+@ContextConfiguration(classes = [RepositoryTest::class])
+@EnableJpaRepositories(basePackages = ["uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo"])
+@EntityScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain")
 @ActiveProfiles("test")
-@Transactional
 abstract class RepositoryTest(
   val entityManager: EntityManager,
 ) {
   @BeforeEach
   fun tearDownDb() {
-    entityManager.createNativeQuery("DELETE FROM course_prerequisite").executeUpdate()
-    entityManager.createNativeQuery("DELETE FROM course").executeUpdate()
-    entityManager.createNativeQuery("DELETE FROM prerequisite").executeUpdate()
+    with(entityManager) {
+      listOf(
+        createNativeQuery("DELETE FROM offering"),
+        createNativeQuery("DELETE FROM course_prerequisite"),
+        createNativeQuery("DELETE FROM course"),
+        createNativeQuery("DELETE FROM prerequisite"),
+      ).forEach(Query::executeUpdate)
+    }
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+    TestTransaction.start()
   }
 }

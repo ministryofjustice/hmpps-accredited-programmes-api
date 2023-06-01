@@ -50,7 +50,7 @@ class InMemoryCourseRepositoryTest {
     val expectedOffering = repository.offeringsForCourse(courseId).find { it.organisationId == "BXI" }
     expectedOffering.shouldNotBeNull()
 
-    val actualOffering = repository.courseOffering(courseId = courseId, offeringId = expectedOffering.id)
+    val actualOffering = repository.courseOffering(courseId = courseId, offeringId = expectedOffering.id!!)
     actualOffering
       .shouldNotBeNull()
       .id shouldBe expectedOffering.id

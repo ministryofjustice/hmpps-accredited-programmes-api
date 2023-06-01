@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
-import org.hamcrest.Matchers.matchesRegex
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -105,9 +104,9 @@ class CoursesControllerTest(
       .json(
         """
         [
-          { "organisationId": "MDI", "contactEmail":"nobody-mdi@digital.justice.gov.uk", "groupSize": 10 },
-          { "organisationId": "BWN", "contactEmail":"nobody-bwn@digital.justice.gov.uk", "groupSize": 6 },
-          { "organisationId": "BXI", "contactEmail":"nobody-bxi@digital.justice.gov.uk", "groupSize": 6 }
+          { "organisationId": "MDI", "contactEmail":"nobody-mdi@digital.justice.gov.uk" },
+          { "organisationId": "BWN", "contactEmail":"nobody-bwn@digital.justice.gov.uk" },
+          { "organisationId": "BXI", "contactEmail":"nobody-bxi@digital.justice.gov.uk" }
         ]
       """,
       )
@@ -136,8 +135,6 @@ class CoursesControllerTest(
       .jsonPath("$.id").isEqualTo(courseOfferingId.toString())
       .jsonPath("$.organisationId").isNotEmpty
       .jsonPath("$.contactEmail").isNotEmpty
-      .jsonPath("$.duration").value(matchesRegex("""^P\d*(T\d+H)?$"""))
-      .jsonPath("$.groupSize").isNumber
   }
 
   @Test

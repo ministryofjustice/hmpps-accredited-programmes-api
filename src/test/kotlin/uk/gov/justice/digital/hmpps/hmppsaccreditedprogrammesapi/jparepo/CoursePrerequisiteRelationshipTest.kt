@@ -82,9 +82,6 @@ class CoursePrerequisiteRelationshipTest
     allPrerequisites.toSet() shouldHaveSize 3
 
     prerequisiteRepo.count() shouldBe 3
-
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
   }
 
   @Test

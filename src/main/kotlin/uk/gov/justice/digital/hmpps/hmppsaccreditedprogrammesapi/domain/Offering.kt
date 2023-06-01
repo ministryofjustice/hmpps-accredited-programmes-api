@@ -1,15 +1,29 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import java.util.UUID
-import kotlin.time.Duration
 
+@Entity
 class Offering(
-  val id: UUID = UUID.randomUUID(),
-  val organisationId: String,
-  val duration: Duration,
-  val groupSize: Int,
-  val contactEmail: String,
-  val course: CourseEntity,
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "offering_id")
+  var id: UUID? = null,
+
+  var organisationId: String,
+
+  var contactEmail: String,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "course_id")
+  var course: CourseEntity,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
