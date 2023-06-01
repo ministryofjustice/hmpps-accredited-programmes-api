@@ -15,7 +15,7 @@ fun CourseEntity.toApi(): Course = Course(
   type = type,
   description = description,
   coursePrerequisites = prerequisites.map(Prerequisite::toApi),
-  audience = audience.map(Audience::toApi),
+  audiences = audiences.map(Audience::toApi),
 )
 
 fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(

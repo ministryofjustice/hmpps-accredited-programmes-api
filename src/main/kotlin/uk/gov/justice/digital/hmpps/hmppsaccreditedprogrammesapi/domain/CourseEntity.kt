@@ -35,7 +35,7 @@ class CourseEntity(
   var prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
 
   @Transient
-  var audience: Set<Audience> = emptySet(),
+  var audiences: Set<Audience> = emptySet(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

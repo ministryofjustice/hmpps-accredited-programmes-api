@@ -38,6 +38,6 @@ class CourseEntityRepositoryTest
     courses shouldHaveSize 1
 
     val retrievedCourse = courses.first()
-    retrievedCourse.shouldBeEqualToIgnoringFields(persistentEntity, CourseEntity::prerequisites, CourseEntity::audience)
+    retrievedCourse.shouldBeEqualToIgnoringFields(persistentEntity, CourseEntity::prerequisites, CourseEntity::audiences)
   }
 }

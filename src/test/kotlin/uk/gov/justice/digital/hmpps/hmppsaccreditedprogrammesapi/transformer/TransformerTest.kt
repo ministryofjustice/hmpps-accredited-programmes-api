@@ -19,7 +19,7 @@ class TransformerTest {
       name = "A Course",
       type = "A type",
       prerequisites = mutableSetOf(),
-      audience = mutableSetOf(),
+      audiences = mutableSetOf(),
     )
 
     with(entity.toApi()) {
@@ -39,7 +39,7 @@ class TransformerTest {
       type = "A type",
       description = "A description",
       prerequisites = mutableSetOf(),
-      audience = mutableSetOf(),
+      audiences = mutableSetOf(),
     )
 
     with(entity.toApi()) {
@@ -57,7 +57,7 @@ class TransformerTest {
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
-      audience = setOf(
+      audiences = setOf(
         Audience("A"),
         Audience("B"),
         Audience("C"),
@@ -69,7 +69,7 @@ class TransformerTest {
         CoursePrerequisite(name = "gender", description = "female"),
         CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
       )
-      audience.map { it.value } shouldContainExactlyInAnyOrder listOf("C", "B", "A")
+      audiences.map { it.value } shouldContainExactlyInAnyOrder listOf("C", "B", "A")
     }
   }
 

@@ -33,9 +33,9 @@ class CoursesControllerTest(
       .json(
         """
           [
-            { "name": "Thinking Skills Programme" },
-            { "name": "New me strengths" },
-            { "name": "Becoming new me +" }
+            { "name": "Lime Course" },
+            { "name": "Azure Course" },
+            { "name": "Violet Course" }
         ]
         """,
       )

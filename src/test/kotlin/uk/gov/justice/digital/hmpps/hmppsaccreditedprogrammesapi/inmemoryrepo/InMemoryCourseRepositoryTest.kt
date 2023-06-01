@@ -34,7 +34,7 @@ class InMemoryCourseRepositoryTest {
 
   @Test
   fun `offerings for a known course should return the offerings`() {
-    val course = repository.allCourses().find { it.name == "Thinking Skills Programme" }
+    val course = repository.allCourses().find { it.name == "Lime Course" }
     course.shouldNotBeNull()
     val offerings = repository.offeringsForCourse(course.id!!)
 
@@ -44,7 +44,7 @@ class InMemoryCourseRepositoryTest {
 
   @Test
   fun `find an offering by known course id and offering id - success`() {
-    val courseId = repository.allCourses().find { it.name == "Thinking Skills Programme" }?.id
+    val courseId = repository.allCourses().find { it.name == "Lime Course" }?.id
     courseId.shouldNotBeNull()
 
     val expectedOffering = repository.offeringsForCourse(courseId).find { it.organisationId == "BXI" }
@@ -58,7 +58,7 @@ class InMemoryCourseRepositoryTest {
 
   @Test
   fun `find an offering by known course id and unknown offering id - fail`() {
-    val courseId = repository.allCourses().find { it.name == "Thinking Skills Programme" }?.id
+    val courseId = repository.allCourses().find { it.name == "Lime Course" }?.id
     courseId.shouldNotBeNull()
 
     repository.courseOffering(courseId = courseId, offeringId = UUID.randomUUID()).shouldBeNull()
