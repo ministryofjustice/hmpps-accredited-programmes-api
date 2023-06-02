@@ -31,6 +31,14 @@ spring:
     hibernate:
       ddl-auto: none
 
+  datasource:
+    url: jdbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME} ?sslmode=verify-full
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      connectionTimeout: 1000
+      validationTimeout: 500
+
 springdoc:
   swagger-ui:
     urls:
