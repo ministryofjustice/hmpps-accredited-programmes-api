@@ -48,4 +48,28 @@ class OfferingRepositoryTest
       course.id.shouldNotBeNull()
     }
   }
+
+  @Test
+  fun `find by courseId`() {
+    val c1 = CourseEntity(name = "Course 1", type = "Accredited Programme", description = "A Course 1")
+    val c2 = CourseEntity(name = "Course 1", type = "Accredited Programme", description = "A Course 2")
+
+    courseRepo.saveAll(listOf(c1, c2))
+
+    val o1 = Offering(organisationId = "MDI", contactEmail = "a@b.com", course = c1)
+    val o2 = Offering(organisationId = "BXI", contactEmail = "a@b.com", course = c1)
+    val o3 = Offering(organisationId = "MDI", contactEmail = "a@b.com", course = c2)
+
+    offeringRepo.saveAll(listOf(o1, o2, o3))
+
+    TestTransaction.flagForCommit()
+    TestTransaction.end()
+    TestTransaction.start()
+
+    courseRepo.findAll() shouldHaveSize 2
+    offeringRepo.findAll() shouldHaveSize 3
+
+    offeringRepo.findByCourseId(c1.id!!) shouldBe setOf(o1, o2)
+    offeringRepo.findByCourseId(c2.id!!) shouldBe setOf(o3)
+  }
 }
