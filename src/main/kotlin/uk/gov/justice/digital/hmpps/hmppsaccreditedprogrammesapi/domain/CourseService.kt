@@ -8,7 +8,7 @@ import java.util.UUID
 @Service
 class CourseService(
   @Autowired
-  @Qualifier("InMemory")
+  @Qualifier("JPA")
   val courseRepository: CourseRepository,
 ) {
   fun allCourses(): List<CourseEntity> = courseRepository.allCourses()
