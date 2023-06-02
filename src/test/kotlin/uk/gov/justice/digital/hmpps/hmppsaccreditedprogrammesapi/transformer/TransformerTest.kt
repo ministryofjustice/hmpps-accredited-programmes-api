@@ -57,10 +57,10 @@ class TransformerTest {
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
-      audiences = setOf(
-        Audience("A"),
-        Audience("B"),
-        Audience("C"),
+      audiences = mutableSetOf(
+        Audience(value = "A", id = UUID.randomUUID()),
+        Audience(value = "B", id = UUID.randomUUID()),
+        Audience(value = "C", id = UUID.randomUUID()),
       ),
     )
 

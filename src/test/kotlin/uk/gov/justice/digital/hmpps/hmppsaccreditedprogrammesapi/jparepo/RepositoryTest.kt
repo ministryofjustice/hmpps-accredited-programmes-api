@@ -22,6 +22,8 @@ abstract class RepositoryTest(
   fun tearDownDb() {
     with(entityManager) {
       listOf(
+        createNativeQuery("DELETE FROM course_audience"),
+        createNativeQuery("DELETE FROM audience"),
         createNativeQuery("DELETE FROM offering"),
         createNativeQuery("DELETE FROM course_prerequisite"),
         createNativeQuery("DELETE FROM course"),

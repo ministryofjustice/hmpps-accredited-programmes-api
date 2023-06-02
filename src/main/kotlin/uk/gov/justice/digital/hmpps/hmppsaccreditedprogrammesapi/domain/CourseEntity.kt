@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.Table
-import jakarta.persistence.Transient
 import java.util.UUID
 
 @Entity
@@ -34,8 +33,13 @@ class CourseEntity(
   )
   var prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
 
-  @Transient
-  var audiences: Set<Audience> = emptySet(),
+  @ManyToMany(cascade = [PERSIST, MERGE])
+  @JoinTable(
+    name = "course_audience",
+    joinColumns = [JoinColumn(name = "course_id")],
+    inverseJoinColumns = [JoinColumn(name = "audience_id")],
+  )
+  var audiences: MutableSet<Audience> = mutableSetOf(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

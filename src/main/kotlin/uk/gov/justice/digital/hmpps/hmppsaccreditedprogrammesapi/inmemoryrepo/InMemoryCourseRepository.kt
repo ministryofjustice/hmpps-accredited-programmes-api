@@ -37,11 +37,11 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
-      audiences = setOf(),
+      audiences = mutableSetOf(),
     )
 
     private val bnm = CourseEntity(
-      id = UUID.fromString("1e8eb213-92ce-402a-bb1a-65fba86c361c"),
+      id = UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
       name = "Azure Course",
       type = "Accredited Programme",
       description = "Similique laborum incidunt sequi rem quidem incidunt incidunt dignissimos iusto. Explicabo nihil atque quod culpa animi quia aspernatur dolorem consequuntur.",
@@ -50,7 +50,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
-      audiences = setOf(Audience(id = UUID.randomUUID(), value = "Sexual violence")),
+      audiences = mutableSetOf(Audience(id = UUID.randomUUID(), value = "Sexual violence")),
     )
 
     private val nms = CourseEntity(
@@ -63,7 +63,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
-      audiences = setOf(),
+      audiences = mutableSetOf(),
     )
 
     private val courses: Set<CourseEntity> = setOf(tsp, bnm, nms)

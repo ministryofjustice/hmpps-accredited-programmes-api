@@ -28,7 +28,19 @@ class PactContractTest {
   lateinit var jwtAuthHelper: JwtAuthHelper
 
   @State("Server is healthy")
-  fun programCourseServiceMock() {
+  fun healthyState() {
+  }
+
+  @State("Courses exist on the API")
+  fun coursesExist() {
+  }
+
+  @State("A course exists with ID 28e47d30-30bf-4dab-a8eb-9fda3f6400e8")
+  fun courseWithGivenId() {
+  }
+
+  @State("Offerings exist for a course with ID 28e47d30-30bf-4dab-a8eb-9fda3f6400e8")
+  fun offeringsExistForCourseWithGivenId() {
   }
 
   @TestTemplate
