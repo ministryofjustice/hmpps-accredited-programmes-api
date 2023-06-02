@@ -5,7 +5,6 @@ import jakarta.persistence.CascadeType.PERSIST
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
@@ -17,7 +16,7 @@ import java.util.UUID
 @Table(name = "course")
 class CourseEntity(
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
+  @GeneratedValue
   @Column(name = "course_id")
   var id: UUID? = null,
 
