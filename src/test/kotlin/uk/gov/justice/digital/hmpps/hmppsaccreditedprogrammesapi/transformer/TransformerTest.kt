@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEn
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 import java.util.UUID
-import kotlin.time.Duration
 
 class TransformerTest {
   @Test
@@ -92,8 +91,6 @@ class TransformerTest {
     val offering = Offering(
       id = UUID.randomUUID(),
       organisationId = "BXI",
-      duration = Duration.parseIsoString("P5D"),
-      groupSize = 5,
       contactEmail = "nobody-bwn@digital.justice.gov.uk",
       course = CourseEntity(
         id = UUID.randomUUID(),
@@ -107,8 +104,6 @@ class TransformerTest {
     with(offering.toApi()) {
       id shouldBe offering.id
       organisationId shouldBe offering.organisationId
-      Duration.parseIsoString(duration) shouldBe offering.duration
-      groupSize shouldBe offering.groupSize
       contactEmail shouldBe offering.contactEmail
     }
   }

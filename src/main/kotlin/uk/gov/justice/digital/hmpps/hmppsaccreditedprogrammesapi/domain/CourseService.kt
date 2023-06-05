@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
 import org.springframework.stereotype.Service
 import java.util.UUID
-import kotlin.time.Duration
 
 @Service
 class CourseService {
@@ -64,40 +63,30 @@ class CourseService {
     private val offerings: Set<Offering> = setOf(
       Offering(
         organisationId = "MDI",
-        duration = Duration.parse("P10D"),
-        groupSize = 10,
         contactEmail = "nobody-mdi@digital.justice.gov.uk",
         course = tsp,
       ),
 
       Offering(
         organisationId = "BWN",
-        duration = Duration.parse("P8D"),
-        groupSize = 6,
         contactEmail = "nobody-bwn@digital.justice.gov.uk",
         course = tsp,
       ),
 
       Offering(
         organisationId = "BXI",
-        duration = Duration.parse("P8D"),
-        groupSize = 6,
         contactEmail = "nobody-bxi@digital.justice.gov.uk",
         course = tsp,
       ),
 
       Offering(
         organisationId = "MDI",
-        duration = Duration.parse("P4D"),
-        groupSize = 2,
         contactEmail = "nobody-mdi@digital.justice.gov.uk",
         course = bnm,
       ),
 
       Offering(
         organisationId = "BWN",
-        duration = Duration.parse("P3D"),
-        groupSize = 12,
         contactEmail = "nobody-bwn@digital.justice.gov.uk",
         course = nms,
       ),
