@@ -167,20 +167,11 @@ components:
           format: email
           example: "ap-admin@digital.justice.gov.uk"
           description: "The email address of a contact for this offering"
-        duration:
-          type: string
-          format: duration
-          example: "P10D"
-          description: "The duration of the offering in ISO 8601 format"
-        groupSize:
-          type: integer
-          example: 10
+
       required:
         - id
         - organisationId
         - contactEmail
-        - duration
-        - groupSize
 
     CourseAudience:
       type: object

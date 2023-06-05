@@ -26,8 +26,6 @@ fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(
 fun Offering.toApi(): CourseOffering = CourseOffering(
   id = id,
   organisationId = organisationId,
-  duration = duration.toIsoString(),
-  groupSize = groupSize,
   contactEmail = contactEmail,
 )
 
