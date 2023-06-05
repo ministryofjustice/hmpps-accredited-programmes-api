@@ -122,7 +122,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CoursePrerequisite'
-        audience:
+        audiences:
           type: array
           items:
             $ref: '#/components/schemas/CourseAudience'
@@ -132,7 +132,7 @@ components:
         - type
         - type
         - coursePrerequisites
-        - audience
+        - audiences
 
     CoursePrerequisite:
       type: object
