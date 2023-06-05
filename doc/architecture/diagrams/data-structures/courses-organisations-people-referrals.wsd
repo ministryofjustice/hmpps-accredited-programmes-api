@@ -9,8 +9,7 @@ entity Course {
   * name: text
   * description: text
   * coursePrerequisites: CoursePrerequisite[]
-  * audience: text[]
-  * type: text
+  * audiences: text[] (e.g. for which types of offence the course is suitable)
 }
 
 entity CoursePrerequisite {
@@ -26,9 +25,7 @@ entity CourseOffering {
   * id: uuid
   * course: Course
   * organisation: Organisation
-  * duration: text
-  * groupSize: text
-  * activities: text
+  * contactEmail: text
 }
 
 entity Referral {
