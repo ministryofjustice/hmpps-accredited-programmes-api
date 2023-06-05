@@ -35,7 +35,7 @@ class CourseServiceTest {
 
   @Test
   fun `offerings for a known course should return the offerings`() {
-    val course = service.allCourses().find { it.name == "Thinking Skills Programme" }
+    val course = service.allCourses().find { it.name == "Lime Course" }
     course.shouldNotBeNull()
     val offerings = service.offeringsForCourse(course.id)
 
@@ -45,7 +45,7 @@ class CourseServiceTest {
 
   @Test
   fun `find an offering by known course id and offering id - success`() {
-    val courseId = service.allCourses().find { it.name == "Thinking Skills Programme" }?.id
+    val courseId = service.allCourses().find { it.name == "Lime Course" }?.id
     courseId.shouldNotBeNull()
 
     val expectedOffering = service.offeringsForCourse(courseId).find { it.organisationId == "BXI" }
@@ -59,7 +59,7 @@ class CourseServiceTest {
 
   @Test
   fun `find an offering by known course id and unknown offering id - fail`() {
-    val courseId = service.allCourses().find { it.name == "Thinking Skills Programme" }?.id
+    val courseId = service.allCourses().find { it.name == "Lime Course" }?.id
     courseId.shouldNotBeNull()
 
     service.courseOffering(courseId = courseId, offeringId = UUID.randomUUID()).shouldBeNull()

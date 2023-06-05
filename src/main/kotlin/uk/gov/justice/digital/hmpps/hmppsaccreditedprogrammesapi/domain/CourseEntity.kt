@@ -8,7 +8,7 @@ class CourseEntity(
   val type: String,
   val description: String? = null,
   val prerequisites: List<Prerequisite>,
-  val audience: List<Audience>,
+  val audiences: List<Audience>,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
