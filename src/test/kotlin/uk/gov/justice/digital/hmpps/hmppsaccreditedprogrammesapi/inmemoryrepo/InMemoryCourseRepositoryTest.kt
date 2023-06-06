@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo
 
-import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.beEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equality.shouldBeEqualToComparingFields
@@ -37,14 +36,14 @@ class InMemoryCourseRepositoryTest {
     val course = repository.allCourses().find { it.name == "Lime Course" }
     course.shouldNotBeNull()
     val offerings = repository.offeringsForCourse(course.id!!)
-
-    offerings.forAll { it.course.id shouldBe course.id }
     offerings shouldHaveSize 3
   }
 
   @Test
   fun `find an offering by known course id and offering id - success`() {
-    val courseId = repository.allCourses().find { it.name == "Lime Course" }?.id
+    val limeCourse = repository.allCourses().find { it.name == "Lime Course" }
+    limeCourse.shouldNotBeNull()
+    val courseId = limeCourse.id
     courseId.shouldNotBeNull()
 
     val expectedOffering = repository.offeringsForCourse(courseId).find { it.organisationId == "BXI" }

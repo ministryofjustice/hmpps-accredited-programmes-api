@@ -89,16 +89,8 @@ class TransformerTest {
   @Test
   fun `transform a domain offering to a api CourseOffering`() {
     val offering = Offering(
-      id = UUID.randomUUID(),
       organisationId = "BXI",
       contactEmail = "nobody-bwn@digital.justice.gov.uk",
-      course = CourseEntity(
-        id = UUID.randomUUID(),
-        name = "A Course",
-        type = "A type",
-        prerequisites = mutableSetOf(),
-        audiences = emptyList(),
-      ),
     )
 
     with(offering.toApi()) {

@@ -10,7 +10,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
 import jakarta.persistence.Transient
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "course")
@@ -27,6 +27,10 @@ class CourseEntity(
   @ElementCollection
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   val prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
+
+  @ElementCollection
+  @CollectionTable(name = "offering", joinColumns = [JoinColumn(name = "course_id")])
+  val offerings: MutableSet<Offering> = mutableSetOf(),
 
   @Transient
   var audiences: List<Audience> = emptyList(),

@@ -18,13 +18,10 @@ class InMemoryCourseRepository : CourseRepository {
       .find { it.id == courseId }
 
   override fun offeringsForCourse(courseId: UUID): List<Offering> =
-    offerings
-      .filter { it.course.id == courseId }
-      .toList()
+    courses.find { it.id == courseId }?.offerings?.toList() ?: emptyList()
 
   override fun courseOffering(courseId: UUID, offeringId: UUID): Offering? =
-    offerings
-      .find { it.id == offeringId && it.course.id == courseId }
+    courses.find { it.id == courseId }?.offerings?.find { it.id == offeringId }
 
   private companion object {
     private val tsp = CourseEntity(
@@ -38,7 +35,11 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
       audiences = emptyList(),
-    )
+    ).apply {
+      offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk"))
+      offerings.add(Offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk"))
+      offerings.add(Offering(organisationId = "BXI", contactEmail = "nobody-bxi@digital.justice.gov.uk"))
+    }
 
     private val bnm = CourseEntity(
       id = UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
@@ -51,7 +52,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
       audiences = listOf(Audience(value = "Sexual violence")),
-    )
+    ).apply { offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk")) }
 
     private val nms = CourseEntity(
       id = UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
@@ -64,45 +65,8 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
       audiences = emptyList(),
-    )
+    ).apply { offerings.add(Offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk")) }
 
     private val courses: Set<CourseEntity> = setOf(tsp, bnm, nms)
-
-    private val offerings: Set<Offering> = setOf(
-      Offering(
-        id = UUID.randomUUID(),
-        organisationId = "MDI",
-        contactEmail = "nobody-mdi@digital.justice.gov.uk",
-        course = tsp,
-      ),
-
-      Offering(
-        id = UUID.randomUUID(),
-        organisationId = "BWN",
-        contactEmail = "nobody-bwn@digital.justice.gov.uk",
-        course = tsp,
-      ),
-
-      Offering(
-        id = UUID.randomUUID(),
-        organisationId = "BXI",
-        contactEmail = "nobody-bxi@digital.justice.gov.uk",
-        course = tsp,
-      ),
-
-      Offering(
-        id = UUID.randomUUID(),
-        organisationId = "MDI",
-        contactEmail = "nobody-mdi@digital.justice.gov.uk",
-        course = bnm,
-      ),
-
-      Offering(
-        id = UUID.randomUUID(),
-        organisationId = "BWN",
-        contactEmail = "nobody-bwn@digital.justice.gov.uk",
-        course = nms,
-      ),
-    )
   }
 }
