@@ -7,40 +7,20 @@ import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.domain.EntityScan
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.transaction.TestTransaction
-import org.springframework.test.jdbc.JdbcTestUtils
 import org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 
-@DataJpaTest
-@ContextConfiguration(classes = [CourseEntityRepositoryTest::class])
-@EnableJpaRepositories(basePackages = ["uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo"])
-@EntityScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain")
-@ActiveProfiles("test")
 class CourseEntityRepositoryTest
 @Autowired
 constructor(
   val repository: CourseEntityRepository,
-  val jdbcTemplate: JdbcTemplate,
-) {
-
-  @BeforeEach
-  fun truncateTables() {
-    JdbcTestUtils.deleteFromTables(jdbcTemplate, "prerequisite", "offering", "course")
-    commitAndStartNewTx()
-  }
-
+  jdbcTemplate: JdbcTemplate,
+) : RepositoryTest(jdbcTemplate) {
   @Test
   fun `save and load behaves as expected`() {
     val transientEntity = CourseEntity(
@@ -126,10 +106,4 @@ constructor(
     persistentCourse.offerings shouldHaveSize 3
     persistentCourse.offerings.shouldForAll { it.id.shouldNotBeNull() }
   }
-}
-
-fun commitAndStartNewTx() {
-  TestTransaction.flagForCommit()
-  TestTransaction.end()
-  TestTransaction.start()
 }

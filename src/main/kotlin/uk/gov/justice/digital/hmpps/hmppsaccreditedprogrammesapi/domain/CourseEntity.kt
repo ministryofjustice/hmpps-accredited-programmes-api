@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
@@ -8,8 +9,9 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
 import jakarta.persistence.Table
-import jakarta.persistence.Transient
 import java.util.UUID
 
 @Entity
@@ -32,8 +34,13 @@ class CourseEntity(
   @CollectionTable(name = "offering", joinColumns = [JoinColumn(name = "course_id")])
   val offerings: MutableSet<Offering> = mutableSetOf(),
 
-  @Transient
-  var audiences: List<Audience> = emptyList(),
+  @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+  @JoinTable(
+    name = "course_audience",
+    joinColumns = [JoinColumn(name = "course_id")],
+    inverseJoinColumns = [JoinColumn(name = "audience_id")],
+  )
+  var audiences: MutableSet<Audience> = mutableSetOf(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

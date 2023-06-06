@@ -34,7 +34,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
-      audiences = emptyList(),
+      audiences = mutableSetOf(),
     ).apply {
       offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk"))
       offerings.add(Offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk"))
@@ -51,7 +51,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
-      audiences = listOf(Audience(value = "Sexual violence")),
+      audiences = mutableSetOf(Audience(value = "Sexual violence", id = UUID.randomUUID())),
     ).apply { offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk")) }
 
     private val nms = CourseEntity(
@@ -64,7 +64,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
-      audiences = emptyList(),
+      audiences = mutableSetOf(),
     ).apply { offerings.add(Offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk")) }
 
     private val courses: Set<CourseEntity> = setOf(tsp, bnm, nms)
