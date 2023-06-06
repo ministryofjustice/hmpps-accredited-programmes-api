@@ -15,6 +15,8 @@ dependencies {
   val kotestVersion = "5.6.2"
   val springdocVersion = "1.7.0"
 
+  runtimeOnly("org.postgresql:postgresql:42.6.0")
+
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
