@@ -3,9 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import java.util.UUID
+import java.util.*
 
 @Entity
 class Audience(
@@ -13,7 +12,7 @@ class Audience(
   var value: String,
 
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
+  @GeneratedValue
   @Column(name = "audience_id")
   var id: UUID? = null,
 ) {
