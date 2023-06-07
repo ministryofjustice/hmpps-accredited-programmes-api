@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo
 
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
@@ -9,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequi
 import java.util.UUID
 
 @Component
+@Qualifier("InMemory")
 class InMemoryCourseRepository : CourseRepository {
 
   override fun allCourses(): List<CourseEntity> = courses.toList()

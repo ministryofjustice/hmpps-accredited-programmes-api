@@ -1,12 +1,16 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
-import java.util.*
+import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
+@Transactional
 class CourseService(
   @Autowired
+  @Qualifier("JPA")
   val courseRepository: CourseRepository,
 ) {
   fun allCourses(): List<CourseEntity> = courseRepository.allCourses()
