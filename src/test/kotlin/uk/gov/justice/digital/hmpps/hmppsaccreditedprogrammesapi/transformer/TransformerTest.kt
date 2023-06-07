@@ -17,7 +17,6 @@ class TransformerTest {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
-      type = "A type",
       prerequisites = mutableSetOf(),
       audiences = mutableSetOf(),
     )
@@ -25,7 +24,6 @@ class TransformerTest {
     with(entity.toApi()) {
       id shouldBe entity.id
       name shouldBe entity.name
-      type shouldBe entity.type
       description shouldBe null
       coursePrerequisites.shouldBeEmpty()
     }
@@ -36,7 +34,6 @@ class TransformerTest {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
-      type = "A type",
       description = "A description",
       prerequisites = mutableSetOf(),
       audiences = mutableSetOf(),
@@ -52,7 +49,6 @@ class TransformerTest {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
-      type = "A type",
       prerequisites = mutableSetOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),

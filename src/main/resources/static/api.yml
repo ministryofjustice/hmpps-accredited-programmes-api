@@ -112,9 +112,6 @@ components:
         name:
           type: string
           example: Thinking skills programme
-        type:
-          type: string
-          example: TypeA
         description:
           type: string
           example: Thinking Skills Programme (TSP) description
@@ -129,8 +126,6 @@ components:
       required:
         - id
         - name
-        - type
-        - type
         - coursePrerequisites
         - audiences
 

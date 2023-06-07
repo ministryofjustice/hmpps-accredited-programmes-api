@@ -22,7 +22,6 @@ class CourseEntity(
   val id: UUID? = null,
 
   var name: String,
-  var type: String,
   var description: String? = null,
 
   @ElementCollection
