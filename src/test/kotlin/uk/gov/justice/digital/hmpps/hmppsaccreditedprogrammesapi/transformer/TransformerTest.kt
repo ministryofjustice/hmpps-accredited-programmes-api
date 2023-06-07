@@ -18,8 +18,8 @@ class TransformerTest {
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = emptyList(),
-      audiences = emptyList(),
+      prerequisites = mutableSetOf(),
+      audiences = mutableSetOf(),
     )
 
     with(entity.toApi()) {
@@ -38,8 +38,8 @@ class TransformerTest {
       name = "A Course",
       type = "A type",
       description = "A description",
-      prerequisites = emptyList(),
-      audiences = emptyList(),
+      prerequisites = mutableSetOf(),
+      audiences = mutableSetOf(),
     )
 
     with(entity.toApi()) {
@@ -53,14 +53,14 @@ class TransformerTest {
       id = UUID.randomUUID(),
       name = "A Course",
       type = "A type",
-      prerequisites = listOf(
+      prerequisites = mutableSetOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
-      audiences = listOf(
-        Audience("A"),
-        Audience("B"),
-        Audience("C"),
+      audiences = mutableSetOf(
+        Audience(value = "A", id = UUID.randomUUID()),
+        Audience(value = "B", id = UUID.randomUUID()),
+        Audience(value = "C", id = UUID.randomUUID()),
       ),
     )
 
@@ -89,16 +89,8 @@ class TransformerTest {
   @Test
   fun `transform a domain offering to a api CourseOffering`() {
     val offering = Offering(
-      id = UUID.randomUUID(),
       organisationId = "BXI",
       contactEmail = "nobody-bwn@digital.justice.gov.uk",
-      course = CourseEntity(
-        id = UUID.randomUUID(),
-        name = "A Course",
-        type = "A type",
-        prerequisites = emptyList(),
-        audiences = emptyList(),
-      ),
     )
 
     with(offering.toApi()) {
@@ -110,7 +102,7 @@ class TransformerTest {
 
   @Test
   fun `transform domain Audience to a CourseAudience`() {
-    val audience = Audience("An audience")
+    val audience = Audience(value = "An audience", id = UUID.randomUUID())
     with(audience.toApi()) {
       id shouldBe audience.id
       value shouldBe audience.value

@@ -1,22 +1,51 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
-import java.util.UUID
+import jakarta.persistence.CascadeType
+import jakarta.persistence.CollectionTable
+import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
+import jakarta.persistence.Table
+import java.util.*
 
+@Entity
+@Table(name = "course")
 class CourseEntity(
-  val id: UUID = UUID.randomUUID(),
-  val name: String,
-  val type: String,
-  val description: String? = null,
-  val prerequisites: List<Prerequisite>,
-  val audiences: List<Audience>,
+  @Id
+  @GeneratedValue
+  @Column(name = "course_id")
+  val id: UUID? = null,
+
+  var name: String,
+  var type: String,
+  var description: String? = null,
+
+  @ElementCollection
+  @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
+  val prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
+
+  @ElementCollection
+  @CollectionTable(name = "offering", joinColumns = [JoinColumn(name = "course_id")])
+  val offerings: MutableSet<Offering> = mutableSetOf(),
+
+  @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+  @JoinTable(
+    name = "course_audience",
+    joinColumns = [JoinColumn(name = "course_id")],
+    inverseJoinColumns = [JoinColumn(name = "audience_id")],
+  )
+  var audiences: MutableSet<Audience> = mutableSetOf(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || other !is CourseEntity) return false
-    return this.id == other.id
+    return id != null && id == other.id
   }
 
-  override fun hashCode(): Int {
-    return id.hashCode()
-  }
+  override fun hashCode(): Int = 1756406093
 }

@@ -24,6 +24,21 @@ spring:
         jwt:
           jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
 
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: true # TODO: Hide the domain model from the view layer and stop using open-in-view.
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+  datasource:
+    url: jdbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME} ?sslmode=verify-full
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      connectionTimeout: 1000
+      validationTimeout: 500
+
 springdoc:
   swagger-ui:
     urls:
