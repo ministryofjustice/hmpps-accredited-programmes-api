@@ -32,7 +32,7 @@ spring:
       ddl-auto: none
 
   datasource:
-    url: jdbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME} ?sslmode=verify-full
+    url: jdbc:postgresql://${DATABASE_ENDPOINT}/${DATABASE_NAME}?sslmode=verify-full
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     hikari:
