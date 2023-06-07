@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequi
 fun CourseEntity.toApi(): Course = Course(
   id = id!!,
   name = name,
-  type = type,
   description = description,
   coursePrerequisites = prerequisites.map(Prerequisite::toApi),
   audiences = audiences.map(Audience::toApi),
