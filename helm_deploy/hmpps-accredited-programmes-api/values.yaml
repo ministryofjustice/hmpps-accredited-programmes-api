@@ -30,6 +30,7 @@ generic-service:
   namespace_secrets:
     hmpps-accredited-programmes-api:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
+      SENTRY_DSN: "SENTRY_DSN"
     rds-postgresql-instance-output:
       DATABASE_ENDPOINT: "rds_instance_endpoint"
       DATABASE_NAME: "database_name"

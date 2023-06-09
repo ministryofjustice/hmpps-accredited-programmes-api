@@ -14,6 +14,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.6.2"
   val springdocVersion = "1.7.0"
+  val sentryVersion = "6.22.0"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
@@ -23,6 +24,9 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.flywaydb:flyway-core")
+
+  implementation("io.sentry:sentry-spring-boot-starter:$sentryVersion")
+  implementation("io.sentry:sentry-logback:$sentryVersion")
 
   implementation("org.springdoc:springdoc-openapi-data-rest:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-ui:$springdocVersion")
