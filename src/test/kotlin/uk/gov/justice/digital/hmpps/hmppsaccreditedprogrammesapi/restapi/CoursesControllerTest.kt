@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
+import java.io.FileNotFoundException
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -164,7 +165,20 @@ class CoursesControllerTest(
       .exchange()
       .expectUnauthenticatedResponse()
   }
+
+  @Test
+  fun `put courses csv`() {
+    webTestClient.put()
+      .uri("/courses")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(bodyValue())
+      .exchange()
+      .expectStatus().is2xxSuccessful
+  }
 }
+
+private fun bodyValue() = CsvHttpMessageConverterTest::class.java.getResource("Courses.csv")?.readText() ?: throw FileNotFoundException("Courses.csv")
 
 private fun (WebTestClient.ResponseSpec).expectUnauthenticatedResponse(): WebTestClient.ResponseSpec {
   this.expectStatus().isUnauthorized
