@@ -15,7 +15,7 @@ services:
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
       - SPRING_H2_CONSOLE_SETTINGS_WEBALLOWOTHERS=true
 
-  posgresql:
+  postgresql:
     image: postgres
     container_name: postgres
     networks:
@@ -23,9 +23,39 @@ services:
     restart: always
     ports:
       - '5432:5432'
+    healthcheck:
+      test: [ "CMD", "pg_isready", "--username=admin", "--dbname=postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin_password
+
+  hmpps-accredited-programmes-api:
+    image: quay.io/hmpps/hmpps-accredited-programmes-api:latest
+    container_name: hmpps-accredited-programmes-api
+    networks:
+      - hmpps
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test:
+        [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      hmpps-auth:
+        condition: service_healthy
+
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin_password
+      - OAUTH_CLIENT_ID=whereabouts-api-client
+      - OAUTH_CLIENT_SECRET=clientsecret
 
 networks:
   hmpps:
