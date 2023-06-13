@@ -12,7 +12,7 @@ import java.util.UUID
 class CourseService(
   @Autowired
   @Qualifier("JPA")
-  val courseRepository: CourseRepository,
+  val courseRepository: MutableCourseRepository,
 ) {
   fun allCourses(): List<CourseEntity> = courseRepository.allCourses()
 
@@ -22,6 +22,19 @@ class CourseService(
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)
   fun replaceAllCourses(courseData: List<CoursesPutRequestInner>) {
-    courseData.forEach(::println)
+    courseRepository.clear()
+    courseRepository.saveAudiences(courseData.flatMap { audienceStrings(it.audience) }.map(::Audience).toSet())
+
+    val allAudiences: Map<String, Audience> = courseRepository.allAudiences().associateBy { it.value }
+
+    courseData.map {
+      CourseEntity(
+        name = it.name,
+        description = it.description,
+        audiences = audienceStrings(it.audience).mapNotNull { audienceName -> allAudiences[audienceName] }.toMutableSet(),
+      )
+    }.forEach(courseRepository::saveCourse)
   }
+
+  private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 }

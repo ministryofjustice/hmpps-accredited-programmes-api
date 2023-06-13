@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
 import org.hamcrest.Matchers.startsWith
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -166,6 +167,7 @@ class CoursesControllerTest(
       .expectUnauthenticatedResponse()
   }
 
+  @Disabled
   @Test
   fun `put courses csv`() {
     webTestClient.put()

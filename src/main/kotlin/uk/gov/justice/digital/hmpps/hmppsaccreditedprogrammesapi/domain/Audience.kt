@@ -23,4 +23,6 @@ class Audience(
   }
 
   override fun hashCode(): Int = 1756406093
+
+  override fun toString(): String = "Audience($value, $id)"
 }
