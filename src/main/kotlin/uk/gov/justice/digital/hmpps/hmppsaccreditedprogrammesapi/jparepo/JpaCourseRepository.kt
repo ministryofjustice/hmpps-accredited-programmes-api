@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo
 
+import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
@@ -17,6 +18,7 @@ class JpaCourseRepository
 constructor(
   private val courseRepository: CourseEntityRepository,
   private val audienceRepository: AudienceRepository,
+  private val entityManager: EntityManager,
 ) : MutableCourseRepository {
   override fun allCourses(): List<CourseEntity> = courseRepository.findAll()
 
@@ -31,6 +33,8 @@ constructor(
   override fun clear() {
     courseRepository.deleteAll()
     audienceRepository.deleteAll()
+    // force Hibernate to delete everything now, not later.
+    entityManager.flush()
   }
 
   override fun saveCourse(courseEntity: CourseEntity) {

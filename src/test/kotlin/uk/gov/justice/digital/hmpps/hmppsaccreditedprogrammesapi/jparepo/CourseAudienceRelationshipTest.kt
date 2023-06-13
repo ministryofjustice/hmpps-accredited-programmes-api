@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 
@@ -14,6 +14,7 @@ class CourseAudienceRelationshipTest
 constructor(
   val courseRepository: CourseEntityRepository,
   val audienceRepository: AudienceRepository,
+  val entityManager: EntityManager,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
@@ -33,10 +34,7 @@ constructor(
       ),
     )
 
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-
-    TestTransaction.start()
+    commitAndStartNewTx()
 
     val courses = courseRepository.findAll().toList()
     val audiences = audienceRepository.findAll().toList()
@@ -45,10 +43,7 @@ constructor(
     courses[1].audiences.addAll(audiences)
     courses[2].audiences.add(audiences[1])
 
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-
-    TestTransaction.start()
+    commitAndStartNewTx()
 
     audienceRepository.count() shouldBe 2
     courseRepository.count() shouldBe 3
@@ -59,5 +54,7 @@ constructor(
 
     courseAudiences shouldHaveSize 2
     courseAudiences.map { it.value } shouldBe setOf("Male", "Female")
+
+    commitAndStartNewTx()
   }
 }

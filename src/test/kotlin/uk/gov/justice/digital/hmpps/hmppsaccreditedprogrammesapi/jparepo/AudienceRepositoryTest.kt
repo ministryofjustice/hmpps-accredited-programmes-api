@@ -4,6 +4,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
@@ -15,6 +17,7 @@ class AudienceRepositoryTest
 @Autowired
 constructor(
   val repository: AudienceRepository,
+  val entityManager: EntityManager,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
@@ -45,5 +48,31 @@ constructor(
     shouldThrow<DataIntegrityViolationException> {
       TestTransaction.end()
     }
+  }
+
+  @Test
+  fun `can delete and re-insert`() {
+    repository.saveAll(
+      listOf(
+        Audience("Male"),
+        Audience("Female"),
+      ),
+    )
+
+    commitAndStartNewTx()
+
+    repository.count() shouldBe 2
+    repository.deleteAll()
+    // Without the flush command Hibernate will not delete the old Audience values before attempting to insert the new ones.
+    // This breaks the unique constraint on audience.value
+    entityManager.flush()
+    repository.saveAll(
+      listOf(
+        Audience("Male"),
+        Audience("Female"),
+      ),
+    )
+
+    commitAndStartNewTx()
   }
 }

@@ -57,4 +57,24 @@ class CourseServiceTest {
     verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
     verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", description = "Description 2", audiences = mutableSetOf(a1, a3)))) }
   }
+
+  @Test
+  fun `Duplicate audience values are eliminated`() {
+    val a1 = Audience("Audience 1", id = UUID.randomUUID())
+    val a2 = Audience("Audience 2", id = UUID.randomUUID())
+    val a3 = Audience("Audience 3", id = UUID.randomUUID())
+
+    every { repository.allAudiences() } returns setOf(a1, a2, a3)
+
+    service.replaceAllCourses(
+      listOf(
+        CoursesPutRequestInner(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", acronym = "111", comments = "A comment for 1"),
+        CoursesPutRequestInner(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", acronym = "222", comments = "A comment for 2"),
+        CoursesPutRequestInner(name = "Course 3", description = "Description 3", audience = a1.value, acronym = "333", comments = "A comment for 3"),
+        CoursesPutRequestInner(name = "Course 4", description = "Description 4", audience = a1.value, acronym = "444", comments = "A comment for 4"),
+      ),
+    )
+
+    verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
+  }
 }
