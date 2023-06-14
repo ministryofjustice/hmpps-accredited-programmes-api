@@ -38,6 +38,9 @@ class PactContractTest {
   @State("Offerings exist for a course with ID 28e47d30-30bf-4dab-a8eb-9fda3f6400e8")
   fun ensureOfferingsExist() {}
 
+  @State("An offering exists with ID 20f3abc8-dd92-43ae-b88e-5797a0ad3f4b")
+  fun ensureOfferingExists() {}
+
   @TestTemplate
   @ExtendWith(PactVerificationSpringProvider::class)
   fun template(context: PactVerificationContext, request: HttpRequest) {
