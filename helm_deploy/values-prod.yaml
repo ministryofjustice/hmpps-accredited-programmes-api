@@ -4,6 +4,7 @@
 generic-service:
   ingress:
     host: accredited-programmes-api.hmpps.service.justice.gov.uk
+    tlsSecretName: hmpps-accredited-programmes-api-prod-cert
 
 env:
   HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth

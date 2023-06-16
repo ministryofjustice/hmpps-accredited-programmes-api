@@ -4,6 +4,7 @@
 generic-service:
   ingress:
     host: accredited-programmes-api-preprod.hmpps.service.justice.gov.uk
+    tlsSecretName: hmpps-accredited-programmes-api-preprod-cert
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
