@@ -3,8 +3,7 @@
 
 generic-service:
   ingress:
-    host: hmpps-accredited-programmes-api.hmpps.service.justice.gov.uk
-
+    host: accredited-programmes-api.hmpps.service.justice.gov.uk
 
 env:
   HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
