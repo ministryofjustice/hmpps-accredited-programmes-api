@@ -3,13 +3,13 @@
 
 generic-service:
   ingress:
-    host: hmpps-accredited-programmes-api-preprod.hmpps.service.justice.gov.uk
+    host: accredited-programmes-api-preprod.hmpps.service.justice.gov.uk
+    tlsSecretName: hmpps-accredited-programmes-api-preprod-cert
 
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
     HMPPS_AUTH_URL: https://sign-in-preprod.hmpps.service.justice.gov.uk/auth
     SENTRY_ENVIRONMENT: preprod
-
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
