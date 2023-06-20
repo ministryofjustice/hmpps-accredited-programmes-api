@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo
 
+import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
@@ -17,6 +18,7 @@ class JpaCourseRepository
 constructor(
   private val courseRepository: CourseEntityRepository,
   private val audienceRepository: AudienceRepository,
+  private val entityManager: EntityManager,
 ) : MutableCourseRepository {
   override fun allCourses(): List<CourseEntity> = courseRepository.findAll()
 
@@ -31,6 +33,13 @@ constructor(
   override fun clear() {
     courseRepository.deleteAll()
     audienceRepository.deleteAll()
+    /*
+     By default, Hibernate lazily deletes audience entities after inserting new ones which can violate the unique
+     constraint on audience.audience_value
+     The call to flush() instructs Hibernate to perform all pending databases changes immediately and ensures that
+     the deletes requested above happen before any subsequent inserts or updates.
+     */
+    entityManager.flush()
   }
 
   override fun saveCourse(courseEntity: CourseEntity) {
