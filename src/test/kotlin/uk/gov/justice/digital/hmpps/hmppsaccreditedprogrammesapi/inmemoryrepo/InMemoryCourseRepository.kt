@@ -1,16 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo
 
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
-import java.util.UUID
+import java.util.*
 
 @Component
-@Qualifier("InMemory")
 class InMemoryCourseRepository : CourseRepository {
 
   override fun allCourses(): List<CourseEntity> = courses.toList()
