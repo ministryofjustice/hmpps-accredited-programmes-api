@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.0"
-  kotlin("plugin.spring") version "1.8.21"
-  kotlin("plugin.jpa") version "1.8.21"
+  kotlin("plugin.spring") version "1.8.22"
+  kotlin("plugin.jpa") version "1.8.22"
   id("org.openapi.generator") version "6.6.0"
 }
 
