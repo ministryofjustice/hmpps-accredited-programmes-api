@@ -11,11 +11,14 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.test.jdbc.JdbcTestUtils
 
+private const val JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo"
+private const val DOMAIN_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain"
+
 @DataJpaTest
 @ContextConfiguration(classes = [RepositoryTest::class])
-@EnableJpaRepositories(basePackages = ["uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo"])
-@ComponentScan(basePackages = ["uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo"])
-@EntityScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain")
+@ComponentScan(basePackages = [JPA_REPO_PACKAGE])
+@EnableJpaRepositories(basePackages = [JPA_REPO_PACKAGE])
+@EntityScan(DOMAIN_PACKAGE)
 @ActiveProfiles("test")
 abstract class RepositoryTest(
   val jdbcTemplate: JdbcTemplate,
