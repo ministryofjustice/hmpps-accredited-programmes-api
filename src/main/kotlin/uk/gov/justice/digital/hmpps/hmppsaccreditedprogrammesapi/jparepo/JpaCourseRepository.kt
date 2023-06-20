@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo
 
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
@@ -12,7 +11,6 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
 @Component
-@Qualifier("JPA")
 class JpaCourseRepository
 @Autowired
 constructor(
