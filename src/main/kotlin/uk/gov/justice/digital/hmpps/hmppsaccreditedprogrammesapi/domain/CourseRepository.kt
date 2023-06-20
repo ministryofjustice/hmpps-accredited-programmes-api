@@ -7,4 +7,5 @@ interface CourseRepository {
   fun course(courseId: UUID): CourseEntity?
   fun offeringsForCourse(courseId: UUID): List<Offering>
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering?
+  fun allAudiences(): Set<Audience>
 }

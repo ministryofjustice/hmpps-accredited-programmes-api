@@ -47,4 +47,6 @@ class CourseEntity(
   }
 
   override fun hashCode(): Int = 1756406093
+
+  override fun toString(): String = "CourseEntity($name, $description, $audiences, $id)"
 }
