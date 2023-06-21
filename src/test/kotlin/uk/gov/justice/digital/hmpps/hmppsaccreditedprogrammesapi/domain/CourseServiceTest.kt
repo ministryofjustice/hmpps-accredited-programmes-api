@@ -1,11 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import java.util.*
 
 class CourseServiceTest {
@@ -80,12 +83,12 @@ class CourseServiceTest {
   }
 
   @Test
-  fun `replaceAllPrerequisites with no records and no courses`() {
+  fun `replaceAllPrerequisites - No records, No courses`() {
     service.replaceAllPrerequisites(emptyList())
   }
 
   @Test
-  fun `replaceAllPrerequisites with no records and one course that has prerequisites`() {
+  fun `replaceAllPrerequisites - No records, one course that has prerequisites`() {
     val allCourses = listOf(
       CourseEntity(
         name = "Course 1",
@@ -100,5 +103,61 @@ class CourseServiceTest {
     service.replaceAllPrerequisites(emptyList())
 
     allCourses.flatMap { it.prerequisites }.shouldBeEmpty()
+  }
+
+  @Test
+  fun `replaceAllPrerequisites - One record matching one course that has prerequisites`() {
+    val allCourses = listOf(
+      CourseEntity(
+        name = "Course 1",
+        prerequisites = mutableSetOf(Prerequisite(name = "PR 1", description = " PR 1 Desc")),
+      ),
+    )
+    every { repository.allCourses() } returns allCourses
+
+    service.replaceAllPrerequisites(
+      listOf(
+        PrerequisiteRecord("PR 2", "Course 1", description = "PR 2 Desc", comments = "Lorem ipsum"),
+      ),
+    )
+
+    allCourses[0].prerequisites shouldContainExactly listOf(Prerequisite("PR 2", description = "PR 2 Desc"))
+  }
+
+  @Test
+  fun `replaceAllPrerequisites - multiple courses and prerequisites - all match`() {
+    val allCourses = listOf(
+      CourseEntity(name = "Course 1"),
+      CourseEntity(name = "Course 2"),
+    )
+    every { repository.allCourses() } returns allCourses
+
+    service.replaceAllPrerequisites(
+      listOf(
+        PrerequisiteRecord("PR 1", "Course 1", description = "PR 1 Desc"),
+        PrerequisiteRecord("PR 2", "Course 1", description = "PR 2 Desc"),
+        PrerequisiteRecord("PR 3", "Course 2", description = "PR 3 Desc"),
+      ),
+    )
+
+    allCourses.associateBy(CourseEntity::name, CourseEntity::prerequisites) shouldBeEqual mapOf(
+      "Course 1" to mutableSetOf(
+        Prerequisite("PR 1", "PR 1 Desc"),
+        Prerequisite("PR 2", "PR 2 Desc"),
+      ),
+      "Course 2" to mutableSetOf(
+        Prerequisite("PR 3", "PR 3 Desc"),
+      ),
+    )
+  }
+
+  @Test
+  fun `replaceAllPrerequisites - course name mismatch - record ignored`() {
+    val allCourses = listOf(CourseEntity(name = "Course 1"))
+    every { repository.allCourses() } returns allCourses
+
+    service.replaceAllPrerequisites(listOf(PrerequisiteRecord("PR 1", "Course X")))
+
+    allCourses[0].prerequisites.shouldBeEmpty()
   }
 }
