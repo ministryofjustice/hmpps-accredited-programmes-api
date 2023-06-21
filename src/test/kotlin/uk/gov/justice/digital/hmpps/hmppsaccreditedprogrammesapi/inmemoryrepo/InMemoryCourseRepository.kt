@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo
 
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
@@ -10,14 +9,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequi
 import java.util.UUID
 
 @Component
-@Qualifier("InMemory")
 class InMemoryCourseRepository : CourseRepository {
 
   override fun allCourses(): List<CourseEntity> = courses.toList()
 
-  override fun course(courseId: UUID): CourseEntity? =
-    courses
-      .find { it.id == courseId }
+  override fun course(courseId: UUID): CourseEntity? = courses.find { it.id == courseId }
 
   override fun offeringsForCourse(courseId: UUID): List<Offering> =
     courses.find { it.id == courseId }?.offerings?.toList() ?: emptyList()
@@ -25,7 +21,11 @@ class InMemoryCourseRepository : CourseRepository {
   override fun courseOffering(courseId: UUID, offeringId: UUID): Offering? =
     courses.find { it.id == courseId }?.offerings?.find { it.id == offeringId }
 
+  override fun allAudiences(): Set<Audience> = audiences
+
   private companion object {
+    private val audiences = setOf(Audience(value = "Sexual violence", id = UUID.randomUUID()))
+
     private val tsp = CourseEntity(
       id = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
       name = "Lime Course",
@@ -51,7 +51,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
-      audiences = mutableSetOf(Audience(value = "Sexual violence", id = UUID.randomUUID())),
+      audiences = audiences.toMutableSet(),
     ).apply { offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk")) }
 
     private val nms = CourseEntity(

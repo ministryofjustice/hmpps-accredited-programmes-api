@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
@@ -10,10 +11,14 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.test.jdbc.JdbcTestUtils
 
+private const val JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo"
+private const val DOMAIN_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain"
+
 @DataJpaTest
 @ContextConfiguration(classes = [RepositoryTest::class])
-@EnableJpaRepositories(basePackages = ["uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo"])
-@EntityScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain")
+@ComponentScan(basePackages = [JPA_REPO_PACKAGE])
+@EnableJpaRepositories(basePackages = [JPA_REPO_PACKAGE])
+@EntityScan(DOMAIN_PACKAGE)
 @ActiveProfiles("test")
 abstract class RepositoryTest(
   val jdbcTemplate: JdbcTemplate,
