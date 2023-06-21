@@ -37,6 +37,28 @@ paths:
         400:
           description: Bad input
 
+  /courses/prerequisites:
+    put:
+      tags:
+        - Course prerequisites bulk upload / replace
+      summary: Upload a CVS format file containing a full set of prerequisites data for a set of courses.
+      requestBody:
+        required: true
+        content:
+          'text/csv;charset=UTF-8':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PrerequisiteRecord'
+      responses:
+        204:
+          description: Successful update
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /courses/{courseId}:
     get:
@@ -183,6 +205,22 @@ components:
       required:
         - name
         - description
+
+    PrerequisiteRecord:
+      type: object
+      title: 'PrerequisiteRecord'
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        course:
+          type: string
+        comments:
+          type: string
+      required:
+        - name
+        - course
 
     CourseOffering:
       type: object
