@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursesPutRequestInner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import java.util.*
 
 class CourseServiceTest {
@@ -26,7 +26,7 @@ class CourseServiceTest {
 
     service.replaceAllCourses(
       listOf(
-        CoursesPutRequestInner(name = "Course", description = "Description", audience = "Audience 1", acronym = "CCC", comments = "A comment"),
+        CourseRecord(name = "Course", description = "Description", audience = "Audience 1", acronym = "CCC", comments = "A comment"),
       ),
     )
 
@@ -47,8 +47,8 @@ class CourseServiceTest {
 
     service.replaceAllCourses(
       listOf(
-        CoursesPutRequestInner(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", acronym = "111", comments = "A comment for 1"),
-        CoursesPutRequestInner(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", acronym = "222", comments = "A comment for 2"),
+        CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", acronym = "111", comments = "A comment for 1"),
+        CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", acronym = "222", comments = "A comment for 2"),
       ),
     )
 
@@ -68,10 +68,10 @@ class CourseServiceTest {
 
     service.replaceAllCourses(
       listOf(
-        CoursesPutRequestInner(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", acronym = "111", comments = "A comment for 1"),
-        CoursesPutRequestInner(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", acronym = "222", comments = "A comment for 2"),
-        CoursesPutRequestInner(name = "Course 3", description = "Description 3", audience = a1.value, acronym = "333", comments = "A comment for 3"),
-        CoursesPutRequestInner(name = "Course 4", description = "Description 4", audience = a1.value, acronym = "444", comments = "A comment for 4"),
+        CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", acronym = "111", comments = "A comment for 1"),
+        CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", acronym = "222", comments = "A comment for 2"),
+        CourseRecord(name = "Course 3", description = "Description 3", audience = a1.value, acronym = "333", comments = "A comment for 3"),
+        CourseRecord(name = "Course 4", description = "Description 4", audience = a1.value, acronym = "444", comments = "A comment for 4"),
       ),
     )
 

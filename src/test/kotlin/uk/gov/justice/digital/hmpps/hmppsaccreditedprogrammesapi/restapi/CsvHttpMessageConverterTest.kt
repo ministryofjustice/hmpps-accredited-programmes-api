@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.mock.http.MockHttpInputMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursesPutRequestInner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import java.nio.charset.StandardCharsets
 
 class CsvHttpMessageConverterTest {
@@ -45,9 +45,9 @@ class CsvHttpMessageConverterTest {
   fun `read csv to a List of CoursePutRequestInner`() {
     val inputMessage = MockHttpInputMessage(CoursesCsvTestData.csvInputStream())
     inputMessage.headers.contentType = MediaType("text", "csv")
-    val beanList = object : ParameterizedTypeReference<List<CoursesPutRequestInner>>() {}
+    val beanList = object : ParameterizedTypeReference<List<CourseRecord>>() {}
     val result = converter.read(beanList.type, null, inputMessage)
-    val list = result.shouldBeInstanceOf<List<CoursesPutRequestInner>>()
+    val list = result.shouldBeInstanceOf<List<CourseRecord>>()
     list.shouldContainExactly(CoursesCsvTestData.requestData)
   }
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.CoursesApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursesPutRequestInner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
@@ -24,8 +24,8 @@ class CoursesController(
           .map(CourseEntity::toApi),
       )
 
-  override fun coursesPut(coursesPutRequestInner: List<CoursesPutRequestInner>): ResponseEntity<Unit> {
-    courseService.replaceAllCourses(coursesPutRequestInner)
+  override fun coursesPut(courseRecords: List<CourseRecord>): ResponseEntity<Unit> {
+    courseService.replaceAllCourses(courseRecords)
     return ResponseEntity.noContent().build()
   }
 

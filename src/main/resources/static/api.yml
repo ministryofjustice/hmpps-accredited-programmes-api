@@ -28,23 +28,9 @@ paths:
         content:
           'text/csv;charset=UTF-8':
             schema:
+              type: array
               items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  acronym:
-                    type: string
-                  description:
-                    type: string
-                  audience:
-                    type: string
-                  comments:
-                    type: string
-                required:
-                  - name
-                  - description
-                  - audience
+                $ref: '#/components/schemas/CourseRecord'
       responses:
         204:
           description: Successful update
@@ -160,6 +146,25 @@ components:
         - name
         - coursePrerequisites
         - audiences
+
+    CourseRecord:
+      title: 'CourseRecord'
+      type: object
+      properties:
+        name:
+          type: string
+        acronym:
+          type: string
+        description:
+          type: string
+        audience:
+          type: string
+        comments:
+          type: string
+      required:
+        - name
+        - description
+        - audience
 
     CoursePrerequisite:
       type: object

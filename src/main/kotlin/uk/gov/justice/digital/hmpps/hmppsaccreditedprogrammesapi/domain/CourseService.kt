@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursesPutRequestInner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import java.util.UUID
 
 @Service
@@ -20,7 +20,7 @@ class CourseService(
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)
 
-  fun replaceAllCourses(courseData: List<CoursesPutRequestInner>) {
+  fun replaceAllCourses(courseData: List<CourseRecord>) {
     courseRepository.clear()
     courseRepository.saveAudiences(courseData.flatMap { audienceStrings(it.audience) }.map(::Audience).toSet())
 
