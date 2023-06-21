@@ -19,6 +19,38 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Course'
+    put:
+      tags:
+        - Courses bulk upload / replace
+      summary: Upload a CSV format file containing a full set of Courses data.
+      requestBody:
+        required: true
+        content:
+          'text/csv;charset=UTF-8':
+            schema:
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  acronym:
+                    type: string
+                  description:
+                    type: string
+                  audience:
+                    type: string
+                  comments:
+                    type: string
+                required:
+                  - name
+                  - description
+                  - audience
+      responses:
+        204:
+          description: Successful update
+        400:
+          description: Bad input
+
 
   /courses/{courseId}:
     get:
