@@ -38,5 +38,10 @@ class CourseService(
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
   fun replaceAllPrerequisites(replacements: List<PrerequisiteRecord>) {
+    deleteAllPrerequisites()
+  }
+
+  private fun deleteAllPrerequisites() {
+    courseRepository.allCourses().forEach { it.prerequisites.clear() }
   }
 }

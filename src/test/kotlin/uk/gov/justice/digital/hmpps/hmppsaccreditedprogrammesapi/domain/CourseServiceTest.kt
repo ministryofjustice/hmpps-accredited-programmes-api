@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -81,5 +82,23 @@ class CourseServiceTest {
   @Test
   fun `replaceAllPrerequisites with no records and no courses`() {
     service.replaceAllPrerequisites(emptyList())
+  }
+
+  @Test
+  fun `replaceAllPrerequisites with no records and one course that has prerequisites`() {
+    val allCourses = listOf(
+      CourseEntity(
+        name = "Course 1",
+        description = "Description 1",
+        prerequisites = mutableSetOf(
+          Prerequisite(name = "PR 1", description = " PR Desc 1 "),
+        ),
+      ),
+    )
+    every { repository.allCourses() } returns allCourses
+
+    service.replaceAllPrerequisites(emptyList())
+
+    allCourses.flatMap { it.prerequisites }.shouldBeEmpty()
   }
 }
