@@ -77,4 +77,9 @@ class CourseServiceTest {
 
     verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
   }
+
+  @Test
+  fun `replaceAllPrerequisites with no records and no courses`() {
+    service.replaceAllPrerequisites(emptyList())
+  }
 }
