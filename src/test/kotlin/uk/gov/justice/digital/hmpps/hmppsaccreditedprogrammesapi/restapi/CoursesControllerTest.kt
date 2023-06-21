@@ -180,6 +180,21 @@ class CoursesControllerTest(
       .exchange()
       .expectUnauthenticatedResponse()
   }
+
+  @Test
+  fun `put courses csv`() {
+    every { coursesService.replaceAllCourses(any()) } just Runs
+
+    webTestClient.put()
+      .uri("/courses")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(CoursesCsvTestData.csvText())
+      .exchange()
+      .expectStatus().is2xxSuccessful
+
+    verify { coursesService.replaceAllCourses(CoursesCsvTestData.requestData) }
+  }
 }
 
 private fun (WebTestClient.ResponseSpec).expectUnauthenticatedResponse(): WebTestClient.ResponseSpec {
