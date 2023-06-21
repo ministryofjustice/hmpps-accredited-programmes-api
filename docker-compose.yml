@@ -49,13 +49,11 @@ services:
         condition: service_healthy
 
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=dev,local,seed
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/postgres
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin_password
-      - OAUTH_CLIENT_ID=whereabouts-api-client
-      - OAUTH_CLIENT_SECRET=clientsecret
 
 networks:
   hmpps:
