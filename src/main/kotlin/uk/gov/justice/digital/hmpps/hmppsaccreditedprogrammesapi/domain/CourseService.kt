@@ -37,11 +37,19 @@ class CourseService(
   }
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
+
   fun replaceAllPrerequisites(replacements: List<PrerequisiteRecord>) {
-    deleteAllPrerequisites()
+    val allCourses = courseRepository.allCourses()
+    clearPrerequisites(allCourses)
+    val coursesByName = allCourses.associateBy(CourseEntity::name)
+    replacements.forEach { record ->
+      coursesByName[record.course]?.run {
+        prerequisites.add(Prerequisite(name = record.name, description = record.description ?: ""))
+      }
+    }
   }
 
-  private fun deleteAllPrerequisites() {
-    courseRepository.allCourses().forEach { it.prerequisites.clear() }
+  private fun clearPrerequisites(courses: List<CourseEntity>) {
+    courses.forEach { it.prerequisites.clear() }
   }
 }
