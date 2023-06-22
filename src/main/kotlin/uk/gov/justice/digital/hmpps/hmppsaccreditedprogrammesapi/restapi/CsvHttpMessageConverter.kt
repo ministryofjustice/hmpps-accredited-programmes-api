@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectReader
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvParser
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.google.common.reflect.TypeToken
@@ -19,7 +21,12 @@ import java.util.stream.Stream
 
 @Component
 class CsvHttpMessageConverter internal constructor() : AbstractGenericHttpMessageConverter<List<Any>>(MediaType("text", "csv")) {
-  private val csvMapper = CsvMapper().apply { registerModule(KotlinModule.Builder().build()) }
+  private val csvMapper = CsvMapper().apply {
+    registerModule(KotlinModule.Builder().build())
+    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    configure(CsvParser.Feature.ALLOW_TRAILING_COMMA, true)
+    configure(CsvParser.Feature.IGNORE_TRAILING_UNMAPPABLE, true)
+  }
 
   override fun canRead(type: Type, contextClass: Class<*>?, mediaType: MediaType?): Boolean = canRead(mediaType) && TypeToken.of(type).rawType.isAssignableFrom(List::class.java)
 
