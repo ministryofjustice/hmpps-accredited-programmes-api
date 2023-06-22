@@ -128,12 +128,12 @@ class CsvHttpMessageConverterTest {
 
   @Test
   fun `read courses csv to a List of CourseRecord`() {
-    val inputMessage = MockHttpInputMessage(CoursesCsvTestData.csvInputStream())
+    val inputMessage = MockHttpInputMessage(CsvTestData.coursesCsvInputStream())
     inputMessage.headers.contentType = MediaType("text", "csv")
     val beanList = object : ParameterizedTypeReference<List<CourseRecord>>() {}
     val result = converter.read(beanList.type, null, inputMessage)
     val list = result.shouldBeInstanceOf<List<CourseRecord>>()
-    list.shouldContainExactly(CoursesCsvTestData.requestData)
+    list.shouldContainExactly(CsvTestData.courseRecords)
   }
 }
 

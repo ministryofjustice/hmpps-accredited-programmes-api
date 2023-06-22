@@ -189,11 +189,26 @@ class CoursesControllerTest(
       .uri("/courses")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType("text", "csv"))
-      .bodyValue(CoursesCsvTestData.csvText())
+      .bodyValue(CsvTestData.coursesCsvText)
       .exchange()
       .expectStatus().is2xxSuccessful
 
-    verify { coursesService.replaceAllCourses(CoursesCsvTestData.requestData) }
+    verify { coursesService.replaceAllCourses(CsvTestData.courseRecords) }
+  }
+
+  @Test
+  fun `put prerequisites csv`() {
+    every { coursesService.replaceAllPrerequisites(any()) } just Runs
+
+    webTestClient.put()
+      .uri("/courses/prerequisites")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(CsvTestData.prerequisitesCsvText)
+      .exchange()
+      .expectStatus().is2xxSuccessful
+
+    verify { coursesService.replaceAllPrerequisites(CsvTestData.prerequisiteRecords) }
   }
 }
 
