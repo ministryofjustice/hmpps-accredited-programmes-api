@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -124,5 +125,32 @@ class CourseServiceTest {
     )
 
     allCourses[0].prerequisites shouldContainExactly listOf(Prerequisite("PR 2", description = "PR 2 Desc"))
+  }
+
+  @Test
+  fun `replaceAllPrerequisites - multiple courses and prerequisites - all match`() {
+    val allCourses = listOf(
+      CourseEntity(name = "Course 1", description = "Description 1"),
+      CourseEntity(name = "Course 2", description = "Description 2"),
+    )
+    every { repository.allCourses() } returns allCourses
+
+    service.replaceAllPrerequisites(
+      listOf(
+        PrerequisiteRecord("PR 1", "Course 1", description = "PR 1 Desc"),
+        PrerequisiteRecord("PR 2", "Course 1", description = "PR 2 Desc"),
+        PrerequisiteRecord("PR 3", "Course 2", description = "PR 3 Desc"),
+      ),
+    )
+
+    allCourses.associateBy(CourseEntity::name, CourseEntity::prerequisites) shouldBeEqual mapOf(
+      "Course 1" to mutableSetOf(
+        Prerequisite("PR 1", "PR 1 Desc"),
+        Prerequisite("PR 2", "PR 2 Desc"),
+      ),
+      "Course 2" to mutableSetOf(
+        Prerequisite("PR 3", "PR 3 Desc"),
+      ),
+    )
   }
 }
