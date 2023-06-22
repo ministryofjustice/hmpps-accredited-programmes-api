@@ -110,10 +110,7 @@ class CourseServiceTest {
     val allCourses = listOf(
       CourseEntity(
         name = "Course 1",
-        description = "Description 1",
-        prerequisites = mutableSetOf(
-          Prerequisite(name = "PR 1", description = " PR 1 Desc"),
-        ),
+        prerequisites = mutableSetOf(Prerequisite(name = "PR 1", description = " PR 1 Desc")),
       ),
     )
     every { repository.allCourses() } returns allCourses
@@ -130,8 +127,8 @@ class CourseServiceTest {
   @Test
   fun `replaceAllPrerequisites - multiple courses and prerequisites - all match`() {
     val allCourses = listOf(
-      CourseEntity(name = "Course 1", description = "Description 1"),
-      CourseEntity(name = "Course 2", description = "Description 2"),
+      CourseEntity(name = "Course 1"),
+      CourseEntity(name = "Course 2"),
     )
     every { repository.allCourses() } returns allCourses
 
@@ -152,5 +149,15 @@ class CourseServiceTest {
         Prerequisite("PR 3", "PR 3 Desc"),
       ),
     )
+  }
+
+  @Test
+  fun `replaceAllPrerequisites - course name mismatch - record ignored`() {
+    val allCourses = listOf(CourseEntity(name = "Course 1"))
+    every { repository.allCourses() } returns allCourses
+
+    service.replaceAllPrerequisites(listOf(PrerequisiteRecord("PR 1", "Course X")))
+
+    allCourses[0].prerequisites.shouldBeEmpty()
   }
 }
