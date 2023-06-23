@@ -54,7 +54,18 @@ class CourseService(
     courses.forEach { it.prerequisites.clear() }
   }
 
-  fun replaceAllOfferings(offeringRecords: List<OfferingRecord>) {
-    offeringRecords.size
+  fun replaceAllOfferings(replacements: List<OfferingRecord>) {
+    val allCourses = courseRepository.allCourses()
+    clearOfferings(allCourses)
+    val coursesByName = allCourses.associateBy(CourseEntity::name)
+    replacements.forEach { record ->
+      coursesByName[record.course]?.run {
+        offerings.add(Offering(organisationId = record.prisonId, contactEmail = record.contactEmail ?: ""))
+      }
+    }
+  }
+
+  private fun clearOfferings(courses: List<CourseEntity>) {
+    courses.forEach { it.offerings.clear() }
   }
 }
