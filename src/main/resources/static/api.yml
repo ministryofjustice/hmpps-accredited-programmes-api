@@ -48,6 +48,7 @@ paths:
           'text/csv;charset=UTF-8':
             schema:
               type: array
+              title: 'coursePrerequisites'
               items:
                 $ref: '#/components/schemas/PrerequisiteRecord'
       responses:
@@ -80,6 +81,31 @@ paths:
             'application/json':
               schema:
                   $ref: '#/components/schemas/Course'
+
+  /courses/offerings:
+    put:
+      tags:
+        - Course offerings bulk upload / replace
+      summary: Upload a CVS format file containing a full set of offerings data for a set of courses.
+      requestBody:
+        required: true
+        content:
+          'text/csv;charset=UTF-8':
+            schema:
+              type: array
+              title: 'courseOfferings'
+              items:
+                $ref: '#/components/schemas/OfferingRecord'
+      responses:
+        204:
+          description: Successful update
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 
   /courses/{courseId}/offerings:
     get:
@@ -242,6 +268,22 @@ components:
         - id
         - organisationId
         - contactEmail
+
+    OfferingRecord:
+      type: object
+      title: 'OfferingRecord'
+      properties:
+        course:
+          type: string
+        organisation:
+          type: string
+        "contact email":
+          type: string
+        prisonId:
+          type: string
+      required:
+        - course
+        - prisonId
 
     CourseAudience:
       type: object

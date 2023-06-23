@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Fetch a list of all the prison names and their IDs from 'prod'. Results in JSON format
+curl https://prison-register.hmpps.service.justice.gov.uk/prisons | jq -c 'sort_by(.prisonName)|.[]|{ prisonName, prisonId }'

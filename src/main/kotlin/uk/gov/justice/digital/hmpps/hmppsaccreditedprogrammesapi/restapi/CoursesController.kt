@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.CoursesApiD
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
@@ -32,6 +33,11 @@ class CoursesController(
 
   override fun coursesPrerequisitesPut(prerequisiteRecords: List<PrerequisiteRecord>): ResponseEntity<Unit> {
     courseService.replaceAllPrerequisites(prerequisiteRecords)
+    return ResponseEntity.noContent().build()
+  }
+
+  override fun coursesOfferingsPut(offeringRecord: List<OfferingRecord>): ResponseEntity<Unit> {
+    courseService.replaceAllOfferings(offeringRecord)
     return ResponseEntity.noContent().build()
   }
 
