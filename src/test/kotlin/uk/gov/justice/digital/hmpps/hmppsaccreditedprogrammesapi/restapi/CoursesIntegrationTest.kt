@@ -1,18 +1,26 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.*
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+  webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+  properties = ["kotest.assertions.collection.print.size=60"],
+)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class CoursesIntegrationTest
@@ -158,7 +166,7 @@ class CoursesIntegrationTest
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectBody()
-      .jsonPath("$.length()").isEqualTo(16)
+      .jsonPath("$.length()").isEqualTo(CsvTestData.courseRecords.size)
   }
 
   @DirtiesContext
@@ -191,20 +199,57 @@ class CoursesIntegrationTest
       .expectBody()
       .jsonPath("$..coursePrerequisites.length()").isEqualTo(94)
   }
-}
 
-private fun (WebTestClient.ResponseSpec).expectUnauthenticatedResponse(): WebTestClient.ResponseSpec {
-  this.expectStatus().isUnauthorized
-    .expectHeader().contentType("application/problem+json;charset=UTF-8")
-    .expectBody()
-    .json(
-      """
-      {
-        "title": "Unauthenticated",
-        "status": 401,
-        "detail": "A valid HMPPS Auth JWT must be supplied via bearer authentication to access this endpoint"
-      } 
-      """,
-    )
-  return this
+  @DirtiesContext
+  @Test
+  fun `put offerings csv`() {
+    webTestClient
+      .put()
+      .uri("/courses")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(CsvTestData.coursesCsvText)
+      .exchange()
+      .expectStatus().is2xxSuccessful
+
+    webTestClient
+      .put()
+      .uri("/courses/offerings")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(CsvTestData.offeringsCsvText)
+      .exchange()
+      .expectStatus().is2xxSuccessful
+
+    val courses: List<Course> = webTestClient
+      .get()
+      .uri("/courses")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectBody(object : ParameterizedTypeReference<List<Course>>() {})
+      .returnResult().responseBody!!
+
+    val allOfferings: List<List<CourseOffering>> = courses.map {
+      webTestClient
+        .get()
+        .uri("/courses/${it.id}/offerings")
+        .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+        .accept(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectBody(object : ParameterizedTypeReference<List<CourseOffering>>() {})
+        .returnResult().responseBody!!
+    }
+
+    allOfferings shouldHaveSize CsvTestData.courseRecords.size
+
+    val actualOrganisationIds: Set<String> = allOfferings
+      .flatMap { courseOfferings ->
+        courseOfferings.map { offering -> offering.organisationId }
+      }.toSet()
+
+    val expectedOrganisationIds = CsvTestData.offeringsRecords.map { it.prisonId }.toSet()
+
+    actualOrganisationIds shouldContainExactly expectedOrganisationIds
+  }
 }
