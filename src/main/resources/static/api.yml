@@ -48,12 +48,18 @@ paths:
           'text/csv;charset=UTF-8':
             schema:
               type: array
-              title: 'coursePrerequisites'
               items:
                 $ref: '#/components/schemas/PrerequisiteRecord'
       responses:
-        204:
+        200:
           description: Successful update
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LineError'
+
         400:
           description: Bad input
           content:
@@ -93,12 +99,17 @@ paths:
           'text/csv;charset=UTF-8':
             schema:
               type: array
-              title: 'courseOfferings'
               items:
                 $ref: '#/components/schemas/OfferingRecord'
       responses:
         204:
           description: Successful update
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LineError'
         400:
           description: Bad input
           content:
@@ -297,6 +308,14 @@ components:
       required:
         - id
         - value
+
+    LineError:
+      type: object
+      properties:
+        lineNumber:
+          type: integer
+        error:
+          type: string
 
     ErrorResponse:
       type: object

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineError
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import java.util.*
@@ -94,7 +95,7 @@ class CourseServiceTest {
   inner class ReplaceAllPrerequisitesTests {
     @Test
     fun `No records, No courses`() {
-      service.replaceAllPrerequisites(emptyList())
+      service.replaceAllPrerequisites(emptyList()).shouldBeEmpty()
     }
 
     @Test
@@ -110,7 +111,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllPrerequisites(emptyList())
+      service.replaceAllPrerequisites(emptyList()).shouldBeEmpty()
 
       allCourses.flatMap { it.prerequisites }.shouldBeEmpty()
     }
@@ -129,7 +130,7 @@ class CourseServiceTest {
         listOf(
           PrerequisiteRecord("PR 2", "Course 1", description = "PR 2 Desc", comments = "Lorem ipsum"),
         ),
-      )
+      ).shouldBeEmpty()
 
       allCourses[0].prerequisites shouldContainExactly listOf(Prerequisite("PR 2", description = "PR 2 Desc"))
     }
@@ -148,7 +149,7 @@ class CourseServiceTest {
           PrerequisiteRecord("PR 2", "Course 1", description = "PR 2 Desc"),
           PrerequisiteRecord("PR 3", "Course 2", description = "PR 3 Desc"),
         ),
-      )
+      ).shouldBeEmpty()
 
       allCourses.associateBy(CourseEntity::name, CourseEntity::prerequisites) shouldBeEqual mapOf(
         "Course 1" to mutableSetOf(
@@ -163,12 +164,25 @@ class CourseServiceTest {
 
     @Test
     fun `course name mismatch - record ignored`() {
-      val allCourses = listOf(CourseEntity(name = "Course 1"))
+      val allCourses = listOf(
+        CourseEntity(name = "Course 1"),
+        CourseEntity(name = "Course 2"),
+      )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllPrerequisites(listOf(PrerequisiteRecord("PR 1", "Course X")))
-
-      allCourses[0].prerequisites.shouldBeEmpty()
+      service.replaceAllPrerequisites(
+        listOf(
+          PrerequisiteRecord("PR 1", "Course 1"),
+          PrerequisiteRecord("PR 1", "Course X"),
+          PrerequisiteRecord("PR 2", "Course 2"),
+        ),
+      )
+        .shouldContainExactly(
+          LineError(
+            lineNumber = 3,
+            error = "No match for course 'Course X'",
+          ),
+        )
     }
   }
 
@@ -177,7 +191,7 @@ class CourseServiceTest {
   inner class ReplaceAllOfferingsTests {
     @Test
     fun `No records, No courses`() {
-      service.replaceAllOfferings(emptyList())
+      service.replaceAllOfferings(emptyList()).shouldBeEmpty()
     }
 
     @Test
@@ -193,7 +207,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllOfferings(emptyList())
+      service.replaceAllOfferings(emptyList()).shouldBeEmpty()
 
       allCourses.flatMap { it.offerings }.shouldBeEmpty()
     }
@@ -214,7 +228,7 @@ class CourseServiceTest {
         listOf(
           OfferingRecord(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
         ),
-      )
+      ).shouldBeEmpty()
 
       allCourses[0].offerings shouldContainExactly listOf(Offering(organisationId = "MDI", contactEmail = "x@y.net"))
     }
@@ -233,7 +247,7 @@ class CourseServiceTest {
           OfferingRecord(course = "Course 1", prisonId = "BWI", contactEmail = "admin@bwi.net"),
           OfferingRecord(course = "Course 2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
         ),
-      )
+      ).shouldBeEmpty()
 
       allCourses.associateBy(CourseEntity::name, CourseEntity::offerings) shouldBeEqual mapOf(
         "Course 1" to mutableSetOf(
@@ -248,12 +262,26 @@ class CourseServiceTest {
 
     @Test
     fun `course name mismatch - record ignored`() {
-      val allCourses = listOf(CourseEntity(name = "Course 1"))
+      val allCourses = listOf(
+        CourseEntity(name = "Course 1"),
+        CourseEntity(name = "Course 2"),
+      )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllOfferings(listOf(OfferingRecord("Course x", "BWI")))
-
-      allCourses[0].prerequisites.shouldBeEmpty()
+      service.replaceAllOfferings(
+        listOf(
+          OfferingRecord(course = "Course 1", prisonId = "MDI"),
+          OfferingRecord(course = "Course 1", prisonId = "BWI"),
+          OfferingRecord(course = "Course X", prisonId = "BWI"),
+          OfferingRecord(course = "Course 2", prisonId = "MDI"),
+        ),
+      )
+        .shouldContainExactly(
+          LineError(
+            lineNumber = 4,
+            error = "No match for course 'Course X', prisonId 'BWI'",
+          ),
+        )
     }
   }
 }

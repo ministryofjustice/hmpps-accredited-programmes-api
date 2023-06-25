@@ -17,10 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.*
 
-@SpringBootTest(
-  webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-  properties = ["kotest.assertions.collection.print.size=60"],
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class CoursesIntegrationTest
@@ -189,6 +186,8 @@ class CoursesIntegrationTest
       .bodyValue(CsvTestData.prerequisitesCsvText)
       .exchange()
       .expectStatus().is2xxSuccessful
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(141)
 
     webTestClient
       .get()
@@ -220,6 +219,8 @@ class CoursesIntegrationTest
       .bodyValue(CsvTestData.offeringsCsvText)
       .exchange()
       .expectStatus().is2xxSuccessful
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(102)
 
     val courses: List<Course> = webTestClient
       .get()

@@ -235,14 +235,18 @@ class CoursesControllerTest(
   inner class PutPrerequisitesTests {
     @Test
     fun `put prerequisites csv`() {
-      every { coursesService.replaceAllPrerequisites(any()) } just Runs
+      every { coursesService.replaceAllPrerequisites(any()) } returns emptyList()
 
       mockMvc.put("/courses/prerequisites") {
         contentType = MediaType("text", "csv")
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
         content = CsvTestData.prerequisitesCsvText
       }.andExpect {
-        status { isNoContent() }
+        status { isOk() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          jsonPath("$.size()") { value(0) }
+        }
       }
 
       verify { coursesService.replaceAllPrerequisites(CsvTestData.prerequisiteRecords) }
@@ -253,14 +257,18 @@ class CoursesControllerTest(
   inner class PutOfferingsTests {
     @Test
     fun `put offerings csv`() {
-      every { coursesService.replaceAllOfferings(any()) } just Runs
+      every { coursesService.replaceAllOfferings(any()) } returns emptyList()
 
       mockMvc.put("/courses/offerings") {
         contentType = MediaType("text", "csv")
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
         content = CsvTestData.offeringsCsvText
       }.andExpect {
-        status { isNoContent() }
+        status { isOk() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          jsonPath("$.size()") { value(0) }
+        }
       }
 
       verify { coursesService.replaceAllOfferings(CsvTestData.offeringsRecords) }
