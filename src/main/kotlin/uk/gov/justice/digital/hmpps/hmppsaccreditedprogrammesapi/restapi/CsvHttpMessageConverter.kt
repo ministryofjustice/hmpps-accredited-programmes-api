@@ -17,10 +17,9 @@ import java.io.Reader
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
-import java.util.stream.Stream
 
 @Component
-class CsvHttpMessageConverter internal constructor() : AbstractGenericHttpMessageConverter<List<Any>>(MediaType("text", "csv")) {
+class CsvHttpMessageConverter : AbstractGenericHttpMessageConverter<Iterable<Any>>(MediaType("text", "csv")) {
   private val csvMapper = CsvMapper().apply {
     registerModule(KotlinModule.Builder().build())
     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -28,36 +27,37 @@ class CsvHttpMessageConverter internal constructor() : AbstractGenericHttpMessag
     configure(CsvParser.Feature.IGNORE_TRAILING_UNMAPPABLE, true)
   }
 
-  override fun canRead(type: Type, contextClass: Class<*>?, mediaType: MediaType?): Boolean = canRead(mediaType) && TypeToken.of(type).rawType.isAssignableFrom(List::class.java)
+  override fun canRead(type: Type, contextClass: Class<*>?, mediaType: MediaType?): Boolean = canRead(mediaType) && isSupported(type)
 
-  override fun supports(clazz: Class<*>): Boolean = getTableType(clazz) != null
+  override fun supports(clazz: Class<*>): Boolean = isSupported(clazz)
 
-  override fun read(type: Type, contextClazz: Class<*>?, inputMessage: HttpInputMessage): List<Any> = getReader(getElementType(type)).readValues<Any>(getInputReader(inputMessage)).readAll()
+  override fun read(type: Type, contextClazz: Class<*>?, inputMessage: HttpInputMessage): List<Any> = readAll(type, inputMessage)
 
-  override fun readInternal(clazz: Class<out List<Any>>, inputMessage: HttpInputMessage): List<Any> = getReader(getElementType(clazz)).readValues<Any>(getInputReader(inputMessage)).readAll()
+  override fun readInternal(clazz: Class<out Iterable<Any>>, inputMessage: HttpInputMessage): List<Any> = readAll(clazz, inputMessage)
 
-  private fun getInputReader(inputMessage: HttpInputMessage): Reader = InputStreamReader(
-    inputMessage.body,
-    inputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
-  )
+  private fun readAll(type: Type, inputMessage: HttpInputMessage) = getCsvReader(type).readValues<Any>(getInputReader(inputMessage)).readAll()
 
-  private fun getReader(clazz: Class<*>): ObjectReader = csvMapper.reader(getSchema()).forType(clazz)
+  private fun getCsvReader(type: Type): ObjectReader = csvMapper.reader(getSchema()).forType(getElementType(type))
 
-  private fun getSchema(): CsvSchema = CsvSchema.emptySchema().withHeader()
-
-  private fun getElementType(type: Type): Class<*> =
-    getTableType(type)?.let {
-      @Suppress("UNCHECKED_CAST")
-      val tableType = TypeToken.of(type).getSupertype(it as Class<Any>).type as ParameterizedType
-      TypeToken.of(tableType.actualTypeArguments[0]).rawType
-    } ?: throw throw IllegalArgumentException()
-
-  private fun getTableType(type: Type): Class<out Any>? = SUPPORTED_SUPER_TYPES.find { TypeToken.of(type).isSubtypeOf(it) }
-
-  override fun writeInternal(instance: List<Any>, type: Type?, outputMessage: HttpOutputMessage) {
+  override fun writeInternal(instance: Iterable<Any>, type: Type?, outputMessage: HttpOutputMessage) {
   }
 
   companion object {
-    private val SUPPORTED_SUPER_TYPES: List<Class<out Any>> = listOf(Iterable::class.java, Stream::class.java)
+    private val supportedSupertype = Iterable::class.java
+
+    private fun getSchema(): CsvSchema = CsvSchema.emptySchema().withHeader()
+
+    private fun isSupported(type: Type) = TypeToken.of(type).isSubtypeOf(supportedSupertype)
+
+    @Suppress("UNCHECKED_CAST")
+    private fun getElementType(type: Type) =
+      (TypeToken.of(type).getSupertype(supportedSupertype as Class<Any>).type as ParameterizedType)
+        .let { TypeToken.of(it.actualTypeArguments[0]).rawType }
+
+    private fun getInputReader(inputMessage: HttpInputMessage): Reader =
+      InputStreamReader(
+        inputMessage.body,
+        inputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
+      )
   }
 }
