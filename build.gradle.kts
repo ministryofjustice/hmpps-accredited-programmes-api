@@ -14,7 +14,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.6.2"
   val springdocVersion = "1.7.0"
-  val sentryVersion = "6.22.0"
+  val sentryVersion = "6.24.0"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
@@ -24,7 +24,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.flywaydb:flyway-core")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.0")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.2")
 
   implementation("io.sentry:sentry-spring-boot-starter:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
@@ -39,7 +39,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.0")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.1")
 }
 
 java {

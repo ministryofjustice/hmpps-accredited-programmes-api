@@ -28,29 +28,44 @@ paths:
         content:
           'text/csv;charset=UTF-8':
             schema:
+              type: array
               items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  acronym:
-                    type: string
-                  description:
-                    type: string
-                  audience:
-                    type: string
-                  comments:
-                    type: string
-                required:
-                  - name
-                  - description
-                  - audience
+                $ref: '#/components/schemas/CourseRecord'
       responses:
         204:
           description: Successful update
         400:
           description: Bad input
 
+  /courses/prerequisites:
+    put:
+      tags:
+        - Course prerequisites bulk upload / replace
+      summary: Upload a CVS format file containing a full set of prerequisites data for a set of courses.
+      requestBody:
+        required: true
+        content:
+          'text/csv;charset=UTF-8':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PrerequisiteRecord'
+      responses:
+        200:
+          description: Successful update
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LineError'
+
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /courses/{courseId}:
     get:
@@ -72,6 +87,36 @@ paths:
             'application/json':
               schema:
                   $ref: '#/components/schemas/Course'
+
+  /courses/offerings:
+    put:
+      tags:
+        - Course offerings bulk upload / replace
+      summary: Upload a CVS format file containing a full set of offerings data for a set of courses.
+      requestBody:
+        required: true
+        content:
+          'text/csv;charset=UTF-8':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OfferingRecord'
+      responses:
+        204:
+          description: Successful update
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LineError'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 
   /courses/{courseId}/offerings:
     get:
@@ -161,6 +206,25 @@ components:
         - coursePrerequisites
         - audiences
 
+    CourseRecord:
+      title: 'CourseRecord'
+      type: object
+      properties:
+        name:
+          type: string
+        acronym:
+          type: string
+        description:
+          type: string
+        audience:
+          type: string
+        comments:
+          type: string
+      required:
+        - name
+        - description
+        - audience
+
     CoursePrerequisite:
       type: object
       properties:
@@ -178,6 +242,22 @@ components:
       required:
         - name
         - description
+
+    PrerequisiteRecord:
+      type: object
+      title: 'PrerequisiteRecord'
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        course:
+          type: string
+        comments:
+          type: string
+      required:
+        - name
+        - course
 
     CourseOffering:
       type: object
@@ -200,6 +280,22 @@ components:
         - organisationId
         - contactEmail
 
+    OfferingRecord:
+      type: object
+      title: 'OfferingRecord'
+      properties:
+        course:
+          type: string
+        organisation:
+          type: string
+        "contact email":
+          type: string
+        prisonId:
+          type: string
+      required:
+        - course
+        - prisonId
+
     CourseAudience:
       type: object
       properties:
@@ -212,6 +308,14 @@ components:
       required:
         - id
         - value
+
+    LineError:
+      type: object
+      properties:
+        lineNumber:
+          type: integer
+        error:
+          type: string
 
     ErrorResponse:
       type: object
