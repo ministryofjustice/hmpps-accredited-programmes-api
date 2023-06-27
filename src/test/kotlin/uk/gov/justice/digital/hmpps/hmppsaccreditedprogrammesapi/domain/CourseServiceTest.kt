@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineError
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import java.util.*
@@ -178,9 +178,10 @@ class CourseServiceTest {
         ),
       )
         .shouldContainExactly(
-          LineError(
+          LineMessage(
             lineNumber = 3,
-            error = "No match for course 'Course X'",
+            level = LineMessage.Level.error,
+            message = "No match for course 'Course X'",
           ),
         )
     }
@@ -270,16 +271,40 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          OfferingRecord(course = "Course 1", prisonId = "MDI"),
-          OfferingRecord(course = "Course 1", prisonId = "BWI"),
-          OfferingRecord(course = "Course X", prisonId = "BWI"),
-          OfferingRecord(course = "Course 2", prisonId = "MDI"),
+          OfferingRecord(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
+          OfferingRecord(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
+          OfferingRecord(course = "Course X", prisonId = "BWI", contactEmail = "x@y.net"),
+          OfferingRecord(course = "Course 2", prisonId = "MDI", contactEmail = "x@y.net"),
         ),
       )
         .shouldContainExactly(
-          LineError(
+          LineMessage(
             lineNumber = 4,
-            error = "No match for course 'Course X', prisonId 'BWI'",
+            level = LineMessage.Level.error,
+            message = "No match for course 'Course X', prisonId 'BWI'",
+          ),
+        )
+    }
+
+    @Test
+    fun `Missing contactEmail - Warning LineMessage produced`() {
+      val allCourses = listOf(
+        CourseEntity(name = "Course 1"),
+        CourseEntity(name = "Course 2"),
+      )
+      every { repository.allCourses() } returns allCourses
+
+      service.replaceAllOfferings(
+        listOf(
+          OfferingRecord(course = "Course 1", prisonId = "MDI"),
+          OfferingRecord(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
+        ),
+      )
+        .shouldContainExactly(
+          LineMessage(
+            lineNumber = 2,
+            level = LineMessage.Level.warning,
+            message = "Missing contactEmail for 'Course 1' offering at prisonId 'MDI'",
           ),
         )
     }

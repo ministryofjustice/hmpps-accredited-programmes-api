@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineError
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import java.util.UUID
@@ -40,7 +40,7 @@ class CourseService(
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
-  fun replaceAllPrerequisites(replacements: List<PrerequisiteRecord>): List<LineError> {
+  fun replaceAllPrerequisites(replacements: List<PrerequisiteRecord>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearPrerequisites(allCourses)
     val coursesByName = allCourses.associateBy(CourseEntity::name)
@@ -53,7 +53,11 @@ class CourseService(
       .mapIndexed { index, record ->
         when (coursesByName.containsKey(record.course)) {
           true -> null
-          false -> LineError(indexToCsvRowNumber(index), "No match for course '${record.course}'")
+          false -> LineMessage(
+            lineNumber = indexToCsvRowNumber(index),
+            level = LineMessage.Level.error,
+            message = "No match for course '${record.course}'",
+          )
         }
       }.filterNotNull()
   }
@@ -62,7 +66,7 @@ class CourseService(
     courses.forEach { it.prerequisites.clear() }
   }
 
-  fun replaceAllOfferings(replacements: List<OfferingRecord>): List<LineError> {
+  fun replaceAllOfferings(replacements: List<OfferingRecord>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearOfferings(allCourses)
     val coursesByName = allCourses.associateBy(CourseEntity::name)
@@ -71,14 +75,35 @@ class CourseService(
         offerings.add(Offering(organisationId = record.prisonId, contactEmail = record.contactEmail ?: ""))
       }
     }
-    return replacements
+
+    return contactEmailWarnings(replacements) + unmatchedCourseErrors(replacements, coursesByName)
+  }
+
+  private fun contactEmailWarnings(offeringRecords: List<OfferingRecord>): List<LineMessage> =
+    offeringRecords.mapIndexed { index, record ->
+      when (record.contactEmail.isNullOrBlank()) {
+        true -> LineMessage(
+          lineNumber = indexToCsvRowNumber(index),
+          level = LineMessage.Level.warning,
+          message = "Missing contactEmail for '${record.course}' offering at prisonId '${record.prisonId}'",
+        )
+
+        false -> null
+      }
+    }.filterNotNull()
+
+  private fun unmatchedCourseErrors(replacements: List<OfferingRecord>, coursesByName: Map<String, CourseEntity>) =
+    replacements
       .mapIndexed { index, record ->
         when (coursesByName.containsKey(record.course)) {
           true -> null
-          false -> LineError(indexToCsvRowNumber(index), "No match for course '${record.course}', prisonId '${record.prisonId}'")
+          false -> LineMessage(
+            lineNumber = indexToCsvRowNumber(index),
+            level = LineMessage.Level.error,
+            message = "No match for course '${record.course}', prisonId '${record.prisonId}'",
+          )
         }
       }.filterNotNull()
-  }
 
   private fun clearOfferings(courses: List<CourseEntity>) {
     courses.forEach { it.offerings.clear() }

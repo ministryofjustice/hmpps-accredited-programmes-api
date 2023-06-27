@@ -61,7 +61,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LineError'
+                  $ref: '#/components/schemas/LineMessage'
 
         400:
           description: Bad input
@@ -115,7 +115,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LineError'
+                  $ref: '#/components/schemas/LineMessage'
         400:
           description: Bad input
           content:
@@ -328,18 +328,24 @@ components:
         - id
         - value
 
-    LineError:
-      description: "Information about why a line in an uploaded CSV file could not be added."
+    LineMessage:
+      description: "warnings and errors for a line in an uploaded CSV file."
       type: object
       properties:
         lineNumber:
           type: integer
           example: 20
           description: "The number of the line in the CSV file that was rejected. The header line is lineNumber 1, the first line of CSV data is lineNumber 2."
-        error:
+        level:
+          type: string
+          enum:
+            - Warning
+            - Error
+          description: "One of 'Error' or 'Warning'.  If a line has an Error then the data was not added. If it is a Warning then the line was added but there was a problem that should be corrected."
+        message:
           type: string
           example: "No match for course 'Kaizen', prisonId 'BWI'"
-          description: "Why the line was rejected."
+          description: "Useful information about the Error or Warning."
 
     ErrorResponse:
       type: object
