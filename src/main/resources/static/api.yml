@@ -41,7 +41,10 @@ paths:
     put:
       tags:
         - Course prerequisites bulk upload / replace
-      summary: Upload a CVS format file containing a full set of prerequisites data for a set of courses.
+      summary: Upload a CSV format file containing a full set of prerequisites data for the current set of courses.
+      description: "Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
+      <p>Pre-existing prerequisite data will be removed before the new data is applied.
+      <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the PrerequisiteRecord schema. Column order is not important."
       requestBody:
         required: true
         content:
@@ -58,7 +61,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LineError'
+                  $ref: '#/components/schemas/LineMessage'
 
         400:
           description: Bad input
@@ -93,6 +96,9 @@ paths:
       tags:
         - Course offerings bulk upload / replace
       summary: Upload a CVS format file containing a full set of offerings data for a set of courses.
+      description: "Accepts a CSV format file of data representing the desired state of all offerings data attached to the current set of courses.
+      <p>Pre-existing offering data will be removed before the new data is applied.
+      <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the OfferingRecord schema. Column order is not important."
       requestBody:
         required: true
         content:
@@ -109,7 +115,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LineError'
+                  $ref: '#/components/schemas/LineMessage'
         400:
           description: Bad input
           content:
@@ -249,10 +255,16 @@ components:
       properties:
         name:
           type: string
+          example: "age"
+          description: "The name of this Course Prerequisite"
         description:
           type: string
+          example: "18+"
+          description: "The value of this Course Prerequisite"
         course:
           type: string
+          example: "Kaizen"
+          description: "The name of the Course to which this Prerequisite applies. The name must match a course name exactly for this Prerequisite to be added to the Course."
         comments:
           type: string
       required:
@@ -268,7 +280,7 @@ components:
         organisationId:
           type: string
           example: "MDI"
-          description: "The unique HPMMS identifier associated with the prison hosting the offering"
+          description: "The unique identifier associated with the location hosting the offering. For prisons this is the PrisonId which is usually three capital letters."
         contactEmail:
           type: string
           format: email
@@ -286,12 +298,19 @@ components:
       properties:
         course:
           type: string
+          example: "Kaizen"
+          description: "The name of the Course to which this Offering applies. The name must match a course name exactly for this Offering to be added to the Course."
         organisation:
           type: string
         "contact email":
           type: string
+          format: email
+          example: "ap-admin@digital.justice.gov.uk"
+          description: "The email address of the contact for this offering"
         prisonId:
           type: string
+          example: "MDI"
+          description: "The prison id for the prison associated with this Offering. This is usually three capital letters"
       required:
         - course
         - prisonId
@@ -309,13 +328,24 @@ components:
         - id
         - value
 
-    LineError:
+    LineMessage:
+      description: "warnings and errors for a line in an uploaded CSV file."
       type: object
       properties:
         lineNumber:
           type: integer
-        error:
+          example: 20
+          description: "The number of the line in the CSV file that was rejected. The header line is lineNumber 1, the first line of CSV data is lineNumber 2."
+        level:
           type: string
+          enum:
+            - Warning
+            - Error
+          description: "One of 'Error' or 'Warning'.  If a line has an Error then the data was not added. If it is a Warning then the line was added but there was a problem that should be corrected."
+        message:
+          type: string
+          example: "No match for course 'Kaizen', prisonId 'BWI'"
+          description: "Useful information about the Error or Warning."
 
     ErrorResponse:
       type: object
