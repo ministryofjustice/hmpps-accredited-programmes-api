@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Be a part of the Ministry of Justice GitHub organisation. This should be done
-  as part of your your team onboarding process.
+  as part of your team onboarding process.
 
 ## Kibana
 
