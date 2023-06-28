@@ -37,7 +37,7 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course", description = "Description", audience = "Audience 1", acronym = "CCC", comments = "A comment"),
+          CourseRecord(name = "Course", description = "Description", audience = "Audience 1", alternateName = "CCC", comments = "A comment"),
         ),
       )
 
@@ -58,8 +58,8 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", acronym = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", acronym = "222", comments = "A comment for 2"),
+          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
+          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
         ),
       )
 
@@ -79,10 +79,10 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", acronym = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", acronym = "222", comments = "A comment for 2"),
-          CourseRecord(name = "Course 3", description = "Description 3", audience = a1.value, acronym = "333", comments = "A comment for 3"),
-          CourseRecord(name = "Course 4", description = "Description 4", audience = a1.value, acronym = "444", comments = "A comment for 4"),
+          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
+          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
+          CourseRecord(name = "Course 3", description = "Description 3", audience = a1.value, alternateName = "333", comments = "A comment for 3"),
+          CourseRecord(name = "Course 4", description = "Description 4", audience = a1.value, alternateName = "444", comments = "A comment for 4"),
         ),
       )
 

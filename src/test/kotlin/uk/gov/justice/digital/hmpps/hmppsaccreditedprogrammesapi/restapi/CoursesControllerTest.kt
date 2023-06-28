@@ -57,8 +57,8 @@ class CoursesControllerTest(
           this.json(
             """
           [
-            { "name": "Lime Course" },
-            { "name": "Azure Course" },
+            { "name": "Lime Course", "alternateName": "LC" },
+            { "name": "Azure Course", "alternateName": "AC++" },
             { "name": "Violet Course" }
         ]
         """,
@@ -88,7 +88,21 @@ class CoursesControllerTest(
         status { isOk() }
         content {
           contentType(MediaType.APPLICATION_JSON)
-          jsonPath("$.id") { value(expectedCourse.id?.toString()) }
+          json(
+            """
+            {
+              "id": "${expectedCourse.id?.toString()}",
+              "name": "Lime Course",
+              "alternateName": "LC",
+              "audiences": [],
+              "coursePrerequisites": [
+                { "name": "Setting", "description": "Custody"},
+                { "name": "Risk criteria", "description":  "High ESARA/SARA/OVP, High OGRS"},
+                { "name": "Criminogenic needs", "description": "Relationships, Thinking and Behaviour, Attitudes, Lifestyle" }
+              ],
+            }
+            """,
+          )
         }
       }
     }

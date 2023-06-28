@@ -23,6 +23,7 @@ class CourseEntity(
 
   var name: String,
   var description: String? = null,
+  var alternateName: String? = null,
 
   @ElementCollection
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])

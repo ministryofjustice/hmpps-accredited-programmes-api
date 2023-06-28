@@ -13,7 +13,7 @@ import java.util.UUID
 
 class TransformerTest {
   @Test
-  fun `transform course entity to api missing description and no prerequisites`() {
+  fun `transform course entity to api missing description, alternateName and no prerequisites`() {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
@@ -25,22 +25,25 @@ class TransformerTest {
       id shouldBe entity.id
       name shouldBe entity.name
       description shouldBe null
+      alternateName shouldBe null
       coursePrerequisites.shouldBeEmpty()
     }
   }
 
   @Test
-  fun `transform course entity to api with description`() {
+  fun `transform course entity to api with description and alternateName`() {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
       description = "A description",
+      alternateName = "AA++",
       prerequisites = mutableSetOf(),
       audiences = mutableSetOf(),
     )
 
     with(entity.toApi()) {
       description shouldBe entity.description
+      alternateName shouldBe entity.alternateName
     }
   }
 

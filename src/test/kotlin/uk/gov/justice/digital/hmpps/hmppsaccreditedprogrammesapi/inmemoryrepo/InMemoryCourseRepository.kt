@@ -35,6 +35,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
+      alternateName = "LC",
       audiences = mutableSetOf(),
     ).apply {
       offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk"))
@@ -51,6 +52,7 @@ class InMemoryCourseRepository : CourseRepository {
         Prerequisite(name = "Risk criteria", description = "High ESARA/SARA/OVP, High OGRS"),
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
+      alternateName = "AC++",
       audiences = audiences.toMutableSet(),
     ).apply { offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk")) }
 

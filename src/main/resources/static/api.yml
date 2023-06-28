@@ -198,6 +198,9 @@ components:
         description:
           type: string
           example: Thinking Skills Programme (TSP) description
+        alternateName:
+          type: string
+          example: 'BNM+'
         coursePrerequisites:
           type: array
           items:
@@ -218,7 +221,7 @@ components:
       properties:
         name:
           type: string
-        acronym:
+        alternateName:
           type: string
         description:
           type: string

@@ -43,10 +43,10 @@ class CoursesIntegrationTest
       .expectBody()
       .json(
         """
-          [
-            { "name": "Lime Course" },
-            { "name": "Azure Course" },
-            { "name": "Violet Course" }
+        [
+          { "name": "Lime Course", "alternateName": "LC" },
+          { "name": "Azure Course", "alternateName": "AC++" },
+          { "name": "Violet Course" }
         ]
         """,
       )

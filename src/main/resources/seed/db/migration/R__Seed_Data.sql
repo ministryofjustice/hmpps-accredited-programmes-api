@@ -11,10 +11,10 @@ VALUES ('7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'Sexual violence'),
        ('7fffcc6a-11f8-4713-be35-cf5ff1aee510', 'Violent offence'),
        ('7fffcc6a-11f8-4713-be35-cf5ff1aee511', 'Intimate partner violence');
 
-INSERT INTO course(course_id, name, description)
-VALUES ('d3abc217-75ee-46e9-a010-368f30282367', 'Lime Course', 'Explicabo exercitationem non asperiores corrupti accusamus quidem autem amet modi. Mollitia tenetur fugiat quo aperiam quasi error consectetur. Fugit neque rerum velit rem laboriosam. Atque nostrum quam aspernatur excepturi laborum harum officia eveniet porro.'),
-       ('28e47d30-30bf-4dab-a8eb-9fda3f6400e8', 'Azure Course', 'Similique laborum incidunt sequi rem quidem incidunt incidunt dignissimos iusto. Explicabo nihil atque quod culpa animi quia aspernatur dolorem consequuntur.'),
-       ('1811faa6-d568-4fc4-83ce-41118b90242e', 'Violet Course', 'Tenetur a quisquam facilis amet illum voluptas error. Eaque eum sunt odit dolor voluptatibus eius sint impedit. Illo voluptatem similique quod voluptate laudantium. Ratione suscipit tempore amet autem quam dolorum. Necessitatibus tenetur recusandae aliquam recusandae temporibus voluptate velit similique fuga. Id tempora doloremque.');
+INSERT INTO course(course_id, name, description, alternate_name)
+VALUES ('d3abc217-75ee-46e9-a010-368f30282367', 'Lime Course', 'Explicabo exercitationem non asperiores corrupti accusamus quidem autem amet modi. Mollitia tenetur fugiat quo aperiam quasi error consectetur. Fugit neque rerum velit rem laboriosam. Atque nostrum quam aspernatur excepturi laborum harum officia eveniet porro.', 'LC'),
+       ('28e47d30-30bf-4dab-a8eb-9fda3f6400e8', 'Azure Course', 'Similique laborum incidunt sequi rem quidem incidunt incidunt dignissimos iusto. Explicabo nihil atque quod culpa animi quia aspernatur dolorem consequuntur.', 'AC++'),
+       ('1811faa6-d568-4fc4-83ce-41118b90242e', 'Violet Course', 'Tenetur a quisquam facilis amet illum voluptas error. Eaque eum sunt odit dolor voluptatibus eius sint impedit. Illo voluptatem similique quod voluptate laudantium. Ratione suscipit tempore amet autem quam dolorum. Necessitatibus tenetur recusandae aliquam recusandae temporibus voluptate velit similique fuga. Id tempora doloremque.', null);
 
 INSERT INTO prerequisite(course_id, name, description)
 VALUES ('d3abc217-75ee-46e9-a010-368f30282367', 'Setting', 'Custody'),
