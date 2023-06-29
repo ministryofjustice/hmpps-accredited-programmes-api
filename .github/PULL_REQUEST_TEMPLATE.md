@@ -20,10 +20,8 @@ ready to be released once merged.
 
 ### Post-merge
 
-- [ ] [Manually approve](../doc/how-to/perform-a-release.md#releasing-to-the-preprod-environment)
-  release to preprod
-- [ ] [Manually approve](../doc/how-to/perform-a-release.md#releasing-to-the-production-environment)
-  release to prod
+- [ ] [Manually approve](../doc/how-to/perform-a-release.md#releasing-to-the-preprod-environment) release to preprod
+- [ ] [Manually approve](../doc/how-to/perform-a-release.md#releasing-to-the-production-environment) release to prod
 
 <!-- Should a release fail at any step, you as the author should now lead the work to
 fix it as soon as possible. You can monitor deployment failures in CircleCI
