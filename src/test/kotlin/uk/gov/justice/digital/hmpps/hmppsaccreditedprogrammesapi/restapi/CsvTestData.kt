@@ -8,27 +8,62 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 
 object CsvTestData {
-  val courseRecords: List<CourseRecord> by lazy {
+  private fun courseRecord(name: String, identifier: String, audience: String, alternateName: String) =
+    CourseRecord(
+      name = name,
+      identifier = identifier,
+      audience = audience,
+      alternateName = alternateName,
+      description = LoremIpsum.words(1..10),
+      comments = LoremIpsum.words(0..20),
+    )
+
+  val courseRecords: List<CourseRecord> =
     listOf(
-      CourseRecord(name = "Becoming New Me Plus", description = "Lorem ipsum dolor sit amet, Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", audience = "Sexual offence, Intimate partner violence, Non-intimate partner violence", alternateName = "BNM+", comments = "General comment: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "),
-      CourseRecord(name = "Building Better Relationships", description = "Lorem ipsum dolor sit amet, Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ", audience = "Intimate partner violence ", alternateName = "BBR", comments = ""),
-      CourseRecord(name = "Healthy Identity Intervention", description = "Lorem ipsum dolor sit amet, Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Extremism offence", alternateName = "HI", comments = ""),
-      CourseRecord(name = "Healthy Sex Programme", description = "Lorem ipsum dolor sit amet, Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Sexual offence", alternateName = "HSP", comments = ""),
-      CourseRecord(name = "Horizon", description = "Lorem ipsum dolor sit amet, Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Sexual offence", alternateName = "", comments = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."),
-      CourseRecord(name = "iHorizon", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ", audience = "Sexual offence", alternateName = "", comments = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."),
-      CourseRecord(name = "Identity Matters", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ", audience = "Gang offence, Extremism offence", alternateName = "IM", comments = ""),
-      CourseRecord(name = "Kaizen", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Violent offence", alternateName = "", comments = ""),
-      CourseRecord(name = "Kaizen", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Intimate partner violence", alternateName = "", comments = ""),
-      CourseRecord(name = "Kaizen", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Sexual offence", alternateName = "", comments = ""),
-      CourseRecord(name = "Living as New Me (custody)", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "LNM", comments = ""),
-      CourseRecord(name = "Living as New Me (community)", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Sexual offence", alternateName = "LNM", comments = ""),
-      CourseRecord(name = "Motivation and Engagement", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "M&E", comments = ""),
-      CourseRecord(name = "New Me MOT", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "NMM", comments = ""),
-      CourseRecord(name = "New Me Strengths", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "NMS", comments = ""),
-      CourseRecord(name = "Thinking Skills Programme", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", audience = "Violent offence, Intimate partner violence", alternateName = "TSP", comments = ""),
-    ).map { it.copy(description = LoremIpsum.words(1..10), comments = LoremIpsum.words(0..20)) }
-  }
-  val prerequisiteRecords: List<PrerequisiteRecord> by lazy {
+      courseRecord(name = "Becoming New Me Plus", alternateName = "BNM+", identifier = "BNM-SO", audience = "Sexual offence"),
+      courseRecord(name = "Becoming New Me Plus", alternateName = "BNM+", identifier = "BNM-IPVO", audience = "Intimate partner violence offence"),
+      courseRecord(name = "Becoming New Me Plus", alternateName = "BNM+", identifier = "BNM-VO", audience = "General violence offence"),
+      courseRecord(name = "Building Better Relationships", alternateName = "BBR", identifier = "BBR-IPVO", audience = "Intimate partner violence offence"),
+      courseRecord(name = "Healthy Identity Intervention", alternateName = "HII", identifier = "HII-EO", audience = "Extremism offence"),
+      courseRecord(name = "Healthy Sex Programme", alternateName = "HSP", identifier = "HSP-SO", audience = "Sexual offence"),
+      courseRecord(name = "Horizon", alternateName = "", identifier = "H-SO", audience = "Sexual offence"),
+      courseRecord(name = "Identity Matters", alternateName = "IM", identifier = "IM-GO", audience = "Gang offence"),
+      courseRecord(name = "Identity Matters", alternateName = "IM", identifier = "IM-EO", audience = "Extremism offence"),
+      courseRecord(name = "Kaizen", alternateName = "", identifier = "K-VO", audience = "General violence offence"),
+      courseRecord(name = "Kaizen", alternateName = "", identifier = "K-IPVO", audience = "Intimate partner violence offence"),
+      courseRecord(name = "Kaizen", alternateName = "", identifier = "K-SO", audience = "Sexual offence"),
+      courseRecord(name = "Living as New Me ", alternateName = "LNM", identifier = "LNM-SO", audience = "Sexual offence"),
+      courseRecord(name = "Motivation and Engagement", alternateName = "M&E", identifier = "ME-VO", audience = "General violence offence"),
+      courseRecord(name = "Motivation and Engagement", alternateName = "M&E", identifier = "ME-SO", audience = "Sexual offence"),
+      courseRecord(name = "Motivation and Engagement", alternateName = "M&E", identifier = "ME-IPVO", audience = "Intimate partner violence offence"),
+      courseRecord(name = "New Me MOT", alternateName = "NMM", identifier = "NMM-VO", audience = "General violence offence"),
+      courseRecord(name = "New Me MOT", alternateName = "NMM", identifier = "NMM-SO", audience = "Sexual offence"),
+      courseRecord(name = "New Me MOT", alternateName = "NMM", identifier = "NMM-IPVO", audience = "Intimate partner violence offence"),
+      courseRecord(name = "New Me Strengths", alternateName = "NMS", identifier = "NMS-VO", audience = "General violence offence"),
+      courseRecord(name = "New Me Strengths", alternateName = "NMS", identifier = "NMS-SO", audience = "Sexual offence"),
+      courseRecord(name = "New Me Strengths", alternateName = "NMS", identifier = "NMS-IPVO", audience = "Intimate partner violence offence"),
+      courseRecord(name = "New Me Strengths", alternateName = "NMS", identifier = "NMS-AO", audience = "General offence"),
+      courseRecord(name = "Thinking Skills Programme", alternateName = "TSP", identifier = "TSP-AO", audience = "General violence offence"),
+
+//      courseRecord(name = "Becoming New Me Plus", audience = "Sexual offence, Intimate partner violence, Non-intimate partner violence", alternateName = "BNM+"),
+//      courseRecord(name = "Building Better Relationships", audience = "Intimate partner violence ", alternateName = "BBR"),
+//      courseRecord(name = "Healthy Identity Intervention", audience = "Extremism offence", alternateName = "HI"),
+//      courseRecord(name = "Healthy Sex Programme", audience = "Sexual offence", alternateName = "HSP"),
+//      courseRecord(name = "Horizon", audience = "Sexual offence", alternateName = ""),
+//      courseRecord(name = "iHorizon", audience = "Sexual offence", alternateName = ""),
+//      courseRecord(name = "Identity Matters", audience = "Gang offence, Extremism offence", alternateName = "IM"),
+//      courseRecord(name = "Kaizen", audience = "Violent offence", alternateName = ""),
+//      courseRecord(name = "Kaizen", audience = "Intimate partner violence", alternateName = ""),
+//      courseRecord(name = "Kaizen", audience = "Sexual offence", alternateName = ""),
+//      courseRecord(name = "Living as New Me (custody)", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "LNM"),
+//      courseRecord(name = "Living as New Me (community)", audience = "Sexual offence", alternateName = "LNM"),
+//      courseRecord(name = "Motivation and Engagement", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "M&E"),
+//      courseRecord(name = "New Me MOT", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "NMM"),
+//      courseRecord(name = "New Me Strengths", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "NMS"),
+//      courseRecord(name = "Thinking Skills Programme", audience = "Violent offence, Intimate partner violence", alternateName = "TSP"),
+    )
+
+  val prerequisiteRecords: List<PrerequisiteRecord> =
     listOf(
       PrerequisiteRecord(name = "gender", course = "Becoming New Me Plus"),
       PrerequisiteRecord(name = "age", course = "Becoming New Me Plus"),
@@ -266,9 +301,8 @@ object CsvTestData {
       PrerequisiteRecord(name = "need requirements", course = "Thinking Skills Programme"),
       PrerequisiteRecord(name = "criminogenic needs", course = "Thinking Skills Programme"),
     ).map { it.copy(description = LoremIpsum.words(1..5), comments = LoremIpsum.words(0..20)) }
-  }
 
-  val offeringsRecords: List<OfferingRecord> by lazy {
+  val offeringsRecords: List<OfferingRecord> =
     listOf(
       OfferingRecord(course = "Becoming New Me Plus ", prisonId = "AYI"),
       OfferingRecord(course = "Becoming New Me Plus ", prisonId = "BSI"),
@@ -507,15 +541,14 @@ object CsvTestData {
       OfferingRecord(course = "Thinking Skills Programme", prisonId = "WHI"),
       OfferingRecord(course = "Thinking Skills Programme", prisonId = "WMI"),
     ).map { it.copy(organisation = "", contactEmail = "${LoremIpsum.words(1..1)}@${LoremIpsum.words(1..1)}.com") }
-  }
 
   fun coursesCsvInputStream(): InputStream = ByteArrayInputStream(coursesCsvText.toByteArray())
   val coursesCsvText: String by lazy {
     courseRecords
       .joinToString(
-        prefix = "name,description,audience,alternateName,comments\n",
+        prefix = "name,alternateName,identifier,description,audience,comments\n",
         separator = "\n",
-        transform = { """"${it.name}","${it.description}","${it.audience}","${it.alternateName}",${it.comments}""" },
+        transform = { """"${it.name}","${it.alternateName}","${it.identifier}","${it.description}","${it.audience}","${it.comments}"""" },
         postfix = "\n",
       )
   }

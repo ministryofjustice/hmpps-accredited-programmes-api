@@ -187,7 +187,7 @@ class CoursesIntegrationTest
       .exchange()
       .expectStatus().is2xxSuccessful
       .expectBody()
-      .jsonPath("$.size()").isEqualTo(141)
+      .jsonPath("$.size()").isEqualTo(157)
 
     webTestClient
       .get()
@@ -196,7 +196,7 @@ class CoursesIntegrationTest
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectBody()
-      .jsonPath("$..coursePrerequisites.length()").isEqualTo(94)
+      .jsonPath("$..coursePrerequisites.length()").isEqualTo(78)
   }
 
   @DirtiesContext
@@ -220,7 +220,7 @@ class CoursesIntegrationTest
       .exchange()
       .expectStatus().is2xxSuccessful
       .expectBody()
-      .jsonPath("$.size()").isEqualTo(102)
+      .jsonPath("$.size()").isEqualTo(98)
 
     val courses: List<Course> = webTestClient
       .get()
