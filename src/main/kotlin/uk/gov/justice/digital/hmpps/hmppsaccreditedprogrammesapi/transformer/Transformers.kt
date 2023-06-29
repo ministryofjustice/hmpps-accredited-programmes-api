@@ -13,6 +13,7 @@ fun CourseEntity.toApi(): Course = Course(
   id = id!!,
   name = name,
   description = description,
+  alternateName = alternateName,
   coursePrerequisites = prerequisites.map(Prerequisite::toApi),
   audiences = audiences.map(Audience::toApi),
 )

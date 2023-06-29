@@ -33,6 +33,7 @@ class CourseService(
       CourseEntity(
         name = it.name,
         description = it.description,
+        alternateName = it.alternateName,
         audiences = audienceStrings(it.audience).mapNotNull { audienceName -> allAudiences[audienceName] }.toMutableSet(),
       )
     }.forEach(courseRepository::saveCourse)
