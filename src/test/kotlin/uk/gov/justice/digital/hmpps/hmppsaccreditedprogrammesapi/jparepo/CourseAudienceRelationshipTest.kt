@@ -20,9 +20,9 @@ constructor(
   fun `can add audience values to courses`() {
     courseRepository.saveAll(
       listOf(
-        CourseEntity(name = "Course 1", description = "A course"),
-        CourseEntity(name = "Course 2", description = "Another course"),
-        CourseEntity(name = "Course 3", description = "Yet another course"),
+        CourseEntity(name = "Course 1", identifier = "C-VO", description = "A course"),
+        CourseEntity(name = "Course 2", identifier = "C-SO", description = "Another course"),
+        CourseEntity(name = "Course 3", identifier = "C-IPVO", description = "Yet another course"),
       ),
     )
 

@@ -37,14 +37,30 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course", description = "Description", audience = "Audience 1", alternateName = "CCC", comments = "A comment"),
+          CourseRecord(
+            name = "Course",
+            description = "Description",
+            identifier = "BNM-SO",
+            audience = "Audience 1",
+            alternateName = "CCC",
+            comments = "A comment",
+          ),
         ),
       )
 
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value))) }
       verify {
-        repository.saveCourse(eqCourse(CourseEntity(name = "Course", description = "Description", audiences = mutableSetOf(a1))))
+        repository.saveCourse(
+          eqCourse(
+            CourseEntity(
+              name = "Course",
+              identifier = "C-VO",
+              description = "Description",
+              audiences = mutableSetOf(a1),
+            ),
+          ),
+        )
       }
     }
 
@@ -58,15 +74,51 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
+          CourseRecord(
+            name = "Course 1",
+            identifier = "BNM-SO",
+            description = "Description 1",
+            audience = "${a1.value}, ${a2.value} ",
+            alternateName = "111",
+            comments = "A comment for 1",
+          ),
+          CourseRecord(
+            name = "Course 2",
+            identifier = "BNM-VO",
+            description = "Description 2",
+            audience = "${a1.value}, ${a3.value}",
+            alternateName = "222",
+            comments = "A comment for 2",
+          ),
         ),
       )
 
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", description = "Description 2", audiences = mutableSetOf(a1, a3)))) }
+      verify {
+        repository.saveCourse(
+          eqCourse(
+            CourseEntity(
+              name = "Course 1",
+              identifier = "BNM-SO",
+              description = "Description 1",
+              audiences = mutableSetOf(a1, a2),
+            ),
+          ),
+        )
+      }
+      verify {
+        repository.saveCourse(
+          eqCourse(
+            CourseEntity(
+              name = "Course 2",
+              identifier = "BNM-VO",
+              description = "Description 2",
+              audiences = mutableSetOf(a1, a3),
+            ),
+          ),
+        )
+      }
     }
 
     @Test
@@ -79,10 +131,38 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
-          CourseRecord(name = "Course 3", description = "Description 3", audience = a1.value, alternateName = "333", comments = "A comment for 3"),
-          CourseRecord(name = "Course 4", description = "Description 4", audience = a1.value, alternateName = "444", comments = "A comment for 4"),
+          CourseRecord(
+            name = "Course 1",
+            identifier = "BNM-S1",
+            description = "Description 1",
+            audience = "${a1.value}, ${a2.value} ",
+            alternateName = "111",
+            comments = "A comment for 1",
+          ),
+          CourseRecord(
+            name = "Course 2",
+            identifier = "BNM-S2",
+            description = "Description 2",
+            audience = "${a1.value}, ${a3.value}",
+            alternateName = "222",
+            comments = "A comment for 2",
+          ),
+          CourseRecord(
+            name = "Course 3",
+            identifier = "BNM-S3",
+            description = "Description 3",
+            audience = a1.value,
+            alternateName = "333",
+            comments = "A comment for 3",
+          ),
+          CourseRecord(
+            name = "Course 4",
+            identifier = "BNM-S4",
+            description = "Description 4",
+            audience = a1.value,
+            alternateName = "444",
+            comments = "A comment for 4",
+          ),
         ),
       )
 
@@ -103,6 +183,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C-VO",
           description = "Description 1",
           prerequisites = mutableSetOf(
             Prerequisite(name = "PR 1", description = " PR Desc 1 "),
@@ -121,6 +202,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C-VO",
           prerequisites = mutableSetOf(Prerequisite(name = "PR 1", description = " PR 1 Desc")),
         ),
       )
@@ -138,8 +220,8 @@ class CourseServiceTest {
     @Test
     fun `multiple courses and prerequisites - all match`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C-VO"),
+        CourseEntity(name = "Course 2", identifier = "C-VO"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -165,8 +247,8 @@ class CourseServiceTest {
     @Test
     fun `course name mismatch - record ignored`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C-VO"),
+        CourseEntity(name = "Course 2", identifier = "C-VO"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -200,6 +282,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C-VO",
           description = "Description 1",
           offerings = mutableSetOf(
             Offering(organisationId = "BWI", contactEmail = "a@b.com"),
@@ -218,6 +301,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C-VO",
           offerings = mutableSetOf(
             Offering(organisationId = "BWI", contactEmail = "a@b.com"),
           ),
@@ -237,8 +321,8 @@ class CourseServiceTest {
     @Test
     fun `multiple courses and offerings - all match`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C-VO"),
+        CourseEntity(name = "Course 2", identifier = "C-VO"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -264,8 +348,8 @@ class CourseServiceTest {
     @Test
     fun `course name mismatch - record ignored`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C-VO"),
+        CourseEntity(name = "Course 2", identifier = "C-VO"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -289,8 +373,8 @@ class CourseServiceTest {
     @Test
     fun `Missing contactEmail - Warning LineMessage produced`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C-VO"),
+        CourseEntity(name = "Course 2", identifier = "C-VO"),
       )
       every { repository.allCourses() } returns allCourses
 

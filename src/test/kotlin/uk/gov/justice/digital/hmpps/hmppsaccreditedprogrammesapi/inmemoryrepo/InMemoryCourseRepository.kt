@@ -29,6 +29,7 @@ class InMemoryCourseRepository : CourseRepository {
     private val tsp = CourseEntity(
       id = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
       name = "Lime Course",
+      identifier = "LC-VO",
       description = "Explicabo exercitationem non asperiores corrupti accusamus quidem autem amet modi. Mollitia tenetur fugiat quo aperiam quasi error consectetur. Fugit neque rerum velit rem laboriosam. Atque nostrum quam aspernatur excepturi laborum harum officia eveniet porro.",
       prerequisites = mutableSetOf(
         Prerequisite(name = "Setting", description = "Custody"),
@@ -46,6 +47,7 @@ class InMemoryCourseRepository : CourseRepository {
     private val bnm = CourseEntity(
       id = UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
       name = "Azure Course",
+      identifier = "AC-SO",
       description = "Similique laborum incidunt sequi rem quidem incidunt incidunt dignissimos iusto. Explicabo nihil atque quod culpa animi quia aspernatur dolorem consequuntur.",
       prerequisites = mutableSetOf(
         Prerequisite(name = "Setting", description = "Custody"),
@@ -59,6 +61,7 @@ class InMemoryCourseRepository : CourseRepository {
     private val nms = CourseEntity(
       id = UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
       name = "Violet Course",
+      identifier = "VC-VO",
       description = "Tenetur a quisquam facilis amet illum voluptas error. Eaque eum sunt odit dolor voluptatibus eius sint impedit. Illo voluptatem similique quod voluptate laudantium. Ratione suscipit tempore amet autem quam dolorum. Necessitatibus tenetur recusandae aliquam recusandae temporibus voluptate velit similique fuga. Id tempora doloremque.",
       prerequisites = mutableSetOf(
         Prerequisite(name = "Setting", description = "Custody"),

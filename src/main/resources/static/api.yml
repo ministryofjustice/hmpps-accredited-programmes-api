@@ -223,6 +223,8 @@ components:
           type: string
         alternateName:
           type: string
+        identifier:
+          type: string
         description:
           type: string
         audience:
@@ -231,6 +233,7 @@ components:
           type: string
       required:
         - name
+        - identifier
         - description
         - audience
 

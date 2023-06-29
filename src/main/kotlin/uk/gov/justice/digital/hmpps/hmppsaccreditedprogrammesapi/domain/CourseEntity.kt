@@ -21,6 +21,7 @@ class CourseEntity(
   @Column(name = "course_id")
   val id: UUID? = null,
 
+  var identifier: String,
   var name: String,
   var description: String? = null,
   var alternateName: String? = null,
@@ -49,5 +50,5 @@ class CourseEntity(
 
   override fun hashCode(): Int = 1756406093
 
-  override fun toString(): String = "CourseEntity($name, $description, $audiences, $id)"
+  override fun toString(): String = "CourseEntity($name, $description, $audiences, $id, $identifier)"
 }

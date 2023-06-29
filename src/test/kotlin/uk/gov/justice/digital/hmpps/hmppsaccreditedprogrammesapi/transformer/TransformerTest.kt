@@ -16,6 +16,7 @@ class TransformerTest {
   fun `transform course entity to api missing description, alternateName and no prerequisites`() {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
+      identifier = "C-VO",
       name = "A Course",
       prerequisites = mutableSetOf(),
       audiences = mutableSetOf(),
@@ -34,6 +35,7 @@ class TransformerTest {
   fun `transform course entity to api with description and alternateName`() {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
+      identifier = "C-VO",
       name = "A Course",
       description = "A description",
       alternateName = "AA++",
@@ -52,6 +54,7 @@ class TransformerTest {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
+      identifier = "C-VO",
       prerequisites = mutableSetOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),

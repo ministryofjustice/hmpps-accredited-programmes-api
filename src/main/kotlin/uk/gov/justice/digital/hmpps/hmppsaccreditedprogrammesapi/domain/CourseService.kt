@@ -32,6 +32,7 @@ class CourseService(
     courseData.map {
       CourseEntity(
         name = it.name,
+        identifier = it.identifier,
         description = it.description,
         alternateName = it.alternateName,
         audiences = audienceStrings(it.audience).mapNotNull { audienceName -> allAudiences[audienceName] }.toMutableSet(),

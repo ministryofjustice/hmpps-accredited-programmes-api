@@ -25,6 +25,7 @@ constructor(
   fun `save and load behaves as expected`() {
     val transientEntity = CourseEntity(
       name = "A Course",
+      identifier = "C-VO",
       description = "A representative Approved Programme for testing",
     )
 
@@ -54,6 +55,7 @@ constructor(
 
     val course = CourseEntity(
       name = "A Course",
+      identifier = "C-VO",
       description = "A representative Approved Programme for testing",
     ).apply {
       prerequisites.addAll(samples)
@@ -83,16 +85,20 @@ constructor(
   fun `offering life-cycle`() {
     val course1 = CourseEntity(
       name = "A Course",
+      identifier = "C-VO",
       description = "A description",
     ).apply {
       offerings.add(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
       offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
       offerings.add(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
     }
-    val course2 = CourseEntity(name = "Another Course", description = "Another description")
-      .apply {
-        offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      }
+    val course2 = CourseEntity(
+      name = "Another Course",
+      description = "Another description",
+      identifier = "C-VO",
+    ).apply {
+      offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+    }
 
     repository.save(course1)
     repository.save(course2)
