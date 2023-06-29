@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# A script that PUTs CSV files representing courses, offerings and prerequisites to the API bulk upload end-points
+# The files to upload must be named Course.csv, Offering.csv and CoursePrerequisite.csv and be present in the
+# directory from which this script is invoked.
+#
+# Responses to each PUT request are saved in files courseMessages.json, offeringMessages.json and prerequisiteMessages.json
+#
+# The script uses jq, kubectl and curl.
+
+# The invoking user must
+#  - have a kubectl context for the HMPPS Kubernetes cluster and
+#  - have access to the 'hmpps-accredited-programmes-dev' namespace.
+#
+# The script invokes curl on one of the API pods - so the curl command must be present on those pods.
+#
+AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+API_URL=https://accredited-programmes-api-dev.hmpps.service.justice.gov.uk
+KUBE_NAMESPACE=hmpps-accredited-programmes-dev
+
+# Fetch and base 64 decode the System client secret and id from kubernetes secret 'hmpps-accredited-programmes-ui'
+API_SECRET=$(kubectl get secret hmpps-accredited-programmes-ui -n ${KUBE_NAMESPACE} -o json | jq -r ".data.SYSTEM_CLIENT_SECRET | @base64d")
+API_ID=$(kubectl get secret hmpps-accredited-programmes-ui -n ${KUBE_NAMESPACE} -o json | jq -r ".data.SYSTEM_CLIENT_ID | @base64d")
+# Build the authorization string
+AUTH_STRING=$(echo -n "${API_ID}":"${API_SECRET}" | base64 -b 0)
+
+# Ask kubernetes for information about the pods in our namespace and extract the name of one of the api pods.
+POD_NAME="$(kubectl get  -n ${KUBE_NAMESPACE} --output=json pods | jq -r '.items |  map(select(.metadata.labels.app=="hmpps-accredited-programmes-api")) | .[0].metadata.name')"
+
+# Invoke curl on POD_NAME to request a token from hmpps-auth using the auth string obtained above.
+JWT_JSON=$(kubectl exec "${POD_NAME}"  -n ${KUBE_NAMESPACE} -- curl -s -X POST "${AUTH_URL}/oauth/token?grant_type=client_credentials" -H 'Content-Type: application/json' -H 'Content-Length: 0' -H "Authorization: Basic ${AUTH_STRING}")
+
+# Extract the access token
+TOKEN=$(echo "$JWT_JSON" | jq -r .access_token)
+
+curl --upload-file Course.csv             --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses                > courseMessages.json
+curl --upload-file Offering.csv           --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/offerings      > offeringMessages.json
+curl --upload-file CoursePrerequisite.csv --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/prerequisites  > prerequisiteMessages.json
