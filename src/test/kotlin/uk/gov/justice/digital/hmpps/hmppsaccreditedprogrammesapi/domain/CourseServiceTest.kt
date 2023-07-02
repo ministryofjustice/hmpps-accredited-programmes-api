@@ -43,7 +43,7 @@ class CourseServiceTest {
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value))) }
       verify {
-        repository.saveCourse(eqCourse(CourseEntity(name = "Course", description = "Description", audiences = mutableSetOf(a1))))
+        repository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1))))
       }
     }
 
@@ -63,8 +63,8 @@ class CourseServiceTest {
       )
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", description = "Description 2", audiences = mutableSetOf(a1, a3)))) }
+      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
+      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3)))) }
     }
 
     @Test
@@ -101,6 +101,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           description = "Description 1",
           prerequisites = mutableSetOf(
             Prerequisite(name = "PR 1", description = " PR Desc 1 "),
@@ -119,6 +120,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           prerequisites = mutableSetOf(Prerequisite(name = "PR 1", description = " PR 1 Desc")),
         ),
       )
@@ -136,8 +138,8 @@ class CourseServiceTest {
     @Test
     fun `multiple courses and prerequisites - all match`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -163,8 +165,8 @@ class CourseServiceTest {
     @Test
     fun `course name mismatch - record ignored`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -198,6 +200,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           description = "Description 1",
           offerings = mutableSetOf(
             Offering(organisationId = "BWI", contactEmail = "a@b.com"),
@@ -216,6 +219,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           offerings = mutableSetOf(
             Offering(organisationId = "BWI", contactEmail = "a@b.com"),
           ),
@@ -235,8 +239,8 @@ class CourseServiceTest {
     @Test
     fun `multiple courses and offerings - all match`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -262,8 +266,8 @@ class CourseServiceTest {
     @Test
     fun `course name mismatch - record ignored`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -287,8 +291,8 @@ class CourseServiceTest {
     @Test
     fun `Missing contactEmail - Warning LineMessage produced`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
