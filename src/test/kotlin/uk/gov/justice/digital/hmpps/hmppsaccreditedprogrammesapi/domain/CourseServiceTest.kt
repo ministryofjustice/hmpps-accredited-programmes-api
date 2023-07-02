@@ -36,7 +36,7 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          NewCourse(name = "Course", description = "Description", audience = "Audience 1", alternateName = "CCC"),
+          NewCourse(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC"),
         ),
       )
 
@@ -57,8 +57,8 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          NewCourse(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
-          NewCourse(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
+          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
+          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
         ),
       )
       verify { repository.clear() }
@@ -77,10 +77,10 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          NewCourse(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
-          NewCourse(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
-          NewCourse(name = "Course 3", description = "Description 3", audience = a1.value, alternateName = "333"),
-          NewCourse(name = "Course 4", description = "Description 4", audience = a1.value, alternateName = "444"),
+          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
+          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
+          NewCourse(name = "Course 3", identifier = "C3", description = "Description 3", audience = a1.value, alternateName = "333"),
+          NewCourse(name = "Course 4", identifier = "C4", description = "Description 4", audience = a1.value, alternateName = "444"),
         ),
       )
 

@@ -233,6 +233,7 @@ components:
           type: string
       required:
         - name
+        - identifier
         - description
         - audience
 

@@ -38,6 +38,7 @@ fun Audience.toApi(): CourseAudience = CourseAudience(
 
 fun CourseRecord.toDomain(): NewCourse = NewCourse(
   name = name,
+  identifier = identifier,
   description = description,
   audience = audience,
   alternateName = alternateName,
