@@ -9,7 +9,6 @@ import io.mockk.verify
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
@@ -37,7 +36,7 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course", description = "Description", audience = "Audience 1", alternateName = "CCC", comments = "A comment"),
+          NewCourse(name = "Course", description = "Description", audience = "Audience 1", alternateName = "CCC"),
         ),
       )
 
@@ -58,11 +57,10 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
+          NewCourse(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
+          NewCourse(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
         ),
       )
-
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
       verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
@@ -79,10 +77,10 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
-          CourseRecord(name = "Course 3", description = "Description 3", audience = a1.value, alternateName = "333", comments = "A comment for 3"),
-          CourseRecord(name = "Course 4", description = "Description 4", audience = a1.value, alternateName = "444", comments = "A comment for 4"),
+          NewCourse(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
+          NewCourse(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
+          NewCourse(name = "Course 3", description = "Description 3", audience = a1.value, alternateName = "333"),
+          NewCourse(name = "Course 4", description = "Description 4", audience = a1.value, alternateName = "444"),
         ),
       )
 

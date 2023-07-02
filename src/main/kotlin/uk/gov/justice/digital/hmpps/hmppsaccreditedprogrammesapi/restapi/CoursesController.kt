@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEn
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.transformer.toApi
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.transformer.toDomain
 import java.util.UUID
 
 @Service
@@ -27,8 +28,8 @@ class CoursesController(
           .map(CourseEntity::toApi),
       )
 
-  override fun coursesPut(courseRecords: List<CourseRecord>): ResponseEntity<Unit> {
-    courseService.replaceAllCourses(courseRecords)
+  override fun coursesPut(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
+    courseService.replaceAllCourses(courseRecord.map(CourseRecord::toDomain))
     return ResponseEntity.noContent().build()
   }
 

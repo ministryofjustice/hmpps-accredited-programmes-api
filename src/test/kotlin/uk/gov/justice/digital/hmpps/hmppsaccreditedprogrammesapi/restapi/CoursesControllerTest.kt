@@ -241,7 +241,7 @@ class CoursesControllerTest(
         status { isNoContent() }
       }
 
-      verify { coursesService.replaceAllCourses(CsvTestData.courseRecords) }
+      verify { coursesService.replaceAllCourses(CsvTestData.newCourses) }
     }
   }
 

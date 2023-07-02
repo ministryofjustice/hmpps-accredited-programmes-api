@@ -163,7 +163,7 @@ class CoursesIntegrationTest
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectBody()
-      .jsonPath("$.length()").isEqualTo(CsvTestData.courseRecords.size)
+      .jsonPath("$.length()").isEqualTo(CsvTestData.newCourses.size)
   }
 
   @DirtiesContext
@@ -242,7 +242,7 @@ class CoursesIntegrationTest
         .returnResult().responseBody!!
     }
 
-    allOfferings shouldHaveSize CsvTestData.courseRecords.size
+    allOfferings shouldHaveSize CsvTestData.newCourses.size
 
     val actualOrganisationIds: Set<String> = allOfferings
       .flatMap { courseOfferings ->
