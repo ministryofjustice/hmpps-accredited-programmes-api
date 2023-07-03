@@ -7,7 +7,6 @@ import au.com.dius.pact.provider.junitsupport.VerificationReports
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider
 import org.apache.hc.core5.http.HttpRequest
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,7 +41,6 @@ class PactContractTest {
   @State("An offering exists with ID 20f3abc8-dd92-43ae-b88e-5797a0ad3f4b")
   fun ensureOfferingExists() {}
 
-  @Disabled
   @TestTemplate
   @ExtendWith(PactVerificationSpringProvider::class)
   fun template(context: PactVerificationContext, request: HttpRequest) {
