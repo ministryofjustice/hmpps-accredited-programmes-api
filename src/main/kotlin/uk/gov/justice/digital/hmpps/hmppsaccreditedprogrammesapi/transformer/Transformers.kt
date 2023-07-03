@@ -39,16 +39,15 @@ fun Audience.toApi(): CourseAudience = CourseAudience(
 )
 
 fun CourseRecord.toDomain(): NewCourse = NewCourse(
-  name = name,
-  identifier = identifier,
-  description = description,
+  name = name.trim(),
+  identifier = identifier.trim(),
+  description = description.trim(),
   audience = audience,
-  alternateName = alternateName,
+  alternateName = alternateName?.trim(),
 )
 
 fun OfferingRecord.toDomain(): NewOffering = NewOffering(
-  course = course,
-  prisonId = prisonId,
-  organisation = organisation,
-  contactEmail = contactEmail,
+  prisonId = prisonId.trim(),
+  identifier = identifier.trim(),
+  contactEmail = contactEmail?.trim(),
 )

@@ -323,6 +323,7 @@ components:
       required:
         - course
         - prisonId
+        - identifier
 
     CourseAudience:
       type: object

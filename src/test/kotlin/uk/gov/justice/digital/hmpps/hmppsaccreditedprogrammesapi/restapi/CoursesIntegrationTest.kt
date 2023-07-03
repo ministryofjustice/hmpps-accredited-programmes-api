@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.Test
@@ -186,7 +187,7 @@ class CoursesIntegrationTest
       .exchange()
       .expectStatus().is2xxSuccessful
       .expectBody()
-      .jsonPath("$.size()").isEqualTo(163)
+      .jsonPath("$.size()").isEqualTo(150)
 
     webTestClient
       .get()
@@ -195,7 +196,7 @@ class CoursesIntegrationTest
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectBody()
-      .jsonPath("$..coursePrerequisites.length()").isEqualTo(72)
+      .jsonPath("$..coursePrerequisites.length()").isEqualTo(85)
   }
 
   @DirtiesContext
@@ -219,7 +220,7 @@ class CoursesIntegrationTest
       .exchange()
       .expectStatus().is2xxSuccessful
       .expectBody()
-      .jsonPath("$.size()").isEqualTo(156)
+      .jsonPath("$.size()").isEqualTo(0)
 
     val courses: List<Course> = webTestClient
       .get()
@@ -250,7 +251,6 @@ class CoursesIntegrationTest
 
     val expectedOrganisationIds = CsvTestData.offeringsRecords.map { it.prisonId }.toSet()
 
-//  To Do: Restore when offerings are linked by course id
-//  actualOrganisationIds shouldContainExactly expectedOrganisationIds
+    actualOrganisationIds shouldContainExactly expectedOrganisationIds
   }
 }

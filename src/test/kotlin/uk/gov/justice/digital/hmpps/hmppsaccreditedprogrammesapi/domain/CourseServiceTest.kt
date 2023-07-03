@@ -228,7 +228,7 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          NewOffering(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
+          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net"),
         ),
       ).shouldBeEmpty()
 
@@ -245,9 +245,9 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          NewOffering(course = "Course 1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
-          NewOffering(course = "Course 1", prisonId = "BWI", contactEmail = "admin@bwi.net"),
-          NewOffering(course = "Course 2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
+          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
+          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "admin@bwi.net"),
+          NewOffering(identifier = "C2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
         ),
       ).shouldBeEmpty()
 
@@ -263,7 +263,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `course name mismatch - record ignored`() {
+    fun `identifier mismatch - record ignored`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
@@ -272,17 +272,17 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          NewOffering(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
-          NewOffering(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
-          NewOffering(course = "Course X", prisonId = "BWI", contactEmail = "x@y.net"),
-          NewOffering(course = "Course 2", prisonId = "MDI", contactEmail = "x@y.net"),
+          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net"),
+          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
+          NewOffering(identifier = "CX", prisonId = "BWI", contactEmail = "x@y.net"),
+          NewOffering(identifier = "C2", prisonId = "MDI", contactEmail = "x@y.net"),
         ),
       )
         .shouldContainExactly(
           LineMessage(
             lineNumber = 4,
             level = LineMessage.Level.error,
-            message = "No match for course 'Course X', prisonId 'BWI'",
+            message = "No course matches offering with identifier 'CX' and prisonId 'BWI'",
           ),
         )
     }
@@ -297,15 +297,15 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          NewOffering(course = "Course 1", prisonId = "MDI"),
-          NewOffering(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
+          NewOffering(identifier = "C1", prisonId = "MDI"),
+          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
         ),
       )
         .shouldContainExactly(
           LineMessage(
             lineNumber = 2,
             level = LineMessage.Level.warning,
-            message = "Missing contactEmail for 'Course 1' offering at prisonId 'MDI'",
+            message = "Missing contactEmail for offering with identifier 'C1' at prisonId 'MDI'",
           ),
         )
     }

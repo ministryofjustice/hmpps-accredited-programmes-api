@@ -69,38 +69,38 @@ class CourseService(
   fun replaceAllOfferings(replacements: List<NewOffering>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearOfferings(allCourses)
-    val coursesByName = allCourses.associateBy(CourseEntity::name)
+    val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     replacements.forEach { record ->
-      coursesByName[record.course]?.run {
+      coursesByIdentifier[record.identifier]?.run {
         offerings.add(Offering(organisationId = record.prisonId, contactEmail = record.contactEmail ?: ""))
       }
     }
 
-    return contactEmailWarnings(replacements) + unmatchedCourseErrors(replacements, coursesByName)
+    return contactEmailWarnings(replacements) + unmatchedCourseErrors(replacements, coursesByIdentifier)
   }
 
-  private fun contactEmailWarnings(offeringRecords: List<NewOffering>): List<LineMessage> =
-    offeringRecords.mapIndexed { index, record ->
+  private fun contactEmailWarnings(newOfferings: List<NewOffering>): List<LineMessage> =
+    newOfferings.mapIndexed { index, record ->
       when (record.contactEmail.isNullOrBlank()) {
         true -> LineMessage(
           lineNumber = indexToCsvRowNumber(index),
           level = LineMessage.Level.warning,
-          message = "Missing contactEmail for '${record.course}' offering at prisonId '${record.prisonId}'",
+          message = "Missing contactEmail for offering with identifier '${record.identifier}' at prisonId '${record.prisonId}'",
         )
 
         false -> null
       }
     }.filterNotNull()
 
-  private fun unmatchedCourseErrors(replacements: List<NewOffering>, coursesByName: Map<String, CourseEntity>) =
+  private fun unmatchedCourseErrors(replacements: List<NewOffering>, coursesByIdentifier: Map<String, CourseEntity>) =
     replacements
       .mapIndexed { index, record ->
-        when (coursesByName.containsKey(record.course)) {
+        when (coursesByIdentifier.containsKey(record.identifier)) {
           true -> null
           false -> LineMessage(
             lineNumber = indexToCsvRowNumber(index),
             level = LineMessage.Level.error,
-            message = "No match for course '${record.course}', prisonId '${record.prisonId}'",
+            message = "No course matches offering with identifier '${record.identifier}' and prisonId '${record.prisonId}'",
           )
         }
       }.filterNotNull()

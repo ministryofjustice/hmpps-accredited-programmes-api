@@ -11,24 +11,32 @@ private fun newCourse(name: String, identifier: String = "", audience: String, a
   NewCourse(name = name, identifier = identifier, alternateName = alternateName, audience = audience, description = LoremIpsum.words(1..10))
 
 object CsvTestData {
-  val newCourses: List<NewCourse> =
-    listOf(
-      newCourse(name = "Becoming New Me Plus", identifier = "BNM+-SO", audience = "Sexual offence, Intimate partner violence, Non-intimate partner violence", alternateName = "BNM+"),
-      newCourse(name = "Building Better Relationships", identifier = "BBR-IPVO", audience = "Intimate partner violence ", alternateName = "BBR"),
-      newCourse(name = "Healthy Identity Intervention", identifier = "HI-EO", audience = "Extremism offence", alternateName = "HI"),
-      newCourse(name = "Healthy Sex Programme", identifier = "HSP-SO", audience = "Sexual offence", alternateName = "HSP"),
-      newCourse(name = "Horizon", identifier = "H-SO", audience = "Sexual offence", alternateName = ""),
-      newCourse(name = "iHorizon", identifier = "iH-SO", audience = "Sexual offence", alternateName = ""),
-      newCourse(name = "Identity Matters", identifier = "IM-GO", audience = "Gang offence, Extremism offence", alternateName = "IM"),
-      newCourse(name = "Kaizen", identifier = "K-VO", audience = "Violent offence", alternateName = ""),
-      newCourse(name = "Kaizen", identifier = "K-IPVO", audience = "Intimate partner violence", alternateName = ""),
-      newCourse(name = "Kaizen", identifier = "K-SO", audience = "Sexual offence", alternateName = ""),
-      newCourse(name = "Living as New Me (custody)", identifier = "LNM-VO", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "LNM"),
-      newCourse(name = "Living as New Me (community)", identifier = "LNM-SO", audience = "Sexual offence", alternateName = "LNM"),
-      newCourse(name = "Motivation and Engagement", identifier = "M&E-VO", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "M&E"),
-      newCourse(name = "New Me MOT", identifier = "NMM-VO", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "NMM"),
-      newCourse(name = "New Me Strengths", identifier = "NMS-VO", audience = "Violent offence, Sexual offence, Intimate partner violence ", alternateName = "NMS"),
-    )
+  val newCourses: List<NewCourse> = listOf(
+    newCourse(name = "Becoming New Me Plus", identifier = "BNM-SO", audience = "Sexual offence", alternateName = "BNM+"),
+    newCourse(name = "Becoming New Me Plus", identifier = "BNM-IPVO", audience = "Intimate partner violence offence", alternateName = "BNM+"),
+    newCourse(name = "Becoming New Me Plus", identifier = "BNM-VO", audience = "General violence offence", alternateName = "BNM+"),
+    newCourse(name = "Building Better Relationships", identifier = "BBR-IPVO", audience = "Intimate partner violence offence", alternateName = "BBR"),
+    newCourse(name = "Healthy Identity Intervention", identifier = "HII-EO", audience = "Extremism offence", alternateName = "HII"),
+    newCourse(name = "Healthy Sex Programme", identifier = "HSP-SO", audience = "Sexual offence", alternateName = "HSP"),
+    newCourse(name = "Horizon", identifier = "H-SO", audience = "Sexual offence", alternateName = ""),
+    newCourse(name = "Identity Matters", identifier = "IM-GO", audience = "Gang offence", alternateName = "IM"),
+    newCourse(name = "Identity Matters", identifier = "IM-EO", audience = "Extremism offence", alternateName = "IM"),
+    newCourse(name = "Kaizen", identifier = "K-VO", audience = "General violence offence", alternateName = ""),
+    newCourse(name = "Kaizen", identifier = "K-IPVO", audience = "Intimate partner violence offence", alternateName = ""),
+    newCourse(name = "Kaizen", identifier = "K-SO", audience = "Sexual offence", alternateName = ""),
+    newCourse(name = "Living as New Me", identifier = "LNM-SO", audience = "Sexual offence", alternateName = "LNM"),
+    newCourse(name = "Motivation and Engagement", identifier = "ME-VO", audience = "General violence offence", alternateName = "M&E"),
+    newCourse(name = "Motivation and Engagement", identifier = "ME-SO", audience = "Sexual offence", alternateName = "M&E"),
+    newCourse(name = "Motivation and Engagement", identifier = "ME-IPVO", audience = "Intimate partner violence offence", alternateName = "M&E"),
+    newCourse(name = "New Me MOT", identifier = "NMM-VO", audience = "General violence offence", alternateName = "NMM"),
+    newCourse(name = "New Me MOT", identifier = "NMM-SO", audience = "Sexual offence", alternateName = "NMM"),
+    newCourse(name = "New Me MOT", identifier = "NMM-IPVO", audience = "Intimate partner violence offence", alternateName = "NMM"),
+    newCourse(name = "New Me Strengths", identifier = "NMS-VO", audience = "General violence offence", alternateName = "NMS"),
+    newCourse(name = "New Me Strengths", identifier = "NMS-SO", audience = "Sexual offence", alternateName = "NMS"),
+    newCourse(name = "New Me Strengths", identifier = "NMS-IPVO", audience = "Intimate partner violence offence", alternateName = "NMS"),
+    newCourse(name = "New Me Strengths", identifier = "NMS-AO", audience = "General offence", alternateName = "NMS"),
+    newCourse(name = "Thinking Skills Programme", identifier = "TSP-AO", audience = "General violence offence", alternateName = "TSP"),
+  )
 
   val prerequisiteRecords: List<PrerequisiteRecord> by lazy {
     listOf(
@@ -430,7 +438,7 @@ object CsvTestData {
     OfferingRecord(course = "Living as New Me ", identifier = "LNM-SO", organisation = "HMP Hull", prisonId = "HLI"),
     OfferingRecord(course = "Living as New Me ", identifier = "LNM-SO", organisation = "HMP Isle of Wight", prisonId = "IWI"),
     OfferingRecord(course = "Living as New Me ", identifier = "LNM-SO", organisation = "HMP Whatton", prisonId = "WTI"),
-    OfferingRecord(course = "New Me MOT", identifier = "", organisation = "?", prisonId = ""),
+//    OfferingRecord(course = "New Me MOT", identifier = "", organisation = "?", prisonId = ""),
     OfferingRecord(course = "New Me Strengths ", identifier = "NMS-IPVO", organisation = "HMP Berwyn", prisonId = "BWI"),
     OfferingRecord(course = "New Me Strengths ", identifier = "NMS-IPVO", organisation = "HMP Bullingdon", prisonId = "BNI"),
     OfferingRecord(course = "New Me Strengths ", identifier = "NMS-IPVO", organisation = "HMP Guys Marsh", prisonId = "GMI"),
