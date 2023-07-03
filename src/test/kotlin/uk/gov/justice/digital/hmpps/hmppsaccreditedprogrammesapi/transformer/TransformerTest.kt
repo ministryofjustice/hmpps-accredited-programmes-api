@@ -17,6 +17,7 @@ class TransformerTest {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
+      identifier = "AC",
       prerequisites = mutableSetOf(),
       audiences = mutableSetOf(),
     )
@@ -35,6 +36,7 @@ class TransformerTest {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
+      identifier = "AC",
       description = "A description",
       alternateName = "AA++",
       prerequisites = mutableSetOf(),
@@ -52,6 +54,7 @@ class TransformerTest {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
+      identifier = "AC",
       prerequisites = mutableSetOf(
         Prerequisite(name = "gender", description = "female"),
         Prerequisite(name = "risk score", description = "ORGS: 50+"),

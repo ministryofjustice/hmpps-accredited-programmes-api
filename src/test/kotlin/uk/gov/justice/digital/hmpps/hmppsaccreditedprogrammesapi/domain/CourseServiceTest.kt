@@ -9,7 +9,6 @@ import io.mockk.verify
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
@@ -37,14 +36,14 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course", description = "Description", audience = "Audience 1", alternateName = "CCC", comments = "A comment"),
+          NewCourse(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC"),
         ),
       )
 
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value))) }
       verify {
-        repository.saveCourse(eqCourse(CourseEntity(name = "Course", description = "Description", audiences = mutableSetOf(a1))))
+        repository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1))))
       }
     }
 
@@ -58,15 +57,14 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
+          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
+          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
         ),
       )
-
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", description = "Description 2", audiences = mutableSetOf(a1, a3)))) }
+      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
+      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3)))) }
     }
 
     @Test
@@ -79,10 +77,10 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          CourseRecord(name = "Course 1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", comments = "A comment for 1"),
-          CourseRecord(name = "Course 2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", comments = "A comment for 2"),
-          CourseRecord(name = "Course 3", description = "Description 3", audience = a1.value, alternateName = "333", comments = "A comment for 3"),
-          CourseRecord(name = "Course 4", description = "Description 4", audience = a1.value, alternateName = "444", comments = "A comment for 4"),
+          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
+          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
+          NewCourse(name = "Course 3", identifier = "C3", description = "Description 3", audience = a1.value, alternateName = "333"),
+          NewCourse(name = "Course 4", identifier = "C4", description = "Description 4", audience = a1.value, alternateName = "444"),
         ),
       )
 
@@ -103,6 +101,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           description = "Description 1",
           prerequisites = mutableSetOf(
             Prerequisite(name = "PR 1", description = " PR Desc 1 "),
@@ -121,6 +120,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           prerequisites = mutableSetOf(Prerequisite(name = "PR 1", description = " PR 1 Desc")),
         ),
       )
@@ -138,8 +138,8 @@ class CourseServiceTest {
     @Test
     fun `multiple courses and prerequisites - all match`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -165,8 +165,8 @@ class CourseServiceTest {
     @Test
     fun `course name mismatch - record ignored`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -200,6 +200,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           description = "Description 1",
           offerings = mutableSetOf(
             Offering(organisationId = "BWI", contactEmail = "a@b.com"),
@@ -218,6 +219,7 @@ class CourseServiceTest {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
+          identifier = "C1",
           offerings = mutableSetOf(
             Offering(organisationId = "BWI", contactEmail = "a@b.com"),
           ),
@@ -237,8 +239,8 @@ class CourseServiceTest {
     @Test
     fun `multiple courses and offerings - all match`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -264,8 +266,8 @@ class CourseServiceTest {
     @Test
     fun `course name mismatch - record ignored`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
@@ -289,8 +291,8 @@ class CourseServiceTest {
     @Test
     fun `Missing contactEmail - Warning LineMessage produced`() {
       val allCourses = listOf(
-        CourseEntity(name = "Course 1"),
-        CourseEntity(name = "Course 2"),
+        CourseEntity(name = "Course 1", identifier = "C1"),
+        CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 

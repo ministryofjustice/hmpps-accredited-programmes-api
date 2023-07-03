@@ -17,6 +17,7 @@ constructor(
     repository.saveCourse(
       CourseEntity(
         name = "Course 1",
+        identifier = "C1",
         description = "A course",
         audiences = mutableSetOf(
           Audience("Male"),
@@ -32,6 +33,7 @@ constructor(
     repository.saveCourse(
       CourseEntity(
         name = "Course 1",
+        identifier = "C1",
         description = "A course",
         audiences = mutableSetOf(
           Audience("Male"),

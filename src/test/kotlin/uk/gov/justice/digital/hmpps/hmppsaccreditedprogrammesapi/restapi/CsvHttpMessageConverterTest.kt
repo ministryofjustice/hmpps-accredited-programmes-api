@@ -8,6 +8,7 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.mock.http.MockHttpInputMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.transformer.toDomain
 import java.nio.charset.StandardCharsets
 
 class CsvHttpMessageConverterTest {
@@ -133,7 +134,7 @@ class CsvHttpMessageConverterTest {
     val beanList = object : ParameterizedTypeReference<List<CourseRecord>>() {}
     val result = converter.read(beanList.type, null, inputMessage)
     val list = result.shouldBeInstanceOf<List<CourseRecord>>()
-    list.shouldContainExactly(CsvTestData.courseRecords)
+    list.map(CourseRecord::toDomain).shouldContainExactly(CsvTestData.newCourses)
   }
 }
 
