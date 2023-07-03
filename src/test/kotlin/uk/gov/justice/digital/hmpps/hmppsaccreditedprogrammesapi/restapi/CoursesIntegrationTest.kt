@@ -219,7 +219,7 @@ class CoursesIntegrationTest
       .exchange()
       .expectStatus().is2xxSuccessful
       .expectBody()
-      .jsonPath("$.size()").isEqualTo(164)
+      .jsonPath("$.size()").isEqualTo(156)
 
     val courses: List<Course> = webTestClient
       .get()

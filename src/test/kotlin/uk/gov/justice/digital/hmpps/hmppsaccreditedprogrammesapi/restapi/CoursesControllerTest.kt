@@ -17,10 +17,12 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo.InMemoryCourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
-import java.util.*
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.transformer.toDomain
+import java.util.UUID
 
 @WebMvcTest
 @ContextConfiguration(classes = [CoursesControllerTest::class])
@@ -285,7 +287,7 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.replaceAllOfferings(CsvTestData.offeringsRecords) }
+      verify { coursesService.replaceAllOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
     }
   }
 }
