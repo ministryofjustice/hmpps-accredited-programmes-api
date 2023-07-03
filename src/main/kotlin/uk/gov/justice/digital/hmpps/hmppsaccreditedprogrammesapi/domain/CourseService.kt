@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
-import java.util.UUID
+import java.util.*
 
 @Service
 @Transactional
@@ -67,7 +66,7 @@ class CourseService(
     courses.forEach { it.prerequisites.clear() }
   }
 
-  fun replaceAllOfferings(replacements: List<OfferingRecord>): List<LineMessage> {
+  fun replaceAllOfferings(replacements: List<NewOffering>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearOfferings(allCourses)
     val coursesByName = allCourses.associateBy(CourseEntity::name)
@@ -80,7 +79,7 @@ class CourseService(
     return contactEmailWarnings(replacements) + unmatchedCourseErrors(replacements, coursesByName)
   }
 
-  private fun contactEmailWarnings(offeringRecords: List<OfferingRecord>): List<LineMessage> =
+  private fun contactEmailWarnings(offeringRecords: List<NewOffering>): List<LineMessage> =
     offeringRecords.mapIndexed { index, record ->
       when (record.contactEmail.isNullOrBlank()) {
         true -> LineMessage(
@@ -93,7 +92,7 @@ class CourseService(
       }
     }.filterNotNull()
 
-  private fun unmatchedCourseErrors(replacements: List<OfferingRecord>, coursesByName: Map<String, CourseEntity>) =
+  private fun unmatchedCourseErrors(replacements: List<NewOffering>, coursesByName: Map<String, CourseEntity>) =
     replacements
       .mapIndexed { index, record ->
         when (coursesByName.containsKey(record.course)) {

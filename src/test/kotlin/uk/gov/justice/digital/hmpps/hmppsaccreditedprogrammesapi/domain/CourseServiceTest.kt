@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import java.util.*
 
@@ -229,7 +228,7 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          OfferingRecord(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
+          NewOffering(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
         ),
       ).shouldBeEmpty()
 
@@ -246,9 +245,9 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          OfferingRecord(course = "Course 1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
-          OfferingRecord(course = "Course 1", prisonId = "BWI", contactEmail = "admin@bwi.net"),
-          OfferingRecord(course = "Course 2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
+          NewOffering(course = "Course 1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
+          NewOffering(course = "Course 1", prisonId = "BWI", contactEmail = "admin@bwi.net"),
+          NewOffering(course = "Course 2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
         ),
       ).shouldBeEmpty()
 
@@ -273,10 +272,10 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          OfferingRecord(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
-          OfferingRecord(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
-          OfferingRecord(course = "Course X", prisonId = "BWI", contactEmail = "x@y.net"),
-          OfferingRecord(course = "Course 2", prisonId = "MDI", contactEmail = "x@y.net"),
+          NewOffering(course = "Course 1", prisonId = "MDI", contactEmail = "x@y.net"),
+          NewOffering(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
+          NewOffering(course = "Course X", prisonId = "BWI", contactEmail = "x@y.net"),
+          NewOffering(course = "Course 2", prisonId = "MDI", contactEmail = "x@y.net"),
         ),
       )
         .shouldContainExactly(
@@ -298,8 +297,8 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          OfferingRecord(course = "Course 1", prisonId = "MDI"),
-          OfferingRecord(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
+          NewOffering(course = "Course 1", prisonId = "MDI"),
+          NewOffering(course = "Course 1", prisonId = "BWI", contactEmail = "x@y.net"),
         ),
       )
         .shouldContainExactly(
