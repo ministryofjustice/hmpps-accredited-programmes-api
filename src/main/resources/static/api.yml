@@ -271,6 +271,9 @@ components:
           type: string
           example: "Kaizen"
           description: "The name of the Course to which this Prerequisite applies. The name must match a course name exactly for this Prerequisite to be added to the Course."
+        identifier:
+          type: string
+          example: "BNM-IPVO"
         comments:
           type: string
       required:
