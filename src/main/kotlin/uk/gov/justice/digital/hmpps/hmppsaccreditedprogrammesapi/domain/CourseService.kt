@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
-import java.util.*
+import java.util.UUID
 
 @Service
 @Transactional
@@ -40,24 +39,28 @@ class CourseService(
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
-  fun replaceAllPrerequisites(replacements: List<PrerequisiteRecord>): List<LineMessage> {
+  fun replaceAllPrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearPrerequisites(allCourses)
-    val coursesByName = allCourses.associateBy(CourseEntity::name)
+    val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     replacements.forEach { record ->
-      coursesByName[record.course]?.run {
-        prerequisites.add(Prerequisite(name = record.name, description = record.description ?: ""))
+      record.identifier.split(",").forEach { identifier ->
+        coursesByIdentifier[identifier.trim()]?.run {
+          prerequisites.add(Prerequisite(name = record.name, description = record.description ?: ""))
+        }
       }
     }
     return replacements
-      .mapIndexed { index, record ->
-        when (coursesByName.containsKey(record.course)) {
-          true -> null
-          false -> LineMessage(
-            lineNumber = indexToCsvRowNumber(index),
-            level = LineMessage.Level.error,
-            message = "No match for course '${record.course}'",
-          )
+      .flatMapIndexed { index, record ->
+        record.identifier.split(",").map { identifier ->
+          when (coursesByIdentifier.containsKey(identifier.trim())) {
+            true -> null
+            false -> LineMessage(
+              lineNumber = indexToCsvRowNumber(index),
+              level = LineMessage.Level.error,
+              message = "No match for course identifier '$identifier'",
+            )
+          }
         }
       }.filterNotNull()
   }
