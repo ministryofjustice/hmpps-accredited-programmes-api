@@ -438,7 +438,6 @@ object CsvTestData {
     OfferingRecord(course = "Living as New Me ", identifier = "LNM-SO", organisation = "HMP Hull", prisonId = "HLI"),
     OfferingRecord(course = "Living as New Me ", identifier = "LNM-SO", organisation = "HMP Isle of Wight", prisonId = "IWI"),
     OfferingRecord(course = "Living as New Me ", identifier = "LNM-SO", organisation = "HMP Whatton", prisonId = "WTI"),
-//    OfferingRecord(course = "New Me MOT", identifier = "", organisation = "?", prisonId = ""),
     OfferingRecord(course = "New Me Strengths ", identifier = "NMS-IPVO", organisation = "HMP Berwyn", prisonId = "BWI"),
     OfferingRecord(course = "New Me Strengths ", identifier = "NMS-IPVO", organisation = "HMP Bullingdon", prisonId = "BNI"),
     OfferingRecord(course = "New Me Strengths ", identifier = "NMS-IPVO", organisation = "HMP Guys Marsh", prisonId = "GMI"),
