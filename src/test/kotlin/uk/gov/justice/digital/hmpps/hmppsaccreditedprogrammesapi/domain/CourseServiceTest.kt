@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import java.util.*
 
 class CourseServiceTest {
@@ -127,7 +126,7 @@ class CourseServiceTest {
 
       service.replaceAllPrerequisites(
         listOf(
-          PrerequisiteRecord("PR 2", "Course 1", description = "PR 2 Desc", comments = "Lorem ipsum"),
+          NewPrerequisite("PR 2", "Course 1", description = "PR 2 Desc", comments = "Lorem ipsum"),
         ),
       ).shouldBeEmpty()
 
@@ -144,9 +143,9 @@ class CourseServiceTest {
 
       service.replaceAllPrerequisites(
         listOf(
-          PrerequisiteRecord("PR 1", "Course 1", description = "PR 1 Desc"),
-          PrerequisiteRecord("PR 2", "Course 1", description = "PR 2 Desc"),
-          PrerequisiteRecord("PR 3", "Course 2", description = "PR 3 Desc"),
+          NewPrerequisite("PR 1", "Course 1", description = "PR 1 Desc"),
+          NewPrerequisite("PR 2", "Course 1", description = "PR 2 Desc"),
+          NewPrerequisite("PR 3", "Course 2", description = "PR 3 Desc"),
         ),
       ).shouldBeEmpty()
 
@@ -171,9 +170,9 @@ class CourseServiceTest {
 
       service.replaceAllPrerequisites(
         listOf(
-          PrerequisiteRecord("PR 1", "Course 1"),
-          PrerequisiteRecord("PR 1", "Course X"),
-          PrerequisiteRecord("PR 2", "Course 2"),
+          NewPrerequisite("PR 1", "Course 1"),
+          NewPrerequisite("PR 1", "Course X"),
+          NewPrerequisite("PR 2", "Course 2"),
         ),
       )
         .shouldContainExactly(

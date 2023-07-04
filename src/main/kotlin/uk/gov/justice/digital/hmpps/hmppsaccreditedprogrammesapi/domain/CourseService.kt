@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
-import java.util.*
+import java.util.UUID
 
 @Service
 @Transactional
@@ -40,7 +39,7 @@ class CourseService(
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
-  fun replaceAllPrerequisites(replacements: List<PrerequisiteRecord>): List<LineMessage> {
+  fun replaceAllPrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearPrerequisites(allCourses)
     val coursesByName = allCourses.associateBy(CourseEntity::name)

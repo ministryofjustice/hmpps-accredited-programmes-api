@@ -6,10 +6,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewCourse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewOffering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewPrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 
@@ -50,4 +52,11 @@ fun OfferingRecord.toDomain(): NewOffering = NewOffering(
   prisonId = prisonId.trim(),
   identifier = identifier.trim(),
   contactEmail = contactEmail?.trim(),
+)
+
+fun PrerequisiteRecord.toDomain(): NewPrerequisite = NewPrerequisite(
+  name = name,
+  course = course,
+  description = description,
+  comments = comments,
 )
