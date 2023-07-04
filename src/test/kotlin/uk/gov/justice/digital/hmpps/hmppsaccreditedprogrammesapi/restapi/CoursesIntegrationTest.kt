@@ -187,7 +187,7 @@ class CoursesIntegrationTest
       .exchange()
       .expectStatus().is2xxSuccessful
       .expectBody()
-      .jsonPath("$.size()").isEqualTo(150)
+      .jsonPath("$.size()").isEqualTo(0)
 
     webTestClient
       .get()
@@ -196,7 +196,7 @@ class CoursesIntegrationTest
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectBody()
-      .jsonPath("$..coursePrerequisites.length()").isEqualTo(85)
+      .jsonPath("$..coursePrerequisites.length()").isEqualTo(247)
   }
 
   @DirtiesContext

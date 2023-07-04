@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import java.util.*
+import java.util.UUID
 
 class CourseServiceTest {
   private val repository = mockk<MutableCourseRepository>(relaxed = true)
@@ -126,7 +126,7 @@ class CourseServiceTest {
 
       service.replaceAllPrerequisites(
         listOf(
-          NewPrerequisite("PR 2", "Course 1", description = "PR 2 Desc", comments = "Lorem ipsum"),
+          NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
         ),
       ).shouldBeEmpty()
 
@@ -143,25 +143,25 @@ class CourseServiceTest {
 
       service.replaceAllPrerequisites(
         listOf(
-          NewPrerequisite("PR 1", "Course 1", description = "PR 1 Desc"),
-          NewPrerequisite("PR 2", "Course 1", description = "PR 2 Desc"),
-          NewPrerequisite("PR 3", "Course 2", description = "PR 3 Desc"),
+          NewPrerequisite(name = "PR 1", description = "PR 1 Desc", identifier = "C1"),
+          NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
+          NewPrerequisite(name = "PR 3", description = "PR 3 Desc", identifier = "C2"),
         ),
       ).shouldBeEmpty()
 
-      allCourses.associateBy(CourseEntity::name, CourseEntity::prerequisites) shouldBeEqual mapOf(
-        "Course 1" to mutableSetOf(
+      allCourses.associateBy(CourseEntity::identifier, CourseEntity::prerequisites) shouldBeEqual mapOf(
+        "C1" to mutableSetOf(
           Prerequisite("PR 1", "PR 1 Desc"),
           Prerequisite("PR 2", "PR 2 Desc"),
         ),
-        "Course 2" to mutableSetOf(
+        "C2" to mutableSetOf(
           Prerequisite("PR 3", "PR 3 Desc"),
         ),
       )
     }
 
     @Test
-    fun `course name mismatch - record ignored`() {
+    fun `identifier mismatch - record ignored`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
@@ -170,18 +170,39 @@ class CourseServiceTest {
 
       service.replaceAllPrerequisites(
         listOf(
-          NewPrerequisite("PR 1", "Course 1"),
-          NewPrerequisite("PR 1", "Course X"),
-          NewPrerequisite("PR 2", "Course 2"),
+          NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "C1"),
+          NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "CX"),
+          NewPrerequisite(name = "PR 2", description = "Don't care", identifier = "C2"),
         ),
       )
         .shouldContainExactly(
           LineMessage(
             lineNumber = 3,
             level = LineMessage.Level.error,
-            message = "No match for course 'Course X'",
+            message = "No match for course identifier 'CX'",
           ),
         )
+    }
+
+    @Test
+    fun `NewPrerequisite has multiple identifiers`() {
+      val allCourses = listOf(
+        CourseEntity(name = "Course 1", identifier = "C-1"),
+        CourseEntity(name = "Course 2", identifier = "C-2"),
+      )
+      every { repository.allCourses() } returns allCourses
+
+      service.replaceAllPrerequisites(
+        listOf(
+          NewPrerequisite(name = "PR 1", description = "D1", identifier = " C-1 , C-2 "),
+          NewPrerequisite(name = "PR 2", description = "D2", identifier = "C-2,C-X"),
+        ),
+      )
+
+      allCourses.associateBy(CourseEntity::identifier, CourseEntity::prerequisites) shouldBeEqual mapOf(
+        "C-1" to mutableSetOf(Prerequisite("PR 1", "D1")),
+        "C-2" to mutableSetOf(Prerequisite("PR 1", "D1"), Prerequisite("PR 2", "D2")),
+      )
     }
   }
 

@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo.InMemoryCourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
@@ -265,7 +266,7 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.replaceAllPrerequisites(CsvTestData.prerequisiteRecords) }
+      verify { coursesService.replaceAllPrerequisites(CsvTestData.prerequisiteRecords.map(PrerequisiteRecord::toDomain)) }
     }
   }
 

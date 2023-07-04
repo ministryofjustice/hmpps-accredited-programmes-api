@@ -56,7 +56,6 @@ fun OfferingRecord.toDomain(): NewOffering = NewOffering(
 
 fun PrerequisiteRecord.toDomain(): NewPrerequisite = NewPrerequisite(
   name = name,
-  course = course,
   description = description,
-  comments = comments,
+  identifier = identifier,
 )
