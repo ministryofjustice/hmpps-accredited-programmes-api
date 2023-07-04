@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jparepo
 
 import jakarta.persistence.EntityManager
+import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
@@ -18,11 +19,26 @@ constructor(
   private val audienceRepository: AudienceRepository,
   private val entityManager: EntityManager,
 ) : MutableCourseRepository {
-  override fun allCourses(): List<CourseEntity> = courseRepository.findAll()
+  override fun allCourses(): List<CourseEntity> = courseRepository
+    .findAll()
+    .onEach {
+      Hibernate.initialize(it.audiences)
+      Hibernate.initialize(it.prerequisites)
+    }
 
-  override fun course(courseId: UUID): CourseEntity? = courseRepository.findById(courseId).getOrNull()
+  override fun course(courseId: UUID): CourseEntity? = courseRepository
+    .findById(courseId)
+    .getOrNull()
+    ?.also {
+      Hibernate.initialize(it.audiences)
+      Hibernate.initialize(it.prerequisites)
+    }
 
-  override fun offeringsForCourse(courseId: UUID): List<Offering> = course(courseId)?.offerings?.toList() ?: emptyList()
+  override fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
+    .findById(courseId)
+    .getOrNull()
+    ?.offerings
+    ?.toList() ?: emptyList()
 
   override fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = offeringsForCourse(courseId).find { it.id == offeringId }
 
