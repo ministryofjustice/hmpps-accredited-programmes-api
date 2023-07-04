@@ -5,7 +5,7 @@ DELETE from audience;
 DELETE from course;
 
 INSERT INTO audience(audience_id, audience_value)
-VALUES ('7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'Sexual violence'),
+VALUES ('7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'Sexual offence'),
        ('7fffcc6a-11f8-4713-be35-cf5ff1aee518', 'Extremism offence'),
        ('7fffcc6a-11f8-4713-be35-cf5ff1aee519', 'Gang offence'),
        ('7fffcc6a-11f8-4713-be35-cf5ff1aee510', 'Violent offence'),
