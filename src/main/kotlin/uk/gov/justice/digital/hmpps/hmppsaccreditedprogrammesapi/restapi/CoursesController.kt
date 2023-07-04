@@ -37,7 +37,7 @@ class CoursesController(
     ResponseEntity.ok(courseService.replaceAllPrerequisites(prerequisiteRecords))
 
   override fun coursesOfferingsPut(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
-    ResponseEntity.ok(courseService.replaceAllOfferings(offeringRecord))
+    ResponseEntity.ok(courseService.replaceAllOfferings(offeringRecord.map(OfferingRecord::toDomain)))
 
   override fun coursesCourseIdGet(courseId: UUID): ResponseEntity<Course> =
     courseService.course(courseId)?.let {

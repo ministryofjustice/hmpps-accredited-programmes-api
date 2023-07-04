@@ -5,9 +5,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewCourse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 
@@ -37,9 +39,15 @@ fun Audience.toApi(): CourseAudience = CourseAudience(
 )
 
 fun CourseRecord.toDomain(): NewCourse = NewCourse(
-  name = name,
-  identifier = identifier,
-  description = description,
+  name = name.trim(),
+  identifier = identifier.trim(),
+  description = description.trim(),
   audience = audience,
-  alternateName = alternateName,
+  alternateName = alternateName?.trim(),
+)
+
+fun OfferingRecord.toDomain(): NewOffering = NewOffering(
+  prisonId = prisonId.trim(),
+  identifier = identifier.trim(),
+  contactEmail = contactEmail?.trim(),
 )
