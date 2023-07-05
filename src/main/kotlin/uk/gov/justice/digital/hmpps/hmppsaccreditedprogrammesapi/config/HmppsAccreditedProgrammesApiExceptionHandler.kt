@@ -30,7 +30,7 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
 
   @ExceptionHandler(NotFoundException::class)
   fun handleNotFoundException(e: NotFoundException): ResponseEntity<ErrorResponse> {
-    log.info("Validation exception: {}", e.message)
+    log.info("Not found exception: {}", e.message)
     return ResponseEntity
       .status(NOT_FOUND)
       .body(
