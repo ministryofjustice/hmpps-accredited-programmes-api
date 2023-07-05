@@ -46,6 +46,10 @@ java {
   toolchain.languageVersion.set(JavaLanguageVersion.of(19))
 }
 
+kotlin {
+  kotlinDaemonJvmArgs = listOf("-Xmx486m")
+}
+
 tasks {
   withType<KotlinCompile> {
     kotlinOptions {

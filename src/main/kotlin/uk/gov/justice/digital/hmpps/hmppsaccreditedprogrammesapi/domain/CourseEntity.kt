@@ -11,6 +11,8 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.Table
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode.SUBSELECT
 import java.util.*
 
 @Entity
@@ -27,14 +29,17 @@ class CourseEntity(
   var alternateName: String? = null,
 
   @ElementCollection
+  @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   val prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
 
   @ElementCollection
+  @Fetch(SUBSELECT)
   @CollectionTable(name = "offering", joinColumns = [JoinColumn(name = "course_id")])
   val offerings: MutableSet<Offering> = mutableSetOf(),
 
   @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+  @Fetch(SUBSELECT)
   @JoinTable(
     name = "course_audience",
     joinColumns = [JoinColumn(name = "course_id")],
