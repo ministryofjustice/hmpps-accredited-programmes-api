@@ -47,7 +47,7 @@ java {
 }
 
 kotlin {
-  kotlinDaemonJvmArgs = listOf("-Xmx486m")
+  kotlinDaemonJvmArgs = listOf("-Xmx1024m")
 }
 
 tasks {
