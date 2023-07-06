@@ -8,8 +8,9 @@ INSERT INTO audience(audience_id, audience_value)
 VALUES ('7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'Sexual offence'),
        ('7fffcc6a-11f8-4713-be35-cf5ff1aee518', 'Extremism offence'),
        ('7fffcc6a-11f8-4713-be35-cf5ff1aee519', 'Gang offence'),
-       ('7fffcc6a-11f8-4713-be35-cf5ff1aee510', 'Violent offence'),
-       ('7fffcc6a-11f8-4713-be35-cf5ff1aee511', 'Intimate partner violence');
+       ('7fffcc6a-11f8-4713-be35-cf5ff1aee510', 'General violence offence'),
+       ('7fffcc6a-11f8-4713-be35-cf5ff1aee511', 'Intimate partner violence offence'),
+       ('7fffcc6a-11f8-4713-be35-cf5ff1aee512', 'General offence');
 
 INSERT INTO course(course_id, name, identifier, description, alternate_name)
 VALUES ('d3abc217-75ee-46e9-a010-368f30282367', 'Lime Course', 'LC', 'Explicabo exercitationem non asperiores corrupti accusamus quidem autem amet modi. Mollitia tenetur fugiat quo aperiam quasi error consectetur. Fugit neque rerum velit rem laboriosam. Atque nostrum quam aspernatur excepturi laborum harum officia eveniet porro.', 'LC'),
@@ -39,6 +40,7 @@ VALUES ('7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'd3abc217-75ee-46e9-a010-368f302
 INSERT INTO course_audience (course_id, audience_id)
 VALUES ('28e47d30-30bf-4dab-a8eb-9fda3f6400e8', '7fffcc6a-11f8-4713-be35-cf5ff1aee517'),
        ('28e47d30-30bf-4dab-a8eb-9fda3f6400e8', '7fffcc6a-11f8-4713-be35-cf5ff1aee511'),
+       ('28e47d30-30bf-4dab-a8eb-9fda3f6400e8', '7fffcc6a-11f8-4713-be35-cf5ff1aee512'),
        ('d3abc217-75ee-46e9-a010-368f30282367', '7fffcc6a-11f8-4713-be35-cf5ff1aee518'),
        ('d3abc217-75ee-46e9-a010-368f30282367', '7fffcc6a-11f8-4713-be35-cf5ff1aee519'),
        ('d3abc217-75ee-46e9-a010-368f30282367', '7fffcc6a-11f8-4713-be35-cf5ff1aee510'),
