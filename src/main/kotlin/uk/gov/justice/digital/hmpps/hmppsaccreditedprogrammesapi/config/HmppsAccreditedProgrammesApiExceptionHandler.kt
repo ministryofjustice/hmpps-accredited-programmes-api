@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config
 
+import io.sentry.Sentry
 import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -29,7 +30,7 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
 
   @ExceptionHandler(NotFoundException::class)
   fun handleNotFoundException(e: NotFoundException): ResponseEntity<ErrorResponse> {
-    log.info("Validation exception: {}", e.message)
+    log.info("Not found exception: {}", e.message)
     return ResponseEntity
       .status(NOT_FOUND)
       .body(
@@ -43,6 +44,7 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
 
   @ExceptionHandler(java.lang.Exception::class)
   fun handleException(e: java.lang.Exception): ResponseEntity<ErrorResponse?>? {
+    Sentry.captureException(e)
     log.error("Unexpected exception", e)
     return ResponseEntity
       .status(INTERNAL_SERVER_ERROR)
