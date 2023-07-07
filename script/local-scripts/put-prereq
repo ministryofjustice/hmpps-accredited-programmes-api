@@ -3,5 +3,5 @@
 # Upload Prerequisite data in CSV format to the PUT /courses/prerequisites endpoint.
 # The data is accepted on stdin
 DIR="$(dirname "$(realpath "$0")")"
-TOKEN=$("$DIR"/get_token)
+TOKEN=$("$DIR"/get-token)
 curl -v --upload-file - --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" http://localhost:8080/courses/prerequisites
