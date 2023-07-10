@@ -93,12 +93,14 @@ class TransformerTest {
     val offering = Offering(
       organisationId = "BXI",
       contactEmail = "nobody-bwn@digital.justice.gov.uk",
+      secondaryContactEmail = "nobody-bwn2@digital.justice.gov.uk",
     )
 
     with(offering.toApi()) {
       id shouldBe offering.id
       organisationId shouldBe offering.organisationId
       contactEmail shouldBe offering.contactEmail
+      secondaryContactEmail shouldBe offering.secondaryContactEmail
     }
   }
 

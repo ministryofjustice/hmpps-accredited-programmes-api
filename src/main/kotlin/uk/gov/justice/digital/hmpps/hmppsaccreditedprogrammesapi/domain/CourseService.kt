@@ -75,7 +75,7 @@ class CourseService(
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     replacements.forEach { record ->
       coursesByIdentifier[record.identifier]?.run {
-        offerings.add(Offering(organisationId = record.prisonId, contactEmail = record.contactEmail ?: ""))
+        offerings.add(Offering(organisationId = record.prisonId, contactEmail = record.contactEmail ?: "", secondaryContactEmail = record.secondaryContactEmail))
       }
     }
 

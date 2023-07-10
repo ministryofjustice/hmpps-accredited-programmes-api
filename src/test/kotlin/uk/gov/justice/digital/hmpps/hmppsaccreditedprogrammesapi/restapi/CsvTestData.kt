@@ -48,10 +48,10 @@ object CsvTestData {
 
   val offeringsRecords: List<OfferingRecord> = listOf(
     OfferingRecord(course = "Becoming New Me Plus ", identifier = "BNM-IPVO", organisation = "HMP Aylesbury", prisonId = "AYI"),
-    OfferingRecord(course = "Becoming New Me Plus ", identifier = "BNM-VO", organisation = "HMP Aylesbury", prisonId = "AYI"),
+    OfferingRecord(course = "Becoming New Me Plus ", identifier = "BNM-VO", organisation = "HMP Aylesbury", secondaryContactEmail = "test@second.com", prisonId = "AYI"),
     OfferingRecord(course = "Becoming New Me Plus ", identifier = "BNM-IPVO", organisation = "HMP Brinsford", prisonId = "BSI"),
     OfferingRecord(course = "Becoming New Me Plus ", identifier = "BNM-SO", organisation = "HMP Bure", prisonId = "BRI"),
-    OfferingRecord(course = "Building Better Relationships", identifier = "BBR-IPVO", organisation = "HMP Dovegate", prisonId = "DGI"),
+    OfferingRecord(course = "Building Better Relationships", identifier = "BBR-IPVO", organisation = "HMP Dovegate", secondaryContactEmail = "test2@second.com", prisonId = "DGI"),
     OfferingRecord(course = "Building Better Relationships", identifier = "BBR-IPVO", organisation = "HMP Elmley", prisonId = "EYI"),
   ).map { it.copy(contactEmail = "${LoremIpsum.words(1..1)}@${LoremIpsum.words(1..1)}.com") }
 
@@ -78,10 +78,12 @@ object CsvTestData {
   val offeringsCsvText: String by lazy {
     offeringsRecords
       .joinToString(
-        prefix = "course,identifier,organisation,contact email,prisonId\n",
+        prefix = "course,identifier,organisation,contact email,secondary contact email,prisonId\n",
         separator = "\n",
-        transform = { """"${it.course}","${it.identifier}","${it.organisation}","${it.contactEmail}",${it.prisonId}""" },
+        transform = { """"${it.course}","${it.identifier}","${it.organisation}","${it.contactEmail}",${asQuotedStringIfNotNull(it.secondaryContactEmail)},${it.prisonId}""" },
         postfix = "\n",
       )
   }
+
+  private fun asQuotedStringIfNotNull(stringOrNull: String?) = stringOrNull?.let { "\"$it\"" } ?: ""
 }
