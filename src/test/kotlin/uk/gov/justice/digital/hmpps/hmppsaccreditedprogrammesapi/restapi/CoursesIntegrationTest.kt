@@ -196,7 +196,7 @@ class CoursesIntegrationTest
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectBody()
-      .jsonPath("$..coursePrerequisites.length()").isEqualTo(247)
+      .jsonPath("$..coursePrerequisites.length()").isEqualTo(35)
   }
 
   @DirtiesContext
