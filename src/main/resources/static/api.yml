@@ -296,6 +296,11 @@ components:
           format: email
           example: "ap-admin@digital.justice.gov.uk"
           description: "The email address of a contact for this offering"
+        secondaryContactEmail:
+          type: string
+          format: email
+          example: "ap-admin-2@digital.justice.gov.uk"
+          description: "An optional secondary email address of a contact for this offering"
 
       required:
         - id
@@ -320,6 +325,11 @@ components:
           format: email
           example: "ap-admin@digital.justice.gov.uk"
           description: "The email address of the contact for this offering"
+        "secondary contact email":
+          type: string
+          format: email
+          example: "ap-admin2@digital.justice.gov.uk"
+          description: "An optional secondary email address of a contact for this offering"
         prisonId:
           type: string
           example: "MDI"

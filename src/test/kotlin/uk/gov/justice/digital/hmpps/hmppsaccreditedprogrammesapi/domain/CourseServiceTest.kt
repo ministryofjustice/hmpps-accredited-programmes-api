@@ -222,7 +222,7 @@ class CourseServiceTest {
           identifier = "C1",
           description = "Description 1",
           offerings = mutableSetOf(
-            Offering(organisationId = "BWI", contactEmail = "a@b.com"),
+            Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"),
           ),
         ),
       )
@@ -240,7 +240,7 @@ class CourseServiceTest {
           name = "Course 1",
           identifier = "C1",
           offerings = mutableSetOf(
-            Offering(organisationId = "BWI", contactEmail = "a@b.com"),
+            Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"),
           ),
         ),
       )
@@ -248,11 +248,11 @@ class CourseServiceTest {
 
       service.replaceAllOfferings(
         listOf(
-          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net"),
+          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
         ),
       ).shouldBeEmpty()
 
-      allCourses[0].offerings shouldContainExactly listOf(Offering(organisationId = "MDI", contactEmail = "x@y.net"))
+      allCourses[0].offerings shouldContainExactly listOf(Offering(organisationId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"))
     }
 
     @Test
@@ -266,7 +266,7 @@ class CourseServiceTest {
       service.replaceAllOfferings(
         listOf(
           NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
-          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "admin@bwi.net"),
+          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
           NewOffering(identifier = "C2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
         ),
       ).shouldBeEmpty()
@@ -274,7 +274,7 @@ class CourseServiceTest {
       allCourses.associateBy(CourseEntity::name, CourseEntity::offerings) shouldBeEqual mapOf(
         "Course 1" to mutableSetOf(
           Offering(organisationId = "MDI", contactEmail = "admin@mdi.net"),
-          Offering(organisationId = "BWI", contactEmail = "admin@bwi.net"),
+          Offering(organisationId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
         ),
         "Course 2" to mutableSetOf(
           Offering(organisationId = "MDI", contactEmail = "admin@mdi.net"),

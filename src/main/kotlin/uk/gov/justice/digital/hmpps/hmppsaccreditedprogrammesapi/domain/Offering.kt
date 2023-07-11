@@ -8,6 +8,7 @@ import java.util.UUID
 class Offering(
   val organisationId: String,
   var contactEmail: String,
+  var secondaryContactEmail: String? = null,
 
   @Column(name = "offering_id")
   val id: UUID = UUID.randomUUID(),
