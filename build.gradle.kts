@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.0"
-  kotlin("plugin.spring") version "1.8.22"
-  kotlin("plugin.jpa") version "1.8.22"
-  id("org.openapi.generator") version "6.6.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.2"
+  kotlin("plugin.spring") version "1.9.0"
+  kotlin("plugin.jpa") version "1.9.0"
+  id("org.openapi.generator") version "7.0.0-beta"
 }
 
 configurations {
@@ -14,7 +14,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.6.2"
   val springdocVersion = "1.7.0"
-  val sentryVersion = "6.24.0"
+  val sentryVersion = "6.25.1"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
@@ -25,6 +25,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.flywaydb:flyway-core")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.2")
+  implementation("com.google.guava:guava:32.1.1-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
