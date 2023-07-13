@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.MutableCourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -18,7 +18,7 @@ constructor(
   private val courseRepository: CourseEntityRepository,
   private val audienceRepository: AudienceRepository,
   private val entityManager: EntityManager,
-) : MutableCourseRepository {
+) : CourseRepository {
   override fun allCourses(): List<CourseEntity> = courseRepository
     .findAll()
     .onEach {

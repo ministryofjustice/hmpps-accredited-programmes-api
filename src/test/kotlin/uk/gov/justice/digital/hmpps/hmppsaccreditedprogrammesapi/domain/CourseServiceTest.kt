@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineM
 import java.util.UUID
 
 class CourseServiceTest {
-  private val repository = mockk<MutableCourseRepository>(relaxed = true)
+  private val repository = mockk<CourseRepository>(relaxed = true)
   private val service = CourseService(repository)
 
   @Nested

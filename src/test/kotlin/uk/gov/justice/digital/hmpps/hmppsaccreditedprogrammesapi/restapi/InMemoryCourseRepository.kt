@@ -1,27 +1,24 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
 import java.util.UUID
 
 @Component
-class InMemoryCourseRepository : CourseRepository {
+class InMemoryCourseRepository {
 
-  override fun allCourses(): List<CourseEntity> = courses.toList()
+  fun allCourses(): List<CourseEntity> = courses.toList()
 
-  override fun course(courseId: UUID): CourseEntity? = courses.find { it.id == courseId }
+  fun course(courseId: UUID): CourseEntity? = courses.find { it.id == courseId }
 
-  override fun offeringsForCourse(courseId: UUID): List<Offering> =
+  fun offeringsForCourse(courseId: UUID): List<Offering> =
     courses.find { it.id == courseId }?.offerings?.toList() ?: emptyList()
 
-  override fun courseOffering(courseId: UUID, offeringId: UUID): Offering? =
+  fun courseOffering(courseId: UUID, offeringId: UUID): Offering? =
     courses.find { it.id == courseId }?.offerings?.find { it.id == offeringId }
-
-  override fun allAudiences(): Set<Audience> = audiences
 
   private companion object {
     private val audiences = setOf(Audience(value = "Sexual violence", id = UUID.randomUUID()))
