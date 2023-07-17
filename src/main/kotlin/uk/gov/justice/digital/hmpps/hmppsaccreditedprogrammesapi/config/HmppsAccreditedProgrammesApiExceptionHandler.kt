@@ -42,8 +42,8 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
       )
   }
 
-  @ExceptionHandler(java.lang.Exception::class)
-  fun handleException(e: java.lang.Exception): ResponseEntity<ErrorResponse?>? {
+  @ExceptionHandler(Throwable::class)
+  fun handleException(e: Throwable): ResponseEntity<ErrorResponse?>? {
     Sentry.captureException(e)
     log.error("Unexpected exception", e)
     return ResponseEntity

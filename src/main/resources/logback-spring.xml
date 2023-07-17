@@ -24,7 +24,10 @@
         </appender>
     </springProfile>
 
-    <logger name="uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.Application" additivity="false" level="DEBUG">
+    <appender name="sentry" class="io.sentry.logback.SentryAppender"/>
+
+    <logger name="uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.Application" additivity="false"
+            level="DEBUG">
         <appender-ref ref="logAppender"/>
         <appender-ref ref="consoleAppender"/>
     </logger>
@@ -53,6 +56,7 @@
 
     <root level="INFO">
         <appender-ref ref="logAppender"/>
+        <appender-ref ref="sentry"/>
     </root>
 
 </configuration>
