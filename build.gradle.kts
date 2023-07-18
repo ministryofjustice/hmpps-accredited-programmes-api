@@ -14,7 +14,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.6.2"
   val springdocVersion = "1.7.0"
-  val sentryVersion = "6.25.1"
+  val sentryVersion = "6.25.2"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
@@ -27,7 +27,7 @@ dependencies {
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.2")
   implementation("com.google.guava:guava:32.1.1-jre")
 
-  implementation("io.sentry:sentry-spring-boot-starter:$sentryVersion")
+  implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 
   implementation("org.springdoc:springdoc-openapi-data-rest:$springdocVersion")
