@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.inmemoryrepo
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
 import io.kotest.matchers.collections.beEmpty
 import io.kotest.matchers.collections.shouldHaveSize

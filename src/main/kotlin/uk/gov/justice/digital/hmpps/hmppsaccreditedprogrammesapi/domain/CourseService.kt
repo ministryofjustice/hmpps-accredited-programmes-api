@@ -10,7 +10,7 @@ import java.util.UUID
 @Transactional
 class CourseService(
   @Autowired
-  val courseRepository: MutableCourseRepository,
+  val courseRepository: CourseRepository,
 ) {
   fun allCourses(): List<CourseEntity> = courseRepository.allCourses()
 
