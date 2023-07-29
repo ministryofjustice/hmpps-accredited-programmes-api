@@ -46,6 +46,40 @@ constructor(
   }
 
   @Test
+  fun `find all current courses`() {
+    repository.saveAll(
+      listOf(
+        CourseEntity(
+          name = "A Course",
+          identifier = "AC",
+          description = "A representative Approved Programme for testing",
+        ),
+        CourseEntity(
+          name = "A Withdrawn Course",
+          identifier = "ACW",
+          description = "A withdrawn Course",
+          withdrawn = true,
+        ),
+      ),
+    )
+
+    commitAndStartNewTx()
+
+    val allCourses: Iterable<CourseEntity> = repository.findAll()
+    allCourses shouldHaveSize 2
+
+    val activeCourses = repository.findAllByWithdrawn(false)
+    activeCourses shouldHaveSize 1
+    activeCourses[0].withdrawn shouldBe false
+
+    val withdrawnCourses = repository.findAllByWithdrawn(true)
+    withdrawnCourses shouldHaveSize 1
+    withdrawnCourses[0].withdrawn shouldBe true
+
+    repository.deleteAll()
+  }
+
+  @Test
   fun `persist course with prerequisites`() {
     val samples = setOf(
       Prerequisite("PR1", "PR1 D1"),

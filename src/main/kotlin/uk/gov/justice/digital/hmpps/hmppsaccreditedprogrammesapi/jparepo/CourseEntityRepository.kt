@@ -6,4 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEn
 import java.util.UUID
 
 @Repository
-interface CourseEntityRepository : JpaRepository<CourseEntity, UUID>
+interface CourseEntityRepository : JpaRepository<CourseEntity, UUID> {
+  fun findAllByWithdrawn(withdrawn: Boolean): List<CourseEntity>
+}

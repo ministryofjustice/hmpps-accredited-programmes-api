@@ -27,6 +27,7 @@ class CourseEntity(
   var identifier: String,
   var description: String? = null,
   var alternateName: String? = null,
+  var withdrawn: Boolean = false,
 
   @ElementCollection
   @Fetch(SUBSELECT)
