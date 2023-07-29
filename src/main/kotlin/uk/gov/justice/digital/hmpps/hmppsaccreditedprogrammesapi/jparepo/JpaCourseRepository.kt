@@ -26,6 +26,13 @@ constructor(
       Hibernate.initialize(it.prerequisites)
     }
 
+  override fun allActiveCourses(): List<CourseEntity> = courseRepository
+    .findAllByWithdrawn(false)
+    .onEach {
+      Hibernate.initialize(it.audiences)
+      Hibernate.initialize(it.prerequisites)
+    }
+
   override fun course(courseId: UUID): CourseEntity? = courseRepository
     .findById(courseId)
     .getOrNull()
@@ -51,7 +58,7 @@ constructor(
      By default, Hibernate lazily deletes audience entities after inserting new ones which can violate the unique
      constraint on audience.audience_value
      The call to flush() instructs Hibernate to perform all pending databases changes immediately and ensures that
-     the deletes requested above happen before any subsequent inserts or updates.
+     the deletions requested above happen before any subsequent inserts or updates.
      */
     entityManager.flush()
   }

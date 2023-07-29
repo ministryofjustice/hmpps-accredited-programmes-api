@@ -12,7 +12,7 @@ class CourseService(
   @Autowired
   val courseRepository: CourseRepository,
 ) {
-  fun allCourses(): List<CourseEntity> = courseRepository.allCourses()
+  fun allActiveCourses(): List<CourseEntity> = courseRepository.allActiveCourses()
 
   fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)
 

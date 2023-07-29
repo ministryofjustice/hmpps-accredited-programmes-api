@@ -47,7 +47,7 @@ class CoursesControllerTest(
   inner class GetCoursesTests {
     @Test
     fun `get all courses`() {
-      every { coursesService.allCourses() } returns repository.allCourses()
+      every { coursesService.allActiveCourses() } returns repository.allCourses()
 
       mockMvc.get("/courses") {
         accept = MediaType.APPLICATION_JSON

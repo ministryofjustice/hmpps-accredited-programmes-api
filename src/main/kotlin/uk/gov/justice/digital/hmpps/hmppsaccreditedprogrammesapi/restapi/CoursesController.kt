@@ -24,7 +24,7 @@ class CoursesController(
     ResponseEntity
       .ok(
         courseService
-          .allCourses()
+          .allActiveCourses()
           .map(CourseEntity::toApi),
       )
 
