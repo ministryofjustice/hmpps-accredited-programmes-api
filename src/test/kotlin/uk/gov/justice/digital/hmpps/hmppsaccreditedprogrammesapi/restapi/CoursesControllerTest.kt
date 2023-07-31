@@ -233,7 +233,7 @@ class CoursesControllerTest(
   inner class PutCoursesTests {
     @Test
     fun `put courses csv`() {
-      every { coursesService.replaceAllCourses(any()) } just Runs
+      every { coursesService.updateCourses(any()) } just Runs
 
       mockMvc.put("/courses") {
         contentType = MediaType("text", "csv")
@@ -243,7 +243,7 @@ class CoursesControllerTest(
         status { isNoContent() }
       }
 
-      verify { coursesService.replaceAllCourses(CsvTestData.newCourses) }
+      verify { coursesService.updateCourses(CsvTestData.newCourses) }
     }
   }
 

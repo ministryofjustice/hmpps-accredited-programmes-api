@@ -6,4 +6,12 @@ data class NewCourse(
   val identifier: String,
   val audience: String,
   val alternateName: String? = null,
-)
+) {
+  val audienceStrings: Set<String> by lazy {
+    audience
+      .split(',')
+      .map(String::trim)
+      .filterNot(String::isEmpty)
+      .toSet()
+  }
+}

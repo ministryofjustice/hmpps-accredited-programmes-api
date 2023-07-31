@@ -8,10 +8,7 @@ import java.util.UUID
 
 @Service
 @Transactional
-class CourseService(
-  @Autowired
-  val courseRepository: CourseRepository,
-) {
+class CourseService(@Autowired val courseRepository: CourseRepository) {
   fun allActiveCourses(): List<CourseEntity> = courseRepository.allActiveCourses()
 
   fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)
@@ -20,24 +17,53 @@ class CourseService(
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)
 
-  fun replaceAllCourses(courseData: List<NewCourse>) {
-    courseRepository.clear()
-    courseRepository.saveAudiences(courseData.flatMap { audienceStrings(it.audience) }.map(::Audience).toSet())
+  fun updateCourses(courseData: List<NewCourse>) {
+    updateAudiences(courseData)
+    val audienceByName: Map<String, Audience> = courseRepository.allAudiences().associateBy(Audience::value)
+    val coursesByIdentifier = courseRepository.allCourses().associateBy(CourseEntity::identifier)
 
-    val allAudiences: Map<String, Audience> = courseRepository.allAudiences().associateBy { it.value }
+    courseData.forEach { courseRecord ->
+      when (val persistentCourse = coursesByIdentifier[courseRecord.identifier]) {
+        null -> courseRepository.saveCourse(courseRecord.toCourseEntity(audienceByName))
+        else -> persistentCourse.update(courseRecord, audienceByName)
+      }
+    }
 
-    courseData.map {
-      CourseEntity(
-        name = it.name,
-        identifier = it.identifier,
-        description = it.description,
-        alternateName = it.alternateName,
-        audiences = audienceStrings(it.audience).mapNotNull { audienceName -> allAudiences[audienceName] }.toMutableSet(),
-      )
-    }.forEach(courseRepository::saveCourse)
+    val identifiersInUpdate = courseData.map(NewCourse::identifier).toSet()
+    val identifiersInRepository = coursesByIdentifier.keys
+    val identifiersToWithdraw = identifiersInRepository - identifiersInUpdate
+    identifiersToWithdraw.forEach {
+      coursesByIdentifier[it]?.withdrawn = true
+    }
   }
 
-  private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
+  private fun NewCourse.toCourseEntity(audiences: Map<String, Audience>) =
+    CourseEntity(
+      name = name,
+      identifier = identifier,
+      description = description,
+      alternateName = alternateName,
+      audiences = audienceStrings.mapNotNull(audiences::get).toMutableSet(),
+    )
+
+  private fun CourseEntity.update(newCourse: NewCourse, allAudiences: Map<String, Audience>) {
+    withdrawn = false
+    name = newCourse.name
+    alternateName = newCourse.alternateName
+    description = newCourse.description
+
+    val expectedAudiences = allAudiences.filterKeys(newCourse.audienceStrings::contains).values.toSet()
+    audiences.retainAll(expectedAudiences)
+    audiences.addAll(expectedAudiences)
+  }
+
+  private fun updateAudiences(courseData: List<NewCourse>) {
+    val desiredAudienceKeys = courseData.flatMap(NewCourse::audienceStrings).toSet()
+    val persistentAudienceKeys = courseRepository.allAudiences().map(Audience::value).toSet()
+    val newKeys = desiredAudienceKeys - persistentAudienceKeys
+    val newAudiences = newKeys.map(::Audience)
+    courseRepository.saveAudiences(newAudiences.toSet())
+  }
 
   fun replaceAllPrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
@@ -75,7 +101,14 @@ class CourseService(
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     replacements.forEach { record ->
       coursesByIdentifier[record.identifier]?.run {
-        offerings.add(Offering(organisationId = record.prisonId, contactEmail = record.contactEmail ?: "", secondaryContactEmail = record.secondaryContactEmail))
+        offerings.add(
+          Offering(
+            organisationId = record.prisonId,
+            contactEmail = record.contactEmail
+              ?: "",
+            secondaryContactEmail = record.secondaryContactEmail,
+          ),
+        )
       }
     }
 
