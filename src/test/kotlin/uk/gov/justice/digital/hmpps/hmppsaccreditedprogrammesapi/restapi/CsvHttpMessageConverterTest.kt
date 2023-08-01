@@ -134,7 +134,7 @@ class CsvHttpMessageConverterTest {
     val beanList = object : ParameterizedTypeReference<List<CourseRecord>>() {}
     val result = converter.read(beanList.type, null, inputMessage)
     val list = result.shouldBeInstanceOf<List<CourseRecord>>()
-    list.map(CourseRecord::toDomain).shouldContainExactly(CsvTestData.newCourses)
+    list.map(CourseRecord::toDomain).shouldContainExactly(CsvTestData.courseUpdates)
   }
 }
 

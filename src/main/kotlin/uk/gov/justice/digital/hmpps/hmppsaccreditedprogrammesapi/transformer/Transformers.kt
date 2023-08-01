@@ -9,11 +9,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Offer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewCourse
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewOffering
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewPrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.Prerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.PrerequisiteUpdate
 
 fun CourseEntity.toApi(): Course = Course(
   id = id!!,
@@ -41,7 +41,7 @@ fun Audience.toApi(): CourseAudience = CourseAudience(
   value = value,
 )
 
-fun CourseRecord.toDomain(): NewCourse = NewCourse(
+fun CourseRecord.toDomain(): CourseUpdate = CourseUpdate(
   name = name.trim(),
   identifier = identifier.trim(),
   description = description.trim(),
@@ -49,7 +49,7 @@ fun CourseRecord.toDomain(): NewCourse = NewCourse(
   alternateName = alternateName?.trim(),
 )
 
-fun OfferingRecord.toDomain(): NewOffering = NewOffering(
+fun OfferingRecord.toDomain(): OfferingUpdate = OfferingUpdate(
   prisonId = prisonId.trim(),
   identifier = identifier.trim(),
   contactEmail = contactEmail?.trim(),
@@ -57,7 +57,7 @@ fun OfferingRecord.toDomain(): NewOffering = NewOffering(
   secondaryContactEmail = secondaryContactEmail?.let { it.trim().ifEmpty { null } },
 )
 
-fun PrerequisiteRecord.toDomain(): NewPrerequisite = NewPrerequisite(
+fun PrerequisiteRecord.toDomain(): PrerequisiteUpdate = PrerequisiteUpdate(
   name = name,
   description = description,
   identifier = identifier,

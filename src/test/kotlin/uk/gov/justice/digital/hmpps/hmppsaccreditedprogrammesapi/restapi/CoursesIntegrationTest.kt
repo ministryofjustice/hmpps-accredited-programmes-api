@@ -147,6 +147,8 @@ class CoursesIntegrationTest
   @DirtiesContext
   @Test
   fun `put courses csv`() {
+    withdrawAllCourses()
+
     webTestClient
       .put()
       .uri("/courses")
@@ -163,7 +165,18 @@ class CoursesIntegrationTest
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectBody()
-      .jsonPath("$.length()").isEqualTo(CsvTestData.newCourses.size)
+      .jsonPath("$.length()").isEqualTo(CsvTestData.courseUpdates.size)
+  }
+
+  private fun withdrawAllCourses() {
+    webTestClient
+      .put()
+      .uri("/courses")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(COURSE_CSV_HEADER_ROW)
+      .exchange()
+      .expectStatus().is2xxSuccessful
   }
 
   @DirtiesContext
@@ -242,7 +255,7 @@ class CoursesIntegrationTest
         .returnResult().responseBody!!
     }
 
-    allOfferings shouldHaveSize CsvTestData.newCourses.size
+    allOfferings shouldHaveSize CsvTestData.courseUpdates.size
 
     val actualOrganisationIds: Set<String> = allOfferings
       .flatMap { courseOfferings ->

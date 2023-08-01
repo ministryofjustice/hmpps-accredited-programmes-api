@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage.Level
 import java.util.UUID
 
 @Service
@@ -17,27 +18,37 @@ class CourseService(@Autowired val courseRepository: CourseRepository) {
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)
 
-  fun updateCourses(courseData: List<NewCourse>) {
-    updateAudiences(courseData)
+  fun updateCourses(courseUpdates: List<CourseUpdate>): List<LineMessage> {
+    updateAudiences(courseUpdates)
     val audienceByName: Map<String, Audience> = courseRepository.allAudiences().associateBy(Audience::value)
     val coursesByIdentifier = courseRepository.allCourses().associateBy(CourseEntity::identifier)
 
-    courseData.forEach { courseRecord ->
-      when (val persistentCourse = coursesByIdentifier[courseRecord.identifier]) {
-        null -> courseRepository.saveCourse(courseRecord.toCourseEntity(audienceByName))
-        else -> persistentCourse.update(courseRecord, audienceByName)
+    courseUpdates.filter { it.identifier.isNotBlank() }
+      .forEach { courseUpdate ->
+        when (val persistentCourse = coursesByIdentifier[courseUpdate.identifier]) {
+          null -> courseRepository.saveCourse(courseUpdate.toCourseEntity(audienceByName))
+          else -> persistentCourse.update(courseUpdate, audienceByName)
+        }
       }
-    }
 
-    val identifiersInUpdate = courseData.map(NewCourse::identifier).toSet()
+    val identifiersInUpdate = courseUpdates.map(CourseUpdate::identifier).toSet()
     val identifiersInRepository = coursesByIdentifier.keys
     val identifiersToWithdraw = identifiersInRepository - identifiersInUpdate
     identifiersToWithdraw.forEach {
       coursesByIdentifier[it]?.withdrawn = true
     }
+    return courseUpdates
+      .filter { it.identifier.isBlank() }
+      .mapIndexed { index, courseUpdate ->
+        LineMessage(
+          lineNumber = index + 2,
+          level = Level.error,
+          message = "Missing course identifier",
+        )
+      }
   }
 
-  private fun NewCourse.toCourseEntity(audiences: Map<String, Audience>) =
+  private fun CourseUpdate.toCourseEntity(audiences: Map<String, Audience>) =
     CourseEntity(
       name = name,
       identifier = identifier,
@@ -46,44 +57,44 @@ class CourseService(@Autowired val courseRepository: CourseRepository) {
       audiences = audienceStrings.mapNotNull(audiences::get).toMutableSet(),
     )
 
-  private fun CourseEntity.update(newCourse: NewCourse, allAudiences: Map<String, Audience>) {
+  private fun CourseEntity.update(courseUpdate: CourseUpdate, allAudiences: Map<String, Audience>) {
     withdrawn = false
-    name = newCourse.name
-    alternateName = newCourse.alternateName
-    description = newCourse.description
+    name = courseUpdate.name
+    alternateName = courseUpdate.alternateName
+    description = courseUpdate.description
 
-    val expectedAudiences = allAudiences.filterKeys(newCourse.audienceStrings::contains).values.toSet()
+    val expectedAudiences = allAudiences.filterKeys(courseUpdate.audienceStrings::contains).values.toSet()
     audiences.retainAll(expectedAudiences)
     audiences.addAll(expectedAudiences)
   }
 
-  private fun updateAudiences(courseData: List<NewCourse>) {
-    val desiredAudienceKeys = courseData.flatMap(NewCourse::audienceStrings).toSet()
+  private fun updateAudiences(courseUpdates: List<CourseUpdate>) {
+    val desiredAudienceKeys = courseUpdates.flatMap(CourseUpdate::audienceStrings).toSet()
     val persistentAudienceKeys = courseRepository.allAudiences().map(Audience::value).toSet()
     val newKeys = desiredAudienceKeys - persistentAudienceKeys
     val newAudiences = newKeys.map(::Audience)
     courseRepository.saveAudiences(newAudiences.toSet())
   }
 
-  fun replaceAllPrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
+  fun updateAllPrerequisites(updates: List<PrerequisiteUpdate>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearPrerequisites(allCourses)
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
-    replacements.forEach { record ->
-      record.identifier.split(",").forEach { identifier ->
+    updates.forEach { update ->
+      update.identifier.split(",").forEach { identifier ->
         coursesByIdentifier[identifier.trim()]?.run {
-          prerequisites.add(Prerequisite(name = record.name, description = record.description ?: ""))
+          prerequisites.add(Prerequisite(name = update.name, description = update.description ?: ""))
         }
       }
     }
-    return replacements
-      .flatMapIndexed { index, record ->
-        record.identifier.split(",").map { identifier ->
+    return updates
+      .flatMapIndexed { index, update ->
+        update.identifier.split(",").map { identifier ->
           when (coursesByIdentifier.containsKey(identifier.trim())) {
             true -> null
             false -> LineMessage(
               lineNumber = indexToCsvRowNumber(index),
-              level = LineMessage.Level.error,
+              level = Level.error,
               message = "No match for course identifier '$identifier'",
             )
           }
@@ -95,32 +106,49 @@ class CourseService(@Autowired val courseRepository: CourseRepository) {
     courses.forEach { it.prerequisites.clear() }
   }
 
-  fun replaceAllOfferings(replacements: List<NewOffering>): List<LineMessage> {
-    val allCourses = courseRepository.allCourses()
-    clearOfferings(allCourses)
+  fun updateAllOfferings(updates: List<OfferingUpdate>): List<LineMessage> {
+    val allCourses = courseRepository.allActiveCourses()
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
-    replacements.forEach { record ->
-      coursesByIdentifier[record.identifier]?.run {
-        offerings.add(
-          Offering(
-            organisationId = record.prisonId,
-            contactEmail = record.contactEmail
-              ?: "",
-            secondaryContactEmail = record.secondaryContactEmail,
-          ),
-        )
-      }
+    val updatesByIdentifier = updates.groupBy(OfferingUpdate::identifier)
+
+    coursesByIdentifier.forEach { (identifier, course) ->
+      updateOfferingsForCourse(course.offerings, updatesByIdentifier.getOrDefault(identifier, emptyList()))
     }
 
-    return contactEmailWarnings(replacements) + unmatchedCourseErrors(replacements, coursesByIdentifier)
+    return contactEmailWarnings(updates) + unmatchedCourseErrors(updates, coursesByIdentifier)
   }
 
-  private fun contactEmailWarnings(newOfferings: List<NewOffering>): List<LineMessage> =
+  private fun updateOfferingsForCourse(offerings: MutableSet<Offering>, offeringUpdates: List<OfferingUpdate>) {
+    val newOfferingsByOrganisationId = offeringUpdates.associateBy(OfferingUpdate::prisonId)
+    val newOrganisationIds = newOfferingsByOrganisationId.keys
+
+    offerings.retainAll { newOrganisationIds.contains(it.organisationId) }
+
+    val offeringsByOrganisationId = offerings.associateBy(Offering::organisationId)
+    newOfferingsByOrganisationId.forEach { (organisationId, offeringUpdate) ->
+      when (val offering = offeringsByOrganisationId[organisationId]) {
+        null -> offerings.add(
+          Offering(
+            organisationId = offeringUpdate.prisonId,
+            contactEmail = offeringUpdate.contactEmail ?: "",
+            secondaryContactEmail = offeringUpdate.secondaryContactEmail,
+          ),
+        )
+
+        else -> {
+          offering.contactEmail = offeringUpdate.contactEmail ?: ""
+          offering.secondaryContactEmail = offeringUpdate.secondaryContactEmail
+        }
+      }
+    }
+  }
+
+  private fun contactEmailWarnings(newOfferings: List<OfferingUpdate>): List<LineMessage> =
     newOfferings.mapIndexed { index, record ->
       when (record.contactEmail.isNullOrBlank()) {
         true -> LineMessage(
           lineNumber = indexToCsvRowNumber(index),
-          level = LineMessage.Level.warning,
+          level = Level.warning,
           message = "Missing contactEmail for offering with identifier '${record.identifier}' at prisonId '${record.prisonId}'",
         )
 
@@ -128,22 +156,18 @@ class CourseService(@Autowired val courseRepository: CourseRepository) {
       }
     }.filterNotNull()
 
-  private fun unmatchedCourseErrors(replacements: List<NewOffering>, coursesByIdentifier: Map<String, CourseEntity>) =
+  private fun unmatchedCourseErrors(replacements: List<OfferingUpdate>, coursesByIdentifier: Map<String, CourseEntity>) =
     replacements
       .mapIndexed { index, record ->
         when (coursesByIdentifier.containsKey(record.identifier)) {
           true -> null
           false -> LineMessage(
             lineNumber = indexToCsvRowNumber(index),
-            level = LineMessage.Level.error,
+            level = Level.error,
             message = "No course matches offering with identifier '${record.identifier}' and prisonId '${record.prisonId}'",
           )
         }
       }.filterNotNull()
-
-  private fun clearOfferings(courses: List<CourseEntity>) {
-    courses.forEach { it.offerings.clear() }
-  }
 
   companion object {
     private fun indexToCsvRowNumber(index: Int) = index + 2

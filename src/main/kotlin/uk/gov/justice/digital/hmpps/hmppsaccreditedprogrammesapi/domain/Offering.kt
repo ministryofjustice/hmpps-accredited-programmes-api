@@ -20,4 +20,6 @@ class Offering(
   }
 
   override fun hashCode(): Int = organisationId.hashCode()
+
+  override fun toString(): String = "Offering(id = '$id', organisationId = '$organisationId', contactEmail = '$contactEmail', secondaryContactEmail = '$secondaryContactEmail')"
 }

@@ -3,15 +3,17 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.LoremIpsum
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.NewCourse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.CourseUpdate
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
 private fun newCourse(name: String, identifier: String = "", audience: String, alternateName: String? = null) =
-  NewCourse(name = name, identifier = identifier, alternateName = alternateName, audience = audience, description = LoremIpsum.words(1..10))
+  CourseUpdate(name = name, identifier = identifier, alternateName = alternateName, audience = audience, description = LoremIpsum.words(1..10))
+
+const val COURSE_CSV_HEADER_ROW = "name,identifier,description,audience,alternateName,comments\n"
 
 object CsvTestData {
-  val newCourses: List<NewCourse> = listOf(
+  val courseUpdates: List<CourseUpdate> = listOf(
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-SO", audience = "Sexual offence", alternateName = "BNM+"),
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-IPVO", audience = "Intimate partner violence offence", alternateName = "BNM+"),
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-VO", audience = "General violence offence", alternateName = "BNM+"),
@@ -57,9 +59,9 @@ object CsvTestData {
 
   fun coursesCsvInputStream(): InputStream = ByteArrayInputStream(coursesCsvText.toByteArray())
   val coursesCsvText: String =
-    newCourses
+    courseUpdates
       .joinToString(
-        prefix = "name,identifier,description,audience,alternateName,comments\n",
+        prefix = COURSE_CSV_HEADER_ROW,
         separator = "\n",
         transform = { """"${it.name}","${it.identifier}","${it.description}","${it.audience}","${it.alternateName}",${LoremIpsum.words(1..20)}""" },
         postfix = "\n",

@@ -1,9 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi
 
 import com.ninjasquad.springmockk.MockkBean
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -233,7 +231,7 @@ class CoursesControllerTest(
   inner class PutCoursesTests {
     @Test
     fun `put courses csv`() {
-      every { coursesService.updateCourses(any()) } just Runs
+      every { coursesService.updateCourses(any()) } returns emptyList()
 
       mockMvc.put("/courses") {
         contentType = MediaType("text", "csv")
@@ -243,7 +241,7 @@ class CoursesControllerTest(
         status { isNoContent() }
       }
 
-      verify { coursesService.updateCourses(CsvTestData.newCourses) }
+      verify { coursesService.updateCourses(CsvTestData.courseUpdates) }
     }
   }
 
@@ -251,7 +249,7 @@ class CoursesControllerTest(
   inner class PutPrerequisitesTests {
     @Test
     fun `put prerequisites csv`() {
-      every { coursesService.replaceAllPrerequisites(any()) } returns emptyList()
+      every { coursesService.updateAllPrerequisites(any()) } returns emptyList()
 
       mockMvc.put("/courses/prerequisites") {
         contentType = MediaType("text", "csv")
@@ -265,7 +263,7 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.replaceAllPrerequisites(CsvTestData.prerequisiteRecords.map(PrerequisiteRecord::toDomain)) }
+      verify { coursesService.updateAllPrerequisites(CsvTestData.prerequisiteRecords.map(PrerequisiteRecord::toDomain)) }
     }
   }
 
@@ -273,7 +271,7 @@ class CoursesControllerTest(
   inner class PutOfferingsTests {
     @Test
     fun `put offerings csv`() {
-      every { coursesService.replaceAllOfferings(any()) } returns emptyList()
+      every { coursesService.updateAllOfferings(any()) } returns emptyList()
 
       mockMvc.put("/courses/offerings") {
         contentType = MediaType("text", "csv")
@@ -287,7 +285,7 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.replaceAllOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
+      verify { coursesService.updateAllOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
     }
   }
 }

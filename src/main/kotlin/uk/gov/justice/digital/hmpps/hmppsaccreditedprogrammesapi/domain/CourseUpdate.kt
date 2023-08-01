@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain
 
-data class NewCourse(
+data class CourseUpdate(
   val name: String,
   val description: String,
   val identifier: String,
