@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.2.4"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.3.0-beta"
   kotlin("plugin.spring") version "1.9.0"
   kotlin("plugin.jpa") version "1.9.0"
   id("org.openapi.generator") version "7.0.0-beta"
@@ -14,7 +14,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.6.2"
   val springdocVersion = "1.7.0"
-  val sentryVersion = "6.25.2"
+  val sentryVersion = "6.26.0"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
