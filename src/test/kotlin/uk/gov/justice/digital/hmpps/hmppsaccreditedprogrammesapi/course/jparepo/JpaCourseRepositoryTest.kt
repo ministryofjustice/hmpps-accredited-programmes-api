@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.jparepo
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.RepositoryTest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.commitAndStartNewTx
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 
