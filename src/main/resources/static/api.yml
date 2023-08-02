@@ -184,6 +184,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /referrals:
+    post:
+      tags:
+        - Referrals
+      summary: Start a referral
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/StartReferral'
+      responses:
+        201:
+          description: Started referral
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReferralStarted'
+
+  /referrals/{id}:
+    get:
+      tags:
+        - Referrals
+      summary: Retrieve a referral
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Information about the referral
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Referral'
+        404:
+          description: No referral has the supplied id (Not Found)
+
 components:
   schemas:
     Course:
@@ -388,3 +430,54 @@ components:
           type: string
       required:
         - status
+
+    StartReferral:
+      type: object
+      properties:
+        offeringId:
+          description: The id (UUID) of an active offering
+          type: string
+          format: uuid
+        prisonNumber:
+          description: The prison number of the person who is being referred
+          example: "A1234AA"
+          type: string
+        referrerId:
+          type: string
+      required:
+        - offeringId
+        - prisonNumber
+        - referrerId
+
+    ReferralStarted:
+      type: object
+      properties:
+        referralId:
+          description: The unique id (UUID) of tne new referral.
+          type: string
+          format: uuid
+      required:
+        - referralId
+
+    Referral:
+      type: object
+      properties:
+        id:
+          description: The unique id (UUID) of this referral.
+          type: string
+          format: uuid
+        offeringId:
+          description: The id (UUID) of an active offering
+          type: string
+          format: uuid
+        prisonNumber:
+          description: The prison number of the person who is being referred
+          example: "A1234AA"
+          type: string
+        referrerId:
+          type: string
+      required:
+        - id
+        - offeringId
+        - prisonNumber
+        - referrerId
