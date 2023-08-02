@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
 
 @RestControllerAdvice
 class HmppsAccreditedProgrammesApiExceptionHandler {
