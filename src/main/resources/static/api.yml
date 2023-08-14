@@ -453,7 +453,7 @@ components:
       type: object
       properties:
         referralId:
-          description: The unique id (UUID) of tne new referral.
+          description: The unique id (UUID) of the new referral.
           type: string
           format: uuid
       required:
