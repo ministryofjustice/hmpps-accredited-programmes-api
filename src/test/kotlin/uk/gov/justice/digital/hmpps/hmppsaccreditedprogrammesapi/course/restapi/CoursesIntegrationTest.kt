@@ -87,6 +87,20 @@ class CoursesIntegrationTest
   }
 
   @Test
+  fun `get a course by offering id`() {
+    webTestClient
+      .get()
+      .uri("/offerings/$courseOfferingId/course")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.id").isEqualTo(courseId)
+  }
+
+  @Test
   fun `get all offerings for a course`() {
     webTestClient
       .get()

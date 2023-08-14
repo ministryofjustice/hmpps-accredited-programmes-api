@@ -226,6 +226,29 @@ paths:
         404:
           description: No referral has the supplied id (Not Found)
 
+  /offerings/{id}/course:
+    get:
+      tags:
+        - Courses
+      summary: Retrieve the course that owns an offering
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of an offering
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Information about the Course that owns the offering
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Course'
+        404:
+          description: No offering has the supplied id (Not Found)
+
 components:
   schemas:
     Course:

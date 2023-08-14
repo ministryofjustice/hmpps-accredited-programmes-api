@@ -6,4 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.C
 import java.util.UUID
 
 @Repository
-interface CourseEntityRepository : JpaRepository<CourseEntity, UUID>
+interface CourseEntityRepository : JpaRepository<CourseEntity, UUID> {
+  fun findByOfferings_id(offeringId: UUID): CourseEntity?
+}
