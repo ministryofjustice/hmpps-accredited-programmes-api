@@ -52,10 +52,10 @@ constructor(
       contentType = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       this.content = """{
-  "offeringId": "$offeringId",
-  "prisonNumber": "$prisonNumber",
-  "referrerId": "$referrerId"
-}"""
+        "offeringId": "$offeringId",
+        "prisonNumber": "$prisonNumber",
+        "referrerId": "$referrerId"
+      }"""
     }.andExpect {
       status { isOk() }
       content {
