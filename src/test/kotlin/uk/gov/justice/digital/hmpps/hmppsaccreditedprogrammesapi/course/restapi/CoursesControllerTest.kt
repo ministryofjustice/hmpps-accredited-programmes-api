@@ -123,8 +123,8 @@ class CoursesControllerTest(
           contentType(MediaType.APPLICATION_JSON)
           jsonPath("$.status") { value(404) }
           jsonPath("$.errorCode") { isEmpty() }
-          jsonPath("$.userMessage") { prefix("Not Found: No Course found at /courses/$randomId") }
-          jsonPath("$.developerMessage") { prefix("No Course found at /courses/$randomId") }
+          jsonPath("$.userMessage") { value("Not Found: No Course found at /courses/$randomId") }
+          jsonPath("$.developerMessage") { value("No Course found at /courses/$randomId") }
           jsonPath("$.moreInfo") { isEmpty() }
         }
       }
@@ -210,8 +210,8 @@ class CoursesControllerTest(
           contentType(MediaType.APPLICATION_JSON)
           jsonPath("$.status") { value(404) }
           jsonPath("$.errorCode") { isEmpty() }
-          jsonPath("$.userMessage") { prefix("Not Found: No CourseOffering  found at /courses/") }
-          jsonPath("$.developerMessage") { prefix("No CourseOffering  found at /courses/") }
+          jsonPath("$.userMessage") { value("Not Found: No CourseOffering found at /courses/$randomUuid/offerings/$randomUuid") }
+          jsonPath("$.developerMessage") { value("No CourseOffering found at /courses/$randomUuid/offerings/$randomUuid") }
           jsonPath("$.moreInfo") { isEmpty() }
         }
       }
