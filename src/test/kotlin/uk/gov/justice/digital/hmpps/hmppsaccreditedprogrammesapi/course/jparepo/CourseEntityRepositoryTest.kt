@@ -7,6 +7,8 @@ import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeSameInstanceAs
+import io.kotest.matchers.types.shouldNotBeSameInstanceAs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
@@ -107,5 +109,38 @@ constructor(
     val persistentCourse = repository.findById(course1.id!!).orElseThrow()
     persistentCourse.offerings shouldHaveSize 3
     persistentCourse.offerings.shouldForAll { it.id.shouldNotBeNull() }
+  }
+
+  @Test
+  fun `find course by offering id`() {
+    val course1 = CourseEntity(
+      name = "A Course",
+      identifier = "AC",
+      description = "A description",
+    ).apply {
+      offerings.add(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
+      offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      offerings.add(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
+    }
+    val course2 = CourseEntity(name = "Another Course", identifier = "ACANO", description = "Another description")
+      .apply {
+        offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      }
+
+    repository.save(course1)
+    repository.save(course2)
+    commitAndStartNewTx()
+
+    countRowsInTable(jdbcTemplate, "offering") shouldBe 4
+    val persistentCourse = repository.findById(course1.id!!).orElseThrow()
+    val offeringId = persistentCourse.offerings.first().id
+    val courseByOfferingIdInSameTx = repository.findByOfferings_id(offeringId)
+    courseByOfferingIdInSameTx shouldBeSameInstanceAs persistentCourse
+
+    commitAndStartNewTx()
+
+    val courseByOfferingInNewTx = repository.findByOfferings_id(offeringId)
+    courseByOfferingInNewTx shouldNotBeSameInstanceAs persistentCourse
+    courseByOfferingInNewTx shouldBe persistentCourse
   }
 }

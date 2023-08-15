@@ -16,6 +16,8 @@ class CourseService(
 
   fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)
 
+  fun getCourseForOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findCourseByOfferingId(offeringId)
+
   fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository.offeringsForCourse(courseId)
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)

@@ -87,6 +87,20 @@ class CoursesIntegrationTest
   }
 
   @Test
+  fun `get a course by offering id`() {
+    webTestClient
+      .get()
+      .uri("/offerings/$courseOfferingId/course")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.id").isEqualTo(courseId)
+  }
+
+  @Test
   fun `get all offerings for a course`() {
     webTestClient
       .get()
@@ -139,8 +153,8 @@ class CoursesIntegrationTest
       .expectBody()
       .jsonPath("$.status").isEqualTo(404)
       .jsonPath("$.errorCode").isEmpty
-      .jsonPath("$.userMessage").value(startsWith("Not Found: No CourseOffering  found at /courses/"))
-      .jsonPath("$.developerMessage").value(startsWith("No CourseOffering  found at /courses/"))
+      .jsonPath("$.userMessage").value(startsWith("Not Found: No CourseOffering found at /courses/"))
+      .jsonPath("$.developerMessage").value(startsWith("No CourseOffering found at /courses/"))
       .jsonPath("$.moreInfo").isEmpty
   }
 

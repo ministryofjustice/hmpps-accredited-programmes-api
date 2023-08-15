@@ -34,6 +34,13 @@ constructor(
       Hibernate.initialize(it.prerequisites)
     }
 
+  override fun findCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository
+    .findByOfferings_id(offeringId)
+    ?.also {
+      Hibernate.initialize(it.audiences)
+      Hibernate.initialize(it.prerequisites)
+    }
+
   override fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
     .findById(courseId)
     .getOrNull()
