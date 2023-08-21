@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.restapi
 
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
@@ -22,7 +23,7 @@ class ReferralsController(
       referrerId = startReferral.referrerId,
       offeringId = startReferral.offeringId,
     )?.let {
-      ResponseEntity.ok(ReferralStarted(it))
+      ResponseEntity.status(HttpStatus.CREATED).body(ReferralStarted(it))
     } ?: throw Exception("Unable to start referral")
 
   override fun referralsIdGet(id: UUID): ResponseEntity<Referral> =
