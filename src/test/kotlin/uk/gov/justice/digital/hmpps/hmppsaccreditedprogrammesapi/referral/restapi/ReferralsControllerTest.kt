@@ -57,7 +57,7 @@ constructor(
         "referrerId": "$referrerId"
       }"""
     }.andExpect {
-      status { isOk() }
+      status { isCreated() }
       content {
         contentType(MediaType.APPLICATION_JSON)
         json("""{ "referralId": "$referralId" }""")
