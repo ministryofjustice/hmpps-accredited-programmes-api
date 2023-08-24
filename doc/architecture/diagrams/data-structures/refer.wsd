@@ -1,0 +1,65 @@
+@startuml
+skinparam linetype ortho
+
+package "Things we own" {
+  entity Referral {
+    e.g. The referral of a person in prison or on probation to a Course
+    --
+    * id: uuid
+    * prisonNumber: text
+    * offering: CourseOffering
+    reason: text
+    referrerId: text
+    oasysConfirmed: boolean
+    reason: text
+    submitted: boolean
+  }
+
+  entity HistoricCourse {
+    e.g. Previous course that the person has been on, that aren't in our own service
+    Will have either a courseId or otherCourseName
+    --
+    * id: uuid
+    * prisonNumber: text
+    courseId?: uuid
+    otherCourseName?: text
+    yearStarted?: integer
+    setting?: "Custody" | "Community"
+    outcome?: Outcome
+    source?: text
+  }
+
+  entity Outcome {
+    e.g The outcome of a Historic Course
+    --
+    * status?: "Deselected" | "Incomplete" | "Complete"
+    * detail?: text
+  }
+}
+
+entity Person {
+  e.g. A person in prison/on probation
+  Identifer used to fetch details from other services
+  --
+  * identifier: text (e.g. Prison Number)
+  * historicCourses: HistoricCourse[]
+  --cached--
+  name: text
+  riskScores: JSON
+  releaseDate: Date
+}
+
+entity Referrer {
+  e.g. A POM, COM
+  --
+  * id: uuid
+  * identifier: text (e.g. HMPPS Auth ID)
+  * permissions: Permission[]
+}
+
+Person }o--|| HistoricCourse
+HistoricCourse }o--|| Outcome
+Referral }o--o{ Person
+Referral }o--o{ Referrer
+
+@enduml

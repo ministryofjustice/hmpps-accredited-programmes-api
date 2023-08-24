@@ -1,0 +1,76 @@
+@startuml
+skinparam linetype ortho
+
+package "Things we own" {
+  entity Course {
+    e.g. an accredited programme
+    --
+    * id: uuid
+    * name: text
+    alternateName: text
+    * description: text
+    * coursePrerequisites: CoursePrerequisite[]
+    * audiences: CourseAudience[]
+  }
+
+  entity CourseAudience {
+    e.g. For which types of offence the course is suitable
+    --
+    *id: uuid
+    *value: text
+  }
+
+  entity CoursePrerequisite {
+    Prerequisite for enrolling in the programme.
+    e.g. risk score, offence type, gender, setting
+    --
+    * name: text
+    * description: text
+  }
+
+  entity CourseOffering {
+    * id: uuid
+    * organisation: Organisation
+    * contactEmail: text
+    secondaryContactEmail: text
+  }
+}
+
+entity Organisation {
+  e.g. A Prison
+  --
+  * name: text
+  * category: text
+  * address: Address
+  * email: text
+}
+
+entity Address {
+  addressLine1: text
+  addressLine2: text
+  * town: text
+  county: text
+  * postalCode: text
+  * country: text
+}
+
+entity Person {
+  e.g. A person in prison/on probation.
+  Identifer used to fetch details from other services
+  --
+  * identifier: text (e.g. NOMIS number)
+  --cached--
+  name: text
+  riskScores: JSON
+  releaseDate: Date
+}
+
+CourseOffering }o--|| Course
+CourseOffering }o--|| Organisation
+
+Course }o--|| CoursePrerequisite
+Course }o--|| CourseAudience
+
+Organisation ||--|| Address
+
+@enduml
