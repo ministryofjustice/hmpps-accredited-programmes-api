@@ -13,7 +13,7 @@ configurations {
 
 dependencies {
   val kotestVersion = "5.6.2"
-  val springdocVersion = "1.7.0"
+  val springdocVersion = "2.2.0"
   val sentryVersion = "6.28.0"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
@@ -30,9 +30,8 @@ dependencies {
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 
-  implementation("org.springdoc:springdoc-openapi-data-rest:$springdocVersion")
-  implementation("org.springdoc:springdoc-openapi-ui:$springdocVersion")
-  implementation("org.springdoc:springdoc-openapi-kotlin:$springdocVersion")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:$springdocVersion")
 
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -40,7 +39,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.1")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.2")
 }
 
 java {
@@ -57,7 +56,9 @@ tasks {
       jvmTarget = "19"
     }
 
-    kotlin.sourceSets["main"].kotlin.srcDir("$buildDir/generated/src/main/kotlin")
+    kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/kotlin"))
+    kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/resources"))
+
     dependsOn("openApiGenerate")
   }
 
@@ -91,7 +92,7 @@ tasks {
 openApiGenerate {
   generatorName.set("kotlin-spring")
   inputSpec.set("$rootDir/src/main/resources/static/api.yml")
-  outputDir.set("$buildDir/generated")
+  outputDir.set(layout.buildDirectory.dir("generated").map { it.asFile.path })
   apiPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api")
   modelPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model")
   configOptions.apply {
@@ -109,7 +110,8 @@ openApiGenerate {
 
 ktlint {
   filter {
-    exclude { it.file.path.contains("$buildDir${File.separator}generated${File.separator}") }
+    val openApiGeneratedSrcPath = layout.buildDirectory.dir("generated").get().asFile.path
+    exclude { it.file.startsWith(openApiGeneratedSrcPath) }
   }
 }
 
