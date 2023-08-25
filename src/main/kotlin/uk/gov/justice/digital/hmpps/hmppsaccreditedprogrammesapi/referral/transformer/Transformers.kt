@@ -8,4 +8,7 @@ fun DomainReferral.toApi(): ApiReferral = ApiReferral(
   offeringId = offeringId,
   prisonNumber = prisonNumber,
   referrerId = referrerId,
+  oasysConfirmed = false,
+  reason = null,
+  status = ApiReferral.Status.rEFERRALSTARTED,
 )

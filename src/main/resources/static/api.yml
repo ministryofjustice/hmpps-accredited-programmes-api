@@ -498,9 +498,24 @@ components:
           example: "A1234AA"
           type: string
         referrerId:
+          description: A permanent identifier for the person creating the referral. StaffId for prison staff
           type: string
+        reason:
+          type: string
+        oasysConfirmed:
+          type: boolean
+          default: false
+        status:
+          type: string
+          enum:
+            - REFERRAL_STARTED
+            - REFERRAL_SUBMITTED
+            - AWAITING_ASSESSMENT
+            - ASSESSMENT_STARTED
       required:
         - id
         - offeringId
         - prisonNumber
         - referrerId
+        - oasysConfirmed
+        - status
