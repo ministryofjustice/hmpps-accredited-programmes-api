@@ -88,7 +88,10 @@ constructor(
           { 
             "offeringId": "$offeringId",
             "prisonNumber": "$prisonNumber",
-            "referrerId": "$referrerId"          
+            "referrerId": "$referrerId",
+            "status": "referral_started",
+            "oasysConfirmed": false,
+            "reason": null
           }
           """,
         )

@@ -223,6 +223,10 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Referral'
+        401:
+          description: The request was unauthorized
+        403:
+          description: Forbidden.  The client is not authorised to access this referral
         404:
           description: No referral has the supplied id (Not Found)
 
@@ -506,12 +510,7 @@ components:
           type: boolean
           default: false
         status:
-          type: string
-          enum:
-            - REFERRAL_STARTED
-            - REFERRAL_SUBMITTED
-            - AWAITING_ASSESSMENT
-            - ASSESSMENT_STARTED
+          $ref: "#/components/schemas/ReferralStatus"
       required:
         - id
         - offeringId
@@ -519,3 +518,11 @@ components:
         - referrerId
         - oasysConfirmed
         - status
+
+    ReferralStatus:
+      type: string
+      enum:
+        - referral_started
+        - referral_submitted
+        - awaiting_assessment
+        - assessment_started
