@@ -21,7 +21,7 @@ paths:
                   $ref: '#/components/schemas/Course'
     put:
       tags:
-        - Courses bulk upload / replace
+        - Courses
       summary: Upload a CSV format file containing a full set of Courses data.
       requestBody:
         required: true
@@ -40,7 +40,7 @@ paths:
   /courses/prerequisites:
     put:
       tags:
-        - Course prerequisites bulk upload / replace
+        - Course Prerequisites
       summary: Upload a CSV format file containing a full set of prerequisites data for the current set of courses.
       description: "Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
       <p>Pre-existing prerequisite data will be removed before the new data is applied.
@@ -94,8 +94,8 @@ paths:
   /courses/offerings:
     put:
       tags:
-        - Course offerings bulk upload / replace
-      summary: Upload a CVS format file containing a full set of offerings data for a set of courses.
+        - Course Offerings
+      summary: Upload a CSV format file containing a full set of offerings data for a set of courses.
       description: "Accepts a CSV format file of data representing the desired state of all offerings data attached to the current set of courses.
       <p>Pre-existing offering data will be removed before the new data is applied.
       <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the OfferingRecord schema. Column order is not important."
@@ -150,7 +150,7 @@ paths:
   /courses/{courseId}/offerings/{offeringId}:
     get:
       tags:
-        - Course Offering
+        - Course Offerings
       summary: Details for a single course offering
 
       parameters:
@@ -177,6 +177,10 @@ paths:
             'application/json':
               schema:
                   $ref: '#/components/schemas/CourseOffering'
+        401:
+          description: Unauthorized. The request was unauthorized
+        403:
+          description: Forbidden.  The client is not authorised to access this offering
         404:
           description: invalid course and/or course offering id
           content:
@@ -203,6 +207,52 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReferralStarted'
 
+    get:
+      summary: Retrieve some referrals
+      tags:
+        - Referrals
+      parameters:
+        - name: status
+          in: query
+          description: If present only return referrals in the given state
+          required: false
+          schema:
+            $ref: "#/components/schemas/ReferralStatus"
+        - name: offeringId
+          in: query
+          description: The id (UUID) of an active offering. If present only return referrals for that offering
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: prisonNumber
+          in: query
+          description: The prison number of the person who is being referred. If present only return referrals for the person.
+          example: "A1234AA"
+          required: false
+          schema:
+            type: string
+        - name: referrerId
+          in: query
+          description: A permanent identifier for the person creating the referral. StaffId for prison staff. If present only return referrals for that referrer
+          required: false
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Returns information about matching referrals
+          content:
+            'application/json':
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Referral'
+        401:
+          description: The request was unauthorized
+        403:
+          description: Forbidden.  The client is not authorised to access referrals
+
   /referrals/{id}:
     get:
       tags:
@@ -228,7 +278,66 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access this referral
         404:
-          description: No referral has the supplied id (Not Found)
+         description: The referral does not exist
+
+    put:
+      tags:
+        - Referrals
+      summary: Update a referral
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/ReferralUpdate"
+      responses:
+        204:
+          description: The referral was updated
+        401:
+          description: The request was unauthorized
+        403:
+          description: Forbidden.  The client is not authorised to access this referral
+        404:
+          description: The referral does not exist
+
+  /referrals/{id}/state:
+    post:
+      summary: Change a referral's state
+      tags:
+        - Referrals
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ReferralStatus'
+      responses:
+        204:
+          description: The referral is now in the requested state
+        401:
+          description: The request was unauthorized
+        403:
+          description: Forbidden.  The client is not authorised to access this referral
+        404:
+          description: The referral does not exist
+        409:
+          description: The POSTed state conflicts with the current state of the referral
 
   /offerings/{id}/course:
     get:
@@ -250,6 +359,10 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Course'
+        401:
+          description: The request was unauthorized
+        403:
+          description: Forbidden.  The client is not authorised to access this offering
         404:
           description: No offering has the supplied id (Not Found)
 
@@ -518,6 +631,17 @@ components:
         - referrerId
         - oasysConfirmed
         - status
+
+    ReferralUpdate:
+      type: object
+      properties:
+        reason:
+          type: string
+        oasysConfirmed:
+          type: boolean
+          default: false
+      required:
+        - oasysConfirmed
 
     ReferralStatus:
       type: string
