@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config
 
 import io.sentry.Sentry
+import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -16,7 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.
 class HmppsAccreditedProgrammesApiExceptionHandler {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
-    log.info("Validation exception: {}", e.message)
+    log.info("Not valid", e)
     return ResponseEntity
       .status(BAD_REQUEST)
       .body(
@@ -30,7 +31,21 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
 
   @ExceptionHandler(NotFoundException::class)
   fun handleNotFoundException(e: NotFoundException): ResponseEntity<ErrorResponse> {
-    log.info("Not found exception: {}", e.message)
+    log.info("Not found", e)
+    return ResponseEntity
+      .status(NOT_FOUND)
+      .body(
+        ErrorResponse(
+          status = NOT_FOUND,
+          userMessage = "Not Found: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(EntityNotFoundException::class)
+  fun handleEntityNotFoundException(e: EntityNotFoundException): ResponseEntity<ErrorResponse> {
+    log.info("Entity not found", e)
     return ResponseEntity
       .status(NOT_FOUND)
       .body(
@@ -45,7 +60,7 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
   @ExceptionHandler(Throwable::class)
   fun handleException(e: Throwable): ResponseEntity<ErrorResponse?>? {
     Sentry.captureException(e)
-    log.error("Unexpected exception", e)
+    log.error("Unexpected error", e)
     return ResponseEntity
       .status(INTERNAL_SERVER_ERROR)
       .body(

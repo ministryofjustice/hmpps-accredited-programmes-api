@@ -19,4 +19,10 @@ class ReferralsService(
   ): UUID? = referralRepository.save(Referral(offeringId = offeringId, prisonNumber = prisonNumber, referrerId = referrerId)).id
 
   fun getReferral(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
+
+  fun updateReferral(referralId: UUID, reason: String?, oasysConfirmed: Boolean) {
+    val referral = referralRepository.getReferenceById(referralId)
+    referral.reason = reason
+    referral.oasysConfirmed = oasysConfirmed
+  }
 }
