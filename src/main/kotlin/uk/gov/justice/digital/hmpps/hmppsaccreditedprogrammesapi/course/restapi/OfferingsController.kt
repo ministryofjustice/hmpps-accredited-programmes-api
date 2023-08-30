@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.OfferingsApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toApi
 import java.util.UUID
@@ -15,4 +16,9 @@ class OfferingsController(private val courseService: CourseService) : OfferingsA
     courseService.getCourseForOfferingId(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /offerings/$id/course")
+
+  override fun offeringsOfferingIdGet(offeringId: UUID): ResponseEntity<CourseOffering> =
+    courseService.courseOffering(offeringId)?.let {
+      ResponseEntity.ok(it.toApi())
+    } ?: throw NotFoundException("No Offering found at /offerings/$offeringId")
 }

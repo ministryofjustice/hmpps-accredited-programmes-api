@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.jparepo
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -142,5 +143,32 @@ constructor(
     val courseByOfferingInNewTx = repository.findByOfferings_id(offeringId)
     courseByOfferingInNewTx shouldNotBeSameInstanceAs persistentCourse
     courseByOfferingInNewTx shouldBe persistentCourse
+  }
+
+  @Test
+  fun `find offering by id`() {
+    val course1 = CourseEntity(
+      name = "A Course",
+      identifier = "AC",
+      description = "A description",
+    ).apply {
+      offerings.add(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
+      offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      offerings.add(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
+    }
+    val course2 = CourseEntity(name = "Another Course", identifier = "ACANO", description = "Another description")
+      .apply {
+        offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      }
+
+    val offering = repository.save(course1).offerings.first()
+    repository.save(course2)
+
+    commitAndStartNewTx()
+
+    val persistentOffering = repository.findOfferingById(offering.id)
+
+    persistentOffering.shouldNotBeNull()
+    persistentOffering shouldBeEqualToComparingFields offering
   }
 }

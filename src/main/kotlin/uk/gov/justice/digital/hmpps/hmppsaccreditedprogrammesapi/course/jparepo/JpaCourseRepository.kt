@@ -48,6 +48,7 @@ constructor(
     ?.toList() ?: emptyList()
 
   override fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = offeringsForCourse(courseId).find { it.id == offeringId }
+  override fun courseOffering(offeringId: UUID): Offering? = courseRepository.findOfferingById(offeringId)
 
   override fun allAudiences(): Set<Audience> = audienceRepository.findAll().toSet()
 

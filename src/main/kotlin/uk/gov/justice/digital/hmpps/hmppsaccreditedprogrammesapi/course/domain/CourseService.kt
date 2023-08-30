@@ -21,6 +21,7 @@ class CourseService(
   fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository.offeringsForCourse(courseId)
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)
+  fun courseOffering(offeringId: UUID): Offering? = courseRepository.courseOffering(offeringId)
 
   fun replaceAllCourses(courseData: List<NewCourse>) {
     courseRepository.clear()
