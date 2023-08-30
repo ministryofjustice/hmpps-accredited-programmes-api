@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.trans
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral as DomainReferral
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status as DomainReferralStatus
 
 fun DomainReferral.toApi(): ApiReferral = ApiReferral(
   id = id!!,
@@ -15,8 +16,15 @@ fun DomainReferral.toApi(): ApiReferral = ApiReferral(
 )
 
 fun DomainReferral.Status.toApi(): ApiReferralStatus = when (this) {
-  DomainReferral.Status.ASSESSMENT_STARTED -> ApiReferralStatus.assessmentStarted
-  DomainReferral.Status.REFERRAL_STARTED -> ApiReferralStatus.referralStarted
-  DomainReferral.Status.REFERRAL_SUBMITTED -> ApiReferralStatus.referralSubmitted
-  DomainReferral.Status.AWAITING_ASSESSMENT -> ApiReferralStatus.awaitingAssessment
+  DomainReferralStatus.ASSESSMENT_STARTED -> ApiReferralStatus.assessmentStarted
+  DomainReferralStatus.REFERRAL_STARTED -> ApiReferralStatus.referralStarted
+  DomainReferralStatus.REFERRAL_SUBMITTED -> ApiReferralStatus.referralSubmitted
+  DomainReferralStatus.AWAITING_ASSESSMENT -> ApiReferralStatus.awaitingAssessment
+}
+
+fun ApiReferralStatus.toDomain(): DomainReferralStatus = when (this) {
+  ApiReferralStatus.referralStarted -> DomainReferralStatus.REFERRAL_STARTED
+  ApiReferralStatus.referralSubmitted -> DomainReferralStatus.REFERRAL_SUBMITTED
+  ApiReferralStatus.awaitingAssessment -> DomainReferralStatus.AWAITING_ASSESSMENT
+  ApiReferralStatus.assessmentStarted -> DomainReferralStatus.ASSESSMENT_STARTED
 }

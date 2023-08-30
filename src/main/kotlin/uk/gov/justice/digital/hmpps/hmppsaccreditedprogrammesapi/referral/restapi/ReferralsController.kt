@@ -8,18 +8,20 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStarted
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StartReferral
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralsService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.transformer.toApi
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.transformer.toDomain
 import java.util.UUID
 
 @Service
 class ReferralsController(
-  val referralsService: ReferralsService,
+  val referralService: ReferralService,
 ) : ReferralsApiDelegate {
 
   override fun referralsPost(startReferral: StartReferral): ResponseEntity<ReferralStarted> =
-    referralsService.startReferral(
+    referralService.startReferral(
       prisonNumber = startReferral.prisonNumber,
       referrerId = startReferral.referrerId,
       offeringId = startReferral.offeringId,
@@ -28,13 +30,18 @@ class ReferralsController(
     } ?: throw Exception("Unable to start referral")
 
   override fun referralsIdGet(id: UUID): ResponseEntity<Referral> =
-    referralsService
+    referralService
       .getReferral(id)
       ?.let { ResponseEntity.ok(it.toApi()) }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 
   override fun referralsIdPut(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> = with(referralUpdate) {
-    referralsService.updateReferral(id, reason, oasysConfirmed)
+    referralService.updateReferral(id, reason, oasysConfirmed)
     ResponseEntity.noContent().build()
+  }
+
+  override fun referralsIdStatusPut(id: UUID, statusUpdate: StatusUpdate): ResponseEntity<Unit> {
+    referralService.updateReferralStatus(id, statusUpdate.status.toDomain())
+    return ResponseEntity.noContent().build()
   }
 }

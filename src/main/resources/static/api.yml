@@ -308,9 +308,9 @@ paths:
         404:
           description: The referral does not exist
 
-  /referrals/{id}/state:
-    post:
-      summary: Change a referral's state
+  /referrals/{id}/status:
+    put:
+      summary: Change a referral's status
       tags:
         - Referrals
       parameters:
@@ -326,10 +326,10 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/ReferralStatus'
+              $ref: '#/components/schemas/StatusUpdate'
       responses:
         204:
-          description: The referral is now in the requested state
+          description: The referral now has the requested status
         401:
           description: The request was unauthorized
         403:
@@ -337,7 +337,7 @@ paths:
         404:
           description: The referral does not exist
         409:
-          description: The POSTed state conflicts with the current state of the referral
+          description: The referral may not change its status to the supplied value
 
   /offerings/{id}/course:
     get:
@@ -642,6 +642,14 @@ components:
           default: false
       required:
         - oasysConfirmed
+
+    StatusUpdate:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ReferralStatus"
+      required:
+        - status
 
     ReferralStatus:
       type: string

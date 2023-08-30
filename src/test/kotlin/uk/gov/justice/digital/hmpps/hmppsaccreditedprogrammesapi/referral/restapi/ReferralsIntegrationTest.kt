@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StartReferral
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.UUID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral as ApiReferral
@@ -73,7 +74,7 @@ constructor(
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(ReferralUpdate(reason = "A Reason", oasysConfirmed = true))
       .exchange()
-      .expectStatus().is2xxSuccessful
+      .expectStatus().isNoContent
 
     val updatedReferral = getReferral(referralId)
 
@@ -98,6 +99,34 @@ constructor(
       .bodyValue(ReferralUpdate(reason = "A Reason", oasysConfirmed = true))
       .exchange()
       .expectStatus().isNotFound
+  }
+
+  @Test
+  fun `update referral status`() {
+    val courseId: UUID = getACourseId()
+    val offeringId: UUID = getACourseOfferingId(courseId)
+    val referralId: UUID = startReferral(offeringId, "ReferrerId", "A1234AB")
+
+    webTestClient
+      .put()
+      .uri("/referrals/{referralId}/status", referralId)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(StatusUpdate(ReferralStatus.referralSubmitted))
+      .exchange()
+      .expectStatus().isNoContent
+
+    val updatedReferral = getReferral(referralId)
+
+    updatedReferral shouldBeEqual ApiReferral(
+      id = referralId,
+      offeringId = offeringId,
+      referrerId = "ReferrerId",
+      prisonNumber = "A1234AB",
+      status = ReferralStatus.referralSubmitted,
+      oasysConfirmed = false,
+      reason = null,
+    )
   }
 
   private fun getACourseId(): UUID = getCourses()!!.first().id
