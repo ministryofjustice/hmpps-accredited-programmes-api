@@ -221,10 +221,9 @@ class CourseServiceTest {
           name = "Course 1",
           identifier = "C1",
           description = "Description 1",
-          offerings = mutableSetOf(
-            Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"),
-          ),
-        ),
+        ).apply {
+          addOffering(Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"))
+        },
       )
       every { repository.allCourses() } returns allCourses
 
@@ -239,10 +238,9 @@ class CourseServiceTest {
         CourseEntity(
           name = "Course 1",
           identifier = "C1",
-          offerings = mutableSetOf(
-            Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"),
-          ),
-        ),
+        ).apply {
+          addOffering(Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"))
+        },
       )
       every { repository.allCourses() } returns allCourses
 

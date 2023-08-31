@@ -41,10 +41,10 @@ constructor(
         name = "Course",
         alternateName = "Alt C",
       ).apply {
-        offerings.add(Offering(organisationId = "MDI", contactEmail = "a@b.c"))
+        addOffering(Offering(organisationId = "MDI", contactEmail = "a@b.c"))
       },
     )
     commitAndStartNewTx()
-    return courseRepository.allCourses()[0].offerings.first().id
+    return courseRepository.allCourses()[0].offerings.first().id!!
   }
 }

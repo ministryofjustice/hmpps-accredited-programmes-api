@@ -10,7 +10,9 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import jakarta.persistence.Transient
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.SUBSELECT
 import java.util.UUID
@@ -33,10 +35,10 @@ class CourseEntity(
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   val prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
 
-  @ElementCollection
+  @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true)
+  @Column(name = "offerings")
   @Fetch(SUBSELECT)
-  @CollectionTable(name = "offering", joinColumns = [JoinColumn(name = "course_id")])
-  val offerings: MutableSet<Offering> = mutableSetOf(),
+  private val mutableOfferings: MutableSet<Offering> = mutableSetOf(),
 
   @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
   @Fetch(SUBSELECT)
@@ -47,6 +49,17 @@ class CourseEntity(
   )
   var audiences: MutableSet<Audience> = mutableSetOf(),
 ) {
+  @get:Transient
+  val offerings: Set<Offering>
+    get() = mutableOfferings
+
+  fun addOffering(offering: Offering) {
+    offering.course = this
+    mutableOfferings += offering
+  }
+
+  fun clearOfferings(): Unit = mutableOfferings.clear()
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || other !is CourseEntity) return false

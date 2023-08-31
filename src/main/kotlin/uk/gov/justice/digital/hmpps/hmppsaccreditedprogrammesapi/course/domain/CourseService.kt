@@ -78,7 +78,7 @@ class CourseService(
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     replacements.forEach { record ->
       coursesByIdentifier[record.identifier]?.run {
-        offerings.add(
+        addOffering(
           Offering(
             organisationId = record.prisonId,
             contactEmail = record.contactEmail
@@ -119,7 +119,7 @@ class CourseService(
       }.filterNotNull()
 
   private fun clearOfferings(courses: List<CourseEntity>) {
-    courses.forEach { it.offerings.clear() }
+    courses.forEach { it.clearOfferings() }
   }
 
   companion object {

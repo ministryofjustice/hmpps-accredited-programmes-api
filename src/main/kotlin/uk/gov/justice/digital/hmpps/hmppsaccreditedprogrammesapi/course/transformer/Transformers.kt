@@ -30,7 +30,7 @@ fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(
 )
 
 fun Offering.toApi(): CourseOffering = CourseOffering(
-  id = id,
+  id = id!!,
   organisationId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,

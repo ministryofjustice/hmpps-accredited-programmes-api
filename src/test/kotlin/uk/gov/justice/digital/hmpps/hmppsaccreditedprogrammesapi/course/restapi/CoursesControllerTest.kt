@@ -178,7 +178,7 @@ class CoursesControllerTest(
     @Test
     fun `get a course offering - happy path`() {
       val courseId = repository.allCourses().first().id
-      val courseOfferingId = repository.offeringsForCourse(courseId!!).first().id
+      val courseOfferingId = repository.offeringsForCourse(courseId!!).first().id!!
 
       every { coursesService.courseOffering(courseId, courseOfferingId) } returns repository.courseOffering(courseId, courseOfferingId)
 
