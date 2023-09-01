@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.restapi
 
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,10 +16,14 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CoursesControllerTest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralsService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.AWAITING_ASSESSMENT
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_STARTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_SUBMITTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralService
 import java.util.UUID
 
 @WebMvcTest
@@ -38,7 +44,7 @@ constructor(
 ) {
 
   @MockkBean
-  private lateinit var referralsService: ReferralsService
+  private lateinit var referralsService: ReferralService
 
   @Test
   fun `start a referral`() {
@@ -88,7 +94,10 @@ constructor(
           { 
             "offeringId": "$offeringId",
             "prisonNumber": "$prisonNumber",
-            "referrerId": "$referrerId"          
+            "referrerId": "$referrerId",
+            "status": "referral_started",
+            "oasysConfirmed": false,
+            "reason": null
           }
           """,
         )
@@ -120,5 +129,39 @@ constructor(
     }
 
     verify { referralsService.getReferral(referralId) }
+  }
+
+  @Test
+  fun `successful referral status update`() {
+    val referralId = UUID.randomUUID()
+
+    every { referralsService.updateReferralStatus(any(), any()) } just Runs
+
+    mockMvc.put("/referrals/$referralId/status") {
+      contentType = MediaType.APPLICATION_JSON
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      content = """{ "status": "referral_submitted" }"""
+    }.andExpect {
+      status { isNoContent() }
+    }
+
+    verify { referralsService.updateReferralStatus(referralId, REFERRAL_SUBMITTED) }
+  }
+
+  @Test
+  fun `referral status update - invalid transition`() {
+    val referralId = UUID.randomUUID()
+
+    every { referralsService.updateReferralStatus(any(), any()) } throws (IllegalArgumentException("Transition from $REFERRAL_STARTED to $AWAITING_ASSESSMENT is not valid"))
+
+    mockMvc.put("/referrals/$referralId/status") {
+      contentType = MediaType.APPLICATION_JSON
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      content = """{ "status": "awaiting_assessment" }"""
+    }.andExpect {
+      status { isConflict() }
+    }
+
+    verify { referralsService.updateReferralStatus(referralId, AWAITING_ASSESSMENT) }
   }
 }

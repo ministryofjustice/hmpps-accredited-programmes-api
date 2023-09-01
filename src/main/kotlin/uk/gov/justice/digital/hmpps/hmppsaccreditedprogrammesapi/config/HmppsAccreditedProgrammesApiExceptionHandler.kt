@@ -1,10 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config
 
 import io.sentry.Sentry
+import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
@@ -16,7 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.
 class HmppsAccreditedProgrammesApiExceptionHandler {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
-    log.info("Validation exception: {}", e.message)
+    log.info("Not valid", e)
     return ResponseEntity
       .status(BAD_REQUEST)
       .body(
@@ -30,7 +32,7 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
 
   @ExceptionHandler(NotFoundException::class)
   fun handleNotFoundException(e: NotFoundException): ResponseEntity<ErrorResponse> {
-    log.info("Not found exception: {}", e.message)
+    log.info("Not found", e)
     return ResponseEntity
       .status(NOT_FOUND)
       .body(
@@ -42,10 +44,38 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
       )
   }
 
+  @ExceptionHandler(EntityNotFoundException::class)
+  fun handleEntityNotFoundException(e: EntityNotFoundException): ResponseEntity<ErrorResponse> {
+    log.info("Entity not found", e)
+    return ResponseEntity
+      .status(NOT_FOUND)
+      .body(
+        ErrorResponse(
+          status = NOT_FOUND,
+          userMessage = "Not Found: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(IllegalArgumentException::class)
+  fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
+    log.info("Conflict", e)
+    return ResponseEntity
+      .status(CONFLICT)
+      .body(
+        ErrorResponse(
+          status = CONFLICT,
+          userMessage = "Conflict: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
   @ExceptionHandler(Throwable::class)
   fun handleException(e: Throwable): ResponseEntity<ErrorResponse?>? {
     Sentry.captureException(e)
-    log.error("Unexpected exception", e)
+    log.error("Unexpected error", e)
     return ResponseEntity
       .status(INTERNAL_SERVER_ERROR)
       .body(
