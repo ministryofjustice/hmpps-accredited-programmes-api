@@ -16,6 +16,7 @@ class JpaCourseRepository
 @Autowired
 constructor(
   private val courseRepository: CourseEntityRepository,
+  private val offeringRepository: OfferingRepository,
   private val audienceRepository: AudienceRepository,
   private val entityManager: EntityManager,
 ) : CourseRepository {
@@ -35,7 +36,7 @@ constructor(
     }
 
   override fun findCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository
-    .findByOfferings_id(offeringId)
+    .findByMutableOfferings_id(offeringId)
     ?.also {
       Hibernate.initialize(it.audiences)
       Hibernate.initialize(it.prerequisites)
@@ -48,6 +49,8 @@ constructor(
     ?.toList() ?: emptyList()
 
   override fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = offeringsForCourse(courseId).find { it.id == offeringId }
+
+  override fun courseOffering(offeringId: UUID): Offering? = offeringRepository.findById(offeringId).getOrNull()
 
   override fun allAudiences(): Set<Audience> = audienceRepository.findAll().toSet()
 

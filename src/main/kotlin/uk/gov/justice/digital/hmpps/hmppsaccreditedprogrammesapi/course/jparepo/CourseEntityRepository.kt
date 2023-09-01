@@ -7,5 +7,5 @@ import java.util.UUID
 
 @Repository
 interface CourseEntityRepository : JpaRepository<CourseEntity, UUID> {
-  fun findByOfferings_id(offeringId: UUID): CourseEntity?
+  fun findByMutableOfferings_id(offeringId: UUID): CourseEntity?
 }

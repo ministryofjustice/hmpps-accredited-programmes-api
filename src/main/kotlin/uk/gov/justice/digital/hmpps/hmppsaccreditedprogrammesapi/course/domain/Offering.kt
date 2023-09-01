@@ -1,18 +1,29 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain
 
 import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import java.util.UUID
 
-@Embeddable
+@Entity
 class Offering(
+  @Id
+  @GeneratedValue
+  @Column(name = "offering_id")
+  val id: UUID? = null,
+
   val organisationId: String,
   var contactEmail: String,
   var secondaryContactEmail: String? = null,
-
-  @Column(name = "offering_id")
-  val id: UUID = UUID.randomUUID(),
 ) {
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "course_id")
+  lateinit var course: CourseEntity
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || other !is Offering) return false

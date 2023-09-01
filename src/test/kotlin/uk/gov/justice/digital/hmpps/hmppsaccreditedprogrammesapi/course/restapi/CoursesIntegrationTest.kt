@@ -139,6 +139,22 @@ class CoursesIntegrationTest
   }
 
   @Test
+  fun `get a course offering using short url - happy path`() {
+    webTestClient
+      .get()
+      .uri("/offerings/$courseOfferingId")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.id").isEqualTo(courseOfferingId)
+      .jsonPath("$.organisationId").isNotEmpty
+      .jsonPath("$.contactEmail").isNotEmpty
+  }
+
+  @Test
   fun `get a course offering - not found`() {
     val randomUuid = UUID.randomUUID()
 

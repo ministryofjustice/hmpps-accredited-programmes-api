@@ -21,6 +21,7 @@ class CourseService(
   fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository.offeringsForCourse(courseId)
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)
+  fun courseOffering(offeringId: UUID): Offering? = courseRepository.courseOffering(offeringId)
 
   fun replaceAllCourses(courseData: List<NewCourse>) {
     courseRepository.clear()
@@ -77,7 +78,7 @@ class CourseService(
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     replacements.forEach { record ->
       coursesByIdentifier[record.identifier]?.run {
-        offerings.add(
+        addOffering(
           Offering(
             organisationId = record.prisonId,
             contactEmail = record.contactEmail
@@ -118,7 +119,7 @@ class CourseService(
       }.filterNotNull()
 
   private fun clearOfferings(courses: List<CourseEntity>) {
-    courses.forEach { it.offerings.clear() }
+    courses.forEach { it.clearOfferings() }
   }
 
   companion object {

@@ -15,10 +15,16 @@ class InMemoryCourseRepository {
   fun course(courseId: UUID): CourseEntity? = courses.find { it.id == courseId }
 
   fun offeringsForCourse(courseId: UUID): List<Offering> =
-    courses.find { it.id == courseId }?.offerings?.toList() ?: emptyList()
+    courses
+      .find { it.id == courseId }
+      ?.offerings
+      ?.toList() ?: emptyList()
 
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering? =
-    courses.find { it.id == courseId }?.offerings?.find { it.id == offeringId }
+    courses
+      .find { it.id == courseId }
+      ?.offerings
+      ?.find { it.id == offeringId }
 
   private companion object {
     private val audiences = setOf(Audience(value = "Sexual violence", id = UUID.randomUUID()))
@@ -36,9 +42,9 @@ class InMemoryCourseRepository {
       alternateName = "LC",
       audiences = mutableSetOf(),
     ).apply {
-      offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk"))
-      offerings.add(Offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk"))
-      offerings.add(Offering(organisationId = "BXI", contactEmail = "nobody-bxi@digital.justice.gov.uk"))
+      addOffering(offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk"))
+      addOffering(offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk"))
+      addOffering(offering(organisationId = "BXI", contactEmail = "nobody-bxi@digital.justice.gov.uk"))
     }
 
     private val bnm = CourseEntity(
@@ -53,7 +59,7 @@ class InMemoryCourseRepository {
       ),
       alternateName = "AC++",
       audiences = audiences.toMutableSet(),
-    ).apply { offerings.add(Offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk")) }
+    ).apply { addOffering(offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk")) }
 
     private val nms = CourseEntity(
       id = UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
@@ -66,8 +72,16 @@ class InMemoryCourseRepository {
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
       audiences = mutableSetOf(),
-    ).apply { offerings.add(Offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk")) }
+    ).apply { addOffering(offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk")) }
 
     private val courses: Set<CourseEntity> = setOf(tsp, bnm, nms)
+
+    private fun offering(organisationId: String, contactEmail: String, secondaryContactEmail: String? = null) =
+      Offering(
+        id = UUID.randomUUID(),
+        organisationId = organisationId,
+        contactEmail = contactEmail,
+        secondaryContactEmail = secondaryContactEmail,
+      )
   }
 }

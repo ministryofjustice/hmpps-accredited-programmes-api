@@ -92,13 +92,13 @@ constructor(
       identifier = "AC",
       description = "A description",
     ).apply {
-      offerings.add(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
-      offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      offerings.add(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
+      addOffering(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
+      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      addOffering(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
     }
     val course2 = CourseEntity(name = "Another Course", identifier = "ACANO", description = "Another description")
       .apply {
-        offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+        addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
       }
 
     repository.save(course1)
@@ -118,13 +118,13 @@ constructor(
       identifier = "AC",
       description = "A description",
     ).apply {
-      offerings.add(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
-      offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      offerings.add(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
+      addOffering(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
+      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      addOffering(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
     }
     val course2 = CourseEntity(name = "Another Course", identifier = "ACANO", description = "Another description")
       .apply {
-        offerings.add(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+        addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
       }
 
     repository.save(course1)
@@ -133,13 +133,13 @@ constructor(
 
     countRowsInTable(jdbcTemplate, "offering") shouldBe 4
     val persistentCourse = repository.findById(course1.id!!).orElseThrow()
-    val offeringId = persistentCourse.offerings.first().id
-    val courseByOfferingIdInSameTx = repository.findByOfferings_id(offeringId)
+    val offeringId = persistentCourse.offerings.first().id!!
+    val courseByOfferingIdInSameTx = repository.findByMutableOfferings_id(offeringId)
     courseByOfferingIdInSameTx shouldBeSameInstanceAs persistentCourse
 
     commitAndStartNewTx()
 
-    val courseByOfferingInNewTx = repository.findByOfferings_id(offeringId)
+    val courseByOfferingInNewTx = repository.findByMutableOfferings_id(offeringId)
     courseByOfferingInNewTx shouldNotBeSameInstanceAs persistentCourse
     courseByOfferingInNewTx shouldBe persistentCourse
   }

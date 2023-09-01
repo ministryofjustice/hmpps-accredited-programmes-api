@@ -9,6 +9,7 @@ interface CourseRepository {
   fun saveCourse(courseEntity: CourseEntity)
   fun offeringsForCourse(courseId: UUID): List<Offering>
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering?
+  fun courseOffering(offeringId: UUID): Offering?
   fun allAudiences(): Set<Audience>
   fun saveAudiences(audiences: Set<Audience>)
   fun clear()
