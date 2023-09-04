@@ -15,12 +15,14 @@ private const val COURSE_JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsa
 private const val COURSE_DOMAIN_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain"
 private const val REFERRAL_JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.jparepo"
 private const val REFERRAL_DOMAIN_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain"
+private const val PARTICIPATION_HISTORY_DOMAIN = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain"
+private const val PARTICIPATION_HISTORY_JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.jparepo"
 
 @DataJpaTest
 @ContextConfiguration(classes = [RepositoryTest::class])
-@ComponentScan(basePackages = [COURSE_JPA_REPO_PACKAGE, REFERRAL_JPA_REPO_PACKAGE])
-@EnableJpaRepositories(basePackages = [COURSE_JPA_REPO_PACKAGE, REFERRAL_JPA_REPO_PACKAGE])
-@EntityScan(basePackages = [COURSE_DOMAIN_PACKAGE, REFERRAL_DOMAIN_PACKAGE])
+@ComponentScan(basePackages = [COURSE_JPA_REPO_PACKAGE, REFERRAL_JPA_REPO_PACKAGE, PARTICIPATION_HISTORY_JPA_REPO_PACKAGE])
+@EnableJpaRepositories(basePackages = [COURSE_JPA_REPO_PACKAGE, REFERRAL_JPA_REPO_PACKAGE, PARTICIPATION_HISTORY_JPA_REPO_PACKAGE])
+@EntityScan(basePackages = [COURSE_DOMAIN_PACKAGE, REFERRAL_DOMAIN_PACKAGE, PARTICIPATION_HISTORY_DOMAIN])
 @ActiveProfiles("test")
 abstract class RepositoryTest(
   val jdbcTemplate: JdbcTemplate,
@@ -29,6 +31,7 @@ abstract class RepositoryTest(
   fun truncateTables() {
     JdbcTestUtils.deleteFromTables(
       jdbcTemplate,
+      "course_participation_history",
       "referral",
       "prerequisite",
       "offering",
