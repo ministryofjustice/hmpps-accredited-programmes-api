@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
 
 @RestControllerAdvice
 class HmppsAccreditedProgrammesApiExceptionHandler {
@@ -27,6 +28,20 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
         ErrorResponse(
           status = BAD_REQUEST,
           userMessage = "Validation failure: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(BusinessException::class)
+  fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse> {
+    log.info("Business rule violation", e)
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = "Business rule violation: ${e.message}",
           developerMessage = e.message,
         ),
       )

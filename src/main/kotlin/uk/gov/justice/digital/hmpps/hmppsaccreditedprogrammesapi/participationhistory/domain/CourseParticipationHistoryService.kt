@@ -13,7 +13,10 @@ class CourseParticipationHistoryService(
   @Autowired val repository: JpaCourseParticipationHistoryRepository,
 ) {
   fun addCourseParticipation(courseParticipation: CourseParticipationHistory): UUID? =
-    repository.save(courseParticipation).id
+    courseParticipation.let {
+      it.assertOnlyCourseIdOrCourseNamePresent()
+      repository.save(it).id
+    }
 
   fun getCourseParticipationHistory(historicCourseParticipationId: UUID): CourseParticipationHistory? =
     repository.findById(historicCourseParticipationId).getOrNull()

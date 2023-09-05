@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
 import java.time.Year
 import java.util.UUID
 
@@ -21,7 +22,6 @@ class CourseParticipationHistory(
   val prisonNumber: String,
   var courseId: UUID? = null,
   var otherCourseName: String?,
-
   var yearStarted: Year?,
 
   @Enumerated(EnumType.STRING)
@@ -29,7 +29,16 @@ class CourseParticipationHistory(
 
   @Embedded
   var outcome: CourseOutcome?,
-)
+) {
+  fun assertOnlyCourseIdOrCourseNamePresent() {
+    if (courseId == null && otherCourseName == null) {
+      throw BusinessException("Expected a courseId or otherCourseName but neither value is present")
+    }
+    if (courseId != null && otherCourseName != null) {
+      throw BusinessException("Expected just one of courseId or otherCourseName but both values are present")
+    }
+  }
+}
 
 @Embeddable
 class CourseOutcome(
