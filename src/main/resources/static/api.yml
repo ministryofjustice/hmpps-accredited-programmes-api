@@ -508,6 +508,7 @@ paths:
           'application/json':
             schema:
               $ref: "#/components/schemas/CourseParticipationUpdate"
+        required: true
       responses:
         201:
           description: The information about a person's participation in a course has been updated
@@ -774,11 +775,7 @@ components:
           example: 2021
           type: integer
         setting:
-          description: Either Custody or Community
-          type: string
-          enum:
-            - custody
-            - community
+          $ref: '#/components/schemas/CourseSetting'
         outcome:
           $ref: '#/components/schemas/CourseParticipationOutcome'
         source:
@@ -810,11 +807,7 @@ components:
           example: 2021
           type: integer
         setting:
-          description: Either Custody or Community
-          type: string
-          enum:
-            - custody
-            - community
+          $ref: '#/components/schemas/CourseSetting'
         outcome:
           $ref: '#/components/schemas/CourseParticipationOutcome'
         source:
@@ -841,15 +834,18 @@ components:
           example: 2021
           type: integer
         setting:
-          description: Either Custody or Community
-          type: string
-          enum:
-            - custody
-            - community
+          $ref: '#/components/schemas/CourseSetting'
         outcome:
           $ref: '#/components/schemas/CourseParticipationOutcome'
         source:
           type: string
+
+    CourseSetting:
+      description: Either Custody or Community
+      type: string
+      enum:
+        - custody
+        - community
 
     CourseParticipationOutcome:
       description: The outcome of participating in a course
@@ -863,8 +859,6 @@ components:
             - complete
         detail:
           type: string
-      required:
-        - status
 
     CourseParticipationAdded:
       type: object

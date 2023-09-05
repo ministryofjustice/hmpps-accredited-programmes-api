@@ -6,4 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 import java.util.UUID
 
 @Repository
-interface JpaCourseParticipationHistoryRepository : JpaRepository<CourseParticipationHistory, UUID>
+interface JpaCourseParticipationHistoryRepository : JpaRepository<CourseParticipationHistory, UUID> {
+  fun findByPrisonNumber(prisonNumber: String): List<CourseParticipationHistory>
+}

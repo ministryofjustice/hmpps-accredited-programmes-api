@@ -19,26 +19,26 @@ class CourseParticipationHistory(
   val id: UUID? = null,
 
   val prisonNumber: String,
-  val courseId: UUID? = null,
-  val otherCourseName: String?,
+  var courseId: UUID? = null,
+  var otherCourseName: String?,
 
-  val yearStarted: Year?,
+  var yearStarted: Year?,
 
   @Enumerated(EnumType.STRING)
-  val setting: CourseSetting,
+  var setting: CourseSetting?,
 
   @Embedded
-  val outcome: CourseOutcome,
+  var outcome: CourseOutcome?,
 )
 
 @Embeddable
 class CourseOutcome(
   @Enumerated(EnumType.STRING)
   @Column(name = "outcome_status")
-  val status: CourseStatus?,
+  var status: CourseStatus?,
 
   @Column(name = "outcome_detail")
-  val detail: String?,
+  var detail: String?,
 )
 
 enum class CourseSetting { CUSTODY, COMMUNITY }
