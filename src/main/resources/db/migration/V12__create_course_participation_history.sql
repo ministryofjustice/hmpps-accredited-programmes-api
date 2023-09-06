@@ -5,6 +5,7 @@ CREATE TABLE course_participation_history
     course_id                       UUID,
     other_course_name               TEXT,
     year_started                    integer,
+    source                          text,
     setting                         text,
     outcome_status                  text,
     outcome_detail                  text,

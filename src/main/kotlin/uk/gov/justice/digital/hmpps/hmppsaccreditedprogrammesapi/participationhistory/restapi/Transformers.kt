@@ -16,6 +16,7 @@ fun CreateCourseParticipation.toDomain() =
     prisonNumber = prisonNumber,
     courseId = courseId,
     otherCourseName = otherCourseName,
+    source = source,
     setting = setting?.toDomain(),
     outcome = outcome?.toDomain(),
     yearStarted = yearStarted?.let(Year::of),
@@ -60,6 +61,7 @@ fun CourseParticipationHistory.toApi() = CourseParticipation(
   courseId = courseId,
   otherCourseName = otherCourseName,
   yearStarted = yearStarted?.value,
+  source = source,
   outcome = outcome?.let {
     CourseParticipationOutcome(
       status = it.status?.toApi(),

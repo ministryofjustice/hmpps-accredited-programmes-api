@@ -63,12 +63,12 @@ class CourseParticipationHistoryControllerTest(
           "courseId": "$courseId",
           "prisonNumber": "A1234AA",
           "yearStarted": 2020,
+          "source": "source",
           "outcome": {
             "status": "complete",
             "detail": "Detail"
           },
-          "setting": "custody",
-          "source": "No idea"
+          "setting": "custody"
         }
         """
       }.andExpect {
@@ -85,6 +85,7 @@ class CourseParticipationHistoryControllerTest(
         otherCourseName = null,
         prisonNumber = "A1234AA",
         yearStarted = Year.of(2020),
+        source = "source",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
           detail = "Detail",
@@ -157,6 +158,7 @@ class CourseParticipationHistoryControllerTest(
         courseId = courseId,
         yearStarted = Year.of(2020),
         prisonNumber = "A1234BC",
+        source = "source",
         setting = CourseSetting.COMMUNITY,
         outcome = CourseOutcome(
           status = CourseStatus.DESELECTED,
@@ -177,6 +179,7 @@ class CourseParticipationHistoryControllerTest(
             "courseId": "$courseId",
             "yearStarted": 2020,
             "prisonNumber": "A1234BC",
+            "source": "source",
             "setting": "community",
             "outcome": {
                     "status": "deselected",
@@ -255,6 +258,7 @@ class CourseParticipationHistoryControllerTest(
           courseId = courseId,
           yearStarted = Year.of(2020),
           prisonNumber = "A1234BC",
+          source = "source",
           setting = CourseSetting.COMMUNITY,
           outcome = CourseOutcome(
             status = CourseStatus.DESELECTED,
@@ -277,6 +281,7 @@ class CourseParticipationHistoryControllerTest(
                 "courseId": "$courseId",
                 "yearStarted": 2020,
                 "prisonNumber": "A1234BC",
+                "source": "source",
                 "setting": "community",
                 "outcome": {
                         "status": "deselected",
@@ -300,8 +305,7 @@ class CourseParticipationHistoryControllerTest(
       }.andExpect {
         status { isOk() }
         content {
-          json("[]",
-          )
+          json("[]")
         }
       }
     }

@@ -33,6 +33,7 @@ class CourseParticipationHistoryTest {
       CourseParticipationHistory(
         courseId = courseId,
         otherCourseName = otherCourseName,
+        source = null,
         outcome = null,
         setting = null,
         prisonNumber = "A1234BC",

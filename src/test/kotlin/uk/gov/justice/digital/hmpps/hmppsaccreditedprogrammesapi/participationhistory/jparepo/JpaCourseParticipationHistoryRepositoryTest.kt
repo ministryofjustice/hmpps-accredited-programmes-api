@@ -33,6 +33,7 @@ constructor(
         prisonNumber = "A1234AA",
         otherCourseName = "Other course name",
         yearStarted = Year.parse("2021"),
+        source = "source",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
           detail = "Course outcome detail",
@@ -53,6 +54,7 @@ constructor(
       prisonNumber = "A1234AA",
       otherCourseName = "Other course name",
       yearStarted = Year.parse("2021"),
+      source = "source",
       outcome = CourseOutcome(
         status = CourseStatus.COMPLETE,
         detail = "Course outcome detail",

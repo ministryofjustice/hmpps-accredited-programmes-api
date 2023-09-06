@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationh
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldNotBeEmpty
-import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -167,7 +166,7 @@ constructor(
   fun `find course participation history by prison number returns no matches`() {
     getCourseIds().map { addCourseParticipationHistory(it, "A1234AA") }
 
-    val courseIdsForPrisonNumber = webTestClient
+    webTestClient
       .get()
       .uri("/course-participation-history?prisonNumber={prisonNumber}", "Z0000ZZ")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())

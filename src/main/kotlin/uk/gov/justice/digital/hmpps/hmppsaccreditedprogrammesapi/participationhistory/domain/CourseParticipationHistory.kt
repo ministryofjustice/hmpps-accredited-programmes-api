@@ -23,6 +23,7 @@ class CourseParticipationHistory(
   var courseId: UUID? = null,
   var otherCourseName: String?,
   var yearStarted: Year?,
+  var source: String?,
 
   @Enumerated(EnumType.STRING)
   var setting: CourseSetting?,
