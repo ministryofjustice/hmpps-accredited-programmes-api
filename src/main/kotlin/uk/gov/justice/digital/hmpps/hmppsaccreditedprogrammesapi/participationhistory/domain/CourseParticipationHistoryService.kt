@@ -28,6 +28,9 @@ class CourseParticipationHistoryService(
   }
 
   fun findByPrisonNumber(prisonNumber: String): List<CourseParticipationHistory> = repository.findByPrisonNumber(prisonNumber)
+  fun deleteCourseParticipation(historicCourseParticipationId: UUID) {
+    repository.deleteById(historicCourseParticipationId)
+  }
 
   companion object {
     private fun CourseParticipationHistory.applyUpdate(update: CourseParticipationHistoryUpdate) {

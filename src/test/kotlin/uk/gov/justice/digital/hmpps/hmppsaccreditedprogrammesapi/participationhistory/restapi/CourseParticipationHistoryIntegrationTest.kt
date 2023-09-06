@@ -10,9 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationAdded
@@ -177,6 +179,30 @@ constructor(
       .returnResult().responseBody!!.shouldBeEmpty()
   }
 
+  @Test
+  fun `delete course participation history`() {
+    val id = addCourseParticipationHistory(getFirstCourseId(), "X9999XX")
+    getCourseParticipationStatusCode(id) shouldBe HttpStatus.OK
+
+    webTestClient
+      .delete()
+      .uri("/course-participation-history/{id}", id)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNoContent
+
+    getCourseParticipationStatusCode(id) shouldBe HttpStatus.NOT_FOUND
+
+    webTestClient
+      .delete()
+      .uri("/course-participation-history/{id}", id)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNoContent
+  }
+
   private fun getFirstCourseId(): UUID = getCourseIds().first()
 
   private fun getCourseIds(): List<UUID> =
@@ -216,4 +242,13 @@ constructor(
       .expectStatus().isOk
       .expectBody(CourseParticipation::class.java)
       .returnResult().responseBody!!
+
+  private fun getCourseParticipationStatusCode(id: UUID): HttpStatusCode =
+    webTestClient
+      .get()
+      .uri("/course-participation-history/{id}", id)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .returnResult<Any>().status
 }

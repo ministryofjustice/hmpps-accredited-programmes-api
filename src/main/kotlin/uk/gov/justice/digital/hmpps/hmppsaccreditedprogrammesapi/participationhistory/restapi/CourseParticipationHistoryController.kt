@@ -41,4 +41,9 @@ class CourseParticipationHistoryController(
         .findByPrisonNumber(prisonNumber)
         .map(CourseParticipationHistory::toApi),
     )
+
+  override fun courseParticipationHistoryHistoricCourseParticipationIdDelete(historicCourseParticipationId: UUID): ResponseEntity<Unit> {
+    service.deleteCourseParticipation(historicCourseParticipationId)
+    return ResponseEntity.noContent().build()
+  }
 }

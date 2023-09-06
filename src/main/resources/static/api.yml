@@ -525,6 +525,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+    delete:
+      tags:
+        - Course participation history
+      summary: Delete information about a person's participation in a course.
+      parameters:
+        - name: historicCourseParticipationId
+          in: path
+          description: The unique identifier assigned to this record when it was created
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        204:
+          description: The information about a person's participation in a course has been deleted
+        401:
+          description: The client is not authorized to perform this operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     Course:
