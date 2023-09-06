@@ -10,9 +10,12 @@ import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageConversionException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
 
 @RestControllerAdvice
 class HmppsAccreditedProgrammesApiExceptionHandler {
@@ -25,6 +28,20 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
         ErrorResponse(
           status = BAD_REQUEST,
           userMessage = "Validation failure: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(BusinessException::class)
+  fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse> {
+    log.info("Business rule violation", e)
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = "Business rule violation: ${e.message}",
           developerMessage = e.message,
         ),
       )
@@ -67,6 +84,34 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
         ErrorResponse(
           status = CONFLICT,
           userMessage = "Conflict: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(HttpMessageConversionException::class)
+  fun handleHttpMessageConversionException(e: HttpMessageConversionException): ResponseEntity<ErrorResponse> {
+    log.info("Request not readable", e)
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = e.message,
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+  fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
+    log.info("Request not readable", e)
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(
+        ErrorResponse(
+          status = BAD_REQUEST,
+          userMessage = e.message,
           developerMessage = e.message,
         ),
       )
