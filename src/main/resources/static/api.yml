@@ -418,12 +418,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCourseParticipation'
       responses:
-        200:
+        201:
           description: The course participation information has been added
           content:
             'application/json':
               schema:
-                $ref: "#/components/schemas/CourseParticipationAdded"
+                $ref: "#/components/schemas/CourseParticipation"
         400:
           description: Bad input
           content:
@@ -510,8 +510,12 @@ paths:
               $ref: "#/components/schemas/CourseParticipationUpdate"
         required: true
       responses:
-        201:
+        200:
           description: The information about a person's participation in a course has been updated
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/CourseParticipation"
         401:
           description: The client is not authorized to perform this operation
           content:
@@ -881,15 +885,6 @@ components:
             - complete
         detail:
           type: string
-
-    CourseParticipationAdded:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-      required:
-        - id
 
     ReferralStarted:
       type: object

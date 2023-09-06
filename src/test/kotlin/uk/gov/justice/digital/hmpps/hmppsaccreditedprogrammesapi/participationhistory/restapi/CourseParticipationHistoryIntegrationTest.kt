@@ -8,16 +8,15 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.test.web.reactive.server.returnResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationAdded
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseSetting
@@ -52,7 +51,7 @@ constructor(
         ),
       ).exchange()
       .expectStatus().isCreated
-      .expectBody(CourseParticipationAdded::class.java)
+      .expectBody<CourseParticipation>()
       .returnResult().responseBody!!
 
     cpa.shouldNotBeNull()
@@ -65,7 +64,7 @@ constructor(
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody(CourseParticipation::class.java)
+      .expectBody<CourseParticipation>()
       .returnResult().responseBody!!
 
     courseParticipation shouldBe CourseParticipation(
@@ -109,7 +108,7 @@ constructor(
 
     val courseParticipationId = addCourseParticipationHistory(courseId, "A1234AA")
 
-    webTestClient
+    val cp = webTestClient
       .put()
       .uri("/course-participation-history/{id}", courseParticipationId)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
@@ -125,11 +124,11 @@ constructor(
           ),
         ),
       ).exchange()
-      .expectStatus().isNoContent
+      .expectStatus().isOk
+      .expectBody<CourseParticipation>()
+      .returnResult().responseBody
 
-    val cp = getCourseParticipation(courseParticipationId)
-
-    cp shouldBe CourseParticipation(
+    val expectedCp = CourseParticipation(
       id = courseParticipationId,
       courseId = courseId,
       yearStarted = 2020,
@@ -140,6 +139,9 @@ constructor(
         detail = "Some detail",
       ),
     )
+
+    cp shouldBe expectedCp
+    getCourseParticipation(courseParticipationId) shouldBe expectedCp
   }
 
   @Test
@@ -158,7 +160,7 @@ constructor(
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody(object : ParameterizedTypeReference<List<CourseParticipation>>() {})
+      .expectBody<List<CourseParticipation>>()
       .returnResult().responseBody!!.map { it.id }.toSet()
 
     courseIdsForPrisonNumber shouldBe ids
@@ -175,7 +177,7 @@ constructor(
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody(object : ParameterizedTypeReference<List<CourseParticipation>>() {})
+      .expectBody<List<CourseParticipation>>()
       .returnResult().responseBody!!.shouldBeEmpty()
   }
 
@@ -212,7 +214,7 @@ constructor(
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectBody(object : ParameterizedTypeReference<List<Course>>() {})
+      .expectBody<List<Course>>()
       .returnResult().responseBody!!.map { it.id }
 
   private fun addCourseParticipationHistory(courseId: UUID, prisonNumber: String): UUID =
@@ -229,7 +231,7 @@ constructor(
         ),
       ).exchange()
       .expectStatus().isCreated
-      .expectBody(CourseParticipationAdded::class.java)
+      .expectBody<CourseParticipation>()
       .returnResult().responseBody!!.id
 
   private fun getCourseParticipation(id: UUID): CourseParticipation =
@@ -240,7 +242,7 @@ constructor(
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody(CourseParticipation::class.java)
+      .expectBody<CourseParticipation>()
       .returnResult().responseBody!!
 
   private fun getCourseParticipationStatusCode(id: UUID): HttpStatusCode =

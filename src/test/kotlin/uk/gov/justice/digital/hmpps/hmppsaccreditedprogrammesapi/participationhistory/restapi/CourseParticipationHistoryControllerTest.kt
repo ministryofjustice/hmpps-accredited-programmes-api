@@ -53,7 +53,17 @@ class CourseParticipationHistoryControllerTest(
       val courseId = UUID.randomUUID()
       val courseParticipationSlot = slot<CourseParticipationHistory>()
 
-      every { service.addCourseParticipation(capture(courseParticipationSlot)) } returns uuid
+      every { service.addCourseParticipation(capture(courseParticipationSlot)) } returns
+        CourseParticipationHistory(
+          id = uuid,
+          courseId = courseId,
+          source = "source",
+          prisonNumber = "A1234AA",
+          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail"),
+          setting = CourseSetting.CUSTODY,
+          yearStarted = Year.of(2020),
+          otherCourseName = null,
+        )
 
       mockMvc.post("/course-participation-history") {
         accept = MediaType.APPLICATION_JSON
