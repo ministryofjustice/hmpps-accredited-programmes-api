@@ -3,6 +3,7 @@ DELETE from offering;
 DELETE from prerequisite;
 DELETE from audience;
 DELETE from course;
+DELETE from referral;
 
 INSERT INTO audience(audience_id, audience_value)
 VALUES ('7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'Sexual offence'),
@@ -44,3 +45,6 @@ VALUES ('28e47d30-30bf-4dab-a8eb-9fda3f6400e8', '7fffcc6a-11f8-4713-be35-cf5ff1a
        ('d3abc217-75ee-46e9-a010-368f30282367', '7fffcc6a-11f8-4713-be35-cf5ff1aee510'),
        ('1811faa6-d568-4fc4-83ce-41118b90242e', '7fffcc6a-11f8-4713-be35-cf5ff1aee518'),
        ('1811faa6-d568-4fc4-83ce-41118b90242e', '7fffcc6a-11f8-4713-be35-cf5ff1aee519');
+
+INSERT INTO referral (referral_id, offering_id, prison_number, referrer_id)
+VALUES ('c11fab18-dc8d-420c-9c82-d0edd373732d', '20f3abc8-dd92-43ae-b88e-5797a0ad3f4b', 'ABC1234', '5105a589-75b3-4ca0-9433-b96228c1c8f3');
