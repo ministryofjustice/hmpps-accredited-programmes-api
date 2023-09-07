@@ -231,22 +231,21 @@ class CourseParticipationHistoryControllerTest(
     }
 
     @Test
-    fun `get participation history by id - not a uuid`() {
-      mockMvc.get("/course-participation-history/{id}", "abcd") {
+    fun `get participation history by id - bad uuid`() {
+      val historicCourseParticipationId = "bad-id"
+
+      mockMvc.get("/course-participation-history/$historicCourseParticipationId") {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isBadRequest() }
         content {
-          json(
-            """{
-              "status":400,
-              "errorCode":null,
-              "userMessage":"Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: abcd",
-              "developerMessage":"Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: abcd",
-              "moreInfo":null
-              }""",
-          )
+          contentType(MediaType.APPLICATION_JSON)
+          jsonPath("$.status") { value(400) }
+          jsonPath("$.errorCode") { isEmpty() }
+          jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
+          jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
+          jsonPath("$.moreInfo") { isEmpty() }
         }
       }
 

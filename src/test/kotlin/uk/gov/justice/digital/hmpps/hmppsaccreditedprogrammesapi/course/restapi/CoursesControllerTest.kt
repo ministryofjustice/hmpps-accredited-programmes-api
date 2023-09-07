@@ -131,6 +131,26 @@ class CoursesControllerTest(
     }
 
     @Test
+    fun `get a course - bad id`() {
+      val courseId = "bad-id"
+
+      mockMvc.get("/courses/$courseId") {
+        accept = MediaType.APPLICATION_JSON
+        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+      }.andExpect {
+        status { isBadRequest() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          jsonPath("$.status") { value(400) }
+          jsonPath("$.errorCode") { isEmpty() }
+          jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
+          jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
+          jsonPath("$.moreInfo") { isEmpty() }
+        }
+      }
+    }
+
+    @Test
     fun `get a course - no token`() {
       mockMvc.get("/courses/${UUID.randomUUID()}") {
         accept = MediaType.APPLICATION_JSON
