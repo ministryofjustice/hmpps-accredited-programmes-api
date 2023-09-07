@@ -12,9 +12,9 @@ configurations {
 }
 
 dependencies {
-  val kotestVersion = "5.6.2"
+  val kotestVersion = "5.7.2"
   val springdocVersion = "2.2.0"
-  val sentryVersion = "6.28.0"
+  val sentryVersion = "6.29.0"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
