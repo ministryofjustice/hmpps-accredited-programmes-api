@@ -111,7 +111,7 @@ class HmppsAccreditedProgrammesApiExceptionHandler {
       .body(
         ErrorResponse(
           status = BAD_REQUEST,
-          userMessage = e.message,
+          userMessage = "Request not readable: ${e.message}",
           developerMessage = e.message,
         ),
       )
