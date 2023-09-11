@@ -123,22 +123,6 @@ class CoursesIntegrationTest
   }
 
   @Test
-  fun `get a course offering - happy path`() {
-    webTestClient
-      .get()
-      .uri("/courses/$courseId/offerings/$courseOfferingId")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBody()
-      .jsonPath("$.id").isEqualTo(courseOfferingId)
-      .jsonPath("$.organisationId").isNotEmpty
-      .jsonPath("$.contactEmail").isNotEmpty
-  }
-
-  @Test
   fun `get a course offering using short url - happy path`() {
     webTestClient
       .get()
@@ -152,26 +136,6 @@ class CoursesIntegrationTest
       .jsonPath("$.id").isEqualTo(courseOfferingId)
       .jsonPath("$.organisationId").isNotEmpty
       .jsonPath("$.contactEmail").isNotEmpty
-  }
-
-  @Test
-  fun `get a course offering - not found`() {
-    val randomUuid = UUID.randomUUID()
-
-    webTestClient
-      .get()
-      .uri("/courses/$randomUuid/offerings/$randomUuid")
-      .accept(MediaType.APPLICATION_JSON)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .exchange()
-      .expectStatus().isNotFound
-      .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBody()
-      .jsonPath("$.status").isEqualTo(404)
-      .jsonPath("$.errorCode").isEmpty
-      .jsonPath("$.userMessage").value(startsWith("Not Found: No CourseOffering found at /courses/"))
-      .jsonPath("$.developerMessage").value(startsWith("No CourseOffering found at /courses/"))
-      .jsonPath("$.moreInfo").isEmpty
   }
 
   @DirtiesContext
