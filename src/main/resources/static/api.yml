@@ -146,47 +146,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/CourseOffering'
 
-  /courses/{courseId}/offerings/{offeringId}:
-    get:
-      tags:
-        - Course Offerings
-      summary: Details for a single course offering
-
-      parameters:
-        - name: courseId
-          in: path
-          description: A course identifier
-          required: true
-          schema:
-            type: string
-            format: uuid
-
-        - name: offeringId
-          in: path
-          description: A course offering identifier
-          required: true
-          schema:
-            type: string
-            format: uuid
-
-      responses:
-        200:
-          description: successful operation
-          content:
-            'application/json':
-              schema:
-                  $ref: '#/components/schemas/CourseOffering'
-        401:
-          description: Unauthorized. The request was unauthorized
-        403:
-          description: Forbidden.  The client is not authorised to access this offering
-        404:
-          description: invalid course and/or course offering id
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
   /offerings/{offeringId}:
     get:
       tags:

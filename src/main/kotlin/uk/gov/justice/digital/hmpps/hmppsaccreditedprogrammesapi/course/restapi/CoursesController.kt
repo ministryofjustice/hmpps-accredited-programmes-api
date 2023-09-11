@@ -51,9 +51,4 @@ class CoursesController(
           .offeringsForCourse(courseId)
           .map(Offering::toApi),
       )
-
-  override fun coursesCourseIdOfferingsOfferingIdGet(courseId: UUID, offeringId: UUID): ResponseEntity<CourseOffering> =
-    courseService.courseOffering(courseId, offeringId)?.let {
-      ResponseEntity.ok(it.toApi())
-    } ?: throw NotFoundException("No CourseOffering found at /courses/$courseId/offerings/$offeringId")
 }

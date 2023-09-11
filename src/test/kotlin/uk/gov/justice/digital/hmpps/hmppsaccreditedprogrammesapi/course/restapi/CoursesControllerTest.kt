@@ -194,59 +194,6 @@ class CoursesControllerTest(
         status { isUnauthorized() }
       }
     }
-
-    @Test
-    fun `get a course offering - happy path`() {
-      val courseId = repository.allCourses().first().id
-      val courseOfferingId = repository.offeringsForCourse(courseId!!).first().id!!
-
-      every { coursesService.courseOffering(courseId, courseOfferingId) } returns repository.courseOffering(courseId, courseOfferingId)
-
-      mockMvc.get("/courses/$courseId/offerings/$courseOfferingId") {
-        accept = MediaType.APPLICATION_JSON
-        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-      }.andExpect {
-        status { isOk() }
-        content {
-          jsonPath("$.id") { value(courseOfferingId.toString()) }
-          jsonPath("$.organisationId") { isNotEmpty() }
-          jsonPath("$.contactEmail") { isNotEmpty() }
-        }
-      }
-    }
-
-    @Test
-    fun `get a course offering - not found`() {
-      val randomUuid = UUID.randomUUID()
-
-      every { coursesService.courseOffering(randomUuid, randomUuid) } returns null
-
-      mockMvc.get("/courses/$randomUuid/offerings/$randomUuid") {
-        accept = MediaType.APPLICATION_JSON
-        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-      }.andExpect {
-        status { isNotFound() }
-        content {
-          contentType(MediaType.APPLICATION_JSON)
-          jsonPath("$.status") { value(404) }
-          jsonPath("$.errorCode") { isEmpty() }
-          jsonPath("$.userMessage") { value("Not Found: No CourseOffering found at /courses/$randomUuid/offerings/$randomUuid") }
-          jsonPath("$.developerMessage") { value("No CourseOffering found at /courses/$randomUuid/offerings/$randomUuid") }
-          jsonPath("$.moreInfo") { isEmpty() }
-        }
-      }
-    }
-
-    @Test
-    fun `get a course offering - no token`() {
-      val randomUuid = UUID.randomUUID()
-
-      mockMvc.get("/courses/$randomUuid/offerings/$randomUuid") {
-        accept = MediaType.APPLICATION_JSON
-      }.andExpect {
-        status { isUnauthorized() }
-      }
-    }
   }
 
   @Nested
