@@ -21,7 +21,8 @@ fun CourseEntity.toApi(): Course = Course(
   description = description,
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(Prerequisite::toApi),
-  audiences = audiences.map(uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience::toApi),
+  audiences = audiences.map(Audience::toApi),
+  referable = referable,
 )
 
 fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(
@@ -47,6 +48,7 @@ fun CourseRecord.toDomain(): NewCourse = NewCourse(
   description = description.trim(),
   audience = audience,
   alternateName = alternateName?.trim(),
+  referable = referable,
 )
 
 fun OfferingRecord.toDomain(): NewOffering = NewOffering(

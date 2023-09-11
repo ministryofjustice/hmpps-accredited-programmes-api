@@ -12,10 +12,10 @@ import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.*
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course as ApiCourse
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -44,9 +44,9 @@ class CoursesIntegrationTest
       .json(
         """
         [
-          { "name": "Lime Course", "alternateName": "LC" },
-          { "name": "Azure Course", "alternateName": "AC++" },
-          { "name": "Violet Course" }
+          { "name": "Lime Course", "alternateName": "LC", "referable": true },
+          { "name": "Azure Course", "alternateName": "AC++", "referable": true },
+          { "name": "Violet Course", "referable": true }
         ]
         """,
       )
@@ -252,13 +252,13 @@ class CoursesIntegrationTest
       .expectBody()
       .jsonPath("$.size()").isEqualTo(0)
 
-    val courses: List<Course> = webTestClient
+    val courses: List<ApiCourse> = webTestClient
       .get()
       .uri("/courses")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectBody(object : ParameterizedTypeReference<List<Course>>() {})
+      .expectBody(object : ParameterizedTypeReference<List<ApiCourse>>() {})
       .returnResult().responseBody!!
 
     val allOfferings: List<List<CourseOffering>> = courses.map {

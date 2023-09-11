@@ -576,11 +576,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CourseAudience'
+        referable:
+          type: boolean
+          default: true
       required:
         - id
         - name
         - coursePrerequisites
         - audiences
+        - referable
 
     CourseRecord:
       title: 'CourseRecord'
@@ -598,11 +602,15 @@ components:
           type: string
         comments:
           type: string
+        referable:
+          type: boolean
+          default: true
       required:
         - name
         - identifier
         - description
         - audience
+        - referable
 
     CoursePrerequisite:
       type: object
