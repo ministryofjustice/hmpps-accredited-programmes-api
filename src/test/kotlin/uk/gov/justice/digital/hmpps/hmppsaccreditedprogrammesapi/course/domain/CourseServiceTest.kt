@@ -34,14 +34,14 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          NewCourse(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC"),
+          NewCourse(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC", referable = true),
         ),
       )
 
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value))) }
       verify {
-        repository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1))))
+        repository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1), referable = true)))
       }
     }
 
@@ -55,14 +55,14 @@ class CourseServiceTest {
 
       service.replaceAllCourses(
         listOf(
-          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
-          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
+          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", referable = true),
+          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", referable = true),
         ),
       )
       verify { repository.clear() }
       verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2)))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3)))) }
+      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2), referable = true))) }
+      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3), referable = true))) }
     }
 
     @Test
