@@ -14,7 +14,8 @@ fun CourseEntity.eqByFields(other: CourseEntity) =
     description == other.description &&
     audiences.refEq(other.audiences) &&
     offerings == other.offerings &&
-    prerequisites == other.prerequisites
+    prerequisites == other.prerequisites &&
+    referable == other.referable
 
 fun Set<Audience>.refEq(other: Set<Audience>) =
   this.size == other.size &&
