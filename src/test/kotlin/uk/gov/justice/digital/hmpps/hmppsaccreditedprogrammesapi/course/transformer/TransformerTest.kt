@@ -20,6 +20,7 @@ class TransformerTest {
       identifier = "AC",
       prerequisites = mutableSetOf(),
       audiences = mutableSetOf(),
+      referable = true,
     )
 
     with(entity.toApi()) {
@@ -28,6 +29,7 @@ class TransformerTest {
       description shouldBe null
       alternateName shouldBe null
       coursePrerequisites.shouldBeEmpty()
+      referable.shouldBe(true)
     }
   }
 
@@ -41,6 +43,7 @@ class TransformerTest {
       alternateName = "AA++",
       prerequisites = mutableSetOf(),
       audiences = mutableSetOf(),
+      referable = true,
     )
 
     with(entity.toApi()) {
@@ -64,6 +67,7 @@ class TransformerTest {
         Audience(value = "B", id = UUID.randomUUID()),
         Audience(value = "C", id = UUID.randomUUID()),
       ),
+      referable = true,
     )
 
     with(entity.toApi()) {

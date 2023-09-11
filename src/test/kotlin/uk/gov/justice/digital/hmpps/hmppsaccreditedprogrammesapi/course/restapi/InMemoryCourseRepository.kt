@@ -41,6 +41,7 @@ class InMemoryCourseRepository {
       ),
       alternateName = "LC",
       audiences = mutableSetOf(),
+      referable = true,
     ).apply {
       addOffering(offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk"))
       addOffering(offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk"))
@@ -59,6 +60,7 @@ class InMemoryCourseRepository {
       ),
       alternateName = "AC++",
       audiences = audiences.toMutableSet(),
+      referable = true,
     ).apply { addOffering(offering(organisationId = "MDI", contactEmail = "nobody-mdi@digital.justice.gov.uk")) }
 
     private val nms = CourseEntity(
@@ -72,6 +74,7 @@ class InMemoryCourseRepository {
         Prerequisite(name = "Criminogenic needs", description = "Relationships, Thinking and Behaviour, Attitudes, Lifestyle"),
       ),
       audiences = mutableSetOf(),
+      referable = true,
     ).apply { addOffering(offering(organisationId = "BWN", contactEmail = "nobody-bwn@digital.justice.gov.uk")) }
 
     private val courses: Set<CourseEntity> = setOf(tsp, bnm, nms)

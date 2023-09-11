@@ -59,9 +59,9 @@ class CoursesControllerTest(
           this.json(
             """
           [
-            { "name": "Lime Course", "alternateName": "LC" },
-            { "name": "Azure Course", "alternateName": "AC++" },
-            { "name": "Violet Course" }
+            { "name": "Lime Course", "alternateName": "LC", "referable": true },
+            { "name": "Azure Course", "alternateName": "AC++", "referable": true },
+            { "name": "Violet Course", "referable": true }
         ]
         """,
           )

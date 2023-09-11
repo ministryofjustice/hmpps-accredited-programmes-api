@@ -6,4 +6,5 @@ data class NewCourse(
   val identifier: String,
   val audience: String,
   val alternateName: String? = null,
+  val referable: Boolean = true,
 )

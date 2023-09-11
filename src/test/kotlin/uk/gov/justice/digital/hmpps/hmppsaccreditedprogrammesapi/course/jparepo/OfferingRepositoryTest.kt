@@ -24,15 +24,21 @@ constructor(
       name = "A Course",
       identifier = "AC",
       description = "A description",
+      referable = true,
     ).apply {
       addOffering(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
       addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
       addOffering(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
     }
-    val course2 = CourseEntity(name = "Another Course", identifier = "ACANO", description = "Another description")
-      .apply {
-        addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      }
+
+    val course2 = CourseEntity(
+      name = "Another Course",
+      identifier = "ACANO",
+      description = "Another description",
+      referable = false,
+    ).apply {
+      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+    }
 
     val offering = courseRepository.save(course1).offerings.first()
     courseRepository.save(course2)

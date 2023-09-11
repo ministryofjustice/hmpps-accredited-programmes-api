@@ -36,6 +36,7 @@ class CourseService(
         description = it.description,
         alternateName = it.alternateName,
         audiences = audienceStrings(it.audience).mapNotNull { audienceName -> allAudiences[audienceName] }.toMutableSet(),
+        referable = it.referable,
       )
     }.forEach(courseRepository::saveCourse)
   }
