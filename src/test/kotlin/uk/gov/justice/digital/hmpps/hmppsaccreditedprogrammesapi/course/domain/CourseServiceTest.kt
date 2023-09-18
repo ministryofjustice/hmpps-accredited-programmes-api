@@ -2,9 +2,12 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -209,65 +212,110 @@ class CourseServiceTest {
   }
 
   @Nested
-  @DisplayName("Replace All Offerings")
-  inner class ReplaceAllOfferingsTests {
+  @DisplayName("Update Offerings")
+  inner class UpdateOfferingsTests {
     @Test
     fun `No records, No courses`() {
-      service.replaceAllOfferings(emptyList()).shouldBeEmpty()
+      service.updateOfferings(emptyList()).shouldBeEmpty()
     }
 
     @Test
-    fun `No records, one course that has offerings`() {
+    fun `Given no records and one course that has an offering, the offering should be withdrawn`() {
+      val theOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
+
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
           identifier = "C1",
           description = "Description 1",
         ).apply {
-          addOffering(Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"))
+          addOffering(theOffering)
         },
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllOfferings(emptyList()).shouldBeEmpty()
+      service.updateOfferings(emptyList()).shouldBeEmpty()
 
-      allCourses.flatMap { it.offerings }.shouldBeEmpty()
+      val updatedOfferings = allCourses.flatMap { it.offerings }
+      updatedOfferings shouldHaveSize 1
+      updatedOfferings[0] shouldBeSameInstanceAs theOffering
+      theOffering.withdrawn shouldBe true
     }
 
     @Test
-    fun `One record matching one course that has offerings`() {
+    fun `Given one record matching an offering from a course then the offering should be updated`() {
+      val theOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
           identifier = "C1",
         ).apply {
-          addOffering(Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com"))
+          addOffering(theOffering)
         },
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllOfferings(
+      service.updateOfferings(
         listOf(
-          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
+          OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
         ),
       ).shouldBeEmpty()
 
-      allCourses[0].offerings shouldContainExactly listOf(Offering(organisationId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"))
+      val updatedOfferings = allCourses.flatMap { it.offerings }
+      updatedOfferings shouldHaveSize 1
+      updatedOfferings[0] shouldBeSameInstanceAs theOffering
+      theOffering.shouldBeEqualToIgnoringFields(
+        Offering(organisationId = "BWI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
+        Offering::course,
+      )
     }
 
     @Test
-    fun `multiple courses and offerings - all match`() {
+    fun `Given one record that matches a course, but not the course's offering then the new offering should be added and the old withdrawn`() {
+      val oldOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
+      val allCourses = listOf(
+        CourseEntity(
+          name = "Course 1",
+          identifier = "C1",
+        ).apply {
+          addOffering(oldOffering)
+        },
+      )
+      every { repository.allCourses() } returns allCourses
+
+      service.updateOfferings(
+        listOf(
+          OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
+        ),
+      ).shouldBeEmpty()
+
+      val offeringsByOrganisationId = allCourses[0].offerings.associateBy(Offering::organisationId)
+
+      offeringsByOrganisationId["MDI"]!!.shouldBeEqualToIgnoringFields(
+        Offering(organisationId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
+        Offering::course,
+      )
+
+      offeringsByOrganisationId["BWI"]!!.shouldBeSameInstanceAs(oldOffering)
+      offeringsByOrganisationId["BWI"]!!.shouldBeEqualToIgnoringFields(
+        Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com", withdrawn = true),
+        Offering::course,
+      )
+    }
+
+    @Test
+    fun `Given multiple courses and offerings - all match`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllOfferings(
+      service.updateOfferings(
         listOf(
-          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
-          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
-          NewOffering(identifier = "C2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
+          OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
+          OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
+          OfferingUpdate(identifier = "C2", prisonId = "MDI", contactEmail = "admin@mdi.net"),
         ),
       ).shouldBeEmpty()
 
@@ -290,12 +338,12 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllOfferings(
+      service.updateOfferings(
         listOf(
-          NewOffering(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net"),
-          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
-          NewOffering(identifier = "CX", prisonId = "BWI", contactEmail = "x@y.net"),
-          NewOffering(identifier = "C2", prisonId = "MDI", contactEmail = "x@y.net"),
+          OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net"),
+          OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
+          OfferingUpdate(identifier = "CX", prisonId = "BWI", contactEmail = "x@y.net"),
+          OfferingUpdate(identifier = "C2", prisonId = "MDI", contactEmail = "x@y.net"),
         ),
       )
         .shouldContainExactly(
@@ -315,10 +363,10 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllOfferings(
+      service.updateOfferings(
         listOf(
-          NewOffering(identifier = "C1", prisonId = "MDI"),
-          NewOffering(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
+          OfferingUpdate(identifier = "C1", prisonId = "MDI"),
+          OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
         ),
       )
         .shouldContainExactly(

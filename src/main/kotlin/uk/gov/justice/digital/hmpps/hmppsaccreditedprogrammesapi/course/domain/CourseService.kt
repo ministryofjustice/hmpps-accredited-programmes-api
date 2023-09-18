@@ -75,28 +75,51 @@ class CourseService(
     courses.forEach { it.prerequisites.clear() }
   }
 
-  fun replaceAllOfferings(replacements: List<NewOffering>): List<LineMessage> {
+  fun updateOfferings(updates: List<OfferingUpdate>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
-    clearOfferings(allCourses)
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
-    replacements.forEach { record ->
-      coursesByIdentifier[record.identifier]?.run {
-        addOffering(
-          Offering(
-            organisationId = record.prisonId,
-            contactEmail = record.contactEmail
-              ?: "",
-            secondaryContactEmail = record.secondaryContactEmail,
-          ),
-        )
+    val desiredOfferingsByCourseIdentifier = updates.groupBy(OfferingUpdate::identifier)
+    coursesByIdentifier.forEach { (courseIdentifier, course) ->
+      updateOfferingsForCourse(course, desiredOfferingsByCourseIdentifier[courseIdentifier] ?: emptyList())
+    }
+
+    return contactEmailWarnings(updates) + unmatchedCourseErrors(updates, coursesByIdentifier)
+  }
+
+  private fun updateOfferingsForCourse(course: CourseEntity, desiredOfferings: List<OfferingUpdate>) {
+    val offeringsByOrganisationId = course.offerings.associateBy(Offering::organisationId)
+    val updatesByPrisonId = desiredOfferings.associateBy(OfferingUpdate::prisonId)
+
+    val toAdd = updatesByPrisonId.keys - offeringsByOrganisationId.keys
+    toAdd.forEach {
+      val update = updatesByPrisonId[it]
+      course.addOffering(
+        Offering(
+          organisationId = it,
+          contactEmail = update?.contactEmail ?: "",
+          secondaryContactEmail = update?.secondaryContactEmail,
+        ),
+      )
+    }
+
+    val toUpdate = updatesByPrisonId.keys.intersect(offeringsByOrganisationId.keys)
+    toUpdate.forEach {
+      val update = updatesByPrisonId[it]
+      offeringsByOrganisationId[it]?.run {
+        withdrawn = false
+        contactEmail = update?.contactEmail ?: ""
+        secondaryContactEmail = update?.secondaryContactEmail
       }
     }
 
-    return contactEmailWarnings(replacements) + unmatchedCourseErrors(replacements, coursesByIdentifier)
+    val toWithdraw = offeringsByOrganisationId.keys - updatesByPrisonId.keys
+    toWithdraw.forEach {
+      offeringsByOrganisationId[it]?.run { withdrawn = true }
+    }
   }
 
-  private fun contactEmailWarnings(newOfferings: List<NewOffering>): List<LineMessage> =
-    newOfferings.mapIndexed { index, record ->
+  private fun contactEmailWarnings(offeringUpdates: List<OfferingUpdate>): List<LineMessage> =
+    offeringUpdates.mapIndexed { index, record ->
       when (record.contactEmail.isNullOrBlank()) {
         true -> LineMessage(
           lineNumber = indexToCsvRowNumber(index),
@@ -108,7 +131,7 @@ class CourseService(
       }
     }.filterNotNull()
 
-  private fun unmatchedCourseErrors(replacements: List<NewOffering>, coursesByIdentifier: Map<String, CourseEntity>) =
+  private fun unmatchedCourseErrors(replacements: List<OfferingUpdate>, coursesByIdentifier: Map<String, CourseEntity>) =
     replacements
       .mapIndexed { index, record ->
         when (coursesByIdentifier.containsKey(record.identifier)) {

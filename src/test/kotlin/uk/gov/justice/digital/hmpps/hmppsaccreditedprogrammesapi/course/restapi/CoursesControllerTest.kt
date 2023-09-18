@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.UUID
@@ -240,7 +241,7 @@ class CoursesControllerTest(
   inner class PutOfferingsTests {
     @Test
     fun `put offerings csv`() {
-      every { coursesService.replaceAllOfferings(any()) } returns emptyList()
+      every { coursesService.updateOfferings(any<List<OfferingUpdate>>()) } returns emptyList()
 
       mockMvc.put("/courses/offerings") {
         contentType = MediaType("text", "csv")
@@ -254,7 +255,7 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.replaceAllOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
+      verify { coursesService.updateOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
     }
   }
 }
