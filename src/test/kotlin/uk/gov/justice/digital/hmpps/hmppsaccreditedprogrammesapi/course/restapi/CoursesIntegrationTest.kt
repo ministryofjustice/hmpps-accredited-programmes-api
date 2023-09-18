@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.*
@@ -205,36 +206,11 @@ class CoursesIntegrationTest
       .exchange()
       .expectStatus().is2xxSuccessful
 
-    webTestClient
-      .put()
-      .uri("/courses/offerings")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
-      .bodyValue(CsvTestData.offeringsCsvText)
-      .exchange()
-      .expectStatus().is2xxSuccessful
-      .expectBody()
-      .jsonPath("$.size()").isEqualTo(0)
+    uploadOfferings(CsvTestData.offeringsCsvText)
 
-    val courses: List<ApiCourse> = webTestClient
-      .get()
-      .uri("/courses")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectBody(object : ParameterizedTypeReference<List<ApiCourse>>() {})
-      .returnResult().responseBody!!
+    val courses: List<ApiCourse> = allCourses()
 
-    val allOfferings: List<List<CourseOffering>> = courses.map {
-      webTestClient
-        .get()
-        .uri("/courses/${it.id}/offerings")
-        .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-        .accept(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectBody(object : ParameterizedTypeReference<List<CourseOffering>>() {})
-        .returnResult().responseBody!!
-    }
+    val allOfferings: List<List<CourseOffering>> = getAllOfferings(courses)
 
     allOfferings shouldHaveSize CsvTestData.newCourses.size
 
@@ -246,5 +222,49 @@ class CoursesIntegrationTest
     val expectedOrganisationIds = CsvTestData.offeringsRecords.map { it.prisonId }.toSet()
 
     actualOrganisationIds shouldContainExactly expectedOrganisationIds
+
+    uploadOfferings(CsvTestData.emptyOfferingsCsvText)
+
+    getAllOfferings(courses).allOfferingIds() shouldHaveSize 0
+
+    uploadOfferings(CsvTestData.offeringsCsvText)
+
+    getAllOfferings(courses).allOfferingIds() shouldContainExactly allOfferings.allOfferingIds()
   }
+
+  private fun uploadOfferings(csvContent: String) {
+    webTestClient
+      .put()
+      .uri("/courses/offerings")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(csvContent)
+      .exchange()
+      .expectStatus().is2xxSuccessful
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(0)
+  }
+
+  private fun getAllOfferings(courses: List<Course>) =
+    courses.map {
+      webTestClient
+        .get()
+        .uri("/courses/${it.id}/offerings")
+        .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+        .accept(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectBody(object : ParameterizedTypeReference<List<CourseOffering>>() {})
+        .returnResult().responseBody!!
+    }
+
+  private fun allCourses() = webTestClient
+    .get()
+    .uri("/courses")
+    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectBody(object : ParameterizedTypeReference<List<ApiCourse>>() {})
+    .returnResult().responseBody!!
+
+  fun List<List<CourseOffering>>.allOfferingIds() = flatMap { it.map(CourseOffering::id) }.toSet()
 }
