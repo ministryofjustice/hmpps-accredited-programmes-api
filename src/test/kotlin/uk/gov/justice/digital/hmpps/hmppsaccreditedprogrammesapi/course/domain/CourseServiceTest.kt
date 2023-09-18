@@ -345,7 +345,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `withdrawn Offering should not be returned from courseOffering`() {
+    fun `A withdrawn Offering should not be returned from courseOffering`() {
       val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
 
       every { repository.courseOffering(any()) } returns withdrawnOffering
@@ -354,12 +354,38 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `Active Offering be returned from courseOffering`() {
+    fun `An active Offering should be returned from courseOffering`() {
       val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
 
       every { repository.courseOffering(any()) } returns offering
 
       service.courseOffering(UUID.randomUUID()) shouldBe offering
+    }
+  }
+
+  @Nested
+  @DisplayName("Handle withdrawn CourseEntities")
+  inner class WithdrawnCourseTests {
+    @Test
+    fun `A withdrawn course should not be returned from course()`() {
+      val withdrawnCourse = CourseEntity(name = "Course", identifier = "C", withdrawn = true)
+      every { repository.course(any()) } returns withdrawnCourse
+      service.course(UUID.randomUUID()).shouldBeNull()
+    }
+
+    @Test
+    fun `An active course should  be returned from course()`() {
+      val activeCourse = CourseEntity(name = "Course", identifier = "C")
+      every { repository.course(any()) } returns activeCourse
+      service.course(UUID.randomUUID()) shouldBe activeCourse
+    }
+
+    @Test
+    fun `allCourses() should exclude withdrawn courses`() {
+      val withdrawnCourse = CourseEntity(name = "Withdrawn", identifier = "W", withdrawn = true)
+      val activeCourse = CourseEntity(name = "Active", identifier = "A")
+      every { repository.allCourses() } returns listOf(activeCourse, withdrawnCourse)
+      service.allCourses().shouldContainExactly(activeCourse)
     }
   }
 }
