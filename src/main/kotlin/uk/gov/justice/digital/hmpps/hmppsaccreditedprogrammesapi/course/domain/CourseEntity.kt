@@ -49,6 +49,7 @@ class CourseEntity(
     inverseJoinColumns = [JoinColumn(name = "audience_id")],
   )
   var audiences: MutableSet<Audience> = mutableSetOf(),
+  var withdrawn: Boolean = false,
 ) {
   @get:Transient
   val offerings: Set<Offering>
