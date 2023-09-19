@@ -7,8 +7,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.C
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
-private fun newCourse(name: String, identifier: String = "", audience: String, alternateName: String? = null) =
-  CourseUpdate(name = name, identifier = identifier, alternateName = alternateName, audience = audience, description = LoremIpsum.words(1..10))
+private fun newCourse(name: String, identifier: String = "", audience: String, alternateName: String? = null, referable: Boolean = true) =
+  CourseUpdate(name = name, identifier = identifier, alternateName = alternateName, audience = audience, referable = referable, description = LoremIpsum.words(1..10))
 
 object CsvTestData {
   val newCourses: List<CourseUpdate> = listOf(
@@ -16,6 +16,12 @@ object CsvTestData {
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-IPVO", audience = "Intimate partner violence offence", alternateName = "BNM+"),
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-VO", audience = "General violence offence", alternateName = "BNM+"),
     newCourse(name = "Building Better Relationships", identifier = "BBR-IPVO", audience = "Intimate partner violence offence", alternateName = "BBR"),
+  )
+
+  val newCourseUpdates: List<CourseUpdate> = listOf(
+    newCourse(name = "Becoming new me Plus", identifier = "BNM-SO", audience = "sexual offence", alternateName = "BNM+++"),
+    newCourse(name = "Becoming new me Plus", identifier = "BNM-VO", audience = "general violence offence", alternateName = "BNM+-", referable = false),
+    newCourse(name = "Building Better Relationships", identifier = "BBR-IPVO", audience = "intimate partner violence offence", alternateName = "BBR-"),
   )
 
   private fun newPrerequisiteRecord(name: String, description: String, identifier: String) = PrerequisiteRecord(
@@ -56,16 +62,10 @@ object CsvTestData {
   ).map { it.copy(contactEmail = "${LoremIpsum.words(1..1)}@${LoremIpsum.words(1..1)}.com") }
 
   fun coursesCsvInputStream(): InputStream = ByteArrayInputStream(coursesCsvText.toByteArray())
-  val coursesCsvText: String =
-    newCourses
-      .joinToString(
-        prefix = COURSES_PREFIX,
-        separator = "\n",
-        transform = { """"${it.name}","${it.identifier}","${it.description}","${it.audience}","${it.alternateName}",${LoremIpsum.words(1..20)}""" },
-        postfix = "\n",
-      )
+  val coursesCsvText: String = newCourses.toCsvText()
+  val courseUpdatesCsvText: String = newCourseUpdates.toCsvText()
 
-  val prerequisitesCsvText: String by lazy {
+  val prerequisitesCsvText: String =
     prerequisiteRecords
       .joinToString(
         prefix = "name,description,course,identifier,comments,,,,\n",
@@ -73,9 +73,8 @@ object CsvTestData {
         transform = { """"${it.name}","${it.description}","${it.course}","${it.identifier}","${it.comments}",,,,""" },
         postfix = "\n",
       )
-  }
 
-  val offeringsCsvText: String by lazy {
+  val offeringsCsvText: String =
     offeringsRecords
       .joinToString(
         prefix = OFFERINGS_PREFIX,
@@ -83,7 +82,6 @@ object CsvTestData {
         transform = { """"${it.course}","${it.identifier}","${it.organisation}","${it.contactEmail}",${asQuotedStringIfNotNull(it.secondaryContactEmail)},${it.prisonId}""" },
         postfix = "\n",
       )
-  }
 
   val emptyCoursesCsvText: String = COURSES_PREFIX
   val emptyOfferingsCsvText: String = OFFERINGS_PREFIX
@@ -91,5 +89,12 @@ object CsvTestData {
   private fun asQuotedStringIfNotNull(stringOrNull: String?) = stringOrNull?.let { "\"$it\"" } ?: ""
 }
 
-private const val COURSES_PREFIX = "name,identifier,description,audience,alternateName,comments\n"
+private const val COURSES_PREFIX = "name,identifier,description,audience,referable,alternateName,comments\n"
 private const val OFFERINGS_PREFIX = "course,identifier,organisation,contact email,secondary contact email,prisonId\n"
+
+private fun List<CourseUpdate>.toCsvText() = joinToString(
+  prefix = COURSES_PREFIX,
+  separator = "\n",
+  transform = { """"${it.name}","${it.identifier}","${it.description}","${it.audience}","${it.referable}","${it.alternateName}",${LoremIpsum.words(1..20)}""" },
+  postfix = "\n",
+)
