@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
@@ -201,7 +202,9 @@ class CoursesControllerTest(
   inner class PutCoursesTests {
     @Test
     fun `put courses csv`() {
-      every { coursesService.replaceAllCourses(any()) } just Runs
+      every {
+        coursesService.updateCourses(any<List<CourseUpdate>>())
+      } just Runs
 
       mockMvc.put("/courses") {
         contentType = MediaType("text", "csv")
@@ -211,7 +214,9 @@ class CoursesControllerTest(
         status { isNoContent() }
       }
 
-      verify { coursesService.replaceAllCourses(CsvTestData.newCourses) }
+      verify {
+        coursesService.updateCourses(CsvTestData.newCourses)
+      }
     }
   }
 

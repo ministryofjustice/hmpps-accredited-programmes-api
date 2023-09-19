@@ -54,18 +54,6 @@ constructor(
 
   override fun allAudiences(): Set<Audience> = audienceRepository.findAll().toSet()
 
-  override fun clear() {
-    courseRepository.deleteAll()
-    audienceRepository.deleteAll()
-    /*
-     By default, Hibernate lazily deletes audience entities after inserting new ones which can violate the unique
-     constraint on audience.audience_value
-     The call to flush() instructs Hibernate to perform all pending databases changes immediately and ensures that
-     the deletes requested above happen before any subsequent inserts or updates.
-     */
-    entityManager.flush()
-  }
-
   override fun saveCourse(courseEntity: CourseEntity) {
     courseRepository.save(courseEntity)
   }

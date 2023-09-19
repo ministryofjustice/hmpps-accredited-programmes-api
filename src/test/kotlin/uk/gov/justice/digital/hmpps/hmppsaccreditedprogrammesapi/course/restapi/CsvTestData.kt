@@ -3,15 +3,15 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.LoremIpsum
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.NewCourse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseUpdate
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
 private fun newCourse(name: String, identifier: String = "", audience: String, alternateName: String? = null) =
-  NewCourse(name = name, identifier = identifier, alternateName = alternateName, audience = audience, description = LoremIpsum.words(1..10))
+  CourseUpdate(name = name, identifier = identifier, alternateName = alternateName, audience = audience, description = LoremIpsum.words(1..10))
 
 object CsvTestData {
-  val newCourses: List<NewCourse> = listOf(
+  val newCourses: List<CourseUpdate> = listOf(
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-SO", audience = "Sexual offence", alternateName = "BNM+"),
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-IPVO", audience = "Intimate partner violence offence", alternateName = "BNM+"),
     newCourse(name = "Becoming New Me Plus", identifier = "BNM-VO", audience = "General violence offence", alternateName = "BNM+"),
@@ -59,7 +59,7 @@ object CsvTestData {
   val coursesCsvText: String =
     newCourses
       .joinToString(
-        prefix = "name,identifier,description,audience,alternateName,comments\n",
+        prefix = COURSES_PREFIX,
         separator = "\n",
         transform = { """"${it.name}","${it.identifier}","${it.description}","${it.audience}","${it.alternateName}",${LoremIpsum.words(1..20)}""" },
         postfix = "\n",
@@ -85,9 +85,11 @@ object CsvTestData {
       )
   }
 
+  val emptyCoursesCsvText: String = COURSES_PREFIX
   val emptyOfferingsCsvText: String = OFFERINGS_PREFIX
 
   private fun asQuotedStringIfNotNull(stringOrNull: String?) = stringOrNull?.let { "\"$it\"" } ?: ""
 }
 
+private const val COURSES_PREFIX = "name,identifier,description,audience,alternateName,comments\n"
 private const val OFFERINGS_PREFIX = "course,identifier,organisation,contact email,secondary contact email,prisonId\n"

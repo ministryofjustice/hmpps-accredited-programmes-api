@@ -22,12 +22,11 @@ class CourseServiceTest {
   private val service = CourseService(repository)
 
   @Nested
-  @DisplayName("Replace All Courses")
-  inner class ReplaceAllCoursesTests {
+  @DisplayName("Update Courses")
+  inner class UpdateCoursesTests {
     @Test
     fun `processes no courses`() {
-      service.replaceAllCourses(emptyList())
-      verify { repository.clear() }
+      service.updateCourses(emptyList())
       verify { repository.saveAudiences(emptySet()) }
     }
 
@@ -37,14 +36,12 @@ class CourseServiceTest {
 
       every { repository.allAudiences() } returns setOf(a1)
 
-      service.replaceAllCourses(
+      service.updateCourses(
         listOf(
-          NewCourse(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC", referable = true),
+          CourseUpdate(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC", referable = true),
         ),
       )
 
-      verify { repository.clear() }
-      verify { repository.saveAudiences(setOf(Audience(a1.value))) }
       verify {
         repository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1), referable = true)))
       }
@@ -58,14 +55,12 @@ class CourseServiceTest {
 
       every { repository.allAudiences() } returns setOf(a1, a2, a3)
 
-      service.replaceAllCourses(
+      service.updateCourses(
         listOf(
-          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", referable = true),
-          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", referable = true),
+          CourseUpdate(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", referable = true),
+          CourseUpdate(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", referable = true),
         ),
       )
-      verify { repository.clear() }
-      verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
       verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2), referable = true))) }
       verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3), referable = true))) }
     }
@@ -76,14 +71,14 @@ class CourseServiceTest {
       val a2 = Audience("Audience 2", id = UUID.randomUUID())
       val a3 = Audience("Audience 3", id = UUID.randomUUID())
 
-      every { repository.allAudiences() } returns setOf(a1, a2, a3)
+      every { repository.allAudiences() } returns setOf()
 
-      service.replaceAllCourses(
+      service.updateCourses(
         listOf(
-          NewCourse(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
-          NewCourse(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
-          NewCourse(name = "Course 3", identifier = "C3", description = "Description 3", audience = a1.value, alternateName = "333"),
-          NewCourse(name = "Course 4", identifier = "C4", description = "Description 4", audience = a1.value, alternateName = "444"),
+          CourseUpdate(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
+          CourseUpdate(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
+          CourseUpdate(name = "Course 3", identifier = "C3", description = "Description 3", audience = a1.value, alternateName = "333"),
+          CourseUpdate(name = "Course 4", identifier = "C4", description = "Description 4", audience = a1.value, alternateName = "444"),
         ),
       )
 

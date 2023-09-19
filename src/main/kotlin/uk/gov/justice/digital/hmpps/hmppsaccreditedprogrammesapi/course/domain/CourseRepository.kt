@@ -12,5 +12,4 @@ interface CourseRepository {
   fun courseOffering(offeringId: UUID): Offering?
   fun allAudiences(): Set<Audience>
   fun saveAudiences(audiences: Set<Audience>)
-  fun clear()
 }

@@ -25,22 +25,57 @@ class CourseService(
     .courseOffering(offeringId)
     ?.takeIf { !it.withdrawn }
 
-  fun replaceAllCourses(courseData: List<NewCourse>) {
-    courseRepository.clear()
-    courseRepository.saveAudiences(courseData.flatMap { audienceStrings(it.audience) }.map(::Audience).toSet())
-
+  fun updateCourses(courseData: List<CourseUpdate>) {
+    updateAudiences(courseData)
     val allAudiences: Map<String, Audience> = courseRepository.allAudiences().associateBy { it.value }
+    val coursesByIdentifier = courseRepository.allCourses().associateBy(CourseEntity::identifier)
+    val courseDataByIdentifier = courseData.associateBy(CourseUpdate::identifier)
 
-    courseData.map {
-      CourseEntity(
-        name = it.name,
-        identifier = it.identifier,
-        description = it.description,
-        alternateName = it.alternateName,
-        audiences = audienceStrings(it.audience).mapNotNull { audienceName -> allAudiences[audienceName] }.toMutableSet(),
-        referable = it.referable,
-      )
+    val toAdd = courseDataByIdentifier.keys - coursesByIdentifier.keys
+    val toUpdate = coursesByIdentifier.keys.intersect(courseDataByIdentifier.keys)
+    val toWithdraw = coursesByIdentifier.keys - courseDataByIdentifier.keys
+
+    toAdd.mapNotNull {
+      courseDataByIdentifier[it]?.let { update ->
+        CourseEntity(
+          name = update.name,
+          identifier = update.identifier,
+          description = update.description,
+          alternateName = update.alternateName,
+          audiences = audienceStrings(update.audience).mapNotNull { audienceName -> allAudiences[audienceName] }.toMutableSet(),
+          referable = update.referable,
+        )
+      }
     }.forEach(courseRepository::saveCourse)
+
+    toUpdate.forEach { courseIdentifier ->
+      courseDataByIdentifier[courseIdentifier]?.let { update ->
+        val expectedAudienceStrings = audienceStrings(update.audience).toSet()
+        coursesByIdentifier[courseIdentifier]?.run {
+          withdrawn = false
+          name = update.name
+          description = update.description
+          alternateName = update.alternateName
+          referable = update.referable
+
+          val audiencesByValue = audiences.associateBy(Audience::value)
+          val audiencesToAdd = expectedAudienceStrings - audiencesByValue.keys
+          val audiencesToRemove = audiencesByValue.keys - expectedAudienceStrings
+          audiences.addAll(audiencesToAdd.mapNotNull { allAudiences[it] })
+          audiences.removeAll(audiencesToRemove.mapNotNull { allAudiences[it] })
+        }
+      }
+    }
+
+    toWithdraw.forEach {
+      coursesByIdentifier[it]?.withdrawn = true
+    }
+  }
+
+  private fun updateAudiences(courseData: List<CourseUpdate>) {
+    val desiredAudiences = courseData.flatMap { audienceStrings(it.audience) }.map(::Audience).toSet()
+    val actualAudiences = courseRepository.allAudiences()
+    courseRepository.saveAudiences(desiredAudiences - actualAudiences)
   }
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
