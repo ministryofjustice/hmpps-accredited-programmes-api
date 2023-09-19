@@ -19,7 +19,9 @@ class Offering(
   val organisationId: String,
   var contactEmail: String,
   var secondaryContactEmail: String? = null,
+  var withdrawn: Boolean = false,
 ) {
+
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "course_id")
   lateinit var course: CourseEntity

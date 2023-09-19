@@ -18,10 +18,13 @@ class CourseService(
 
   fun getCourseForOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findCourseByOfferingId(offeringId)
 
-  fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository.offeringsForCourse(courseId)
+  fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
+    .offeringsForCourse(courseId)
+    .filterNot(Offering::withdrawn)
 
-  fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = courseRepository.courseOffering(courseId, offeringId)
-  fun courseOffering(offeringId: UUID): Offering? = courseRepository.courseOffering(offeringId)
+  fun courseOffering(offeringId: UUID): Offering? = courseRepository
+    .courseOffering(offeringId)
+    ?.takeIf { !it.withdrawn }
 
   fun replaceAllCourses(courseData: List<NewCourse>) {
     courseRepository.clear()

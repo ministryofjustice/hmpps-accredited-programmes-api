@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -326,6 +328,38 @@ class CourseServiceTest {
             message = "Missing contactEmail for offering with identifier 'C1' at prisonId 'MDI'",
           ),
         )
+    }
+  }
+
+  @Nested
+  @DisplayName("Handle withdrawn Offerings")
+  inner class WithdrawnOfferingsTests {
+    @Test
+    fun `withdrawn Offerings should not be returned from offeringsForCourse`() {
+      val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
+      val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
+
+      every { repository.offeringsForCourse(any()) } returns listOf(withdrawnOffering, offering)
+
+      service.offeringsForCourse(UUID.randomUUID()).shouldContainExactly(offering)
+    }
+
+    @Test
+    fun `withdrawn Offering should not be returned from courseOffering`() {
+      val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
+
+      every { repository.courseOffering(any()) } returns withdrawnOffering
+
+      service.courseOffering(UUID.randomUUID()).shouldBeNull()
+    }
+
+    @Test
+    fun `Active Offering be returned from courseOffering`() {
+      val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
+
+      every { repository.courseOffering(any()) } returns offering
+
+      service.courseOffering(UUID.randomUUID()) shouldBe offering
     }
   }
 }
