@@ -20,7 +20,7 @@ object CsvTestData {
 
   val newCourseUpdates: List<CourseUpdate> = listOf(
     newCourse(name = "Becoming new me Plus", identifier = "BNM-SO", audience = "sexual offence", alternateName = "BNM+++"),
-    newCourse(name = "Becoming new me Plus", identifier = "BNM-VO", audience = "general violence offence", alternateName = "BNM+-", referable = false),
+    newCourse(name = "Becoming new me Plus", identifier = "BNM-VO", audience = "general violence offence, mystery offence", alternateName = "BNM+-", referable = false),
     newCourse(name = "Building Better Relationships", identifier = "BBR-IPVO", audience = "intimate partner violence offence", alternateName = "BBR-"),
   )
 
