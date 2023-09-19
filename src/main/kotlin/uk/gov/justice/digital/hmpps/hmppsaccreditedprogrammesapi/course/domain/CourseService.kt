@@ -12,10 +12,9 @@ class CourseService(
   @Autowired
   val courseRepository: CourseRepository,
 ) {
-  fun allCourses(): List<CourseEntity> = courseRepository.allCourses()
+  fun allCourses(): List<CourseEntity> = courseRepository.allCourses().filterNot(CourseEntity::withdrawn)
 
-  fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)
-
+  fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)?.takeIf { !it.withdrawn }
   fun getCourseForOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findCourseByOfferingId(offeringId)
 
   fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
