@@ -10,9 +10,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Prere
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.NewCourse
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.NewOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.NewPrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
 
 fun CourseEntity.toApi(): Course = Course(
@@ -51,7 +51,7 @@ fun CourseRecord.toDomain(): NewCourse = NewCourse(
   referable = referable,
 )
 
-fun OfferingRecord.toDomain(): NewOffering = NewOffering(
+fun OfferingRecord.toDomain(): OfferingUpdate = OfferingUpdate(
   prisonId = prisonId.trim(),
   identifier = identifier.trim(),
   contactEmail = contactEmail?.trim(),

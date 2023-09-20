@@ -78,12 +78,16 @@ object CsvTestData {
   val offeringsCsvText: String by lazy {
     offeringsRecords
       .joinToString(
-        prefix = "course,identifier,organisation,contact email,secondary contact email,prisonId\n",
+        prefix = OFFERINGS_PREFIX,
         separator = "\n",
         transform = { """"${it.course}","${it.identifier}","${it.organisation}","${it.contactEmail}",${asQuotedStringIfNotNull(it.secondaryContactEmail)},${it.prisonId}""" },
         postfix = "\n",
       )
   }
 
+  val emptyOfferingsCsvText: String = OFFERINGS_PREFIX
+
   private fun asQuotedStringIfNotNull(stringOrNull: String?) = stringOrNull?.let { "\"$it\"" } ?: ""
 }
+
+private const val OFFERINGS_PREFIX = "course,identifier,organisation,contact email,secondary contact email,prisonId\n"
