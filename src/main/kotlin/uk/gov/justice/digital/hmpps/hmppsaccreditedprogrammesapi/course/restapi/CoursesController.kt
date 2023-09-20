@@ -29,7 +29,7 @@ class CoursesController(
       )
 
   override fun coursesPut(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
-    courseService.replaceAllCourses(courseRecord.map(CourseRecord::toDomain))
+    courseService.updateCourses(courseRecord.map(CourseRecord::toDomain))
     return ResponseEntity.noContent().build()
   }
 

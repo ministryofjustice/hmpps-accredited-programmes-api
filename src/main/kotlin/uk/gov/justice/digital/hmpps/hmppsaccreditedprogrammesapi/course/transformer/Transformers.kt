@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Offer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.NewCourse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.NewPrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
@@ -42,7 +42,7 @@ fun Audience.toApi(): CourseAudience = CourseAudience(
   value = value,
 )
 
-fun CourseRecord.toDomain(): NewCourse = NewCourse(
+fun CourseRecord.toDomain(): CourseUpdate = CourseUpdate(
   name = name.trim(),
   identifier = identifier.trim(),
   description = description.trim(),

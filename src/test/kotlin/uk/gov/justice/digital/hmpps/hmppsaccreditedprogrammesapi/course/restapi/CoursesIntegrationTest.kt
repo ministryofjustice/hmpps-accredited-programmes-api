@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,7 +16,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
-import java.util.*
+import java.util.UUID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course as ApiCourse
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -142,36 +143,29 @@ class CoursesIntegrationTest
   @DirtiesContext
   @Test
   fun `put courses csv`() {
-    webTestClient
-      .put()
-      .uri("/courses")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
-      .bodyValue(CsvTestData.coursesCsvText)
-      .exchange()
-      .expectStatus().is2xxSuccessful
+    uploadCourses(CsvTestData.emptyCoursesCsvText)
+    allCourses() shouldHaveSize 0
 
-    webTestClient
-      .get()
-      .uri("/courses")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectBody()
-      .jsonPath("$.length()").isEqualTo(CsvTestData.newCourses.size)
+    uploadCourses(CsvTestData.coursesCsvText)
+    val originalCourses = allCourses()
+    originalCourses shouldHaveSize CsvTestData.newCourses.size
+
+    uploadCourses(CsvTestData.emptyCoursesCsvText)
+    allCourses() shouldHaveSize 0
+
+    uploadCourses(CsvTestData.coursesCsvText)
+    val restoredCourses = allCourses()
+    originalCourses.map { it.id }.toSet() shouldBe restoredCourses.map { it.id }.toSet()
+
+    uploadCourses(CsvTestData.coursesCsvText)
+    val updatedCourses = allCourses()
+    originalCourses.map { it.id }.toSet() shouldBe updatedCourses.map { it.id }.toSet()
   }
 
   @DirtiesContext
   @Test
   fun `put prerequisites csv`() {
-    webTestClient
-      .put()
-      .uri("/courses")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
-      .bodyValue(CsvTestData.coursesCsvText)
-      .exchange()
-      .expectStatus().is2xxSuccessful
+    uploadCourses(CsvTestData.coursesCsvText)
 
     webTestClient
       .put()
@@ -197,14 +191,7 @@ class CoursesIntegrationTest
   @DirtiesContext
   @Test
   fun `put offerings csv`() {
-    webTestClient
-      .put()
-      .uri("/courses")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
-      .bodyValue(CsvTestData.coursesCsvText)
-      .exchange()
-      .expectStatus().is2xxSuccessful
+    uploadCourses(CsvTestData.coursesCsvText)
 
     uploadOfferings(CsvTestData.offeringsCsvText)
 
@@ -230,6 +217,17 @@ class CoursesIntegrationTest
     uploadOfferings(CsvTestData.offeringsCsvText)
 
     getAllOfferings(courses).allOfferingIds() shouldContainExactly allOfferings.allOfferingIds()
+  }
+
+  private fun uploadCourses(csvData: String) {
+    webTestClient
+      .put()
+      .uri("/courses")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType("text", "csv"))
+      .bodyValue(csvData)
+      .exchange()
+      .expectStatus().is2xxSuccessful
   }
 
   private fun uploadOfferings(csvContent: String) {
