@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toApi
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toCourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
 import java.util.UUID
 
@@ -27,6 +28,13 @@ class CoursesController(
           .allCourses()
           .map(CourseEntity::toApi),
       )
+
+  override fun coursesCsvGet(): ResponseEntity<List<CourseRecord>> =
+    ResponseEntity.ok(
+      courseService
+        .allCourses()
+        .map(CourseEntity::toCourseRecord),
+    )
 
   override fun coursesPut(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
     courseService.updateCourses(courseRecord.map(CourseRecord::toDomain))

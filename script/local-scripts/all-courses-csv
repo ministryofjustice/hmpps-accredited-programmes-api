@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# GET a CSV representation of all courses from http://localhost:8080/courses/csv and output to stdout
+# Requires the hmpps-auth app to be running and accessible to the application. (See docker-compose.yml)
+
+DIR="$(dirname "$(realpath "$0")")"
+TOKEN=$("$DIR"/get-token)
+curl -v --header "Authorization: Bearer $TOKEN" http://localhost:8080/courses/csv

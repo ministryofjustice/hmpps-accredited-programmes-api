@@ -166,6 +166,26 @@ class CoursesIntegrationTest
 
   @DirtiesContext
   @Test
+  fun `round-trip courses csv`() {
+    uploadCourses(CsvTestData.coursesCsvText)
+    val originalCourses = allCourses()
+    originalCourses shouldHaveSize CsvTestData.newCourses.size
+
+    val coursesCsv = allCoursesCsv()
+
+    uploadCourses(CsvTestData.emptyCoursesCsvText)
+    allCourses() shouldHaveSize 0
+
+    uploadCourses(coursesCsv)
+
+    val roundTripCourses = allCourses()
+    roundTripCourses shouldHaveSize CsvTestData.newCourses.size
+    originalCourses.map { it.id } shouldContainExactlyInAnyOrder roundTripCourses.map { it.id }
+    originalCourses shouldContainExactlyInAnyOrder roundTripCourses
+  }
+
+  @DirtiesContext
+  @Test
   fun `put prerequisites csv`() {
     uploadCourses(CsvTestData.coursesCsvText)
 
@@ -263,7 +283,17 @@ class CoursesIntegrationTest
     .headers(jwtAuthHelper.authorizationHeaderConfigurer())
     .accept(MediaType.APPLICATION_JSON)
     .exchange()
-    .expectBody(object : ParameterizedTypeReference<List<ApiCourse>>() {})
+    .expectBodyList(ApiCourse::class.java)
+    .returnResult().responseBody!!
+
+  private fun allCoursesCsv(): String = webTestClient
+    .get()
+    .uri("/courses/csv")
+    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+    .accept(MediaType("text", "csv"))
+    .exchange()
+    .expectStatus().is2xxSuccessful
+    .expectBody(String::class.java)
     .returnResult().responseBody!!
 
   fun List<List<CourseOffering>>.allOfferingIds() = flatMap { it.map(CourseOffering::id) }.toSet()
