@@ -65,7 +65,7 @@ class CourseParticipationHistoryControllerTest(
           otherCourseName = null,
         )
 
-      mockMvc.post("/course-participation-history") {
+      mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
@@ -106,7 +106,7 @@ class CourseParticipationHistoryControllerTest(
 
     @Test
     fun `add participation history - bad content`() {
-      mockMvc.post("/course-participation-history") {
+      mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
@@ -129,7 +129,7 @@ class CourseParticipationHistoryControllerTest(
 
     @Test
     fun ` participation history - bad courseId`() {
-      mockMvc.post("/course-participation-history") {
+      mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
@@ -176,7 +176,7 @@ class CourseParticipationHistoryControllerTest(
         ),
       )
 
-      mockMvc.get("/course-participation-history/{id}", participationHistoryId) {
+      mockMvc.get("/course-participations/{id}", participationHistoryId) {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
@@ -209,7 +209,7 @@ class CourseParticipationHistoryControllerTest(
 
       every { service.getCourseParticipationHistory(any()) } returns null
 
-      mockMvc.get("/course-participation-history/{id}", participationHistoryId) {
+      mockMvc.get("/course-participations/{id}", participationHistoryId) {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
@@ -234,7 +234,7 @@ class CourseParticipationHistoryControllerTest(
     fun `get participation history by id - bad uuid`() {
       val historicCourseParticipationId = "bad-id"
 
-      mockMvc.get("/course-participation-history/$historicCourseParticipationId") {
+      mockMvc.get("/course-participations/$historicCourseParticipationId") {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
@@ -250,73 +250,6 @@ class CourseParticipationHistoryControllerTest(
       }
 
       confirmVerified(service)
-    }
-  }
-
-  @Nested
-  inner class FindByPrisonNumber {
-    @Test
-    fun `find some results`() {
-      val participationHistoryId = UUID.randomUUID()
-      val courseId = UUID.randomUUID()
-
-      every { service.findByPrisonNumber(any()) } returns listOf(
-        CourseParticipationHistory(
-          id = participationHistoryId,
-          otherCourseName = null,
-          courseId = courseId,
-          yearStarted = Year.of(2020),
-          prisonNumber = "A1234BC",
-          source = "source",
-          setting = CourseSetting.COMMUNITY,
-          outcome = CourseOutcome(
-            status = CourseStatus.DESELECTED,
-            detail = "Detail",
-          ),
-        ),
-      )
-
-      mockMvc.get("/course-participation-history?prisonNumber={prisonNumber}", "A1234AA") {
-        accept = MediaType.APPLICATION_JSON
-        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      }.andExpect {
-        status { isOk() }
-        content {
-          json(
-            """
-              [{ 
-                "id": "$participationHistoryId",
-                "otherCourseName": null,
-                "courseId": "$courseId",
-                "yearStarted": 2020,
-                "prisonNumber": "A1234BC",
-                "source": "source",
-                "setting": "community",
-                "outcome": {
-                        "status": "deselected",
-                        "detail": "Detail"
-                        }
-              }]""",
-          )
-        }
-      }
-
-      verify { service.findByPrisonNumber("A1234AA") }
-    }
-
-    @Test
-    fun `missing prison number`() {
-      every { service.findByPrisonNumber(any()) } returns emptyList()
-
-      mockMvc.get("/course-participation-history?prisonNumber=") {
-        accept = MediaType.APPLICATION_JSON
-        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      }.andExpect {
-        status { isOk() }
-        content {
-          json("[]")
-        }
-      }
     }
   }
 }
