@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -155,11 +155,13 @@ class CoursesIntegrationTest
 
     uploadCourses(CsvTestData.coursesCsvText)
     val restoredCourses = allCourses()
-    originalCourses.map { it.id }.toSet() shouldBe restoredCourses.map { it.id }.toSet()
+    restoredCourses shouldHaveSize CsvTestData.newCourses.size
+    originalCourses.map { it.id } shouldContainExactlyInAnyOrder restoredCourses.map { it.id }
 
-    uploadCourses(CsvTestData.coursesCsvText)
-    val updatedCourses = allCourses()
-    originalCourses.map { it.id }.toSet() shouldBe updatedCourses.map { it.id }.toSet()
+    uploadCourses(CsvTestData.courseUpdatesCsvText)
+    val updatedCourses: List<Course> = allCourses()
+    updatedCourses shouldHaveSize CsvTestData.newCourseUpdates.size
+    (originalCourses.map { it.id } - updatedCourses.map { it.id }) shouldHaveSize 1
   }
 
   @DirtiesContext
