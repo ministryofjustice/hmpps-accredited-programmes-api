@@ -68,7 +68,7 @@ object CsvTestData {
   val prerequisitesCsvText: String =
     prerequisiteRecords
       .joinToString(
-        prefix = "name,description,course,identifier,comments,,,,\n",
+        prefix = PREREQUISITES_PREFIX,
         separator = "\n",
         transform = { """"${it.name}","${it.description}","${it.course}","${it.identifier}","${it.comments}",,,,""" },
         postfix = "\n",
@@ -85,12 +85,14 @@ object CsvTestData {
 
   val emptyCoursesCsvText: String = COURSES_PREFIX
   val emptyOfferingsCsvText: String = OFFERINGS_PREFIX
+  val emmptyPrerequisitesCsvText: String = PREREQUISITES_PREFIX
 
   private fun asQuotedStringIfNotNull(stringOrNull: String?) = stringOrNull?.let { "\"$it\"" } ?: ""
 }
 
 private const val COURSES_PREFIX = "name,identifier,description,audience,referable,alternateName,comments\n"
 private const val OFFERINGS_PREFIX = "course,identifier,organisation,contact email,secondary contact email,prisonId\n"
+private const val PREREQUISITES_PREFIX = "name,description,course,identifier,comments,,,,\n"
 
 private fun List<CourseUpdate>.toCsvText() = joinToString(
   prefix = COURSES_PREFIX,

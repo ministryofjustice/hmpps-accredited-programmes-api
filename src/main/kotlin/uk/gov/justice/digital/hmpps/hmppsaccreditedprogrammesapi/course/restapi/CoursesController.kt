@@ -43,6 +43,22 @@ class CoursesController(
   override fun coursesPrerequisitesPut(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.replaceAllPrerequisites(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
 
+  override fun coursesPrerequisitesGet(): ResponseEntity<List<PrerequisiteRecord>> =
+    ResponseEntity.ok(
+      courseService
+        .allCourses()
+        .flatMap { course ->
+          course.prerequisites.map { prerequisite ->
+            PrerequisiteRecord(
+              name = prerequisite.name,
+              description = prerequisite.description,
+              course = course.name,
+              identifier = course.identifier,
+            )
+          }
+        },
+    )
+
   override fun coursesCourseIdGet(courseId: UUID): ResponseEntity<Course> =
     courseService.course(courseId)?.let {
       ResponseEntity.ok(it.toApi())

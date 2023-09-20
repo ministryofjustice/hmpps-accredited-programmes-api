@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Download Prerequisite data in CSV format from the GET /courses/prerequisites endpoint.
+# The data is output to stdin
+DIR="$(dirname "$(realpath "$0")")"
+TOKEN=$("$DIR"/get-token)
+curl -v --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" http://localhost:8080/courses/prerequisites

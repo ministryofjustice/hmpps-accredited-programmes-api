@@ -189,16 +189,7 @@ class CoursesIntegrationTest
   fun `put prerequisites csv`() {
     uploadCourses(CsvTestData.coursesCsvText)
 
-    webTestClient
-      .put()
-      .uri("/courses/prerequisites")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MEDIA_TYPE_TEXT_CSV)
-      .bodyValue(CsvTestData.prerequisitesCsvText)
-      .exchange()
-      .expectStatus().is2xxSuccessful
-      .expectBody()
-      .jsonPath("$.size()").isEqualTo(0)
+    uploadPrerequisites(CsvTestData.prerequisitesCsvText)
 
     webTestClient
       .get()
@@ -208,6 +199,23 @@ class CoursesIntegrationTest
       .exchange()
       .expectBody()
       .jsonPath("$..coursePrerequisites.length()").isEqualTo(35)
+  }
+
+  @DirtiesContext
+  @Test
+  fun `Round-trip prerequisites csv`() {
+    uploadCourses(CsvTestData.coursesCsvText)
+    uploadPrerequisites(CsvTestData.prerequisitesCsvText)
+
+    val originalCourses = allCourses()
+    val prerequisitesCsv = allPrerequisitesCsv()
+
+    uploadPrerequisites(CsvTestData.emmptyPrerequisitesCsvText)
+    allCourses().flatMap { it.coursePrerequisites } shouldHaveSize 0
+
+    uploadPrerequisites(prerequisitesCsv)
+
+    originalCourses shouldContainExactlyInAnyOrder allCourses()
   }
 
   @DirtiesContext
@@ -283,6 +291,19 @@ class CoursesIntegrationTest
       .jsonPath("$.size()").isEqualTo(0)
   }
 
+  private fun uploadPrerequisites(csvContent: String) {
+    webTestClient
+      .put()
+      .uri("/courses/prerequisites")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MEDIA_TYPE_TEXT_CSV)
+      .bodyValue(csvContent)
+      .exchange()
+      .expectStatus().is2xxSuccessful
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(0)
+  }
+
   private fun getAllOfferings(courses: List<Course>) =
     courses.map {
       webTestClient
@@ -320,6 +341,17 @@ class CoursesIntegrationTest
     webTestClient
       .get()
       .uri("/offerings")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MEDIA_TYPE_TEXT_CSV)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(String::class.java)
+      .returnResult().responseBody!!
+
+  private fun allPrerequisitesCsv(): String =
+    webTestClient
+      .get()
+      .uri("/courses/prerequisites")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MEDIA_TYPE_TEXT_CSV)
       .exchange()

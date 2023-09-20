@@ -181,10 +181,6 @@ class CourseService(
         }
       }.filterNotNull()
 
-  private fun clearOfferings(courses: List<CourseEntity>) {
-    courses.forEach { it.clearOfferings() }
-  }
-
   companion object {
     private fun indexToCsvRowNumber(index: Int) = index + 2
   }
