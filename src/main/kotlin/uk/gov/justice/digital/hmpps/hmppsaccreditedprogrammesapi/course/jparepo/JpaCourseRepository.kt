@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.jparepo
 
-import jakarta.persistence.EntityManager
 import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -18,7 +17,6 @@ constructor(
   private val courseRepository: CourseEntityRepository,
   private val offeringRepository: OfferingRepository,
   private val audienceRepository: AudienceRepository,
-  private val entityManager: EntityManager,
 ) : CourseRepository {
   override fun allCourses(): List<CourseEntity> = courseRepository
     .findAll()
@@ -41,6 +39,10 @@ constructor(
       Hibernate.initialize(it.audiences)
       Hibernate.initialize(it.prerequisites)
     }
+
+  override fun allOfferings(): List<Offering> = offeringRepository
+    .findAll()
+    .onEach { Hibernate.initialize(it.course) }
 
   override fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
     .findById(courseId)

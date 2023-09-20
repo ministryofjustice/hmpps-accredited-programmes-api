@@ -46,6 +46,14 @@ fun Offering.toApi(): CourseOffering = CourseOffering(
   secondaryContactEmail = secondaryContactEmail,
 )
 
+fun Offering.toOfferingRecord() = OfferingRecord(
+  course = course.name,
+  identifier = course.identifier,
+  prisonId = organisationId,
+  contactEmail = contactEmail,
+  secondaryContactEmail = secondaryContactEmail,
+)
+
 fun Audience.toApi(): CourseAudience = CourseAudience(
   id = id!!,
   value = value,

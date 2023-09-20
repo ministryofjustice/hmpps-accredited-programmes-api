@@ -17,6 +17,8 @@ class CourseService(
   fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)?.takeIf { !it.withdrawn }
   fun getCourseForOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findCourseByOfferingId(offeringId)
 
+  fun allOfferings(): List<Offering> = courseRepository.allOfferings().filterNot(Offering::withdrawn)
+
   fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
     .offeringsForCourse(courseId)
     .filterNot(Offering::withdrawn)

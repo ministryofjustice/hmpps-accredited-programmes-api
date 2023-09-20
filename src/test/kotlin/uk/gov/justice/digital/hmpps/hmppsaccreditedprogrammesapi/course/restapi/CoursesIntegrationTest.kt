@@ -193,7 +193,7 @@ class CoursesIntegrationTest
       .put()
       .uri("/courses/prerequisites")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
+      .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(CsvTestData.prerequisitesCsvText)
       .exchange()
       .expectStatus().is2xxSuccessful
@@ -241,12 +241,30 @@ class CoursesIntegrationTest
     getAllOfferings(courses).allOfferingIds() shouldContainExactly allOfferings.allOfferingIds()
   }
 
+  @DirtiesContext
+  @Test
+  fun `Round-trip offerings csv`() {
+    uploadCourses(CsvTestData.coursesCsvText)
+    uploadOfferings(CsvTestData.offeringsCsvText)
+
+    val courses: List<ApiCourse> = allCourses()
+
+    val allOfferings: List<List<CourseOffering>> = getAllOfferings(courses)
+
+    val offeringsCsv = allOfferingsCsv()
+    uploadOfferings(CsvTestData.emptyOfferingsCsvText)
+    uploadOfferings(offeringsCsv)
+
+    getAllOfferings(courses).allOfferingIds() shouldContainExactly allOfferings.allOfferingIds()
+    getAllOfferings(courses).flatten() shouldContainExactly allOfferings.flatten()
+  }
+
   private fun uploadCourses(csvData: String) {
     webTestClient
       .put()
       .uri("/courses")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
+      .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(csvData)
       .exchange()
       .expectStatus().is2xxSuccessful
@@ -255,9 +273,9 @@ class CoursesIntegrationTest
   private fun uploadOfferings(csvContent: String) {
     webTestClient
       .put()
-      .uri("/courses/offerings")
+      .uri("/offerings")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
+      .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(csvContent)
       .exchange()
       .expectStatus().is2xxSuccessful
@@ -286,15 +304,29 @@ class CoursesIntegrationTest
     .expectBodyList(ApiCourse::class.java)
     .returnResult().responseBody!!
 
-  private fun allCoursesCsv(): String = webTestClient
-    .get()
-    .uri("/courses/csv")
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .accept(MediaType("text", "csv"))
-    .exchange()
-    .expectStatus().is2xxSuccessful
-    .expectBody(String::class.java)
-    .returnResult().responseBody!!
+  private fun allCoursesCsv(): String {
+    return webTestClient
+      .get()
+      .uri("/courses/csv")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MEDIA_TYPE_TEXT_CSV)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(String::class.java)
+      .returnResult().responseBody!!
+  }
 
-  fun List<List<CourseOffering>>.allOfferingIds() = flatMap { it.map(CourseOffering::id) }.toSet()
+  private fun allOfferingsCsv(): String =
+    webTestClient
+      .get()
+      .uri("/offerings")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MEDIA_TYPE_TEXT_CSV)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(String::class.java)
+      .returnResult().responseBody!!
 }
+
+private val MEDIA_TYPE_TEXT_CSV: MediaType = MediaType("text", "csv")
+private fun List<List<CourseOffering>>.allOfferingIds() = flatMap { it.map(CourseOffering::id) }.toSet()

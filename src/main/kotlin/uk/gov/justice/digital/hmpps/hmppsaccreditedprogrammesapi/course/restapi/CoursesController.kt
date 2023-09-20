@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
@@ -43,9 +42,6 @@ class CoursesController(
 
   override fun coursesPrerequisitesPut(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.replaceAllPrerequisites(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
-
-  override fun coursesOfferingsPut(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
-    ResponseEntity.ok(courseService.updateOfferings(offeringRecord.map(OfferingRecord::toDomain)))
 
   override fun coursesCourseIdGet(courseId: UUID): ResponseEntity<Course> =
     courseService.course(courseId)?.let {

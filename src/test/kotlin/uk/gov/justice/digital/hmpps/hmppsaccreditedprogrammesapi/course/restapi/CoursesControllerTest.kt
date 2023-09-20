@@ -17,11 +17,9 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.UUID
@@ -239,28 +237,6 @@ class CoursesControllerTest(
       }
 
       verify { coursesService.replaceAllPrerequisites(CsvTestData.prerequisiteRecords.map(PrerequisiteRecord::toDomain)) }
-    }
-  }
-
-  @Nested
-  inner class PutOfferingsTests {
-    @Test
-    fun `put offerings csv`() {
-      every { coursesService.updateOfferings(any<List<OfferingUpdate>>()) } returns emptyList()
-
-      mockMvc.put("/courses/offerings") {
-        contentType = MediaType("text", "csv")
-        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = CsvTestData.offeringsCsvText
-      }.andExpect {
-        status { isOk() }
-        content {
-          contentType(MediaType.APPLICATION_JSON)
-          jsonPath("$.size()") { value(0) }
-        }
-      }
-
-      verify { coursesService.updateOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
     }
   }
 }
