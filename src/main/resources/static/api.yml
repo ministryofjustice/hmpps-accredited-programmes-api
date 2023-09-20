@@ -12,7 +12,7 @@ paths:
       summary: List all courses
       responses:
         200:
-          description: successful operation
+          description: Return a JSON representation of all courses that are not withdrawn
           content:
             'application/json':
               schema:
@@ -37,7 +37,35 @@ paths:
         400:
           description: Bad input
 
+  /courses/csv:
+    get:
+      tags:
+        - Courses
+      summary: List all courses
+      responses:
+        200:
+          description: Return a CSV format representation of all courses that are not withdrawn. The data is compatible with the PUT /courses endpoint and may be round-tripped
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseRecord'
+
   /courses/prerequisites:
+    get:
+      tags:
+        - Course Prerequisites
+      summary: Download a CSV format representation of the current set of prerequisites.
+      responses:
+        200:
+          description: The CSV formatted data is compatible the PUT operation and may be round-tripped
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrerequisiteRecord'
     put:
       tags:
         - Course Prerequisites
@@ -92,6 +120,19 @@ paths:
                   $ref: '#/components/schemas/Course'
 
   /courses/offerings:
+    get:
+      tags:
+        - Course Offerings
+      summary: Download a CSV format representation of those offerings that are not withdrawn.
+      responses:
+        200:
+          description: successful operation
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfferingRecord'
     put:
       tags:
         - Course Offerings
