@@ -40,7 +40,7 @@ constructor(
 
     val cpa = webTestClient
       .post()
-      .uri("/course-participation-history")
+      .uri("/course-participations")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -59,7 +59,7 @@ constructor(
 
     val courseParticipation = webTestClient
       .get()
-      .uri("/course-participation-history/{id}", cpa.id)
+      .uri("/course-participations/{id}", cpa.id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -80,7 +80,7 @@ constructor(
 
     val errorResponse = webTestClient
       .post()
-      .uri("/course-participation-history")
+      .uri("/course-participations")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -110,7 +110,7 @@ constructor(
 
     val cp = webTestClient
       .put()
-      .uri("/course-participation-history/{id}", courseParticipationId)
+      .uri("/course-participations/{id}", courseParticipationId)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(
@@ -155,7 +155,7 @@ constructor(
 
     val courseIdsForPrisonNumber = webTestClient
       .get()
-      .uri("/course-participation-history?prisonNumber={prisonNumber}", "A1234AA")
+      .uri("/people/{prisonNumber}/course-participations", "A1234AA")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -172,7 +172,7 @@ constructor(
 
     webTestClient
       .get()
-      .uri("/course-participation-history?prisonNumber={prisonNumber}", "Z0000ZZ")
+      .uri("/people/{prisonNumber}/course-participations", "Z0000ZZ")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -188,7 +188,7 @@ constructor(
 
     webTestClient
       .delete()
-      .uri("/course-participation-history/{id}", id)
+      .uri("/course-participations/{id}", id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -198,7 +198,7 @@ constructor(
 
     webTestClient
       .delete()
-      .uri("/course-participation-history/{id}", id)
+      .uri("/course-participations/{id}", id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -220,7 +220,7 @@ constructor(
   private fun addCourseParticipationHistory(courseId: UUID, prisonNumber: String): UUID =
     webTestClient
       .post()
-      .uri("/course-participation-history")
+      .uri("/course-participations")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -237,7 +237,7 @@ constructor(
   private fun getCourseParticipation(id: UUID): CourseParticipation =
     webTestClient
       .get()
-      .uri("/course-participation-history/{id}", id)
+      .uri("/course-participations/{id}", id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -248,7 +248,7 @@ constructor(
   private fun getCourseParticipationStatusCode(id: UUID): HttpStatusCode =
     webTestClient
       .get()
-      .uri("/course-participation-history/{id}", id)
+      .uri("/course-participations/{id}", id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

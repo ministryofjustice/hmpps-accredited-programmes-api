@@ -365,11 +365,11 @@ paths:
         404:
           description: No offering has the supplied id (Not Found)
 
-  /course-participation-history:
+  /course-participations:
     post:
       tags:
-        - Course participation history
-      summary: Record information about a person's prior participation in a course that was not managed by this service
+        - Course participations
+      summary: Record information about a person's prior participation in a course
       requestBody:
         required: true
         content:
@@ -395,41 +395,14 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-    get:
-      tags:
-        - Course participation history
-      summary: Retrieve course participation information for a person identified by their prison number
-      parameters:
-        - name: prisonNumber
-          in: query
-          description: The prison number of the person for whom the information should be retrieved
-          example: "A1234AA"
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: All historic course participation information for the person.  Empty if none found
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CourseParticipation"
-        401:
-          description: The client is not authorized to perform this operation
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
 
-  /course-participation-history/{historicCourseParticipationId}:
+  /course-participations/{courseParticipationId}:
     get:
       tags:
-        - Course participation history
+        - Course participations
       summary: Return information about a person's participation in a course. Selected by a unique identifier
       parameters:
-        - name: historicCourseParticipationId
+        - name: courseParticipationId
           in: path
           description: The unique identifier assigned to this record when it was created
           schema:
@@ -452,10 +425,10 @@ paths:
 
     put:
       tags:
-        - Course participation history
+        - Course participations
       summary: Update the information about a person's participation in a course.
       parameters:
-        - name: historicCourseParticipationId
+        - name: courseParticipationId
           in: path
           description: The unique identifier assigned to this record when it was created
           schema:
@@ -490,10 +463,10 @@ paths:
 
     delete:
       tags:
-        - Course participation history
+        - Course participations
       summary: Delete information about a person's participation in a course.
       parameters:
-        - name: historicCourseParticipationId
+        - name: courseParticipationId
           in: path
           description: The unique identifier assigned to this record when it was created
           schema:
@@ -503,6 +476,35 @@ paths:
       responses:
         204:
           description: The information about a person's participation in a course has been deleted
+        401:
+          description: The client is not authorized to perform this operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /people/{prisonNumber}/course-participations:
+    get:
+      tags:
+        - Course participations
+      summary: Retrieve course participation information for a person identified by their prison number
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: The prison number of the person for whom the information should be retrieved
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: All historic course participation information for the person.  Empty if none found
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseParticipation"
         401:
           description: The client is not authorized to perform this operation
           content:
