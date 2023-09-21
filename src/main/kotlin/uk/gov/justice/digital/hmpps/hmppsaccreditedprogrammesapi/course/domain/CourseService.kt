@@ -17,6 +17,8 @@ class CourseService(
   fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)?.takeIf { !it.withdrawn }
   fun getCourseForOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findCourseByOfferingId(offeringId)
 
+  fun allOfferings(): List<Offering> = courseRepository.allOfferings().filterNot(Offering::withdrawn)
+
   fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
     .offeringsForCourse(courseId)
     .filterNot(Offering::withdrawn)
@@ -178,10 +180,6 @@ class CourseService(
           )
         }
       }.filterNotNull()
-
-  private fun clearOfferings(courses: List<CourseEntity>) {
-    courses.forEach { it.clearOfferings() }
-  }
 
   companion object {
     private fun indexToCsvRowNumber(index: Int) = index + 2

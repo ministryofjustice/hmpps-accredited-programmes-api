@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectReader
+import com.fasterxml.jackson.databind.ObjectWriter
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvParser
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
@@ -13,7 +14,9 @@ import org.springframework.http.MediaType
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter
 import org.springframework.stereotype.Component
 import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.io.Reader
+import java.io.Writer
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
@@ -40,7 +43,10 @@ class CsvHttpMessageConverter : AbstractGenericHttpMessageConverter<Iterable<Any
   private fun getCsvReader(type: Type): ObjectReader = csvMapper.reader(getSchema()).forType(getElementType(type))
 
   override fun writeInternal(instance: Iterable<Any>, type: Type?, outputMessage: HttpOutputMessage) {
+    getCsvWriter(type).writeValues(getOutputWriter(outputMessage)).writeAll(instance)
   }
+
+  private fun getCsvWriter(type: Type?): ObjectWriter = csvMapper.writer(csvMapper.schemaFor(getElementType(type!!)).withHeader())
 
   companion object {
     private val supportedSupertype = Iterable::class.java
@@ -58,6 +64,12 @@ class CsvHttpMessageConverter : AbstractGenericHttpMessageConverter<Iterable<Any
       InputStreamReader(
         inputMessage.body,
         inputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
+      )
+
+    private fun getOutputWriter(outputMessage: HttpOutputMessage): Writer =
+      OutputStreamWriter(
+        outputMessage.body,
+        outputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
       )
   }
 }

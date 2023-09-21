@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+declare -A API_URLS
+API_URLS['dev']=https://accredited-programmes-api-dev.hmpps.service.justice.gov.uk
+API_URLS['preprod']=https://accredited-programmes-api-preprod.hmpps.service.justice.gov.uk
+API_URLS['prod']=https://accredited-programmes-api.hmpps.service.justice.gov.uk
+
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+
+. "$DIR/.namespace"
+TOKEN=$("$DIR/get-token" -ns ${NS_KEY})
+API_URL=${API_URLS[$NS_KEY]}
+
+confirm() {
+  if [[ ${NS_KEY} == "prod" ]]; then
+    local confirm=""
+    echo "WARNING: This is the PRODUCTION namespace"
+    while [[ ${confirm} != "Y" ]] && [[ ${confirm} != "n" ]]; do
+      read -p 'Continue? Y/n: ' -n 1 confirm
+      echo
+    done
+    if [[ ${confirm} != "Y" ]]; then
+      exit
+    fi
+  fi
+}
+
+confirm
+
+echo Uploading Course.csv to "${NS_LEY}"
+curl --upload-file Course.csv             --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/csv                > courseMessages.json
+echo Uploading Offering.csv to "${NS_LEY}"
+curl --upload-file Offering.csv           --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/offerings/csv      > offeringMessages.json
+echo Uploading CoursePrerequiste.csv to "${NS_LEY}"
+curl --upload-file CoursePrerequisite.csv --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/prerequisites/csv  > prerequisiteMessages.json

@@ -7,6 +7,7 @@ interface CourseRepository {
   fun course(courseId: UUID): CourseEntity?
   fun findCourseByOfferingId(offeringId: UUID): CourseEntity?
   fun saveCourse(courseEntity: CourseEntity)
+  fun allOfferings(): List<Offering>
   fun offeringsForCourse(courseId: UUID): List<Offering>
   fun courseOffering(courseId: UUID, offeringId: UUID): Offering?
   fun courseOffering(offeringId: UUID): Offering?

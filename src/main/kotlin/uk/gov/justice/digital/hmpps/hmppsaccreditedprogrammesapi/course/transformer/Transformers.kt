@@ -25,6 +25,15 @@ fun CourseEntity.toApi(): Course = Course(
   referable = referable,
 )
 
+fun CourseEntity.toCourseRecord(): CourseRecord = CourseRecord(
+  name = name,
+  description = description ?: "",
+  alternateName = alternateName,
+  referable = referable,
+  identifier = identifier,
+  audience = audiences.joinToString { it.value },
+)
+
 fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(
   name = name,
   description = description,
@@ -33,6 +42,14 @@ fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(
 fun Offering.toApi(): CourseOffering = CourseOffering(
   id = id!!,
   organisationId = organisationId,
+  contactEmail = contactEmail,
+  secondaryContactEmail = secondaryContactEmail,
+)
+
+fun Offering.toOfferingRecord() = OfferingRecord(
+  course = course.name,
+  identifier = course.identifier,
+  prisonId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
 )

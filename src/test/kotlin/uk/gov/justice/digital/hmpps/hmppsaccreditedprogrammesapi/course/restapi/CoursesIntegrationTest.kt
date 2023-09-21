@@ -166,19 +166,30 @@ class CoursesIntegrationTest
 
   @DirtiesContext
   @Test
+  fun `round-trip courses csv`() {
+    uploadCourses(CsvTestData.coursesCsvText)
+    val originalCourses = allCourses()
+    originalCourses shouldHaveSize CsvTestData.newCourses.size
+
+    val coursesCsv = allCoursesCsv()
+
+    uploadCourses(CsvTestData.emptyCoursesCsvText)
+    allCourses() shouldHaveSize 0
+
+    uploadCourses(coursesCsv)
+
+    val roundTripCourses = allCourses()
+    roundTripCourses shouldHaveSize CsvTestData.newCourses.size
+    originalCourses.map { it.id } shouldContainExactlyInAnyOrder roundTripCourses.map { it.id }
+    originalCourses shouldContainExactlyInAnyOrder roundTripCourses
+  }
+
+  @DirtiesContext
+  @Test
   fun `put prerequisites csv`() {
     uploadCourses(CsvTestData.coursesCsvText)
 
-    webTestClient
-      .put()
-      .uri("/courses/prerequisites")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
-      .bodyValue(CsvTestData.prerequisitesCsvText)
-      .exchange()
-      .expectStatus().is2xxSuccessful
-      .expectBody()
-      .jsonPath("$.size()").isEqualTo(0)
+    uploadPrerequisites(CsvTestData.prerequisitesCsvText)
 
     webTestClient
       .get()
@@ -188,6 +199,23 @@ class CoursesIntegrationTest
       .exchange()
       .expectBody()
       .jsonPath("$..coursePrerequisites.length()").isEqualTo(35)
+  }
+
+  @DirtiesContext
+  @Test
+  fun `Round-trip prerequisites csv`() {
+    uploadCourses(CsvTestData.coursesCsvText)
+    uploadPrerequisites(CsvTestData.prerequisitesCsvText)
+
+    val originalCourses = allCourses()
+    val prerequisitesCsv = allPrerequisitesCsv()
+
+    uploadPrerequisites(CsvTestData.emmptyPrerequisitesCsvText)
+    allCourses().flatMap { it.coursePrerequisites } shouldHaveSize 0
+
+    uploadPrerequisites(prerequisitesCsv)
+
+    originalCourses shouldContainExactlyInAnyOrder allCourses()
   }
 
   @DirtiesContext
@@ -221,12 +249,30 @@ class CoursesIntegrationTest
     getAllOfferings(courses).allOfferingIds() shouldContainExactly allOfferings.allOfferingIds()
   }
 
+  @DirtiesContext
+  @Test
+  fun `Round-trip offerings csv`() {
+    uploadCourses(CsvTestData.coursesCsvText)
+    uploadOfferings(CsvTestData.offeringsCsvText)
+
+    val courses: List<ApiCourse> = allCourses()
+
+    val allOfferings: List<List<CourseOffering>> = getAllOfferings(courses)
+
+    val offeringsCsv = allOfferingsCsv()
+    uploadOfferings(CsvTestData.emptyOfferingsCsvText)
+    uploadOfferings(offeringsCsv)
+
+    getAllOfferings(courses).allOfferingIds() shouldContainExactly allOfferings.allOfferingIds()
+    getAllOfferings(courses).flatten() shouldContainExactly allOfferings.flatten()
+  }
+
   private fun uploadCourses(csvData: String) {
     webTestClient
       .put()
-      .uri("/courses")
+      .uri("/courses/csv")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
+      .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(csvData)
       .exchange()
       .expectStatus().is2xxSuccessful
@@ -235,9 +281,22 @@ class CoursesIntegrationTest
   private fun uploadOfferings(csvContent: String) {
     webTestClient
       .put()
-      .uri("/courses/offerings")
+      .uri("/offerings/csv")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType("text", "csv"))
+      .contentType(MEDIA_TYPE_TEXT_CSV)
+      .bodyValue(csvContent)
+      .exchange()
+      .expectStatus().is2xxSuccessful
+      .expectBody()
+      .jsonPath("$.size()").isEqualTo(0)
+  }
+
+  private fun uploadPrerequisites(csvContent: String) {
+    webTestClient
+      .put()
+      .uri("/courses/prerequisites/csv")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(csvContent)
       .exchange()
       .expectStatus().is2xxSuccessful
@@ -263,8 +322,43 @@ class CoursesIntegrationTest
     .headers(jwtAuthHelper.authorizationHeaderConfigurer())
     .accept(MediaType.APPLICATION_JSON)
     .exchange()
-    .expectBody(object : ParameterizedTypeReference<List<ApiCourse>>() {})
+    .expectBodyList(ApiCourse::class.java)
     .returnResult().responseBody!!
 
-  fun List<List<CourseOffering>>.allOfferingIds() = flatMap { it.map(CourseOffering::id) }.toSet()
+  private fun allCoursesCsv(): String {
+    return webTestClient
+      .get()
+      .uri("/courses/csv")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MEDIA_TYPE_TEXT_CSV)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(String::class.java)
+      .returnResult().responseBody!!
+  }
+
+  private fun allOfferingsCsv(): String =
+    webTestClient
+      .get()
+      .uri("/offerings/csv")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MEDIA_TYPE_TEXT_CSV)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(String::class.java)
+      .returnResult().responseBody!!
+
+  private fun allPrerequisitesCsv(): String =
+    webTestClient
+      .get()
+      .uri("/courses/prerequisites/csv")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MEDIA_TYPE_TEXT_CSV)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(String::class.java)
+      .returnResult().responseBody!!
 }
+
+private val MEDIA_TYPE_TEXT_CSV: MediaType = MediaType("text", "csv")
+private fun List<List<CourseOffering>>.allOfferingIds() = flatMap { it.map(CourseOffering::id) }.toSet()

@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.verify
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -12,7 +14,11 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.put
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.UUID
 
@@ -100,6 +106,28 @@ class OfferingsControllerTest(
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
       status { isUnauthorized() }
+    }
+  }
+
+  @Nested
+  inner class PutOfferingsTests {
+    @Test
+    fun `put offerings csv`() {
+      every { coursesService.updateOfferings(any<List<OfferingUpdate>>()) } returns emptyList()
+
+      mockMvc.put("/offerings/csv") {
+        contentType = MediaType("text", "csv")
+        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+        content = CsvTestData.offeringsCsvText
+      }.andExpect {
+        status { isOk() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          jsonPath("$.size()") { value(0) }
+        }
+      }
+
+      verify { coursesService.updateOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
     }
   }
 

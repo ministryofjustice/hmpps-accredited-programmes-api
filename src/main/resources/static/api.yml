@@ -12,13 +12,15 @@ paths:
       summary: List all courses
       responses:
         200:
-          description: successful operation
+          description: Return a JSON representation of all courses that are not withdrawn
           content:
             'application/json':
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Course'
+
+  /courses/csv:
     put:
       tags:
         - Courses
@@ -36,8 +38,34 @@ paths:
           description: Successful update
         400:
           description: Bad input
+    get:
+      tags:
+        - Courses
+      summary: List all courses
+      responses:
+        200:
+          description: Return a CSV format representation of all courses that are not withdrawn. The data is compatible with the PUT /courses endpoint and may be round-tripped
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseRecord'
 
-  /courses/prerequisites:
+  /courses/prerequisites/csv:
+    get:
+      tags:
+        - Course Prerequisites
+      summary: Download a CSV format representation of the current set of prerequisites.
+      responses:
+        200:
+          description: The CSV formatted data is compatible the PUT operation and may be round-tripped
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrerequisiteRecord'
     put:
       tags:
         - Course Prerequisites
@@ -91,11 +119,47 @@ paths:
               schema:
                   $ref: '#/components/schemas/Course'
 
-  /courses/offerings:
+  /courses/{courseId}/offerings:
+    get:
+      tags:
+        - Course Offerings
+      summary: List all offerings for a course
+      parameters:
+        - name: courseId
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseOffering'
+
+  /offerings/csv:
+    get:
+      tags:
+        - Course Offerings
+      summary: Download all Offerings in CSV format
+      responses:
+        200:
+          description: successful operation
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfferingRecord'
     put:
       tags:
         - Course Offerings
-      summary: Upload a CSV format file containing a full set of offerings data for a set of courses.
+      summary: Upload all offerings in CSV format.
       description: "Accepts a CSV format file of data representing the desired state of all offerings data attached to the current set of courses.
       <p>Pre-existing offering data will be removed before the new data is applied.
       <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the OfferingRecord schema. Column order is not important."
@@ -122,29 +186,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  /courses/{courseId}/offerings:
-    get:
-      tags:
-        - Course Offerings
-      summary: List all offerings for a course
-      parameters:
-        - name: courseId
-          in: path
-          description: A course identifier
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        200:
-          description: successful operation
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CourseOffering'
 
   /offerings/{offeringId}:
     get:
@@ -650,9 +691,10 @@ components:
         course:
           type: string
           example: "Kaizen"
-          description: "The name of the Course to which this Offering applies. The name must match a course name exactly for this Offering to be added to the Course."
+          description: "The name of the Course to which this Offering applies. This value is only present to help with comprehension. It is not used to match offerings with courses"
         identifier:
           type: string
+          description: "The unique identifier of the Course variant to which this Offering applies. The offering is added to the course having this identifier"
           example: "BNM-IPVO"
         organisation:
           type: string
