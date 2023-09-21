@@ -204,7 +204,7 @@ class CoursesControllerTest(
         coursesService.updateCourses(any<List<CourseUpdate>>())
       } just Runs
 
-      mockMvc.put("/courses") {
+      mockMvc.put("/courses/csv") {
         contentType = MediaType("text", "csv")
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
         content = CsvTestData.coursesCsvText
@@ -224,7 +224,7 @@ class CoursesControllerTest(
     fun `put prerequisites csv`() {
       every { coursesService.replaceAllPrerequisites(any()) } returns emptyList()
 
-      mockMvc.put("/courses/prerequisites") {
+      mockMvc.put("/courses/prerequisites/csv") {
         contentType = MediaType("text", "csv")
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
         content = CsvTestData.prerequisitesCsvText

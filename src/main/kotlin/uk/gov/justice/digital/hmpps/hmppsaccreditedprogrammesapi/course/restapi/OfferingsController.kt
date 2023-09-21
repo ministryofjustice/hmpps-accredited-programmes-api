@@ -27,10 +27,10 @@ class OfferingsController(private val courseService: CourseService) : OfferingsA
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Offering found at /offerings/$offeringId")
 
-  override fun offeringsPut(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
+  override fun offeringsCsvPut(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.updateOfferings(offeringRecord.map(OfferingRecord::toDomain)))
 
-  override fun offeringsGet(): ResponseEntity<List<OfferingRecord>> =
+  override fun offeringsCsvGet(): ResponseEntity<List<OfferingRecord>> =
     ResponseEntity.ok(
       courseService
         .allOfferings()

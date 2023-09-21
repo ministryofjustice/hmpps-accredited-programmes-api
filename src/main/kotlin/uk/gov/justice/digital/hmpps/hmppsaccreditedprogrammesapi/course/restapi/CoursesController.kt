@@ -35,15 +35,15 @@ class CoursesController(
         .map(CourseEntity::toCourseRecord),
     )
 
-  override fun coursesPut(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
+  override fun coursesCsvPut(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
     courseService.updateCourses(courseRecord.map(CourseRecord::toDomain))
     return ResponseEntity.noContent().build()
   }
 
-  override fun coursesPrerequisitesPut(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
+  override fun coursesPrerequisitesCsvPut(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.replaceAllPrerequisites(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
 
-  override fun coursesPrerequisitesGet(): ResponseEntity<List<PrerequisiteRecord>> =
+  override fun coursesPrerequisitesCsvGet(): ResponseEntity<List<PrerequisiteRecord>> =
     ResponseEntity.ok(
       courseService
         .allCourses()

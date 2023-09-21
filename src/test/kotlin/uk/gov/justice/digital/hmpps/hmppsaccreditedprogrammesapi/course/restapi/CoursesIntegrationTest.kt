@@ -270,7 +270,7 @@ class CoursesIntegrationTest
   private fun uploadCourses(csvData: String) {
     webTestClient
       .put()
-      .uri("/courses")
+      .uri("/courses/csv")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(csvData)
@@ -281,7 +281,7 @@ class CoursesIntegrationTest
   private fun uploadOfferings(csvContent: String) {
     webTestClient
       .put()
-      .uri("/offerings")
+      .uri("/offerings/csv")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(csvContent)
@@ -294,7 +294,7 @@ class CoursesIntegrationTest
   private fun uploadPrerequisites(csvContent: String) {
     webTestClient
       .put()
-      .uri("/courses/prerequisites")
+      .uri("/courses/prerequisites/csv")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(csvContent)
@@ -340,7 +340,7 @@ class CoursesIntegrationTest
   private fun allOfferingsCsv(): String =
     webTestClient
       .get()
-      .uri("/offerings")
+      .uri("/offerings/csv")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MEDIA_TYPE_TEXT_CSV)
       .exchange()
@@ -351,7 +351,7 @@ class CoursesIntegrationTest
   private fun allPrerequisitesCsv(): String =
     webTestClient
       .get()
-      .uri("/courses/prerequisites")
+      .uri("/courses/prerequisites/csv")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MEDIA_TYPE_TEXT_CSV)
       .exchange()

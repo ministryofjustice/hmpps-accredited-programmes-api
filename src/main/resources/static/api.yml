@@ -19,6 +19,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Course'
+
+  /courses/csv:
     put:
       tags:
         - Courses
@@ -36,8 +38,6 @@ paths:
           description: Successful update
         400:
           description: Bad input
-
-  /courses/csv:
     get:
       tags:
         - Courses
@@ -52,7 +52,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/CourseRecord'
 
-  /courses/prerequisites:
+  /courses/prerequisites/csv:
     get:
       tags:
         - Course Prerequisites
@@ -142,7 +142,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/CourseOffering'
 
-  /offerings:
+  /offerings/csv:
     get:
       tags:
         - Course Offerings

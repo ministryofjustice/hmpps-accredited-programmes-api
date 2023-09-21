@@ -141,7 +141,7 @@ On a Mac these tools may be installed using Homebrew: https://brew.sh/
 For example, to replace the data served by the 'dev' instance of the API:
 
 ```shell
-script/kubernetes-scripts/upload-csv -ns dev
+script/kubernetes-scripts/upload-csvs -ns dev
 ```
 
 There is a companion script `script/kubernetes-scripts/get-courses` that queries the `GET /courses` end-point and

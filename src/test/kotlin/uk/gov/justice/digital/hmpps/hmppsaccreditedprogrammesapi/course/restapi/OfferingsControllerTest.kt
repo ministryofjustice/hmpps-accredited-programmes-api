@@ -115,7 +115,7 @@ class OfferingsControllerTest(
     fun `put offerings csv`() {
       every { coursesService.updateOfferings(any<List<OfferingUpdate>>()) } returns emptyList()
 
-      mockMvc.put("/offerings") {
+      mockMvc.put("/offerings/csv") {
         contentType = MediaType("text", "csv")
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
         content = CsvTestData.offeringsCsvText
