@@ -28,9 +28,9 @@ confirm() {
 
 confirm
 
-echo Uploading Course.csv to "${NS_LEY}"
+echo Uploading Course.csv to "${NS_KEY}"
 curl --upload-file Course.csv             --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/csv                > courseMessages.json
-echo Uploading Offering.csv to "${NS_LEY}"
-curl --upload-file Offering.csv           --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/offerings/csv      > offeringMessages.json
-echo Uploading CoursePrerequiste.csv to "${NS_LEY}"
+echo Uploading Offering.csv to "${NS_KEY}"
+curl --upload-file Offering.csv           --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/offerings/csv      > offeringMessages.json
+echo Uploading CoursePrerequiste.csv to "${NS_KEY}"
 curl --upload-file CoursePrerequisite.csv --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/prerequisites/csv  > prerequisiteMessages.json

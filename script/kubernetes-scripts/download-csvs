@@ -31,6 +31,6 @@ confirm
 echo Downloading Course.csv from "${NS_KEY}"
 curl --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/csv                > Course.csv
 echo Downloading Offering.csv from "${NS_KEY}"
-curl --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/offerings/csv      > Offering.csv
+curl --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/offerings/csv              > Offering.csv
 echo Downloading CoursePrerequiste.csv from "${NS_KEY}"
 curl --header "Authorization: Bearer $TOKEN" --header "Content-Type: text/csv" ${API_URL}/courses/prerequisites/csv  > CoursePrerequisite.csv

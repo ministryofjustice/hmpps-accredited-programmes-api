@@ -13,11 +13,7 @@ if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 
 get_auth_string() {
     case "$NS_KEY" in
-    preprod | prod)
-      API_SECRET=$(kubectl get secret hmpps-accredited-programmes-ui -n "$NAMESPACE" -o json | jq -r ".data.API_CLIENT_SECRET | @base64d")
-      API_ID=$(kubectl get secret hmpps-accredited-programmes-ui -n "$NAMESPACE" -o json | jq -r ".data.API_CLIENT_ID | @base64d")
-      ;;
-    dev)
+    dev | preprod | prod)
       API_SECRET=$(kubectl get secret hmpps-accredited-programmes-ui -n "$NAMESPACE" -o json | jq -r ".data.SYSTEM_CLIENT_SECRET | @base64d")
       API_ID=$(kubectl get secret hmpps-accredited-programmes-ui -n "$NAMESPACE" -o json | jq -r ".data.SYSTEM_CLIENT_ID | @base64d")
       ;;
