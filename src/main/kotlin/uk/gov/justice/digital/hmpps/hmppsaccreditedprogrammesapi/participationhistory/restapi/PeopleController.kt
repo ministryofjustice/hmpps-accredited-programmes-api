@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 class PeopleController(
   @Autowired val service: CourseParticipationHistoryService,
 ) : PeopleApiDelegate {
-  override fun peoplePrisonNumberCourseParticipationsGet(prisonNumber: String): ResponseEntity<List<CourseParticipation>> =
+  override fun getCourseParticipationsForPrisonNumber(prisonNumber: String): ResponseEntity<List<CourseParticipation>> =
     ResponseEntity.ok(
       service
         .findByPrisonNumber(prisonNumber)

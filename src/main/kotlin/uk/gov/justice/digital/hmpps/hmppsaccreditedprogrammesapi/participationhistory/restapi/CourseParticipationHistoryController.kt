@@ -16,22 +16,22 @@ import java.util.UUID
 class CourseParticipationHistoryController(
   @Autowired val service: CourseParticipationHistoryService,
 ) : CourseParticipationsApiDelegate {
-  override fun courseParticipationsPost(createCourseParticipation: CreateCourseParticipation): ResponseEntity<CourseParticipation> =
+  override fun createCourseParticipation(createCourseParticipation: CreateCourseParticipation): ResponseEntity<CourseParticipation> =
     service.addCourseParticipation(createCourseParticipation.toDomain())
       ?.let {
         ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
       } ?: throw Exception("Unable to add to course participation history")
 
-  override fun courseParticipationsCourseParticipationIdGet(courseParticipationId: UUID): ResponseEntity<CourseParticipation> =
+  override fun getCourseParticipation(courseParticipationId: UUID): ResponseEntity<CourseParticipation> =
     service.getCourseParticipationHistory(courseParticipationId)
       ?.let {
         ResponseEntity.ok(it.toApi())
       } ?: throw NotFoundException("No course participation history found for id $courseParticipationId")
 
-  override fun courseParticipationsCourseParticipationIdPut(courseParticipationId: UUID, courseParticipationUpdate: CourseParticipationUpdate): ResponseEntity<CourseParticipation> =
+  override fun updateCourseParticipation(courseParticipationId: UUID, courseParticipationUpdate: CourseParticipationUpdate): ResponseEntity<CourseParticipation> =
     ResponseEntity.ok(service.updateCourseParticipationHistory(courseParticipationId, courseParticipationUpdate.toDomain()).toApi())
 
-  override fun courseParticipationsCourseParticipationIdDelete(courseParticipationId: UUID): ResponseEntity<Unit> {
+  override fun deleteCourseParticipation(courseParticipationId: UUID): ResponseEntity<Unit> {
     service.deleteCourseParticipation(courseParticipationId)
     return ResponseEntity.noContent().build()
   }
