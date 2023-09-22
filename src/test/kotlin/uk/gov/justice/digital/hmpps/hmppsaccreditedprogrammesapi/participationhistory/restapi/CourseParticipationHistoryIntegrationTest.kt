@@ -18,8 +18,9 @@ import org.springframework.test.web.reactive.server.returnResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
@@ -116,11 +117,13 @@ constructor(
       .bodyValue(
         CourseParticipationUpdate(
           courseId = courseId,
-          yearStarted = 2020,
-          setting = CourseSetting.custody,
+          setting = CourseParticipationSetting(
+            type = CourseParticipationSettingType.custody,
+          ),
           outcome = CourseParticipationOutcome(
-            status = CourseParticipationOutcome.Status.deselected,
+            status = CourseParticipationOutcome.Status.incomplete,
             detail = "Some detail",
+            yearStarted = 2020,
           ),
         ),
       ).exchange()
@@ -131,12 +134,14 @@ constructor(
     val expectedCp = CourseParticipation(
       id = courseParticipationId,
       courseId = courseId,
-      yearStarted = 2020,
-      setting = CourseSetting.custody,
+      setting = CourseParticipationSetting(
+        type = CourseParticipationSettingType.custody,
+      ),
       prisonNumber = "A1234AA",
       outcome = CourseParticipationOutcome(
-        status = CourseParticipationOutcome.Status.deselected,
+        status = CourseParticipationOutcome.Status.incomplete,
         detail = "Some detail",
+        yearStarted = 2020,
       ),
     )
 

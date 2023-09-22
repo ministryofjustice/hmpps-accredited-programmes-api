@@ -69,18 +69,21 @@ class CourseParticipationHistoryControllerTest(
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = """{
-          "courseId": "$courseId",
-          "prisonNumber": "A1234AA",
-          "yearStarted": 2020,
-          "source": "source",
-          "outcome": {
-            "status": "complete",
-            "detail": "Detail"
-          },
-          "setting": "custody"
-        }
-        """
+        content = """
+          { 
+            "otherCourseName": null,
+            "courseId": "$courseId",
+            "prisonNumber": "A1234AA",
+            "source": "source",
+            "setting": {
+              "type": "custody"
+            },
+            "outcome": {
+              "status": "complete",
+              "detail": "Detail",
+              "yearStarted": 2020
+            }
+          }"""
       }.andExpect {
         status { isCreated() }
         content {
@@ -171,7 +174,7 @@ class CourseParticipationHistoryControllerTest(
         source = "source",
         setting = CourseSetting.COMMUNITY,
         outcome = CourseOutcome(
-          status = CourseStatus.DESELECTED,
+          status = CourseStatus.INCOMPLETE,
           detail = "Detail",
         ),
       )
@@ -183,19 +186,22 @@ class CourseParticipationHistoryControllerTest(
         status { isOk() }
         content {
           json(
-            """{ 
-            "id": "$participationHistoryId",
-            "otherCourseName": null,
-            "courseId": "$courseId",
-            "yearStarted": 2020,
-            "prisonNumber": "A1234BC",
-            "source": "source",
-            "setting": "community",
-            "outcome": {
-                    "status": "deselected",
-                    "detail": "Detail"
-                    }
-              }""",
+            """
+            { 
+              "id": "$participationHistoryId",
+              "otherCourseName": null,
+              "courseId": "$courseId",
+              "prisonNumber": "A1234BC",
+              "source": "source",
+              "setting": {
+                type: "community"
+              },
+              "outcome": {
+                "status": "incomplete",
+                "detail": "Detail",
+                "yearStarted": 2020
+              }
+            }""",
           )
         }
       }

@@ -59,7 +59,7 @@ class PeopleControllerTest(
           source = "source",
           setting = CourseSetting.COMMUNITY,
           outcome = CourseOutcome(
-            status = CourseStatus.DESELECTED,
+            status = CourseStatus.INCOMPLETE,
             detail = "Detail",
           ),
         ),
@@ -77,14 +77,16 @@ class PeopleControllerTest(
               "id": "$participationHistoryId",
               "otherCourseName": null,
               "courseId": "$courseId",
-              "yearStarted": 2020,
               "prisonNumber": "A1234BC",
               "source": "source",
-              "setting": "community",
+              "setting": {
+                "type": "community"
+              },
               "outcome": {
-                      "status": "deselected",
-                      "detail": "Detail"
-                      }
+                "status": "incomplete",
+                "detail": "Detail",
+                "yearStarted": 2020
+              }
             }]""",
           )
         }

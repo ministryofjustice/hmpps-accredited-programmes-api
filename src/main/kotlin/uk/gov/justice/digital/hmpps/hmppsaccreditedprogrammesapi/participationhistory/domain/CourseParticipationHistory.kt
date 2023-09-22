@@ -52,4 +52,4 @@ class CourseOutcome(
 )
 
 enum class CourseSetting { CUSTODY, COMMUNITY }
-enum class CourseStatus { DESELECTED, INCOMPLETE, COMPLETE }
+enum class CourseStatus { INCOMPLETE, COMPLETE }
