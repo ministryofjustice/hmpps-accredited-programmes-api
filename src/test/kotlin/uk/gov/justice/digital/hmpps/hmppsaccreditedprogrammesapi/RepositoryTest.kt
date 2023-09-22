@@ -31,7 +31,7 @@ abstract class RepositoryTest(
   fun truncateTables() {
     JdbcTestUtils.deleteFromTables(
       jdbcTemplate,
-      "course_participation_history",
+      "course_participation",
       "referral",
       "prerequisite",
       "offering",

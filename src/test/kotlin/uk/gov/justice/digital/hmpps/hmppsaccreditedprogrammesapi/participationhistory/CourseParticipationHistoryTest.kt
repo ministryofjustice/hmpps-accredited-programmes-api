@@ -3,7 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationh
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
 import java.util.UUID
 
@@ -34,10 +37,9 @@ class CourseParticipationHistoryTest {
         courseId = courseId,
         otherCourseName = otherCourseName,
         source = null,
-        outcome = null,
-        setting = null,
+        outcome = CourseOutcome(detail = null, yearCompleted = null, yearStarted = null, status = null),
+        setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),
         prisonNumber = "A1234BC",
-        yearStarted = null,
       )
   }
 }

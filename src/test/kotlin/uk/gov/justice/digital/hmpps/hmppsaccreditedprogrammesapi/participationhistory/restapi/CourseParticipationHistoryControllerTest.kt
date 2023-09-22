@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fix
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
 import java.time.Year
@@ -59,9 +60,16 @@ class CourseParticipationHistoryControllerTest(
           courseId = courseId,
           source = "source",
           prisonNumber = "A1234AA",
-          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail"),
-          setting = CourseSetting.CUSTODY,
-          yearStarted = Year.of(2020),
+          outcome = CourseOutcome(
+            status = CourseStatus.COMPLETE,
+            detail = "Detail",
+            yearStarted = Year.of(2020),
+            yearCompleted = Year.of(2021),
+          ),
+          setting = CourseParticipationSetting(
+            type = CourseSetting.CUSTODY,
+            location = "location",
+          ),
           otherCourseName = null,
         )
 
@@ -76,12 +84,14 @@ class CourseParticipationHistoryControllerTest(
             "prisonNumber": "A1234AA",
             "source": "source",
             "setting": {
-              "type": "custody"
+              "type": "custody",
+              "location": "location"
             },
             "outcome": {
               "status": "complete",
               "detail": "Detail",
-              "yearStarted": 2020
+              "yearStarted": 2020,
+              "yearCompleted": 2021
             }
           }"""
       }.andExpect {
@@ -97,13 +107,17 @@ class CourseParticipationHistoryControllerTest(
         courseId = courseId,
         otherCourseName = null,
         prisonNumber = "A1234AA",
-        yearStarted = Year.of(2020),
         source = "source",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
           detail = "Detail",
+          yearStarted = Year.of(2020),
+          yearCompleted = Year.of(2021),
         ),
-        setting = CourseSetting.CUSTODY,
+        setting = CourseParticipationSetting(
+          type = CourseSetting.CUSTODY,
+          location = "location",
+        ),
       )
     }
 
@@ -169,13 +183,17 @@ class CourseParticipationHistoryControllerTest(
         id = participationHistoryId,
         otherCourseName = null,
         courseId = courseId,
-        yearStarted = Year.of(2020),
         prisonNumber = "A1234BC",
         source = "source",
-        setting = CourseSetting.COMMUNITY,
+        setting = CourseParticipationSetting(
+          type = CourseSetting.COMMUNITY,
+          location = "location",
+        ),
         outcome = CourseOutcome(
           status = CourseStatus.INCOMPLETE,
           detail = "Detail",
+          yearStarted = Year.of(2020),
+          yearCompleted = Year.of(2020),
         ),
       )
 

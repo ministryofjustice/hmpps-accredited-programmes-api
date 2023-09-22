@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fix
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
 import java.time.Year
@@ -54,13 +55,17 @@ class PeopleControllerTest(
           id = participationHistoryId,
           otherCourseName = null,
           courseId = courseId,
-          yearStarted = Year.of(2020),
           prisonNumber = "A1234BC",
           source = "source",
-          setting = CourseSetting.COMMUNITY,
+          setting = CourseParticipationSetting(
+            type = CourseSetting.COMMUNITY,
+            location = null,
+          ),
           outcome = CourseOutcome(
             status = CourseStatus.INCOMPLETE,
             detail = "Detail",
+            yearStarted = Year.of(2018),
+            yearCompleted = Year.of(2023),
           ),
         ),
       )
@@ -85,7 +90,8 @@ class PeopleControllerTest(
               "outcome": {
                 "status": "incomplete",
                 "detail": "Detail",
-                "yearStarted": 2020
+                "yearStarted": 2018,
+                "yearCompleted": 2023
               }
             }]""",
           )
