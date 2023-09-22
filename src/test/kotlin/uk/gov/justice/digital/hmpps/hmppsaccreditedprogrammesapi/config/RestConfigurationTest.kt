@@ -7,10 +7,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import java.util.UUID
 
-class HmppsAccreditedProgrammesApiExceptionHandlerTest {
+class RestConfigurationTest {
   @Test
-  fun `handleMethodArgumentTypeMismatchException returns ErrorResponse when a bad UUID is provided`() {
-    val handler = HmppsAccreditedProgrammesApiExceptionHandler()
+  fun `handleMethodArgumentTypeMismatchException with invalid UUID returns 400 with error response`() {
+    val handler = RestConfiguration()
     val exception = MethodArgumentTypeMismatchException("bad-uuid", UUID::class.java, "uuid", mockk(), Throwable("Conversion error"))
     val response = handler.handleMethodArgumentTypeMismatchException(exception)
 

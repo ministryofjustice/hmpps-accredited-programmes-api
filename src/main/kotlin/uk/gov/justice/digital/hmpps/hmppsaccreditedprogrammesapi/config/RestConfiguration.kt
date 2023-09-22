@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
 
 @RestControllerAdvice
-class HmppsAccreditedProgrammesApiExceptionHandler {
+class RestConfiguration {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
     log.info("Not valid", e)
