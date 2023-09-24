@@ -40,6 +40,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.2")
+  testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
 }
 
 java {
