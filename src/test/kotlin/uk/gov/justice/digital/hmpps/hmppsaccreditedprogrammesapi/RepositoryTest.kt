@@ -11,18 +11,15 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.test.jdbc.JdbcTestUtils
 
-private const val COURSE_JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.jparepo"
-private const val COURSE_DOMAIN_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain"
-private const val REFERRAL_JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.jparepo"
-private const val REFERRAL_DOMAIN_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain"
-private const val PARTICIPATION_HISTORY_DOMAIN = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain"
-private const val PARTICIPATION_HISTORY_JPA_REPO_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.jparepo"
+private const val BASE_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi"
+
+private const val COURSE_PACKAGE = "$BASE_PACKAGE.course"
 
 @DataJpaTest
 @ContextConfiguration(classes = [RepositoryTest::class])
-@ComponentScan(basePackages = [COURSE_JPA_REPO_PACKAGE, REFERRAL_JPA_REPO_PACKAGE, PARTICIPATION_HISTORY_JPA_REPO_PACKAGE])
-@EnableJpaRepositories(basePackages = [COURSE_JPA_REPO_PACKAGE, REFERRAL_JPA_REPO_PACKAGE, PARTICIPATION_HISTORY_JPA_REPO_PACKAGE])
-@EntityScan(basePackages = [COURSE_DOMAIN_PACKAGE, REFERRAL_DOMAIN_PACKAGE, PARTICIPATION_HISTORY_DOMAIN])
+@ComponentScan(basePackages = [COURSE_PACKAGE, "$BASE_PACKAGE.shared"])
+@EnableJpaRepositories(basePackages = [BASE_PACKAGE])
+@EntityScan(basePackages = [BASE_PACKAGE])
 @ActiveProfiles("test")
 abstract class RepositoryTest(
   val jdbcTemplate: JdbcTemplate,

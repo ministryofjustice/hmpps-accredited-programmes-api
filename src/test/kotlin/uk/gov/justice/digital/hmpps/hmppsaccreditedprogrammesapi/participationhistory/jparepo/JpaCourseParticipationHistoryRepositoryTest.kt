@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.jparepo
 
-import io.kotest.matchers.equality.shouldBeEqualToComparingFields
+import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +15,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.AUDITOR_AWARE_TEST_USER_NAME
+import java.time.LocalDateTime
 import java.time.Year
 import kotlin.jvm.optionals.getOrNull
 
@@ -27,6 +30,7 @@ constructor(
   @Test
   fun `save and retrieve a course participation history`() {
     val courseId = courseEntityRepository.save(CourseEntity(name = "A Course", identifier = "ID")).id!!
+    val startTime = LocalDateTime.now()
 
     val participationId = courseParticipationHistoryRepository.save(
       CourseParticipationHistory(
@@ -53,23 +57,28 @@ constructor(
 
     persistentHistory.shouldNotBeNull()
 
-    persistentHistory shouldBeEqualToComparingFields CourseParticipationHistory(
-      id = participationId,
-      courseId = courseId,
-      prisonNumber = "A1234AA",
-      otherCourseName = null,
-      source = "source",
-      outcome = CourseOutcome(
-        status = CourseStatus.COMPLETE,
-        detail = "Course outcome detail",
-        yearStarted = Year.parse("2021"),
-        yearCompleted = Year.parse("2022"),
+    persistentHistory.shouldBeEqualToIgnoringFields(
+      CourseParticipationHistory(
+        id = participationId,
+        courseId = courseId,
+        prisonNumber = "A1234AA",
+        otherCourseName = null,
+        source = "source",
+        outcome = CourseOutcome(
+          status = CourseStatus.COMPLETE,
+          detail = "Course outcome detail",
+          yearStarted = Year.parse("2021"),
+          yearCompleted = Year.parse("2022"),
+        ),
+        setting = CourseParticipationSetting(
+          type = CourseSetting.CUSTODY,
+          location = "location",
+        ),
+        createdByUsername = AUDITOR_AWARE_TEST_USER_NAME,
       ),
-      setting = CourseParticipationSetting(
-        type = CourseSetting.CUSTODY,
-        location = "location",
-      ),
+      CourseParticipationHistory::createdDateTime,
     )
+    persistentHistory.createdDateTime shouldBeGreaterThanOrEqualTo startTime
   }
 
   @Test
@@ -91,14 +100,58 @@ constructor(
 
     persistentHistory.shouldNotBeNull()
 
-    persistentHistory shouldBeEqualToComparingFields CourseParticipationHistory(
-      id = participationId,
-      courseId = null,
-      prisonNumber = "A1234AA",
-      otherCourseName = "Other course name",
-      source = null,
-      setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-      outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+    persistentHistory.shouldBeEqualToIgnoringFields(
+      CourseParticipationHistory(
+        id = participationId,
+        courseId = null,
+        prisonNumber = "A1234AA",
+        otherCourseName = "Other course name",
+        source = null,
+        setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
+        outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+        createdByUsername = AUDITOR_AWARE_TEST_USER_NAME,
+      ),
+      CourseParticipationHistory::createdDateTime,
     )
+  }
+
+  @Test
+  fun `save and update a course participation history - audit fields`() {
+    val startTime = LocalDateTime.now()
+    val participationId = courseParticipationHistoryRepository.save(
+      CourseParticipationHistory(
+        courseId = null,
+        prisonNumber = "A1234AA",
+        otherCourseName = "Other course name",
+        source = null,
+        setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
+        outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+      ),
+    ).id!!
+
+    val persistentHistory = courseParticipationHistoryRepository.findById(participationId).get()
+    persistentHistory.setting.type = CourseSetting.CUSTODY
+
+    commitAndStartNewTx()
+
+    persistentHistory.shouldBeEqualToIgnoringFields(
+      CourseParticipationHistory(
+        id = participationId,
+        courseId = null,
+        prisonNumber = "A1234AA",
+        otherCourseName = "Other course name",
+        source = null,
+        setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),
+        outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+        createdByUsername = AUDITOR_AWARE_TEST_USER_NAME,
+        lastModifiedByUsername = AUDITOR_AWARE_TEST_USER_NAME,
+      ),
+      CourseParticipationHistory::createdDateTime,
+      CourseParticipationHistory::lastModifiedDateTime,
+    )
+
+    persistentHistory.createdDateTime shouldBeGreaterThanOrEqualTo startTime
+    persistentHistory.lastModifiedDateTime.shouldNotBeNull()
+    persistentHistory.lastModifiedDateTime!! shouldBeGreaterThanOrEqualTo startTime
   }
 }
