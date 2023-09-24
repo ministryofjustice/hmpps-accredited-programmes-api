@@ -3,172 +3,150 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.resta
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
+import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStarted
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StartReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral as ApiReferral
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class ReferralsIntegrationTest
-@Autowired
-constructor(
-  val webTestClient: WebTestClient,
-  val jwtAuthHelper: JwtAuthHelper,
-) {
+class ReferralsIntegrationTest : IntegrationTestBase() {
+  companion object {
+    const val PRISON_NUMBER = "A1234AA"
+    const val REFERRER_ID = "MWX0001"
+  }
+
   @Test
-  fun `create and retrieve a referral`() {
-    val courseId: UUID = getACourseId()
-    val offeringId: UUID = getACourseOfferingId(courseId)
+  fun `Creating a referral should return 201 with correct body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val createdReferralId = startReferral(offeringId).referralId
 
-    val referralStarted = webTestClient
-      .post()
-      .uri("/referrals")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(StartReferral(offeringId = offeringId, referrerId = "MWX0001", prisonNumber = "AB1234A"))
-      .exchange()
-      .expectStatus().is2xxSuccessful
-      .expectBody(ReferralStarted::class.java)
-      .returnResult().responseBody
+    createdReferralId.shouldNotBeNull()
 
-    referralStarted.shouldNotBeNull()
-
-    val referral = getReferral(referralStarted.referralId)
-
-    referral shouldBeEqual ApiReferral(
-      id = referralStarted.referralId,
+    getReferralById(createdReferralId) shouldBeEqual Referral(
+      id = createdReferralId,
       offeringId = offeringId,
-      referrerId = "MWX0001",
-      prisonNumber = "AB1234A",
+      referrerId = REFERRER_ID,
+      prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
-      oasysConfirmed = false,
       reason = null,
+      oasysConfirmed = false,
     )
   }
 
   @Test
-  fun `update a referral`() {
-    val courseId: UUID = getACourseId()
-    val offeringId: UUID = getACourseOfferingId(courseId)
-    val referralId: UUID = startReferral(offeringId, "ReferrerId", "A1234AB")
+  fun `Updating a referral with a valid payload should return 204 with no body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val createdReferralId = startReferral(offeringId).referralId
 
     webTestClient
       .put()
-      .uri("/referrals/{referralId}", referralId)
+      .uri("/referrals/$createdReferralId")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(ReferralUpdate(reason = "A Reason", oasysConfirmed = true))
+      .bodyValue(
+        ReferralUpdate(
+          reason = "A Reason",
+          oasysConfirmed = true,
+        ),
+      )
       .exchange()
       .expectStatus().isNoContent
 
-    val updatedReferral = getReferral(referralId)
-
-    updatedReferral shouldBeEqual ApiReferral(
-      id = referralId,
+    getReferralById(createdReferralId) shouldBeEqual Referral(
+      id = createdReferralId,
       offeringId = offeringId,
-      referrerId = "ReferrerId",
-      prisonNumber = "A1234AB",
+      referrerId = REFERRER_ID,
+      prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
-      oasysConfirmed = true,
       reason = "A Reason",
+      oasysConfirmed = true,
     )
   }
 
   @Test
-  fun `update a missing referral`() {
+  fun `Updating a nonexistent referral should return 404 with error body`() {
     webTestClient
       .put()
-      .uri("/referrals/{referralId}", UUID.randomUUID())
+      .uri("/referrals/${UUID.randomUUID()}")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(ReferralUpdate(reason = "A Reason", oasysConfirmed = true))
-      .exchange()
-      .expectStatus().isNotFound
+      .bodyValue(
+        ReferralUpdate(
+          reason = "A Reason",
+          oasysConfirmed = true,
+        ),
+      )
+      .exchange().expectStatus().isNotFound
   }
 
   @Test
-  fun `update referral status`() {
-    val courseId: UUID = getACourseId()
-    val offeringId: UUID = getACourseOfferingId(courseId)
-    val referralId: UUID = startReferral(offeringId, "ReferrerId", "A1234AB")
+  fun `Updating a referral status should return 204 with no body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val createdReferralId = startReferral(offeringId).referralId
 
     webTestClient
       .put()
-      .uri("/referrals/{referralId}/status", referralId)
+      .uri("/referrals/$createdReferralId/status")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(StatusUpdate(ReferralStatus.referralSubmitted))
-      .exchange()
-      .expectStatus().isNoContent
+      .bodyValue(
+        StatusUpdate(
+          status = ReferralStatus.referralSubmitted,
+        ),
+      )
+      .exchange().expectStatus().isNoContent
 
-    val updatedReferral = getReferral(referralId)
-
-    updatedReferral shouldBeEqual ApiReferral(
-      id = referralId,
+    getReferralById(createdReferralId) shouldBeEqual Referral(
+      id = createdReferralId,
       offeringId = offeringId,
-      referrerId = "ReferrerId",
-      prisonNumber = "A1234AB",
+      referrerId = REFERRER_ID,
+      prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralSubmitted,
       oasysConfirmed = false,
       reason = null,
     )
   }
 
-  private fun getACourseId(): UUID = getCourses()!!.first().id
-  private fun getACourseOfferingId(courseId: UUID) = getOfferings(courseId)!!.first().id
-  private fun getCourses(): List<Course>? = webTestClient
-    .get()
-    .uri("/courses")
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectBodyList(Course::class.java)
-    .returnResult().responseBody
-
-  private fun getOfferings(courseId: UUID): List<CourseOffering>? = webTestClient
-    .get()
-    .uri("courses/{courseId}/offerings", courseId)
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectBodyList(CourseOffering::class.java)
-    .returnResult()
-    .responseBody
-
-  private fun startReferral(offeringId: UUID, referrerId: String, prisonNumber: String): UUID = webTestClient
+  fun startReferral(offeringId: UUID) = webTestClient
     .post()
     .uri("/referrals")
     .headers(jwtAuthHelper.authorizationHeaderConfigurer())
     .contentType(MediaType.APPLICATION_JSON)
     .accept(MediaType.APPLICATION_JSON)
-    .bodyValue(StartReferral(offeringId = offeringId, referrerId = referrerId, prisonNumber = prisonNumber))
+    .bodyValue(
+      StartReferral(
+        offeringId = offeringId,
+        referrerId = REFERRER_ID,
+        prisonNumber = PRISON_NUMBER,
+      ),
+    )
     .exchange()
-    .expectStatus().is2xxSuccessful
-    .expectBody(ReferralStarted::class.java)
-    .returnResult().responseBody!!.referralId
+    .expectStatus().isCreated
+    .expectBody<ReferralStarted>()
+    .returnResult().responseBody!!
 
-  private fun getReferral(referralId: UUID): ApiReferral = webTestClient
+  fun getReferralById(createdReferralId: UUID) = webTestClient
     .get()
-    .uri("/referrals/{referralId}", referralId)
+    .uri("/referrals/$createdReferralId")
     .headers(jwtAuthHelper.authorizationHeaderConfigurer())
     .accept(MediaType.APPLICATION_JSON)
     .exchange()
-    .expectStatus().is2xxSuccessful
-    .expectBody(ApiReferral::class.java)
+    .expectStatus().isOk
+    .expectBody<Referral>()
     .returnResult().responseBody!!
 }
