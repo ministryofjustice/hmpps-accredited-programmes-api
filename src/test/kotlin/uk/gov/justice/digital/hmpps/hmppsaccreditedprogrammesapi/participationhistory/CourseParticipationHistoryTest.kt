@@ -1,43 +1,51 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory
-
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.CourseParticipationHistoryEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
 import java.util.UUID
 
 class CourseParticipationHistoryTest {
+
+  private val factory = CourseParticipationHistoryEntityFactory()
+
   @Test
-  fun `validate - ok with courseId`() {
-    shouldNotThrowAny { testObject(UUID.randomUUID(), null).assertOnlyCourseIdOrCourseNamePresent() }
+  fun `assertOnlyCourseIdOrCourseNamePresent should successfully validate with valid courseId`() {
+    val courseParticipationHistory = factory
+      .withCourseId(UUID.randomUUID())
+      .withOtherCourseName(null)
+      .produce()
+
+    shouldNotThrowAny { courseParticipationHistory.assertOnlyCourseIdOrCourseNamePresent() }
   }
 
   @Test
-  fun `validate - ok with otherCourseName`() {
-    shouldNotThrowAny { testObject(null, "Course Name").assertOnlyCourseIdOrCourseNamePresent() }
+  fun `assertOnlyCourseIdOrCourseNamePresent should successfully validate with valid otherCourseName`() {
+    val courseParticipationHistory = factory
+      .withOtherCourseName("Course Name")
+      .withCourseId(null)
+      .produce()
+
+    shouldNotThrowAny { courseParticipationHistory.assertOnlyCourseIdOrCourseNamePresent() }
   }
 
   @Test
-  fun `validate - neither courseId or otherCourseName`() {
-    shouldThrow<BusinessException> { testObject(null, null).assertOnlyCourseIdOrCourseNamePresent() }
+  fun `assertOnlyCourseIdOrCourseNamePresent should throw exception when attempting to validate with neither courseId nor otherCourseName`() {
+    val courseParticipationHistory = factory
+      .withCourseId(null)
+      .withOtherCourseName(null)
+      .produce()
+
+    shouldThrow<BusinessException> { courseParticipationHistory.assertOnlyCourseIdOrCourseNamePresent() }
   }
 
   @Test
-  fun `validate - both courseId and otherCourseName`() {
-    shouldThrow<BusinessException> { testObject(UUID.randomUUID(), "Course Name").assertOnlyCourseIdOrCourseNamePresent() }
-  }
+  fun `assertOnlyCourseIdOrCourseNamePresent should throw exception when attempting to validate with both courseId and otherCourseName`() {
+    val courseParticipationHistory = factory
+      .withCourseId(UUID.randomUUID())
+      .withOtherCourseName("Course Name")
+      .produce()
 
-  companion object {
-    private fun testObject(courseId: UUID?, otherCourseName: String?) =
-      CourseParticipationHistory(
-        courseId = courseId,
-        otherCourseName = otherCourseName,
-        source = null,
-        outcome = null,
-        setting = null,
-        prisonNumber = "A1234BC",
-        yearStarted = null,
-      )
+    shouldThrow<BusinessException> { courseParticipationHistory.assertOnlyCourseIdOrCourseNamePresent() }
   }
 }

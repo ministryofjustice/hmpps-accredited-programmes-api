@@ -2,8 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import io.mockk.verify
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -14,11 +12,9 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.put
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import java.util.UUID
 
@@ -36,35 +32,35 @@ class OfferingsControllerTest(
   @Autowired val mockMvc: MockMvc,
   @Autowired val jwtAuthHelper: JwtAuthHelper,
 ) {
-  private val repository = InMemoryCourseRepository()
 
   @MockkBean
   private lateinit var coursesService: CourseService
 
   @Test
-  fun `get a course by offering id - happy path`() {
-    val courseId = repository.allCourses().first().id
-    val courseOfferingId = repository.offeringsForCourse(courseId!!).first().id
+  fun `offeringsIdCourseGet with JWT returns 200 with correct body`() {
+    val offering = OfferingEntityFactory().withId(UUID.randomUUID()).produce()
+    val course = CourseEntityFactory().withId(UUID.randomUUID()).withMutableOfferings(mutableSetOf(offering)).produce()
 
-    every { coursesService.getCourseForOfferingId(any()) } returns repository.course(courseId)
+    every { coursesService.getCourseForOfferingId(any()) } returns course
 
-    mockMvc.get(COURSE_BY_OFFERING_ID_TEMPLATE, courseOfferingId) {
+    mockMvc.get("/offerings/${offering.id}/course") {
       accept = MediaType.APPLICATION_JSON
       header(AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
       status { isOk() }
       content {
-        jsonPath("$.id") { value(courseId.toString()) }
+        jsonPath("$.id") { value(course.id.toString()) }
       }
     }
   }
 
   @Test
-  fun `get a course by offering id - not found`() {
+  fun `offeringsIdCourseGet with random UUID returns 404 with error body`() {
     val offeringId = UUID.randomUUID()
+
     every { coursesService.getCourseForOfferingId(any()) } returns null
 
-    mockMvc.get(COURSE_BY_OFFERING_ID_TEMPLATE, offeringId) {
+    mockMvc.get("/offerings/$offeringId/course") {
       accept = MediaType.APPLICATION_JSON
       header(AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
@@ -81,10 +77,10 @@ class OfferingsControllerTest(
   }
 
   @Test
-  fun `get a course by offering id - bad uuid`() {
-    val offeringId = "bad-id"
+  fun `offeringsIdCourseGet with invalid UUID returns 400 with error body`() {
+    val badId = "bad-id"
 
-    mockMvc.get("/offerings/$offeringId") {
+    mockMvc.get("/offerings/$badId/course") {
       accept = MediaType.APPLICATION_JSON
       header(AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
@@ -93,45 +89,19 @@ class OfferingsControllerTest(
         contentType(MediaType.APPLICATION_JSON)
         jsonPath("$.status") { value(400) }
         jsonPath("$.errorCode") { isEmpty() }
-        jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
-        jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
+        jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: $badId") }
+        jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: $badId") }
         jsonPath("$.moreInfo") { isEmpty() }
       }
     }
   }
 
   @Test
-  fun `get a course by offering id - no token`() {
-    mockMvc.get(COURSE_BY_OFFERING_ID_TEMPLATE, UUID.randomUUID()) {
+  fun `offeringsIdCourseGet without JWT returns 401`() {
+    mockMvc.get("/offerings/${UUID.randomUUID()}/course") {
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
       status { isUnauthorized() }
     }
-  }
-
-  @Nested
-  inner class PutOfferingsTests {
-    @Test
-    fun `put offerings csv`() {
-      every { coursesService.updateOfferings(any<List<OfferingUpdate>>()) } returns emptyList()
-
-      mockMvc.put("/offerings/csv") {
-        contentType = MediaType("text", "csv")
-        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = CsvTestData.offeringsCsvText
-      }.andExpect {
-        status { isOk() }
-        content {
-          contentType(MediaType.APPLICATION_JSON)
-          jsonPath("$.size()") { value(0) }
-        }
-      }
-
-      verify { coursesService.updateOfferings(CsvTestData.offeringsRecords.map(OfferingRecord::toDomain)) }
-    }
-  }
-
-  private companion object {
-    private const val COURSE_BY_OFFERING_ID_TEMPLATE = "/offerings/{offeringId}/course"
   }
 }

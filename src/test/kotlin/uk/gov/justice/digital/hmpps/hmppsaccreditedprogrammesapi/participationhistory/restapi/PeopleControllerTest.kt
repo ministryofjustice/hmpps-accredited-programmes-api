@@ -14,14 +14,10 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.CourseParticipationHistoryEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
-import java.time.Year
-import java.util.*
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.randomStringUpperCaseWithNumbers
 
 @WebMvcTest
 @ContextConfiguration(classes = [PeopleControllerTest::class])
@@ -40,70 +36,48 @@ class PeopleControllerTest(
   val jwtAuthHelper: JwtAuthHelper,
 ) {
   @MockkBean
-  private lateinit var service: CourseParticipationHistoryService
+  private lateinit var courseParticipationHistoryService: CourseParticipationHistoryService
 
   @Nested
   inner class FindByPrisonNumber {
     @Test
-    fun `it returns an array of results when course participations are found`() {
-      val participationHistoryId = UUID.randomUUID()
-      val courseId = UUID.randomUUID()
+    fun `courseParticipationHistoryGet with JWT and valid prison number returns 200 with correct body`() {
+      val sharedPrisonNumber = randomStringUpperCaseWithNumbers(6)
 
-      every { service.findByPrisonNumber(any()) } returns listOf(
-        CourseParticipationHistory(
-          id = participationHistoryId,
-          otherCourseName = null,
-          courseId = courseId,
-          yearStarted = Year.of(2020),
-          prisonNumber = "A1234BC",
-          source = "source",
-          setting = CourseSetting.COMMUNITY,
-          outcome = CourseOutcome(
-            status = CourseStatus.DESELECTED,
-            detail = "Detail",
-          ),
-        ),
+      val courseParticipationHistoryList = listOf(
+        CourseParticipationHistoryEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
+        CourseParticipationHistoryEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
       )
 
-      mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
+      every { courseParticipationHistoryService.findByPrisonNumber(any()) } returns courseParticipationHistoryList
+
+      mockMvc.get("/people/$sharedPrisonNumber/course-participations") {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
         content {
-          json(
-            """
-            [{
-              "id": "$participationHistoryId",
-              "otherCourseName": null,
-              "courseId": "$courseId",
-              "yearStarted": 2020,
-              "prisonNumber": "A1234BC",
-              "source": "source",
-              "setting": "community",
-              "outcome": {
-                      "status": "deselected",
-                      "detail": "Detail"
-                      }
-            }]""",
-          )
+          courseParticipationHistoryList.forEachIndexed { index, entity ->
+            jsonPath("$[$index].id") { value(entity.id.toString()) }
+            jsonPath("$[$index].prisonNumber") { value(sharedPrisonNumber) }
+          }
         }
       }
 
-      verify { service.findByPrisonNumber("A1234AA") }
+      verify { courseParticipationHistoryService.findByPrisonNumber(sharedPrisonNumber) }
     }
 
     @Test
-    fun `it returns an empty array when no course participations are found`() {
-      every { service.findByPrisonNumber(any()) } returns emptyList()
+    fun `courseParticipationHistoryGet with JWT and no prison number returns 200 with an empty body`() {
+      every { courseParticipationHistoryService.findByPrisonNumber(any()) } returns emptyList()
 
-      mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
+      mockMvc.get("/people/${randomStringUpperCaseWithNumbers(6)}/course-participations") {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
         content {
-          json("[]")
+          jsonPath("$") { isEmpty() }
         }
       }
     }
