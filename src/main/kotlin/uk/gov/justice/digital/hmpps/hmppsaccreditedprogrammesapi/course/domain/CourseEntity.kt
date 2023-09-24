@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
+import jakarta.persistence.Embeddable
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
@@ -15,6 +16,7 @@ import jakarta.persistence.Table
 import jakarta.persistence.Transient
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.SUBSELECT
+import org.hibernate.annotations.Immutable
 import java.util.UUID
 
 @Entity
@@ -60,8 +62,6 @@ class CourseEntity(
     mutableOfferings += offering
   }
 
-  fun clearOfferings(): Unit = mutableOfferings.clear()
-
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || other !is CourseEntity) return false
@@ -72,3 +72,10 @@ class CourseEntity(
 
   override fun toString(): String = "CourseEntity($name, $description, $audiences, $id)"
 }
+
+@Embeddable
+@Immutable
+data class Prerequisite(
+  val name: String,
+  val description: String,
+)
