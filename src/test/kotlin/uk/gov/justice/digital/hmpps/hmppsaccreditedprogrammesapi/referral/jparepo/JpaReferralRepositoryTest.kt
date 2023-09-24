@@ -5,12 +5,12 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.RepositoryTest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.commitAndStartNewTx
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.jpa.RepositoryTest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.jpa.commitAndStartNewTx
 import java.util.UUID
 
 class JpaReferralRepositoryTest

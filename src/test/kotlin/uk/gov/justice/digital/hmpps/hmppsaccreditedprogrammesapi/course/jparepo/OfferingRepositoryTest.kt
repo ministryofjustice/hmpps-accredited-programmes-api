@@ -5,10 +5,10 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.RepositoryTest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.commitAndStartNewTx
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.jpa.RepositoryTest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.jpa.commitAndStartNewTx
 import kotlin.jvm.optionals.getOrNull
 
 class OfferingRepositoryTest

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.jpa
 
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.boot.autoconfigure.domain.EntityScan
