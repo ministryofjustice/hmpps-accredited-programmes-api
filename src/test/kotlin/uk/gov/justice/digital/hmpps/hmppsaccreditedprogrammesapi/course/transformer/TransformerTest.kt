@@ -13,47 +13,7 @@ import java.util.UUID
 
 class TransformerTest {
   @Test
-  fun `transform course entity to api missing description, alternateName and no prerequisites`() {
-    val entity = CourseEntity(
-      id = UUID.randomUUID(),
-      name = "A Course",
-      identifier = "AC",
-      prerequisites = mutableSetOf(),
-      audiences = mutableSetOf(),
-      referable = true,
-    )
-
-    with(entity.toApi()) {
-      id shouldBe entity.id
-      name shouldBe entity.name
-      description shouldBe null
-      alternateName shouldBe null
-      coursePrerequisites.shouldBeEmpty()
-      referable.shouldBe(true)
-    }
-  }
-
-  @Test
-  fun `transform course entity to api with description and alternateName`() {
-    val entity = CourseEntity(
-      id = UUID.randomUUID(),
-      name = "A Course",
-      identifier = "AC",
-      description = "A description",
-      alternateName = "AA++",
-      prerequisites = mutableSetOf(),
-      audiences = mutableSetOf(),
-      referable = true,
-    )
-
-    with(entity.toApi()) {
-      description shouldBe entity.description
-      alternateName shouldBe entity.alternateName
-    }
-  }
-
-  @Test
-  fun `transform course entity to api with prerequisites and audience`() {
+  fun `Transforming a course entity with all required fields should convert to its API equivalent`() {
     val entity = CourseEntity(
       id = UUID.randomUUID(),
       name = "A Course",
@@ -80,7 +40,47 @@ class TransformerTest {
   }
 
   @Test
-  fun `transform a course prerequisite entity to api`() {
+  fun `Transforming a course entity with missing fields should tolerantly convert`() {
+    val entity = CourseEntity(
+      id = UUID.randomUUID(),
+      name = "A Course",
+      identifier = "AC",
+      prerequisites = mutableSetOf(),
+      audiences = mutableSetOf(),
+      referable = true,
+    )
+
+    with(entity.toApi()) {
+      id shouldBe entity.id
+      name shouldBe entity.name
+      description shouldBe null
+      alternateName shouldBe null
+      coursePrerequisites.shouldBeEmpty()
+      referable.shouldBe(true)
+    }
+  }
+
+  @Test
+  fun `Transforming a course entity with empty prerequisites and audiences should tolerantly convert`() {
+    val entity = CourseEntity(
+      id = UUID.randomUUID(),
+      name = "A Course",
+      identifier = "AC",
+      description = "A description",
+      alternateName = "AA++",
+      prerequisites = mutableSetOf(),
+      audiences = mutableSetOf(),
+      referable = true,
+    )
+
+    with(entity.toApi()) {
+      description shouldBe entity.description
+      alternateName shouldBe entity.alternateName
+    }
+  }
+
+  @Test
+  fun `Transforming a course prerequisite entity should convert to its API equivalent`() {
     val entity = Prerequisite(
       name = "gender",
       description = "female",
@@ -93,7 +93,7 @@ class TransformerTest {
   }
 
   @Test
-  fun `transform a domain offering to a api CourseOffering`() {
+  fun `Transforming an offering entity should convert to its API equivalent`() {
     val offering = Offering(
       id = UUID.randomUUID(),
       organisationId = "BXI",
@@ -110,7 +110,7 @@ class TransformerTest {
   }
 
   @Test
-  fun `transform domain Audience to a CourseAudience`() {
+  fun `Transforming an audience entity should convert to its API equivalent`() {
     val audience = Audience(value = "An audience", id = UUID.randomUUID())
     with(audience.toApi()) {
       id shouldBe audience.id

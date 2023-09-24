@@ -15,7 +15,7 @@ import java.util.stream.Stream
 class ReferralStatusTest {
   @ParameterizedTest
   @MethodSource
-  fun `confirm status transition validity`(from: Status, to: Status, expected: Boolean) {
+  fun `isValidTransition should validate referral statuses`(from: Status, to: Status, expected: Boolean) {
     from.isValidTransition(to) shouldBe expected
   }
 
@@ -28,7 +28,7 @@ class ReferralStatusTest {
     )
 
     @JvmStatic
-    fun `confirm status transition validity`(): Stream<Arguments> =
+    fun `isValidTransition should validate referral statuses`(): Stream<Arguments> =
       Status.entries.flatMap { from ->
         Status.entries.map { to ->
           arguments(from, to, validTransitions[from]!!.contains(to))

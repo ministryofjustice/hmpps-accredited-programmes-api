@@ -21,7 +21,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
-  fun `save and retrieve a referral`() {
+  fun `referralRepository should successfully save and retrieve records`() {
     val persistentOfferingId = persistOffering()
     val referralId = repository.save(Referral(referrerId = "refId", prisonNumber = "A1234AA", offeringId = persistentOfferingId)).id!!
 

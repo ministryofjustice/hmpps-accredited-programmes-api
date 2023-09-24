@@ -19,7 +19,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
-  fun `find offering by id`() {
+  fun `findById with a valid offering id should return the correct offering for a course`() {
     val course1 = CourseEntity(
       name = "A Course",
       identifier = "AC",
@@ -52,7 +52,7 @@ constructor(
   }
 
   @Test
-  fun `find withdrawn offering by id`() {
+  fun `findById with a valid withdrawn offering id should return the correct offering for a course`() {
     val course1 = CourseEntity(
       name = "A Course",
       identifier = "AC",
