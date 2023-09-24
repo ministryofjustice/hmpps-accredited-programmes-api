@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.domain.BusinessException
 
 @RestControllerAdvice
 class HmppsAccreditedProgrammesApiExceptionHandler {

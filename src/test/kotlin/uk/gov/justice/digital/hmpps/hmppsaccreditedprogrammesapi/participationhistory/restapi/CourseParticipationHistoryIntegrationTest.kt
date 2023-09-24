@@ -26,7 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.AUDITOR_AWARE_TEST_USER_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.TEST_USER_NAME
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -99,7 +99,7 @@ constructor(
           yearCompleted = 2022,
           detail = "Some detail",
         ),
-        addedBy = AUDITOR_AWARE_TEST_USER_NAME,
+        addedBy = TEST_USER_NAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,
@@ -178,7 +178,7 @@ constructor(
         detail = "Some detail",
         yearStarted = 2020,
       ),
-      addedBy = AUDITOR_AWARE_TEST_USER_NAME,
+      addedBy = TEST_USER_NAME,
       createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
     )
 

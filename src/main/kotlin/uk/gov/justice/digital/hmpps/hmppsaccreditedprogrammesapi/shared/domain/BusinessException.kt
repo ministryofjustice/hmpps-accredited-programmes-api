@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.domain
 
 /**
  * Thrown from domain logic to indicate that a business rule has been violated in a way that prevents

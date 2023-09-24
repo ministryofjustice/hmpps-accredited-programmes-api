@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.jpa
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.jpa
 
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter

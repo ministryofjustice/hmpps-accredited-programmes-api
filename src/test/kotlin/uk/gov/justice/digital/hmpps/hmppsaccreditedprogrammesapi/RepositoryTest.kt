@@ -6,10 +6,14 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.transaction.TestTransaction
 import org.springframework.test.jdbc.JdbcTestUtils
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.TEST_USER_NAME
 
 private const val BASE_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi"
 
@@ -37,6 +41,11 @@ abstract class RepositoryTest(
       "course",
     )
     commitAndStartNewTx()
+  }
+
+  @BeforeEach
+  fun setSecurityContextAuthentication() {
+    SecurityContextHolder.getContext().authentication = TestingAuthenticationToken(User(TEST_USER_NAME, "", emptyList()), null)
   }
 }
 

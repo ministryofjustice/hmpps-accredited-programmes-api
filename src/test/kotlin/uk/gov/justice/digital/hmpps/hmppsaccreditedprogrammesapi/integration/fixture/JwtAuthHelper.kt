@@ -7,7 +7,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.AUDITOR_AWARE_TEST_USER_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.TEST_USER_NAME
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
@@ -31,7 +31,7 @@ class JwtAuthHelper {
   fun authorizationHeaderConfigurer() = { headers: HttpHeaders -> headers.set(HttpHeaders.AUTHORIZATION, bearerToken()) }
 
   fun bearerToken(): String = createJwt(
-    subject = AUDITOR_AWARE_TEST_USER_NAME,
+    subject = TEST_USER_NAME,
     expiryTime = Duration.ofHours(1L),
   ).let { "Bearer $it" }
 

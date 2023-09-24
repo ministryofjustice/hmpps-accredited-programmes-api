@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.domain.BusinessException
 import java.util.UUID
 
 class CourseParticipationHistoryTest {

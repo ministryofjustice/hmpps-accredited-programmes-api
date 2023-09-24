@@ -17,7 +17,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shareddomain.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.domain.BusinessException
 import java.time.LocalDateTime
 import java.time.Year
 import java.util.UUID

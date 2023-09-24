@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.AUDITOR_AWARE_TEST_USER_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.shared.TEST_USER_NAME
 import java.time.LocalDateTime
 import java.time.Year
 import kotlin.jvm.optionals.getOrNull
@@ -74,7 +74,7 @@ constructor(
           type = CourseSetting.CUSTODY,
           location = "location",
         ),
-        createdByUsername = AUDITOR_AWARE_TEST_USER_NAME,
+        createdByUsername = TEST_USER_NAME,
       ),
       CourseParticipationHistory::createdDateTime,
     )
@@ -109,7 +109,7 @@ constructor(
         source = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
         outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
-        createdByUsername = AUDITOR_AWARE_TEST_USER_NAME,
+        createdByUsername = TEST_USER_NAME,
       ),
       CourseParticipationHistory::createdDateTime,
     )
@@ -143,8 +143,8 @@ constructor(
         source = null,
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),
         outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
-        createdByUsername = AUDITOR_AWARE_TEST_USER_NAME,
-        lastModifiedByUsername = AUDITOR_AWARE_TEST_USER_NAME,
+        createdByUsername = TEST_USER_NAME,
+        lastModifiedByUsername = TEST_USER_NAME,
       ),
       CourseParticipationHistory::createdDateTime,
       CourseParticipationHistory::lastModifiedDateTime,
