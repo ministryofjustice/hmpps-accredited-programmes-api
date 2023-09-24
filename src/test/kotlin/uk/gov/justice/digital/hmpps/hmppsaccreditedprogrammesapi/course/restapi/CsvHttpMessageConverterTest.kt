@@ -1,18 +1,21 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.MediaType
 import org.springframework.mock.http.MockHttpInputMessage
 import org.springframework.mock.http.MockHttpOutputMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.MEDIA_TYPE_TEXT_CSV
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateCourseRecords
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toCourseCsv
+import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 class CsvHttpMessageConverterTest {
@@ -22,185 +25,181 @@ class CsvHttpMessageConverterTest {
   @Nested
   inner class ReaderTests {
     @Test
-    fun `can read`() {
+    fun `Valid CSV should always be possible to convert to its domain equivalent`() {
       converter
         .canRead(
-          listOf(MyBean("A", "B", "C"))::class.java,
-          MediaType("text", "csv", Charsets.UTF_8),
+          listOf(PlaceholderRecord("A", "B", "C"))::class.java,
+          MEDIA_TYPE_TEXT_CSV,
         )
         .shouldBeTrue()
     }
 
     @Test
-    fun `read csv to a List of MyBean`() {
+    fun `Reading valid CSV should converts to the domain equivalent`() {
       val body = "name,description,comment\nA,Desc A,It's an A\nB,Desc B,It's a B\n"
 
       val inputMessage = MockHttpInputMessage(body.byteInputStream(StandardCharsets.UTF_8))
-      inputMessage.headers.contentType = MediaType("text", "csv")
+      inputMessage.headers.contentType = MEDIA_TYPE_TEXT_CSV
       val result = converter.read(listOfBeanType, null, inputMessage)
-      val list = result.shouldBeInstanceOf<List<MyBean>>()
+      val list = result.shouldBeInstanceOf<List<PlaceholderRecord>>()
       list shouldContainExactly (
         listOf(
-          MyBean(name = "A", description = "Desc A", comment = "It's an A"),
-          MyBean(name = "B", description = "Desc B", comment = "It's a B"),
+          PlaceholderRecord(name = "A", description = "Desc A", comment = "It's an A"),
+          PlaceholderRecord(name = "B", description = "Desc B", comment = "It's a B"),
         )
         )
     }
 
     @Test
-    fun `Tolerant conversion - accept csv with extra columns`() {
+    fun `Reading valid CSV with extra columns should tolerantly convert to the domain equivalent`() {
       val body = "name,description,comment,,,\nA,Desc A,It's an A,,,\nB,Desc B,It's a B,,,\n"
 
       val inputMessage = MockHttpInputMessage(body.byteInputStream(StandardCharsets.UTF_8))
-      inputMessage.headers.contentType = MediaType("text", "csv")
+      inputMessage.headers.contentType = MEDIA_TYPE_TEXT_CSV
       val result = converter.read(listOfBeanType, null, inputMessage)
-      val list = result.shouldBeInstanceOf<List<MyBean>>()
+      val list = result.shouldBeInstanceOf<List<PlaceholderRecord>>()
       list shouldContainExactly (
         listOf(
-          MyBean(name = "A", description = "Desc A", comment = "It's an A"),
-          MyBean(name = "B", description = "Desc B", comment = "It's a B"),
+          PlaceholderRecord(name = "A", description = "Desc A", comment = "It's an A"),
+          PlaceholderRecord(name = "B", description = "Desc B", comment = "It's a B"),
         )
         )
     }
 
     @Test
-    fun `Tolerant conversion - accept csv with varying extra columns`() {
+    fun `Reading valid CSV with varying columns should tolerantly convert to the domain equivalent`() {
       val body = "name,description,comment\nA,Desc A,It's an A,\nB,Desc B,It's a B,,\n"
 
       val inputMessage = MockHttpInputMessage(body.byteInputStream(StandardCharsets.UTF_8))
 
-      inputMessage.headers.contentType = MediaType("text", "csv")
+      inputMessage.headers.contentType = MEDIA_TYPE_TEXT_CSV
       val result = converter.read(listOfBeanType, null, inputMessage)
-      val list = result.shouldBeInstanceOf<List<MyBean>>()
+      val list = result.shouldBeInstanceOf<List<PlaceholderRecord>>()
       list shouldContainExactly (
         listOf(
-          MyBean(name = "A", description = "Desc A", comment = "It's an A"),
-          MyBean(name = "B", description = "Desc B", comment = "It's a B"),
+          PlaceholderRecord(name = "A", description = "Desc A", comment = "It's an A"),
+          PlaceholderRecord(name = "B", description = "Desc B", comment = "It's a B"),
         )
         )
     }
 
     @Test
-    fun `Tolerant conversion - accept csv with re-ordered columns`() {
+    fun `Reading valid CSV and disordered columns should tolerantly convert to the domain equivalent`() {
       val body = ",comment,name,description\n,It's an A,A,Desc A,,\n,It's a B,B,Desc B,,\n"
 
       val inputMessage = MockHttpInputMessage(body.byteInputStream(StandardCharsets.UTF_8))
-      inputMessage.headers.contentType = MediaType("text", "csv")
+      inputMessage.headers.contentType = MEDIA_TYPE_TEXT_CSV
       val result = converter.read(listOfBeanType, null, inputMessage)
-      val list = result.shouldBeInstanceOf<List<MyBean>>()
+      val list = result.shouldBeInstanceOf<List<PlaceholderRecord>>()
       list shouldContainExactly (
         listOf(
-          MyBean(name = "A", description = "Desc A", comment = "It's an A"),
-          MyBean(name = "B", description = "Desc B", comment = "It's a B"),
+          PlaceholderRecord(name = "A", description = "Desc A", comment = "It's an A"),
+          PlaceholderRecord(name = "B", description = "Desc B", comment = "It's a B"),
         )
         )
     }
 
     @Test
-    fun `Tolerant conversion - accept csv with unknown property name`() {
+    fun `Reading valid CSV with unknown property names should tolerantly convert to the domain equivalent`() {
       val body = "unknown1,comment,unknown2,name,description\n,It's an A,,A,Desc A,,\n,It's a B,,B,Desc B,,\n"
 
       val inputMessage = MockHttpInputMessage(body.byteInputStream(StandardCharsets.UTF_8))
       val result = converter.read(listOfBeanType, null, inputMessage)
-      val list = result.shouldBeInstanceOf<List<MyBean>>()
+      val list = result.shouldBeInstanceOf<List<PlaceholderRecord>>()
       list shouldContainExactly (
         listOf(
-          MyBean(name = "A", description = "Desc A", comment = "It's an A"),
-          MyBean(name = "B", description = "Desc B", comment = "It's a B"),
+          PlaceholderRecord(name = "A", description = "Desc A", comment = "It's an A"),
+          PlaceholderRecord(name = "B", description = "Desc B", comment = "It's a B"),
         )
         )
     }
 
     @Test
-    fun `Tolerant conversion - accept csv with empty columns`() {
+    fun `Reading valid CSV with empty columns should tolerantly convert to the domain equivalent`() {
       val body = "name,description,comment,,,\n,Desc A,It's an A,,,\nB,,It's a B,,,\n"
 
       val inputMessage = MockHttpInputMessage(body.byteInputStream(StandardCharsets.UTF_8))
-      inputMessage.headers.contentType = MediaType("text", "csv")
+      inputMessage.headers.contentType = MEDIA_TYPE_TEXT_CSV
       val result = converter.read(listOfBeanType, null, inputMessage)
-      val list = result.shouldBeInstanceOf<List<MyBean>>()
+      val list = result.shouldBeInstanceOf<List<PlaceholderRecord>>()
       list shouldContainExactly (
         listOf(
-          MyBean(name = "", description = "Desc A", comment = "It's an A"),
-          MyBean(name = "B", description = "", comment = "It's a B"),
+          PlaceholderRecord(name = "", description = "Desc A", comment = "It's an A"),
+          PlaceholderRecord(name = "B", description = "", comment = "It's a B"),
         )
         )
     }
 
     @Test
-    fun `read courses csv to a List of CourseRecord`() {
-      val inputMessage = MockHttpInputMessage(CsvTestData.coursesCsvInputStream())
-      inputMessage.headers.contentType = MediaType("text", "csv")
+    fun `Reading valid course records as CSV should convert them to the domain equivalent`() {
+      val courseRecords = generateCourseRecords(3)
+      val inputMessage = MockHttpInputMessage(ByteArrayInputStream(courseRecords.toCourseCsv().toByteArray()))
+      inputMessage.headers.contentType = MEDIA_TYPE_TEXT_CSV
       val result = converter.read(listOfCourseRecordType, null, inputMessage)
-      val list = result.shouldBeInstanceOf<List<CourseRecord>>()
-      list.map(CourseRecord::toDomain).shouldContainExactly(CsvTestData.newCourses)
+      val convertedRecords = result.shouldBeInstanceOf<List<CourseRecord>>()
+      convertedRecords.map { it.toDomain() }.shouldContainAll(courseRecords.map { it.toDomain() })
     }
   }
 
   @Nested
   inner class WriterTests {
     @Test
-    fun `can write empty list`() {
-      val outputMessage = MockHttpOutputMessage()
-      converter.write(emptyList<MyBean>(), listOfBeanType, MediaType("text", "csv"), outputMessage)
-      outputMessage.body.toString() shouldBe ""
-    }
-
-    @Test
-    fun `can write a list of two beans`() {
-      val outputMessage = MockHttpOutputMessage()
-      val beans = listOf(
-        MyBean(name = "", description = "Desc A", comment = "It's an A"),
-        MyBean(name = "B", description = "Desc B"),
-      )
-
-      converter.write(beans, listOfBeanType, MediaType("text", "csv"), outputMessage)
-
-      outputMessage.body.toString() shouldBe
-        """
-        comment,description,name
-        "It's an A","Desc A",
-        ,"Desc B",B
-        
-        """.trimIndent()
-    }
-
-    @Test
-    fun `A CourseRecords round trip should be the identity transformation`() {
+    fun `Writing an empty list should result in an empty string`() {
       val outputMessage = MockHttpOutputMessage()
 
       converter.write(
-        CsvTestData.newCourseUpdates.toCourseRecords(),
-        listOfCourseRecordType,
-        MediaType("text", "csv"),
+        emptyList<PlaceholderRecord>(),
+        listOfBeanType,
+        MEDIA_TYPE_TEXT_CSV,
         outputMessage,
       )
 
-      val inputMessage = MockHttpInputMessage(outputMessage.bodyAsBytes)
-      inputMessage.headers.contentType = MediaType("text", "csv")
+      val result = outputMessage.body.toString()
+      result shouldBe ""
+    }
 
-      val result = converter.read(listOfCourseRecordType, null, inputMessage)
-      val roundTrippedCourseRecords = result.shouldBeInstanceOf<List<CourseRecord>>()
-      roundTrippedCourseRecords.map(CourseRecord::toDomain).shouldContainExactly(CsvTestData.newCourseUpdates)
+    @Test
+    fun `Writing a populated list of records should produce the correct CSV output`() {
+      val outputMessage = MockHttpOutputMessage()
+      val placeholderRecords = listOf(
+        PlaceholderRecord(name = "", description = "Desc A", comment = "It's an A"),
+        PlaceholderRecord(name = "B", description = "Desc B"),
+      )
+
+      converter.write(
+        placeholderRecords,
+        listOfBeanType,
+        MEDIA_TYPE_TEXT_CSV,
+        outputMessage,
+      )
+
+      val expectedOutput = "comment,description,name\n\"It's an A\",\"Desc A\",\n,\"Desc B\",B\n"
+      val result = outputMessage.body.toString()
+      result shouldBe expectedOutput
+    }
+
+    @Test
+    fun `Converting course records to a CSV and back to a list of course records should maintain internal consistency`() {
+      val initialCourseRecords = generateCourseRecords(3)
+
+      val outputMessage = MockHttpOutputMessage()
+      converter.write(initialCourseRecords, listOfCourseRecordType, MEDIA_TYPE_TEXT_CSV, outputMessage)
+
+      val inputMessage = MockHttpInputMessage(outputMessage.bodyAsBytes)
+      inputMessage.headers.contentType = MEDIA_TYPE_TEXT_CSV
+      val readResult = converter.read(listOfCourseRecordType, null, inputMessage)
+
+      val convertedCourseRecords = readResult.shouldBeInstanceOf<List<CourseRecord>>()
+      convertedCourseRecords.map { it.toDomain() }.shouldContainExactly(initialCourseRecords.map { it.toDomain() })
     }
   }
 }
 
-private fun List<CourseUpdate>.toCourseRecords() = map {
-  CourseRecord(
-    name = it.name,
-    description = it.description,
-    audience = it.audience,
-    identifier = it.identifier,
-    referable = it.referable,
-    alternateName = it.alternateName,
-  )
-}
+private val listOfBeanType = object : ParameterizedTypeReference<List<PlaceholderRecord>>() {}.type
 
-private val listOfBeanType = object : ParameterizedTypeReference<List<MyBean>>() {}.type
 private val listOfCourseRecordType = object : ParameterizedTypeReference<List<CourseRecord>>() {}.type
 
-data class MyBean(
+data class PlaceholderRecord(
   val name: String? = null,
   val description: String? = null,
   val comment: String? = null,
