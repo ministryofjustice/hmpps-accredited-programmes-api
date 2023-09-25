@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status as DomainReferralStatus
 
-class TransformersTest {
+class ReferralTransformersTest {
   @ParameterizedTest
   @EnumSource
   fun `toApi should map status from domain to api`(domainStatus: DomainReferralStatus) {

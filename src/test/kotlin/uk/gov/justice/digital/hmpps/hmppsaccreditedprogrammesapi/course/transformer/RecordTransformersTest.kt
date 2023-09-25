@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.O
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
 import java.util.UUID
 
-class TransformerTest {
+class RecordTransformersTest {
   @Test
   fun `Transforming a course entity with all required fields should convert to its API equivalent`() {
     val entity = CourseEntity(
