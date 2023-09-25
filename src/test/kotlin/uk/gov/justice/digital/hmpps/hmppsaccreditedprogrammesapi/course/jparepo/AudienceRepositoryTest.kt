@@ -19,7 +19,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
-  fun `saves and retrieves audience`() {
+  fun `audienceRepository successfully saves and retrieves records`() {
     val transientAudience = Audience("A")
     repository.save(transientAudience)
 
@@ -37,7 +37,7 @@ constructor(
   }
 
   @Test
-  fun `reject duplicate audience values`() {
+  fun `audienceRepository ignores duplicate audience records when attempting to save`() {
     val a1 = Audience("A")
     val a2 = Audience("A")
     repository.saveAll(listOf(a1, a2))

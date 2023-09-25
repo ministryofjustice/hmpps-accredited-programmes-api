@@ -24,7 +24,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
-  fun `save and retrieve a course participation history`() {
+  fun `courseParticipationHistoryRepository should successfully save and retrieve records`() {
     val courseId = courseEntityRepository.save(CourseEntity(name = "A Course", identifier = "ID")).id!!
 
     val participationId = courseParticipationHistoryRepository.save(

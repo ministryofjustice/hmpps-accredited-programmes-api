@@ -10,8 +10,9 @@ import java.util.function.Consumer
 class HealthCheckTest : IntegrationTestBase() {
 
   @Test
-  fun `Health page reports ok`() {
-    webTestClient.get()
+  fun `Requesting health endpoint should report status as UP`() {
+    webTestClient
+      .get()
       .uri("/health")
       .exchange()
       .expectStatus()
@@ -21,11 +22,14 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Health info reports version`() {
-    webTestClient.get().uri("/health")
+  fun `Health info endpoint should report version with today's date`() {
+    webTestClient
+      .get()
+      .uri("/health")
       .exchange()
       .expectStatus().isOk
-      .expectBody().jsonPath("components.healthInfo.details.version").value(
+      .expectBody()
+      .jsonPath("components.healthInfo.details.version").value(
         Consumer<String> {
           assertThat(it).startsWith(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
         },
@@ -33,8 +37,9 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Health ping page is accessible`() {
-    webTestClient.get()
+  fun `Health ping page should be accessible and report status as UP`() {
+    webTestClient
+      .get()
       .uri("/health/ping")
       .exchange()
       .expectStatus()
@@ -44,8 +49,9 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `readiness reports ok`() {
-    webTestClient.get()
+  fun `Requesting readiness endpoint should report status as UP`() {
+    webTestClient
+      .get()
       .uri("/health/readiness")
       .exchange()
       .expectStatus()
@@ -55,8 +61,9 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `liveness reports ok`() {
-    webTestClient.get()
+  fun `Requesting liveness endpoint should report status as UP`() {
+    webTestClient
+      .get()
       .uri("/health/liveness")
       .exchange()
       .expectStatus()

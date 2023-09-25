@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.restapi
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.Runs
 import io.mockk.every
@@ -18,8 +19,8 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CoursesControllerTest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_SUBMITTED
@@ -44,74 +45,81 @@ constructor(
 ) {
 
   @MockkBean
-  private lateinit var referralsService: ReferralService
+  private lateinit var referralService: ReferralService
 
   @Test
-  fun `start a referral`() {
-    val offeringId = UUID.randomUUID()
-    val prisonNumber = "A1234BC"
-    val referrerId = "XWK1234MN"
-    val referralId = UUID.randomUUID()
-    every { referralsService.startReferral(any(), any(), any()) } returns referralId
+  fun `referralsPost with JWT and valid payload returns 201 with correct body`() {
+    val referral = ReferralEntityFactory()
+      .withOfferingId(UUID.randomUUID())
+      .withPrisonNumber("A1234BC")
+      .withReferrerId("XWK1234MN")
+      .produce()
+
+    val payload = mapOf(
+      "offeringId" to referral.offeringId,
+      "prisonNumber" to referral.prisonNumber,
+      "referrerId" to referral.referrerId,
+    )
+
+    every { referralService.startReferral(any(), any(), any()) } returns referral.id
 
     mockMvc.post("/referrals") {
       contentType = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      this.content = """{
-        "offeringId": "$offeringId",
-        "prisonNumber": "$prisonNumber",
-        "referrerId": "$referrerId"
-      }"""
+      content = jacksonObjectMapper().writeValueAsString(payload)
     }.andExpect {
       status { isCreated() }
       content {
         contentType(MediaType.APPLICATION_JSON)
-        json("""{ "referralId": "$referralId" }""")
+        jsonPath("$.referralId") { value(referral.id.toString()) }
       }
     }
 
-    verify { referralsService.startReferral(prisonNumber, offeringId, referrerId) }
+    verify { referralService.startReferral(referral.prisonNumber, referral.offeringId, referral.referrerId) }
   }
 
   @Test
-  fun `get a referral`() {
-    val offeringId = UUID.randomUUID()
-    val prisonNumber = "A1234BC"
-    val referrerId = "XWK1234MN"
-    val referralId = UUID.randomUUID()
+  fun `referralsIdGet with JWT returns 200 with correct body`() {
+    val referral = ReferralEntityFactory()
+      .withId(UUID.randomUUID())
+      .withOfferingId(UUID.randomUUID())
+      .produce()
 
-    every { referralsService.getReferral(any()) } returns Referral(id = referralId, offeringId = offeringId, prisonNumber = prisonNumber, referrerId = referrerId)
+    every { referralService.getReferral(any()) } returns referral
 
-    mockMvc.get("/referrals/$referralId") {
+    mockMvc.get("/referrals/${referral.id}") {
       accept = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
       status { isOk() }
       content {
         contentType(MediaType.APPLICATION_JSON)
-        json(
-          """
-          { 
-            "offeringId": "$offeringId",
-            "prisonNumber": "$prisonNumber",
-            "referrerId": "$referrerId",
-            "status": "referral_started",
-            "oasysConfirmed": false,
-            "reason": null
-          }
-          """,
-        )
+        jsonPath("$.offeringId") { value(referral.offeringId.toString()) }
+        jsonPath("$.prisonNumber") { value(referral.prisonNumber) }
+        jsonPath("$.referrerId") { value(referral.referrerId) }
+        jsonPath("$.status") { REFERRAL_STARTED }
+        jsonPath("$.oasysConfirmed") { value(false) }
+        jsonPath("$.reason") { doesNotExist() }
       }
     }
 
-    verify { referralsService.getReferral(referralId) }
+    verify { referralService.getReferral(referral.id!!) }
   }
 
   @Test
-  fun `get a referral - not found`() {
+  fun `referralsIdGet without JWT returns 401`() {
+    mockMvc.get("/referrals/${UUID.randomUUID()}") {
+      accept = MediaType.APPLICATION_JSON
+    }.andExpect {
+      status { isUnauthorized() }
+    }
+  }
+
+  @Test
+  fun `referralsIdGet with random UUID returns 404 with error body`() {
     val referralId = UUID.randomUUID()
 
-    every { referralsService.getReferral(any()) } returns null
+    every { referralService.getReferral(any()) } returns null
 
     mockMvc.get("/referrals/$referralId") {
       accept = MediaType.APPLICATION_JSON
@@ -128,11 +136,11 @@ constructor(
       }
     }
 
-    verify { referralsService.getReferral(referralId) }
+    verify { referralService.getReferral(referralId) }
   }
 
   @Test
-  fun `get a referral - bad id`() {
+  fun `referralsIdGet with invalid UUID returns 400 with error body`() {
     val referralId = "bad-id"
 
     mockMvc.get("/referrals/$referralId") {
@@ -152,36 +160,46 @@ constructor(
   }
 
   @Test
-  fun `successful referral status update`() {
-    val referralId = UUID.randomUUID()
+  fun `referralIdStatusPut with valid transition returns 204 with no body`() {
+    val referral = ReferralEntityFactory().produce()
 
-    every { referralsService.updateReferralStatus(any(), any()) } just Runs
+    val payload = mapOf(
+      "status" to "referral_submitted",
+    )
 
-    mockMvc.put("/referrals/$referralId/status") {
+    every { referralService.updateReferralStatus(any(), any()) } just Runs
+
+    mockMvc.put("/referrals/${referral.id}/status") {
       contentType = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      content = """{ "status": "referral_submitted" }"""
+      content = jacksonObjectMapper().writeValueAsString(payload)
     }.andExpect {
       status { isNoContent() }
     }
 
-    verify { referralsService.updateReferralStatus(referralId, REFERRAL_SUBMITTED) }
+    verify { referralService.updateReferralStatus(referral.id!!, REFERRAL_SUBMITTED) }
   }
 
   @Test
-  fun `referral status update - invalid transition`() {
-    val referralId = UUID.randomUUID()
+  fun `referralIdStatusPut with invalid transition returns 409 with no body`() {
+    val referral = ReferralEntityFactory().produce()
 
-    every { referralsService.updateReferralStatus(any(), any()) } throws (IllegalArgumentException("Transition from $REFERRAL_STARTED to $AWAITING_ASSESSMENT is not valid"))
+    val payload = mapOf(
+      "status" to "awaiting_assessment",
+    )
 
-    mockMvc.put("/referrals/$referralId/status") {
+    val illegalArgumentException = IllegalArgumentException("Transition from $REFERRAL_STARTED to $AWAITING_ASSESSMENT is not valid")
+
+    every { referralService.updateReferralStatus(any(), any()) } throws illegalArgumentException
+
+    mockMvc.put("/referrals/${referral.id}/status") {
       contentType = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      content = """{ "status": "awaiting_assessment" }"""
+      content = jacksonObjectMapper().writeValueAsString(payload)
     }.andExpect {
       status { isConflict() }
     }
 
-    verify { referralsService.updateReferralStatus(referralId, AWAITING_ASSESSMENT) }
+    verify { referralService.updateReferralStatus(referral.id!!, AWAITING_ASSESSMENT) }
   }
 }

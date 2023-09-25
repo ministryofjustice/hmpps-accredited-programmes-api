@@ -25,13 +25,13 @@ class CourseServiceTest {
   @DisplayName("Update Courses")
   inner class UpdateCoursesTests {
     @Test
-    fun `processes no courses`() {
+    fun `updateCourses with an empty list clears the repository`() {
       service.updateCourses(emptyList())
       verify { repository.saveAudiences(emptySet()) }
     }
 
     @Test
-    fun `processes one row`() {
+    fun `updateCourses with one valid course successfully clears and persists to the repository`() {
       val a1 = Audience("Audience 1", id = UUID.randomUUID())
 
       every { repository.allAudiences() } returns setOf(a1)
@@ -48,7 +48,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `processes two rows`() {
+    fun `updateCourses with two valid courses clears and persists to the repository`() {
       val a1 = Audience("Audience 1", id = UUID.randomUUID())
       val a2 = Audience("Audience 2", id = UUID.randomUUID())
       val a3 = Audience("Audience 3", id = UUID.randomUUID())
@@ -66,7 +66,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `Duplicate audience values are eliminated`() {
+    fun `updateCourses with duplicate audience values only persists unique values to the repository`() {
       val a1 = Audience("Audience 1", id = UUID.randomUUID())
       val a2 = Audience("Audience 2", id = UUID.randomUUID())
       val a3 = Audience("Audience 3", id = UUID.randomUUID())
@@ -90,12 +90,12 @@ class CourseServiceTest {
   @DisplayName("Replace All Prerequisites")
   inner class ReplaceAllPrerequisitesTests {
     @Test
-    fun `No records, No courses`() {
+    fun `replaceAllPrerequisites with an empty list successfully clears the repository`() {
       service.replaceAllPrerequisites(emptyList()).shouldBeEmpty()
     }
 
     @Test
-    fun `No records, one course that has prerequisites`() {
+    fun `replaceAllPrerequisites should remove existing prerequisites when no new records are provided`() {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
@@ -114,7 +114,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `One record matching one course that has prerequisites`() {
+    fun `replaceAllPrerequisites should replace existing prerequisites when a matching course is found`() {
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
@@ -134,7 +134,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `multiple courses and prerequisites - all match`() {
+    fun `replaceAllPrerequisites should associate multiple prerequisites to multiple courses when all identifiers match`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
@@ -161,7 +161,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `identifier mismatch - record ignored`() {
+    fun `replaceAllPrerequisites should return an error when a prerequisite course identifier does matches no existing courses`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
@@ -185,7 +185,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `NewPrerequisite has multiple identifiers`() {
+    fun `replaceAllPrerequisites should associate prerequisites to multiple courses when multiple matching identifiers are provided`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C-1"),
         CourseEntity(name = "Course 2", identifier = "C-2"),
@@ -210,12 +210,12 @@ class CourseServiceTest {
   @DisplayName("Update Offerings")
   inner class UpdateOfferingsTests {
     @Test
-    fun `No records, No courses`() {
+    fun `updateOfferings with an empty list clears the repository`() {
       service.updateOfferings(emptyList()).shouldBeEmpty()
     }
 
     @Test
-    fun `Given no records and one course that has an offering, the offering should be withdrawn`() {
+    fun `Given no records and one course that has an offering, updateOfferings should withdraw that offering`() {
       val theOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
 
       val allCourses = listOf(
@@ -238,7 +238,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `Given one record matching an offering from a course then the offering should be updated`() {
+    fun `Given one record matching an offering from a course, updateOfferings should update that offering`() {
       val theOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
       val allCourses = listOf(
         CourseEntity(
@@ -266,7 +266,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `Given one record that matches a course, but not the course's offering then the new offering should be added and the old withdrawn`() {
+    fun `Given one record that matches a course, but not the course's offering, then updateOfferings should withdraw the old offering and add the new offering`() {
       val oldOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
       val allCourses = listOf(
         CourseEntity(
@@ -299,7 +299,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `Given multiple courses and offerings - all match`() {
+    fun `Given multiple matching courses and offerings, updateOfferings should associate the courses to their offerings`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
@@ -326,7 +326,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `identifier mismatch - record ignored`() {
+    fun `replaceAllOfferings should return an error when an offering course identifier does not match any existing courses`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
@@ -351,7 +351,7 @@ class CourseServiceTest {
     }
 
     @Test
-    fun `Missing contactEmail - Warning LineMessage produced`() {
+    fun `replaceAllOfferings should return a warning when the contact email for an offering is missing`() {
       val allCourses = listOf(
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
@@ -378,7 +378,7 @@ class CourseServiceTest {
   @DisplayName("Handle withdrawn Offerings")
   inner class WithdrawnOfferingsTests {
     @Test
-    fun `withdrawn Offerings should not be returned from offeringsForCourse`() {
+    fun `Withdrawn offerings should not be returned from offeringsForCourse`() {
       val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
       val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
 

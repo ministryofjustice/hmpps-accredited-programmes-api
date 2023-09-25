@@ -26,7 +26,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
-  fun `save and load behaves as expected`() {
+  fun `courseEntityRepository successfully saves and retrieves records`() {
     val transientEntity = CourseEntity(
       name = "A Course",
       identifier = "AC",
@@ -50,7 +50,7 @@ constructor(
   }
 
   @Test
-  fun `persist course with prerequisites`() {
+  fun `courseEntityRepository should successfully persist a course with prerequisites`() {
     val samples = setOf(
       Prerequisite("PR1", "PR1 D1"),
       Prerequisite("PR1", "PR1 D2"),
@@ -86,7 +86,7 @@ constructor(
   }
 
   @Test
-  fun `offering life-cycle`() {
+  fun `courseEntityRepository should persist multiple offerings for multiple courses and validate offering ids`() {
     val course1 = CourseEntity(
       name = "A Course",
       identifier = "AC",
@@ -112,7 +112,7 @@ constructor(
   }
 
   @Test
-  fun `find course by offering id`() {
+  fun `courseEntityRepository should retrieve course by its associated offering id`() {
     val course1 = CourseEntity(
       name = "A Course",
       identifier = "AC",

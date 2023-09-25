@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.Runs
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.just
 import io.mockk.verify
@@ -17,11 +18,20 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.MEDIA_TYPE_TEXT_CSV
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateCourseRecords
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateOfferingRecords
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generatePrerequisiteRecords
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.randomSentence
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toCourseCsv
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toOfferingCsv
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toPrerequisiteCsv
 import java.util.UUID
 
 @WebMvcTest
@@ -38,7 +48,6 @@ class CoursesControllerTest(
   @Autowired val mockMvc: MockMvc,
   @Autowired val jwtAuthHelper: JwtAuthHelper,
 ) {
-  private val repository = InMemoryCourseRepository()
 
   @MockkBean
   private lateinit var coursesService: CourseService
@@ -46,8 +55,14 @@ class CoursesControllerTest(
   @Nested
   inner class GetCoursesTests {
     @Test
-    fun `get all courses`() {
-      every { coursesService.allCourses() } returns repository.allCourses()
+    fun `coursesGet with JWT returns 200 with correct body`() {
+      val courses = listOf(
+        CourseEntityFactory().withName("Course1").produce(),
+        CourseEntityFactory().withName("Course2").produce(),
+        CourseEntityFactory().withName("Course3").produce(),
+      )
+
+      every { coursesService.allCourses() } returns courses
 
       mockMvc.get("/courses") {
         accept = MediaType.APPLICATION_JSON
@@ -55,22 +70,16 @@ class CoursesControllerTest(
       }.andExpect {
         status { isOk() }
         content {
-          this.contentType(MediaType.APPLICATION_JSON)
-          this.json(
-            """
-          [
-            { "name": "Lime Course", "alternateName": "LC", "referable": true },
-            { "name": "Azure Course", "alternateName": "AC++", "referable": true },
-            { "name": "Violet Course", "referable": true }
-        ]
-        """,
-          )
+          contentType(MediaType.APPLICATION_JSON)
+          courses.forEachIndexed { index, course ->
+            jsonPath("$[$index].name") { value(course.name) }
+          }
         }
       }
     }
 
     @Test
-    fun `get all courses - no token`() {
+    fun `coursesGet without JWT returns 401`() {
       mockMvc.get("/courses") {
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
@@ -79,9 +88,17 @@ class CoursesControllerTest(
     }
 
     @Test
-    fun `get a course - happy path`() {
-      val expectedCourse = repository.allCourses().first()
-      every { coursesService.course(expectedCourse.id!!) } returns repository.allCourses().first()
+    fun `coursesCourseIdGet with correct UUID returns 200 with correct body`() {
+      val prerequisites = mutableSetOf(
+        Prerequisite(name = "Prerequisite1", description = randomSentence(1..10)),
+        Prerequisite(name = "Prerequisite2", description = randomSentence(1..10)),
+      )
+
+      val expectedCourse = CourseEntityFactory()
+        .withPrerequisites(prerequisites)
+        .produce()
+
+      every { coursesService.course(expectedCourse.id!!) } returns expectedCourse
 
       mockMvc.get("/courses/${expectedCourse.id}") {
         accept = MediaType.APPLICATION_JSON
@@ -90,29 +107,21 @@ class CoursesControllerTest(
         status { isOk() }
         content {
           contentType(MediaType.APPLICATION_JSON)
-          json(
-            """
-            {
-              "id": "${expectedCourse.id?.toString()}",
-              "name": "Lime Course",
-              "alternateName": "LC",
-              "audiences": [],
-              "coursePrerequisites": [
-                { "name": "Setting", "description": "Custody"},
-                { "name": "Risk criteria", "description":  "High ESARA/SARA/OVP, High OGRS"},
-                { "name": "Criminogenic needs", "description": "Relationships, Thinking and Behaviour, Attitudes, Lifestyle" }
-              ],
-            }
-            """,
-          )
+          prerequisites.forEachIndexed { index, prerequisite ->
+            jsonPath("$.coursePrerequisites[$index].name") { value(prerequisite.name) }
+            jsonPath("$.coursePrerequisites[$index].description") { value(prerequisite.description) }
+          }
         }
       }
+
+      verify { coursesService.course(expectedCourse.id!!) }
     }
 
     @Test
-    fun `get a course - not found`() {
+    fun `coursesCourseIdGet with random UUID returns 404 with error body`() {
       val randomId = UUID.randomUUID()
-      every { coursesService.course(randomId) } returns null
+
+      every { coursesService.course(any()) } returns null
 
       mockMvc.get("/courses/$randomId") {
         accept = MediaType.APPLICATION_JSON
@@ -131,10 +140,10 @@ class CoursesControllerTest(
     }
 
     @Test
-    fun `get a course - bad id`() {
-      val courseId = "bad-id"
+    fun `coursesCourseIdGet with invalid UUID returns 400 with error body`() {
+      val badId = "bad-id"
 
-      mockMvc.get("/courses/$courseId") {
+      mockMvc.get("/courses/$badId") {
         accept = MediaType.APPLICATION_JSON
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
@@ -143,15 +152,17 @@ class CoursesControllerTest(
           contentType(MediaType.APPLICATION_JSON)
           jsonPath("$.status") { value(400) }
           jsonPath("$.errorCode") { isEmpty() }
-          jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
-          jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: bad-id") }
+          jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: $badId") }
+          jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: $badId") }
           jsonPath("$.moreInfo") { isEmpty() }
         }
       }
+
+      confirmVerified(coursesService)
     }
 
     @Test
-    fun `get a course - no token`() {
+    fun `coursesCourseIdGet without JWT returns 401`() {
       mockMvc.get("/courses/${UUID.randomUUID()}") {
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
@@ -163,31 +174,32 @@ class CoursesControllerTest(
   @Nested
   inner class GetOfferingsTests {
     @Test
-    fun `get all offerings for a course`() {
-      val courseId = repository.allCourses().first().id!!
-      every { coursesService.offeringsForCourse(courseId) } returns repository.offeringsForCourse(courseId)
+    fun `coursesCourseIdOfferingsGet with JWT returns 200 with correct body`() {
+      val offerings = listOf(
+        OfferingEntityFactory().withOrganisationId("OF1").withContactEmail("of1@digital.justice.gov.uk").produce(),
+        OfferingEntityFactory().withOrganisationId("OF2").withContactEmail("of2@digital.justice.gov.uk").produce(),
+        OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce(),
+      )
 
-      mockMvc.get("/courses/$courseId/offerings") {
+      every { coursesService.offeringsForCourse(any()) } returns offerings
+
+      mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
         content {
-          json(
-            """
-        [
-          { "organisationId": "MDI", "contactEmail":"nobody-mdi@digital.justice.gov.uk" },
-          { "organisationId": "BWN", "contactEmail":"nobody-bwn@digital.justice.gov.uk" },
-          { "organisationId": "BXI", "contactEmail":"nobody-bxi@digital.justice.gov.uk" }
-        ]
-      """,
-          )
+          contentType(MediaType.APPLICATION_JSON)
+          offerings.forEachIndexed { index, offering ->
+            jsonPath("$[$index].organisationId") { value(offering.organisationId) }
+            jsonPath("$[$index].contactEmail") { value(offering.contactEmail) }
+          }
         }
       }
     }
 
     @Test
-    fun `get all offerings for a course - no token`() {
+    fun `coursesCourseIdOfferingsGet without JWT returns 401`() {
       mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
@@ -199,35 +211,39 @@ class CoursesControllerTest(
   @Nested
   inner class PutCoursesTests {
     @Test
-    fun `put courses csv`() {
-      every {
-        coursesService.updateCourses(any<List<CourseUpdate>>())
-      } just Runs
+    fun `coursesPut with valid CSV data returns 204`() {
+      every { coursesService.updateCourses(any()) } just Runs
+
+      val replacementCourses = generateCourseRecords(3)
+      val replacementCoursesCsv = replacementCourses.toCourseCsv()
+      val replacementCoursesDomain = replacementCourses.map { it.toDomain() }
 
       mockMvc.put("/courses/csv") {
-        contentType = MediaType("text", "csv")
+        contentType = MEDIA_TYPE_TEXT_CSV
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = CsvTestData.coursesCsvText
+        content = replacementCoursesCsv
       }.andExpect {
         status { isNoContent() }
       }
 
-      verify {
-        coursesService.updateCourses(CsvTestData.newCourses)
-      }
+      verify { coursesService.updateCourses(replacementCoursesDomain) }
     }
   }
 
   @Nested
   inner class PutPrerequisitesTests {
     @Test
-    fun `put prerequisites csv`() {
+    fun `coursesPrerequisitesPut with valid CSV data returns 200 and no content`() {
       every { coursesService.replaceAllPrerequisites(any()) } returns emptyList()
 
+      val replacementPrerequisites = generatePrerequisiteRecords(3)
+      val replacementPrerequisitesCsv = replacementPrerequisites.toPrerequisiteCsv()
+      val replacementPrerequisitesDomain = replacementPrerequisites.map { it.toDomain() }
+
       mockMvc.put("/courses/prerequisites/csv") {
-        contentType = MediaType("text", "csv")
+        contentType = MEDIA_TYPE_TEXT_CSV
         header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = CsvTestData.prerequisitesCsvText
+        content = replacementPrerequisitesCsv
       }.andExpect {
         status { isOk() }
         content {
@@ -236,7 +252,33 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.replaceAllPrerequisites(CsvTestData.prerequisiteRecords.map(PrerequisiteRecord::toDomain)) }
+      verify { coursesService.replaceAllPrerequisites(replacementPrerequisitesDomain) }
+    }
+  }
+
+  @Nested
+  inner class PutOfferingsTests {
+    @Test
+    fun `coursesOfferingsPut with valid CSV data returns 200 and no content`() {
+      every { coursesService.updateOfferings(any()) } returns emptyList()
+
+      val replacementOfferings = generateOfferingRecords(3)
+      val replacementOfferingsCsv = replacementOfferings.toOfferingCsv()
+      val replacementOfferingsDomain = replacementOfferings.map { it.toDomain() }
+
+      mockMvc.put("/offerings/csv") {
+        contentType = MEDIA_TYPE_TEXT_CSV
+        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+        content = replacementOfferingsCsv
+      }.andExpect {
+        status { isOk() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          jsonPath("$.size()") { value(0) }
+        }
+      }
+
+      verify { coursesService.updateOfferings(replacementOfferingsDomain) }
     }
   }
 }

@@ -14,10 +14,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status as DomainReferralStatus
 
-class TransformersTest {
+class ReferralTransformersTest {
   @ParameterizedTest
   @EnumSource
-  fun `maps status from domain to api`(domainStatus: DomainReferralStatus) {
+  fun `toApi should map status from domain to api`(domainStatus: DomainReferralStatus) {
     val apiStatus = domainStatus.toApi()
     when (domainStatus) {
       REFERRAL_STARTED -> apiStatus shouldBe referralStarted
@@ -29,7 +29,7 @@ class TransformersTest {
 
   @ParameterizedTest
   @EnumSource
-  fun `maps status from api to domain`(apiStatus: ApiReferralStatus) {
+  fun `toDomain should map status from api to domain`(apiStatus: ApiReferralStatus) {
     val domainStatus = apiStatus.toDomain()
     when (apiStatus) {
       referralStarted -> domainStatus shouldBe REFERRAL_STARTED

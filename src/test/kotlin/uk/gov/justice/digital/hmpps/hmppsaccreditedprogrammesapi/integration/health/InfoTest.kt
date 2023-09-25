@@ -9,8 +9,9 @@ import java.time.format.DateTimeFormatter
 class InfoTest : IntegrationTestBase() {
 
   @Test
-  fun `Info page is accessible`() {
-    webTestClient.get()
+  fun `Requesting info endpoint should be accessible and contain correct build name`() {
+    webTestClient
+      .get()
       .uri("/info")
       .exchange()
       .expectStatus()
@@ -20,11 +21,14 @@ class InfoTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Info page reports version`() {
-    webTestClient.get().uri("/info")
+  fun `Info endpoint should report build version with today's date`() {
+    webTestClient
+      .get()
+      .uri("/info")
       .exchange()
       .expectStatus().isOk
-      .expectBody().jsonPath("build.version").value<String> {
+      .expectBody()
+      .jsonPath("build.version").value<String> {
         assertThat(it).startsWith(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
       }
   }
