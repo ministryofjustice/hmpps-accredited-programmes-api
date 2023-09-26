@@ -15,15 +15,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.EntityExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.MEDIA_TYPE_TEXT_CSV
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateCourseRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateOfferingRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generatePrerequisiteRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toCourseCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toOfferingCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toPrerequisiteCsv
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

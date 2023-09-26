@@ -12,10 +12,10 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.CourseEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.OfferingEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntityFactory
 import java.util.UUID
 
 @WebMvcTest
@@ -23,7 +23,7 @@ import java.util.UUID
 @ComponentScan(
   basePackages = [
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config",
+    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi",
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api",
   ],
 )

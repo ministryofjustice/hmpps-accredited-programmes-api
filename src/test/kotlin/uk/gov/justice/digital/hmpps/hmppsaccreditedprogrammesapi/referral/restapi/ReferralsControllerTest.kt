@@ -18,9 +18,9 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CoursesControllerTest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.ReferralEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_SUBMITTED
@@ -32,7 +32,7 @@ import java.util.UUID
 @ComponentScan(
   basePackages = [
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config",
+    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi",
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api",
   ],
 )
