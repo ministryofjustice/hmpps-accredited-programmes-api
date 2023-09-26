@@ -11,8 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Start
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.transformer.toApi
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.transformer.toDomain
 import java.util.UUID
 
 @Service

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.jparepo.JpaReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.repositories.JpaReferralRepository
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 

@@ -18,20 +18,12 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomSentence
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.CourseEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.factory.OfferingEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.fixture.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.MEDIA_TYPE_TEXT_CSV
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateCourseRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateOfferingRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generatePrerequisiteRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.randomSentence
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toCourseCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toOfferingCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toPrerequisiteCsv
 import java.util.UUID
 
 @WebMvcTest
@@ -39,7 +31,7 @@ import java.util.UUID
 @ComponentScan(
   basePackages = [
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config",
+    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi",
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api",
   ],
 )

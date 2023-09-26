@@ -11,9 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Prere
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toApi
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toCourseRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
 import java.util.UUID
 
 @Service

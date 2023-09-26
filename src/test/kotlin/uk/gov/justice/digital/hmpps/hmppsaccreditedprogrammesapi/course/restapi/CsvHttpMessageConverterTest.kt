@@ -11,10 +11,6 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.mock.http.MockHttpInputMessage
 import org.springframework.mock.http.MockHttpOutputMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.transformer.toDomain
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.MEDIA_TYPE_TEXT_CSV
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.generateCourseRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.util.toCourseCsv
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 

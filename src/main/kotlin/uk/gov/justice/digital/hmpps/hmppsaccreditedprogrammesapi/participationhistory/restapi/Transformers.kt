@@ -1,28 +1,28 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.restapi
 
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
 import java.time.Year
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation as ApiCourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseSetting as ApiCourseSetting
 
-fun CreateCourseParticipation.toDomain() =
-  CourseParticipationHistory(
-    prisonNumber = prisonNumber,
-    courseId = courseId,
-    otherCourseName = otherCourseName,
-    source = source,
-    setting = setting?.toDomain(),
-    outcome = outcome?.toDomain(),
-    yearStarted = yearStarted?.let(Year::of),
-  )
+fun CreateCourseParticipation.toDomain() = CourseParticipation(
+  prisonNumber = prisonNumber,
+  courseId = courseId,
+  otherCourseName = otherCourseName,
+  source = source,
+  setting = setting?.toDomain(),
+  outcome = outcome?.toDomain(),
+  yearStarted = yearStarted?.let(Year::of),
+)
 
-fun CourseParticipationUpdate.toDomain() = CourseParticipationHistoryUpdate(
+fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   courseId = courseId,
   yearStarted = yearStarted?.let(Year::of),
   setting = setting?.toDomain(),
@@ -30,14 +30,14 @@ fun CourseParticipationUpdate.toDomain() = CourseParticipationHistoryUpdate(
   outcome = outcome?.toDomain(),
 )
 
-fun CourseSetting.toDomain() = when (this) {
-  CourseSetting.community -> uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting.COMMUNITY
-  CourseSetting.custody -> uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting.CUSTODY
+fun ApiCourseSetting.toDomain() = when (this) {
+  ApiCourseSetting.community -> CourseSetting.COMMUNITY
+  ApiCourseSetting.custody -> CourseSetting.CUSTODY
 }
 
-fun uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting.toApi() = when (this) {
-  uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting.CUSTODY -> CourseSetting.custody
-  uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting.COMMUNITY -> CourseSetting.community
+fun CourseSetting.toApi() = when (this) {
+  CourseSetting.CUSTODY -> ApiCourseSetting.custody
+  CourseSetting.COMMUNITY -> ApiCourseSetting.community
 }
 
 fun CourseParticipationOutcome.toDomain() = CourseOutcome(status = status?.toDomain(), detail = detail)
@@ -54,7 +54,7 @@ fun CourseStatus.toApi() = when (this) {
   CourseStatus.COMPLETE -> CourseParticipationOutcome.Status.complete
 }
 
-fun CourseParticipationHistory.toApi() = CourseParticipation(
+fun CourseParticipation.toApi() = ApiCourseParticipation(
   id = id!!,
   prisonNumber = prisonNumber,
   setting = setting?.toApi(),
