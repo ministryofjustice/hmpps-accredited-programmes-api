@@ -29,3 +29,8 @@ fun randomSentence(wordCountRange: IntRange = 1..20, wordLengthRange: IntRange =
 fun randomEmailAddress() = randomWithCharPool(charPoolLowerCase, 5) + "." + randomWithCharPool(charPoolLowerCase, 8) + "@" + randomWithCharPool(charPoolLowerCase, 6) + ".com"
 
 fun randomInt(min: Int, max: Int) = Random.nextInt(min, max)
+
+fun Collection<Char>.takeNAtRandom(n: Int): Sequence<Char> = generateSequence { this.random() }.take(n)
+fun prisonNumber(): String = (charPoolUpperCase.takeNAtRandom(1) + charPoolNumbers.takeNAtRandom(4) + charPoolUpperCase.takeNAtRandom(2)).asString()
+
+private fun Sequence<Char>.asString() = fold(StringBuffer()) { buffer, char -> buffer.append(char) }.toString()

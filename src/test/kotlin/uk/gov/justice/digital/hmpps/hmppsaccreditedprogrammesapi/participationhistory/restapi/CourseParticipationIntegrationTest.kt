@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
@@ -20,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringUpperCaseWithNumbers
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.prisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import java.util.UUID
 
@@ -28,19 +27,14 @@ import java.util.UUID
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class CourseParticipationIntegrationTest : IntegrationTestBase() {
-  companion object {
-    const val PRISON_NUMBER = "A1234AA"
-    const val OTHER_PRISON_NUMBER = "Z9999ZZ"
-  }
-
-  @DirtiesContext
   @Test
   fun `Creating a course participation should return 201 with correct body`() {
     val courseId = getFirstCourseId()
+    val prisonNumber = prisonNumber()
 
     val createdCourseParticipationId = createCourseParticipation(
       courseId = courseId,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = prisonNumber,
     ).expectStatus().isCreated
       .expectBody<CourseParticipation>()
       .returnResult().responseBody!!.id
@@ -52,19 +46,18 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val expectedCourseParticipation = CourseParticipation(
       id = createdCourseParticipationId,
       courseId = courseId,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = prisonNumber,
     )
 
     retrievedCourseParticipation shouldBe expectedCourseParticipation
   }
 
-  @DirtiesContext
   @Test
   fun `Creating a course participation with a valid course id but a different course name should return 400 with error body`() {
     val createCourseParticipationErrorResponse = createCourseParticipation(
       courseId = getFirstCourseId(),
       otherCourseName = "A Course",
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = prisonNumber(),
     ).expectStatus().isBadRequest
       .expectBody<ErrorResponse>()
       .returnResult().responseBody!!
@@ -76,14 +69,14 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     )
   }
 
-  @DirtiesContext
   @Test
   fun `Updating a course participation with a valid payload should return 200 with correct body`() {
     val courseId = getFirstCourseId()
+    val prisonNumber = prisonNumber()
 
     val courseParticipationId = createCourseParticipation(
       courseId = courseId,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = prisonNumber,
     ).expectStatus().isCreated
       .expectBody<CourseParticipation>()
       .returnResult().responseBody!!.id
@@ -113,7 +106,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       courseId = courseId,
       yearStarted = 2020,
       setting = CourseSetting.custody,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = prisonNumber,
       outcome = CourseParticipationOutcome(
         status = CourseParticipationOutcome.Status.deselected,
         detail = "Some detail",
@@ -126,10 +119,13 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Searching for a course participation with a valid prison number should return 200 with correct body`() {
+    val prisonNumber = prisonNumber()
+    val otherPrisonNumber = prisonNumber()
+
     val createdCourseParticipationIds = getCourseIds().map {
       createCourseParticipation(
         courseId = it,
-        prisonNumber = PRISON_NUMBER,
+        prisonNumber = prisonNumber,
       ).expectStatus().isCreated
         .expectBody<CourseParticipation>()
         .returnResult().responseBody!!.id
@@ -140,7 +136,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val unrelatedCourseParticipationIds = getCourseIds().map {
       createCourseParticipation(
         courseId = it,
-        prisonNumber = OTHER_PRISON_NUMBER,
+        prisonNumber = otherPrisonNumber,
       ).expectStatus().isCreated
         .expectBody<CourseParticipation>()
         .returnResult().responseBody!!.id
@@ -150,7 +146,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
     val courseIdsForPrisonNumber = webTestClient
       .get()
-      .uri("/people/$PRISON_NUMBER/course-participations")
+      .uri("/people/$prisonNumber/course-participations")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -167,13 +163,13 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     getCourseIds().forEach {
       createCourseParticipation(
         courseId = it,
-        prisonNumber = PRISON_NUMBER,
+        prisonNumber = prisonNumber(),
       ).expectStatus().isCreated
         .expectBody<CourseParticipation>()
         .returnResult().responseBody!!
     }
 
-    val randomPrisonNumber = randomStringUpperCaseWithNumbers(7)
+    val randomPrisonNumber = prisonNumber()
 
     val courseParticipationsForPrisonNumber = webTestClient
       .get()
@@ -188,10 +184,9 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     courseParticipationsForPrisonNumber shouldBe emptyList()
   }
 
-  @DirtiesContext
   @Test
   fun `Deleting a course participation returns 204 with no body`() {
-    val randomPrisonNumber = randomStringUpperCaseWithNumbers(7)
+    val randomPrisonNumber = prisonNumber()
 
     val createdCourseParticipationId = createCourseParticipation(
       courseId = getFirstCourseId(),
