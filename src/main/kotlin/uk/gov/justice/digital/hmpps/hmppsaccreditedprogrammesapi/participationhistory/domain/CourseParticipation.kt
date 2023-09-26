@@ -8,17 +8,15 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
-import jakarta.persistence.Table
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.domain.BusinessException
 import java.time.Year
 import java.util.UUID
 
 @Entity
-@Table(name = "course_participation_history")
 class CourseParticipation(
   @Id
   @GeneratedValue
-  @Column(name = "course_participation_history_id")
+  @Column(name = "course_participation_id")
   val id: UUID? = null,
 
   val prisonNumber: String,
