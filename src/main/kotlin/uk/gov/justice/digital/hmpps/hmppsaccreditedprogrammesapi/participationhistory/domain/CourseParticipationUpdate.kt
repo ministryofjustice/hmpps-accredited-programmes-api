@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationh
 import java.time.Year
 import java.util.UUID
 
-data class CourseParticipationHistoryUpdate(
+data class CourseParticipationUpdate(
   val courseId: UUID? = null,
   val otherCourseName: String?,
   val yearStarted: Year?,

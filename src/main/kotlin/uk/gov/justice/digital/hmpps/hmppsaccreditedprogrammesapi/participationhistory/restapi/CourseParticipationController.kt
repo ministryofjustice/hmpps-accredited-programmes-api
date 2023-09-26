@@ -9,27 +9,27 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 import java.util.UUID
 
 @Service
-class CourseParticipationHistoryController(
-  @Autowired val service: CourseParticipationHistoryService,
+class CourseParticipationController(
+  @Autowired val service: CourseParticipationService,
 ) : CourseParticipationsApiDelegate {
   override fun courseParticipationsPost(createCourseParticipation: CreateCourseParticipation): ResponseEntity<CourseParticipation> =
     service.addCourseParticipation(createCourseParticipation.toDomain())
       ?.let {
         ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
-      } ?: throw Exception("Unable to add to course participation history")
+      } ?: throw Exception("Unable to add to course participation")
 
   override fun courseParticipationsCourseParticipationIdGet(courseParticipationId: UUID): ResponseEntity<CourseParticipation> =
-    service.getCourseParticipationHistory(courseParticipationId)
+    service.getCourseParticipation(courseParticipationId)
       ?.let {
         ResponseEntity.ok(it.toApi())
-      } ?: throw NotFoundException("No course participation history found for id $courseParticipationId")
+      } ?: throw NotFoundException("No course participation found for id $courseParticipationId")
 
   override fun courseParticipationsCourseParticipationIdPut(courseParticipationId: UUID, courseParticipationUpdate: CourseParticipationUpdate): ResponseEntity<CourseParticipation> =
-    ResponseEntity.ok(service.updateCourseParticipationHistory(courseParticipationId, courseParticipationUpdate.toDomain()).toApi())
+    ResponseEntity.ok(service.updateCourseParticipation(courseParticipationId, courseParticipationUpdate.toDomain()).toApi())
 
   override fun courseParticipationsCourseParticipationIdDelete(courseParticipationId: UUID): ResponseEntity<Unit> {
     service.deleteCourseParticipation(courseParticipationId)

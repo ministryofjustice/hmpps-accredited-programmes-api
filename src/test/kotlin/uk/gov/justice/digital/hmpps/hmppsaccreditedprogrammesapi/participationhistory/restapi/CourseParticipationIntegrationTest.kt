@@ -27,7 +27,7 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class CourseParticipationHistoryIntegrationTest : IntegrationTestBase() {
+class CourseParticipationIntegrationTest : IntegrationTestBase() {
   companion object {
     const val PRISON_NUMBER = "A1234AA"
     const val OTHER_PRISON_NUMBER = "Z9999ZZ"

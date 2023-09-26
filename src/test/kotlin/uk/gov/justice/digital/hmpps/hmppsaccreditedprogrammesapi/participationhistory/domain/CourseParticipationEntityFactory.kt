@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupp
 import java.time.Year
 import java.util.UUID
 
-class CourseParticipationHistoryEntityFactory : Factory<CourseParticipationHistory> {
+class CourseParticipationEntityFactory : Factory<CourseParticipation> {
 
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
   private var prisonNumber: Yielded<String> = { randomStringUpperCaseWithNumbers(6) }
@@ -42,8 +42,8 @@ class CourseParticipationHistoryEntityFactory : Factory<CourseParticipationHisto
     this.outcome = { outcome }
   }
 
-  override fun produce(): CourseParticipationHistory {
-    return CourseParticipationHistory(
+  override fun produce(): CourseParticipation {
+    return CourseParticipation(
       id = this.id(),
       prisonNumber = this.prisonNumber(),
       courseId = this.courseId(),

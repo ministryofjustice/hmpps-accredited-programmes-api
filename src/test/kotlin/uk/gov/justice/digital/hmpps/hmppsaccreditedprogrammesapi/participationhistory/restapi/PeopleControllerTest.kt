@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringUpperCaseWithNumbers
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 
 @WebMvcTest
 @ContextConfiguration(classes = [PeopleControllerTest::class])
@@ -36,20 +36,20 @@ class PeopleControllerTest(
   val jwtAuthHelper: JwtAuthHelper,
 ) {
   @MockkBean
-  private lateinit var courseParticipationHistoryService: CourseParticipationHistoryService
+  private lateinit var courseParticipationService: CourseParticipationService
 
   @Nested
   inner class FindByPrisonNumber {
     @Test
-    fun `courseParticipationHistoryGet with JWT and valid prison number returns 200 with correct body`() {
+    fun `GET course-participations with JWT and valid prison number returns 200 with correct body`() {
       val sharedPrisonNumber = randomStringUpperCaseWithNumbers(6)
 
       val courseParticipationHistoryList = listOf(
-        CourseParticipationHistoryEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
-        CourseParticipationHistoryEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
+        CourseParticipationEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
+        CourseParticipationEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
       )
 
-      every { courseParticipationHistoryService.findByPrisonNumber(any()) } returns courseParticipationHistoryList
+      every { courseParticipationService.findByPrisonNumber(any()) } returns courseParticipationHistoryList
 
       mockMvc.get("/people/$sharedPrisonNumber/course-participations") {
         accept = MediaType.APPLICATION_JSON
@@ -64,12 +64,12 @@ class PeopleControllerTest(
         }
       }
 
-      verify { courseParticipationHistoryService.findByPrisonNumber(sharedPrisonNumber) }
+      verify { courseParticipationService.findByPrisonNumber(sharedPrisonNumber) }
     }
 
     @Test
-    fun `courseParticipationHistoryGet with JWT and no prison number returns 200 with an empty body`() {
-      every { courseParticipationHistoryService.findByPrisonNumber(any()) } returns emptyList()
+    fun `GET course-participations with JWT and unknown prison number returns 200 with an empty body`() {
+      every { courseParticipationService.findByPrisonNumber(any()) } returns emptyList()
 
       mockMvc.get("/people/${randomStringUpperCaseWithNumbers(6)}/course-participations") {
         accept = MediaType.APPLICATION_JSON

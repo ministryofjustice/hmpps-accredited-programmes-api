@@ -10,25 +10,25 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.comm
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.repositories.CourseEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
 import java.time.Year
 import kotlin.jvm.optionals.getOrNull
 
-class JpaCourseParticipationHistoryRepositoryTest
+class JpaCourseParticipationRepositoryTest
 @Autowired
 constructor(
-  val courseParticipationHistoryRepository: JpaCourseParticipationHistoryRepository,
+  val courseParticipationRepository: JpaCourseParticipationRepository,
   val courseEntityRepository: CourseEntityRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
-  fun `courseParticipationHistoryRepository should successfully save and retrieve records`() {
+  fun `It should successfully save and retrieve records`() {
     val courseId = courseEntityRepository.save(CourseEntity(name = "A Course", identifier = "ID")).id!!
 
-    val participationId = courseParticipationHistoryRepository.save(
-      CourseParticipationHistory(
+    val participationId = courseParticipationRepository.save(
+      CourseParticipation(
         courseId = courseId,
         prisonNumber = "A1234AA",
         otherCourseName = "Other course name",
@@ -44,11 +44,11 @@ constructor(
 
     commitAndStartNewTx()
 
-    val persistentHistory = courseParticipationHistoryRepository.findById(participationId).getOrNull()
+    val persistentCourseParticipationi = courseParticipationRepository.findById(participationId).getOrNull()
 
-    persistentHistory.shouldNotBeNull()
+    persistentCourseParticipationi.shouldNotBeNull()
 
-    persistentHistory shouldBeEqualToComparingFields CourseParticipationHistory(
+    persistentCourseParticipationi shouldBeEqualToComparingFields CourseParticipation(
       id = participationId,
       courseId = courseId,
       prisonNumber = "A1234AA",

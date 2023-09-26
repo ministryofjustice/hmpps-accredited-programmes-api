@@ -22,8 +22,8 @@ import org.springframework.test.web.servlet.post
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CoursesControllerTest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
 import java.util.UUID
@@ -38,25 +38,25 @@ import java.util.UUID
   ],
 )
 @Import(JwtAuthHelper::class)
-class CourseParticipationHistoryControllerTest(
+class CourseParticipationControllerTest(
   @Autowired val mockMvc: MockMvc,
   @Autowired val jwtAuthHelper: JwtAuthHelper,
 ) {
   @MockkBean
-  private lateinit var courseParticipationHistoryService: CourseParticipationHistoryService
+  private lateinit var courseParticipationService: CourseParticipationService
 
   @Nested
   inner class AddParticipationHistoryTests {
     @Test
-    fun `courseParticipationHistoryPost with JWT and valid payload with valid id returns 201 with correct body`() {
-      val courseParticipationHistory = CourseParticipationHistoryEntityFactory()
+    fun `POST course participation with JWT and valid payload with valid id returns 201 with correct body`() {
+      val courseParticipationHistory = CourseParticipationEntityFactory()
         .withId(UUID.randomUUID())
         .withSource("source")
         .withOutcome(CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail"))
         .withSetting(CourseSetting.CUSTODY)
         .produce()
 
-      every { courseParticipationHistoryService.addCourseParticipation(any()) } returns courseParticipationHistory
+      every { courseParticipationService.addCourseParticipation(any()) } returns courseParticipationHistory
 
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
@@ -80,11 +80,11 @@ class CourseParticipationHistoryControllerTest(
         }
       }
 
-      verify { courseParticipationHistoryService.addCourseParticipation(any()) }
+      verify { courseParticipationService.addCourseParticipation(any()) }
     }
 
     @Test
-    fun `courseParticipationHistoryPost with JWT and invalid payload returns 400 with error body`() {
+    fun `POST course participation with JWT and invalid payload returns 400 with error body`() {
       val badPayload = "bad_payload"
 
       mockMvc.post("/course-participations") {
@@ -105,8 +105,8 @@ class CourseParticipationHistoryControllerTest(
     }
 
     @Test
-    fun `courseParticipationHistoryPost without JWT returns 401`() {
-      val courseParticipationHistory = CourseParticipationHistoryEntityFactory().produce()
+    fun `POST course participation without JWT returns 401`() {
+      val courseParticipationHistory = CourseParticipationEntityFactory().produce()
 
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
@@ -121,29 +121,29 @@ class CourseParticipationHistoryControllerTest(
   @Nested
   inner class GetParticipationHistoryTests {
     @Test
-    fun `courseParticipationHistoryHistoricCourseParticipationIdGet with JWT returns 200 with correct body`() {
-      val participationHistory = CourseParticipationHistoryEntityFactory().produce()
+    fun `GET course participation with JWT returns 200 with correct body`() {
+      val courseParticipation = CourseParticipationEntityFactory().produce()
 
-      every { courseParticipationHistoryService.getCourseParticipationHistory(any()) } returns participationHistory
+      every { courseParticipationService.getCourseParticipation(any()) } returns courseParticipation
 
-      mockMvc.get("/course-participations/${participationHistory.id}") {
+      mockMvc.get("/course-participations/${courseParticipation.id}") {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
         content {
-          jsonPath("$.id") { value(participationHistory.id.toString()) }
+          jsonPath("$.id") { value(courseParticipation.id.toString()) }
         }
       }
 
-      verify { courseParticipationHistoryService.getCourseParticipationHistory(participationHistory.id!!) }
+      verify { courseParticipationService.getCourseParticipation(courseParticipation.id!!) }
     }
 
     @Test
-    fun `courseParticipationHistoryHistoricCourseParticipationIdGet with random UUID returns 404 with error body`() {
+    fun `GET course participation with random UUID returns 404 with error body`() {
       val randomId = UUID.randomUUID()
 
-      every { courseParticipationHistoryService.getCourseParticipationHistory(any()) } returns null
+      every { courseParticipationService.getCourseParticipation(any()) } returns null
 
       mockMvc.get("/course-participations/$randomId") {
         accept = MediaType.APPLICATION_JSON
@@ -154,17 +154,17 @@ class CourseParticipationHistoryControllerTest(
           contentType(MediaType.APPLICATION_JSON)
           jsonPath("$.status") { value(404) }
           jsonPath("$.errorCode") { isEmpty() }
-          jsonPath("$.userMessage") { value("Not Found: No course participation history found for id $randomId") }
-          jsonPath("$.developerMessage") { value("No course participation history found for id $randomId") }
+          jsonPath("$.userMessage") { value("Not Found: No course participation found for id $randomId") }
+          jsonPath("$.developerMessage") { value("No course participation found for id $randomId") }
           jsonPath("$.moreInfo") { isEmpty() }
         }
       }
 
-      verify { courseParticipationHistoryService.getCourseParticipationHistory(randomId) }
+      verify { courseParticipationService.getCourseParticipation(randomId) }
     }
 
     @Test
-    fun `courseParticipationHistoryHistoricCourseParticipationIdGet with invalid UUID returns 400 with error body`() {
+    fun `GET course participation with invalid UUID returns 400 with error body`() {
       val badId = "bad-id"
 
       mockMvc.get("/course-participations/$badId") {
@@ -182,7 +182,7 @@ class CourseParticipationHistoryControllerTest(
         }
       }
 
-      confirmVerified(courseParticipationHistoryService)
+      confirmVerified(courseParticipationService)
     }
   }
 }
