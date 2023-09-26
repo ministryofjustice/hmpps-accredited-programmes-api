@@ -4,7 +4,7 @@ plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.4.1"
   kotlin("plugin.spring") version "1.9.10"
   kotlin("plugin.jpa") version "1.9.10"
-  id("org.openapi.generator") version "7.0.0"
+  id("org.openapi.generator") version "7.0.1"
 }
 
 configurations {
@@ -39,7 +39,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.2")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.3")
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
 }
 
