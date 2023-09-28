@@ -2,14 +2,14 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain
 
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringLowerCase
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringUpperCase
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomLowercaseString
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomUppercaseString
 import java.util.UUID
 
 class CourseEntityFactory : Factory<CourseEntity> {
   private var id: Yielded<UUID> = { UUID.randomUUID() }
-  private var name: Yielded<String> = { randomStringLowerCase(6) }
-  private var identifier: Yielded<String> = { randomStringUpperCase(10) }
+  private var name: Yielded<String> = { randomLowercaseString(6) }
+  private var identifier: Yielded<String> = { randomUppercaseString(10) }
   private var description: Yielded<String?> = { null }
   private var alternateName: Yielded<String?> = { null }
   private var referable: Yielded<Boolean> = { true }

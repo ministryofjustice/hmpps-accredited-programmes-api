@@ -2,67 +2,123 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationh
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import org.springframework.test.web.reactive.server.returnResult
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.prisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class CourseParticipationIntegrationTest : IntegrationTestBase() {
+class CourseParticipationIntegrationTest
+@Autowired
+constructor(
+  val webTestClient: WebTestClient,
+  val jwtAuthHelper: JwtAuthHelper,
+) {
   @Test
-  fun `Creating a course participation should return 201 with correct body`() {
+  fun `Add and retrieve a course participation history - happy flow`() {
     val courseId = getFirstCourseId()
-    val prisonNumber = prisonNumber()
 
-    val createdCourseParticipationId = createCourseParticipation(
-      courseId = courseId,
-      prisonNumber = prisonNumber,
-    ).expectStatus().isCreated
+    val cpa = webTestClient
+      .post()
+      .uri("/course-participations")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        CreateCourseParticipation(
+          courseId = courseId,
+          prisonNumber = "A1234AA",
+          setting = CourseParticipationSetting(
+            type = CourseParticipationSettingType.custody,
+            location = "location",
+          ),
+          outcome = CourseParticipationOutcome(
+            status = CourseParticipationOutcome.Status.complete,
+            yearStarted = 2021,
+            yearCompleted = 2022,
+            detail = "Some detail",
+          ),
+        ),
+      ).exchange()
+      .expectStatus().isCreated
       .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!.id
+      .returnResult().responseBody!!
 
-    createdCourseParticipationId shouldNotBe null
+    cpa.shouldNotBeNull()
+    cpa.id.shouldNotBeNull()
 
-    val retrievedCourseParticipation = getCourseParticipation(createdCourseParticipationId)
+    val courseParticipation = webTestClient
+      .get()
+      .uri("/course-participations/{id}", cpa.id)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<CourseParticipation>()
+      .returnResult().responseBody!!
 
-    val expectedCourseParticipation = CourseParticipation(
-      id = createdCourseParticipationId,
+    courseParticipation shouldBe CourseParticipation(
+      id = cpa.id,
       courseId = courseId,
-      prisonNumber = prisonNumber,
+      prisonNumber = "A1234AA",
+      setting = CourseParticipationSetting(
+        type = CourseParticipationSettingType.custody,
+        location = "location",
+      ),
+      outcome = CourseParticipationOutcome(
+        status = CourseParticipationOutcome.Status.complete,
+        yearStarted = 2021,
+        yearCompleted = 2022,
+        detail = "Some detail",
+      ),
     )
-
-    retrievedCourseParticipation shouldBe expectedCourseParticipation
   }
 
   @Test
-  fun `Creating a course participation with a valid course id but a different course name should return 400 with error body`() {
-    val createCourseParticipationErrorResponse = createCourseParticipation(
-      courseId = getFirstCourseId(),
-      otherCourseName = "A Course",
-      prisonNumber = prisonNumber(),
-    ).expectStatus().isBadRequest
-      .expectBody<ErrorResponse>()
+  fun `Add a course participation history with courseId and otherCourseName is rejected`() {
+    val courseId = getFirstCourseId()
+
+    val errorResponse = webTestClient
+      .post()
+      .uri("/course-participations")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        CreateCourseParticipation(
+          courseId = courseId,
+          otherCourseName = "A Course",
+          prisonNumber = "A1234AA",
+          setting = CourseParticipationSetting(type = CourseParticipationSettingType.custody),
+          outcome = CourseParticipationOutcome(),
+        ),
+      ).exchange()
+      .expectStatus().isBadRequest
+      .expectBody(ErrorResponse::class.java)
       .returnResult().responseBody!!
 
-    createCourseParticipationErrorResponse shouldBe ErrorResponse(
+    errorResponse shouldBe ErrorResponse(
       HttpStatus.BAD_REQUEST,
       developerMessage = "Expected just one of courseId or otherCourseName but both values are present",
       userMessage = "Business rule violation: Expected just one of courseId or otherCourseName but both values are present",
@@ -70,174 +126,125 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Updating a course participation with a valid payload should return 200 with correct body`() {
+  fun `Update a course participation history`() {
     val courseId = getFirstCourseId()
-    val prisonNumber = prisonNumber()
 
-    val courseParticipationId = createCourseParticipation(
-      courseId = courseId,
-      prisonNumber = prisonNumber,
-    ).expectStatus().isCreated
-      .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!.id
+    val courseParticipationId = addCourseParticipationHistory(courseId, "A1234AA")
 
-    val updatedCourseParticipation = webTestClient
+    val cp = webTestClient
       .put()
-      .uri("/course-participations/$courseParticipationId")
+      .uri("/course-participations/{id}", courseParticipationId)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(
         CourseParticipationUpdate(
           courseId = courseId,
-          yearStarted = 2020,
-          setting = CourseSetting.custody,
+          setting = CourseParticipationSetting(
+            type = CourseParticipationSettingType.custody,
+          ),
           outcome = CourseParticipationOutcome(
-            status = CourseParticipationOutcome.Status.deselected,
+            status = CourseParticipationOutcome.Status.incomplete,
             detail = "Some detail",
+            yearStarted = 2020,
           ),
         ),
-      )
-      .exchange().expectStatus().isOk
+      ).exchange()
+      .expectStatus().isOk
       .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!
+      .returnResult().responseBody
 
-    val expectedCourseParticipation = CourseParticipation(
+    val expectedCp = CourseParticipation(
       id = courseParticipationId,
       courseId = courseId,
-      yearStarted = 2020,
-      setting = CourseSetting.custody,
-      prisonNumber = prisonNumber,
+      setting = CourseParticipationSetting(
+        type = CourseParticipationSettingType.custody,
+      ),
+      prisonNumber = "A1234AA",
       outcome = CourseParticipationOutcome(
-        status = CourseParticipationOutcome.Status.deselected,
+        status = CourseParticipationOutcome.Status.incomplete,
         detail = "Some detail",
+        yearStarted = 2020,
       ),
     )
 
-    updatedCourseParticipation shouldBe expectedCourseParticipation
-    getCourseParticipation(courseParticipationId) shouldBe expectedCourseParticipation
+    cp shouldBe expectedCp
+    getCourseParticipation(courseParticipationId) shouldBe expectedCp
   }
 
   @Test
-  fun `Searching for a course participation with a valid prison number should return 200 with correct body`() {
-    val prisonNumber = prisonNumber()
-    val otherPrisonNumber = prisonNumber()
+  fun `find course participation history by prison number returns matches`() {
+    val ids = getCourseIds().map { addCourseParticipationHistory(it, "A1234AA") }.toSet()
+    ids.shouldNotBeEmpty()
 
-    val createdCourseParticipationIds = getCourseIds().map {
-      createCourseParticipation(
-        courseId = it,
-        prisonNumber = prisonNumber,
-      ).expectStatus().isCreated
-        .expectBody<CourseParticipation>()
-        .returnResult().responseBody!!.id
-    }.toSet()
+    val otherIds = getCourseIds().map { addCourseParticipationHistory(it, "Z9999ZZ") }.toSet()
 
-    createdCourseParticipationIds.shouldNotBeEmpty()
-
-    val unrelatedCourseParticipationIds = getCourseIds().map {
-      createCourseParticipation(
-        courseId = it,
-        prisonNumber = otherPrisonNumber,
-      ).expectStatus().isCreated
-        .expectBody<CourseParticipation>()
-        .returnResult().responseBody!!.id
-    }.toSet()
-
-    unrelatedCourseParticipationIds.intersect(createdCourseParticipationIds).shouldBeEmpty()
+    otherIds.intersect(ids).shouldBeEmpty()
 
     val courseIdsForPrisonNumber = webTestClient
       .get()
-      .uri("/people/$prisonNumber/course-participations")
+      .uri("/people/{prisonNumber}/course-participations", "A1234AA")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
       .expectBody<List<CourseParticipation>>()
-      .returnResult().responseBody!!
-      .map { it.id }.toSet()
+      .returnResult().responseBody!!.map { it.id }.toSet()
 
-    courseIdsForPrisonNumber shouldBe createdCourseParticipationIds
+    courseIdsForPrisonNumber shouldBe ids
   }
 
   @Test
-  fun `Searching for a course participation with a random prison number should return 200 with empty body`() {
-    getCourseIds().forEach {
-      createCourseParticipation(
-        courseId = it,
-        prisonNumber = prisonNumber(),
-      ).expectStatus().isCreated
-        .expectBody<CourseParticipation>()
-        .returnResult().responseBody!!
-    }
+  fun `find course participation history by prison number returns no matches`() {
+    getCourseIds().map { addCourseParticipationHistory(it, "A1234AA") }
 
-    val randomPrisonNumber = prisonNumber()
-
-    val courseParticipationsForPrisonNumber = webTestClient
+    webTestClient
       .get()
-      .uri("/people/$randomPrisonNumber/course-participations")
+      .uri("/people/{prisonNumber}/course-participations", "Z0000ZZ")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
       .expectBody<List<CourseParticipation>>()
-      .returnResult().responseBody!!
-
-    courseParticipationsForPrisonNumber shouldBe emptyList()
+      .returnResult().responseBody!!.shouldBeEmpty()
   }
 
   @Test
-  fun `Deleting a course participation returns 204 with no body`() {
-    val randomPrisonNumber = prisonNumber()
-
-    val createdCourseParticipationId = createCourseParticipation(
-      courseId = getFirstCourseId(),
-      prisonNumber = randomPrisonNumber,
-    ).expectStatus().isCreated
-      .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!.id
-
-    val retrievedCourseParticipationId = getCourseParticipation(createdCourseParticipationId).id
+  fun `delete course participation history`() {
+    val id = addCourseParticipationHistory(getFirstCourseId(), "X9999XX")
+    getCourseParticipationStatusCode(id) shouldBe HttpStatus.OK
 
     webTestClient
       .delete()
-      .uri("/course-participations/$retrievedCourseParticipationId")
+      .uri("/course-participations/{id}", id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isNoContent
 
-    webTestClient
-      .get()
-      .uri("/course-participations/$createdCourseParticipationId")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isNotFound
+    getCourseParticipationStatusCode(id) shouldBe HttpStatus.NOT_FOUND
 
     webTestClient
       .delete()
-      .uri("/course-participations/$retrievedCourseParticipationId")
+      .uri("/course-participations/{id}", id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isNoContent
   }
 
-  fun getCourseParticipation(id: UUID): CourseParticipation =
+  private fun getFirstCourseId(): UUID = getCourseIds().first()
+
+  private fun getCourseIds(): List<UUID> =
     webTestClient
       .get()
-      .uri("/course-participations/$id")
+      .uri("/courses")
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectStatus().isOk
-      .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!
+      .expectBody<List<Course>>()
+      .returnResult().responseBody!!.map { it.id }
 
-  fun createCourseParticipation(
-    courseId: UUID,
-    otherCourseName: String? = null,
-    prisonNumber: String,
-  ): WebTestClient.ResponseSpec =
+  private fun addCourseParticipationHistory(courseId: UUID, prisonNumber: String): UUID =
     webTestClient
       .post()
       .uri("/course-participations")
@@ -247,9 +254,32 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       .bodyValue(
         CreateCourseParticipation(
           courseId = courseId,
-          otherCourseName = otherCourseName,
           prisonNumber = prisonNumber,
+          setting = CourseParticipationSetting(type = CourseParticipationSettingType.community),
+          outcome = CourseParticipationOutcome(),
         ),
-      )
+      ).exchange()
+      .expectStatus().isCreated
+      .expectBody<CourseParticipation>()
+      .returnResult().responseBody!!.id
+
+  private fun getCourseParticipation(id: UUID): CourseParticipation =
+    webTestClient
+      .get()
+      .uri("/course-participations/{id}", id)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
       .exchange()
+      .expectStatus().isOk
+      .expectBody<CourseParticipation>()
+      .returnResult().responseBody!!
+
+  private fun getCourseParticipationStatusCode(id: UUID): HttpStatusCode =
+    webTestClient
+      .get()
+      .uri("/course-participations/{id}", id)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .returnResult<Any>().status
 }

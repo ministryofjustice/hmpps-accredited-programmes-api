@@ -1,71 +1,87 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.restapi
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
 import java.time.Year
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation as ApiCourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSetting as ApiCourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseSetting as ApiCourseSetting
 
-fun CreateCourseParticipation.toDomain() = CourseParticipation(
-  prisonNumber = prisonNumber,
-  courseId = courseId,
-  otherCourseName = otherCourseName,
-  source = source,
-  setting = setting?.toDomain(),
-  outcome = outcome?.toDomain(),
-  yearStarted = yearStarted?.let(Year::of),
-)
+fun CreateCourseParticipation.toDomain() =
+  CourseParticipation(
+    prisonNumber = prisonNumber,
+    courseId = courseId,
+    otherCourseName = otherCourseName,
+    source = source,
+    setting = setting.toDomain(),
+    outcome = outcome.toDomain(),
+  )
 
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   courseId = courseId,
-  yearStarted = yearStarted?.let(Year::of),
-  setting = setting?.toDomain(),
   otherCourseName = otherCourseName,
-  outcome = outcome?.toDomain(),
+  setting = setting.toDomain(),
+  outcome = outcome.toDomain(),
 )
 
-fun ApiCourseSetting.toDomain() = when (this) {
-  ApiCourseSetting.community -> CourseSetting.COMMUNITY
-  ApiCourseSetting.custody -> CourseSetting.CUSTODY
+fun CourseParticipationSettingType.toDomain() = when (this) {
+  CourseParticipationSettingType.community -> CourseSetting.COMMUNITY
+  CourseParticipationSettingType.custody -> CourseSetting.CUSTODY
 }
+
+fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
+  type = type.toDomain(),
+  location = location,
+)
+
+fun CourseParticipationSetting.toApi() = ApiCourseParticipationSetting(
+  type = type.toApi(),
+  location = location,
+)
 
 fun CourseSetting.toApi() = when (this) {
-  CourseSetting.CUSTODY -> ApiCourseSetting.custody
-  CourseSetting.COMMUNITY -> ApiCourseSetting.community
+  CourseSetting.CUSTODY -> CourseParticipationSettingType.custody
+  CourseSetting.COMMUNITY -> CourseParticipationSettingType.community
 }
 
-fun CourseParticipationOutcome.toDomain() = CourseOutcome(status = status?.toDomain(), detail = detail)
+fun CourseParticipationOutcome.toDomain() =
+  CourseOutcome(
+    status = status?.toDomain(),
+    detail = detail,
+    yearStarted = yearStarted?.let(Year::of),
+    yearCompleted = yearCompleted?.let(Year::of),
+  )
 
 fun CourseParticipationOutcome.Status.toDomain() = when (this) {
   CourseParticipationOutcome.Status.complete -> CourseStatus.COMPLETE
-  CourseParticipationOutcome.Status.deselected -> CourseStatus.DESELECTED
   CourseParticipationOutcome.Status.incomplete -> CourseStatus.INCOMPLETE
 }
 
 fun CourseStatus.toApi() = when (this) {
   CourseStatus.INCOMPLETE -> CourseParticipationOutcome.Status.incomplete
-  CourseStatus.DESELECTED -> CourseParticipationOutcome.Status.deselected
   CourseStatus.COMPLETE -> CourseParticipationOutcome.Status.complete
 }
 
 fun CourseParticipation.toApi() = ApiCourseParticipation(
   id = id!!,
   prisonNumber = prisonNumber,
-  setting = setting?.toApi(),
+  setting = setting.toApi(),
   courseId = courseId,
   otherCourseName = otherCourseName,
-  yearStarted = yearStarted?.value,
   source = source,
-  outcome = outcome?.let {
+  outcome = with(outcome) {
     CourseParticipationOutcome(
-      status = it.status?.toApi(),
-      detail = it.detail,
+      status = status?.toApi(),
+      detail = detail,
+      yearStarted = yearStarted?.value,
+      yearCompleted = yearCompleted?.value,
     )
   },
 )

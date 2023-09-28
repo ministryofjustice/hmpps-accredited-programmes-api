@@ -18,32 +18,32 @@ class CourseParticipationService(
       repository.save(it)
     }
 
-  fun getCourseParticipation(courseParticipationId: UUID): CourseParticipation? =
-    repository.findById(courseParticipationId).getOrNull()
+  fun getCourseParticipation(historicCourseParticipationId: UUID): CourseParticipation? =
+    repository.findById(historicCourseParticipationId).getOrNull()
 
-  fun updateCourseParticipation(courseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipation =
+  fun updateCourseParticipation(historicCourseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipation =
     repository
-      .getReferenceById(courseParticipationId)
+      .getReferenceById(historicCourseParticipationId)
       .applyUpdate(update)
 
   fun findByPrisonNumber(prisonNumber: String): List<CourseParticipation> = repository.findByPrisonNumber(prisonNumber)
-  fun deleteCourseParticipation(courseParticipationId: UUID) {
-    repository.deleteById(courseParticipationId)
-  }
-
-  companion object {
-    private fun CourseParticipation.applyUpdate(update: CourseParticipationUpdate): CourseParticipation =
-      this.apply {
-        yearStarted = update.yearStarted
-        courseId = update.courseId
-        otherCourseName = update.otherCourseName
-        setting = update.setting
-        if (outcome == null) {
-          outcome = update.outcome?.let { CourseOutcome(status = it.status, detail = it.detail) }
-        } else {
-          outcome!!.status = update.outcome?.status
-          outcome!!.detail = update.outcome?.detail
-        }
-      }
+  fun deleteCourseParticipation(historicCourseParticipationId: UUID) {
+    repository.deleteById(historicCourseParticipationId)
   }
 }
+
+private fun CourseParticipation.applyUpdate(update: CourseParticipationUpdate): CourseParticipation =
+  apply {
+    courseId = update.courseId
+    otherCourseName = update.otherCourseName
+    setting.run {
+      type = update.setting.type
+      location = update.setting.location
+    }
+    outcome.run {
+      status = update.outcome.status
+      detail = update.outcome.detail
+      yearStarted = update.outcome.yearStarted
+      yearCompleted = update.outcome.yearCompleted
+    }
+  }

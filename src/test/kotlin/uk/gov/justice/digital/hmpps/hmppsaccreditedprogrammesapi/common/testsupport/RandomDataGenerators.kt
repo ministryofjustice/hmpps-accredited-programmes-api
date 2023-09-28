@@ -1,36 +1,37 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport
 
-import java.util.Locale
 import kotlin.random.Random
 
-private val charPoolUpperCase = ('A'..'Z').toList()
-private val charPoolLowerCase = ('a'..'z').toList()
-private val charPoolNumbers = ('0'..'9').toList()
+private val upperCase = ('A'..'Z').toList()
+private val lowerCase = ('a'..'z').toList()
+private val digits = ('0'..'9').toList()
 
-private fun randomWithCharPool(charPool: List<Char>, length: Int) = (1..length)
-  .map { Random.nextInt(0, charPool.size) }
-  .map(charPool::get)
-  .joinToString("")
+fun randomAlphanumericString(length: Int) = (upperCase + lowerCase + digits)(length).asString()
 
-fun randomStringMultiCaseWithNumbers(length: Int) = randomWithCharPool(charPoolUpperCase + charPoolLowerCase + charPoolNumbers, length)
+fun randomUppercaseString(length: Int) = upperCase(length).asString()
 
-fun randomStringUpperCase(length: Int) = randomWithCharPool(charPoolUpperCase, length)
+fun randomLowercaseString(length: Int) = lowerCase(length).asString()
 
-fun randomStringLowerCase(length: Int) = randomWithCharPool(charPoolLowerCase, length)
+fun randomUppercaseAlphanumericString(length: Int) = (upperCase + digits)(length).asString()
 
-fun randomStringUpperCaseWithNumbers(length: Int) = randomWithCharPool(charPoolUpperCase + charPoolNumbers, length)
-
-fun randomSentence(wordCountRange: IntRange = 1..20, wordLengthRange: IntRange = 3..10): String =
-  (1..randomInt(wordCountRange.first, wordCountRange.last))
-    .joinToString(" ") {
-      randomWithCharPool(charPoolLowerCase, randomInt(wordLengthRange.first, wordLengthRange.last))
-    }.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-
-fun randomEmailAddress() = randomWithCharPool(charPoolLowerCase, 5) + "." + randomWithCharPool(charPoolLowerCase, 8) + "@" + randomWithCharPool(charPoolLowerCase, 6) + ".com"
+fun randomSentence(wordRange: IntRange = 1..20, wordLength: IntRange = 3..10): String =
+  (sequenceOf(capitalisedWord(wordLength)) + generateSequence { word(wordLength) })
+    .take(wordRange.random())
+    .reduce { left, right -> left + space() + right }
+    .asString()
 
 fun randomInt(min: Int, max: Int) = Random.nextInt(min, max)
 
-fun Collection<Char>.takeNAtRandom(n: Int): Sequence<Char> = generateSequence { this.random() }.take(n)
-fun prisonNumber(): String = (charPoolUpperCase.takeNAtRandom(1) + charPoolNumbers.takeNAtRandom(4) + charPoolUpperCase.takeNAtRandom(2)).asString()
+private fun space() = sequenceOf(' ')
 
-private fun Sequence<Char>.asString() = fold(StringBuffer()) { buffer, char -> buffer.append(char) }.toString()
+fun word(length: IntRange) = lowerCase(length.random())
+
+fun capitalisedWord(length: IntRange) = upperCase(1) + lowerCase((length).random() - 1)
+
+fun randomEmailAddress() = (lowerCase(5) + ".".asSequence() + lowerCase(8) + "@".asSequence() + lowerCase(6) + ".com".asSequence()).asString()
+
+fun randomPrisonNumber(): String = (upperCase(1) + digits(4) + upperCase(2)).asString()
+
+fun Sequence<Char>.asString() = fold(StringBuilder(), StringBuilder::append).toString()
+
+private operator fun Collection<Char>.invoke(n: Int) = generateSequence { random() }.take(n)

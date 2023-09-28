@@ -12,19 +12,25 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.servlet.MockHttpServletRequestDsl
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringUpperCaseWithNumbers
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
+import java.time.Year
+import java.util.UUID
 
 @WebMvcTest
 @ContextConfiguration(classes = [PeopleControllerTest::class])
 @ComponentScan(
   basePackages = [
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config",
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api",
   ],
 )
@@ -36,50 +42,87 @@ class PeopleControllerTest(
   val jwtAuthHelper: JwtAuthHelper,
 ) {
   @MockkBean
-  private lateinit var courseParticipationService: CourseParticipationService
+  private lateinit var service: CourseParticipationService
 
   @Nested
   inner class FindByPrisonNumber {
     @Test
     fun `GET course-participations with JWT and valid prison number returns 200 with correct body`() {
-      val sharedPrisonNumber = randomStringUpperCaseWithNumbers(6)
-
-      val courseParticipationHistoryList = listOf(
-        CourseParticipationEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
-        CourseParticipationEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
+      val prisonNumber = randomPrisonNumber()
+      val courseParticipations = listOf(
+        CourseParticipation(
+          id = UUID.randomUUID(),
+          otherCourseName = null,
+          courseId = UUID.randomUUID(),
+          prisonNumber = prisonNumber,
+          source = "S1",
+          setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = "A location"),
+          outcome = CourseOutcome(status = CourseStatus.INCOMPLETE, detail = "Detail", yearStarted = Year.of(2018), yearCompleted = Year.of(2023)),
+        ),
+        CourseParticipation(
+          id = UUID.randomUUID(),
+          otherCourseName = "A Course Name",
+          courseId = null,
+          prisonNumber = prisonNumber,
+          source = "S2",
+          setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
+          outcome = CourseOutcome(),
+        ),
       )
 
-      every { courseParticipationService.findByPrisonNumber(any()) } returns courseParticipationHistoryList
+      every { service.findByPrisonNumber(any()) } returns courseParticipations
 
-      mockMvc.get("/people/$sharedPrisonNumber/course-participations") {
+      mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON
-        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+        authorizationHeader()
       }.andExpect {
         status { isOk() }
         content {
-          courseParticipationHistoryList.forEachIndexed { index, entity ->
-            jsonPath("$[$index].id") { value(entity.id.toString()) }
-            jsonPath("$[$index].prisonNumber") { value(sharedPrisonNumber) }
-          }
+          json(
+            strict = true,
+            jsonContent =
+            """[
+              {
+                "id": "${courseParticipations[0].id}",
+                "otherCourseName": null,
+                "courseId": "${courseParticipations[0].courseId}",
+                "prisonNumber": "$prisonNumber",
+                "source": "S1",
+                "setting": { "type": "community", "location": "A location" },
+                "outcome": { "status": "incomplete", "detail": "Detail", "yearStarted": 2018, "yearCompleted": 2023 }
+              },
+              {
+                "id": "${courseParticipations[1].id}",
+                "otherCourseName": "A Course Name",
+                "courseId": null,
+                "prisonNumber": "$prisonNumber",
+                "source": "S2",
+                "setting": { "type": "custody", "location": null },
+                "outcome": { "detail":  null, "status":  null, "yearStarted":  null, "yearCompleted":  null }
+              }
+            ]""",
+          )
         }
       }
 
-      verify { courseParticipationService.findByPrisonNumber(sharedPrisonNumber) }
+      verify { service.findByPrisonNumber("A1234AA") }
     }
 
     @Test
     fun `GET course-participations with JWT and unknown prison number returns 200 with an empty body`() {
-      every { courseParticipationService.findByPrisonNumber(any()) } returns emptyList()
+      every { service.findByPrisonNumber(any()) } returns emptyList()
 
-      mockMvc.get("/people/${randomStringUpperCaseWithNumbers(6)}/course-participations") {
+      mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON
-        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+        authorizationHeader()
       }.andExpect {
         status { isOk() }
         content {
-          jsonPath("$") { isEmpty() }
+          json("[]")
         }
       }
     }
   }
+
+  private fun MockHttpServletRequestDsl.authorizationHeader() = header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
 }

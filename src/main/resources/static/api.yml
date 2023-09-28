@@ -12,7 +12,7 @@ paths:
       summary: List all courses
       responses:
         200:
-          description: Return a JSON representation of all courses that are not withdrawn
+          description: Return a JSON representation of all courses that are not withdrawn.
           content:
             'application/json':
               schema:
@@ -44,7 +44,7 @@ paths:
       summary: List all courses
       responses:
         200:
-          description: Return a CSV format representation of all courses that are not withdrawn. The data is compatible with the PUT /courses endpoint and may be round-tripped
+          description: Return a CSV format representation of all courses that are not withdrawn. The data is compatible with the PUT /courses endpoint and may be round-tripped.
           content:
             'text/csv;charset=UTF-8':
               schema:
@@ -59,7 +59,7 @@ paths:
       summary: Download a CSV format representation of the current set of prerequisites.
       responses:
         200:
-          description: The CSV formatted data is compatible the PUT operation and may be round-tripped
+          description: The CSV formatted data is compatible with the PUT operation and may be round-tripped.
           content:
             'text/csv;charset=UTF-8':
               schema:
@@ -117,7 +117,7 @@ paths:
           content:
             'application/json':
               schema:
-                  $ref: '#/components/schemas/Course'
+                $ref: '#/components/schemas/Course'
 
   /courses/{courseId}/offerings:
     get:
@@ -210,11 +210,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/CourseOffering'
         401:
-          description: Unauthorized. The request was unauthorized
+          description: Unauthorised. The request was unauthorised.
         403:
-          description: Forbidden.  The client is not authorised to access this offering
+          description: Forbidden.  The client is not authorised to access this offering.
         404:
-          description: invalid course offering id
+          description: Invalid course offering id
           content:
             'application/json':
               schema:
@@ -245,7 +245,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         401:
-          description: Unauthorized. The request was unauthorized
+          description: Unauthorised. The request was unauthorised.
 
     get:
       summary: Retrieve some referrals
@@ -254,27 +254,27 @@ paths:
       parameters:
         - name: status
           in: query
-          description: If present only return referrals in the given state
+          description: If present, only return referrals in the given state
           required: false
           schema:
             $ref: "#/components/schemas/ReferralStatus"
         - name: offeringId
           in: query
-          description: The id (UUID) of an active offering. If present only return referrals for that offering
+          description: The id (UUID) of an active offering. If present, only return referrals for that offering.
           required: false
           schema:
             type: string
             format: uuid
         - name: prisonNumber
           in: query
-          description: The prison number of the person who is being referred. If present only return referrals for the person.
+          description: The prison number of the person who is being referred. If present, only return referrals for the person.
           example: "A1234AA"
           required: false
           schema:
             type: string
         - name: referrerId
           in: query
-          description: A permanent identifier for the person creating the referral. StaffId for prison staff. If present only return referrals for that referrer
+          description: A permanent identifier for the person creating the referral. StaffId for prison staff. If present, only return referrals for that referrer.
           required: false
           schema:
             type: string
@@ -284,14 +284,14 @@ paths:
           description: Returns information about matching referrals
           content:
             'application/json':
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Referral'
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Referral'
         401:
-          description: The request was unauthorized
+          description: The request was unauthorised
         403:
-          description: Forbidden.  The client is not authorised to access referrals
+          description: Forbidden.  The client is not authorised to access referrals.
 
   /referrals/{id}:
     get:
@@ -314,11 +314,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Referral'
         401:
-          description: The request was unauthorized
+          description: The request was unauthorised
         403:
-          description: Forbidden.  The client is not authorised to access this referral
+          description: Forbidden.  The client is not authorised to access this referral.
         404:
-         description: The referral does not exist
+          description: The referral does not exist
 
     put:
       tags:
@@ -342,9 +342,9 @@ paths:
         204:
           description: The referral was updated
         401:
-          description: The request was unauthorized
+          description: The request was unauthorised
         403:
-          description: Forbidden.  The client is not authorised to access this referral
+          description: Forbidden.  The client is not authorised to access this referral.
         404:
           description: The referral does not exist
 
@@ -369,48 +369,49 @@ paths:
               $ref: '#/components/schemas/StatusUpdate'
       responses:
         204:
-          description: The referral now has the requested status
+          description: The referral now has the requested status.
         401:
-          description: The request was unauthorized
+          description: The request was unauthorised.
         403:
-          description: Forbidden.  The client is not authorised to access this referral
+          description: Forbidden.  The client is not authorised to access this referral.
         404:
-          description: The referral does not exist
+          description: The referral does not exist.
         409:
-          description: The referral may not change its status to the supplied value
+          description: The referral may not change its status to the supplied value.
 
   /offerings/{id}/course:
     get:
       tags:
         - Courses
-      summary: Retrieve the course that owns an offering
+      summary: Retrieve the course that owns an offering.
       parameters:
         - name: id
           in: path
-          description: The id (UUID) of an offering
+          description: The id (UUID) of an offering.
           required: true
           schema:
             type: string
             format: uuid
       responses:
         200:
-          description: Information about the Course that owns the offering
+          description: Information about the Course that owns the offering.
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Course'
         401:
-          description: The request was unauthorized
+          description: The request was unauthorised
         403:
-          description: Forbidden.  The client is not authorised to access this offering
+          description: Forbidden.  The client is not authorised to access this offering.
         404:
-          description: No offering has the supplied id (Not Found)
+          description: No offering has the supplied id (Not Found).
 
   /course-participations:
     post:
       tags:
         - Course participations
-      summary: Record information about a person's prior participation in a course
+      summary: Record information about a person's prior participation in a course.
+      operationId: createCourseParticipation
       requestBody:
         required: true
         content:
@@ -419,7 +420,7 @@ paths:
               $ref: '#/components/schemas/CreateCourseParticipation'
       responses:
         201:
-          description: The course participation information has been added
+          description: The course participation information has been added.
           content:
             'application/json':
               schema:
@@ -431,7 +432,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         401:
-          description: The client is not authorized to perform this operation
+          description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
@@ -441,11 +442,12 @@ paths:
     get:
       tags:
         - Course participations
-      summary: Return information about a person's participation in a course. Selected by a unique identifier
+      summary: Return information about a person's participation in a course. Selected by a unique identifier.
+      operationId: getCourseParticipation
       parameters:
         - name: courseParticipationId
           in: path
-          description: The unique identifier assigned to this record when it was created
+          description: The unique identifier assigned to this record when it was created.
           schema:
             type: string
             format: uuid
@@ -458,7 +460,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/CourseParticipation"
         401:
-          description: The client is not authorized to perform this operation
+          description: The client is not authorised to perform this operation.
           content:
             'application/json':
               schema:
@@ -468,10 +470,11 @@ paths:
       tags:
         - Course participations
       summary: Update the information about a person's participation in a course.
+      operationId: updateCourseParticipation
       parameters:
         - name: courseParticipationId
           in: path
-          description: The unique identifier assigned to this record when it was created
+          description: The unique identifier assigned to this record when it was created.
           schema:
             type: string
             format: uuid
@@ -484,19 +487,19 @@ paths:
         required: true
       responses:
         200:
-          description: The information about a person's participation in a course has been updated
+          description: The information about a person's participation in a course has been updated.
           content:
             'application/json':
               schema:
                 $ref: "#/components/schemas/CourseParticipation"
         401:
-          description: The client is not authorized to perform this operation
+          description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         404:
-          description: There is no information for the id so it cannot be updated.
+          description: There is no information for the id, so it cannot be updated.
           content:
             'application/json':
               schema:
@@ -506,19 +509,20 @@ paths:
       tags:
         - Course participations
       summary: Delete information about a person's participation in a course.
+      operationId: deleteCourseParticipation
       parameters:
         - name: courseParticipationId
           in: path
-          description: The unique identifier assigned to this record when it was created
+          description: The unique identifier assigned to this record when it was created.
           schema:
             type: string
             format: uuid
           required: true
       responses:
         204:
-          description: The information about a person's participation in a course has been deleted
+          description: The information about a person's participation in a course has been deleted.
         401:
-          description: The client is not authorized to perform this operation
+          description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
@@ -528,18 +532,19 @@ paths:
     get:
       tags:
         - Course participations
-      summary: Retrieve course participation information for a person identified by their prison number
+      summary: Retrieve course participation information for a person identified by their prison number.
+      operationId: getCourseParticipationsForPrisonNumber
       parameters:
         - name: prisonNumber
           in: path
-          description: The prison number of the person for whom the information should be retrieved
+          description: The prison number of the person for whom the information should be retrieved.
           example: "A1234AA"
           required: true
           schema:
             type: string
       responses:
         200:
-          description: All historic course participation information for the person.  Empty if none found
+          description: All historic course participation information for the person.  Empty if none found.
           content:
             'application/json':
               schema:
@@ -547,7 +552,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/CourseParticipation"
         401:
-          description: The client is not authorized to perform this operation
+          description: The client is not authorised to perform this operation.
           content:
             'application/json':
               schema:
@@ -639,11 +644,11 @@ components:
         name:
           type: string
           example: "age"
-          description: "The name of this Course Prerequisite"
+          description: "The name of this Course Prerequisite."
         description:
           type: string
           example: "18+"
-          description: "The value of this Course Prerequisite"
+          description: "The value of this Course Prerequisite."
         course:
           type: string
           example: "Kaizen"
@@ -667,7 +672,7 @@ components:
         organisationId:
           type: string
           example: "MDI"
-          description: "The unique identifier associated with the location hosting the offering. For prisons this is the PrisonId which is usually three capital letters."
+          description: "The unique identifier associated with the location hosting the offering. For prisons, this is the PrisonId, which is usually three capital letters."
         contactEmail:
           type: string
           format: email
@@ -677,7 +682,7 @@ components:
           type: string
           format: email
           example: "ap-admin-2@digital.justice.gov.uk"
-          description: "An optional secondary email address of a contact for this offering"
+          description: "An optional secondary email address of a contact for this offering."
 
       required:
         - id
@@ -691,10 +696,10 @@ components:
         course:
           type: string
           example: "Kaizen"
-          description: "The name of the Course to which this Offering applies. This value is only present to help with comprehension. It is not used to match offerings with courses"
+          description: "The name of the Course to which this Offering applies. This value is only present to help with comprehension. It is not used to match offerings with courses."
         identifier:
           type: string
-          description: "The unique identifier of the Course variant to which this Offering applies. The offering is added to the course having this identifier"
+          description: "The unique identifier of the Course variant to which this Offering applies. The offering is added to the course having this identifier."
           example: "BNM-IPVO"
         organisation:
           type: string
@@ -702,16 +707,16 @@ components:
           type: string
           format: email
           example: "ap-admin@digital.justice.gov.uk"
-          description: "The email address of the contact for this offering"
+          description: "The email address of the contact for this offering."
         "secondary contact email":
           type: string
           format: email
           example: "ap-admin2@digital.justice.gov.uk"
-          description: "An optional secondary email address of a contact for this offering"
+          description: "An optional secondary email address of a contact for this offering."
         prisonId:
           type: string
           example: "MDI"
-          description: "The prison id for the prison associated with this Offering. This is usually three capital letters"
+          description: "The prison id for the prison associated with this Offering. This is usually three capital letters."
       required:
         - course
         - prisonId
@@ -767,6 +772,88 @@ components:
       required:
         - status
 
+    CourseParticipationUpdate:
+      type: object
+      properties:
+        courseId:
+          description: "The identifier of a course currently or previously managed by this service.  
+                        Must be the unique identifier of a course. If the participant's course is not known to this service
+                        or cannot be identified, then this field should not be supplied. Instead, add an arbitrary name 
+                        for the course in otherCourseName."
+          type: string
+          format: uuid
+        otherCourseName:
+          description: "The name of the course taken by the participant.  It should only be used when this course is not managed
+                        by this service or cannot be identified. See courseId."
+          type: string
+        setting:
+          $ref: '#/components/schemas/CourseParticipationSetting'
+        outcome:
+          $ref: '#/components/schemas/CourseParticipationOutcome'
+        source:
+          type: string
+      required:
+        - setting
+        - outcome
+
+    CreateCourseParticipation:
+      allOf:
+        - $ref: "#/components/schemas/CourseParticipationUpdate"
+        - type: object
+          properties:
+            prisonNumber:
+              description: The prison number of the course participant.
+              example: "A1234AA"
+              type: string
+          required:
+            - prisonNumber
+
+    CourseParticipation:
+      allOf:
+        - $ref: "#/components/schemas/CreateCourseParticipation"
+        - type: object
+          properties:
+            id:
+              description: A unique identifier for this record of participation in a course.
+              type: string
+              format: uuid
+          required:
+            - id
+
+    CourseParticipationSettingType:
+      description: Either Custody or Community.
+      type: string
+      enum:
+        - custody
+        - community
+
+    CourseParticipationSetting:
+      description: Information about where the course was held.
+      type: object
+      properties:
+        location:
+          type: string
+        type:
+          $ref: '#/components/schemas/CourseParticipationSettingType'
+      required:
+        - type
+
+    CourseParticipationOutcome:
+      description: The outcome of participating in a course.
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - incomplete
+            - complete
+        detail:
+          type: string
+        yearStarted:
+          type: integer
+        yearCompleted:
+          type: integer
+
     StartReferral:
       type: object
       properties:
@@ -775,170 +862,16 @@ components:
           type: string
           format: uuid
         prisonNumber:
-          description: The prison number of the person who is being referred
+          description: The prison number of the person who is being referred.
           example: "A1234AA"
           type: string
         referrerId:
+          description: A permanent identifier for the person creating the referral. StaffId for prison staff.
           type: string
       required:
         - offeringId
         - prisonNumber
         - referrerId
-
-    CourseParticipation:
-      type: object
-      properties:
-        id:
-          description: A unique identifier for this record of participation in a course
-          type: string
-          format: uuid
-        prisonNumber:
-          description: The prison number of the course participant
-          example: "A1234AA"
-          type: string
-        courseId:
-          description: "The identifier of a course currently or previously managed by this service.  
-                        Must be the unique id of a course. If the participant's course is not known to this service
-                        or cannot be identified then this field will be null while the otherCourseName
-                        property will be populated."
-          type: string
-          format: uuid
-        otherCourseName:
-          description: "The name of the course taken by the participant.  Only  used if this course is not managed
-                        by this service or cannot be identified. See courseId"
-          type: string
-        yearStarted:
-          description: The year in which the participant commenced the course
-          example: 2021
-          type: integer
-        setting:
-          $ref: '#/components/schemas/CourseSetting'
-        outcome:
-          $ref: '#/components/schemas/CourseParticipationOutcome'
-        source:
-          type: string
-      required:
-        - id
-        - prisonNumber
-
-    CreateCourseParticipation:
-      type: object
-      properties:
-        prisonNumber:
-          description: The prison number of the course participant
-          example: "A1234AA"
-          type: string
-        courseId:
-          description: "The identifier of a course currently or previously managed by this service.  
-                        Must be the unique id of a course. If the participant's course is not known to this service
-                        or cannot be identified then this field should not be supplied. Instead, the otherCourseName
-                        property should be populated."
-          type: string
-          format: uuid
-        otherCourseName:
-          description: "The name of the course taken by the participant.  Should only be used if this course is not managed
-                        by this service or cannot be identified. See courseId"
-          type: string
-        yearStarted:
-          description: The year in which the participant commenced the course
-          example: 2021
-          type: integer
-        setting:
-          $ref: '#/components/schemas/CourseSetting'
-        outcome:
-          $ref: '#/components/schemas/CourseParticipationOutcome'
-        source:
-          type: string
-      required:
-        - prisonNumber
-
-    CourseParticipationUpdate:
-      type: object
-      properties:
-        courseId:
-          description: "The identifier of a course currently or previously managed by this service.  
-                        Must be the unique id of a course. If the participant's course is not known to this service
-                        or cannot be identified then this field should not be supplied. Instead, the otherCourseName
-                        property should be populated."
-          type: string
-          format: uuid
-        otherCourseName:
-          description: "The name of the course taken by the participant.  Should only be used if this course is not managed
-                        by this service or cannot be identified. See courseId"
-          type: string
-        yearStarted:
-          description: The year in which the participant commenced the course
-          example: 2021
-          type: integer
-        setting:
-          $ref: '#/components/schemas/CourseSetting'
-        outcome:
-          $ref: '#/components/schemas/CourseParticipationOutcome'
-        source:
-          type: string
-
-    CourseSetting:
-      description: Either Custody or Community
-      type: string
-      enum:
-        - custody
-        - community
-
-    CourseParticipationOutcome:
-      description: The outcome of participating in a course
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - deselected
-            - incomplete
-            - complete
-        detail:
-          type: string
-
-    ReferralStarted:
-      type: object
-      properties:
-        referralId:
-          description: The unique id (UUID) of the new referral.
-          type: string
-          format: uuid
-      required:
-        - referralId
-
-    Referral:
-      type: object
-      properties:
-        id:
-          description: The unique id (UUID) of this referral.
-          type: string
-          format: uuid
-        offeringId:
-          description: The id (UUID) of an active offering
-          type: string
-          format: uuid
-        prisonNumber:
-          description: The prison number of the person who is being referred
-          example: "A1234AA"
-          type: string
-        referrerId:
-          description: A permanent identifier for the person creating the referral. StaffId for prison staff
-          type: string
-        reason:
-          type: string
-        oasysConfirmed:
-          type: boolean
-          default: false
-        status:
-          $ref: "#/components/schemas/ReferralStatus"
-      required:
-        - id
-        - offeringId
-        - prisonNumber
-        - referrerId
-        - oasysConfirmed
-        - status
 
     ReferralUpdate:
       type: object
@@ -950,6 +883,36 @@ components:
           default: false
       required:
         - oasysConfirmed
+
+    Referral:
+      allOf:
+        - $ref: "#/components/schemas/StartReferral"
+        - $ref: "#/components/schemas/ReferralUpdate"
+        - type: object
+          properties:
+            id:
+              description: The unique id (UUID) of this referral.
+              type: string
+              format: uuid
+            status:
+              $ref: "#/components/schemas/ReferralStatus"
+          required:
+            - id
+            - offeringId
+            - prisonNumber
+            - referrerId
+            - oasysConfirmed
+            - status
+
+    ReferralStarted:
+      type: object
+      properties:
+        referralId:
+          description: The unique id (UUID) of the new referral.
+          type: string
+          format: uuid
+      required:
+        - referralId
 
     StatusUpdate:
       type: object
