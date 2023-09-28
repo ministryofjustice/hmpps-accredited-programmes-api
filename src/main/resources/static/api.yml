@@ -772,24 +772,6 @@ components:
       required:
         - status
 
-    StartReferral:
-      type: object
-      properties:
-        offeringId:
-          description: The id (UUID) of an active offering
-          type: string
-          format: uuid
-        prisonNumber:
-          description: The prison number of the person who is being referred
-          example: "A1234AA"
-          type: string
-        referrerId:
-          type: string
-      required:
-        - offeringId
-        - prisonNumber
-        - referrerId
-
     CourseParticipationUpdate:
       type: object
       properties:
@@ -867,25 +849,11 @@ components:
         yearCompleted:
           type: integer
 
-    ReferralStarted:
+    StartReferral:
       type: object
       properties:
-        referralId:
-          description: The unique id (UUID) of the new referral.
-          type: string
-          format: uuid
-      required:
-        - referralId
-
-    Referral:
-      type: object
-      properties:
-        id:
-          description: The unique id (UUID) of this referral.
-          type: string
-          format: uuid
         offeringId:
-          description: The id (UUID) of an active offering.
+          description: The id (UUID) of an active offering
           type: string
           format: uuid
         prisonNumber:
@@ -895,20 +863,10 @@ components:
         referrerId:
           description: A permanent identifier for the person creating the referral. StaffId for prison staff.
           type: string
-        reason:
-          type: string
-        oasysConfirmed:
-          type: boolean
-          default: false
-        status:
-          $ref: "#/components/schemas/ReferralStatus"
       required:
-        - id
         - offeringId
         - prisonNumber
         - referrerId
-        - oasysConfirmed
-        - status
 
     ReferralUpdate:
       type: object
@@ -920,6 +878,36 @@ components:
           default: false
       required:
         - oasysConfirmed
+
+    Referral:
+      allOf:
+        - $ref: "#/components/schemas/StartReferral"
+        - $ref: "#/components/schemas/ReferralUpdate"
+        - type: object
+          properties:
+            id:
+              description: The unique id (UUID) of this referral.
+              type: string
+              format: uuid
+            status:
+              $ref: "#/components/schemas/ReferralStatus"
+          required:
+            - id
+            - offeringId
+            - prisonNumber
+            - referrerId
+            - oasysConfirmed
+            - status
+
+    ReferralStarted:
+      type: object
+      properties:
+        referralId:
+          description: The unique id (UUID) of the new referral.
+          type: string
+          format: uuid
+      required:
+        - referralId
 
     StatusUpdate:
       type: object
