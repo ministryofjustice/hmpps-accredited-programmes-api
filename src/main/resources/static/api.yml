@@ -411,6 +411,7 @@ paths:
       tags:
         - Course participations
       summary: Record information about a person's prior participation in a course.
+      operationId: createCourseParticipation
       requestBody:
         required: true
         content:
@@ -442,6 +443,7 @@ paths:
       tags:
         - Course participations
       summary: Return information about a person's participation in a course. Selected by a unique identifier.
+      operationId: getCourseParticipation
       parameters:
         - name: courseParticipationId
           in: path
@@ -468,6 +470,7 @@ paths:
       tags:
         - Course participations
       summary: Update the information about a person's participation in a course.
+      operationId: updateCourseParticipation
       parameters:
         - name: courseParticipationId
           in: path
@@ -506,6 +509,7 @@ paths:
       tags:
         - Course participations
       summary: Delete information about a person's participation in a course.
+      operationId: deleteCourseParticipation
       parameters:
         - name: courseParticipationId
           in: path
@@ -529,6 +533,7 @@ paths:
       tags:
         - Course participations
       summary: Retrieve course participation information for a person identified by their prison number.
+      operationId: getCourseParticipationsForPrisonNumber
       parameters:
         - name: prisonNumber
           in: path
@@ -785,65 +790,6 @@ components:
         - prisonNumber
         - referrerId
 
-    CourseParticipation:
-      type: object
-      properties:
-        id:
-          description: A unique identifier for this record of participation in a course
-          type: string
-          format: uuid
-        prisonNumber:
-          description: The prison number of the course participant
-          example: "A1234AA"
-          type: string
-        courseId:
-          description: "The identifier of a course currently or previously managed by this service.  
-                        Must be the unique identifier of a course. If the participant's course is not known to this service
-                        or cannot be identified then this field will be null while the otherCourseName
-                        property will be populated."
-          type: string
-          format: uuid
-        otherCourseName:
-          description: "The name of the course taken by the participant.  Only used if this course is not managed
-                        by this service or cannot be identified. See courseId."
-          type: string
-        setting:
-          $ref: '#/components/schemas/CourseParticipationSetting'
-        outcome:
-          $ref: '#/components/schemas/CourseParticipationOutcome'
-        source:
-          type: string
-      required:
-        - id
-        - prisonNumber
-
-    CreateCourseParticipation:
-      type: object
-      properties:
-        prisonNumber:
-          description: The prison number of the course participant
-          example: "A1234AA"
-          type: string
-        courseId:
-          description: "The identifier of a course currently or previously managed by this service.  
-                        Must be the unique identifier of a course. If the participant's course is not known to this service
-                        or cannot be identified then this field should not be supplied. Instead, add an arbitrary name 
-                        for the course in otherCourseName."
-          type: string
-          format: uuid
-        otherCourseName:
-          description: "The name of the course taken by the participant.  It should only be used when this course is not managed
-                        by this service or cannot be identified. See courseId."
-          type: string
-        setting:
-          $ref: '#/components/schemas/CourseParticipationSetting'
-        outcome:
-          $ref: '#/components/schemas/CourseParticipationOutcome'
-        source:
-          type: string
-      required:
-        - prisonNumber
-
     CourseParticipationUpdate:
       type: object
       properties:
@@ -864,6 +810,30 @@ components:
           $ref: '#/components/schemas/CourseParticipationOutcome'
         source:
           type: string
+
+    CreateCourseParticipation:
+      allOf:
+        - $ref: "#/components/schemas/CourseParticipationUpdate"
+        - type: object
+          properties:
+            prisonNumber:
+              description: The prison number of the course participant.
+              example: "A1234AA"
+              type: string
+          required:
+            - prisonNumber
+
+    CourseParticipation:
+      allOf:
+        - $ref: "#/components/schemas/CreateCourseParticipation"
+        - type: object
+          properties:
+            id:
+              description: A unique identifier for this record of participation in a course.
+              type: string
+              format: uuid
+          required:
+            - id
 
     CourseParticipationSettingType:
       description: Either Custody or Community.
