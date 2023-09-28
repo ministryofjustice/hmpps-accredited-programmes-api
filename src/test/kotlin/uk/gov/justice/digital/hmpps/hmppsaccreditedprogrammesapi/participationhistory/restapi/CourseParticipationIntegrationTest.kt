@@ -49,6 +49,16 @@ constructor(
         CreateCourseParticipation(
           courseId = courseId,
           prisonNumber = "A1234AA",
+          setting = CourseParticipationSetting(
+            type = CourseParticipationSettingType.custody,
+            location = "location",
+          ),
+          outcome = CourseParticipationOutcome(
+            status = CourseParticipationOutcome.Status.complete,
+            yearStarted = 2021,
+            yearCompleted = 2022,
+            detail = "Some detail",
+          ),
         ),
       ).exchange()
       .expectStatus().isCreated
@@ -72,6 +82,16 @@ constructor(
       id = cpa.id,
       courseId = courseId,
       prisonNumber = "A1234AA",
+      setting = CourseParticipationSetting(
+        type = CourseParticipationSettingType.custody,
+        location = "location",
+      ),
+      outcome = CourseParticipationOutcome(
+        status = CourseParticipationOutcome.Status.complete,
+        yearStarted = 2021,
+        yearCompleted = 2022,
+        detail = "Some detail",
+      ),
     )
   }
 
@@ -90,6 +110,8 @@ constructor(
           courseId = courseId,
           otherCourseName = "A Course",
           prisonNumber = "A1234AA",
+          setting = CourseParticipationSetting(type = CourseParticipationSettingType.custody),
+          outcome = CourseParticipationOutcome(),
         ),
       ).exchange()
       .expectStatus().isBadRequest
@@ -233,6 +255,8 @@ constructor(
         CreateCourseParticipation(
           courseId = courseId,
           prisonNumber = prisonNumber,
+          setting = CourseParticipationSetting(type = CourseParticipationSettingType.community),
+          outcome = CourseParticipationOutcome(),
         ),
       ).exchange()
       .expectStatus().isCreated

@@ -8,6 +8,8 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import org.hibernate.Hibernate
+import org.hibernate.annotations.Formula
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.domain.BusinessException
 import java.time.Year
 import java.util.UUID
@@ -22,14 +24,13 @@ class CourseParticipation(
   val prisonNumber: String,
   var courseId: UUID? = null,
   var otherCourseName: String?,
-  var yearStarted: Year?,
   var source: String?,
 
-  @Enumerated(EnumType.STRING)
-  var setting: CourseSetting?,
+  @Embedded
+  var setting: CourseParticipationSetting,
 
   @Embedded
-  var outcome: CourseOutcome?,
+  val outcome: CourseOutcome,
 ) {
   fun assertOnlyCourseIdOrCourseNamePresent() {
     if (courseId == null && otherCourseName == null) {
@@ -39,16 +40,39 @@ class CourseParticipation(
       throw BusinessException("Expected just one of courseId or otherCourseName but both values are present")
     }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as CourseParticipation
+    return id != null && id == other.id
+  }
+
+  override fun hashCode(): Int = 1004284837
 }
+
+@Embeddable
+class CourseParticipationSetting(
+  var location: String? = null,
+
+  @Enumerated(EnumType.STRING)
+  var type: CourseSetting,
+)
 
 @Embeddable
 class CourseOutcome(
   @Enumerated(EnumType.STRING)
   @Column(name = "outcome_status")
-  var status: CourseStatus?,
+  var status: CourseStatus? = null,
 
   @Column(name = "outcome_detail")
-  var detail: String?,
+  var detail: String? = null,
+
+  var yearStarted: Year? = null,
+  var yearCompleted: Year? = null,
+
+  @Formula("0")
+  private val ignoreMe: Int = 0, // This unused, non-nullable field forces Hibernate to create an @Embedded instance when all fields are null.
 )
 
 enum class CourseSetting { CUSTODY, COMMUNITY }

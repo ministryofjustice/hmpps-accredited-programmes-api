@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
 import java.time.Year
@@ -57,9 +58,8 @@ class CourseParticipationControllerTest(
           courseId = courseId,
           source = "source",
           prisonNumber = "A1234AA",
-          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail"),
-          setting = CourseSetting.CUSTODY,
-          yearStarted = Year.of(2020),
+          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail", yearStarted = Year.of(2020)),
+          setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
           otherCourseName = null,
         )
       mockMvc.post("/course-participations") {
@@ -92,13 +92,13 @@ class CourseParticipationControllerTest(
         courseId = courseId,
         otherCourseName = null,
         prisonNumber = "A1234AA",
-        yearStarted = Year.of(2020),
         source = "source",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
           detail = "Detail",
+          yearStarted = Year.of(2020),
         ),
-        setting = CourseSetting.CUSTODY,
+        setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
       )
     }
 
@@ -160,13 +160,13 @@ class CourseParticipationControllerTest(
         id = courseParticipationId,
         otherCourseName = null,
         courseId = courseId,
-        yearStarted = Year.of(2020),
         prisonNumber = "A1234BC",
         source = "source",
-        setting = CourseSetting.COMMUNITY,
+        setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY),
         outcome = CourseOutcome(
           status = CourseStatus.INCOMPLETE,
           detail = "Detail",
+          yearStarted = Year.of(2020),
         ),
       )
 
