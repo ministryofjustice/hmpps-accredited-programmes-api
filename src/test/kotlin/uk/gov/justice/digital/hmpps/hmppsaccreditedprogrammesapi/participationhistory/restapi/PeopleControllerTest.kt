@@ -15,7 +15,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringUpperCaseWithNumbers
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomUppercaseAlphanumericString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 
@@ -42,7 +42,7 @@ class PeopleControllerTest(
   inner class FindByPrisonNumber {
     @Test
     fun `GET course-participations with JWT and valid prison number returns 200 with correct body`() {
-      val sharedPrisonNumber = randomStringUpperCaseWithNumbers(6)
+      val sharedPrisonNumber = randomUppercaseAlphanumericString(6)
 
       val courseParticipationHistoryList = listOf(
         CourseParticipationEntityFactory().withPrisonNumber(sharedPrisonNumber).produce(),
@@ -71,7 +71,7 @@ class PeopleControllerTest(
     fun `GET course-participations with JWT and unknown prison number returns 200 with an empty body`() {
       every { courseParticipationService.findByPrisonNumber(any()) } returns emptyList()
 
-      mockMvc.get("/people/${randomStringUpperCaseWithNumbers(6)}/course-participations") {
+      mockMvc.get("/people/${randomUppercaseAlphanumericString(6)}/course-participations") {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {

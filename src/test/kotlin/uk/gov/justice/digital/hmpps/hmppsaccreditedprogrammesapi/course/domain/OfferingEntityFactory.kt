@@ -2,13 +2,13 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain
 
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomAlphanumericString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomEmailAddress
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringMultiCaseWithNumbers
 import java.util.UUID
 
 class OfferingEntityFactory : Factory<Offering> {
   private var id: Yielded<UUID> = { UUID.randomUUID() }
-  private var organisationId: Yielded<String> = { randomStringMultiCaseWithNumbers(6) }
+  private var organisationId: Yielded<String> = { randomAlphanumericString(6) }
   private var contactEmail: Yielded<String> = { randomEmailAddress() }
   private var secondaryContactEmail: Yielded<String> = { randomEmailAddress() }
 

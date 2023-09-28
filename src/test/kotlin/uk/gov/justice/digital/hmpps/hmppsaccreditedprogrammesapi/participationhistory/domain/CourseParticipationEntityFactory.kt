@@ -2,14 +2,14 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationh
 
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomStringUpperCaseWithNumbers
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
 import java.time.Year
 import java.util.UUID
 
 class CourseParticipationEntityFactory : Factory<CourseParticipation> {
 
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
-  private var prisonNumber: Yielded<String> = { randomStringUpperCaseWithNumbers(6) }
+  private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
   private var courseId: Yielded<UUID?> = { UUID.randomUUID() }
   private var otherCourseName: Yielded<String?> = { null }
   private var yearStarted: Yielded<Year?> = { null }

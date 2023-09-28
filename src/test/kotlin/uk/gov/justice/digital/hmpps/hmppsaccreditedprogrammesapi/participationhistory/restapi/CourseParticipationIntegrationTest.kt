@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.prisonNumber
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import java.util.UUID
 
@@ -30,7 +30,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Creating a course participation should return 201 with correct body`() {
     val courseId = getFirstCourseId()
-    val prisonNumber = prisonNumber()
+    val prisonNumber = randomPrisonNumber()
 
     val createdCourseParticipationId = createCourseParticipation(
       courseId = courseId,
@@ -57,7 +57,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val createCourseParticipationErrorResponse = createCourseParticipation(
       courseId = getFirstCourseId(),
       otherCourseName = "A Course",
-      prisonNumber = prisonNumber(),
+      prisonNumber = randomPrisonNumber(),
     ).expectStatus().isBadRequest
       .expectBody<ErrorResponse>()
       .returnResult().responseBody!!
@@ -72,7 +72,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Updating a course participation with a valid payload should return 200 with correct body`() {
     val courseId = getFirstCourseId()
-    val prisonNumber = prisonNumber()
+    val prisonNumber = randomPrisonNumber()
 
     val courseParticipationId = createCourseParticipation(
       courseId = courseId,
@@ -119,8 +119,8 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Searching for a course participation with a valid prison number should return 200 with correct body`() {
-    val prisonNumber = prisonNumber()
-    val otherPrisonNumber = prisonNumber()
+    val prisonNumber = randomPrisonNumber()
+    val otherPrisonNumber = randomPrisonNumber()
 
     val createdCourseParticipationIds = getCourseIds().map {
       createCourseParticipation(
@@ -163,13 +163,13 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     getCourseIds().forEach {
       createCourseParticipation(
         courseId = it,
-        prisonNumber = prisonNumber(),
+        prisonNumber = randomPrisonNumber(),
       ).expectStatus().isCreated
         .expectBody<CourseParticipation>()
         .returnResult().responseBody!!
     }
 
-    val randomPrisonNumber = prisonNumber()
+    val randomPrisonNumber = randomPrisonNumber()
 
     val courseParticipationsForPrisonNumber = webTestClient
       .get()
@@ -186,7 +186,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Deleting a course participation returns 204 with no body`() {
-    val randomPrisonNumber = prisonNumber()
+    val randomPrisonNumber = randomPrisonNumber()
 
     val createdCourseParticipationId = createCourseParticipation(
       courseId = getFirstCourseId(),
