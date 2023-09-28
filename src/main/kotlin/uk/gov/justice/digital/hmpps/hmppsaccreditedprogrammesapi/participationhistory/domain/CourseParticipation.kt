@@ -4,17 +4,25 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import org.hibernate.Hibernate
 import org.hibernate.annotations.Formula
+import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.domain.BusinessException
+import java.time.LocalDateTime
 import java.time.Year
 import java.util.UUID
 
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 class CourseParticipation(
   @Id
   @GeneratedValue
@@ -31,6 +39,18 @@ class CourseParticipation(
 
   @Embedded
   val outcome: CourseOutcome,
+
+  @CreatedBy
+  var createdByUsername: String = "anonymous",
+
+  @CreatedDate
+  var createdDateTime: LocalDateTime = LocalDateTime.MIN,
+
+  @LastModifiedBy
+  var lastModifiedByUsername: String? = null,
+
+  @LastModifiedDate
+  var lastModifiedDateTime: LocalDateTime? = null,
 ) {
   fun assertOnlyCourseIdOrCourseNamePresent() {
     if (courseId == null && otherCourseName == null) {
@@ -52,7 +72,7 @@ class CourseParticipation(
 }
 
 @Embeddable
-class CourseParticipationSetting(
+data class CourseParticipationSetting(
   var location: String? = null,
 
   @Enumerated(EnumType.STRING)
@@ -60,7 +80,7 @@ class CourseParticipationSetting(
 )
 
 @Embeddable
-class CourseOutcome(
+data class CourseOutcome(
   @Enumerated(EnumType.STRING)
   @Column(name = "outcome_status")
   var status: CourseStatus? = null,

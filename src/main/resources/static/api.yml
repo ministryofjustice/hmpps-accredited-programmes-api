@@ -817,8 +817,16 @@ components:
               description: A unique identifier for this record of participation in a course.
               type: string
               format: uuid
+            addedBy:
+              description: The identity of the person who added this CourseParticipation
+              type: string
+            createdAt:
+              description: The date and time at which this CourseParticipation was created. ISO 8601 date-time format.
+              type: string
           required:
             - id
+            - addedBy
+            - createdAt
 
     CourseParticipationSettingType:
       description: Either Custody or Community.

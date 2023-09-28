@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationh
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -24,6 +26,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.TEST_USER_NAME
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,6 +42,7 @@ constructor(
 ) {
   @Test
   fun `Add and retrieve a course participation history - happy flow`() {
+    val startTime = LocalDateTime.now()
     val courseId = getFirstCourseId()
 
     val cpa = webTestClient
@@ -78,21 +84,28 @@ constructor(
       .expectBody<CourseParticipation>()
       .returnResult().responseBody!!
 
-    courseParticipation shouldBe CourseParticipation(
-      id = cpa.id,
-      courseId = courseId,
-      prisonNumber = "A1234AA",
-      setting = CourseParticipationSetting(
-        type = CourseParticipationSettingType.custody,
-        location = "location",
+    courseParticipation.shouldBeEqualToIgnoringFields(
+      CourseParticipation(
+        id = cpa.id,
+        courseId = courseId,
+        prisonNumber = "A1234AA",
+        setting = CourseParticipationSetting(
+          type = CourseParticipationSettingType.custody,
+          location = "location",
+        ),
+        outcome = CourseParticipationOutcome(
+          status = CourseParticipationOutcome.Status.complete,
+          yearStarted = 2021,
+          yearCompleted = 2022,
+          detail = "Some detail",
+        ),
+        addedBy = TEST_USER_NAME,
+        createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
-      outcome = CourseParticipationOutcome(
-        status = CourseParticipationOutcome.Status.complete,
-        yearStarted = 2021,
-        yearCompleted = 2022,
-        detail = "Some detail",
-      ),
+      CourseParticipation::createdAt,
     )
+
+    LocalDateTime.parse(courseParticipation.createdAt) shouldBeGreaterThanOrEqualTo startTime
   }
 
   @Test
@@ -127,11 +140,12 @@ constructor(
 
   @Test
   fun `Update a course participation history`() {
+    val startTime = LocalDateTime.now()
     val courseId = getFirstCourseId()
 
     val courseParticipationId = addCourseParticipationHistory(courseId, "A1234AA")
 
-    val cp = webTestClient
+    val courseParticipationFromUpdate = webTestClient
       .put()
       .uri("/course-participations/{id}", courseParticipationId)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
@@ -153,7 +167,7 @@ constructor(
       .expectBody<CourseParticipation>()
       .returnResult().responseBody
 
-    val expectedCp = CourseParticipation(
+    val expectedCourseParticipation = CourseParticipation(
       id = courseParticipationId,
       courseId = courseId,
       setting = CourseParticipationSetting(
@@ -165,10 +179,13 @@ constructor(
         detail = "Some detail",
         yearStarted = 2020,
       ),
+      addedBy = TEST_USER_NAME,
+      createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
     )
 
-    cp shouldBe expectedCp
-    getCourseParticipation(courseParticipationId) shouldBe expectedCp
+    courseParticipationFromUpdate.shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
+    LocalDateTime.parse(courseParticipationFromUpdate!!.createdAt) shouldBeGreaterThanOrEqualTo startTime
+    getCourseParticipation(courseParticipationId).shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
   }
 
   @Test
