@@ -51,19 +51,5 @@ class CourseOutcome(
   var detail: String?,
 )
 
-enum class CourseSetting {
-  CUSTODY,
-  COMMUNITY,
-  ;
-
-  override fun toString(): String = name.lowercase()
-}
-
-enum class CourseStatus {
-  DESELECTED,
-  INCOMPLETE,
-  COMPLETE,
-  ;
-
-  override fun toString(): String = name.lowercase()
-}
+enum class CourseSetting { CUSTODY, COMMUNITY }
+enum class CourseStatus { INCOMPLETE, COMPLETE }

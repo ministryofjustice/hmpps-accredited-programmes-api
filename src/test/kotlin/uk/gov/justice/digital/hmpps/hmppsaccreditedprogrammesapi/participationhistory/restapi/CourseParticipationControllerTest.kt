@@ -1,11 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.restapi
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -20,20 +19,20 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CoursesControllerTest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
+import java.time.Year
 import java.util.UUID
 
 @WebMvcTest
-@ContextConfiguration(classes = [CoursesControllerTest::class])
+@ContextConfiguration(classes = [CourseParticipationControllerTest::class])
 @ComponentScan(
   basePackages = [
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config",
+    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi",
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api",
   ],
 )
@@ -46,41 +45,61 @@ class CourseParticipationControllerTest(
   private lateinit var courseParticipationService: CourseParticipationService
 
   @Nested
-  inner class AddParticipationHistoryTests {
+  inner class AddCourseParticipationTests {
     @Test
     fun `POST course participation with JWT and valid payload with valid id returns 201 with correct body`() {
-      val courseParticipationHistory = CourseParticipationEntityFactory()
-        .withId(UUID.randomUUID())
-        .withSource("source")
-        .withOutcome(CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail"))
-        .withSetting(CourseSetting.CUSTODY)
-        .produce()
-
-      every { courseParticipationService.addCourseParticipation(any()) } returns courseParticipationHistory
-
+      val uuid = UUID.randomUUID()
+      val courseId = UUID.randomUUID()
+      val courseParticipationSlot = slot<CourseParticipation>()
+      every { courseParticipationService.addCourseParticipation(capture(courseParticipationSlot)) } returns
+        CourseParticipation(
+          id = uuid,
+          courseId = courseId,
+          source = "source",
+          prisonNumber = "A1234AA",
+          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail"),
+          setting = CourseSetting.CUSTODY,
+          yearStarted = Year.of(2020),
+          otherCourseName = null,
+        )
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = jacksonObjectMapper()
-          .registerModule(JavaTimeModule())
-          .configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true)
-          .writeValueAsString(courseParticipationHistory)
+        content = """
+          { 
+            "otherCourseName": null,
+            "courseId": "$courseId",
+            "prisonNumber": "A1234AA",
+            "source": "source",
+            "setting": {
+              "type": "custody"
+            },
+            "outcome": {
+              "status": "complete",
+              "detail": "Detail",
+              "yearStarted": 2020
+            }
+          }"""
       }.andExpect {
         status { isCreated() }
         content {
-          jsonPath("$.id") { value(courseParticipationHistory.id.toString()) }
-          jsonPath("$.courseId") { value(courseParticipationHistory.courseId.toString()) }
-          jsonPath("$.prisonNumber") { value(courseParticipationHistory.prisonNumber) }
-          jsonPath("$.yearStarted") { value(courseParticipationHistory.yearStarted) }
-          jsonPath("$.source") { value(courseParticipationHistory.source) }
-          jsonPath("$.outcome.status") { value(courseParticipationHistory.outcome?.status?.name?.lowercase()) }
-          jsonPath("$.outcome.detail") { value(courseParticipationHistory.outcome?.detail) }
-          jsonPath("$.setting") { value(courseParticipationHistory.setting?.name?.lowercase()) }
+          json(""" { "id": "$uuid" } """)
         }
       }
-
       verify { courseParticipationService.addCourseParticipation(any()) }
+      courseParticipationSlot.captured shouldBeEqualToComparingFields CourseParticipation(
+        courseId = courseId,
+        otherCourseName = null,
+        prisonNumber = "A1234AA",
+        yearStarted = Year.of(2020),
+        source = "source",
+        outcome = CourseOutcome(
+          status = CourseStatus.COMPLETE,
+          detail = "Detail",
+        ),
+        setting = CourseSetting.CUSTODY,
+      )
     }
 
     @Test
@@ -106,12 +125,24 @@ class CourseParticipationControllerTest(
 
     @Test
     fun `POST course participation without JWT returns 401`() {
-      val courseParticipationHistory = CourseParticipationEntityFactory().produce()
-
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
-        content = jacksonObjectMapper().writeValueAsString(courseParticipationHistory)
+        content = """
+          { 
+            "otherCourseName": null,
+            "courseId": "${UUID.randomUUID()}",
+            "prisonNumber": "A1234AA",
+            "source": "source",
+            "setting": {
+              "type": "custody"
+            },
+            "outcome": {
+              "status": "complete",
+              "detail": "Detail",
+              "yearStarted": 2020
+            }
+          }"""
       }.andExpect {
         status { isUnauthorized() }
       }
@@ -119,33 +150,63 @@ class CourseParticipationControllerTest(
   }
 
   @Nested
-  inner class GetParticipationHistoryTests {
+  inner class GetCourseParticipationTests {
     @Test
     fun `GET course participation with JWT returns 200 with correct body`() {
-      val courseParticipation = CourseParticipationEntityFactory().produce()
+      val courseParticipationId = UUID.randomUUID()
+      val courseId = UUID.randomUUID()
 
-      every { courseParticipationService.getCourseParticipation(any()) } returns courseParticipation
+      every { courseParticipationService.getCourseParticipation(any()) } returns CourseParticipation(
+        id = courseParticipationId,
+        otherCourseName = null,
+        courseId = courseId,
+        yearStarted = Year.of(2020),
+        prisonNumber = "A1234BC",
+        source = "source",
+        setting = CourseSetting.COMMUNITY,
+        outcome = CourseOutcome(
+          status = CourseStatus.INCOMPLETE,
+          detail = "Detail",
+        ),
+      )
 
-      mockMvc.get("/course-participations/${courseParticipation.id}") {
+      mockMvc.get("/course-participations/{id}", courseParticipationId) {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
         content {
-          jsonPath("$.id") { value(courseParticipation.id.toString()) }
+          json(
+            """
+            { 
+              "id": "$courseParticipationId",
+              "otherCourseName": null,
+              "courseId": "$courseId",
+              "prisonNumber": "A1234BC",
+              "source": "source",
+              "setting": {
+                type: "community"
+              },
+              "outcome": {
+                "status": "incomplete",
+                "detail": "Detail",
+                "yearStarted": 2020
+              }
+            }""",
+          )
         }
       }
 
-      verify { courseParticipationService.getCourseParticipation(courseParticipation.id!!) }
+      verify { courseParticipationService.getCourseParticipation(courseParticipationId) }
     }
 
     @Test
     fun `GET course participation with random UUID returns 404 with error body`() {
-      val randomId = UUID.randomUUID()
+      val courseParticipationId = UUID.randomUUID()
 
       every { courseParticipationService.getCourseParticipation(any()) } returns null
 
-      mockMvc.get("/course-participations/$randomId") {
+      mockMvc.get("/course-participations/{id}", courseParticipationId) {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
@@ -154,13 +215,13 @@ class CourseParticipationControllerTest(
           contentType(MediaType.APPLICATION_JSON)
           jsonPath("$.status") { value(404) }
           jsonPath("$.errorCode") { isEmpty() }
-          jsonPath("$.userMessage") { value("Not Found: No course participation found for id $randomId") }
-          jsonPath("$.developerMessage") { value("No course participation found for id $randomId") }
+          jsonPath("$.userMessage") { value("Not Found: No course participation found for id $courseParticipationId") }
+          jsonPath("$.developerMessage") { value("No course participation found for id $courseParticipationId") }
           jsonPath("$.moreInfo") { isEmpty() }
         }
       }
 
-      verify { courseParticipationService.getCourseParticipation(randomId) }
+      verify { courseParticipationService.getCourseParticipation(courseParticipationId) }
     }
 
     @Test
