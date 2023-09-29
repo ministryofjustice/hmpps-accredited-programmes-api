@@ -11,6 +11,7 @@ fun DomainReferral.toApi(): ApiReferral = ApiReferral(
   prisonNumber = prisonNumber,
   referrerId = referrerId,
   oasysConfirmed = oasysConfirmed,
+  hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   reason = reason,
   status = status.toApi(),
 )

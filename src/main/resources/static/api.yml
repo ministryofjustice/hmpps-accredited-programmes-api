@@ -225,6 +225,7 @@ paths:
       tags:
         - Referrals
       summary: Start a referral
+      operationId: startReferral
       requestBody:
         required: true
         content:
@@ -249,6 +250,7 @@ paths:
 
     get:
       summary: Retrieve some referrals
+      operationId: getReferrals
       tags:
         - Referrals
       parameters:
@@ -298,6 +300,7 @@ paths:
       tags:
         - Referrals
       summary: Retrieve a referral
+      operationId: getReferral
       parameters:
         - name: id
           in: path
@@ -324,6 +327,7 @@ paths:
       tags:
         - Referrals
       summary: Update a referral
+      operationId: updateReferral
       parameters:
         - name: id
           in: path
@@ -353,6 +357,7 @@ paths:
       summary: Change a referral's status
       tags:
         - Referrals
+      operationId: updateReferralStatus
       parameters:
         - name: id
           in: path
@@ -889,8 +894,12 @@ components:
         oasysConfirmed:
           type: boolean
           default: false
+        hasReviewedProgrammeHistory:
+          type: boolean
+          default: false
       required:
         - oasysConfirmed
+        - hasReviewedProgrammeHistory
 
     Referral:
       allOf:

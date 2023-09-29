@@ -83,6 +83,8 @@ constructor(
     val referral = ReferralEntityFactory()
       .withId(UUID.randomUUID())
       .withOfferingId(UUID.randomUUID())
+      .withOasysConfirmed(true)
+      .withHasReviewedProgrammeHistory(true)
       .produce()
 
     every { referralService.getReferral(any()) } returns referral
@@ -98,7 +100,8 @@ constructor(
         jsonPath("$.prisonNumber") { value(referral.prisonNumber) }
         jsonPath("$.referrerId") { value(referral.referrerId) }
         jsonPath("$.status") { REFERRAL_STARTED }
-        jsonPath("$.oasysConfirmed") { value(false) }
+        jsonPath("$.oasysConfirmed") { value(true) }
+        jsonPath("$.hasReviewedProgrammeHistory") { value(true) }
         jsonPath("$.reason") { doesNotExist() }
       }
     }
