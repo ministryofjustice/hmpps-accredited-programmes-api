@@ -38,12 +38,12 @@ fun CourseParticipationSettingType.toDomain() = when (this) {
 }
 
 fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
-  type = type.toDomain(),
+  type = type?.toDomain(),
   location = location,
 )
 
 fun CourseParticipationSetting.toApi() = ApiCourseParticipationSetting(
-  type = type.toApi(),
+  type = type?.toApi(),
   location = location,
 )
 
