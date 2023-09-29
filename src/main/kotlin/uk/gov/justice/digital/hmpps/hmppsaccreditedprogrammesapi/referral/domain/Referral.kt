@@ -26,6 +26,7 @@ class Referral(
   val referrerId: String,
   var reason: String? = null,
   var oasysConfirmed: Boolean = false,
+  var hasReviewedProgrammeHistory: Boolean = false,
   @Enumerated(STRING)
   var status: Status = REFERRAL_STARTED,
 ) {
