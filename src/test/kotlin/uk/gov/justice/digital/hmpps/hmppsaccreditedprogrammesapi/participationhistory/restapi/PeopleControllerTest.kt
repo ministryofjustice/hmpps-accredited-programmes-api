@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockHttpServletRequestDsl
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomLowercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
@@ -23,7 +24,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
+import java.time.LocalDateTime
 import java.time.Year
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @WebMvcTest
@@ -49,6 +52,9 @@ class PeopleControllerTest(
     @Test
     fun `GET course-participations with JWT and valid prison number returns 200 with correct body`() {
       val prisonNumber = randomPrisonNumber()
+      val createdAt = LocalDateTime.now()
+      val username = randomLowercaseString(10)
+
       val courseParticipations = listOf(
         CourseParticipation(
           id = UUID.randomUUID(),
@@ -58,6 +64,8 @@ class PeopleControllerTest(
           source = "S1",
           setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = "A location"),
           outcome = CourseOutcome(status = CourseStatus.INCOMPLETE, detail = "Detail", yearStarted = Year.of(2018), yearCompleted = Year.of(2023)),
+          createdByUsername = username,
+          createdDateTime = createdAt,
         ),
         CourseParticipation(
           id = UUID.randomUUID(),
@@ -67,6 +75,8 @@ class PeopleControllerTest(
           source = "S2",
           setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
           outcome = CourseOutcome(),
+          createdByUsername = username,
+          createdDateTime = createdAt,
         ),
       )
 
@@ -89,7 +99,9 @@ class PeopleControllerTest(
                 "prisonNumber": "$prisonNumber",
                 "source": "S1",
                 "setting": { "type": "community", "location": "A location" },
-                "outcome": { "status": "incomplete", "detail": "Detail", "yearStarted": 2018, "yearCompleted": 2023 }
+                "outcome": { "status": "incomplete", "detail": "Detail", "yearStarted": 2018, "yearCompleted": 2023 },
+                "addedBy": "$username",
+                "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
               },
               {
                 "id": "${courseParticipations[1].id}",
@@ -98,7 +110,9 @@ class PeopleControllerTest(
                 "prisonNumber": "$prisonNumber",
                 "source": "S2",
                 "setting": { "type": "custody", "location": null },
-                "outcome": { "detail":  null, "status":  null, "yearStarted":  null, "yearCompleted":  null }
+                "outcome": { "detail":  null, "status":  null, "yearStarted":  null, "yearCompleted":  null },
+                "addedBy": "$username",
+                "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
               }
             ]""",
           )
