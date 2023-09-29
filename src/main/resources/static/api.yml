@@ -889,8 +889,12 @@ components:
         oasysConfirmed:
           type: boolean
           default: false
+        hasReviewedProgrammeHistory:
+          type: boolean
+          default: false
       required:
         - oasysConfirmed
+        - hasReviewedProgrammeHistory
 
     Referral:
       allOf:
