@@ -76,7 +76,10 @@ data class CourseParticipationSetting(
   var location: String? = null,
 
   @Enumerated(EnumType.STRING)
-  var type: CourseSetting,
+  var type: CourseSetting?,
+
+  @Formula("0")
+  private val ignoreMe: Int = 0, // This unused, non-nullable field forces Hibernate to create an @Embedded instance when all fields are null.
 )
 
 @Embeddable
