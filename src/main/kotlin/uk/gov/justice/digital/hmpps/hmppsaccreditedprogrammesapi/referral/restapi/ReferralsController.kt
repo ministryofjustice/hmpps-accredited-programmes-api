@@ -18,7 +18,7 @@ class ReferralsController(
   val referralService: ReferralService,
 ) : ReferralsApiDelegate {
 
-  override fun referralsPost(startReferral: StartReferral): ResponseEntity<ReferralStarted> =
+  override fun startReferral(startReferral: StartReferral): ResponseEntity<ReferralStarted> =
     referralService.startReferral(
       prisonNumber = startReferral.prisonNumber,
       referrerId = startReferral.referrerId,
@@ -27,18 +27,18 @@ class ReferralsController(
       ResponseEntity.status(HttpStatus.CREATED).body(ReferralStarted(it))
     } ?: throw Exception("Unable to start referral")
 
-  override fun referralsIdGet(id: UUID): ResponseEntity<Referral> =
+  override fun getReferral(id: UUID): ResponseEntity<Referral> =
     referralService
       .getReferral(id)
       ?.let { ResponseEntity.ok(it.toApi()) }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 
-  override fun referralsIdPut(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> = with(referralUpdate) {
+  override fun updateReferral(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> = with(referralUpdate) {
     referralService.updateReferral(id, reason, oasysConfirmed)
     ResponseEntity.noContent().build()
   }
 
-  override fun referralsIdStatusPut(id: UUID, statusUpdate: StatusUpdate): ResponseEntity<Unit> {
+  override fun updateReferralStatus(id: UUID, statusUpdate: StatusUpdate): ResponseEntity<Unit> {
     referralService.updateReferralStatus(id, statusUpdate.status.toDomain())
     return ResponseEntity.noContent().build()
   }
