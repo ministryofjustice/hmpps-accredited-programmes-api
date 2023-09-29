@@ -21,10 +21,11 @@ class ReferralService(
 
   fun getReferral(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
 
-  fun updateReferral(referralId: UUID, reason: String?, oasysConfirmed: Boolean) {
+  fun updateReferral(referralId: UUID, reason: String?, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean) {
     val referral = referralRepository.getReferenceById(referralId)
     referral.reason = reason
     referral.oasysConfirmed = oasysConfirmed
+    referral.hasReviewedProgrammeHistory = hasReviewedProgrammeHistory
   }
 
   fun updateReferralStatus(referralId: UUID, nextStatus: Status) {

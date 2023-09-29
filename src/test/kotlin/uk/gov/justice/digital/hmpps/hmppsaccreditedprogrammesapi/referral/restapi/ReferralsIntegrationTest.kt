@@ -43,6 +43,7 @@ class ReferralsIntegrationTest : IntegrationTestBase() {
       status = ReferralStatus.referralStarted,
       reason = null,
       oasysConfirmed = false,
+      hasReviewedProgrammeHistory = false,
     )
   }
 
@@ -61,6 +62,7 @@ class ReferralsIntegrationTest : IntegrationTestBase() {
         ReferralUpdate(
           reason = "A Reason",
           oasysConfirmed = true,
+          hasReviewedProgrammeHistory = true,
         ),
       )
       .exchange()
@@ -74,6 +76,7 @@ class ReferralsIntegrationTest : IntegrationTestBase() {
       status = ReferralStatus.referralStarted,
       reason = "A Reason",
       oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
     )
   }
 
