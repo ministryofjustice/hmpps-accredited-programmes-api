@@ -10,7 +10,6 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import org.hibernate.Hibernate
-import org.hibernate.annotations.Formula
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
@@ -36,10 +35,10 @@ class CourseParticipation(
   var detail: String?,
 
   @Embedded
-  var setting: CourseParticipationSetting,
+  var setting: CourseParticipationSetting? = null,
 
   @Embedded
-  val outcome: CourseOutcome,
+  var outcome: CourseOutcome? = null,
 
   @CreatedBy
   var createdByUsername: String = "anonymous",
@@ -77,23 +76,17 @@ data class CourseParticipationSetting(
   var location: String? = null,
 
   @Enumerated(EnumType.STRING)
-  var type: CourseSetting?,
-
-  @Formula("0")
-  private val ignoreMe: Int = 0, // This unused, non-nullable field forces Hibernate to create an @Embedded instance when all fields are null.
+  var type: CourseSetting,
 )
 
 @Embeddable
 data class CourseOutcome(
   @Enumerated(EnumType.STRING)
   @Column(name = "outcome_status")
-  var status: CourseStatus? = null,
+  var status: CourseStatus,
 
   var yearStarted: Year? = null,
   var yearCompleted: Year? = null,
-
-  @Formula("0")
-  private val ignoreMe: Int = 0, // This unused, non-nullable field forces Hibernate to create an @Embedded instance when all fields are null.
 )
 
 enum class CourseSetting { CUSTODY, COMMUNITY }

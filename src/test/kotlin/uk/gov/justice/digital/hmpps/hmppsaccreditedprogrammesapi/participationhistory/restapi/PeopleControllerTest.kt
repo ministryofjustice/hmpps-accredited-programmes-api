@@ -50,7 +50,7 @@ class PeopleControllerTest(
   @Nested
   inner class FindByPrisonNumber {
     @Test
-    fun `GET course-participations with JWT and valid prison number returns 200 with correct body`() {
+    fun `getCourseParticipationsForPrisonNumber with JWT and valid prison number returns 200 with correct body`() {
       val prisonNumber = randomPrisonNumber()
       val createdAt = LocalDateTime.now()
       val username = randomLowercaseString(10)
@@ -76,7 +76,7 @@ class PeopleControllerTest(
           source = "Source of information 2",
           detail = "Course detail 2",
           setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
-          outcome = CourseOutcome(),
+          outcome = CourseOutcome(status = CourseStatus.INCOMPLETE),
           createdByUsername = username,
           createdDateTime = createdAt,
         ),
@@ -114,7 +114,7 @@ class PeopleControllerTest(
                 "source": "Source of information 2",
                 "detail": "Course detail 2",
                 "setting": { "type": "custody", "location": null },
-                "outcome": { "status":  null, "yearStarted":  null, "yearCompleted":  null },
+                "outcome": { "status": "incomplete", "yearStarted": null, "yearCompleted":  null },
                 "addedBy": "$username",
                 "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
               }
@@ -127,7 +127,7 @@ class PeopleControllerTest(
     }
 
     @Test
-    fun `GET course-participations with JWT and unknown prison number returns 200 with an empty body`() {
+    fun `getCourseParticipationsForPrisonNumber with JWT and unknown prison number returns 200 with empty body`() {
       every { service.findByPrisonNumber(any()) } returns emptyList()
 
       mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {

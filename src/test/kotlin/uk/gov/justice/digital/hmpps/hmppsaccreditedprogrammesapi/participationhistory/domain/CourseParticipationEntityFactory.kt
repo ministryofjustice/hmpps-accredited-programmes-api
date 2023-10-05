@@ -14,7 +14,7 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
   private var source: Yielded<String?> = { null }
   private var detail: Yielded<String?> = { null }
   private var setting: Yielded<CourseParticipationSetting> = { CourseParticipationSetting(type = CourseSetting.CUSTODY) }
-  private var outcome: Yielded<CourseOutcome> = { CourseOutcome() }
+  private var outcome: Yielded<CourseOutcome> = { CourseOutcome(status = CourseStatus.INCOMPLETE) }
 
   fun withId(id: UUID) = apply {
     this.id = { id }

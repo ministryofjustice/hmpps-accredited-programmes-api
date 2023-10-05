@@ -30,7 +30,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
-  fun `It should successfully save and retrieve a CourseParticipation entity`() {
+  fun `Should save and retrieve a CourseParticipation entity`() {
     val courseId = courseEntityRepository.save(CourseEntity(name = "A Course", identifier = "ID")).id!!
     val startTime = LocalDateTime.now()
     val prisonNumber = randomPrisonNumber()
@@ -79,7 +79,7 @@ constructor(
   }
 
   @Test
-  fun `It should successfully save and retrieve a CourseParticipation entity having all nullable fields set to null`() {
+  fun `Should save and retrieve a CourseParticipation entity having all nullable fields set to null`() {
     val prisonNumber = randomPrisonNumber()
 
     val participationId = courseParticipationRepository.save(
@@ -89,8 +89,8 @@ constructor(
         otherCourseName = "Other course name",
         source = null,
         detail = null,
-        setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
+        setting = null,
+        outcome = null,
       ),
     ).id!!
 
@@ -108,8 +108,8 @@ constructor(
         otherCourseName = "Other course name",
         source = null,
         detail = null,
-        setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
+        setting = null,
+        outcome = null,
         createdByUsername = TEST_USER_NAME,
       ),
       CourseParticipation::createdDateTime,
@@ -117,7 +117,7 @@ constructor(
   }
 
   @Test
-  fun `save and update a course participation history - audit fields`() {
+  fun `Should save and update a CouseParticipation entity with all auditable fields`() {
     val startTime = LocalDateTime.now()
     val prisonNumber = randomPrisonNumber()
 
@@ -129,12 +129,12 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
+        outcome = CourseOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
       ),
     ).id!!
 
     val persistentHistory = courseParticipationRepository.findById(participationId).get()
-    persistentHistory.setting.type = CourseSetting.CUSTODY
+    persistentHistory.setting?.type = CourseSetting.CUSTODY
 
     commitAndStartNewTx()
 
@@ -147,7 +147,7 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),
-        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
+        outcome = CourseOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
         createdByUsername = TEST_USER_NAME,
         lastModifiedByUsername = TEST_USER_NAME,
       ),

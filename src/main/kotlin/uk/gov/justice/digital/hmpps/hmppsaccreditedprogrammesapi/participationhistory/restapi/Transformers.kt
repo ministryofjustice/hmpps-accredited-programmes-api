@@ -22,8 +22,8 @@ fun CreateCourseParticipation.toDomain() =
     otherCourseName = otherCourseName,
     source = source,
     detail = detail,
-    setting = setting.toDomain(),
-    outcome = outcome.toDomain(),
+    setting = setting?.toDomain(),
+    outcome = outcome?.toDomain(),
   )
 
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
@@ -31,8 +31,8 @@ fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   otherCourseName = otherCourseName,
   source = source,
   detail = detail,
-  setting = setting.toDomain(),
-  outcome = outcome.toDomain(),
+  setting = setting?.toDomain(),
+  outcome = outcome?.toDomain(),
 )
 
 fun CourseParticipationSettingType.toDomain() = when (this) {
@@ -41,12 +41,12 @@ fun CourseParticipationSettingType.toDomain() = when (this) {
 }
 
 fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
-  type = type?.toDomain(),
+  type = type.toDomain(),
   location = location,
 )
 
 fun CourseParticipationSetting.toApi() = ApiCourseParticipationSetting(
-  type = type?.toApi(),
+  type = type.toApi(),
   location = location,
 )
 
@@ -57,7 +57,7 @@ fun CourseSetting.toApi() = when (this) {
 
 fun CourseParticipationOutcome.toDomain() =
   CourseOutcome(
-    status = status?.toDomain(),
+    status = status.toDomain(),
     yearStarted = yearStarted?.let(Year::of),
     yearCompleted = yearCompleted?.let(Year::of),
   )
@@ -75,16 +75,16 @@ fun CourseStatus.toApi() = when (this) {
 fun CourseParticipation.toApi() = ApiCourseParticipation(
   id = id!!,
   prisonNumber = prisonNumber,
-  setting = setting.toApi(),
+  setting = setting?.toApi(),
   courseId = courseId,
   otherCourseName = otherCourseName,
   source = source,
   detail = detail,
-  outcome = with(outcome) {
+  outcome = outcome?.let {
     CourseParticipationOutcome(
-      status = status?.toApi(),
-      yearStarted = yearStarted?.value,
-      yearCompleted = yearCompleted?.value,
+      status = it.status.toApi(),
+      yearStarted = it.yearStarted?.value,
+      yearCompleted = it.yearCompleted?.value,
     )
   },
   addedBy = createdByUsername,
