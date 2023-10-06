@@ -57,8 +57,9 @@ class CourseParticipationControllerTest(
           id = uuid,
           courseId = courseId,
           source = "source",
+          detail = "Course detail",
           prisonNumber = "A1234AA",
-          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Detail", yearStarted = Year.of(2020)),
+          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Course outcome detail", yearStarted = Year.of(2020)),
           setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
           otherCourseName = null,
         )
@@ -72,12 +73,13 @@ class CourseParticipationControllerTest(
             "courseId": "$courseId",
             "prisonNumber": "A1234AA",
             "source": "source",
+            "detail": "Course detail",
             "setting": {
               "type": "custody"
             },
             "outcome": {
               "status": "complete",
-              "detail": "Detail",
+              "detail": "Course outcome detail",
               "yearStarted": 2020
             }
           }"""
@@ -93,9 +95,10 @@ class CourseParticipationControllerTest(
         otherCourseName = null,
         prisonNumber = "A1234AA",
         source = "source",
+        detail = "Course detail",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
-          detail = "Detail",
+          detail = "Course outcome detail",
           yearStarted = Year.of(2020),
         ),
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
@@ -134,12 +137,13 @@ class CourseParticipationControllerTest(
             "courseId": "${UUID.randomUUID()}",
             "prisonNumber": "A1234AA",
             "source": "source",
+            "detail": "Course detail",
             "setting": {
               "type": "custody"
             },
             "outcome": {
               "status": "complete",
-              "detail": "Detail",
+              "detail": "Course outcome detail",
               "yearStarted": 2020
             }
           }"""
@@ -162,10 +166,11 @@ class CourseParticipationControllerTest(
         courseId = courseId,
         prisonNumber = "A1234BC",
         source = "source",
+        detail = "Course detail",
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY),
         outcome = CourseOutcome(
           status = CourseStatus.INCOMPLETE,
-          detail = "Detail",
+          detail = "Course outcome detail",
           yearStarted = Year.of(2020),
         ),
       )
@@ -184,12 +189,13 @@ class CourseParticipationControllerTest(
               "courseId": "$courseId",
               "prisonNumber": "A1234BC",
               "source": "source",
+              "detail": "Course detail",
               "setting": {
                 type: "community"
               },
               "outcome": {
                 "status": "incomplete",
-                "detail": "Detail",
+                "detail": "Course outcome detail",
                 "yearStarted": 2020
               }
             }""",

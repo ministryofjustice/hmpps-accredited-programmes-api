@@ -12,6 +12,7 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
   private var courseId: Yielded<UUID?> = { UUID.randomUUID() }
   private var otherCourseName: Yielded<String?> = { null }
   private var source: Yielded<String?> = { null }
+  private var detail: Yielded<String?> = { null }
   private var setting: Yielded<CourseParticipationSetting> = { CourseParticipationSetting(type = CourseSetting.CUSTODY) }
   private var outcome: Yielded<CourseOutcome> = { CourseOutcome() }
 
@@ -35,6 +36,10 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
     this.source = { source }
   }
 
+  fun withDetail(detail: String?) = apply {
+    this.detail = { detail }
+  }
+
   fun withSetting(setting: CourseParticipationSetting) = apply {
     this.setting = { setting }
   }
@@ -50,6 +55,7 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
       courseId = this.courseId(),
       otherCourseName = this.otherCourseName(),
       source = this.source(),
+      detail = this.detail(),
       setting = this.setting(),
       outcome = this.outcome(),
     )
