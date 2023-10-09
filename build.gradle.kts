@@ -79,7 +79,7 @@ tasks {
     description = "Runs this project as a Spring Boot application with the local profile"
     doFirst {
       bootRun.configure {
-        systemProperty("spring.profiles.active", "local")
+        systemProperty("spring.profiles.active", "local,dev,seed")
       }
     }
     finalizedBy("bootRun")
