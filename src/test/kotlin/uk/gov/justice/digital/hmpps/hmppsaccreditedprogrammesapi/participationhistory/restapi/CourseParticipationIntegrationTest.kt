@@ -50,6 +50,7 @@ constructor(
       CreateCourseParticipation(
         courseId = courseId,
         prisonNumber = "A1234AA",
+        detail = "Course detail",
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
           location = "location",
@@ -58,7 +59,7 @@ constructor(
           status = CourseParticipationOutcome.Status.complete,
           yearStarted = 2021,
           yearCompleted = 2022,
-          detail = "Some detail",
+          detail = "Course outcome detail",
         ),
       ),
     )
@@ -73,6 +74,7 @@ constructor(
         id = cpa.id,
         courseId = courseId,
         prisonNumber = "A1234AA",
+        detail = "Course detail",
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
           location = "location",
@@ -81,7 +83,7 @@ constructor(
           status = CourseParticipationOutcome.Status.complete,
           yearStarted = 2021,
           yearCompleted = 2022,
-          detail = "Some detail",
+          detail = "Course outcome detail",
         ),
         addedBy = TEST_USER_NAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
@@ -116,6 +118,7 @@ constructor(
         id = cpa.id,
         courseId = courseId,
         prisonNumber = prisonNumber,
+        detail = null,
         setting = CourseParticipationSetting(),
         outcome = CourseParticipationOutcome(),
         addedBy = TEST_USER_NAME,
@@ -163,6 +166,7 @@ constructor(
 
     val courseParticipationId = createCourseParticipation(minimalCourseParticipation(courseId, "A1234AA")).id
 
+    val updatedDetail = "Some detail"
     val courseParticipationFromUpdate = updateCourseParticipation(
       courseParticipationId,
       CourseParticipationUpdate(
@@ -172,7 +176,7 @@ constructor(
         ),
         outcome = CourseParticipationOutcome(
           status = CourseParticipationOutcome.Status.incomplete,
-          detail = "Some detail",
+          detail = updatedDetail,
           yearStarted = 2020,
         ),
       ),
@@ -185,18 +189,21 @@ constructor(
         type = CourseParticipationSettingType.custody,
       ),
       prisonNumber = "A1234AA",
+      detail = updatedDetail,
       outcome = CourseParticipationOutcome(
         status = CourseParticipationOutcome.Status.incomplete,
-        detail = "Some detail",
+        detail = updatedDetail,
         yearStarted = 2020,
       ),
       addedBy = TEST_USER_NAME,
       createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
     )
 
-    courseParticipationFromUpdate.shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
+    courseParticipationFromUpdate.shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt, CourseParticipation::detail)
     LocalDateTime.parse(courseParticipationFromUpdate.createdAt) shouldBeGreaterThanOrEqualTo startTime
-    getCourseParticipation(courseParticipationId).shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
+    getCourseParticipation(courseParticipationId).shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt, CourseParticipation::detail)
+
+    expectedCourseParticipation.detail.shouldBe(courseParticipationFromUpdate.outcome.detail)
   }
 
   @Test

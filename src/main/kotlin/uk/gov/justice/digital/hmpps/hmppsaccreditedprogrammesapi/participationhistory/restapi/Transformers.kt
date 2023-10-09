@@ -21,6 +21,7 @@ fun CreateCourseParticipation.toDomain() =
     courseId = courseId,
     otherCourseName = otherCourseName,
     source = source,
+    detail = detail,
     setting = setting.toDomain(),
     outcome = outcome.toDomain(),
   )
@@ -28,6 +29,7 @@ fun CreateCourseParticipation.toDomain() =
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   courseId = courseId,
   otherCourseName = otherCourseName,
+  detail = detail,
   setting = setting.toDomain(),
   outcome = outcome.toDomain(),
 )
@@ -77,6 +79,7 @@ fun CourseParticipation.toApi() = ApiCourseParticipation(
   courseId = courseId,
   otherCourseName = otherCourseName,
   source = source,
+  detail = detail,
   outcome = with(outcome) {
     CourseParticipationOutcome(
       status = status?.toApi(),

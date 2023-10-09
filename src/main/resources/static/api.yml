@@ -795,6 +795,8 @@ components:
           $ref: '#/components/schemas/CourseParticipationSetting'
         outcome:
           $ref: '#/components/schemas/CourseParticipationOutcome'
+        detail:
+          type: string
         source:
           type: string
       required:
@@ -860,6 +862,7 @@ components:
             - complete
         detail:
           type: string
+          deprecated: true
         yearStarted:
           type: integer
         yearCompleted:

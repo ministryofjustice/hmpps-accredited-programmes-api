@@ -33,6 +33,7 @@ class CourseParticipation(
   var courseId: UUID? = null,
   var otherCourseName: String?,
   var source: String?,
+  var detail: String?,
 
   @Embedded
   var setting: CourseParticipationSetting,
@@ -89,6 +90,7 @@ data class CourseOutcome(
   var status: CourseStatus? = null,
 
   @Column(name = "outcome_detail")
+  @Deprecated("use CourseParticipation.detail instead")
   var detail: String? = null,
 
   var yearStarted: Year? = null,
