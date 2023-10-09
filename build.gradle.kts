@@ -1,7 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.4.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.5.0"
+  `jvm-test-suite`
   kotlin("plugin.spring") version "1.9.10"
   kotlin("plugin.jpa") version "1.9.10"
   id("org.openapi.generator") version "7.0.1"
@@ -15,6 +16,7 @@ dependencies {
   val kotestVersion = "5.7.2"
   val springdocVersion = "2.2.0"
   val sentryVersion = "6.30.0"
+  val jsonWebtokenVersion = "0.12.2"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
@@ -36,9 +38,9 @@ dependencies {
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
-  testImplementation("io.jsonwebtoken:jjwt-api:0.11.5")
-  testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-  testImplementation("io.jsonwebtoken:jjwt-orgjson:0.11.5")
+  testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
+  testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
+  testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.3")
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
 }
@@ -49,6 +51,26 @@ java {
 
 kotlin {
   kotlinDaemonJvmArgs = listOf("-Xmx1024m")
+}
+
+testing {
+  suites {
+    val test by getting(JvmTestSuite::class) {
+      useJUnitJupiter()
+
+      targets {
+        all {
+          testTask.configure {
+            maxParallelForks = Runtime.getRuntime().availableProcessors()
+            environment["pact_do_not_track"] = "true"
+            environment["pact.provider.tag"] = environment["PACT_PROVIDER_TAG"]
+            environment["pact.provider.version"] = environment["PACT_PROVIDER_VERSION"]
+            environment["pact.verifier.publishResults"] = environment["PACT_PUBLISH_RESULTS"] ?: "false"
+          }
+        }
+      }
+    }
+  }
 }
 
 tasks {
@@ -63,23 +85,12 @@ tasks {
     dependsOn("openApiGenerate")
   }
 
-  test {
-    useJUnitPlatform()
-
-    maxParallelForks = Runtime.getRuntime().availableProcessors()
-
-    environment["pact_do_not_track"] = "true"
-    environment["pact.provider.tag"] = environment["PACT_PROVIDER_TAG"]
-    environment["pact.provider.version"] = environment["PACT_PROVIDER_VERSION"]
-    environment["pact.verifier.publishResults"] = environment["PACT_PUBLISH_RESULTS"] ?: "false"
-  }
-
   register("bootRunLocal") {
     group = "application"
     description = "Runs this project as a Spring Boot application with the local profile"
     doFirst {
       bootRun.configure {
-        systemProperty("spring.profiles.active", "local")
+        systemProperty("spring.profiles.active", "local,dev,seed")
       }
     }
     finalizedBy("bootRun")

@@ -18,16 +18,16 @@ running in docker and prints it to stdout.
 
 The `all-courses-csv`, `all-offerings-csv` and `all-prereq-csv` scripts provide a convenient way
 to update course, offering and prerequisite information in the application. To do so
-download the CSV data to files,  edit in a spreadsheet program and ensure the changes are save
+download the CSV data to files, edit in a spreadsheet program (or IntelliJ's built-in CSV editor) and ensure the changes are saved
 in CSV format. Upload the modified file(s) using the corresponding `put-courses`, `put-offerings` or `put-prereq`
-scripts.  Courses variants and Offerings are soft-deleted when absent from the uploaded CSV.
+scripts.  Course variants and Offerings are soft-deleted when absent from the uploaded CSV.
 Returning a Course variant or Offering to the CSV will restore the soft-deleted course/offering in the application.
 
-Courses are distinguished by the value in the `identifier` column. All other values may be changed
-and will be applied to the course having that identifier.
+Courses are distinguished by the value in the `identifier` column.
+Any other column value may be changed and the change will be applied to the course with that identifier.
 
-Offerings are distinguished by course identifier and prisonId.  All other values may be changed and will
-be applied to the offering having that identifier and prisonId.
+Offerings are distinguished by course identifier and prisonId. 
+Any other value may be changed and the change will be applied to the offering having that identifier and prisonId.
 
 Prerequisites are hard-deleted.
-This is not a problem because in prerequisites do not have unique UUIDs that must be preserved in the application.
+Prerequisites do not have unique UUIDs that must be preserved in the application, so they can be deleted and recreated.

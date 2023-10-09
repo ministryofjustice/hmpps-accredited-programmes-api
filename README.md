@@ -5,55 +5,68 @@
 [![API docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](https://accredited-programmes-api-dev.hmpps.service.justice.gov.uk/swagger-ui/index.html?configUrl=/v3/api-docs)
 
 ## Prerequisites
-
+For building and running:
 - Docker
-- Java
+- Java 19
+
+Additionally, for running scripts:
+- kubectl
+- jq
+- curl
 
 ## Setup
 
-When running the application for the first time, run the following command:
+Before running the application for the first time, run the following command:
 
 ```bash
-script/setup # TODO - this script is currently a stub
-```
-
-If you're coming back to the application after a certain amount of time, you can run:
-
-```bash
-script/bootstrap # TODO - this script is currently a stub
+./gradlew clean build
 ```
 
 ## Running the application
 
-To run the server, from the root directory, run:
+The running application expects to connect to a PostgresQL database and an hmpps-auth instance.
+Use the docker-compose.yml file to pull and start these:
 
 ```bash
-script/server
+docker compose up hmpps-auth postgresql
+```
+
+Then, to run the server:
+
+```bash
+./gradlew bootRunLocal
 ```
 
 This runs the project as a Spring Boot application on `localhost:8080`
 
+You can confirm that the application is running by querying an endpoint using one of the 
+scripts in script/local-scripts. For example:
+```bash
+./scripts/local-scripts/all-courses
+```
+should output a nicely formatted JSON document containing information about courses.
+
 ### Running/Debugging from IntelliJ
 
-To run from IntelliJ, first start the database:
-
-```bash
-script/development_database
-```
+To run from IntelliJ, first start hmpps-auth and the PostgresQL database in docker as above.
 
 Then in the "Gradle" panel (`View->Tool Windows->Gradle` if not visible), expand `hmpps-accredited-programmes-api`, `Tasks`,
-`application` and right click on `bootRunLocal` and select either Run or Debug.
+`application`, right-click on `bootRunLocal` and select either Run or Debug.
 
 ## Running the tests
 
-To run linting and tests, run:
+To run linting and tests, do:
 
 ```bash
-script/test
+./gradlew clean build
 ```
+Repository integration tests use an embedded H2 database. REST API tests start a local server which listens on a random
+port.
 
 ## OpenAPI documentation
 
 The API which is offered to front-end UI apps is documented using Swagger/OpenAPI.
 
 This is available in development at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+
+
