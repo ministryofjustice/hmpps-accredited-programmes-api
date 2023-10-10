@@ -89,10 +89,6 @@ data class CourseOutcome(
   @Column(name = "outcome_status")
   var status: CourseStatus? = null,
 
-  @Column(name = "outcome_detail")
-  @Deprecated("use CourseParticipation.detail instead")
-  var detail: String? = null,
-
   var yearStarted: Year? = null,
   var yearCompleted: Year? = null,
 
