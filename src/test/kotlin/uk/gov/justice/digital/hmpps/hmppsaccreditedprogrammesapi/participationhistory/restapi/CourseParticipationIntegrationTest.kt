@@ -60,7 +60,6 @@ constructor(
           status = CourseParticipationOutcome.Status.complete,
           yearStarted = 2021,
           yearCompleted = 2022,
-          detail = "Course outcome detail",
         ),
       ),
     )
@@ -85,7 +84,6 @@ constructor(
           status = CourseParticipationOutcome.Status.complete,
           yearStarted = 2021,
           yearCompleted = 2022,
-          detail = "Course outcome detail",
         ),
         addedBy = TEST_USER_NAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
@@ -120,6 +118,7 @@ constructor(
         id = cpa.id,
         courseId = courseId,
         prisonNumber = prisonNumber,
+        source = null,
         detail = null,
         setting = CourseParticipationSetting(),
         outcome = CourseParticipationOutcome(),
@@ -138,6 +137,8 @@ constructor(
       courseId = courseId,
       otherCourseName = "A Course",
       prisonNumber = "A1234AA",
+      source = "Source of information",
+      detail = "Course detail",
       setting = CourseParticipationSetting(type = CourseParticipationSettingType.custody),
       outcome = CourseParticipationOutcome(),
     )
@@ -168,20 +169,18 @@ constructor(
     val courseParticipationId = createCourseParticipation(minimalCourseParticipation(courseId, "A1234AA")).id
     val updatedSource = "Source of information"
     val updatedDetail = "Updated course participation detail"
-    val updatedOutcomeDetail = "Updated course participation outcome detail"
 
     val courseParticipationFromUpdate = updateCourseParticipation(
       courseParticipationId,
       CourseParticipationUpdate(
         courseId = courseId,
-        source = updatedSource,
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
         ),
+        source = updatedSource,
         detail = updatedDetail,
         outcome = CourseParticipationOutcome(
           status = CourseParticipationOutcome.Status.incomplete,
-          detail = updatedOutcomeDetail,
           yearStarted = 2020,
         ),
       ),
@@ -198,7 +197,6 @@ constructor(
       detail = updatedDetail,
       outcome = CourseParticipationOutcome(
         status = CourseParticipationOutcome.Status.incomplete,
-        detail = updatedOutcomeDetail,
         yearStarted = 2020,
       ),
       addedBy = TEST_USER_NAME,

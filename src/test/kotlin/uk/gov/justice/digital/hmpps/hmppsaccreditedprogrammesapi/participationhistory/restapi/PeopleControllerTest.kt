@@ -64,7 +64,7 @@ class PeopleControllerTest(
           source = "Source of information 1",
           detail = "Course detail 1",
           setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = "A location"),
-          outcome = CourseOutcome(status = CourseStatus.INCOMPLETE, detail = "Course outcome detail", yearStarted = Year.of(2018), yearCompleted = Year.of(2023)),
+          outcome = CourseOutcome(status = CourseStatus.INCOMPLETE, yearStarted = Year.of(2018), yearCompleted = Year.of(2023)),
           createdByUsername = username,
           createdDateTime = createdAt,
         ),
@@ -102,7 +102,7 @@ class PeopleControllerTest(
                 "source": "Source of information 1",
                 "detail": "Course detail 1",
                 "setting": { "type": "community", "location": "A location" },
-                "outcome": { "status": "incomplete", "detail": "Course outcome detail", "yearStarted": 2018, "yearCompleted": 2023 },
+                "outcome": { "status": "incomplete", "yearStarted": 2018, "yearCompleted": 2023 },
                 "addedBy": "$username",
                 "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
               },
@@ -114,7 +114,7 @@ class PeopleControllerTest(
                 "source": "Source of information 2",
                 "detail": "Course detail 2",
                 "setting": { "type": "custody", "location": null },
-                "outcome": { "detail":  null, "status":  null, "yearStarted":  null, "yearCompleted":  null },
+                "outcome": { "status":  null, "yearStarted":  null, "yearCompleted":  null },
                 "addedBy": "$username",
                 "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
               }

@@ -58,7 +58,6 @@ fun CourseSetting.toApi() = when (this) {
 fun CourseParticipationOutcome.toDomain() =
   CourseOutcome(
     status = status?.toDomain(),
-    detail = detail,
     yearStarted = yearStarted?.let(Year::of),
     yearCompleted = yearCompleted?.let(Year::of),
   )
@@ -84,7 +83,6 @@ fun CourseParticipation.toApi() = ApiCourseParticipation(
   outcome = with(outcome) {
     CourseParticipationOutcome(
       status = status?.toApi(),
-      detail = detail,
       yearStarted = yearStarted?.value,
       yearCompleted = yearCompleted?.value,
     )

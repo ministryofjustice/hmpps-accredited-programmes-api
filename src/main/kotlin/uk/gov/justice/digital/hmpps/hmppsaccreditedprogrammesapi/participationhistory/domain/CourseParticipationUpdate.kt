@@ -6,7 +6,7 @@ data class CourseParticipationUpdate(
   val courseId: UUID? = null,
   val otherCourseName: String?,
   val source: String?,
-  var detail: String?,
+  val detail: String?,
   val setting: CourseParticipationSetting,
   val outcome: CourseOutcome,
 )
