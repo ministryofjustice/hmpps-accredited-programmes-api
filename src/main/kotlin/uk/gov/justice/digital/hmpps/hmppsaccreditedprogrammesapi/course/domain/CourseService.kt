@@ -139,7 +139,7 @@ class CourseService(
       )
     }
 
-    val toUpdate = updatesByPrisonId.keys.intersect(offeringsByOrganisationId.keys)
+    val toUpdate = updatesByPrisonId.keys intersect offeringsByOrganisationId.keys
     toUpdate.forEach {
       val update = updatesByPrisonId[it]
       offeringsByOrganisationId[it]?.run {

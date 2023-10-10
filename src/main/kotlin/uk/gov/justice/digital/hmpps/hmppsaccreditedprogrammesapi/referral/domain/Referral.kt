@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import org.hibernate.Hibernate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.ASSESSMENT_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_STARTED
@@ -30,6 +31,15 @@ class Referral(
   @Enumerated(STRING)
   var status: Status = REFERRAL_STARTED,
 ) {
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as Referral
+    return id != null && id == other.id
+  }
+
+  override fun hashCode(): Int = 1004284837
 
   enum class Status {
     REFERRAL_STARTED,

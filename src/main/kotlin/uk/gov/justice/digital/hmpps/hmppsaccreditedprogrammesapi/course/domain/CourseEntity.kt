@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.persistence.Transient
+import org.hibernate.Hibernate
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.SUBSELECT
 import org.hibernate.annotations.Immutable
@@ -64,7 +65,8 @@ class CourseEntity(
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other == null || other !is CourseEntity) return false
+    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+    other as CourseEntity
     return id != null && id == other.id
   }
 
