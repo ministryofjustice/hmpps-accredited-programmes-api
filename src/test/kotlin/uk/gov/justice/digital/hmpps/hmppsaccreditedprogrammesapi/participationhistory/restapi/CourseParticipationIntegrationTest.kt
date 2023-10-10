@@ -167,7 +167,8 @@ constructor(
     val courseId = getFirstCourseId()
     val courseParticipationId = createCourseParticipation(minimalCourseParticipation(courseId, "A1234AA")).id
     val updatedSource = "Source of information"
-    val updatedDetail = "Some detail"
+    val updatedDetail = "Updated course participation detail"
+    val updatedOutcomeDetail = "Updated course participation outcome detail"
 
     val courseParticipationFromUpdate = updateCourseParticipation(
       courseParticipationId,
@@ -177,9 +178,10 @@ constructor(
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
         ),
+        detail = updatedDetail,
         outcome = CourseParticipationOutcome(
           status = CourseParticipationOutcome.Status.incomplete,
-          detail = updatedDetail,
+          detail = updatedOutcomeDetail,
           yearStarted = 2020,
         ),
       ),
@@ -196,18 +198,16 @@ constructor(
       detail = updatedDetail,
       outcome = CourseParticipationOutcome(
         status = CourseParticipationOutcome.Status.incomplete,
-        detail = updatedDetail,
+        detail = updatedOutcomeDetail,
         yearStarted = 2020,
       ),
       addedBy = TEST_USER_NAME,
       createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
     )
 
-    courseParticipationFromUpdate.shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt, CourseParticipation::detail)
+    courseParticipationFromUpdate.shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
     LocalDateTime.parse(courseParticipationFromUpdate.createdAt) shouldBeGreaterThanOrEqualTo startTime
-    getCourseParticipation(courseParticipationId).shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt, CourseParticipation::detail)
-
-    expectedCourseParticipation.detail.shouldBe(courseParticipationFromUpdate.outcome.detail)
+    getCourseParticipation(courseParticipationId).shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
   }
 
   @Test
