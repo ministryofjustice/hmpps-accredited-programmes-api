@@ -56,7 +56,7 @@ class CourseParticipationControllerTest(
         CourseParticipation(
           id = uuid,
           courseId = courseId,
-          source = "source",
+          source = "Source of information",
           detail = "Course detail",
           prisonNumber = "A1234AA",
           outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Course outcome detail", yearStarted = Year.of(2020)),
@@ -72,7 +72,7 @@ class CourseParticipationControllerTest(
             "otherCourseName": null,
             "courseId": "$courseId",
             "prisonNumber": "A1234AA",
-            "source": "source",
+            "source": "Source of information",
             "detail": "Course detail",
             "setting": {
               "type": "custody"
@@ -94,7 +94,7 @@ class CourseParticipationControllerTest(
         courseId = courseId,
         otherCourseName = null,
         prisonNumber = "A1234AA",
-        source = "source",
+        source = "Source of information",
         detail = "Course detail",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
@@ -136,7 +136,7 @@ class CourseParticipationControllerTest(
             "otherCourseName": null,
             "courseId": "${UUID.randomUUID()}",
             "prisonNumber": "A1234AA",
-            "source": "source",
+            "source": "Source of information",
             "detail": "Course detail",
             "setting": {
               "type": "custody"
@@ -165,7 +165,7 @@ class CourseParticipationControllerTest(
         otherCourseName = null,
         courseId = courseId,
         prisonNumber = "A1234BC",
-        source = "source",
+        source = "Source of information",
         detail = "Course detail",
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY),
         outcome = CourseOutcome(
@@ -188,7 +188,7 @@ class CourseParticipationControllerTest(
               "otherCourseName": null,
               "courseId": "$courseId",
               "prisonNumber": "A1234BC",
-              "source": "source",
+              "source": "Source of information",
               "detail": "Course detail",
               "setting": {
                 type: "community"

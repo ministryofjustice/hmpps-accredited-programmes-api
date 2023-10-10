@@ -50,6 +50,7 @@ constructor(
       CreateCourseParticipation(
         courseId = courseId,
         prisonNumber = "A1234AA",
+        source = "Source of information",
         detail = "Course detail",
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
@@ -74,6 +75,7 @@ constructor(
         id = cpa.id,
         courseId = courseId,
         prisonNumber = "A1234AA",
+        source = "Source of information",
         detail = "Course detail",
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
@@ -163,14 +165,15 @@ constructor(
   fun `Update a course participation`() {
     val startTime = LocalDateTime.now()
     val courseId = getFirstCourseId()
-
     val courseParticipationId = createCourseParticipation(minimalCourseParticipation(courseId, "A1234AA")).id
-
+    val updatedSource = "Source of information"
     val updatedDetail = "Some detail"
+
     val courseParticipationFromUpdate = updateCourseParticipation(
       courseParticipationId,
       CourseParticipationUpdate(
         courseId = courseId,
+        source = updatedSource,
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
         ),
@@ -189,6 +192,7 @@ constructor(
         type = CourseParticipationSettingType.custody,
       ),
       prisonNumber = "A1234AA",
+      source = updatedSource,
       detail = updatedDetail,
       outcome = CourseParticipationOutcome(
         status = CourseParticipationOutcome.Status.incomplete,
