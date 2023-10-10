@@ -36,6 +36,7 @@ private fun CourseParticipation.applyUpdate(update: CourseParticipationUpdate): 
   apply {
     courseId = update.courseId
     otherCourseName = update.otherCourseName
+    source = update.source
     detail = detail
     setting.run {
       type = update.setting.type

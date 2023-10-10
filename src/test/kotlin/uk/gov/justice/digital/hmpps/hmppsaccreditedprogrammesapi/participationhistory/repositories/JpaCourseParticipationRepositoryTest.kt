@@ -40,7 +40,7 @@ constructor(
         courseId = courseId,
         prisonNumber = prisonNumber,
         otherCourseName = null,
-        source = "source",
+        source = "Source of information",
         detail = "Course detail",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
@@ -64,7 +64,7 @@ constructor(
         courseId = courseId,
         prisonNumber = prisonNumber,
         otherCourseName = null,
-        source = "source",
+        source = "Source of information",
         detail = "Course detail",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,

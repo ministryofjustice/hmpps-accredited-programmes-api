@@ -29,6 +29,7 @@ fun CreateCourseParticipation.toDomain() =
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   courseId = courseId,
   otherCourseName = otherCourseName,
+  source = source,
   detail = detail,
   setting = setting.toDomain(),
   outcome = outcome.toDomain(),
