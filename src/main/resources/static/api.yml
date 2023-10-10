@@ -860,9 +860,6 @@ components:
           enum:
             - incomplete
             - complete
-        detail:
-          type: string
-          deprecated: true
         yearStarted:
           type: integer
         yearCompleted:

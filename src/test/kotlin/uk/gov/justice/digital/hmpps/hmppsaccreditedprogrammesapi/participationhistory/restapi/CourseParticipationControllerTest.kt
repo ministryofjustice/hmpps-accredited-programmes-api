@@ -59,7 +59,7 @@ class CourseParticipationControllerTest(
           source = "Source of information",
           detail = "Course detail",
           prisonNumber = "A1234AA",
-          outcome = CourseOutcome(status = CourseStatus.COMPLETE, detail = "Course outcome detail", yearStarted = Year.of(2020)),
+          outcome = CourseOutcome(status = CourseStatus.COMPLETE, yearStarted = Year.of(2020)),
           setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
           otherCourseName = null,
         )
@@ -79,7 +79,6 @@ class CourseParticipationControllerTest(
             },
             "outcome": {
               "status": "complete",
-              "detail": "Course outcome detail",
               "yearStarted": 2020
             }
           }"""
@@ -98,7 +97,6 @@ class CourseParticipationControllerTest(
         detail = "Course detail",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
-          detail = "Course outcome detail",
           yearStarted = Year.of(2020),
         ),
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
@@ -143,7 +141,6 @@ class CourseParticipationControllerTest(
             },
             "outcome": {
               "status": "complete",
-              "detail": "Course outcome detail",
               "yearStarted": 2020
             }
           }"""
@@ -170,7 +167,6 @@ class CourseParticipationControllerTest(
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY),
         outcome = CourseOutcome(
           status = CourseStatus.INCOMPLETE,
-          detail = "Course outcome detail",
           yearStarted = Year.of(2020),
         ),
       )
@@ -195,7 +191,6 @@ class CourseParticipationControllerTest(
               },
               "outcome": {
                 "status": "incomplete",
-                "detail": "Course outcome detail",
                 "yearStarted": 2020
               }
             }""",

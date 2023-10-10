@@ -44,7 +44,6 @@ private fun CourseParticipation.applyUpdate(update: CourseParticipationUpdate): 
     }
     outcome.run {
       status = update.outcome.status
-      detail = update.outcome.detail
       yearStarted = update.outcome.yearStarted
       yearCompleted = update.outcome.yearCompleted
     }

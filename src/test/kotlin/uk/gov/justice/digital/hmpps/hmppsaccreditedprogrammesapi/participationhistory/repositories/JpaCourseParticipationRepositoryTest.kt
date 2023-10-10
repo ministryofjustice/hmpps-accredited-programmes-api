@@ -44,7 +44,6 @@ constructor(
         detail = "Course detail",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
-          detail = "Course outcome detail",
           yearStarted = Year.parse("2021"),
           yearCompleted = Year.parse("2022"),
         ),
@@ -68,7 +67,6 @@ constructor(
         detail = "Course detail",
         outcome = CourseOutcome(
           status = CourseStatus.COMPLETE,
-          detail = "Course outcome detail",
           yearStarted = Year.parse("2021"),
           yearCompleted = Year.parse("2022"),
         ),
@@ -92,7 +90,7 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
       ),
     ).id!!
 
@@ -111,7 +109,7 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
         createdByUsername = TEST_USER_NAME,
       ),
       CourseParticipation::createdDateTime,
@@ -131,7 +129,7 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
       ),
     ).id!!
 
@@ -149,7 +147,7 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),
-        outcome = CourseOutcome(status = null, detail = null, yearStarted = null, yearCompleted = null),
+        outcome = CourseOutcome(status = null, yearStarted = null, yearCompleted = null),
         createdByUsername = TEST_USER_NAME,
         lastModifiedByUsername = TEST_USER_NAME,
       ),
