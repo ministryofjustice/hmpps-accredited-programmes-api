@@ -38,13 +38,23 @@ private fun CourseParticipation.applyUpdate(update: CourseParticipationUpdate): 
     otherCourseName = update.otherCourseName
     source = update.source
     detail = update.detail
-    setting.run {
-      type = update.setting.type
-      location = update.setting.location
+
+    update.setting?.let {
+      if (setting == null) {
+        setting = it
+      } else {
+        setting?.location = it.location
+        setting?.type = it.type
+      }
     }
-    outcome.run {
-      status = update.outcome.status
-      yearStarted = update.outcome.yearStarted
-      yearCompleted = update.outcome.yearCompleted
+
+    update.outcome?.let {
+      if (outcome == null) {
+        outcome = it
+      } else {
+        outcome?.status = it.status
+        outcome?.yearStarted = it.yearStarted
+        outcome?.yearCompleted = it.yearCompleted
+      }
     }
   }

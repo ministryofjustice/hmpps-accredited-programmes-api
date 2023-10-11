@@ -799,9 +799,6 @@ components:
           type: string
         source:
           type: string
-      required:
-        - setting
-        - outcome
 
     CreateCourseParticipation:
       allOf:
@@ -850,6 +847,8 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/CourseParticipationSettingType'
+      required:
+        - type
 
     CourseParticipationOutcome:
       description: The outcome of participating in a course.
@@ -864,6 +863,8 @@ components:
           type: integer
         yearCompleted:
           type: integer
+      required:
+        - status
 
     StartReferral:
       type: object

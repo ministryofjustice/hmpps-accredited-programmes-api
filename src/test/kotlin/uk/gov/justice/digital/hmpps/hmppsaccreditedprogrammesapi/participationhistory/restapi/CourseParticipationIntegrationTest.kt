@@ -42,7 +42,7 @@ constructor(
   val jwtAuthHelper: JwtAuthHelper,
 ) {
   @Test
-  fun `Add and retrieve a course participation - happy flow`() {
+  fun `Creating a course participation should return 201 with correct body`() {
     val startTime = LocalDateTime.now()
     val courseId = getFirstCourseId()
 
@@ -95,20 +95,17 @@ constructor(
   }
 
   @Test
-  fun `Add and retrieve a course participation with minimal fields - happy flow`() {
+  fun `Creating a course participation with minimal fields should tolerantly return 201 with correct body`() {
     val courseId = getFirstCourseId()
     val prisonNumber = randomPrisonNumber()
 
-    // Use JSON below for clarity
     val cpa = createCourseParticipation(
-      """
-      {
-        "courseId": "$courseId",
-        "prisonNumber": "$prisonNumber",
-        "setting": {},
-        "outcome": {}
-      }
-      """,
+      CreateCourseParticipation(
+        courseId = courseId,
+        prisonNumber = prisonNumber,
+        setting = null,
+        outcome = null,
+      ),
     )
 
     val courseParticipation = getCourseParticipation(cpa.id)
@@ -120,8 +117,8 @@ constructor(
         prisonNumber = prisonNumber,
         source = null,
         detail = null,
-        setting = CourseParticipationSetting(),
-        outcome = CourseParticipationOutcome(),
+        setting = null,
+        outcome = null,
         addedBy = TEST_USER_NAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
@@ -130,7 +127,7 @@ constructor(
   }
 
   @Test
-  fun `Add a course participation with courseId and otherCourseName is rejected`() {
+  fun `Creating a course participation with courseId and otherCourseName should return 400 with error body`() {
     val courseId = getFirstCourseId()
 
     val courseParticipation = CreateCourseParticipation(
@@ -140,7 +137,7 @@ constructor(
       source = "Source of information",
       detail = "Course detail",
       setting = CourseParticipationSetting(type = CourseParticipationSettingType.custody),
-      outcome = CourseParticipationOutcome(),
+      outcome = null,
     )
 
     val errorResponse = webTestClient
@@ -163,7 +160,7 @@ constructor(
   }
 
   @Test
-  fun `Update a course participation`() {
+  fun `Updating a course participation should return 200 with correct body`() {
     val startTime = LocalDateTime.now()
     val courseId = getFirstCourseId()
     val courseParticipationId = createCourseParticipation(minimalCourseParticipation(courseId, "A1234AA")).id
@@ -209,7 +206,7 @@ constructor(
   }
 
   @Test
-  fun `find course participations by prison number returns matches`() {
+  fun `Finding course participations by prison number should return 200 with matching entries`() {
     val prisonNumber = randomPrisonNumber()
     val ids = getCourseIds().map { createCourseParticipation(minimalCourseParticipation(it, prisonNumber)).id }.toSet()
     ids.shouldNotBeEmpty()
@@ -232,7 +229,7 @@ constructor(
   }
 
   @Test
-  fun `find course participations by prison number returns no matches`() {
+  fun `Finding course participations by random prison number should return 200 with no matching entries`() {
     val prisonNumber = randomPrisonNumber()
     getCourseIds().map { createCourseParticipation(minimalCourseParticipation(it, prisonNumber)) }
 
@@ -248,7 +245,7 @@ constructor(
   }
 
   @Test
-  fun `delete course participation`() {
+  fun `Deleting a course participation by id should return 204 with no body`() {
     val id = createCourseParticipation(minimalCourseParticipation(getFirstCourseId(), "X9999XX")).id
     getCourseParticipationStatusCode(id) shouldBe HttpStatus.OK
 
@@ -296,19 +293,6 @@ constructor(
       .expectBody<CourseParticipation>()
       .returnResult().responseBody!!
 
-  private fun createCourseParticipation(bodyValue: String) =
-    webTestClient
-      .post()
-      .uri("/course-participations")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(bodyValue)
-      .exchange()
-      .expectStatus().isCreated
-      .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!
-
   private fun updateCourseParticipation(courseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipation? =
     webTestClient
       .put()
@@ -345,6 +329,4 @@ constructor(
 private fun minimalCourseParticipation(courseId: UUID, prisonNumber: String) = CreateCourseParticipation(
   courseId = courseId,
   prisonNumber = prisonNumber,
-  setting = CourseParticipationSetting(),
-  outcome = CourseParticipationOutcome(),
 )
