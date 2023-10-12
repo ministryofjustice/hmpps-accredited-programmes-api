@@ -57,6 +57,7 @@ class PeopleControllerTest(
 
       val courseParticipations = listOf(
         CourseParticipation(
+          courseName = "Course name 1",
           id = UUID.randomUUID(),
           otherCourseName = null,
           courseId = UUID.randomUUID(),
@@ -69,6 +70,7 @@ class PeopleControllerTest(
           createdDateTime = createdAt,
         ),
         CourseParticipation(
+          courseName = "Course name 2",
           id = UUID.randomUUID(),
           otherCourseName = "A Course Name",
           courseId = null,
@@ -95,6 +97,7 @@ class PeopleControllerTest(
             jsonContent =
             """[
               {
+                "courseName": "Course name 1",
                 "id": "${courseParticipations[0].id}",
                 "otherCourseName": null,
                 "courseId": "${courseParticipations[0].courseId}",
@@ -107,6 +110,7 @@ class PeopleControllerTest(
                 "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
               },
               {
+                "courseName": "Course name 2",
                 "id": "${courseParticipations[1].id}",
                 "otherCourseName": "A Course Name",
                 "courseId": null,

@@ -38,6 +38,7 @@ constructor(
     val participationId = courseParticipationRepository.save(
       CourseParticipation(
         courseId = courseId,
+        courseName = "Course name",
         prisonNumber = prisonNumber,
         otherCourseName = null,
         source = "Source of information",
@@ -60,6 +61,7 @@ constructor(
     persistentHistory.shouldBeEqualToIgnoringFields(
       CourseParticipation(
         id = participationId,
+        courseName = "Course name",
         courseId = courseId,
         prisonNumber = prisonNumber,
         otherCourseName = null,
@@ -84,6 +86,7 @@ constructor(
 
     val participationId = courseParticipationRepository.save(
       CourseParticipation(
+        courseName = null,
         courseId = null,
         prisonNumber = prisonNumber,
         otherCourseName = "Other course name",
@@ -103,6 +106,7 @@ constructor(
     persistentHistory.shouldBeEqualToIgnoringFields(
       CourseParticipation(
         id = participationId,
+        courseName = null,
         courseId = null,
         prisonNumber = prisonNumber,
         otherCourseName = "Other course name",
@@ -123,6 +127,7 @@ constructor(
 
     val participationId = courseParticipationRepository.save(
       CourseParticipation(
+        courseName = null,
         courseId = null,
         prisonNumber = prisonNumber,
         otherCourseName = "Other course name",
@@ -141,6 +146,7 @@ constructor(
     persistentHistory.shouldBeEqualToIgnoringFields(
       CourseParticipation(
         id = participationId,
+        courseName = null,
         courseId = null,
         prisonNumber = prisonNumber,
         otherCourseName = "Other course name",
