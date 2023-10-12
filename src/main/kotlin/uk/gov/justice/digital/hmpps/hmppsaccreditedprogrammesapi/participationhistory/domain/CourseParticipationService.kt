@@ -34,6 +34,7 @@ class CourseParticipationService(
 
 private fun CourseParticipation.applyUpdate(update: CourseParticipationUpdate): CourseParticipation =
   apply {
+    courseName = update.courseName
     courseId = update.courseId
     otherCourseName = update.otherCourseName
     source = update.source
