@@ -48,6 +48,7 @@ constructor(
 
     val cpa = createCourseParticipation(
       CreateCourseParticipation(
+        courseName = "Course name",
         courseId = courseId,
         prisonNumber = "A1234AA",
         source = "Source of information",
@@ -72,6 +73,7 @@ constructor(
     courseParticipation.shouldBeEqualToIgnoringFields(
       CourseParticipation(
         id = cpa.id,
+        courseName = "Course name",
         courseId = courseId,
         prisonNumber = "A1234AA",
         source = "Source of information",
@@ -101,6 +103,7 @@ constructor(
 
     val cpa = createCourseParticipation(
       CreateCourseParticipation(
+        courseName = null,
         courseId = courseId,
         prisonNumber = prisonNumber,
         setting = null,
@@ -113,6 +116,7 @@ constructor(
     courseParticipation.shouldBeEqualToIgnoringFields(
       CourseParticipation(
         id = cpa.id,
+        courseName = null,
         courseId = courseId,
         prisonNumber = prisonNumber,
         source = null,
@@ -131,6 +135,7 @@ constructor(
     val courseId = getFirstCourseId()
 
     val courseParticipation = CreateCourseParticipation(
+      courseName = "Course name",
       courseId = courseId,
       otherCourseName = "A Course",
       prisonNumber = "A1234AA",
@@ -166,10 +171,12 @@ constructor(
     val courseParticipationId = createCourseParticipation(minimalCourseParticipation(courseId, "A1234AA")).id
     val updatedSource = "Source of information"
     val updatedDetail = "Updated course participation detail"
+    val updatedCourseName = "Updated course name"
 
     val courseParticipationFromUpdate = updateCourseParticipation(
       courseParticipationId,
       CourseParticipationUpdate(
+        courseName = updatedCourseName,
         courseId = courseId,
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
@@ -185,6 +192,7 @@ constructor(
 
     val expectedCourseParticipation = CourseParticipation(
       id = courseParticipationId,
+      courseName = updatedCourseName,
       courseId = courseId,
       setting = CourseParticipationSetting(
         type = CourseParticipationSettingType.custody,
