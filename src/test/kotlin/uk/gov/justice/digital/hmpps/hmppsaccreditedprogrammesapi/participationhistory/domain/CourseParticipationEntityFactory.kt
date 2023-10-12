@@ -9,6 +9,7 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
 
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
+  private var courseName: Yielded<String?> = { null }
   private var courseId: Yielded<UUID?> = { UUID.randomUUID() }
   private var otherCourseName: Yielded<String?> = { null }
   private var source: Yielded<String?> = { null }
@@ -22,6 +23,10 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
 
   fun withPrisonNumber(prisonNumber: String) = apply {
     this.prisonNumber = { prisonNumber }
+  }
+
+  fun withCourseName(courseName: String?) = apply {
+    this.courseName = { courseName }
   }
 
   fun withCourseId(courseId: UUID?) = apply {
@@ -50,6 +55,7 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
 
   override fun produce(): CourseParticipation {
     return CourseParticipation(
+      courseName = this.courseName(),
       id = this.id(),
       prisonNumber = this.prisonNumber(),
       courseId = this.courseId(),

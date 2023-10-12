@@ -54,6 +54,7 @@ class CourseParticipationControllerTest(
       val courseParticipationSlot = slot<CourseParticipation>()
       every { courseParticipationService.addCourseParticipation(capture(courseParticipationSlot)) } returns
         CourseParticipation(
+          courseName = "Course name",
           id = uuid,
           courseId = courseId,
           source = "Source of information",
@@ -69,6 +70,7 @@ class CourseParticipationControllerTest(
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
         content = """
           { 
+            "courseName": "Course name",
             "otherCourseName": null,
             "courseId": "$courseId",
             "prisonNumber": "A1234AA",
@@ -90,6 +92,7 @@ class CourseParticipationControllerTest(
       }
       verify { courseParticipationService.addCourseParticipation(any()) }
       courseParticipationSlot.captured shouldBeEqualToComparingFields CourseParticipation(
+        courseName = "Course name",
         courseId = courseId,
         otherCourseName = null,
         prisonNumber = "A1234AA",
@@ -131,6 +134,7 @@ class CourseParticipationControllerTest(
         contentType = MediaType.APPLICATION_JSON
         content = """
           { 
+            "courseName": "Course name",
             "otherCourseName": null,
             "courseId": "${UUID.randomUUID()}",
             "prisonNumber": "A1234AA",
@@ -158,6 +162,7 @@ class CourseParticipationControllerTest(
       val courseId = UUID.randomUUID()
 
       every { courseParticipationService.getCourseParticipation(any()) } returns CourseParticipation(
+        courseName = "Course name",
         id = courseParticipationId,
         otherCourseName = null,
         courseId = courseId,
@@ -180,6 +185,7 @@ class CourseParticipationControllerTest(
           json(
             """
             { 
+              "courseName": "Course name",
               "id": "$courseParticipationId",
               "otherCourseName": null,
               "courseId": "$courseId",

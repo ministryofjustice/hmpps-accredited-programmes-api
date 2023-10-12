@@ -787,9 +787,14 @@ components:
                         for the course in otherCourseName."
           type: string
           format: uuid
+          deprecated: true
         otherCourseName:
           description: "The name of the course taken by the participant.  It should only be used when this course is not managed
                         by this service or cannot be identified. See courseId."
+          type: string
+          deprecated: true
+        courseName:
+          description: "The name of the course taken by the participant."
           type: string
         setting:
           $ref: '#/components/schemas/CourseParticipationSetting'

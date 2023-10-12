@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 
 fun CreateCourseParticipation.toDomain() =
   CourseParticipation(
+    courseName = courseName,
     prisonNumber = prisonNumber,
     courseId = courseId,
     otherCourseName = otherCourseName,
@@ -27,6 +28,7 @@ fun CreateCourseParticipation.toDomain() =
   )
 
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
+  courseName = courseName,
   courseId = courseId,
   otherCourseName = otherCourseName,
   source = source,
@@ -73,6 +75,7 @@ fun CourseStatus.toApi() = when (this) {
 }
 
 fun CourseParticipation.toApi() = ApiCourseParticipation(
+  courseName = courseName,
   id = id!!,
   prisonNumber = prisonNumber,
   setting = setting?.toApi(),
