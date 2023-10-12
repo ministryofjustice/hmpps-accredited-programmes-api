@@ -7,17 +7,14 @@ import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.test.web.reactive.server.returnResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSetting
@@ -28,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.TEST_USER_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -35,21 +33,15 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class CourseParticipationIntegrationTest
-@Autowired
-constructor(
-  val webTestClient: WebTestClient,
-  val jwtAuthHelper: JwtAuthHelper,
-) {
+class CourseParticipationIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Creating a course participation should return 201 with correct body`() {
     val startTime = LocalDateTime.now()
-    val courseId = getFirstCourseId()
 
-    val cpa = createCourseParticipation(
+    val created = createCourseParticipation(
       CreateCourseParticipation(
         courseName = "Course name",
-        courseId = courseId,
+        courseId = getFirstCourseId(),
         prisonNumber = "A1234AA",
         source = "Source of information",
         detail = "Course detail",
@@ -65,27 +57,27 @@ constructor(
       ),
     )
 
-    cpa.shouldNotBeNull()
-    cpa.id.shouldNotBeNull()
+    created.shouldNotBeNull()
+    created.id.shouldNotBeNull()
 
-    val courseParticipation = getCourseParticipation(cpa.id)
+    val retrieved = getCourseParticipation(created.id)
 
-    courseParticipation.shouldBeEqualToIgnoringFields(
+    retrieved.shouldBeEqualToIgnoringFields(
       CourseParticipation(
-        id = cpa.id,
-        courseName = "Course name",
-        courseId = courseId,
-        prisonNumber = "A1234AA",
-        source = "Source of information",
-        detail = "Course detail",
+        id = created.id,
+        courseName = created.courseName,
+        courseId = created.courseId,
+        prisonNumber = created.prisonNumber,
+        source = created.source,
+        detail = created.detail,
         setting = CourseParticipationSetting(
-          type = CourseParticipationSettingType.custody,
-          location = "location",
+          type = created.setting!!.type,
+          location = created.setting?.location,
         ),
         outcome = CourseParticipationOutcome(
-          status = CourseParticipationOutcome.Status.complete,
-          yearStarted = 2021,
-          yearCompleted = 2022,
+          status = created.outcome!!.status,
+          yearStarted = created.outcome?.yearStarted,
+          yearCompleted = created.outcome?.yearCompleted,
         ),
         addedBy = TEST_USER_NAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
@@ -93,32 +85,29 @@ constructor(
       CourseParticipation::createdAt,
     )
 
-    LocalDateTime.parse(courseParticipation.createdAt) shouldBeGreaterThanOrEqualTo startTime
+    LocalDateTime.parse(retrieved.createdAt) shouldBeGreaterThanOrEqualTo startTime
   }
 
   @Test
   fun `Creating a course participation with minimal fields should tolerantly return 201 with correct body`() {
-    val courseId = getFirstCourseId()
-    val prisonNumber = randomPrisonNumber()
-
-    val cpa = createCourseParticipation(
+    val created = createCourseParticipation(
       CreateCourseParticipation(
         courseName = null,
-        courseId = courseId,
-        prisonNumber = prisonNumber,
+        courseId = getFirstCourseId(),
+        prisonNumber = randomPrisonNumber(),
         setting = null,
         outcome = null,
       ),
     )
 
-    val courseParticipation = getCourseParticipation(cpa.id)
+    val retrieved = getCourseParticipation(created.id)
 
-    courseParticipation.shouldBeEqualToIgnoringFields(
+    retrieved.shouldBeEqualToIgnoringFields(
       CourseParticipation(
-        id = cpa.id,
+        id = created.id,
         courseName = null,
-        courseId = courseId,
-        prisonNumber = prisonNumber,
+        courseId = created.courseId,
+        prisonNumber = created.prisonNumber,
         source = null,
         detail = null,
         setting = null,
@@ -132,11 +121,9 @@ constructor(
 
   @Test
   fun `Creating a course participation with courseId and otherCourseName should return 400 with error body`() {
-    val courseId = getFirstCourseId()
-
-    val courseParticipation = CreateCourseParticipation(
+    val created = CreateCourseParticipation(
       courseName = "Course name",
-      courseId = courseId,
+      courseId = getFirstCourseId(),
       otherCourseName = "A Course",
       prisonNumber = "A1234AA",
       source = "Source of information",
@@ -151,7 +138,7 @@ constructor(
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(courseParticipation)
+      .bodyValue(created)
       .exchange()
       .expectStatus().isBadRequest
       .expectBody<ErrorResponse>()
@@ -167,22 +154,24 @@ constructor(
   @Test
   fun `Updating a course participation should return 200 with correct body`() {
     val startTime = LocalDateTime.now()
-    val courseId = getFirstCourseId()
-    val courseParticipationId = createCourseParticipation(minimalCourseParticipation(courseId, "A1234AA")).id
-    val updatedSource = "Source of information"
-    val updatedDetail = "Updated course participation detail"
-    val updatedCourseName = "Updated course name"
 
-    val courseParticipationFromUpdate = updateCourseParticipation(
-      courseParticipationId,
+    val created = createCourseParticipation(
+      CreateCourseParticipation(
+        courseId = getFirstCourseId(),
+        prisonNumber = "A1234AA",
+      ),
+    )
+
+    val updated = updateCourseParticipation(
+      created.id,
       CourseParticipationUpdate(
-        courseName = updatedCourseName,
-        courseId = courseId,
+        courseName = "Course name",
+        courseId = created.courseId,
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
         ),
-        source = updatedSource,
-        detail = updatedDetail,
+        source = "Source of information",
+        detail = "Course participation detail",
         outcome = CourseParticipationOutcome(
           status = CourseParticipationOutcome.Status.incomplete,
           yearStarted = 2020,
@@ -190,105 +179,95 @@ constructor(
       ),
     )!!
 
-    val expectedCourseParticipation = CourseParticipation(
-      id = courseParticipationId,
-      courseName = updatedCourseName,
-      courseId = courseId,
-      setting = CourseParticipationSetting(
-        type = CourseParticipationSettingType.custody,
+    val retrieved = getCourseParticipation(created.id)
+
+    retrieved.shouldBeEqualToIgnoringFields(
+      CourseParticipation(
+        id = created.id,
+        courseName = updated.courseName,
+        courseId = created.courseId,
+        setting = CourseParticipationSetting(
+          type = updated.setting!!.type,
+        ),
+        prisonNumber = created.prisonNumber,
+        source = updated.source,
+        detail = updated.detail,
+        outcome = CourseParticipationOutcome(
+          status = updated.outcome!!.status,
+          yearStarted = updated.outcome?.yearStarted,
+        ),
+        addedBy = TEST_USER_NAME,
+        createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
-      prisonNumber = "A1234AA",
-      source = updatedSource,
-      detail = updatedDetail,
-      outcome = CourseParticipationOutcome(
-        status = CourseParticipationOutcome.Status.incomplete,
-        yearStarted = 2020,
-      ),
-      addedBy = TEST_USER_NAME,
-      createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
+      CourseParticipation::createdAt,
     )
 
-    courseParticipationFromUpdate.shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
-    LocalDateTime.parse(courseParticipationFromUpdate.createdAt) shouldBeGreaterThanOrEqualTo startTime
-    getCourseParticipation(courseParticipationId).shouldBeEqualToIgnoringFields(expectedCourseParticipation, CourseParticipation::createdAt)
+    updated.shouldBeEqualToIgnoringFields(retrieved, CourseParticipation::createdAt)
+    LocalDateTime.parse(updated.createdAt) shouldBeGreaterThanOrEqualTo startTime
   }
 
   @Test
   fun `Finding course participations by prison number should return 200 with matching entries`() {
-    val prisonNumber = randomPrisonNumber()
-    val ids = getCourseIds().map { createCourseParticipation(minimalCourseParticipation(it, prisonNumber)).id }.toSet()
-    ids.shouldNotBeEmpty()
+    val expectedPrisonNumber = randomPrisonNumber()
+    val otherPrisonNumber = randomPrisonNumber()
 
-    val otherIds = getCourseIds().map { createCourseParticipation(minimalCourseParticipation(it, randomPrisonNumber())) }.toSet()
+    val expectedPrisonNumberCourseIds = getCourseIds().map {
+      createCourseParticipation(
+        CreateCourseParticipation(
+          courseId = it,
+          prisonNumber = expectedPrisonNumber,
+        ),
+      ).id
+    }.toSet()
 
-    otherIds.intersect(ids).shouldBeEmpty()
+    expectedPrisonNumberCourseIds.shouldNotBeEmpty()
 
-    val courseIdsForPrisonNumber = webTestClient
-      .get()
-      .uri("/people/{prisonNumber}/course-participations", prisonNumber)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseParticipation>>()
-      .returnResult().responseBody!!.map { it.id }.toSet()
+    val randomPrisonNumber = getCourseIds().map {
+      createCourseParticipation(
+        CreateCourseParticipation(
+          courseId = it,
+          prisonNumber = otherPrisonNumber,
+        ),
+      ).id
+    }.toSet()
 
-    courseIdsForPrisonNumber shouldBe ids
+    randomPrisonNumber.intersect(expectedPrisonNumberCourseIds).shouldBeEmpty()
+
+    val retrieved = getCourseParticipationsForPrisonNumber(expectedPrisonNumber).map { it.id }.toSet()
+    retrieved shouldBe expectedPrisonNumberCourseIds
   }
 
   @Test
   fun `Finding course participations by random prison number should return 200 with no matching entries`() {
-    val prisonNumber = randomPrisonNumber()
-    getCourseIds().map { createCourseParticipation(minimalCourseParticipation(it, prisonNumber)) }
+    getCourseIds().forEach {
+      createCourseParticipation(
+        CreateCourseParticipation(
+          courseId = it,
+          prisonNumber = randomPrisonNumber(),
+        ),
+      )
+    }
 
-    webTestClient
-      .get()
-      .uri("/people/{prisonNumber}/course-participations", "Z0000ZZ")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseParticipation>>()
-      .returnResult().responseBody!!.shouldBeEmpty()
+    getCourseParticipationsForPrisonNumber("Z0000ZZ").shouldBeEmpty()
   }
 
   @Test
   fun `Deleting a course participation by id should return 204 with no body`() {
-    val id = createCourseParticipation(minimalCourseParticipation(getFirstCourseId(), "X9999XX")).id
-    getCourseParticipationStatusCode(id) shouldBe HttpStatus.OK
+    val created = createCourseParticipation(
+      CreateCourseParticipation(
+        courseId = getFirstCourseId(),
+        prisonNumber = "X9999XX",
+      ),
+    )
 
-    webTestClient
-      .delete()
-      .uri("/course-participations/{id}", id)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isNoContent
+    getCourseParticipationStatusCode(created.id) shouldBe HttpStatus.OK
+    deleteCourseParticipation(created.id)
 
-    getCourseParticipationStatusCode(id) shouldBe HttpStatus.NOT_FOUND
-
-    webTestClient
-      .delete()
-      .uri("/course-participations/{id}", id)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isNoContent
+    getCourseParticipationStatusCode(created.id) shouldBe HttpStatus.NOT_FOUND
+    deleteCourseParticipation(created.id)
   }
 
-  private fun getFirstCourseId(): UUID = getCourseIds().first()
-
-  private fun getCourseIds(): List<UUID> =
-    webTestClient
-      .get()
-      .uri("/courses")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectBody<List<Course>>()
-      .returnResult().responseBody!!.map { it.id }
-
-  private fun createCourseParticipation(courseParticipationToAdd: CreateCourseParticipation) =
+  private fun createCourseParticipation(courseParticipationToAdd: CreateCourseParticipation): CourseParticipation =
     webTestClient
       .post()
       .uri("/course-participations")
@@ -301,10 +280,10 @@ constructor(
       .expectBody<CourseParticipation>()
       .returnResult().responseBody!!
 
-  private fun updateCourseParticipation(courseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipation? =
+  private fun updateCourseParticipation(id: UUID, update: CourseParticipationUpdate): CourseParticipation? =
     webTestClient
       .put()
-      .uri("/course-participations/{id}", courseParticipationId)
+      .uri("/course-participations/{id}", id)
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(update)
@@ -312,6 +291,15 @@ constructor(
       .expectStatus().isOk
       .expectBody<CourseParticipation>()
       .returnResult().responseBody
+
+  private fun deleteCourseParticipation(id: UUID) =
+    webTestClient
+      .delete()
+      .uri("/course-participations/{id}", id)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNoContent
 
   private fun getCourseParticipation(id: UUID): CourseParticipation =
     webTestClient
@@ -332,9 +320,15 @@ constructor(
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .returnResult<Any>().status
-}
 
-private fun minimalCourseParticipation(courseId: UUID, prisonNumber: String) = CreateCourseParticipation(
-  courseId = courseId,
-  prisonNumber = prisonNumber,
-)
+  private fun getCourseParticipationsForPrisonNumber(prisonNumber: String): List<CourseParticipation> =
+    webTestClient
+      .get()
+      .uri("/people/{prisonNumber}/course-participations", prisonNumber)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<CourseParticipation>>()
+      .returnResult().responseBody!!
+}
