@@ -17,7 +17,7 @@ import java.util.UUID
 class CoursesController(
   val courseService: CourseService,
 ) : CoursesApiDelegate {
-  override fun coursesGet(): ResponseEntity<List<Course>> =
+  override fun getAllCourses(): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
         courseService
@@ -25,22 +25,22 @@ class CoursesController(
           .map(CourseEntity::toApi),
       )
 
-  override fun coursesCsvGet(): ResponseEntity<List<CourseRecord>> =
+  override fun getCoursesCsv(): ResponseEntity<List<CourseRecord>> =
     ResponseEntity.ok(
       courseService
         .allCourses()
         .map(CourseEntity::toCourseRecord),
     )
 
-  override fun coursesCsvPut(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
+  override fun uploadCoursesCsv(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
     courseService.updateCourses(courseRecord.map(CourseRecord::toDomain))
     return ResponseEntity.noContent().build()
   }
 
-  override fun coursesPrerequisitesCsvPut(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
+  override fun uploadPrerequisitesCsv(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.replaceAllPrerequisites(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
 
-  override fun coursesPrerequisitesCsvGet(): ResponseEntity<List<PrerequisiteRecord>> =
+  override fun getPrerequisitesCsv(): ResponseEntity<List<PrerequisiteRecord>> =
     ResponseEntity.ok(
       courseService
         .allCourses()
@@ -56,16 +56,16 @@ class CoursesController(
         },
     )
 
-  override fun coursesCourseIdGet(courseId: UUID): ResponseEntity<Course> =
-    courseService.course(courseId)?.let {
+  override fun getCourseById(id: UUID): ResponseEntity<Course> =
+    courseService.course(id)?.let {
       ResponseEntity.ok(it.toApi())
-    } ?: throw NotFoundException("No Course found at /courses/$courseId")
+    } ?: throw NotFoundException("No Course found at /courses/$id")
 
-  override fun coursesCourseIdOfferingsGet(courseId: UUID): ResponseEntity<List<CourseOffering>> =
+  override fun getAllOfferingsByCourseId(id: UUID): ResponseEntity<List<CourseOffering>> =
     ResponseEntity
       .ok(
         courseService
-          .offeringsForCourse(courseId)
+          .offeringsForCourse(id)
           .map(Offering::toApi),
       )
 }

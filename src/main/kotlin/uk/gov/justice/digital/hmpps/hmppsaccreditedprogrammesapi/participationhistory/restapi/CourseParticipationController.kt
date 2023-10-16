@@ -21,17 +21,17 @@ class CourseParticipationController(
       ?.let {
         ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
       } ?: throw Exception("Unable to add to course participation")
-  override fun getCourseParticipation(courseParticipationId: UUID): ResponseEntity<CourseParticipation> =
-    service.getCourseParticipation(courseParticipationId)
+  override fun getCourseParticipationById(id: UUID): ResponseEntity<CourseParticipation> =
+    service.getCourseParticipation(id)
       ?.let {
         ResponseEntity.ok(it.toApi())
-      } ?: throw NotFoundException("No course participation found for id $courseParticipationId")
+      } ?: throw NotFoundException("No course participation found for id $id")
 
-  override fun updateCourseParticipation(courseParticipationId: UUID, courseParticipationUpdate: CourseParticipationUpdate): ResponseEntity<CourseParticipation> =
-    ResponseEntity.ok(service.updateCourseParticipation(courseParticipationId, courseParticipationUpdate.toDomain()).toApi())
+  override fun updateCourseParticipationById(id: UUID, courseParticipationUpdate: CourseParticipationUpdate): ResponseEntity<CourseParticipation> =
+    ResponseEntity.ok(service.updateCourseParticipation(id, courseParticipationUpdate.toDomain()).toApi())
 
-  override fun deleteCourseParticipation(courseParticipationId: UUID): ResponseEntity<Unit> {
-    service.deleteCourseParticipation(courseParticipationId)
+  override fun deleteCourseParticipationById(id: UUID): ResponseEntity<Unit> {
+    service.deleteCourseParticipation(id)
     return ResponseEntity.noContent().build()
   }
 }

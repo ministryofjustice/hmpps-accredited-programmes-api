@@ -13,21 +13,20 @@ import java.util.UUID
 
 @Service
 class OfferingsController(private val courseService: CourseService) : OfferingsApiDelegate {
-
-  override fun offeringsIdCourseGet(id: UUID): ResponseEntity<Course> =
+  override fun getCourseByOfferingId(id: UUID): ResponseEntity<Course> =
     courseService.getCourseForOfferingId(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /offerings/$id/course")
 
-  override fun offeringsOfferingIdGet(offeringId: UUID): ResponseEntity<CourseOffering> =
-    courseService.courseOffering(offeringId)?.let {
+  override fun getOfferingById(id: UUID): ResponseEntity<CourseOffering> =
+    courseService.courseOffering(id)?.let {
       ResponseEntity.ok(it.toApi())
-    } ?: throw NotFoundException("No Offering found at /offerings/$offeringId")
+    } ?: throw NotFoundException("No Offering found at /offerings/$id")
 
-  override fun offeringsCsvPut(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
+  override fun uploadOfferingsCsv(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.updateOfferings(offeringRecord.map(OfferingRecord::toDomain)))
 
-  override fun offeringsCsvGet(): ResponseEntity<List<OfferingRecord>> =
+  override fun getOfferingsCsv(): ResponseEntity<List<OfferingRecord>> =
     ResponseEntity.ok(
       courseService
         .allOfferings()
