@@ -13,25 +13,27 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 import java.util.UUID
 
 @Service
-class CourseParticipationController(
-  @Autowired val service: CourseParticipationService,
+class CourseParticipationController
+@Autowired
+constructor (
+  private val courseParticipationService: CourseParticipationService,
 ) : CourseParticipationsApiDelegate {
   override fun createCourseParticipation(createCourseParticipation: CreateCourseParticipation): ResponseEntity<CourseParticipation> =
-    service.addCourseParticipation(createCourseParticipation.toDomain())
+    courseParticipationService.createCourseParticipation(createCourseParticipation.toDomain())
       ?.let {
         ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
       } ?: throw Exception("Unable to add to course participation")
   override fun getCourseParticipationById(id: UUID): ResponseEntity<CourseParticipation> =
-    service.getCourseParticipation(id)
+    courseParticipationService.getCourseParticipationById(id)
       ?.let {
         ResponseEntity.ok(it.toApi())
       } ?: throw NotFoundException("No course participation found for id $id")
 
   override fun updateCourseParticipationById(id: UUID, courseParticipationUpdate: CourseParticipationUpdate): ResponseEntity<CourseParticipation> =
-    ResponseEntity.ok(service.updateCourseParticipation(id, courseParticipationUpdate.toDomain()).toApi())
+    ResponseEntity.ok(courseParticipationService.updateCourseParticipationById(id, courseParticipationUpdate.toDomain()).toApi())
 
   override fun deleteCourseParticipationById(id: UUID): ResponseEntity<Unit> {
-    service.deleteCourseParticipation(id)
+    courseParticipationService.deleteCourseParticipationById(id)
     return ResponseEntity.noContent().build()
   }
 }

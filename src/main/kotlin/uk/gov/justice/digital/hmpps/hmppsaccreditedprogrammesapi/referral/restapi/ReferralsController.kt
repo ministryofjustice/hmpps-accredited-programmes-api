@@ -12,10 +12,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Statu
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralService
 import java.util.UUID
+import org.springframework.beans.factory.annotation.Autowired
 
 @Service
-class ReferralsController(
-  val referralService: ReferralService,
+class ReferralsController
+@Autowired
+constructor(
+  private val referralService: ReferralService,
 ) : ReferralsApiDelegate {
 
   override fun startReferral(startReferral: StartReferral): ResponseEntity<ReferralStarted> =
@@ -31,18 +34,18 @@ class ReferralsController(
 
   override fun getReferralById(id: UUID): ResponseEntity<Referral> =
     referralService
-      .getReferral(id)
+      .getReferralById(id)
       ?.let { ResponseEntity.ok(it.toApi()) }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 
   override fun updateReferralById(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> = with(referralUpdate) {
-    referralService.updateReferral(id, reason, oasysConfirmed, hasReviewedProgrammeHistory)
+    referralService.updateReferralById(id, reason, oasysConfirmed, hasReviewedProgrammeHistory)
     ResponseEntity.noContent().build()
   }
 
   override fun updateReferralStatusById(id: UUID, statusUpdate: StatusUpdate): ResponseEntity<Unit> =
     with(statusUpdate) {
-      referralService.updateReferralStatus(id, status.toDomain())
+      referralService.updateReferralStatusById(id, status.toDomain())
       ResponseEntity.noContent().build()
     }
 }

@@ -19,16 +19,16 @@ class ReferralService(
     referrerId: String,
   ): UUID? = referralRepository.save(Referral(offeringId = offeringId, prisonNumber = prisonNumber, referrerId = referrerId)).id
 
-  fun getReferral(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
+  fun getReferralById(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
 
-  fun updateReferral(referralId: UUID, reason: String?, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean) {
+  fun updateReferralById(referralId: UUID, reason: String?, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean) {
     val referral = referralRepository.getReferenceById(referralId)
     referral.reason = reason
     referral.oasysConfirmed = oasysConfirmed
     referral.hasReviewedProgrammeHistory = hasReviewedProgrammeHistory
   }
 
-  fun updateReferralStatus(referralId: UUID, nextStatus: Status) {
+  fun updateReferralStatusById(referralId: UUID, nextStatus: Status) {
     val referral = referralRepository.getReferenceById(referralId)
     if (referral.status.isValidTransition(nextStatus)) {
       referral.status = nextStatus

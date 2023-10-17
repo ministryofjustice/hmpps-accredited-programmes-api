@@ -84,7 +84,7 @@ class PeopleControllerTest(
         ),
       )
 
-      every { service.findByPrisonNumber(any()) } returns courseParticipations
+      every { service.getCourseParticipationsByPrisonNumber(any()) } returns courseParticipations
 
       mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON
@@ -127,12 +127,12 @@ class PeopleControllerTest(
         }
       }
 
-      verify { service.findByPrisonNumber("A1234AA") }
+      verify { service.getCourseParticipationsByPrisonNumber("A1234AA") }
     }
 
     @Test
     fun `getCourseParticipationsForPrisonNumber with JWT and unknown prison number returns 200 with empty body`() {
-      every { service.findByPrisonNumber(any()) } returns emptyList()
+      every { service.getCourseParticipationsByPrisonNumber(any()) } returns emptyList()
 
       mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON

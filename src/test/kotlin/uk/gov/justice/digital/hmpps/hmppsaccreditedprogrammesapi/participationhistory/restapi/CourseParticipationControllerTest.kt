@@ -52,7 +52,7 @@ class CourseParticipationControllerTest(
       val uuid = UUID.randomUUID()
       val courseId = UUID.randomUUID()
       val courseParticipationSlot = slot<CourseParticipation>()
-      every { courseParticipationService.addCourseParticipation(capture(courseParticipationSlot)) } returns
+      every { courseParticipationService.createCourseParticipation(capture(courseParticipationSlot)) } returns
         CourseParticipation(
           courseName = "Course name",
           id = uuid,
@@ -90,7 +90,7 @@ class CourseParticipationControllerTest(
           json(""" { "id": "$uuid" } """)
         }
       }
-      verify { courseParticipationService.addCourseParticipation(any()) }
+      verify { courseParticipationService.createCourseParticipation(any()) }
       courseParticipationSlot.captured shouldBeEqualToComparingFields CourseParticipation(
         courseName = "Course name",
         courseId = courseId,
@@ -161,7 +161,7 @@ class CourseParticipationControllerTest(
       val courseParticipationId = UUID.randomUUID()
       val courseId = UUID.randomUUID()
 
-      every { courseParticipationService.getCourseParticipation(any()) } returns CourseParticipation(
+      every { courseParticipationService.getCourseParticipationById(any()) } returns CourseParticipation(
         courseName = "Course name",
         id = courseParticipationId,
         otherCourseName = null,
@@ -204,14 +204,14 @@ class CourseParticipationControllerTest(
         }
       }
 
-      verify { courseParticipationService.getCourseParticipation(courseParticipationId) }
+      verify { courseParticipationService.getCourseParticipationById(courseParticipationId) }
     }
 
     @Test
     fun `GET course participation with random UUID returns 404 with error body`() {
       val courseParticipationId = UUID.randomUUID()
 
-      every { courseParticipationService.getCourseParticipation(any()) } returns null
+      every { courseParticipationService.getCourseParticipationById(any()) } returns null
 
       mockMvc.get("/course-participations/{id}", courseParticipationId) {
         accept = MediaType.APPLICATION_JSON
@@ -228,7 +228,7 @@ class CourseParticipationControllerTest(
         }
       }
 
-      verify { courseParticipationService.getCourseParticipation(courseParticipationId) }
+      verify { courseParticipationService.getCourseParticipationById(courseParticipationId) }
     }
 
     @Test

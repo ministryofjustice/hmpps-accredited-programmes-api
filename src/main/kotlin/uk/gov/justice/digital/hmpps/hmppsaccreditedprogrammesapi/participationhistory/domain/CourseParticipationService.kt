@@ -12,22 +12,22 @@ import kotlin.jvm.optionals.getOrNull
 class CourseParticipationService(
   @Autowired val repository: JpaCourseParticipationRepository,
 ) {
-  fun addCourseParticipation(courseParticipation: CourseParticipation): CourseParticipation? =
+  fun createCourseParticipation(courseParticipation: CourseParticipation): CourseParticipation? =
     courseParticipation.let {
       it.assertOnlyCourseIdOrCourseNamePresent()
       repository.save(it)
     }
 
-  fun getCourseParticipation(historicCourseParticipationId: UUID): CourseParticipation? =
+  fun getCourseParticipationById(historicCourseParticipationId: UUID): CourseParticipation? =
     repository.findById(historicCourseParticipationId).getOrNull()
 
-  fun updateCourseParticipation(historicCourseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipation =
+  fun updateCourseParticipationById(historicCourseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipation =
     repository
       .getReferenceById(historicCourseParticipationId)
       .applyUpdate(update)
 
-  fun findByPrisonNumber(prisonNumber: String): List<CourseParticipation> = repository.findByPrisonNumber(prisonNumber)
-  fun deleteCourseParticipation(historicCourseParticipationId: UUID) {
+  fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipation> = repository.findByPrisonNumber(prisonNumber)
+  fun deleteCourseParticipationById(historicCourseParticipationId: UUID) {
     repository.deleteById(historicCourseParticipationId)
   }
 }

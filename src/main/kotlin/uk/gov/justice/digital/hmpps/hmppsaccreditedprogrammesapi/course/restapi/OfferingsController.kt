@@ -10,26 +10,31 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Offer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
 import java.util.UUID
+import org.springframework.beans.factory.annotation.Autowired
 
 @Service
-class OfferingsController(private val courseService: CourseService) : OfferingsApiDelegate {
+class OfferingsController
+@Autowired
+constructor (
+  private val courseService: CourseService,
+) : OfferingsApiDelegate {
   override fun getCourseByOfferingId(id: UUID): ResponseEntity<Course> =
-    courseService.getCourseForOfferingId(id)?.let {
+    courseService.getCourseByOfferingId(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /offerings/$id/course")
 
   override fun getOfferingById(id: UUID): ResponseEntity<CourseOffering> =
-    courseService.courseOffering(id)?.let {
+    courseService.getOfferingById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Offering found at /offerings/$id")
 
   override fun uploadOfferingsCsv(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
-    ResponseEntity.ok(courseService.updateOfferings(offeringRecord.map(OfferingRecord::toDomain)))
+    ResponseEntity.ok(courseService.uploadOfferingsCsv(offeringRecord.map(OfferingRecord::toDomain)))
 
   override fun getOfferingsCsv(): ResponseEntity<List<OfferingRecord>> =
     ResponseEntity.ok(
       courseService
-        .allOfferings()
+        .getOfferingsCsv()
         .map(Offering::toOfferingRecord),
     )
 }

@@ -26,7 +26,7 @@ class CourseServiceTest {
   inner class UpdateCoursesTests {
     @Test
     fun `updateCourses with an empty list clears the repository`() {
-      service.updateCourses(emptyList())
+      service.uploadCoursesCsv(emptyList())
       verify { repository.saveAudiences(emptySet()) }
     }
 
@@ -36,7 +36,7 @@ class CourseServiceTest {
 
       every { repository.allAudiences() } returns setOf(a1)
 
-      service.updateCourses(
+      service.uploadCoursesCsv(
         listOf(
           CourseUpdate(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC", referable = true),
         ),
@@ -55,7 +55,7 @@ class CourseServiceTest {
 
       every { repository.allAudiences() } returns setOf(a1, a2, a3)
 
-      service.updateCourses(
+      service.uploadCoursesCsv(
         listOf(
           CourseUpdate(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", referable = true),
           CourseUpdate(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", referable = true),
@@ -73,7 +73,7 @@ class CourseServiceTest {
 
       every { repository.allAudiences() } returns setOf()
 
-      service.updateCourses(
+      service.uploadCoursesCsv(
         listOf(
           CourseUpdate(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
           CourseUpdate(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
@@ -91,7 +91,7 @@ class CourseServiceTest {
   inner class ReplaceAllPrerequisitesTests {
     @Test
     fun `replaceAllPrerequisites with an empty list successfully clears the repository`() {
-      service.replaceAllPrerequisites(emptyList()).shouldBeEmpty()
+      service.uploadPrerequisitedCsv(emptyList()).shouldBeEmpty()
     }
 
     @Test
@@ -108,7 +108,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllPrerequisites(emptyList()).shouldBeEmpty()
+      service.uploadPrerequisitedCsv(emptyList()).shouldBeEmpty()
 
       allCourses.flatMap { it.prerequisites }.shouldBeEmpty()
     }
@@ -124,7 +124,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllPrerequisites(
+      service.uploadPrerequisitedCsv(
         listOf(
           NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
         ),
@@ -141,7 +141,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllPrerequisites(
+      service.uploadPrerequisitedCsv(
         listOf(
           NewPrerequisite(name = "PR 1", description = "PR 1 Desc", identifier = "C1"),
           NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
@@ -168,7 +168,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllPrerequisites(
+      service.uploadPrerequisitedCsv(
         listOf(
           NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "C1"),
           NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "CX"),
@@ -192,7 +192,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.replaceAllPrerequisites(
+      service.uploadPrerequisitedCsv(
         listOf(
           NewPrerequisite(name = "PR 1", description = "D1", identifier = " C-1 , C-2 "),
           NewPrerequisite(name = "PR 2", description = "D2", identifier = "C-2,C-X"),
@@ -211,7 +211,7 @@ class CourseServiceTest {
   inner class UpdateOfferingsTests {
     @Test
     fun `updateOfferings with an empty list clears the repository`() {
-      service.updateOfferings(emptyList()).shouldBeEmpty()
+      service.uploadOfferingsCsv(emptyList()).shouldBeEmpty()
     }
 
     @Test
@@ -229,7 +229,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.updateOfferings(emptyList()).shouldBeEmpty()
+      service.uploadOfferingsCsv(emptyList()).shouldBeEmpty()
 
       val updatedOfferings = allCourses.flatMap { it.offerings }
       updatedOfferings shouldHaveSize 1
@@ -250,7 +250,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.updateOfferings(
+      service.uploadOfferingsCsv(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
         ),
@@ -278,7 +278,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.updateOfferings(
+      service.uploadOfferingsCsv(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
         ),
@@ -306,7 +306,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.updateOfferings(
+      service.uploadOfferingsCsv(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
@@ -333,7 +333,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.updateOfferings(
+      service.uploadOfferingsCsv(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net"),
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
@@ -358,7 +358,7 @@ class CourseServiceTest {
       )
       every { repository.allCourses() } returns allCourses
 
-      service.updateOfferings(
+      service.uploadOfferingsCsv(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI"),
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
@@ -384,7 +384,7 @@ class CourseServiceTest {
 
       every { repository.offeringsForCourse(any()) } returns listOf(withdrawnOffering, offering)
 
-      service.offeringsForCourse(UUID.randomUUID()).shouldContainExactly(offering)
+      service.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(offering)
     }
 
     @Test
@@ -393,7 +393,7 @@ class CourseServiceTest {
 
       every { repository.courseOffering(any()) } returns withdrawnOffering
 
-      service.courseOffering(UUID.randomUUID()).shouldBeNull()
+      service.getOfferingById(UUID.randomUUID()).shouldBeNull()
     }
 
     @Test
@@ -402,7 +402,7 @@ class CourseServiceTest {
 
       every { repository.courseOffering(any()) } returns offering
 
-      service.courseOffering(UUID.randomUUID()) shouldBe offering
+      service.getOfferingById(UUID.randomUUID()) shouldBe offering
     }
   }
 
@@ -413,14 +413,14 @@ class CourseServiceTest {
     fun `A withdrawn course should not be returned from course()`() {
       val withdrawnCourse = CourseEntity(name = "Course", identifier = "C", withdrawn = true)
       every { repository.course(any()) } returns withdrawnCourse
-      service.course(UUID.randomUUID()).shouldBeNull()
+      service.getCourseById(UUID.randomUUID()).shouldBeNull()
     }
 
     @Test
     fun `An active course should  be returned from course()`() {
       val activeCourse = CourseEntity(name = "Course", identifier = "C")
       every { repository.course(any()) } returns activeCourse
-      service.course(UUID.randomUUID()) shouldBe activeCourse
+      service.getCourseById(UUID.randomUUID()) shouldBe activeCourse
     }
 
     @Test
@@ -428,7 +428,7 @@ class CourseServiceTest {
       val withdrawnCourse = CourseEntity(name = "Withdrawn", identifier = "W", withdrawn = true)
       val activeCourse = CourseEntity(name = "Active", identifier = "A")
       every { repository.allCourses() } returns listOf(activeCourse, withdrawnCourse)
-      service.allCourses().shouldContainExactly(activeCourse)
+      service.getAllCourses().shouldContainExactly(activeCourse)
     }
   }
 }

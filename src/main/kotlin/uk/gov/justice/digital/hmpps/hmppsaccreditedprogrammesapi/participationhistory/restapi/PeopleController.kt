@@ -9,13 +9,15 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation as CourseParticipationApi
 
 @Service
-class PeopleController(
-  @Autowired val service: CourseParticipationService,
+class PeopleController
+@Autowired
+constructor (
+  private val courseParticipationService: CourseParticipationService,
 ) : PeopleApiDelegate {
   override fun getCourseParticipationsByPrisonNumber(prisonNumber: String): ResponseEntity<List<CourseParticipationApi>> =
     ResponseEntity.ok(
-      service
-        .findByPrisonNumber(prisonNumber)
+      courseParticipationService
+        .getCourseParticipationsByPrisonNumber(prisonNumber)
         .map(CourseParticipation::toApi),
     )
 }

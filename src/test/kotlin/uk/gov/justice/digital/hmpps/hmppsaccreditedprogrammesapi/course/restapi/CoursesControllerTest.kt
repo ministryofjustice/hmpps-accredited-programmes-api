@@ -54,7 +54,7 @@ class CoursesControllerTest(
         CourseEntityFactory().withName("Course3").produce(),
       )
 
-      every { coursesService.allCourses() } returns courses
+      every { coursesService.getAllCourses() } returns courses
 
       mockMvc.get("/courses") {
         accept = MediaType.APPLICATION_JSON
@@ -90,7 +90,7 @@ class CoursesControllerTest(
         .withPrerequisites(prerequisites)
         .produce()
 
-      every { coursesService.course(expectedCourse.id!!) } returns expectedCourse
+      every { coursesService.getCourseById(expectedCourse.id!!) } returns expectedCourse
 
       mockMvc.get("/courses/${expectedCourse.id}") {
         accept = MediaType.APPLICATION_JSON
@@ -106,14 +106,14 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.course(expectedCourse.id!!) }
+      verify { coursesService.getCourseById(expectedCourse.id!!) }
     }
 
     @Test
     fun `coursesCourseIdGet with random UUID returns 404 with error body`() {
       val randomId = UUID.randomUUID()
 
-      every { coursesService.course(any()) } returns null
+      every { coursesService.getCourseById(any()) } returns null
 
       mockMvc.get("/courses/$randomId") {
         accept = MediaType.APPLICATION_JSON
@@ -173,7 +173,7 @@ class CoursesControllerTest(
         OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce(),
       )
 
-      every { coursesService.offeringsForCourse(any()) } returns offerings
+      every { coursesService.getAllOfferingsByCourseId(any()) } returns offerings
 
       mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON
@@ -204,7 +204,7 @@ class CoursesControllerTest(
   inner class PutCoursesTests {
     @Test
     fun `coursesPut with valid CSV data returns 204`() {
-      every { coursesService.updateCourses(any()) } just Runs
+      every { coursesService.uploadCoursesCsv(any()) } just Runs
 
       val replacementCourses = generateCourseRecords(3)
       val replacementCoursesCsv = replacementCourses.toCourseCsv()
@@ -218,7 +218,7 @@ class CoursesControllerTest(
         status { isNoContent() }
       }
 
-      verify { coursesService.updateCourses(replacementCoursesDomain) }
+      verify { coursesService.uploadCoursesCsv(replacementCoursesDomain) }
     }
   }
 
@@ -226,7 +226,7 @@ class CoursesControllerTest(
   inner class PutPrerequisitesTests {
     @Test
     fun `coursesPrerequisitesPut with valid CSV data returns 200 and no content`() {
-      every { coursesService.replaceAllPrerequisites(any()) } returns emptyList()
+      every { coursesService.uploadPrerequisitedCsv(any()) } returns emptyList()
 
       val replacementPrerequisites = generatePrerequisiteRecords(3)
       val replacementPrerequisitesCsv = replacementPrerequisites.toPrerequisiteCsv()
@@ -244,7 +244,7 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.replaceAllPrerequisites(replacementPrerequisitesDomain) }
+      verify { coursesService.uploadPrerequisitedCsv(replacementPrerequisitesDomain) }
     }
   }
 
@@ -252,7 +252,7 @@ class CoursesControllerTest(
   inner class PutOfferingsTests {
     @Test
     fun `coursesOfferingsPut with valid CSV data returns 200 and no content`() {
-      every { coursesService.updateOfferings(any()) } returns emptyList()
+      every { coursesService.uploadOfferingsCsv(any()) } returns emptyList()
 
       val replacementOfferings = generateOfferingRecords(3)
       val replacementOfferingsCsv = replacementOfferings.toOfferingCsv()
@@ -270,7 +270,7 @@ class CoursesControllerTest(
         }
       }
 
-      verify { coursesService.updateOfferings(replacementOfferingsDomain) }
+      verify { coursesService.uploadOfferingsCsv(replacementOfferingsDomain) }
     }
   }
 }

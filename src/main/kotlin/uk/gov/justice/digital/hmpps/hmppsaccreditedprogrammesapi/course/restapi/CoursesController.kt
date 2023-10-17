@@ -12,38 +12,41 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
 import java.util.UUID
+import org.springframework.beans.factory.annotation.Autowired
 
 @Service
-class CoursesController(
-  val courseService: CourseService,
+class CoursesController
+@Autowired
+constructor (
+  private val courseService: CourseService,
 ) : CoursesApiDelegate {
   override fun getAllCourses(): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
         courseService
-          .allCourses()
+          .getAllCourses()
           .map(CourseEntity::toApi),
       )
 
   override fun getCoursesCsv(): ResponseEntity<List<CourseRecord>> =
     ResponseEntity.ok(
       courseService
-        .allCourses()
+        .getAllCourses()
         .map(CourseEntity::toCourseRecord),
     )
 
   override fun uploadCoursesCsv(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
-    courseService.updateCourses(courseRecord.map(CourseRecord::toDomain))
+    courseService.uploadCoursesCsv(courseRecord.map(CourseRecord::toDomain))
     return ResponseEntity.noContent().build()
   }
 
   override fun uploadPrerequisitesCsv(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
-    ResponseEntity.ok(courseService.replaceAllPrerequisites(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
+    ResponseEntity.ok(courseService.uploadPrerequisitedCsv(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
 
   override fun getPrerequisitesCsv(): ResponseEntity<List<PrerequisiteRecord>> =
     ResponseEntity.ok(
       courseService
-        .allCourses()
+        .getAllCourses()
         .flatMap { course ->
           course.prerequisites.map { prerequisite ->
             PrerequisiteRecord(
@@ -57,7 +60,7 @@ class CoursesController(
     )
 
   override fun getCourseById(id: UUID): ResponseEntity<Course> =
-    courseService.course(id)?.let {
+    courseService.getCourseById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /courses/$id")
 
@@ -65,7 +68,7 @@ class CoursesController(
     ResponseEntity
       .ok(
         courseService
-          .offeringsForCourse(id)
+          .getAllOfferingsByCourseId(id)
           .map(Offering::toApi),
       )
 }

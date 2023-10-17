@@ -12,22 +12,22 @@ class CourseService(
   @Autowired
   val courseRepository: CourseRepository,
 ) {
-  fun allCourses(): List<CourseEntity> = courseRepository.allCourses().filterNot(CourseEntity::withdrawn)
+  fun getAllCourses(): List<CourseEntity> = courseRepository.allCourses().filterNot(CourseEntity::withdrawn)
 
-  fun course(courseId: UUID): CourseEntity? = courseRepository.course(courseId)?.takeIf { !it.withdrawn }
-  fun getCourseForOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findCourseByOfferingId(offeringId)
+  fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.course(courseId)?.takeIf { !it.withdrawn }
+  fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findCourseByOfferingId(offeringId)
 
-  fun allOfferings(): List<Offering> = courseRepository.allOfferings().filterNot(Offering::withdrawn)
+  fun getOfferingsCsv(): List<Offering> = courseRepository.allOfferings().filterNot(Offering::withdrawn)
 
-  fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
+  fun getAllOfferingsByCourseId(courseId: UUID): List<Offering> = courseRepository
     .offeringsForCourse(courseId)
     .filterNot(Offering::withdrawn)
 
-  fun courseOffering(offeringId: UUID): Offering? = courseRepository
+  fun getOfferingById(offeringId: UUID): Offering? = courseRepository
     .courseOffering(offeringId)
     ?.takeIf { !it.withdrawn }
 
-  fun updateCourses(courseData: List<CourseUpdate>) {
+  fun uploadCoursesCsv(courseData: List<CourseUpdate>) {
     updateAudiences(courseData)
     val allAudiences: Map<String, Audience> = courseRepository.allAudiences().associateBy { it.value }
     val coursesByIdentifier = courseRepository.allCourses().associateBy(CourseEntity::identifier)
@@ -82,7 +82,7 @@ class CourseService(
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
-  fun replaceAllPrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
+  fun uploadPrerequisitedCsv(replacements: List<NewPrerequisite>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     clearPrerequisites(allCourses)
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
@@ -112,7 +112,7 @@ class CourseService(
     courses.forEach { it.prerequisites.clear() }
   }
 
-  fun updateOfferings(updates: List<OfferingUpdate>): List<LineMessage> {
+  fun uploadOfferingsCsv(updates: List<OfferingUpdate>): List<LineMessage> {
     val allCourses = courseRepository.allCourses()
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     val desiredOfferingsByCourseIdentifier = updates.groupBy(OfferingUpdate::identifier)

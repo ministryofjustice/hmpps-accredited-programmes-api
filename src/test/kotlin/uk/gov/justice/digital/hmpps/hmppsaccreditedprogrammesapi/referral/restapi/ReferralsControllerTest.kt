@@ -87,7 +87,7 @@ constructor(
       .withHasReviewedProgrammeHistory(true)
       .produce()
 
-    every { referralService.getReferral(any()) } returns referral
+    every { referralService.getReferralById(any()) } returns referral
 
     mockMvc.get("/referrals/${referral.id}") {
       accept = MediaType.APPLICATION_JSON
@@ -106,7 +106,7 @@ constructor(
       }
     }
 
-    verify { referralService.getReferral(referral.id!!) }
+    verify { referralService.getReferralById(referral.id!!) }
   }
 
   @Test
@@ -122,7 +122,7 @@ constructor(
   fun `referralsIdGet with random UUID returns 404 with error body`() {
     val referralId = UUID.randomUUID()
 
-    every { referralService.getReferral(any()) } returns null
+    every { referralService.getReferralById(any()) } returns null
 
     mockMvc.get("/referrals/$referralId") {
       accept = MediaType.APPLICATION_JSON
@@ -139,7 +139,7 @@ constructor(
       }
     }
 
-    verify { referralService.getReferral(referralId) }
+    verify { referralService.getReferralById(referralId) }
   }
 
   @Test
@@ -170,7 +170,7 @@ constructor(
       "status" to "referral_submitted",
     )
 
-    every { referralService.updateReferralStatus(any(), any()) } just Runs
+    every { referralService.updateReferralStatusById(any(), any()) } just Runs
 
     mockMvc.put("/referrals/${referral.id}/status") {
       contentType = MediaType.APPLICATION_JSON
@@ -180,7 +180,7 @@ constructor(
       status { isNoContent() }
     }
 
-    verify { referralService.updateReferralStatus(referral.id!!, REFERRAL_SUBMITTED) }
+    verify { referralService.updateReferralStatusById(referral.id!!, REFERRAL_SUBMITTED) }
   }
 
   @Test
@@ -193,7 +193,7 @@ constructor(
 
     val illegalArgumentException = IllegalArgumentException("Transition from $REFERRAL_STARTED to $AWAITING_ASSESSMENT is not valid")
 
-    every { referralService.updateReferralStatus(any(), any()) } throws illegalArgumentException
+    every { referralService.updateReferralStatusById(any(), any()) } throws illegalArgumentException
 
     mockMvc.put("/referrals/${referral.id}/status") {
       contentType = MediaType.APPLICATION_JSON
@@ -203,6 +203,6 @@ constructor(
       status { isConflict() }
     }
 
-    verify { referralService.updateReferralStatus(referral.id!!, AWAITING_ASSESSMENT) }
+    verify { referralService.updateReferralStatusById(referral.id!!, AWAITING_ASSESSMENT) }
   }
 }

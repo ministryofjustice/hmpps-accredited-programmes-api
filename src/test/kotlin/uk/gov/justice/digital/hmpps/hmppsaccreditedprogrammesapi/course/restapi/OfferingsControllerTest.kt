@@ -41,7 +41,7 @@ class OfferingsControllerTest(
     val offering = OfferingEntityFactory().withId(UUID.randomUUID()).produce()
     val course = CourseEntityFactory().withId(UUID.randomUUID()).withMutableOfferings(mutableSetOf(offering)).produce()
 
-    every { coursesService.getCourseForOfferingId(any()) } returns course
+    every { coursesService.getCourseByOfferingId(any()) } returns course
 
     mockMvc.get("/offerings/${offering.id}/course") {
       accept = MediaType.APPLICATION_JSON
@@ -58,7 +58,7 @@ class OfferingsControllerTest(
   fun `offeringsIdCourseGet with random UUID returns 404 with error body`() {
     val offeringId = UUID.randomUUID()
 
-    every { coursesService.getCourseForOfferingId(any()) } returns null
+    every { coursesService.getCourseByOfferingId(any()) } returns null
 
     mockMvc.get("/offerings/$offeringId/course") {
       accept = MediaType.APPLICATION_JSON
