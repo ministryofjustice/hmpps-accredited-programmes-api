@@ -15,7 +15,7 @@ import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 
 @Service
-class ReferralsController
+class ReferralController
 @Autowired
 constructor(
   private val referralService: ReferralService,

@@ -13,7 +13,7 @@ import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 
 @Service
-class OfferingsController
+class OfferingController
 @Autowired
 constructor (
   private val courseService: CourseService,

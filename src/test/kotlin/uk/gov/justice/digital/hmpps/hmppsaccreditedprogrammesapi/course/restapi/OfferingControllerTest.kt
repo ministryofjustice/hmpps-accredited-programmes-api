@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.O
 import java.util.UUID
 
 @WebMvcTest
-@ContextConfiguration(classes = [OfferingsControllerTest::class])
+@ContextConfiguration(classes = [OfferingControllerTest::class])
 @ComponentScan(
   basePackages = [
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi",
@@ -28,7 +28,7 @@ import java.util.UUID
   ],
 )
 @Import(JwtAuthHelper::class)
-class OfferingsControllerTest(
+class OfferingControllerTest(
   @Autowired val mockMvc: MockMvc,
   @Autowired val jwtAuthHelper: JwtAuthHelper,
 ) {

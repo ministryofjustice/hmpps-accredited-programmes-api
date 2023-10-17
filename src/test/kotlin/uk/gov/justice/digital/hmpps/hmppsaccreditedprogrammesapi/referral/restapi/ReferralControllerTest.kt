@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.ReferralEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CoursesControllerTest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CourseControllerTest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status.REFERRAL_SUBMITTED
@@ -28,7 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain
 import java.util.UUID
 
 @WebMvcTest
-@ContextConfiguration(classes = [CoursesControllerTest::class])
+@ContextConfiguration(classes = [CourseControllerTest::class])
 @ComponentScan(
   basePackages = [
     "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.restapi",
@@ -37,7 +37,7 @@ import java.util.UUID
   ],
 )
 @Import(JwtAuthHelper::class)
-class ReferralsControllerTest
+class ReferralControllerTest
 @Autowired
 constructor(
   private val mockMvc: MockMvc,
