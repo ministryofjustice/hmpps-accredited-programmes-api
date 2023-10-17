@@ -18,14 +18,14 @@ constructor(
   private val offeringRepository: OfferingRepository,
   private val audienceRepository: AudienceRepository,
 ) : CourseRepository {
-  override fun allCourses(): List<CourseEntity> = courseRepository
+  override fun getAllCourses(): List<CourseEntity> = courseRepository
     .findAll()
     .onEach {
       Hibernate.initialize(it.audiences)
       Hibernate.initialize(it.prerequisites)
     }
 
-  override fun course(courseId: UUID): CourseEntity? = courseRepository
+  override fun getCourseById(courseId: UUID): CourseEntity? = courseRepository
     .findById(courseId)
     .getOrNull()
     ?.also {
@@ -33,28 +33,26 @@ constructor(
       Hibernate.initialize(it.prerequisites)
     }
 
-  override fun findCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository
+  override fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository
     .findByMutableOfferings_id(offeringId)
     ?.also {
       Hibernate.initialize(it.audiences)
       Hibernate.initialize(it.prerequisites)
     }
 
-  override fun allOfferings(): List<Offering> = offeringRepository
+  override fun getOfferingsCsv(): List<Offering> = offeringRepository
     .findAll()
     .onEach { Hibernate.initialize(it.course) }
 
-  override fun offeringsForCourse(courseId: UUID): List<Offering> = courseRepository
+  override fun getAllOfferingsByCourseId(courseId: UUID): List<Offering> = courseRepository
     .findById(courseId)
     .getOrNull()
     ?.offerings
     ?.toList() ?: emptyList()
 
-  override fun courseOffering(courseId: UUID, offeringId: UUID): Offering? = offeringsForCourse(courseId).find { it.id == offeringId }
+  override fun getOfferingById(offeringId: UUID): Offering? = offeringRepository.findById(offeringId).getOrNull()
 
-  override fun courseOffering(offeringId: UUID): Offering? = offeringRepository.findById(offeringId).getOrNull()
-
-  override fun allAudiences(): Set<Audience> = audienceRepository.findAll().toSet()
+  override fun getAllAudiences(): Set<Audience> = audienceRepository.findAll().toSet()
 
   override fun saveCourse(courseEntity: CourseEntity) {
     courseRepository.save(courseEntity)
