@@ -24,7 +24,7 @@ import java.util.UUID
 @Entity
 @EntityListeners(AuditingEntityListener::class)
 @Table(name = "course_participation")
-class CourseParticipationEntity(
+data class CourseParticipationEntity(
   @Id
   @GeneratedValue
   @Column(name = "course_participation_id")
@@ -68,15 +68,6 @@ class CourseParticipationEntity(
       throw BusinessException("Expected just one of courseId or otherCourseName but both values are present")
     }
   }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as CourseParticipationEntity
-    return id != null && id == other.id
-  }
-
-  override fun hashCode(): Int = 1004284837
 }
 
 @Embeddable

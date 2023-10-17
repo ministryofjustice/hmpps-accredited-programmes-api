@@ -7,17 +7,17 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.Status.ASSESSMENT_STARTED
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.Status.AWAITING_ASSESSMENT
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.Status.REFERRAL_STARTED
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.Status.REFERRAL_SUBMITTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.ReferralStatus.ASSESSMENT_STARTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.ReferralStatus.REFERRAL_STARTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
 import java.util.EnumMap
 import java.util.EnumSet
 import java.util.UUID
 
 @Entity
 @Table(name = "referral")
-class ReferralEntity(
+data class ReferralEntity(
   @Id
   @GeneratedValue
   @Column(name = "referral_id")
@@ -30,17 +30,17 @@ class ReferralEntity(
   var oasysConfirmed: Boolean = false,
   var hasReviewedProgrammeHistory: Boolean = false,
   @Enumerated(STRING)
-  var status: Status = REFERRAL_STARTED,
+  var status: ReferralStatus = REFERRAL_STARTED,
 ) {
 
-  enum class Status {
+  enum class ReferralStatus {
     REFERRAL_STARTED,
     REFERRAL_SUBMITTED,
     AWAITING_ASSESSMENT,
     ASSESSMENT_STARTED,
     ;
 
-    fun isValidTransition(nextStatus: Status?): Boolean = validTransitions[this]?.contains(nextStatus) ?: false
+    fun isValidTransition(nextReferralStatus: ReferralStatus?): Boolean = validTransitions[this]?.contains(nextReferralStatus) ?: false
   }
 
   companion object {

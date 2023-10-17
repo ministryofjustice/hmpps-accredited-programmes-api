@@ -6,6 +6,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Embeddable
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
@@ -21,7 +22,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "course")
-class CourseEntity(
+data class CourseEntity(
   @Id
   @GeneratedValue
   @Column(name = "course_id")
@@ -33,7 +34,7 @@ class CourseEntity(
   var alternateName: String? = null,
   var referable: Boolean = true,
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   val prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
@@ -43,7 +44,7 @@ class CourseEntity(
   @Fetch(SUBSELECT)
   private val mutableOfferings: MutableSet<OfferingEntity> = mutableSetOf(),
 
-  @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+  @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
   @Fetch(SUBSELECT)
   @JoinTable(
     name = "course_audience",
@@ -61,16 +62,6 @@ class CourseEntity(
     offering.course = this
     mutableOfferings += offering
   }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || other !is CourseEntity) return false
-    return id != null && id == other.id
-  }
-
-  override fun hashCode(): Int = 1756406093
-
-  override fun toString(): String = "CourseEntity($name, $description, $audiences, $id)"
 }
 
 @Embeddable

@@ -76,9 +76,13 @@ constructor (
   }
 
   private fun updateAudiences(courseData: List<CourseUpdate>) {
-    val desiredAudiences = courseData.flatMap { audienceStrings(it.audience) }.map(::AudienceEntity).toSet()
-    val actualAudiences = courseRepository.getAllAudiences()
-    courseRepository.saveAudiences(desiredAudiences - actualAudiences)
+    val desiredAudienceValues = courseData.flatMap { audienceStrings(it.audience) }.toSet()
+    val actualAudienceValues = courseRepository.getAllAudiences().map { it.value }.toSet()
+
+    val audienceValuesToSave = desiredAudienceValues - actualAudienceValues
+    val audiencesToSave = audienceValuesToSave.map(::AudienceEntity).toSet()
+
+    courseRepository.saveAudiences(audiencesToSave)
   }
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)

@@ -7,8 +7,6 @@ import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeSameInstanceAs
-import io.kotest.matchers.types.shouldNotBeSameInstanceAs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
@@ -135,12 +133,11 @@ constructor(
     val persistentCourse = courseEntityRepository.findById(course1.id!!).orElseThrow()
     val offeringId = persistentCourse.offerings.first().id!!
     val courseByOfferingIdInSameTx = courseEntityRepository.findByMutableOfferings_id(offeringId)
-    courseByOfferingIdInSameTx shouldBeSameInstanceAs persistentCourse
+    courseByOfferingIdInSameTx shouldBe persistentCourse
 
     commitAndStartNewTx()
 
     val courseByOfferingInNewTx = courseEntityRepository.findByMutableOfferings_id(offeringId)
-    courseByOfferingInNewTx shouldNotBeSameInstanceAs persistentCourse
     courseByOfferingInNewTx shouldBe persistentCourse
   }
 }

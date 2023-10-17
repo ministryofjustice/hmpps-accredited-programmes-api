@@ -9,7 +9,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "audience")
-class AudienceEntity(
+data class AudienceEntity(
   @Column(name = "audience_value")
   var value: String,
 
@@ -17,14 +17,4 @@ class AudienceEntity(
   @GeneratedValue
   @Column(name = "audience_id")
   var id: UUID? = null,
-) {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || other !is AudienceEntity) return false
-    return this.value == other.value
-  }
-
-  override fun hashCode(): Int = 1756406093
-
-  override fun toString(): String = "AudienceEntity($value, $id)"
-}
+)

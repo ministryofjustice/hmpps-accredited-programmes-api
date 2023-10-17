@@ -16,7 +16,7 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
   private var reason: Yielded<String?> = { null }
   private var oasysConfirmed: Yielded<Boolean> = { false }
   private var hasReviewedProgrammeHistory: Yielded<Boolean> = { false }
-  private var status: Yielded<ReferralEntity.Status> = { ReferralEntity.Status.REFERRAL_STARTED }
+  private var status: Yielded<ReferralEntity.ReferralStatus> = { ReferralEntity.ReferralStatus.REFERRAL_STARTED }
 
   fun withId(id: UUID) = apply {
     this.id = { id }
@@ -46,7 +46,7 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
     this.hasReviewedProgrammeHistory = { hasReviewedProgrammeHistory }
   }
 
-  fun withStatus(status: ReferralEntity.Status) = apply {
+  fun withStatus(status: ReferralEntity.ReferralStatus) = apply {
     this.status = { status }
   }
 

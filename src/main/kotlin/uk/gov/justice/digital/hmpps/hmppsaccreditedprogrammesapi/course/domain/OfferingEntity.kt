@@ -12,7 +12,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "offering")
-class OfferingEntity(
+data class OfferingEntity(
   @Id
   @GeneratedValue
   @Column(name = "offering_id")
@@ -23,16 +23,7 @@ class OfferingEntity(
   var secondaryContactEmail: String? = null,
   var withdrawn: Boolean = false,
 ) {
-
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "course_id")
   lateinit var course: CourseEntity
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || other !is OfferingEntity) return false
-    return organisationId == other.organisationId
-  }
-
-  override fun hashCode(): Int = organisationId.hashCode()
 }
