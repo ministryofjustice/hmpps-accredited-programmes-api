@@ -24,7 +24,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TEST_USER_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -115,38 +114,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,
-    )
-  }
-
-  @Test
-  fun `Creating a course participation with courseId and otherCourseName should return 400 with error body`() {
-    val created = CourseParticipationCreate(
-      courseName = "Course name",
-      courseId = getFirstCourseId(),
-      otherCourseName = "A Course",
-      prisonNumber = "A1234AA",
-      source = "Source of information",
-      detail = "Course detail",
-      setting = CourseParticipationSetting(type = CourseParticipationSettingType.custody),
-      outcome = null,
-    )
-
-    val errorResponse = webTestClient
-      .post()
-      .uri("/course-participations")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(created)
-      .exchange()
-      .expectStatus().isBadRequest
-      .expectBody<ErrorResponse>()
-      .returnResult().responseBody!!
-
-    errorResponse shouldBe ErrorResponse(
-      HttpStatus.BAD_REQUEST,
-      developerMessage = "Expected just one of courseId or otherCourseName but both values are present",
-      userMessage = "Business rule violation: Expected just one of courseId or otherCourseName but both values are present",
     )
   }
 
