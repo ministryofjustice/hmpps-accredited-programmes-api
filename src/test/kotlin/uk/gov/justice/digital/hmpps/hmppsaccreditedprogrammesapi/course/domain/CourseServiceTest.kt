@@ -34,7 +34,7 @@ class CourseServiceTest {
     fun `updateCourses with one valid course successfully clears and persists to the repository`() {
       val a1 = Audience("Audience 1", id = UUID.randomUUID())
 
-      every { repository.allAudiences() } returns setOf(a1)
+      every { repository.getAllAudiences() } returns setOf(a1)
 
       service.uploadCoursesCsv(
         listOf(
@@ -53,7 +53,7 @@ class CourseServiceTest {
       val a2 = Audience("Audience 2", id = UUID.randomUUID())
       val a3 = Audience("Audience 3", id = UUID.randomUUID())
 
-      every { repository.allAudiences() } returns setOf(a1, a2, a3)
+      every { repository.getAllAudiences() } returns setOf(a1, a2, a3)
 
       service.uploadCoursesCsv(
         listOf(
@@ -71,7 +71,7 @@ class CourseServiceTest {
       val a2 = Audience("Audience 2", id = UUID.randomUUID())
       val a3 = Audience("Audience 3", id = UUID.randomUUID())
 
-      every { repository.allAudiences() } returns setOf()
+      every { repository.getAllAudiences() } returns setOf()
 
       service.uploadCoursesCsv(
         listOf(
@@ -106,7 +106,7 @@ class CourseServiceTest {
           ),
         ),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadPrerequisitedCsv(emptyList()).shouldBeEmpty()
 
@@ -122,7 +122,7 @@ class CourseServiceTest {
           prerequisites = mutableSetOf(Prerequisite(name = "PR 1", description = " PR 1 Desc")),
         ),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadPrerequisitedCsv(
         listOf(
@@ -139,7 +139,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadPrerequisitedCsv(
         listOf(
@@ -166,7 +166,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadPrerequisitedCsv(
         listOf(
@@ -190,7 +190,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C-1"),
         CourseEntity(name = "Course 2", identifier = "C-2"),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadPrerequisitedCsv(
         listOf(
@@ -227,7 +227,7 @@ class CourseServiceTest {
           addOffering(theOffering)
         },
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadOfferingsCsv(emptyList()).shouldBeEmpty()
 
@@ -248,7 +248,7 @@ class CourseServiceTest {
           addOffering(theOffering)
         },
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadOfferingsCsv(
         listOf(
@@ -276,7 +276,7 @@ class CourseServiceTest {
           addOffering(oldOffering)
         },
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadOfferingsCsv(
         listOf(
@@ -304,7 +304,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadOfferingsCsv(
         listOf(
@@ -331,7 +331,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadOfferingsCsv(
         listOf(
@@ -356,7 +356,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.allCourses() } returns allCourses
+      every { repository.getAllCourses() } returns allCourses
 
       service.uploadOfferingsCsv(
         listOf(
@@ -382,7 +382,7 @@ class CourseServiceTest {
       val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
       val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
 
-      every { repository.offeringsForCourse(any()) } returns listOf(withdrawnOffering, offering)
+      every { repository.getAllOfferingsByCourseId(any()) } returns listOf(withdrawnOffering, offering)
 
       service.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(offering)
     }
@@ -391,7 +391,7 @@ class CourseServiceTest {
     fun `A withdrawn Offering should not be returned from courseOffering`() {
       val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
 
-      every { repository.courseOffering(any()) } returns withdrawnOffering
+      every { repository.getOfferingById(any()) } returns withdrawnOffering
 
       service.getOfferingById(UUID.randomUUID()).shouldBeNull()
     }
@@ -400,7 +400,7 @@ class CourseServiceTest {
     fun `An active Offering should be returned from courseOffering`() {
       val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
 
-      every { repository.courseOffering(any()) } returns offering
+      every { repository.getOfferingById(any()) } returns offering
 
       service.getOfferingById(UUID.randomUUID()) shouldBe offering
     }
@@ -412,14 +412,14 @@ class CourseServiceTest {
     @Test
     fun `A withdrawn course should not be returned from course()`() {
       val withdrawnCourse = CourseEntity(name = "Course", identifier = "C", withdrawn = true)
-      every { repository.course(any()) } returns withdrawnCourse
+      every { repository.getCourseById(any()) } returns withdrawnCourse
       service.getCourseById(UUID.randomUUID()).shouldBeNull()
     }
 
     @Test
     fun `An active course should  be returned from course()`() {
       val activeCourse = CourseEntity(name = "Course", identifier = "C")
-      every { repository.course(any()) } returns activeCourse
+      every { repository.getCourseById(any()) } returns activeCourse
       service.getCourseById(UUID.randomUUID()) shouldBe activeCourse
     }
 
@@ -427,7 +427,7 @@ class CourseServiceTest {
     fun `allCourses() should exclude withdrawn courses`() {
       val withdrawnCourse = CourseEntity(name = "Withdrawn", identifier = "W", withdrawn = true)
       val activeCourse = CourseEntity(name = "Active", identifier = "A")
-      every { repository.allCourses() } returns listOf(activeCourse, withdrawnCourse)
+      every { repository.getAllCourses() } returns listOf(activeCourse, withdrawnCourse)
       service.getAllCourses().shouldContainExactly(activeCourse)
     }
   }

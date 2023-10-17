@@ -10,8 +10,10 @@ import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
-class ReferralService(
-  @Autowired val referralRepository: JpaReferralRepository,
+class ReferralService
+@Autowired
+constructor (
+  private val referralRepository: JpaReferralRepository,
 ) {
   fun startReferral(
     prisonNumber: String,

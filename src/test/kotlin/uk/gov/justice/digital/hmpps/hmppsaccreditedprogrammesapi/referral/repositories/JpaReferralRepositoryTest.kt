@@ -82,6 +82,6 @@ constructor(
       },
     )
     commitAndStartNewTx()
-    return courseRepository.allCourses()[0].offerings.first().id!!
+    return courseRepository.getAllCourses()[0].offerings.first().id!!
   }
 }
