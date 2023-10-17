@@ -10,6 +10,7 @@ paths:
       tags:
         - Courses
       summary: List all courses
+      operationId: getAllCourses
       responses:
         200:
           description: Return a JSON representation of all courses that are not withdrawn.
@@ -25,6 +26,7 @@ paths:
       tags:
         - Courses
       summary: Upload a CSV format file containing a full set of Courses data.
+      operationId: updateCourses
       requestBody:
         required: true
         content:
@@ -42,6 +44,7 @@ paths:
       tags:
         - Courses
       summary: List all courses
+      operationId: getCoursesCsv
       responses:
         200:
           description: Return a CSV format representation of all courses that are not withdrawn. The data is compatible with the PUT /courses endpoint and may be round-tripped.
@@ -53,23 +56,11 @@ paths:
                   $ref: '#/components/schemas/CourseRecord'
 
   /courses/prerequisites/csv:
-    get:
-      tags:
-        - Course Prerequisites
-      summary: Download a CSV format representation of the current set of prerequisites.
-      responses:
-        200:
-          description: The CSV formatted data is compatible with the PUT operation and may be round-tripped.
-          content:
-            'text/csv;charset=UTF-8':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PrerequisiteRecord'
     put:
       tags:
         - Course Prerequisites
       summary: Upload a CSV format file containing a full set of prerequisites data for the current set of courses.
+      operationId: updatePrerequisites
       description: "Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
       <p>Pre-existing prerequisite data will be removed before the new data is applied.
       <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the PrerequisiteRecord schema. Column order is not important."
@@ -90,21 +81,35 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LineMessage'
-
         400:
           description: Bad input
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Course Prerequisites
+      summary: Download a CSV format representation of the current set of prerequisites.
+      operationId: getPrerequisitesCsv
+      responses:
+        200:
+          description: The CSV formatted data is compatible with the PUT operation and may be round-tripped.
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrerequisiteRecord'
 
-  /courses/{courseId}:
+  /courses/{id}:
     get:
       tags:
         - Courses
       summary: Details for a single course
+      operationId: getCourseById
       parameters:
-        - name: courseId
+        - name: id
           in: path
           description: A course identifier
           required: true
@@ -119,13 +124,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Course'
 
-  /courses/{courseId}/offerings:
+  /courses/{id}/offerings:
     get:
       tags:
         - Course Offerings
       summary: List all offerings for a course
+      operationId: getAllOfferingsByCourseId
       parameters:
-        - name: courseId
+        - name: id
           in: path
           description: A course identifier
           required: true
@@ -143,23 +149,11 @@ paths:
                   $ref: '#/components/schemas/CourseOffering'
 
   /offerings/csv:
-    get:
-      tags:
-        - Course Offerings
-      summary: Download all Offerings in CSV format
-      responses:
-        200:
-          description: successful operation
-          content:
-            'text/csv;charset=UTF-8':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OfferingRecord'
     put:
       tags:
         - Course Offerings
       summary: Upload all offerings in CSV format.
+      operationId: updateOfferings
       description: "Accepts a CSV format file of data representing the desired state of all offerings data attached to the current set of courses.
       <p>Pre-existing offering data will be removed before the new data is applied.
       <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the OfferingRecord schema. Column order is not important."
@@ -186,22 +180,35 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Course Offerings
+      summary: Download all Offerings in CSV format
+      operationId: getOfferingsCsv
+      responses:
+        200:
+          description: successful operation
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfferingRecord'
 
-  /offerings/{offeringId}:
+  /offerings/{id}:
     get:
       tags:
         - Course Offerings
       summary: Details for a single course offering
-
+      operationId: getOfferingById
       parameters:
-        - name: offeringId
+        - name: id
           in: path
           description: A course offering identifier
           required: true
           schema:
             type: string
             format: uuid
-
       responses:
         200:
           description: successful operation
@@ -225,20 +232,20 @@ paths:
       tags:
         - Referrals
       summary: Start a referral
-      operationId: startReferral
+      operationId: createReferral
       requestBody:
         required: true
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/StartReferral'
+              $ref: '#/components/schemas/ReferralCreate'
       responses:
         201:
           description: Started referral
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ReferralStarted'
+                $ref: '#/components/schemas/ReferralCreated'
         400:
           description: Bad input
           content:
@@ -280,7 +287,6 @@ paths:
           required: false
           schema:
             type: string
-
       responses:
         200:
           description: Returns information about matching referrals
@@ -300,7 +306,7 @@ paths:
       tags:
         - Referrals
       summary: Retrieve a referral
-      operationId: getReferral
+      operationId: getReferralById
       parameters:
         - name: id
           in: path
@@ -327,7 +333,7 @@ paths:
       tags:
         - Referrals
       summary: Update a referral
-      operationId: updateReferral
+      operationId: updateReferralById
       parameters:
         - name: id
           in: path
@@ -357,7 +363,7 @@ paths:
       summary: Change a referral's status
       tags:
         - Referrals
-      operationId: updateReferralStatus
+      operationId: updateReferralStatusById
       parameters:
         - name: id
           in: path
@@ -371,7 +377,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/StatusUpdate'
+              $ref: '#/components/schemas/ReferralStatusUpdate'
       responses:
         204:
           description: The referral now has the requested status.
@@ -389,6 +395,7 @@ paths:
       tags:
         - Courses
       summary: Retrieve the course that owns an offering.
+      operationId: getCourseByOfferingId
       parameters:
         - name: id
           in: path
@@ -414,7 +421,7 @@ paths:
   /course-participations:
     post:
       tags:
-        - Course participations
+        - Course Participations
       summary: Record information about a person's prior participation in a course.
       operationId: createCourseParticipation
       requestBody:
@@ -422,7 +429,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/CreateCourseParticipation'
+              $ref: '#/components/schemas/CourseParticipationCreate'
       responses:
         201:
           description: The course participation information has been added.
@@ -443,14 +450,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /course-participations/{courseParticipationId}:
+  /course-participations/{id}:
     get:
       tags:
-        - Course participations
+        - Course Participations
       summary: Return information about a person's participation in a course. Selected by a unique identifier.
-      operationId: getCourseParticipation
+      operationId: getCourseParticipationById
       parameters:
-        - name: courseParticipationId
+        - name: id
           in: path
           description: The unique identifier assigned to this record when it was created.
           schema:
@@ -470,14 +477,13 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
     put:
       tags:
-        - Course participations
+        - Course Participations
       summary: Update the information about a person's participation in a course.
-      operationId: updateCourseParticipation
+      operationId: updateCourseParticipationById
       parameters:
-        - name: courseParticipationId
+        - name: id
           in: path
           description: The unique identifier assigned to this record when it was created.
           schema:
@@ -509,14 +515,13 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
     delete:
       tags:
-        - Course participations
+        - Course Participations
       summary: Delete information about a person's participation in a course.
-      operationId: deleteCourseParticipation
+      operationId: deleteCourseParticipationById
       parameters:
-        - name: courseParticipationId
+        - name: id
           in: path
           description: The unique identifier assigned to this record when it was created.
           schema:
@@ -536,9 +541,9 @@ paths:
   /people/{prisonNumber}/course-participations:
     get:
       tags:
-        - Course participations
+        - Course Participations
       summary: Retrieve course participation information for a person identified by their prison number.
-      operationId: getCourseParticipationsForPrisonNumber
+      operationId: getCourseParticipationsByPrisonNumber
       parameters:
         - name: prisonNumber
           in: path
@@ -688,7 +693,6 @@ components:
           format: email
           example: "ap-admin-2@digital.justice.gov.uk"
           description: "An optional secondary email address of a contact for this offering."
-
       required:
         - id
         - organisationId
@@ -805,7 +809,7 @@ components:
         source:
           type: string
 
-    CreateCourseParticipation:
+    CourseParticipationCreate:
       allOf:
         - $ref: "#/components/schemas/CourseParticipationUpdate"
         - type: object
@@ -819,7 +823,7 @@ components:
 
     CourseParticipation:
       allOf:
-        - $ref: "#/components/schemas/CreateCourseParticipation"
+        - $ref: "#/components/schemas/CourseParticipationCreate"
         - type: object
           properties:
             id:
@@ -871,7 +875,7 @@ components:
       required:
         - status
 
-    StartReferral:
+    ReferralCreate:
       type: object
       properties:
         offeringId:
@@ -907,7 +911,7 @@ components:
 
     Referral:
       allOf:
-        - $ref: "#/components/schemas/StartReferral"
+        - $ref: "#/components/schemas/ReferralCreate"
         - $ref: "#/components/schemas/ReferralUpdate"
         - type: object
           properties:
@@ -925,7 +929,7 @@ components:
             - oasysConfirmed
             - status
 
-    ReferralStarted:
+    ReferralCreated:
       type: object
       properties:
         referralId:
@@ -935,7 +939,7 @@ components:
       required:
         - referralId
 
-    StatusUpdate:
+    ReferralStatusUpdate:
       type: object
       properties:
         status:
