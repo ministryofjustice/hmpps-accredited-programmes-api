@@ -29,7 +29,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test
-  fun `Should save and retrieve a CourseParticipation entity`() {
+  fun `CourseParticipationRepository should save and retrieve CourseParticipationEntity objects`() {
     val courseId = courseEntityRepository.save(CourseEntity(name = "A Course", identifier = "ID")).id!!
     val startTime = LocalDateTime.now()
     val prisonNumber = randomPrisonNumber()
@@ -80,7 +80,7 @@ constructor(
   }
 
   @Test
-  fun `Should save and retrieve a CourseParticipation entity having all nullable fields set to null`() {
+  fun `CourseParticipationRepository should save and retrieve CourseParticipationEntity objects, having all nullable fields set to null`() {
     val prisonNumber = randomPrisonNumber()
 
     val participationId = courseParticipationRepository.save(
@@ -120,7 +120,7 @@ constructor(
   }
 
   @Test
-  fun `Should save and update a CouseParticipation entity with all auditable fields`() {
+  fun `CourseParticipationRepository should save and update CouseParticipationEntity objects, having all auditable fields set`() {
     val startTime = LocalDateTime.now()
     val prisonNumber = randomPrisonNumber()
 

@@ -26,7 +26,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test
-  fun `referralRepository should successfully save and retrieve records`() {
+  fun `JpaReferralRepository should save and retrieve ReferralEntity objects`() {
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
@@ -44,7 +44,7 @@ constructor(
   }
 
   @Test
-  fun `referralRepository should successfully update and retrieve records`() {
+  fun `JpaReferralRepository should update and retrieve ReferralEntity objects`() {
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)

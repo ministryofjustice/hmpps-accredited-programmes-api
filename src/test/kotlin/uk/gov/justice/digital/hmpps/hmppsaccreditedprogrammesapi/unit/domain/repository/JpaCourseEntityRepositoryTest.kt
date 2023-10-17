@@ -23,7 +23,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test
-  fun `courseEntityRepository successfully saves and retrieves records`() {
+  fun `JpaCourseEntityRepository should save and retrieve CourseEntity objects`() {
     val transientEntity = CourseEntity(
       name = "A Course",
       identifier = "AC",
@@ -47,7 +47,7 @@ constructor(
   }
 
   @Test
-  fun `courseEntityRepository should successfully persist a course with prerequisites`() {
+  fun `JpaCourseEntityRepository should persist a CourseEntity object with prerequisites`() {
     val samples = setOf(
       PrerequisiteEntity(name = "PR1", description = "PR1 D1"),
       PrerequisiteEntity(name = "PR1", description = "PR1 D2"),
@@ -83,7 +83,7 @@ constructor(
   }
 
   @Test
-  fun `courseEntityRepository should persist multiple offerings for multiple courses and validate offering ids`() {
+  fun `JpaCourseEntityRepository should persist multiple OfferingEntity objects for multiple CourseEntity objects and verify ids`() {
     val course1 = CourseEntity(
       name = "A Course",
       identifier = "AC",
@@ -109,7 +109,7 @@ constructor(
   }
 
   @Test
-  fun `courseEntityRepository should retrieve course by its associated offering id`() {
+  fun `JpaCourseEntityRepository should retrieve CourseEntity objects by their associated offering id`() {
     val course1 = CourseEntity(
       name = "A Course",
       identifier = "AC",

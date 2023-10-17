@@ -41,7 +41,7 @@ constructor(
   private lateinit var referralService: ReferralService
 
   @Test
-  fun `referralsPost with JWT and valid payload returns 201 with correct body`() {
+  fun `createReferral with JWT and valid payload returns 201 with correct body`() {
     val referral = ReferralEntityFactory()
       .withOfferingId(UUID.randomUUID())
       .withPrisonNumber("A1234BC")
@@ -72,7 +72,7 @@ constructor(
   }
 
   @Test
-  fun `referralsIdGet with JWT returns 200 with correct body`() {
+  fun `getReferralById with JWT returns 200 with correct body`() {
     val referral = ReferralEntityFactory()
       .withId(UUID.randomUUID())
       .withOfferingId(UUID.randomUUID())
@@ -103,7 +103,7 @@ constructor(
   }
 
   @Test
-  fun `referralsIdGet without JWT returns 401`() {
+  fun `getReferralById without JWT returns 401`() {
     mockMvc.get("/referrals/${UUID.randomUUID()}") {
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
@@ -112,7 +112,7 @@ constructor(
   }
 
   @Test
-  fun `referralsIdGet with random UUID returns 404 with error body`() {
+  fun `getReferralById with random UUID returns 404 with error body`() {
     val referralId = UUID.randomUUID()
 
     every { referralService.getReferralById(any()) } returns null
@@ -136,7 +136,7 @@ constructor(
   }
 
   @Test
-  fun `referralsIdGet with invalid UUID returns 400 with error body`() {
+  fun `getReferralById with invalid UUID returns 400 with error body`() {
     val referralId = "bad-id"
 
     mockMvc.get("/referrals/$referralId") {
@@ -156,7 +156,7 @@ constructor(
   }
 
   @Test
-  fun `referralIdStatusPut with valid transition returns 204 with no body`() {
+  fun `updateReferralStatusById with valid transition returns 204 with no body`() {
     val referral = ReferralEntityFactory().produce()
 
     val payload = mapOf(
@@ -177,7 +177,7 @@ constructor(
   }
 
   @Test
-  fun `referralIdStatusPut with invalid transition returns 409 with no body`() {
+  fun `updateReferralStatusById with invalid transition returns 409 with no body`() {
     val referral = ReferralEntityFactory().produce()
 
     val payload = mapOf(

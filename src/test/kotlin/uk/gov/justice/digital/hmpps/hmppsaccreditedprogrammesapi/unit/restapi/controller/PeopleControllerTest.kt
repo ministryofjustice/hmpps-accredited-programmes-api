@@ -40,12 +40,12 @@ constructor(
   val jwtAuthHelper: JwtAuthHelper,
 ) {
   @MockkBean
-  private lateinit var service: CourseParticipationService
+  private lateinit var courseParticipationService: CourseParticipationService
 
   @Nested
   inner class FindByPrisonNumber {
     @Test
-    fun `getCourseParticipationsForPrisonNumber with JWT and valid prison number returns 200 with correct body`() {
+    fun `getCourseParticipationsByPrisonNumber with JWT and valid prison number returns 200 with correct body`() {
       val prisonNumber = randomPrisonNumber()
       val createdAt = LocalDateTime.now()
       val username = randomLowercaseString(10)
@@ -79,7 +79,7 @@ constructor(
         ),
       )
 
-      every { service.getCourseParticipationsByPrisonNumber(any()) } returns courseParticipations
+      every { courseParticipationService.getCourseParticipationsByPrisonNumber(any()) } returns courseParticipations
 
       mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON
@@ -122,12 +122,12 @@ constructor(
         }
       }
 
-      verify { service.getCourseParticipationsByPrisonNumber("A1234AA") }
+      verify { courseParticipationService.getCourseParticipationsByPrisonNumber("A1234AA") }
     }
 
     @Test
-    fun `getCourseParticipationsForPrisonNumber with JWT and unknown prison number returns 200 with empty body`() {
-      every { service.getCourseParticipationsByPrisonNumber(any()) } returns emptyList()
+    fun `getCourseParticipationsByPrisonNumber with JWT and unknown prison number returns 200 with empty body`() {
+      every { courseParticipationService.getCourseParticipationsByPrisonNumber(any()) } returns emptyList()
 
       mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON

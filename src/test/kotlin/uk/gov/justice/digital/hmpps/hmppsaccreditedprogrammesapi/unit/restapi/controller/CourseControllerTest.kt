@@ -46,19 +46,19 @@ constructor(
 ) {
 
   @MockkBean
-  private lateinit var coursesService: CourseService
+  private lateinit var courseService: CourseService
 
   @Nested
   inner class GetCoursesTests {
     @Test
-    fun `coursesGet with JWT returns 200 with correct body`() {
+    fun `getAllCourses with JWT returns 200 with correct body`() {
       val courses = listOf(
         CourseEntityFactory().withName("Course1").produce(),
         CourseEntityFactory().withName("Course2").produce(),
         CourseEntityFactory().withName("Course3").produce(),
       )
 
-      every { coursesService.getAllCourses() } returns courses
+      every { courseService.getAllCourses() } returns courses
 
       mockMvc.get("/courses") {
         accept = MediaType.APPLICATION_JSON
@@ -75,7 +75,7 @@ constructor(
     }
 
     @Test
-    fun `coursesGet without JWT returns 401`() {
+    fun `getAllCourses without JWT returns 401`() {
       mockMvc.get("/courses") {
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
@@ -84,7 +84,7 @@ constructor(
     }
 
     @Test
-    fun `coursesCourseIdGet with correct UUID returns 200 with correct body`() {
+    fun `getCourseById with correct UUID returns 200 with correct body`() {
       val prerequisites = mutableSetOf(
         PrerequisiteEntity(name = "Prerequisite1", description = randomSentence(1..10)),
         PrerequisiteEntity(name = "Prerequisite2", description = randomSentence(1..10)),
@@ -94,7 +94,7 @@ constructor(
         .withPrerequisites(prerequisites)
         .produce()
 
-      every { coursesService.getCourseById(expectedCourse.id!!) } returns expectedCourse
+      every { courseService.getCourseById(expectedCourse.id!!) } returns expectedCourse
 
       mockMvc.get("/courses/${expectedCourse.id}") {
         accept = MediaType.APPLICATION_JSON
@@ -110,14 +110,14 @@ constructor(
         }
       }
 
-      verify { coursesService.getCourseById(expectedCourse.id!!) }
+      verify { courseService.getCourseById(expectedCourse.id!!) }
     }
 
     @Test
-    fun `coursesCourseIdGet with random UUID returns 404 with error body`() {
+    fun `getCourseById with random UUID returns 404 with error body`() {
       val randomId = UUID.randomUUID()
 
-      every { coursesService.getCourseById(any()) } returns null
+      every { courseService.getCourseById(any()) } returns null
 
       mockMvc.get("/courses/$randomId") {
         accept = MediaType.APPLICATION_JSON
@@ -136,7 +136,7 @@ constructor(
     }
 
     @Test
-    fun `coursesCourseIdGet with invalid UUID returns 400 with error body`() {
+    fun `getCourseById with invalid UUID returns 400 with error body`() {
       val badId = "bad-id"
 
       mockMvc.get("/courses/$badId") {
@@ -154,11 +154,11 @@ constructor(
         }
       }
 
-      confirmVerified(coursesService)
+      confirmVerified(courseService)
     }
 
     @Test
-    fun `coursesCourseIdGet without JWT returns 401`() {
+    fun `getCourseById without JWT returns 401`() {
       mockMvc.get("/courses/${UUID.randomUUID()}") {
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
@@ -170,14 +170,14 @@ constructor(
   @Nested
   inner class GetOfferingsTests {
     @Test
-    fun `coursesCourseIdOfferingsGet with JWT returns 200 with correct body`() {
+    fun `getAllOfferingsByCourseId with JWT returns 200 with correct body`() {
       val offerings = listOf(
         OfferingEntityFactory().withOrganisationId("OF1").withContactEmail("of1@digital.justice.gov.uk").produce(),
         OfferingEntityFactory().withOrganisationId("OF2").withContactEmail("of2@digital.justice.gov.uk").produce(),
         OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce(),
       )
 
-      every { coursesService.getAllOfferingsByCourseId(any()) } returns offerings
+      every { courseService.getAllOfferingsByCourseId(any()) } returns offerings
 
       mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON
@@ -195,7 +195,7 @@ constructor(
     }
 
     @Test
-    fun `coursesCourseIdOfferingsGet without JWT returns 401`() {
+    fun `getAllOfferingsByCourseId without JWT returns 401`() {
       mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
@@ -207,8 +207,8 @@ constructor(
   @Nested
   inner class PutCoursesTests {
     @Test
-    fun `coursesPut with valid CSV data returns 204`() {
-      every { coursesService.uploadCoursesCsv(any()) } just Runs
+    fun `updateCourses with valid CSV data returns 204`() {
+      every { courseService.updateCourses(any()) } just Runs
 
       val replacementCourses = generateCourseRecords(3)
       val replacementCoursesCsv = replacementCourses.toCourseCsv()
@@ -222,15 +222,15 @@ constructor(
         status { isNoContent() }
       }
 
-      verify { coursesService.uploadCoursesCsv(replacementCoursesDomain) }
+      verify { courseService.updateCourses(replacementCoursesDomain) }
     }
   }
 
   @Nested
   inner class PutPrerequisitesTests {
     @Test
-    fun `coursesPrerequisitesPut with valid CSV data returns 200 and no content`() {
-      every { coursesService.uploadPrerequisitesCsv(any()) } returns emptyList()
+    fun `updatePrerequisites with valid CSV data returns 200 and no content`() {
+      every { courseService.updatePrerequisites(any()) } returns emptyList()
 
       val replacementPrerequisites = generatePrerequisiteRecords(3)
       val replacementPrerequisitesCsv = replacementPrerequisites.toPrerequisiteCsv()
@@ -248,15 +248,15 @@ constructor(
         }
       }
 
-      verify { coursesService.uploadPrerequisitesCsv(replacementPrerequisitesDomain) }
+      verify { courseService.updatePrerequisites(replacementPrerequisitesDomain) }
     }
   }
 
   @Nested
   inner class PutOfferingsTests {
     @Test
-    fun `coursesOfferingsPut with valid CSV data returns 200 and no content`() {
-      every { coursesService.uploadOfferingsCsv(any()) } returns emptyList()
+    fun `updateOfferings with valid CSV data returns 200 and no content`() {
+      every { courseService.updateOfferings(any()) } returns emptyList()
 
       val replacementOfferings = generateOfferingRecords(3)
       val replacementOfferingsCsv = replacementOfferings.toOfferingCsv()
@@ -274,7 +274,7 @@ constructor(
         }
       }
 
-      verify { coursesService.uploadOfferingsCsv(replacementOfferingsDomain) }
+      verify { courseService.updateOfferings(replacementOfferingsDomain) }
     }
   }
 }

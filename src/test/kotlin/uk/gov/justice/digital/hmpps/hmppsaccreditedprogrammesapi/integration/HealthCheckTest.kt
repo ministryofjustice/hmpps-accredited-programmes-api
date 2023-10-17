@@ -9,7 +9,7 @@ import java.util.function.Consumer
 class HealthCheckTest : IntegrationTestBase() {
 
   @Test
-  fun `Requesting health endpoint should report status as UP`() {
+  fun `Health endpoint should report status as UP`() {
     webTestClient
       .get()
       .uri("/health")
@@ -21,7 +21,7 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Health info endpoint should report version with today's date`() {
+  fun `Health endpoint should report version with today's date`() {
     webTestClient
       .get()
       .uri("/health")
@@ -36,7 +36,7 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Health ping page should be accessible and report status as UP`() {
+  fun `Health ping endpoint should be accessible and report status as UP`() {
     webTestClient
       .get()
       .uri("/health/ping")
@@ -48,7 +48,7 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Requesting readiness endpoint should report status as UP`() {
+  fun `Readiness endpoint should report status as UP`() {
     webTestClient
       .get()
       .uri("/health/readiness")
@@ -60,7 +60,7 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Requesting liveness endpoint should report status as UP`() {
+  fun `Liveness endpoint should report status as UP`() {
     webTestClient
       .get()
       .uri("/health/liveness")

@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 class InfoTest : IntegrationTestBase() {
 
   @Test
-  fun `Requesting info endpoint should be accessible and contain correct build name`() {
+  fun `Info endpoint should be accessible and contain correct build name`() {
     webTestClient
       .get()
       .uri("/info")

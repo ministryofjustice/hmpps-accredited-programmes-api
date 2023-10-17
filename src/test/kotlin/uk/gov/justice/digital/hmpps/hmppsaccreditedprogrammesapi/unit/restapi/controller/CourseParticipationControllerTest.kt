@@ -45,7 +45,7 @@ constructor(
   @Nested
   inner class AddCourseParticipationTests {
     @Test
-    fun `POST course participation with JWT and valid payload with valid id returns 201 with correct body`() {
+    fun `createCourseParticipation with JWT and valid payload with valid id returns 201 with correct body`() {
       val uuid = UUID.randomUUID()
       val courseId = UUID.randomUUID()
       val courseParticipationSlot = slot<CourseParticipationEntity>()
@@ -104,7 +104,7 @@ constructor(
     }
 
     @Test
-    fun `POST course participation with JWT and invalid payload returns 400 with error body`() {
+    fun `createCourseParticipation with JWT and invalid payload returns 400 with error body`() {
       val badPayload = "bad_payload"
 
       mockMvc.post("/course-participations") {
@@ -125,7 +125,7 @@ constructor(
     }
 
     @Test
-    fun `POST course participation without JWT returns 401`() {
+    fun `createCourseParticipation without JWT returns 401`() {
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
@@ -154,7 +154,7 @@ constructor(
   @Nested
   inner class GetCourseParticipationTests {
     @Test
-    fun `GET course participation with JWT returns 200 with correct body`() {
+    fun `getCourseParticipationById with JWT returns 200 with correct body`() {
       val courseParticipationId = UUID.randomUUID()
       val courseId = UUID.randomUUID()
 
@@ -205,7 +205,7 @@ constructor(
     }
 
     @Test
-    fun `GET course participation with random UUID returns 404 with error body`() {
+    fun `getCourseParticipationById with random UUID returns 404 with error body`() {
       val courseParticipationId = UUID.randomUUID()
 
       every { courseParticipationService.getCourseParticipationById(any()) } returns null
@@ -229,7 +229,7 @@ constructor(
     }
 
     @Test
-    fun `GET course participation with invalid UUID returns 400 with error body`() {
+    fun `getCourseParticipationById with invalid UUID returns 400 with error body`() {
       val badId = "bad-id"
 
       mockMvc.get("/course-participations/$badId") {

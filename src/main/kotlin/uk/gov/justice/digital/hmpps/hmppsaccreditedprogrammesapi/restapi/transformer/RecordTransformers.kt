@@ -12,8 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.PrerequisiteUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.NewPrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.OfferingUpdate
 
 fun CourseEntity.toApi(): Course = Course(
@@ -77,7 +76,7 @@ fun OfferingRecord.toDomain(): OfferingUpdate = OfferingUpdate(
   secondaryContactEmail = secondaryContactEmail?.let { it.trim().ifEmpty { null } },
 )
 
-fun PrerequisiteRecord.toDomain(): PrerequisiteUpdate = PrerequisiteUpdate(
+fun PrerequisiteRecord.toDomain(): NewPrerequisite = NewPrerequisite(
   name = name,
   description = description,
   identifier = identifier,

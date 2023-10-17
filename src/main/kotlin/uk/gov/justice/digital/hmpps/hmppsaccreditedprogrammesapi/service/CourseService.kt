@@ -8,7 +8,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.PrerequisiteUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.NewPrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.OfferingUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import java.util.UUID
 
 @Service
 @Transactional
@@ -91,7 +95,7 @@ constructor(
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
-  fun updatePrerequisites(replacements: List<PrerequisiteUpdate>): List<LineMessage> {
+  fun updatePrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
     val allCourses = courseRepository.getAllCourses()
     clearPrerequisites(allCourses)
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)

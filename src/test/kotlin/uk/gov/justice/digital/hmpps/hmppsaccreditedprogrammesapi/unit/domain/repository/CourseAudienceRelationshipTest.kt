@@ -19,7 +19,7 @@ constructor(
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test
-  fun `saveAll should add audience values to courses`() {
+  fun `CourseEntityRepository should add AudienceEntity values to CourseEntity objects`() {
     courseEntityRepository.saveAll(
       listOf(
         CourseEntity(name = "Course 1", identifier = "C1", description = "A course"),

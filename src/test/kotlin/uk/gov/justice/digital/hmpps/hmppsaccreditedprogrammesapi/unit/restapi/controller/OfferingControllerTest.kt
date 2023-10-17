@@ -29,14 +29,14 @@ constructor(
 ) {
 
   @MockkBean
-  private lateinit var coursesService: CourseService
+  private lateinit var courseService: CourseService
 
   @Test
-  fun `offeringsIdCourseGet with JWT returns 200 with correct body`() {
+  fun `getCourseByOfferingId with JWT returns 200 with correct body`() {
     val offering = OfferingEntityFactory().withId(UUID.randomUUID()).produce()
     val course = CourseEntityFactory().withId(UUID.randomUUID()).withMutableOfferings(mutableSetOf(offering)).produce()
 
-    every { coursesService.getCourseByOfferingId(any()) } returns course
+    every { courseService.getCourseByOfferingId(any()) } returns course
 
     mockMvc.get("/offerings/${offering.id}/course") {
       accept = MediaType.APPLICATION_JSON
@@ -50,10 +50,10 @@ constructor(
   }
 
   @Test
-  fun `offeringsIdCourseGet with random UUID returns 404 with error body`() {
+  fun `getCourseByOfferingId with random UUID returns 404 with error body`() {
     val offeringId = UUID.randomUUID()
 
-    every { coursesService.getCourseByOfferingId(any()) } returns null
+    every { courseService.getCourseByOfferingId(any()) } returns null
 
     mockMvc.get("/offerings/$offeringId/course") {
       accept = MediaType.APPLICATION_JSON
@@ -72,7 +72,7 @@ constructor(
   }
 
   @Test
-  fun `offeringsIdCourseGet with invalid UUID returns 400 with error body`() {
+  fun `getCourseByOfferingId with invalid UUID returns 400 with error body`() {
     val badId = "bad-id"
 
     mockMvc.get("/offerings/$badId/course") {
@@ -92,7 +92,7 @@ constructor(
   }
 
   @Test
-  fun `offeringsIdCourseGet without JWT returns 401`() {
+  fun `getCourseByOfferingId without JWT returns 401`() {
     mockMvc.get("/offerings/${UUID.randomUUID()}/course") {
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
