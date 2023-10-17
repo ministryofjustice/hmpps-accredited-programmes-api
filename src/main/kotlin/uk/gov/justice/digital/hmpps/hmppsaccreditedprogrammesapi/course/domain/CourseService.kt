@@ -94,7 +94,7 @@ constructor (
     replacements.forEach { record ->
       record.identifier.split(",").forEach { identifier ->
         coursesByIdentifier[identifier.trim()]?.run {
-          prerequisites.add(Prerequisite(name = record.name, description = record.description ?: ""))
+          prerequisites.add(PrerequisiteEntity(name = record.name, description = record.description ?: ""))
         }
       }
     }

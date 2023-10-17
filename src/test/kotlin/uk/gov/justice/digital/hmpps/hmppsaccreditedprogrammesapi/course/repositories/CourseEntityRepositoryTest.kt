@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.Repo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.commitAndStartNewTx
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.PrerequisiteEntity
 
 class CourseEntityRepositoryTest
 @Autowired
@@ -50,9 +50,9 @@ constructor(
   @Test
   fun `courseEntityRepository should successfully persist a course with prerequisites`() {
     val samples = setOf(
-      Prerequisite("PR1", "PR1 D1"),
-      Prerequisite("PR1", "PR1 D2"),
-      Prerequisite("PR2", "PR2 D1"),
+      PrerequisiteEntity(name = "PR1", description = "PR1 D1"),
+      PrerequisiteEntity(name = "PR1", description = "PR1 D2"),
+      PrerequisiteEntity(name = "PR2", description = "PR2 D1"),
     )
 
     val course = CourseEntity(
@@ -72,7 +72,7 @@ constructor(
     val persistentPrereqs = courseEntityRepository.findAll().first().prerequisites
 
     persistentPrereqs shouldContainExactly samples
-    persistentPrereqs.remove(Prerequisite("PR1", "PR1 D2"))
+    persistentPrereqs.remove(PrerequisiteEntity(name = "PR1", description = "PR1 D2"))
 
     commitAndStartNewTx()
     countRowsInTable(jdbcTemplate, "prerequisite") shouldBe 2
@@ -132,12 +132,12 @@ constructor(
     countRowsInTable(jdbcTemplate, "offering") shouldBe 4
     val persistentCourse = courseEntityRepository.findById(course1.id!!).orElseThrow()
     val offeringId = persistentCourse.offerings.first().id!!
-    val courseByOfferingIdInSameTx = courseEntityRepository.findByMutableOfferings_id(offeringId)
+    val courseByOfferingIdInSameTx = courseEntityRepository.findByMutableOfferingsId(offeringId)
     courseByOfferingIdInSameTx shouldBe persistentCourse
 
     commitAndStartNewTx()
 
-    val courseByOfferingInNewTx = courseEntityRepository.findByMutableOfferings_id(offeringId)
+    val courseByOfferingInNewTx = courseEntityRepository.findByMutableOfferingsId(offeringId)
     courseByOfferingInNewTx shouldBe persistentCourse
   }
 }

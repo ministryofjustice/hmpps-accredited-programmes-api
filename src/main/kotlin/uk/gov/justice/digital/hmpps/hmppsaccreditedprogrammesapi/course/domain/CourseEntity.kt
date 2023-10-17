@@ -37,7 +37,7 @@ data class CourseEntity(
   @ElementCollection(fetch = FetchType.EAGER)
   @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
-  val prerequisites: MutableSet<Prerequisite> = mutableSetOf(),
+  val prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true)
   @Column(name = "offerings")
@@ -66,7 +66,7 @@ data class CourseEntity(
 
 @Embeddable
 @Immutable
-data class Prerequisite(
+data class PrerequisiteEntity(
   val name: String,
   val description: String,
 )

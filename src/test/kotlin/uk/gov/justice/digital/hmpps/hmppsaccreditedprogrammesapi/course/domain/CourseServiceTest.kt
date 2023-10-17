@@ -102,7 +102,7 @@ class CourseServiceTest {
           identifier = "C1",
           description = "Description 1",
           prerequisites = mutableSetOf(
-            Prerequisite(name = "PR 1", description = " PR Desc 1 "),
+            PrerequisiteEntity(name = "PR 1", description = " PR Desc 1 "),
           ),
         ),
       )
@@ -119,7 +119,7 @@ class CourseServiceTest {
         CourseEntity(
           name = "Course 1",
           identifier = "C1",
-          prerequisites = mutableSetOf(Prerequisite(name = "PR 1", description = " PR 1 Desc")),
+          prerequisites = mutableSetOf(PrerequisiteEntity(name = "PR 1", description = " PR 1 Desc")),
         ),
       )
       every { repository.getAllCourses() } returns allCourses
@@ -130,7 +130,7 @@ class CourseServiceTest {
         ),
       ).shouldBeEmpty()
 
-      allCourses[0].prerequisites shouldContainExactly listOf(Prerequisite("PR 2", description = "PR 2 Desc"))
+      allCourses[0].prerequisites shouldContainExactly listOf(PrerequisiteEntity(name = "PR 2", description = "PR 2 Desc"))
     }
 
     @Test
@@ -151,11 +151,11 @@ class CourseServiceTest {
 
       allCourses.associateBy(CourseEntity::identifier, CourseEntity::prerequisites) shouldBeEqual mapOf(
         "C1" to mutableSetOf(
-          Prerequisite("PR 1", "PR 1 Desc"),
-          Prerequisite("PR 2", "PR 2 Desc"),
+          PrerequisiteEntity(name = "PR 1", description = "PR 1 Desc"),
+          PrerequisiteEntity(name = "PR 2", description = "PR 2 Desc"),
         ),
         "C2" to mutableSetOf(
-          Prerequisite("PR 3", "PR 3 Desc"),
+          PrerequisiteEntity(name = "PR 3", description = "PR 3 Desc"),
         ),
       )
     }
@@ -200,8 +200,8 @@ class CourseServiceTest {
       )
 
       allCourses.associateBy(CourseEntity::identifier, CourseEntity::prerequisites) shouldBeEqual mapOf(
-        "C-1" to mutableSetOf(Prerequisite("PR 1", "D1")),
-        "C-2" to mutableSetOf(Prerequisite("PR 1", "D1"), Prerequisite("PR 2", "D2")),
+        "C-1" to mutableSetOf(PrerequisiteEntity(name = "PR 1", description = "D1")),
+        "C-2" to mutableSetOf(PrerequisiteEntity(name = "PR 1", description = "D1"), PrerequisiteEntity(name = "PR 2", description = "D2")),
       )
     }
   }

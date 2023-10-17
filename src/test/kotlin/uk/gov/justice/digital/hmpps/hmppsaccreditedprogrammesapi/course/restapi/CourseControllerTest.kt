@@ -23,7 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.PrerequisiteEntity
 import java.util.UUID
 
 @WebMvcTest
@@ -82,8 +82,8 @@ class CourseControllerTest(
     @Test
     fun `coursesCourseIdGet with correct UUID returns 200 with correct body`() {
       val prerequisites = mutableSetOf(
-        Prerequisite(name = "Prerequisite1", description = randomSentence(1..10)),
-        Prerequisite(name = "Prerequisite2", description = randomSentence(1..10)),
+        PrerequisiteEntity(name = "Prerequisite1", description = randomSentence(1..10)),
+        PrerequisiteEntity(name = "Prerequisite2", description = randomSentence(1..10)),
       )
 
       val expectedCourse = CourseEntityFactory()

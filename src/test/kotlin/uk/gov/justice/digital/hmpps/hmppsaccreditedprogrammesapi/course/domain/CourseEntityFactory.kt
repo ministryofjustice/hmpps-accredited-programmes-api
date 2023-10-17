@@ -13,7 +13,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
   private var description: Yielded<String?> = { null }
   private var alternateName: Yielded<String?> = { null }
   private var referable: Yielded<Boolean> = { true }
-  private var prerequisites: Yielded<MutableSet<Prerequisite>> = { mutableSetOf() }
+  private var prerequisites: Yielded<MutableSet<PrerequisiteEntity>> = { mutableSetOf() }
   private var mutableOfferings: Yielded<MutableSet<OfferingEntity>> = { mutableSetOf() }
   private var audiences: Yielded<MutableSet<AudienceEntity>> = { mutableSetOf() }
 
@@ -41,7 +41,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
     this.referable = { referable }
   }
 
-  fun withPrerequisites(prerequisites: MutableSet<Prerequisite>) = apply {
+  fun withPrerequisites(prerequisites: MutableSet<PrerequisiteEntity>) = apply {
     this.prerequisites = { prerequisites }
   }
 

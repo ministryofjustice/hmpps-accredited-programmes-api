@@ -34,7 +34,7 @@ constructor(
     }
 
   override fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository
-    .findByMutableOfferings_id(offeringId)
+    .findByMutableOfferingsId(offeringId)
     ?.also {
       Hibernate.initialize(it.audiences)
       Hibernate.initialize(it.prerequisites)

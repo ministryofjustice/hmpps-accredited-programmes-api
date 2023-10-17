@@ -13,14 +13,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.PrerequisiteUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.PrerequisiteEntity
 
 fun CourseEntity.toApi(): Course = Course(
   id = id!!,
   name = name,
   description = description,
   alternateName = alternateName,
-  coursePrerequisites = prerequisites.map(Prerequisite::toApi),
+  coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
   audiences = audiences.map(AudienceEntity::toApi),
   referable = referable,
 )
@@ -34,7 +34,7 @@ fun CourseEntity.toCourseRecord(): CourseRecord = CourseRecord(
   audience = audiences.joinToString { it.value },
 )
 
-fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(
+fun PrerequisiteEntity.toApi(): CoursePrerequisite = CoursePrerequisite(
   name = name,
   description = description,
 )

@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.PrerequisiteEntity
 import java.util.UUID
 
 class RecordTransformersTest {
@@ -19,8 +19,8 @@ class RecordTransformersTest {
       name = "A Course",
       identifier = "AC",
       prerequisites = mutableSetOf(
-        Prerequisite(name = "gender", description = "female"),
-        Prerequisite(name = "risk score", description = "ORGS: 50+"),
+        PrerequisiteEntity(name = "gender", description = "female"),
+        PrerequisiteEntity(name = "risk score", description = "ORGS: 50+"),
       ),
       audiences = mutableSetOf(
         AudienceEntity(value = "A", id = UUID.randomUUID()),
@@ -81,7 +81,7 @@ class RecordTransformersTest {
 
   @Test
   fun `Transforming a course prerequisite entity should convert to its API equivalent`() {
-    val entity = Prerequisite(
+    val entity = PrerequisiteEntity(
       name = "gender",
       description = "female",
     )
