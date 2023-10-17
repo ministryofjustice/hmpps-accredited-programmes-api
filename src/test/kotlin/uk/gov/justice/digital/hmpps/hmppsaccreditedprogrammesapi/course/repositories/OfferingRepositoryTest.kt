@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.commitAndStartNewTx
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import kotlin.jvm.optionals.getOrNull
 
 class OfferingRepositoryTest
@@ -26,9 +26,9 @@ constructor(
       description = "A description",
       referable = true,
     ).apply {
-      addOffering(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
-      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      addOffering(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
+      addOffering(OfferingEntity(organisationId = "BWI", contactEmail = "bwi@a.com"))
+      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      addOffering(OfferingEntity(organisationId = "BXI", contactEmail = "bxi@a.com"))
     }
 
     val course2 = CourseEntity(
@@ -37,7 +37,7 @@ constructor(
       description = "Another description",
       referable = false,
     ).apply {
-      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
     }
 
     val offering = courseRepository.save(course1).offerings.first()
@@ -59,9 +59,9 @@ constructor(
       description = "A description",
       referable = true,
     ).apply {
-      addOffering(Offering(organisationId = "BWI", contactEmail = "bwi@a.com", withdrawn = true))
-      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com", withdrawn = true))
-      addOffering(Offering(organisationId = "BXI", contactEmail = "bxi@a.com", withdrawn = true))
+      addOffering(OfferingEntity(organisationId = "BWI", contactEmail = "bwi@a.com", withdrawn = true))
+      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com", withdrawn = true))
+      addOffering(OfferingEntity(organisationId = "BXI", contactEmail = "bxi@a.com", withdrawn = true))
     }
 
     val course2 = CourseEntity(
@@ -70,7 +70,7 @@ constructor(
       description = "Another description",
       referable = false,
     ).apply {
-      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
     }
 
     val offering = courseRepository.save(course1).offerings.first()

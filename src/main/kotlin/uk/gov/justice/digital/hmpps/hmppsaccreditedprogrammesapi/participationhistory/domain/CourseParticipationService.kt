@@ -14,27 +14,27 @@ class CourseParticipationService
 constructor (
   private val courseParticipationRepository: JpaCourseParticipationRepository,
 ) {
-  fun createCourseParticipation(courseParticipation: CourseParticipation): CourseParticipation? =
+  fun createCourseParticipation(courseParticipation: CourseParticipationEntity): CourseParticipationEntity? =
     courseParticipation.let {
       it.assertOnlyCourseIdOrCourseNamePresent()
       courseParticipationRepository.save(it)
     }
 
-  fun getCourseParticipationById(historicCourseParticipationId: UUID): CourseParticipation? =
+  fun getCourseParticipationById(historicCourseParticipationId: UUID): CourseParticipationEntity? =
     courseParticipationRepository.findById(historicCourseParticipationId).getOrNull()
 
-  fun updateCourseParticipationById(historicCourseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipation =
+  fun updateCourseParticipationById(historicCourseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipationEntity =
     courseParticipationRepository
       .getReferenceById(historicCourseParticipationId)
       .applyUpdate(update)
 
-  fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipation> = courseParticipationRepository.findByPrisonNumber(prisonNumber)
+  fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity> = courseParticipationRepository.findByPrisonNumber(prisonNumber)
   fun deleteCourseParticipationById(historicCourseParticipationId: UUID) {
     courseParticipationRepository.deleteById(historicCourseParticipationId)
   }
 }
 
-private fun CourseParticipation.applyUpdate(update: CourseParticipationUpdate): CourseParticipation =
+private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity =
   apply {
     courseName = update.courseName
     courseId = update.courseId

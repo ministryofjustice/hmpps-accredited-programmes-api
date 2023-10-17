@@ -41,7 +41,7 @@ class CourseEntity(
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true)
   @Column(name = "offerings")
   @Fetch(SUBSELECT)
-  private val mutableOfferings: MutableSet<Offering> = mutableSetOf(),
+  private val mutableOfferings: MutableSet<OfferingEntity> = mutableSetOf(),
 
   @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
   @Fetch(SUBSELECT)
@@ -50,14 +50,14 @@ class CourseEntity(
     joinColumns = [JoinColumn(name = "course_id")],
     inverseJoinColumns = [JoinColumn(name = "audience_id")],
   )
-  var audiences: MutableSet<Audience> = mutableSetOf(),
+  var audiences: MutableSet<AudienceEntity> = mutableSetOf(),
   var withdrawn: Boolean = false,
 ) {
   @get:Transient
-  val offerings: Set<Offering>
+  val offerings: Set<OfferingEntity>
     get() = mutableOfferings
 
-  fun addOffering(offering: Offering) {
+  fun addOffering(offering: OfferingEntity) {
     offering.course = this
     mutableOfferings += offering
   }

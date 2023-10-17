@@ -18,19 +18,19 @@ constructor (
   fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.getCourseById(courseId)?.takeIf { !it.withdrawn }
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.getCourseByOfferingId(offeringId)
 
-  fun getOfferingsCsv(): List<Offering> = courseRepository.getOfferingsCsv().filterNot(Offering::withdrawn)
+  fun getOfferingsCsv(): List<OfferingEntity> = courseRepository.getOfferingsCsv().filterNot(OfferingEntity::withdrawn)
 
-  fun getAllOfferingsByCourseId(courseId: UUID): List<Offering> = courseRepository
+  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> = courseRepository
     .getAllOfferingsByCourseId(courseId)
-    .filterNot(Offering::withdrawn)
+    .filterNot(OfferingEntity::withdrawn)
 
-  fun getOfferingById(offeringId: UUID): Offering? = courseRepository
+  fun getOfferingById(offeringId: UUID): OfferingEntity? = courseRepository
     .getOfferingById(offeringId)
     ?.takeIf { !it.withdrawn }
 
   fun uploadCoursesCsv(courseData: List<CourseUpdate>) {
     updateAudiences(courseData)
-    val allAudiences: Map<String, Audience> = courseRepository.getAllAudiences().associateBy { it.value }
+    val allAudiences: Map<String, AudienceEntity> = courseRepository.getAllAudiences().associateBy { it.value }
     val coursesByIdentifier = courseRepository.getAllCourses().associateBy(CourseEntity::identifier)
     val courseDataByIdentifier = courseData.associateBy(CourseUpdate::identifier)
 
@@ -61,7 +61,7 @@ constructor (
           alternateName = update.alternateName
           referable = update.referable
 
-          val audiencesByValue = audiences.associateBy(Audience::value)
+          val audiencesByValue = audiences.associateBy(AudienceEntity::value)
           val audiencesToAdd = expectedAudienceStrings - audiencesByValue.keys
           val audiencesToRemove = audiencesByValue.keys - expectedAudienceStrings
           audiences.addAll(audiencesToAdd.mapNotNull { allAudiences[it] })
@@ -76,14 +76,14 @@ constructor (
   }
 
   private fun updateAudiences(courseData: List<CourseUpdate>) {
-    val desiredAudiences = courseData.flatMap { audienceStrings(it.audience) }.map(::Audience).toSet()
+    val desiredAudiences = courseData.flatMap { audienceStrings(it.audience) }.map(::AudienceEntity).toSet()
     val actualAudiences = courseRepository.getAllAudiences()
     courseRepository.saveAudiences(desiredAudiences - actualAudiences)
   }
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
-  fun uploadPrerequisitedCsv(replacements: List<NewPrerequisite>): List<LineMessage> {
+  fun uploadPrerequisitedCsv(replacements: List<PrerequisiteUpdate>): List<LineMessage> {
     val allCourses = courseRepository.getAllCourses()
     clearPrerequisites(allCourses)
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
@@ -125,14 +125,14 @@ constructor (
   }
 
   private fun updateOfferingsForCourse(course: CourseEntity, desiredOfferings: List<OfferingUpdate>) {
-    val offeringsByOrganisationId = course.offerings.associateBy(Offering::organisationId)
+    val offeringsByOrganisationId = course.offerings.associateBy(OfferingEntity::organisationId)
     val updatesByPrisonId = desiredOfferings.associateBy(OfferingUpdate::prisonId)
 
     val toAdd = updatesByPrisonId.keys - offeringsByOrganisationId.keys
     toAdd.forEach {
       val update = updatesByPrisonId[it]
       course.addOffering(
-        Offering(
+        OfferingEntity(
           organisationId = it,
           contactEmail = update?.contactEmail ?: "",
           secondaryContactEmail = update?.secondaryContactEmail,

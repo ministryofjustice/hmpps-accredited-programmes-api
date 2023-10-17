@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomEmailAddress
 import java.util.UUID
 
-class OfferingEntityFactory : Factory<Offering> {
+class OfferingEntityFactory : Factory<OfferingEntity> {
   private var id: Yielded<UUID> = { UUID.randomUUID() }
   private var organisationId: Yielded<String> = { randomAlphanumericString(6) }
   private var contactEmail: Yielded<String> = { randomEmailAddress() }
@@ -28,7 +28,7 @@ class OfferingEntityFactory : Factory<Offering> {
     this.secondaryContactEmail = { secondaryContactEmail }
   }
 
-  override fun produce(): Offering = Offering(
+  override fun produce(): OfferingEntity = OfferingEntity(
     id = this.id(),
     organisationId = this.organisationId(),
     contactEmail = this.contactEmail(),

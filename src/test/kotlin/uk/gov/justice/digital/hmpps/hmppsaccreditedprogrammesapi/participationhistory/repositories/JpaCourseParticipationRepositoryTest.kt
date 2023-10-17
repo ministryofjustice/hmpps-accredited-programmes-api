@@ -12,8 +12,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.repositories.CourseEntityRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseStatus
@@ -36,14 +36,14 @@ constructor(
     val prisonNumber = randomPrisonNumber()
 
     val participationId = courseParticipationRepository.save(
-      CourseParticipation(
+      CourseParticipationEntity(
         courseId = courseId,
         courseName = "Course name",
         prisonNumber = prisonNumber,
         otherCourseName = null,
         source = "Source of information",
         detail = "Course detail",
-        outcome = CourseOutcome(
+        outcome = CourseParticipationOutcome(
           status = CourseStatus.COMPLETE,
           yearStarted = Year.parse("2021"),
           yearCompleted = Year.parse("2022"),
@@ -59,7 +59,7 @@ constructor(
     persistentHistory.shouldNotBeNull()
 
     persistentHistory.shouldBeEqualToIgnoringFields(
-      CourseParticipation(
+      CourseParticipationEntity(
         id = participationId,
         courseName = "Course name",
         courseId = courseId,
@@ -67,7 +67,7 @@ constructor(
         otherCourseName = null,
         source = "Source of information",
         detail = "Course detail",
-        outcome = CourseOutcome(
+        outcome = CourseParticipationOutcome(
           status = CourseStatus.COMPLETE,
           yearStarted = Year.parse("2021"),
           yearCompleted = Year.parse("2022"),
@@ -75,7 +75,7 @@ constructor(
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = "location"),
         createdByUsername = TEST_USER_NAME,
       ),
-      CourseParticipation::createdDateTime,
+      CourseParticipationEntity::createdDateTime,
     )
     persistentHistory.createdDateTime.shouldBeWithin(Duration.ofSeconds(1), startTime)
   }
@@ -85,7 +85,7 @@ constructor(
     val prisonNumber = randomPrisonNumber()
 
     val participationId = courseParticipationRepository.save(
-      CourseParticipation(
+      CourseParticipationEntity(
         courseName = null,
         courseId = null,
         prisonNumber = prisonNumber,
@@ -104,7 +104,7 @@ constructor(
     persistentHistory.shouldNotBeNull()
 
     persistentHistory.shouldBeEqualToIgnoringFields(
-      CourseParticipation(
+      CourseParticipationEntity(
         id = participationId,
         courseName = null,
         courseId = null,
@@ -116,7 +116,7 @@ constructor(
         outcome = null,
         createdByUsername = TEST_USER_NAME,
       ),
-      CourseParticipation::createdDateTime,
+      CourseParticipationEntity::createdDateTime,
     )
   }
 
@@ -126,7 +126,7 @@ constructor(
     val prisonNumber = randomPrisonNumber()
 
     val participationId = courseParticipationRepository.save(
-      CourseParticipation(
+      CourseParticipationEntity(
         courseName = null,
         courseId = null,
         prisonNumber = prisonNumber,
@@ -134,7 +134,7 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
+        outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
       ),
     ).id!!
 
@@ -144,7 +144,7 @@ constructor(
     commitAndStartNewTx()
 
     persistentHistory.shouldBeEqualToIgnoringFields(
-      CourseParticipation(
+      CourseParticipationEntity(
         id = participationId,
         courseName = null,
         courseId = null,
@@ -153,12 +153,12 @@ constructor(
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),
-        outcome = CourseOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
+        outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
         createdByUsername = TEST_USER_NAME,
         lastModifiedByUsername = TEST_USER_NAME,
       ),
-      CourseParticipation::createdDateTime,
-      CourseParticipation::lastModifiedDateTime,
+      CourseParticipationEntity::createdDateTime,
+      CourseParticipationEntity::lastModifiedDateTime,
     )
 
     persistentHistory.createdDateTime.shouldBeWithin(Duration.ofSeconds(1), startTime)

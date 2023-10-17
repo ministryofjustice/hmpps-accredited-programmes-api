@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.RepositoryTest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 
 class CourseAudienceRelationshipTest
@@ -29,8 +29,8 @@ constructor(
 
     audienceRepository.saveAll(
       listOf(
-        Audience("Male"),
-        Audience("Female"),
+        AudienceEntity("Male"),
+        AudienceEntity("Female"),
       ),
     )
 
@@ -56,7 +56,7 @@ constructor(
 
     val courseAudiences = courseRepository
       .findAll()
-      .fold(emptySet<Audience>()) { acc, course -> acc.plus(course!!.audiences) }
+      .fold(emptySet<AudienceEntity>()) { acc, course -> acc.plus(course!!.audiences) }
 
     courseAudiences shouldHaveSize 2
     courseAudiences.map { it.value } shouldBe setOf("Male", "Female")

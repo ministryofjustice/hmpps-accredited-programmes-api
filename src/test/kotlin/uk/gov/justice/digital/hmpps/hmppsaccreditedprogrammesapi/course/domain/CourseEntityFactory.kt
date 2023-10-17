@@ -14,8 +14,8 @@ class CourseEntityFactory : Factory<CourseEntity> {
   private var alternateName: Yielded<String?> = { null }
   private var referable: Yielded<Boolean> = { true }
   private var prerequisites: Yielded<MutableSet<Prerequisite>> = { mutableSetOf() }
-  private var mutableOfferings: Yielded<MutableSet<Offering>> = { mutableSetOf() }
-  private var audiences: Yielded<MutableSet<Audience>> = { mutableSetOf() }
+  private var mutableOfferings: Yielded<MutableSet<OfferingEntity>> = { mutableSetOf() }
+  private var audiences: Yielded<MutableSet<AudienceEntity>> = { mutableSetOf() }
 
   fun withId(id: UUID) = apply {
     this.id = { id }
@@ -45,11 +45,11 @@ class CourseEntityFactory : Factory<CourseEntity> {
     this.prerequisites = { prerequisites }
   }
 
-  fun withMutableOfferings(mutableOfferingEntities: MutableSet<Offering>) = apply {
+  fun withMutableOfferings(mutableOfferingEntities: MutableSet<OfferingEntity>) = apply {
     this.mutableOfferings = { mutableOfferingEntities }
   }
 
-  fun withAudiences(audienceEntities: MutableSet<Audience>) = apply {
+  fun withAudiences(audienceEntities: MutableSet<AudienceEntity>) = apply {
     this.audiences = { audienceEntities }
   }
 

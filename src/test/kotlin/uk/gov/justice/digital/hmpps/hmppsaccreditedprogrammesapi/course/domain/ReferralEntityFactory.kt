@@ -4,10 +4,10 @@ import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomUppercaseAlphanumericString
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity
 import java.util.UUID
 
-class ReferralEntityFactory : Factory<Referral> {
+class ReferralEntityFactory : Factory<ReferralEntity> {
 
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
   private var offeringId: Yielded<UUID> = { UUID.randomUUID() }
@@ -16,7 +16,7 @@ class ReferralEntityFactory : Factory<Referral> {
   private var reason: Yielded<String?> = { null }
   private var oasysConfirmed: Yielded<Boolean> = { false }
   private var hasReviewedProgrammeHistory: Yielded<Boolean> = { false }
-  private var status: Yielded<Referral.Status> = { Referral.Status.REFERRAL_STARTED }
+  private var status: Yielded<ReferralEntity.Status> = { ReferralEntity.Status.REFERRAL_STARTED }
 
   fun withId(id: UUID) = apply {
     this.id = { id }
@@ -46,11 +46,11 @@ class ReferralEntityFactory : Factory<Referral> {
     this.hasReviewedProgrammeHistory = { hasReviewedProgrammeHistory }
   }
 
-  fun withStatus(status: Referral.Status) = apply {
+  fun withStatus(status: ReferralEntity.Status) = apply {
     this.status = { status }
   }
 
-  override fun produce(): Referral = Referral(
+  override fun produce(): ReferralEntity = ReferralEntity(
     id = id(),
     offeringId = offeringId(),
     prisonNumber = prisonNumber(),

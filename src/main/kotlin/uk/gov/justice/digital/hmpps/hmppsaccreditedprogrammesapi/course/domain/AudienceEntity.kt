@@ -4,10 +4,12 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.util.UUID
 
 @Entity
-class Audience(
+@Table(name = "audience")
+class AudienceEntity(
   @Column(name = "audience_value")
   var value: String,
 
@@ -18,11 +20,11 @@ class Audience(
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other == null || other !is Audience) return false
+    if (other == null || other !is AudienceEntity) return false
     return this.value == other.value
   }
 
   override fun hashCode(): Int = 1756406093
 
-  override fun toString(): String = "Audience($value, $id)"
+  override fun toString(): String = "AudienceEntity($value, $id)"
 }

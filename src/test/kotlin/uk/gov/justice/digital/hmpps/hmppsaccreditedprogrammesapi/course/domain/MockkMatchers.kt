@@ -18,6 +18,6 @@ fun CourseEntity.eqByFields(other: CourseEntity) =
     referable == other.referable &&
     withdrawn == other.withdrawn
 
-fun Set<Audience>.refEq(other: Set<Audience>) =
+fun Set<AudienceEntity>.refEq(other: Set<AudienceEntity>) =
   this.size == other.size &&
     this.all { x -> other.any { y -> x === y } }

@@ -9,5 +9,5 @@ data class CourseParticipationUpdate(
   val source: String?,
   val detail: String?,
   val setting: CourseParticipationSetting? = null,
-  val outcome: CourseOutcome? = null,
+  val outcome: CourseParticipationOutcome? = null,
 )

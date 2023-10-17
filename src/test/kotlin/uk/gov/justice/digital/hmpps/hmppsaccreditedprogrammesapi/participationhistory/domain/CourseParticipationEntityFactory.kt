@@ -5,7 +5,7 @@ import io.github.bluegroundltd.kfactory.Yielded
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
 import java.util.UUID
 
-class CourseParticipationEntityFactory : Factory<CourseParticipation> {
+class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
 
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
@@ -15,7 +15,7 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
   private var source: Yielded<String?> = { null }
   private var detail: Yielded<String?> = { null }
   private var setting: Yielded<CourseParticipationSetting> = { CourseParticipationSetting(type = CourseSetting.CUSTODY) }
-  private var outcome: Yielded<CourseOutcome> = { CourseOutcome(status = CourseStatus.INCOMPLETE) }
+  private var outcome: Yielded<CourseParticipationOutcome> = { CourseParticipationOutcome(status = CourseStatus.INCOMPLETE) }
 
   fun withId(id: UUID) = apply {
     this.id = { id }
@@ -49,12 +49,12 @@ class CourseParticipationEntityFactory : Factory<CourseParticipation> {
     this.setting = { setting }
   }
 
-  fun withOutcome(outcome: CourseOutcome) = apply {
+  fun withOutcome(outcome: CourseParticipationOutcome) = apply {
     this.outcome = { outcome }
   }
 
-  override fun produce(): CourseParticipation {
-    return CourseParticipation(
+  override fun produce(): CourseParticipationEntity {
+    return CourseParticipationEntity(
       courseName = this.courseName(),
       id = this.id(),
       prisonNumber = this.prisonNumber(),

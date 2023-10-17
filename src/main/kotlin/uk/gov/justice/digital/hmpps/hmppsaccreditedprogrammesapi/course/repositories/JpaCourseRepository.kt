@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.reposit
 import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -40,25 +40,25 @@ constructor(
       Hibernate.initialize(it.prerequisites)
     }
 
-  override fun getOfferingsCsv(): List<Offering> = offeringRepository
+  override fun getOfferingsCsv(): List<OfferingEntity> = offeringRepository
     .findAll()
     .onEach { Hibernate.initialize(it.course) }
 
-  override fun getAllOfferingsByCourseId(courseId: UUID): List<Offering> = courseRepository
+  override fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> = courseRepository
     .findById(courseId)
     .getOrNull()
     ?.offerings
     ?.toList() ?: emptyList()
 
-  override fun getOfferingById(offeringId: UUID): Offering? = offeringRepository.findById(offeringId).getOrNull()
+  override fun getOfferingById(offeringId: UUID): OfferingEntity? = offeringRepository.findById(offeringId).getOrNull()
 
-  override fun getAllAudiences(): Set<Audience> = audienceRepository.findAll().toSet()
+  override fun getAllAudiences(): Set<AudienceEntity> = audienceRepository.findAll().toSet()
 
   override fun saveCourse(courseEntity: CourseEntity) {
     courseRepository.save(courseEntity)
   }
 
-  override fun saveAudiences(audiences: Set<Audience>) {
+  override fun saveAudiences(audiences: Set<AudienceEntity>) {
     audienceRepository.saveAll(audiences)
   }
 }

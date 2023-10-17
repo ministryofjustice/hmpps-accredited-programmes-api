@@ -5,9 +5,9 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
 import java.util.UUID
 
@@ -23,9 +23,9 @@ class RecordTransformersTest {
         Prerequisite(name = "risk score", description = "ORGS: 50+"),
       ),
       audiences = mutableSetOf(
-        Audience(value = "A", id = UUID.randomUUID()),
-        Audience(value = "B", id = UUID.randomUUID()),
-        Audience(value = "C", id = UUID.randomUUID()),
+        AudienceEntity(value = "A", id = UUID.randomUUID()),
+        AudienceEntity(value = "B", id = UUID.randomUUID()),
+        AudienceEntity(value = "C", id = UUID.randomUUID()),
       ),
       referable = true,
     )
@@ -94,7 +94,7 @@ class RecordTransformersTest {
 
   @Test
   fun `Transforming an offering entity should convert to its API equivalent`() {
-    val offering = Offering(
+    val offering = OfferingEntity(
       id = UUID.randomUUID(),
       organisationId = "BXI",
       contactEmail = "nobody-bwn@digital.justice.gov.uk",
@@ -111,7 +111,7 @@ class RecordTransformersTest {
 
   @Test
   fun `Transforming an audience entity should convert to its API equivalent`() {
-    val audience = Audience(value = "An audience", id = UUID.randomUUID())
+    val audience = AudienceEntity(value = "An audience", id = UUID.randomUUID())
     with(audience.toApi()) {
       id shouldBe audience.id
       value shouldBe audience.value

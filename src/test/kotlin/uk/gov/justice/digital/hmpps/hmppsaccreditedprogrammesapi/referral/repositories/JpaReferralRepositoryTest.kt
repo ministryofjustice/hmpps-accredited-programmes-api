@@ -15,8 +15,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity
 import java.util.UUID
 
 class JpaReferralRepositoryTest
@@ -31,7 +31,7 @@ constructor(
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
-    val referralId = repository.save(Referral(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
+    val referralId = repository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
 
     commitAndStartNewTx()
 
@@ -49,7 +49,7 @@ constructor(
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
-    val referralId = repository.save(Referral(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
+    val referralId = repository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
 
     commitAndStartNewTx()
 
@@ -78,7 +78,7 @@ constructor(
         name = randomSentence(1..3, 1..8),
         alternateName = null,
       ).apply {
-        addOffering(Offering(organisationId = randomUppercaseString(3), contactEmail = randomEmailAddress()))
+        addOffering(OfferingEntity(organisationId = randomUppercaseString(3), contactEmail = randomEmailAddress()))
       },
     )
     commitAndStartNewTx()

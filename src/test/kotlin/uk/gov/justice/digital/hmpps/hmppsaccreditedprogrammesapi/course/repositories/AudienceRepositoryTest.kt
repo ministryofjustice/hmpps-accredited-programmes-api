@@ -10,7 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.RepositoryTest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.AudienceEntity
 
 class AudienceRepositoryTest
 @Autowired
@@ -20,7 +20,7 @@ constructor(
 ) : RepositoryTest(jdbcTemplate) {
   @Test
   fun `audienceRepository successfully saves and retrieves records`() {
-    val transientAudience = Audience("A")
+    val transientAudience = AudienceEntity("A")
     repository.save(transientAudience)
 
     TestTransaction.flagForCommit()
@@ -33,13 +33,13 @@ constructor(
     val audiences = repository.findAll()
 
     audiences shouldHaveSize 1
-    audiences shouldContainExactly setOf(Audience(value = "A", transientAudience.id))
+    audiences shouldContainExactly setOf(AudienceEntity(value = "A", transientAudience.id))
   }
 
   @Test
   fun `audienceRepository ignores duplicate audience records when attempting to save`() {
-    val a1 = Audience("A")
-    val a2 = Audience("A")
+    val a1 = AudienceEntity("A")
+    val a2 = AudienceEntity("A")
     repository.saveAll(listOf(a1, a2))
 
     TestTransaction.flagForCommit()

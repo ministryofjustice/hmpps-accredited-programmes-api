@@ -7,11 +7,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Audience
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.NewPrerequisite
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.PrerequisiteUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
 
@@ -21,7 +21,7 @@ fun CourseEntity.toApi(): Course = Course(
   description = description,
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(Prerequisite::toApi),
-  audiences = audiences.map(Audience::toApi),
+  audiences = audiences.map(AudienceEntity::toApi),
   referable = referable,
 )
 
@@ -39,14 +39,14 @@ fun Prerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(
   description = description,
 )
 
-fun Offering.toApi(): CourseOffering = CourseOffering(
+fun OfferingEntity.toApi(): CourseOffering = CourseOffering(
   id = id!!,
   organisationId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
 )
 
-fun Offering.toOfferingRecord() = OfferingRecord(
+fun OfferingEntity.toOfferingRecord() = OfferingRecord(
   course = course.name,
   identifier = course.identifier,
   prisonId = organisationId,
@@ -54,7 +54,7 @@ fun Offering.toOfferingRecord() = OfferingRecord(
   secondaryContactEmail = secondaryContactEmail,
 )
 
-fun Audience.toApi(): CourseAudience = CourseAudience(
+fun AudienceEntity.toApi(): CourseAudience = CourseAudience(
   id = id!!,
   value = value,
 )
@@ -76,7 +76,7 @@ fun OfferingRecord.toDomain(): OfferingUpdate = OfferingUpdate(
   secondaryContactEmail = secondaryContactEmail?.let { it.trim().ifEmpty { null } },
 )
 
-fun PrerequisiteRecord.toDomain(): NewPrerequisite = NewPrerequisite(
+fun PrerequisiteRecord.toDomain(): PrerequisiteUpdate = PrerequisiteUpdate(
   name = name,
   description = description,
   identifier = identifier,

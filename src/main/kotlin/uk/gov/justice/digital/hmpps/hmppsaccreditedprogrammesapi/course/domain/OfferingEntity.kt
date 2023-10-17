@@ -7,10 +7,12 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
 import java.util.UUID
 
 @Entity
-class Offering(
+@Table(name = "offering")
+class OfferingEntity(
   @Id
   @GeneratedValue
   @Column(name = "offering_id")
@@ -28,7 +30,7 @@ class Offering(
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
-    if (other == null || other !is Offering) return false
+    if (other == null || other !is OfferingEntity) return false
     return organisationId == other.organisationId
   }
 

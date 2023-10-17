@@ -19,8 +19,8 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
@@ -51,16 +51,16 @@ class CourseParticipationControllerTest(
     fun `POST course participation with JWT and valid payload with valid id returns 201 with correct body`() {
       val uuid = UUID.randomUUID()
       val courseId = UUID.randomUUID()
-      val courseParticipationSlot = slot<CourseParticipation>()
+      val courseParticipationSlot = slot<CourseParticipationEntity>()
       every { courseParticipationService.createCourseParticipation(capture(courseParticipationSlot)) } returns
-        CourseParticipation(
+        CourseParticipationEntity(
           courseName = "Course name",
           id = uuid,
           courseId = courseId,
           source = "Source of information",
           detail = "Course detail",
           prisonNumber = "A1234AA",
-          outcome = CourseOutcome(status = CourseStatus.COMPLETE, yearStarted = Year.of(2020)),
+          outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = Year.of(2020)),
           setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
           otherCourseName = null,
         )
@@ -91,14 +91,14 @@ class CourseParticipationControllerTest(
         }
       }
       verify { courseParticipationService.createCourseParticipation(any()) }
-      courseParticipationSlot.captured shouldBeEqualToComparingFields CourseParticipation(
+      courseParticipationSlot.captured shouldBeEqualToComparingFields CourseParticipationEntity(
         courseName = "Course name",
         courseId = courseId,
         otherCourseName = null,
         prisonNumber = "A1234AA",
         source = "Source of information",
         detail = "Course detail",
-        outcome = CourseOutcome(
+        outcome = CourseParticipationOutcome(
           status = CourseStatus.COMPLETE,
           yearStarted = Year.of(2020),
         ),
@@ -161,7 +161,7 @@ class CourseParticipationControllerTest(
       val courseParticipationId = UUID.randomUUID()
       val courseId = UUID.randomUUID()
 
-      every { courseParticipationService.getCourseParticipationById(any()) } returns CourseParticipation(
+      every { courseParticipationService.getCourseParticipationById(any()) } returns CourseParticipationEntity(
         courseName = "Course name",
         id = courseParticipationId,
         otherCourseName = null,
@@ -170,7 +170,7 @@ class CourseParticipationControllerTest(
         source = "Source of information",
         detail = "Course detail",
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY),
-        outcome = CourseOutcome(
+        outcome = CourseParticipationOutcome(
           status = CourseStatus.INCOMPLETE,
           yearStarted = Year.of(2020),
         ),

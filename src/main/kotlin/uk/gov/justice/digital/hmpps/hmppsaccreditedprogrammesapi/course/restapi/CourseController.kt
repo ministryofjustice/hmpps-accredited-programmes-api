@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineM
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -69,6 +69,6 @@ constructor (
       .ok(
         courseService
           .getAllOfferingsByCourseId(id)
-          .map(Offering::toApi),
+          .map(OfferingEntity::toApi),
       )
 }

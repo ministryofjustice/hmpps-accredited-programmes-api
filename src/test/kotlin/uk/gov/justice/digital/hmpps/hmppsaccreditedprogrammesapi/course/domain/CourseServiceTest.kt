@@ -32,7 +32,7 @@ class CourseServiceTest {
 
     @Test
     fun `updateCourses with one valid course successfully clears and persists to the repository`() {
-      val a1 = Audience("Audience 1", id = UUID.randomUUID())
+      val a1 = AudienceEntity("Audience 1", id = UUID.randomUUID())
 
       every { repository.getAllAudiences() } returns setOf(a1)
 
@@ -49,9 +49,9 @@ class CourseServiceTest {
 
     @Test
     fun `updateCourses with two valid courses clears and persists to the repository`() {
-      val a1 = Audience("Audience 1", id = UUID.randomUUID())
-      val a2 = Audience("Audience 2", id = UUID.randomUUID())
-      val a3 = Audience("Audience 3", id = UUID.randomUUID())
+      val a1 = AudienceEntity("Audience 1", id = UUID.randomUUID())
+      val a2 = AudienceEntity("Audience 2", id = UUID.randomUUID())
+      val a3 = AudienceEntity("Audience 3", id = UUID.randomUUID())
 
       every { repository.getAllAudiences() } returns setOf(a1, a2, a3)
 
@@ -67,9 +67,9 @@ class CourseServiceTest {
 
     @Test
     fun `updateCourses with duplicate audience values only persists unique values to the repository`() {
-      val a1 = Audience("Audience 1", id = UUID.randomUUID())
-      val a2 = Audience("Audience 2", id = UUID.randomUUID())
-      val a3 = Audience("Audience 3", id = UUID.randomUUID())
+      val a1 = AudienceEntity("Audience 1", id = UUID.randomUUID())
+      val a2 = AudienceEntity("Audience 2", id = UUID.randomUUID())
+      val a3 = AudienceEntity("Audience 3", id = UUID.randomUUID())
 
       every { repository.getAllAudiences() } returns setOf()
 
@@ -82,7 +82,7 @@ class CourseServiceTest {
         ),
       )
 
-      verify { repository.saveAudiences(setOf(Audience(a1.value), Audience(a2.value), Audience(a3.value))) }
+      verify { repository.saveAudiences(setOf(AudienceEntity(a1.value), AudienceEntity(a2.value), AudienceEntity(a3.value))) }
     }
   }
 
@@ -126,7 +126,7 @@ class CourseServiceTest {
 
       service.uploadPrerequisitedCsv(
         listOf(
-          NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
+          PrerequisiteUpdate(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
         ),
       ).shouldBeEmpty()
 
@@ -143,9 +143,9 @@ class CourseServiceTest {
 
       service.uploadPrerequisitedCsv(
         listOf(
-          NewPrerequisite(name = "PR 1", description = "PR 1 Desc", identifier = "C1"),
-          NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
-          NewPrerequisite(name = "PR 3", description = "PR 3 Desc", identifier = "C2"),
+          PrerequisiteUpdate(name = "PR 1", description = "PR 1 Desc", identifier = "C1"),
+          PrerequisiteUpdate(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
+          PrerequisiteUpdate(name = "PR 3", description = "PR 3 Desc", identifier = "C2"),
         ),
       ).shouldBeEmpty()
 
@@ -170,9 +170,9 @@ class CourseServiceTest {
 
       service.uploadPrerequisitedCsv(
         listOf(
-          NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "C1"),
-          NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "CX"),
-          NewPrerequisite(name = "PR 2", description = "Don't care", identifier = "C2"),
+          PrerequisiteUpdate(name = "PR 1", description = "Don't care", identifier = "C1"),
+          PrerequisiteUpdate(name = "PR 1", description = "Don't care", identifier = "CX"),
+          PrerequisiteUpdate(name = "PR 2", description = "Don't care", identifier = "C2"),
         ),
       )
         .shouldContainExactly(
@@ -194,8 +194,8 @@ class CourseServiceTest {
 
       service.uploadPrerequisitedCsv(
         listOf(
-          NewPrerequisite(name = "PR 1", description = "D1", identifier = " C-1 , C-2 "),
-          NewPrerequisite(name = "PR 2", description = "D2", identifier = "C-2,C-X"),
+          PrerequisiteUpdate(name = "PR 1", description = "D1", identifier = " C-1 , C-2 "),
+          PrerequisiteUpdate(name = "PR 2", description = "D2", identifier = "C-2,C-X"),
         ),
       )
 
@@ -216,7 +216,7 @@ class CourseServiceTest {
 
     @Test
     fun `Given no records and one course that has an offering, updateOfferings should withdraw that offering`() {
-      val theOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
+      val theOffering = OfferingEntity(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
 
       val allCourses = listOf(
         CourseEntity(
@@ -239,7 +239,7 @@ class CourseServiceTest {
 
     @Test
     fun `Given one record matching an offering from a course, updateOfferings should update that offering`() {
-      val theOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
+      val theOffering = OfferingEntity(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
@@ -260,14 +260,14 @@ class CourseServiceTest {
       updatedOfferings shouldHaveSize 1
       updatedOfferings[0] shouldBeSameInstanceAs theOffering
       theOffering.shouldBeEqualToIgnoringFields(
-        Offering(organisationId = "BWI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
-        Offering::course,
+        OfferingEntity(organisationId = "BWI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
+        OfferingEntity::course,
       )
     }
 
     @Test
     fun `Given one record that matches a course, but not the course's offering, then updateOfferings should withdraw the old offering and add the new offering`() {
-      val oldOffering = Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
+      val oldOffering = OfferingEntity(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com")
       val allCourses = listOf(
         CourseEntity(
           name = "Course 1",
@@ -284,17 +284,17 @@ class CourseServiceTest {
         ),
       ).shouldBeEmpty()
 
-      val offeringsByOrganisationId = allCourses[0].offerings.associateBy(Offering::organisationId)
+      val offeringsByOrganisationId = allCourses[0].offerings.associateBy(OfferingEntity::organisationId)
 
       offeringsByOrganisationId["MDI"]!!.shouldBeEqualToIgnoringFields(
-        Offering(organisationId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
-        Offering::course,
+        OfferingEntity(organisationId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
+        OfferingEntity::course,
       )
 
       offeringsByOrganisationId["BWI"]!!.shouldBeSameInstanceAs(oldOffering)
       offeringsByOrganisationId["BWI"]!!.shouldBeEqualToIgnoringFields(
-        Offering(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com", withdrawn = true),
-        Offering::course,
+        OfferingEntity(organisationId = "BWI", contactEmail = "a@b.com", secondaryContactEmail = "c@b.com", withdrawn = true),
+        OfferingEntity::course,
       )
     }
 
@@ -316,11 +316,11 @@ class CourseServiceTest {
 
       allCourses.associateBy(CourseEntity::name, CourseEntity::offerings) shouldBeEqual mapOf(
         "Course 1" to mutableSetOf(
-          Offering(organisationId = "MDI", contactEmail = "admin@mdi.net"),
-          Offering(organisationId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
+          OfferingEntity(organisationId = "MDI", contactEmail = "admin@mdi.net"),
+          OfferingEntity(organisationId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
         ),
         "Course 2" to mutableSetOf(
-          Offering(organisationId = "MDI", contactEmail = "admin@mdi.net"),
+          OfferingEntity(organisationId = "MDI", contactEmail = "admin@mdi.net"),
         ),
       )
     }
@@ -379,8 +379,8 @@ class CourseServiceTest {
   inner class WithdrawnOfferingsTests {
     @Test
     fun `Withdrawn offerings should not be returned from offeringsForCourse`() {
-      val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
-      val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
+      val withdrawnOffering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
+      val offering = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
 
       every { repository.getAllOfferingsByCourseId(any()) } returns listOf(withdrawnOffering, offering)
 
@@ -389,7 +389,7 @@ class CourseServiceTest {
 
     @Test
     fun `A withdrawn Offering should not be returned from courseOffering`() {
-      val withdrawnOffering = Offering(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
+      val withdrawnOffering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
 
       every { repository.getOfferingById(any()) } returns withdrawnOffering
 
@@ -398,7 +398,7 @@ class CourseServiceTest {
 
     @Test
     fun `An active Offering should be returned from courseOffering`() {
-      val offering = Offering(organisationId = "MDI", contactEmail = "a@b.com")
+      val offering = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
 
       every { repository.getOfferingById(any()) } returns offering
 

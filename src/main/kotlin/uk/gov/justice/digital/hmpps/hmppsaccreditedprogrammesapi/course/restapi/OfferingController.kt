@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -35,6 +35,6 @@ constructor (
     ResponseEntity.ok(
       courseService
         .getOfferingsCsv()
-        .map(Offering::toOfferingRecord),
+        .map(OfferingEntity::toOfferingRecord),
     )
 }

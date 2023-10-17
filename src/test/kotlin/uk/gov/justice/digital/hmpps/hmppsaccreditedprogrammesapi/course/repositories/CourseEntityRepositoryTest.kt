@@ -16,7 +16,7 @@ import org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.RepositoryTest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.jpa.commitAndStartNewTx
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Offering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.Prerequisite
 
 class CourseEntityRepositoryTest
@@ -92,13 +92,13 @@ constructor(
       identifier = "AC",
       description = "A description",
     ).apply {
-      addOffering(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
-      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      addOffering(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
+      addOffering(OfferingEntity(organisationId = "BWI", contactEmail = "bwi@a.com"))
+      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      addOffering(OfferingEntity(organisationId = "BXI", contactEmail = "bxi@a.com"))
     }
     val course2 = CourseEntity(name = "Another Course", identifier = "ACANO", description = "Another description")
       .apply {
-        addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+        addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
       }
 
     repository.save(course1)
@@ -118,13 +118,13 @@ constructor(
       identifier = "AC",
       description = "A description",
     ).apply {
-      addOffering(Offering(organisationId = "BWI", contactEmail = "bwi@a.com"))
-      addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      addOffering(Offering(organisationId = "BXI", contactEmail = "bxi@a.com"))
+      addOffering(OfferingEntity(organisationId = "BWI", contactEmail = "bwi@a.com"))
+      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
+      addOffering(OfferingEntity(organisationId = "BXI", contactEmail = "bxi@a.com"))
     }
     val course2 = CourseEntity(name = "Another Course", identifier = "ACANO", description = "Another description")
       .apply {
-        addOffering(Offering(organisationId = "MDI", contactEmail = "mdi@a.com"))
+        addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
       }
 
     repository.save(course1)

@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domai
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.Referral.Status
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.Status
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.repositories.JpaReferralRepository
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -19,7 +19,7 @@ constructor (
     prisonNumber: String,
     offeringId: UUID,
     referrerId: String,
-  ): UUID? = referralRepository.save(Referral(offeringId = offeringId, prisonNumber = prisonNumber, referrerId = referrerId)).id
+  ): UUID? = referralRepository.save(ReferralEntity(offeringId = offeringId, prisonNumber = prisonNumber, referrerId = referrerId)).id
 
   fun getReferralById(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
 

@@ -9,6 +9,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 import org.hibernate.Hibernate
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
@@ -22,7 +23,8 @@ import java.util.UUID
 
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-class CourseParticipation(
+@Table(name = "course_participation")
+class CourseParticipationEntity(
   @Id
   @GeneratedValue
   @Column(name = "course_participation_id")
@@ -31,10 +33,10 @@ class CourseParticipation(
   val prisonNumber: String,
   var courseName: String?,
 
-  @Deprecated("please use CourseParticipation.courseName instead")
+  @Deprecated("please use CourseParticipationEntity.courseName instead")
   var courseId: UUID? = null,
 
-  @Deprecated("please use CourseParticipation.courseName instead")
+  @Deprecated("please use CourseParticipationEntity.courseName instead")
   var otherCourseName: String?,
 
   var source: String?,
@@ -44,7 +46,7 @@ class CourseParticipation(
   var setting: CourseParticipationSetting? = null,
 
   @Embedded
-  var outcome: CourseOutcome? = null,
+  var outcome: CourseParticipationOutcome? = null,
 
   @CreatedBy
   var createdByUsername: String = "anonymous",
@@ -70,7 +72,7 @@ class CourseParticipation(
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-    other as CourseParticipation
+    other as CourseParticipationEntity
     return id != null && id == other.id
   }
 
@@ -86,7 +88,7 @@ data class CourseParticipationSetting(
 )
 
 @Embeddable
-data class CourseOutcome(
+data class CourseParticipationOutcome(
   @Enumerated(EnumType.STRING)
   @Column(name = "outcome_status")
   var status: CourseStatus,

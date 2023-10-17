@@ -7,9 +7,9 @@ interface CourseRepository {
   fun getCourseById(courseId: UUID): CourseEntity?
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity?
   fun saveCourse(courseEntity: CourseEntity)
-  fun getOfferingsCsv(): List<Offering>
-  fun getAllOfferingsByCourseId(courseId: UUID): List<Offering>
-  fun getOfferingById(offeringId: UUID): Offering?
-  fun getAllAudiences(): Set<Audience>
-  fun saveAudiences(audiences: Set<Audience>)
+  fun getOfferingsCsv(): List<OfferingEntity>
+  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity>
+  fun getOfferingById(offeringId: UUID): OfferingEntity?
+  fun getAllAudiences(): Set<AudienceEntity>
+  fun saveAudiences(audiences: Set<AudienceEntity>)
 }

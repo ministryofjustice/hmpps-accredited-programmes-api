@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationh
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome as ApiCourseParticipationOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType as ApiCourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationCreate as ApiCreateCourseParticipation
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
 
 fun ApiCreateCourseParticipation.toDomain() =
-  CourseParticipation(
+  CourseParticipationEntity(
     courseName = courseName,
     prisonNumber = prisonNumber,
     courseId = courseId,
@@ -58,7 +58,7 @@ fun CourseSetting.toApi() = when (this) {
 }
 
 fun ApiCourseParticipationOutcome.toDomain() =
-  CourseOutcome(
+  CourseParticipationOutcome(
     status = status.toDomain(),
     yearStarted = yearStarted?.let(Year::of),
     yearCompleted = yearCompleted?.let(Year::of),
@@ -74,7 +74,7 @@ fun CourseStatus.toApi() = when (this) {
   CourseStatus.COMPLETE -> ApiCourseParticipationOutcome.Status.complete
 }
 
-fun CourseParticipation.toApi() = ApiCourseParticipation(
+fun CourseParticipationEntity.toApi() = ApiCourseParticipation(
   courseName = courseName,
   id = id!!,
   prisonNumber = prisonNumber,

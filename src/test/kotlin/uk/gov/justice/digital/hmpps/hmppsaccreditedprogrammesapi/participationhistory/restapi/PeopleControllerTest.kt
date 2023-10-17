@@ -18,8 +18,8 @@ import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomLowercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.randomPrisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseSetting
@@ -56,7 +56,7 @@ class PeopleControllerTest(
       val username = randomLowercaseString(10)
 
       val courseParticipations = listOf(
-        CourseParticipation(
+        CourseParticipationEntity(
           courseName = "Course name 1",
           id = UUID.randomUUID(),
           otherCourseName = null,
@@ -65,11 +65,11 @@ class PeopleControllerTest(
           source = "Source of information 1",
           detail = "Course detail 1",
           setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = "A location"),
-          outcome = CourseOutcome(status = CourseStatus.INCOMPLETE, yearStarted = Year.of(2018), yearCompleted = Year.of(2023)),
+          outcome = CourseParticipationOutcome(status = CourseStatus.INCOMPLETE, yearStarted = Year.of(2018), yearCompleted = Year.of(2023)),
           createdByUsername = username,
           createdDateTime = createdAt,
         ),
-        CourseParticipation(
+        CourseParticipationEntity(
           courseName = "Course name 2",
           id = UUID.randomUUID(),
           otherCourseName = "A Course Name",
@@ -78,7 +78,7 @@ class PeopleControllerTest(
           source = "Source of information 2",
           detail = "Course detail 2",
           setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
-          outcome = CourseOutcome(status = CourseStatus.INCOMPLETE),
+          outcome = CourseParticipationOutcome(status = CourseStatus.INCOMPLETE),
           createdByUsername = username,
           createdDateTime = createdAt,
         ),
