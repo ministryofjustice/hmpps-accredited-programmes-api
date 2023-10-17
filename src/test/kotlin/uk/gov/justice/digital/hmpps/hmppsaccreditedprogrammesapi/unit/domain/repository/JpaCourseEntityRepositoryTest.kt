@@ -14,12 +14,12 @@ import org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaCourseEntityRepository
 
-class CourseEntityRepositoryTest
+class JpaCourseEntityRepositoryTest
 @Autowired
 constructor(
-  val courseEntityRepository: CourseEntityRepository,
+  val courseEntityRepository: JpaCourseEntityRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test

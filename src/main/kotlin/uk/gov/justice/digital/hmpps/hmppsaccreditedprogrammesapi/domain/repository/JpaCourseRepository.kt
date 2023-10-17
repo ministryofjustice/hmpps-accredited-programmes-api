@@ -13,9 +13,9 @@ import kotlin.jvm.optionals.getOrNull
 class JpaCourseRepository
 @Autowired
 constructor(
-  private val courseRepository: CourseEntityRepository,
-  private val offeringRepository: OfferingRepository,
-  private val audienceRepository: AudienceRepository,
+  private val courseRepository: JpaCourseEntityRepository,
+  private val offeringRepository: JpaOfferingRepository,
+  private val audienceRepository: JpaAudienceRepository,
 ) : CourseRepository {
   override fun getAllCourses(): List<CourseEntity> = courseRepository
     .findAll()
