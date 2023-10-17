@@ -18,7 +18,6 @@ constructor(
 ) {
   fun createCourseParticipation(courseParticipation: CourseParticipationEntity): CourseParticipationEntity? =
     courseParticipation.let {
-      it.assertOnlyCourseIdOrCourseNamePresent()
       courseParticipationRepository.save(it)
     }
 

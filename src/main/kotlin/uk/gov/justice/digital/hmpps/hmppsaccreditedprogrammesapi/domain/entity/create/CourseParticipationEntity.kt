@@ -15,7 +15,6 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import java.time.LocalDateTime
 import java.time.Year
 import java.util.UUID
@@ -58,16 +57,7 @@ data class CourseParticipationEntity(
 
   @LastModifiedDate
   var lastModifiedDateTime: LocalDateTime? = null,
-) {
-  fun assertOnlyCourseIdOrCourseNamePresent() {
-    if (courseId == null && otherCourseName == null) {
-      throw BusinessException("Expected a courseId or otherCourseName but neither value is present")
-    }
-    if (courseId != null && otherCourseName != null) {
-      throw BusinessException("Expected just one of courseId or otherCourseName but both values are present")
-    }
-  }
-}
+)
 
 @Embeddable
 data class CourseParticipationSetting(
