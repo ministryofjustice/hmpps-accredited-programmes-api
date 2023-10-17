@@ -8,40 +8,33 @@ import io.mockk.just
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.ReferralEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.CourseControllerTest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.ReferralStatus.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralService
 import java.util.UUID
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 
-@WebMvcTest
-@ContextConfiguration(classes = [CourseControllerTest::class])
-@ComponentScan(
-  basePackages = [
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api",
-  ],
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class ReferralControllerTest
 @Autowired
 constructor(
-  private val mockMvc: MockMvc,
-  private val jwtAuthHelper: JwtAuthHelper,
+  val mockMvc: MockMvc,
+  val jwtAuthHelper: JwtAuthHelper,
 ) {
 
   @MockkBean

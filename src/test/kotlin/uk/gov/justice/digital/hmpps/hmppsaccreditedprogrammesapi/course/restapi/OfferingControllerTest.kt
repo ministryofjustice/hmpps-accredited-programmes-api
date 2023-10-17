@@ -4,12 +4,9 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi.JwtAuthHelper
@@ -17,20 +14,18 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.OfferingEntityFactory
 import java.util.UUID
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 
-@WebMvcTest
-@ContextConfiguration(classes = [OfferingControllerTest::class])
-@ComponentScan(
-  basePackages = [
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.restapi",
-    "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api",
-  ],
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class OfferingControllerTest(
-  @Autowired val mockMvc: MockMvc,
-  @Autowired val jwtAuthHelper: JwtAuthHelper,
+class OfferingControllerTest@Autowired
+constructor(
+  val mockMvc: MockMvc,
+  val jwtAuthHelper: JwtAuthHelper,
 ) {
 
   @MockkBean

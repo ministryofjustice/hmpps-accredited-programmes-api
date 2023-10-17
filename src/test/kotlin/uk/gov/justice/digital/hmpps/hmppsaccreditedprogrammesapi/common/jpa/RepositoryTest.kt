@@ -15,13 +15,9 @@ import org.springframework.test.jdbc.JdbcTestUtils
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.testsupport.TEST_USER_NAME
 
-private const val BASE_PACKAGE = "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi"
-
 @SpringBootTest
 @Transactional
 @AutoConfigureTestDatabase
-@EnableJpaRepositories(basePackages = [BASE_PACKAGE])
-@EntityScan(basePackages = [BASE_PACKAGE])
 @ActiveProfiles("test")
 abstract class RepositoryTest(
   val jdbcTemplate: JdbcTemplate,
