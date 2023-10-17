@@ -13,13 +13,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.C
 class CourseAudienceRelationshipTest
 @Autowired
 constructor(
-  val courseRepository: CourseEntityRepository,
+  val courseEntityRepository: CourseEntityRepository,
   val audienceRepository: AudienceRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
   fun `saveAll should add audience values to courses`() {
-    courseRepository.saveAll(
+    courseEntityRepository.saveAll(
       listOf(
         CourseEntity(name = "Course 1", identifier = "C1", description = "A course"),
         CourseEntity(name = "Course 2", identifier = "C2", description = "Another course"),
@@ -39,7 +39,7 @@ constructor(
 
     TestTransaction.start()
 
-    val courses = courseRepository.findAll().toList()
+    val courses = courseEntityRepository.findAll().toList()
     val audiences = audienceRepository.findAll().toList()
 
     courses[0].audiences.add(audiences[0])
@@ -52,9 +52,9 @@ constructor(
     TestTransaction.start()
 
     audienceRepository.count() shouldBe 2
-    courseRepository.count() shouldBe 3
+    courseEntityRepository.count() shouldBe 3
 
-    val courseAudiences = courseRepository
+    val courseAudiences = courseEntityRepository
       .findAll()
       .fold(emptySet<AudienceEntity>()) { acc, course -> acc.plus(course!!.audiences) }
 

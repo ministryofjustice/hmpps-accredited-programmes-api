@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.P
 class CourseEntityRepositoryTest
 @Autowired
 constructor(
-  val repository: CourseEntityRepository,
+  val courseEntityRepository: CourseEntityRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
@@ -35,18 +35,18 @@ constructor(
 
     transientEntity.id.shouldBeNull()
 
-    val persistentEntity = repository.save(transientEntity)
+    val persistentEntity = courseEntityRepository.save(transientEntity)
     persistentEntity.id.shouldNotBeNull()
 
     commitAndStartNewTx()
 
-    val courses: Iterable<CourseEntity> = repository.findAll()
+    val courses: Iterable<CourseEntity> = courseEntityRepository.findAll()
     courses shouldHaveSize 1
 
     val retrievedCourse = courses.first()
     retrievedCourse.shouldBeEqualToIgnoringFields(persistentEntity, CourseEntity::prerequisites, CourseEntity::audiences)
 
-    repository.deleteAll()
+    courseEntityRepository.deleteAll()
   }
 
   @Test
@@ -65,20 +65,20 @@ constructor(
       prerequisites.addAll(samples)
     }
 
-    repository.save(course)
+    courseEntityRepository.save(course)
 
     commitAndStartNewTx()
 
     countRowsInTable(jdbcTemplate, "prerequisite") shouldBe 3
 
-    val persistentPrereqs = repository.findAll().first().prerequisites
+    val persistentPrereqs = courseEntityRepository.findAll().first().prerequisites
 
     persistentPrereqs shouldContainExactly samples
     persistentPrereqs.remove(Prerequisite("PR1", "PR1 D2"))
 
     commitAndStartNewTx()
     countRowsInTable(jdbcTemplate, "prerequisite") shouldBe 2
-    repository.delete(repository.findAll().first())
+    courseEntityRepository.delete(courseEntityRepository.findAll().first())
 
     commitAndStartNewTx()
     countRowsInTable(jdbcTemplate, "prerequisite") shouldBe 0
@@ -101,12 +101,12 @@ constructor(
         addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
       }
 
-    repository.save(course1)
-    repository.save(course2)
+    courseEntityRepository.save(course1)
+    courseEntityRepository.save(course2)
     commitAndStartNewTx()
 
     countRowsInTable(jdbcTemplate, "offering") shouldBe 4
-    val persistentCourse = repository.findById(course1.id!!).orElseThrow()
+    val persistentCourse = courseEntityRepository.findById(course1.id!!).orElseThrow()
     persistentCourse.offerings shouldHaveSize 3
     persistentCourse.offerings.shouldForAll { it.id.shouldNotBeNull() }
   }
@@ -127,19 +127,19 @@ constructor(
         addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
       }
 
-    repository.save(course1)
-    repository.save(course2)
+    courseEntityRepository.save(course1)
+    courseEntityRepository.save(course2)
     commitAndStartNewTx()
 
     countRowsInTable(jdbcTemplate, "offering") shouldBe 4
-    val persistentCourse = repository.findById(course1.id!!).orElseThrow()
+    val persistentCourse = courseEntityRepository.findById(course1.id!!).orElseThrow()
     val offeringId = persistentCourse.offerings.first().id!!
-    val courseByOfferingIdInSameTx = repository.findByMutableOfferings_id(offeringId)
+    val courseByOfferingIdInSameTx = courseEntityRepository.findByMutableOfferings_id(offeringId)
     courseByOfferingIdInSameTx shouldBeSameInstanceAs persistentCourse
 
     commitAndStartNewTx()
 
-    val courseByOfferingInNewTx = repository.findByMutableOfferings_id(offeringId)
+    val courseByOfferingInNewTx = courseEntityRepository.findByMutableOfferings_id(offeringId)
     courseByOfferingInNewTx shouldNotBeSameInstanceAs persistentCourse
     courseByOfferingInNewTx shouldBe persistentCourse
   }

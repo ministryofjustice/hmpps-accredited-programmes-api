@@ -22,7 +22,7 @@ import java.util.UUID
 class JpaReferralRepositoryTest
 @Autowired
 constructor(
-  val repository: JpaReferralRepository,
+  val referralRepository: JpaReferralRepository,
   val courseRepository: CourseRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
@@ -31,11 +31,11 @@ constructor(
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
-    val referralId = repository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
+    val referralId = referralRepository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
 
     commitAndStartNewTx()
 
-    repository.findById(referralId) shouldBePresent {
+    referralRepository.findById(referralId) shouldBePresent {
       referrerId shouldBe referrerId
       prisonNumber shouldBe prisonNumber
       offeringId shouldBe persistentOfferingId
@@ -49,11 +49,11 @@ constructor(
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
-    val referralId = repository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
+    val referralId = referralRepository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
 
     commitAndStartNewTx()
 
-    val persistentReferral = repository.findById(referralId).get()
+    val persistentReferral = referralRepository.findById(referralId).get()
     with(persistentReferral) {
       oasysConfirmed = true
       hasReviewedProgrammeHistory = true
@@ -61,7 +61,7 @@ constructor(
 
     commitAndStartNewTx()
 
-    repository.findById(referralId) shouldBePresent {
+    referralRepository.findById(referralId) shouldBePresent {
       referrerId shouldBe referrerId
       prisonNumber shouldBe prisonNumber
       offeringId shouldBe persistentOfferingId

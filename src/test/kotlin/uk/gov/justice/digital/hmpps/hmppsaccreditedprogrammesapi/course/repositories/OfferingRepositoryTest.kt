@@ -14,7 +14,7 @@ import kotlin.jvm.optionals.getOrNull
 class OfferingRepositoryTest
 @Autowired
 constructor(
-  val courseRepository: CourseEntityRepository,
+  val courseEntityRepository: CourseEntityRepository,
   val offeringRepository: OfferingRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
@@ -40,8 +40,8 @@ constructor(
       addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
     }
 
-    val offering = courseRepository.save(course1).offerings.first()
-    courseRepository.save(course2)
+    val offering = courseEntityRepository.save(course1).offerings.first()
+    courseEntityRepository.save(course2)
 
     commitAndStartNewTx()
 
@@ -73,8 +73,8 @@ constructor(
       addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
     }
 
-    val offering = courseRepository.save(course1).offerings.first()
-    courseRepository.save(course2)
+    val offering = courseEntityRepository.save(course1).offerings.first()
+    courseEntityRepository.save(course2)
 
     commitAndStartNewTx()
 

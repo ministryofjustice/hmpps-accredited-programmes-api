@@ -15,13 +15,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.domain.A
 class AudienceRepositoryTest
 @Autowired
 constructor(
-  val repository: AudienceRepository,
+  val audienceRepository: AudienceRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTest(jdbcTemplate) {
   @Test
   fun `audienceRepository successfully saves and retrieves records`() {
     val transientAudience = AudienceEntity("A")
-    repository.save(transientAudience)
+    audienceRepository.save(transientAudience)
 
     TestTransaction.flagForCommit()
     TestTransaction.end()
@@ -30,7 +30,7 @@ constructor(
 
     TestTransaction.start()
 
-    val audiences = repository.findAll()
+    val audiences = audienceRepository.findAll()
 
     audiences shouldHaveSize 1
     audiences shouldContainExactly setOf(AudienceEntity(value = "A", transientAudience.id))
@@ -40,7 +40,7 @@ constructor(
   fun `audienceRepository ignores duplicate audience records when attempting to save`() {
     val a1 = AudienceEntity("A")
     val a2 = AudienceEntity("A")
-    repository.saveAll(listOf(a1, a2))
+    audienceRepository.saveAll(listOf(a1, a2))
 
     TestTransaction.flagForCommit()
     shouldThrow<DataIntegrityViolationException> {
