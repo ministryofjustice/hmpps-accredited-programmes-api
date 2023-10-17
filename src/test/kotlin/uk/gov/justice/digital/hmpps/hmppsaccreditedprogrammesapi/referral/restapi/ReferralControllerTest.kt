@@ -61,7 +61,7 @@ constructor(
       "referrerId" to referral.referrerId,
     )
 
-    every { referralService.startReferral(any(), any(), any()) } returns referral.id
+    every { referralService.createReferral(any(), any(), any()) } returns referral.id
 
     mockMvc.post("/referrals") {
       contentType = MediaType.APPLICATION_JSON
@@ -75,7 +75,7 @@ constructor(
       }
     }
 
-    verify { referralService.startReferral(referral.prisonNumber, referral.offeringId, referral.referrerId) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offeringId, referral.referrerId) }
   }
 
   @Test

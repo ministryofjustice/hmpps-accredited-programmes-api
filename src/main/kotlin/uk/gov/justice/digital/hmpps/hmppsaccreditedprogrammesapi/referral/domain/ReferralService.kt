@@ -15,7 +15,7 @@ class ReferralService
 constructor (
   private val referralRepository: JpaReferralRepository,
 ) {
-  fun startReferral(
+  fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
     referrerId: String,

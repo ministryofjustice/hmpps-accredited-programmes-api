@@ -5,14 +5,14 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStarted
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StartReferral
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.StatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.referral.domain.ReferralService
 import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 
 @Service
 class ReferralController
@@ -21,14 +21,14 @@ constructor(
   private val referralService: ReferralService,
 ) : ReferralsApiDelegate {
 
-  override fun startReferral(startReferral: StartReferral): ResponseEntity<ReferralStarted> =
-    with(startReferral) {
-      referralService.startReferral(
+  override fun createReferral(referralCreate: ReferralCreate): ResponseEntity<ReferralCreated> =
+    with(referralCreate) {
+      referralService.createReferral(
         prisonNumber = prisonNumber,
         referrerId = referrerId,
         offeringId = offeringId,
       )?.let {
-        ResponseEntity.status(HttpStatus.CREATED).body(ReferralStarted(it))
+        ResponseEntity.status(HttpStatus.CREATED).body(ReferralCreated(it))
       } ?: throw Exception("Unable to start referral")
     }
 
@@ -43,8 +43,8 @@ constructor(
     ResponseEntity.noContent().build()
   }
 
-  override fun updateReferralStatusById(id: UUID, statusUpdate: StatusUpdate): ResponseEntity<Unit> =
-    with(statusUpdate) {
+  override fun updateReferralStatusById(id: UUID, referralStatusUpdate: ReferralStatusUpdate): ResponseEntity<Unit> =
+    with(referralStatusUpdate) {
       referralService.updateReferralStatusById(id, status.toDomain())
       ResponseEntity.noContent().build()
     }

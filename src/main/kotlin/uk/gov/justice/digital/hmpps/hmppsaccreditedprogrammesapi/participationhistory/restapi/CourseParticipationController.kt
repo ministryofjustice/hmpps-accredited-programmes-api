@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.CourseParticipationsApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.course.restapi.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationService
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationCreate
 
 @Service
 class CourseParticipationController
@@ -18,8 +18,8 @@ class CourseParticipationController
 constructor (
   private val courseParticipationService: CourseParticipationService,
 ) : CourseParticipationsApiDelegate {
-  override fun createCourseParticipation(createCourseParticipation: CreateCourseParticipation): ResponseEntity<CourseParticipation> =
-    courseParticipationService.createCourseParticipation(createCourseParticipation.toDomain())
+  override fun createCourseParticipation(courseParticipationCreate: CourseParticipationCreate): ResponseEntity<CourseParticipation> =
+    courseParticipationService.createCourseParticipation(courseParticipationCreate.toDomain())
       ?.let {
         ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
       } ?: throw Exception("Unable to add to course participation")

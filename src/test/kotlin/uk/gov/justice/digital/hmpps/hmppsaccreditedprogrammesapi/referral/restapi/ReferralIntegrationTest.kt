@@ -31,7 +31,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun `Creating a referral should return 201 with correct body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
-    val createdReferralId = startReferral(offeringId).referralId
+    val createdReferralId = createReferral(offeringId).referralId
 
     createdReferralId.shouldNotBeNull()
 
@@ -51,7 +51,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun `Updating a referral with a valid payload should return 204 with no body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
-    val createdReferralId = startReferral(offeringId).referralId
+    val createdReferralId = createReferral(offeringId).referralId
 
     webTestClient
       .put()
@@ -100,7 +100,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun `Updating a referral status should return 204 with no body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
-    val createdReferralId = startReferral(offeringId).referralId
+    val createdReferralId = createReferral(offeringId).referralId
 
     webTestClient
       .put()
@@ -125,7 +125,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     )
   }
 
-  fun startReferral(offeringId: UUID) = webTestClient
+  fun createReferral(offeringId: UUID) = webTestClient
     .post()
     .uri("/referrals")
     .headers(jwtAuthHelper.authorizationHeaderConfigurer())

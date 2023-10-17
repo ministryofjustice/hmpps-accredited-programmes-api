@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.restapi
 
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CreateCourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome as ApiCourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType as ApiCourseParticipationSettingType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationCreate as ApiCreateCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.participationhistory.domain.CourseParticipationSetting
@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSetting as ApiCourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
 
-fun CreateCourseParticipation.toDomain() =
+fun ApiCreateCourseParticipation.toDomain() =
   CourseParticipation(
     courseName = courseName,
     prisonNumber = prisonNumber,
@@ -37,9 +37,9 @@ fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   outcome = outcome?.toDomain(),
 )
 
-fun CourseParticipationSettingType.toDomain() = when (this) {
-  CourseParticipationSettingType.community -> CourseSetting.COMMUNITY
-  CourseParticipationSettingType.custody -> CourseSetting.CUSTODY
+fun ApiCourseParticipationSettingType.toDomain() = when (this) {
+  ApiCourseParticipationSettingType.community -> CourseSetting.COMMUNITY
+  ApiCourseParticipationSettingType.custody -> CourseSetting.CUSTODY
 }
 
 fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
@@ -53,25 +53,25 @@ fun CourseParticipationSetting.toApi() = ApiCourseParticipationSetting(
 )
 
 fun CourseSetting.toApi() = when (this) {
-  CourseSetting.CUSTODY -> CourseParticipationSettingType.custody
-  CourseSetting.COMMUNITY -> CourseParticipationSettingType.community
+  CourseSetting.CUSTODY -> ApiCourseParticipationSettingType.custody
+  CourseSetting.COMMUNITY -> ApiCourseParticipationSettingType.community
 }
 
-fun CourseParticipationOutcome.toDomain() =
+fun ApiCourseParticipationOutcome.toDomain() =
   CourseOutcome(
     status = status.toDomain(),
     yearStarted = yearStarted?.let(Year::of),
     yearCompleted = yearCompleted?.let(Year::of),
   )
 
-fun CourseParticipationOutcome.Status.toDomain() = when (this) {
-  CourseParticipationOutcome.Status.complete -> CourseStatus.COMPLETE
-  CourseParticipationOutcome.Status.incomplete -> CourseStatus.INCOMPLETE
+fun ApiCourseParticipationOutcome.Status.toDomain() = when (this) {
+  ApiCourseParticipationOutcome.Status.complete -> CourseStatus.COMPLETE
+  ApiCourseParticipationOutcome.Status.incomplete -> CourseStatus.INCOMPLETE
 }
 
 fun CourseStatus.toApi() = when (this) {
-  CourseStatus.INCOMPLETE -> CourseParticipationOutcome.Status.incomplete
-  CourseStatus.COMPLETE -> CourseParticipationOutcome.Status.complete
+  CourseStatus.INCOMPLETE -> ApiCourseParticipationOutcome.Status.incomplete
+  CourseStatus.COMPLETE -> ApiCourseParticipationOutcome.Status.complete
 }
 
 fun CourseParticipation.toApi() = ApiCourseParticipation(
@@ -84,7 +84,7 @@ fun CourseParticipation.toApi() = ApiCourseParticipation(
   source = source,
   detail = detail,
   outcome = outcome?.let {
-    CourseParticipationOutcome(
+    ApiCourseParticipationOutcome(
       status = it.status.toApi(),
       yearStarted = it.yearStarted?.value,
       yearCompleted = it.yearCompleted?.value,
