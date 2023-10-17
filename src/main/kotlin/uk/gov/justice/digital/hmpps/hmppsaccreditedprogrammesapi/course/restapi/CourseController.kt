@@ -41,7 +41,7 @@ constructor (
   }
 
   override fun uploadPrerequisitesCsv(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
-    ResponseEntity.ok(courseService.uploadPrerequisitedCsv(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
+    ResponseEntity.ok(courseService.uploadPrerequisitesCsv(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
 
   override fun getPrerequisitesCsv(): ResponseEntity<List<PrerequisiteRecord>> =
     ResponseEntity.ok(

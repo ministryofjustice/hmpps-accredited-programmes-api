@@ -87,7 +87,7 @@ constructor (
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
-  fun uploadPrerequisitedCsv(replacements: List<PrerequisiteUpdate>): List<LineMessage> {
+  fun uploadPrerequisitesCsv(replacements: List<PrerequisiteUpdate>): List<LineMessage> {
     val allCourses = courseRepository.getAllCourses()
     clearPrerequisites(allCourses)
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)

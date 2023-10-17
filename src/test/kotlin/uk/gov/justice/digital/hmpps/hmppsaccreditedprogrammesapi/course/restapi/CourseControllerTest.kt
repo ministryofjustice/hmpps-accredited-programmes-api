@@ -226,7 +226,7 @@ class CourseControllerTest(
   inner class PutPrerequisitesTests {
     @Test
     fun `coursesPrerequisitesPut with valid CSV data returns 200 and no content`() {
-      every { coursesService.uploadPrerequisitedCsv(any()) } returns emptyList()
+      every { coursesService.uploadPrerequisitesCsv(any()) } returns emptyList()
 
       val replacementPrerequisites = generatePrerequisiteRecords(3)
       val replacementPrerequisitesCsv = replacementPrerequisites.toPrerequisiteCsv()
@@ -244,7 +244,7 @@ class CourseControllerTest(
         }
       }
 
-      verify { coursesService.uploadPrerequisitedCsv(replacementPrerequisitesDomain) }
+      verify { coursesService.uploadPrerequisitesCsv(replacementPrerequisitesDomain) }
     }
   }
 

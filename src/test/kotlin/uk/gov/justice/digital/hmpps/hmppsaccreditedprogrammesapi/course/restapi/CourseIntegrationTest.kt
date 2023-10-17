@@ -31,7 +31,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Searching for all courses with JWT returns 200 with correct body`() {
     val courseRecords = generateCourseRecords(3)
-    updateCoursesCsv(courseRecords.toCourseCsv())
+    uploadCoursesCsv(courseRecords.toCourseCsv())
 
     courseRecords.forEach { courseRecord ->
       val matchingCourse = getAllCourses().find { it.name == courseRecord.name }
@@ -139,22 +139,22 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Uploading valid course records in CSV format will process and persist them`() {
     val emptyCourseRecords = generateCourseRecords(0)
-    updateCoursesCsv(emptyCourseRecords.toCourseCsv())
+    uploadCoursesCsv(emptyCourseRecords.toCourseCsv())
 
     getAllCourses() shouldHaveSize emptyCourseRecords.size
 
     val originalCourseRecords = generateCourseRecords(3)
-    updateCoursesCsv(originalCourseRecords.toCourseCsv())
+    uploadCoursesCsv(originalCourseRecords.toCourseCsv())
 
     val originalCourses = getAllCourses()
 
     originalCourses shouldHaveSize originalCourseRecords.size
 
-    updateCoursesCsv(emptyCourseRecords.toCourseCsv())
+    uploadCoursesCsv(emptyCourseRecords.toCourseCsv())
 
     getAllCourses() shouldHaveSize emptyCourseRecords.size
 
-    updateCoursesCsv(originalCourseRecords.toCourseCsv())
+    uploadCoursesCsv(originalCourseRecords.toCourseCsv())
 
     val restoredCourses = getAllCourses()
 
@@ -163,7 +163,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     val updatedCourseRecords = generateCourseRecords(4)
 
-    updateCoursesCsv(updatedCourseRecords.toCourseCsv())
+    uploadCoursesCsv(updatedCourseRecords.toCourseCsv())
 
     val finalCourses = getAllCourses()
 
@@ -179,7 +179,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Valid course records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
-    updateCoursesCsv(courseRecordsToUpload.toCourseCsv())
+    uploadCoursesCsv(courseRecordsToUpload.toCourseCsv())
 
     val uploadedCourses = getAllCourses()
 
@@ -197,11 +197,11 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     val emptyCourseRecords = generateCourseRecords(0)
 
-    updateCoursesCsv(emptyCourseRecords.toCourseCsv())
+    uploadCoursesCsv(emptyCourseRecords.toCourseCsv())
 
     getAllCourses() shouldHaveSize emptyCourseRecords.size
 
-    updateCoursesCsv(downloadedCoursesCsv)
+    uploadCoursesCsv(downloadedCoursesCsv)
 
     val reuploadedCourses = getAllCourses()
 
@@ -214,10 +214,10 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Uploading valid prerequisite records in CSV format will process and persist them`() {
     val courseRecordsToUpload = generateCourseRecords(3)
-    updateCoursesCsv(courseRecordsToUpload.toCourseCsv())
+    uploadCoursesCsv(courseRecordsToUpload.toCourseCsv())
 
     val prerequisiteRecordsToUpload = generatePrerequisiteRecords(3)
-    updatePrerequisitesCsv(prerequisiteRecordsToUpload.toPrerequisiteCsv())
+    uploadPrerequisitesCsv(prerequisiteRecordsToUpload.toPrerequisiteCsv())
 
     getAllCourses().flatMap { it.coursePrerequisites } shouldHaveSize prerequisiteRecordsToUpload.size
   }
@@ -226,10 +226,10 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Valid prerequisite records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
-    updateCoursesCsv(courseRecordsToUpload.toCourseCsv())
+    uploadCoursesCsv(courseRecordsToUpload.toCourseCsv())
 
     val prerequisiteRecordsToUpload = generatePrerequisiteRecords(3)
-    updatePrerequisitesCsv(prerequisiteRecordsToUpload.toPrerequisiteCsv())
+    uploadPrerequisitesCsv(prerequisiteRecordsToUpload.toPrerequisiteCsv())
 
     val uploadedCourses = getAllCourses()
 
@@ -245,11 +245,11 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     val emptyPrerequisiteRecords = generatePrerequisiteRecords(0)
 
-    updatePrerequisitesCsv(emptyPrerequisiteRecords.toPrerequisiteCsv())
+    uploadPrerequisitesCsv(emptyPrerequisiteRecords.toPrerequisiteCsv())
 
     getAllCourses().flatMap { it.coursePrerequisites } shouldHaveSize emptyPrerequisiteRecords.size
 
-    updatePrerequisitesCsv(downloadedPrerequisitesCsv)
+    uploadPrerequisitesCsv(downloadedPrerequisitesCsv)
 
     val coursesWithUpdatedPrerequisites = getAllCourses()
 
@@ -260,10 +260,10 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Uploading valid offering records in CSV format will process and persist them`() {
     val courseRecordsToUpload = generateCourseRecords(3)
-    updateCoursesCsv(courseRecordsToUpload.toCourseCsv())
+    uploadCoursesCsv(courseRecordsToUpload.toCourseCsv())
 
     val offeringRecordsToUpload = generateOfferingRecords(3)
-    updateOfferingsCsv(offeringRecordsToUpload.toOfferingCsv())
+    uploadOfferingsCsv(offeringRecordsToUpload.toOfferingCsv())
 
     val uploadedCourses = getAllCourses()
 
@@ -282,14 +282,14 @@ class CourseIntegrationTest : IntegrationTestBase() {
     actualOrganisationIds shouldContainExactly expectedOrganisationIds
 
     val emptyOfferingRecords = generateOfferingRecords(0)
-    updateOfferingsCsv(emptyOfferingRecords.toOfferingCsv())
+    uploadOfferingsCsv(emptyOfferingRecords.toOfferingCsv())
 
     val emptyOfferings = uploadedCourses.map { getAllOfferingsForCourse(it.id) }
     val emptyOfferingsIds = emptyOfferings.flatten().map { it.id }.toSet()
 
     emptyOfferingsIds shouldHaveSize emptyOfferingRecords.size
 
-    updateOfferingsCsv(offeringRecordsToUpload.toOfferingCsv())
+    uploadOfferingsCsv(offeringRecordsToUpload.toOfferingCsv())
 
     val reuploadedOfferings = uploadedCourses.map { getAllOfferingsForCourse(it.id) }
     val reuploadedOfferingsIds = reuploadedOfferings.flatten().map { it.id }.toSet()
@@ -301,10 +301,10 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Valid offering records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
-    updateCoursesCsv(courseRecordsToUpload.toCourseCsv())
+    uploadCoursesCsv(courseRecordsToUpload.toCourseCsv())
 
     val offeringRecordsToUpload = generateOfferingRecords(3)
-    updateOfferingsCsv(offeringRecordsToUpload.toOfferingCsv())
+    uploadOfferingsCsv(offeringRecordsToUpload.toOfferingCsv())
 
     val uploadedCourses = getAllCourses()
     val uploadedOfferings = uploadedCourses.map { getAllOfferingsForCourse(it.id) }
@@ -321,9 +321,9 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody!!
 
     val emptyOfferingRecords = generateOfferingRecords(0)
-    updateOfferingsCsv(emptyOfferingRecords.toOfferingCsv())
+    uploadOfferingsCsv(emptyOfferingRecords.toOfferingCsv())
 
-    updateOfferingsCsv(downloadedOfferingsCsv)
+    uploadOfferingsCsv(downloadedOfferingsCsv)
 
     val reuploadedOfferings = uploadedCourses.map { getAllOfferingsForCourse(it.id) }
     val reuploadedOfferingsIds = reuploadedOfferings.flatten().map { it.id }.toSet()
@@ -331,7 +331,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     reuploadedOfferingsIds shouldContainExactly uploadedOfferingsIds
   }
 
-  fun updateCoursesCsv(coursesCsvData: String): EntityExchangeResult<Void> =
+  fun uploadCoursesCsv(coursesCsvData: String): EntityExchangeResult<Void> =
     webTestClient
       .put()
       .uri("/courses/csv")
@@ -342,7 +342,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNoContent
       .expectBody().isEmpty
 
-  fun updateOfferingsCsv(offeringsCsvData: String): WebTestClient.ResponseSpec =
+  fun uploadOfferingsCsv(offeringsCsvData: String): WebTestClient.ResponseSpec =
     webTestClient
       .put()
       .uri("/offerings/csv")
@@ -352,7 +352,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
 
-  fun updatePrerequisitesCsv(prerequisitesCsvData: String): WebTestClient.ResponseSpec =
+  fun uploadPrerequisitesCsv(prerequisitesCsvData: String): WebTestClient.ResponseSpec =
     webTestClient
       .put()
       .uri("/courses/prerequisites/csv")

@@ -91,7 +91,7 @@ class CourseServiceTest {
   inner class ReplaceAllPrerequisitesTests {
     @Test
     fun `replaceAllPrerequisites with an empty list successfully clears the repository`() {
-      service.uploadPrerequisitedCsv(emptyList()).shouldBeEmpty()
+      service.uploadPrerequisitesCsv(emptyList()).shouldBeEmpty()
     }
 
     @Test
@@ -108,7 +108,7 @@ class CourseServiceTest {
       )
       every { repository.getAllCourses() } returns allCourses
 
-      service.uploadPrerequisitedCsv(emptyList()).shouldBeEmpty()
+      service.uploadPrerequisitesCsv(emptyList()).shouldBeEmpty()
 
       allCourses.flatMap { it.prerequisites }.shouldBeEmpty()
     }
@@ -124,7 +124,7 @@ class CourseServiceTest {
       )
       every { repository.getAllCourses() } returns allCourses
 
-      service.uploadPrerequisitedCsv(
+      service.uploadPrerequisitesCsv(
         listOf(
           PrerequisiteUpdate(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
         ),
@@ -141,7 +141,7 @@ class CourseServiceTest {
       )
       every { repository.getAllCourses() } returns allCourses
 
-      service.uploadPrerequisitedCsv(
+      service.uploadPrerequisitesCsv(
         listOf(
           PrerequisiteUpdate(name = "PR 1", description = "PR 1 Desc", identifier = "C1"),
           PrerequisiteUpdate(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
@@ -168,7 +168,7 @@ class CourseServiceTest {
       )
       every { repository.getAllCourses() } returns allCourses
 
-      service.uploadPrerequisitedCsv(
+      service.uploadPrerequisitesCsv(
         listOf(
           PrerequisiteUpdate(name = "PR 1", description = "Don't care", identifier = "C1"),
           PrerequisiteUpdate(name = "PR 1", description = "Don't care", identifier = "CX"),
@@ -192,7 +192,7 @@ class CourseServiceTest {
       )
       every { repository.getAllCourses() } returns allCourses
 
-      service.uploadPrerequisitedCsv(
+      service.uploadPrerequisitesCsv(
         listOf(
           PrerequisiteUpdate(name = "PR 1", description = "D1", identifier = " C-1 , C-2 "),
           PrerequisiteUpdate(name = "PR 2", description = "D2", identifier = "C-2,C-X"),
