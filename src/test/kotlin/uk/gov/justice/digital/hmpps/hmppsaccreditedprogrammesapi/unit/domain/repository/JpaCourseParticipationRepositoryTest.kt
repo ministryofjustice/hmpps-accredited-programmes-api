@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TEST_USER_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationSetting
@@ -30,16 +29,13 @@ constructor(
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test
   fun `CourseParticipationRepository should save and retrieve CourseParticipationEntity objects`() {
-    val courseId = courseEntityRepository.save(CourseEntity(name = "A Course", identifier = "ID")).id!!
     val startTime = LocalDateTime.now()
     val prisonNumber = randomPrisonNumber()
 
     val participationId = courseParticipationRepository.save(
       CourseParticipationEntity(
-        courseId = courseId,
         courseName = "Course name",
         prisonNumber = prisonNumber,
-        otherCourseName = null,
         source = "Source of information",
         detail = "Course detail",
         outcome = CourseParticipationOutcome(
@@ -61,9 +57,7 @@ constructor(
       CourseParticipationEntity(
         id = participationId,
         courseName = "Course name",
-        courseId = courseId,
         prisonNumber = prisonNumber,
-        otherCourseName = null,
         source = "Source of information",
         detail = "Course detail",
         outcome = CourseParticipationOutcome(
@@ -86,9 +80,7 @@ constructor(
     val participationId = courseParticipationRepository.save(
       CourseParticipationEntity(
         courseName = null,
-        courseId = null,
         prisonNumber = prisonNumber,
-        otherCourseName = "Other course name",
         source = null,
         detail = null,
         setting = null,
@@ -106,9 +98,7 @@ constructor(
       CourseParticipationEntity(
         id = participationId,
         courseName = null,
-        courseId = null,
         prisonNumber = prisonNumber,
-        otherCourseName = "Other course name",
         source = null,
         detail = null,
         setting = null,
@@ -127,9 +117,7 @@ constructor(
     val participationId = courseParticipationRepository.save(
       CourseParticipationEntity(
         courseName = null,
-        courseId = null,
         prisonNumber = prisonNumber,
-        otherCourseName = "Other course name",
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
@@ -146,9 +134,7 @@ constructor(
       CourseParticipationEntity(
         id = participationId,
         courseName = null,
-        courseId = null,
         prisonNumber = prisonNumber,
-        otherCourseName = "Other course name",
         source = null,
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),

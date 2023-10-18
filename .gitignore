@@ -6,7 +6,7 @@
 .idea/
 .gradle/
 build/
-
+gradle.properties
 # CMake
 cmake-build-debug/
 
