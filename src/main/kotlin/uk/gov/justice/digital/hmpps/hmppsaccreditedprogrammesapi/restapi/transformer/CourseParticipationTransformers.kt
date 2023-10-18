@@ -19,8 +19,6 @@ fun ApiCreateCourseParticipation.toDomain() =
   CourseParticipationEntity(
     courseName = courseName,
     prisonNumber = prisonNumber,
-    courseId = courseId,
-    otherCourseName = otherCourseName,
     source = source,
     detail = detail,
     setting = setting?.toDomain(),
@@ -29,8 +27,6 @@ fun ApiCreateCourseParticipation.toDomain() =
 
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   courseName = courseName,
-  courseId = courseId,
-  otherCourseName = otherCourseName,
   source = source,
   detail = detail,
   setting = setting?.toDomain(),
@@ -79,8 +75,6 @@ fun CourseParticipationEntity.toApi() = ApiCourseParticipation(
   id = id!!,
   prisonNumber = prisonNumber,
   setting = setting?.toApi(),
-  courseId = courseId,
-  otherCourseName = otherCourseName,
   source = source,
   detail = detail,
   outcome = outcome?.let {

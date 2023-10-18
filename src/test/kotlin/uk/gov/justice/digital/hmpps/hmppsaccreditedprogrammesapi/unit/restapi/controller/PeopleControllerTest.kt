@@ -54,8 +54,6 @@ constructor(
         CourseParticipationEntity(
           courseName = "Course name 1",
           id = UUID.randomUUID(),
-          otherCourseName = null,
-          courseId = UUID.randomUUID(),
           prisonNumber = prisonNumber,
           source = "Source of information 1",
           detail = "Course detail 1",
@@ -67,8 +65,6 @@ constructor(
         CourseParticipationEntity(
           courseName = "Course name 2",
           id = UUID.randomUUID(),
-          otherCourseName = "A Course Name",
-          courseId = null,
           prisonNumber = prisonNumber,
           source = "Source of information 2",
           detail = "Course detail 2",
@@ -94,8 +90,6 @@ constructor(
               {
                 "courseName": "Course name 1",
                 "id": "${courseParticipations[0].id}",
-                "otherCourseName": null,
-                "courseId": "${courseParticipations[0].courseId}",
                 "prisonNumber": "$prisonNumber",
                 "source": "Source of information 1",
                 "detail": "Course detail 1",
@@ -107,8 +101,6 @@ constructor(
               {
                 "courseName": "Course name 2",
                 "id": "${courseParticipations[1].id}",
-                "otherCourseName": "A Course Name",
-                "courseId": null,
                 "prisonNumber": "$prisonNumber",
                 "source": "Source of information 2",
                 "detail": "Course detail 2",

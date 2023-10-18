@@ -39,7 +39,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val created = createCourseParticipation(
       CourseParticipationCreate(
         courseName = "Course name",
-        courseId = getFirstCourseId(),
         prisonNumber = "A1234AA",
         source = "Source of information",
         detail = "Course detail",
@@ -64,7 +63,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       CourseParticipation(
         id = created.id,
         courseName = created.courseName,
-        courseId = created.courseId,
         prisonNumber = created.prisonNumber,
         source = created.source,
         detail = created.detail,
@@ -91,7 +89,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val created = createCourseParticipation(
       CourseParticipationCreate(
         courseName = null,
-        courseId = getFirstCourseId(),
         prisonNumber = randomPrisonNumber(),
         setting = null,
         outcome = null,
@@ -104,7 +101,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       CourseParticipation(
         id = created.id,
         courseName = null,
-        courseId = created.courseId,
         prisonNumber = created.prisonNumber,
         source = null,
         detail = null,
@@ -123,7 +119,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
     val created = createCourseParticipation(
       CourseParticipationCreate(
-        courseId = getFirstCourseId(),
         prisonNumber = "A1234AA",
       ),
     )
@@ -132,7 +127,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       created.id,
       CourseParticipationUpdate(
         courseName = "Course name",
-        courseId = created.courseId,
         setting = CourseParticipationSetting(
           type = CourseParticipationSettingType.custody,
         ),
@@ -151,7 +145,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       CourseParticipation(
         id = created.id,
         courseName = updated.courseName,
-        courseId = created.courseId,
         setting = CourseParticipationSetting(
           type = updated.setting!!.type,
         ),
@@ -180,7 +173,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val expectedPrisonNumberCourseIds = getCourseIds().map {
       createCourseParticipation(
         CourseParticipationCreate(
-          courseId = it,
           prisonNumber = expectedPrisonNumber,
         ),
       ).id
@@ -191,7 +183,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val randomPrisonNumber = getCourseIds().map {
       createCourseParticipation(
         CourseParticipationCreate(
-          courseId = it,
           prisonNumber = otherPrisonNumber,
         ),
       ).id
@@ -208,7 +199,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     getCourseIds().forEach {
       createCourseParticipation(
         CourseParticipationCreate(
-          courseId = it,
           prisonNumber = randomPrisonNumber(),
         ),
       )
@@ -221,7 +211,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   fun `Deleting a course participation by id should return 204 with no body`() {
     val created = createCourseParticipation(
       CourseParticipationCreate(
-        courseId = getFirstCourseId(),
         prisonNumber = "X9999XX",
       ),
     )

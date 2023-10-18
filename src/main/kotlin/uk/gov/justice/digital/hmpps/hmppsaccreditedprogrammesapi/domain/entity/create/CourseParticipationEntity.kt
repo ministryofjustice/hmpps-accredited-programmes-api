@@ -31,12 +31,6 @@ data class CourseParticipationEntity(
   val prisonNumber: String,
   var courseName: String?,
 
-  @Deprecated("please use CourseParticipationEntity.courseName instead")
-  var courseId: UUID? = null,
-
-  @Deprecated("please use CourseParticipationEntity.courseName instead")
-  var otherCourseName: String?,
-
   var source: String?,
   var detail: String?,
 

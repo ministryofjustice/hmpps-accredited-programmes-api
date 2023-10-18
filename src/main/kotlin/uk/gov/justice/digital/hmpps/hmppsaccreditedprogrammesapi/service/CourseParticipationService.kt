@@ -38,8 +38,6 @@ constructor(
 private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity =
   apply {
     courseName = update.courseName
-    courseId = update.courseId
-    otherCourseName = update.otherCourseName
     source = update.source
     detail = update.detail
 

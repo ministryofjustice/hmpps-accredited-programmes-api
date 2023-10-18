@@ -63,8 +63,6 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
       courseName = this.courseName(),
       id = this.id(),
       prisonNumber = this.prisonNumber(),
-      courseId = this.courseId(),
-      otherCourseName = this.otherCourseName(),
       source = this.source(),
       detail = this.detail(),
       setting = this.setting(),
