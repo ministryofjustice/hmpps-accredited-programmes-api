@@ -84,6 +84,38 @@ constructor(
     }
 
     @Test
+    fun `getAllCourseNames with JWT returns 200 with correct body`() {
+      val offering1 = OfferingEntityFactory().withOrganisationId("OF1").withContactEmail("of1@digital.justice.gov.uk").produce()
+      val offering2 = OfferingEntityFactory().withOrganisationId("OF2").withContactEmail("of2@digital.justice.gov.uk").produce()
+      val offering3 = OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce()
+
+      val courses = listOf(
+        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering1)).produce(),
+        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering2)).produce(),
+        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering3)).produce(),
+        CourseEntityFactory().withName("Course2").produce(),
+        CourseEntityFactory().withName("Course3").produce(),
+      )
+
+      every { courseService.getAllCourses() } returns courses
+
+      val uniqueCourseNames = courses.map { it.name }.distinct()
+
+      mockMvc.get("/courses/course-names") {
+        accept = MediaType.APPLICATION_JSON
+        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+      }.andExpect {
+        status { isOk() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          uniqueCourseNames.forEachIndexed { index, courseName ->
+            jsonPath("$[$index]") { value(courseName) }
+          }
+        }
+      }
+    }
+
+    @Test
     fun `getCourseById with correct UUID returns 200 with correct body`() {
       val prerequisites = mutableSetOf(
         PrerequisiteEntity(name = "Prerequisite1", description = randomSentence(1..10)),
