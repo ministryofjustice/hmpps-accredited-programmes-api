@@ -8,9 +8,11 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
+import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -28,32 +30,41 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import java.util.UUID
 
 class CourseServiceTest {
-  private val repository = mockk<CourseRepository>(relaxed = true)
-  private val service = CourseService(repository)
+
+  @MockK(relaxed = true)
+  private lateinit var courseRepository: CourseRepository
+
+  private lateinit var courseService: CourseService
+
+  @BeforeEach
+  fun setup() {
+    MockKAnnotations.init(this)
+    courseService = CourseService(courseRepository)
+  }
 
   @Nested
   @DisplayName("Update Courses")
   inner class UpdateCoursesTests {
     @Test
     fun `updateCourses with an empty list clears the repository`() {
-      service.updateCourses(emptyList())
-      verify { repository.saveAudiences(emptySet()) }
+      courseService.updateCourses(emptyList())
+      verify { courseRepository.saveAudiences(emptySet()) }
     }
 
     @Test
     fun `updateCourses with one valid CourseEntity object clears and persists to the repository`() {
       val a1 = AudienceEntity("Audience 1", id = UUID.randomUUID())
 
-      every { repository.getAllAudiences() } returns setOf(a1)
+      every { courseRepository.getAllAudiences() } returns setOf(a1)
 
-      service.updateCourses(
+      courseService.updateCourses(
         listOf(
           CourseUpdate(name = "Course", identifier = "C", description = "Description", audience = "Audience 1", alternateName = "CCC", referable = true),
         ),
       )
 
       verify {
-        repository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1), referable = true)))
+        courseRepository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1), referable = true)))
       }
     }
 
@@ -63,16 +74,16 @@ class CourseServiceTest {
       val a2 = AudienceEntity("Audience 2", id = UUID.randomUUID())
       val a3 = AudienceEntity("Audience 3", id = UUID.randomUUID())
 
-      every { repository.getAllAudiences() } returns setOf(a1, a2, a3)
+      every { courseRepository.getAllAudiences() } returns setOf(a1, a2, a3)
 
-      service.updateCourses(
+      courseService.updateCourses(
         listOf(
           CourseUpdate(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111", referable = true),
           CourseUpdate(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", referable = true),
         ),
       )
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2), referable = true))) }
-      verify { repository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3), referable = true))) }
+      verify { courseRepository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2), referable = true))) }
+      verify { courseRepository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3), referable = true))) }
     }
 
     @Test
@@ -81,9 +92,9 @@ class CourseServiceTest {
       val a2 = AudienceEntity("Audience 2", id = UUID.randomUUID())
       val a3 = AudienceEntity("Audience 3", id = UUID.randomUUID())
 
-      every { repository.getAllAudiences() } returns setOf()
+      every { courseRepository.getAllAudiences() } returns setOf()
 
-      service.updateCourses(
+      courseService.updateCourses(
         listOf(
           CourseUpdate(name = "Course 1", identifier = "C1", description = "Description 1", audience = "${a1.value}, ${a2.value} ", alternateName = "111"),
           CourseUpdate(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222"),
@@ -92,7 +103,7 @@ class CourseServiceTest {
         ),
       )
 
-      verify { repository.saveAudiences(setOf(AudienceEntity(a1.value), AudienceEntity(a2.value), AudienceEntity(a3.value))) }
+      verify { courseRepository.saveAudiences(setOf(AudienceEntity(a1.value), AudienceEntity(a2.value), AudienceEntity(a3.value))) }
     }
   }
 
@@ -101,7 +112,7 @@ class CourseServiceTest {
   inner class ReplaceAllPrerequisitesTests {
     @Test
     fun `updatePrerequisites with an empty list successfully clears the repository`() {
-      service.updatePrerequisites(emptyList()).shouldBeEmpty()
+      courseService.updatePrerequisites(emptyList()).shouldBeEmpty()
     }
 
     @Test
@@ -116,9 +127,9 @@ class CourseServiceTest {
           ),
         ),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updatePrerequisites(emptyList()).shouldBeEmpty()
+      courseService.updatePrerequisites(emptyList()).shouldBeEmpty()
 
       allCourses.flatMap { it.prerequisites }.shouldBeEmpty()
     }
@@ -132,9 +143,9 @@ class CourseServiceTest {
           prerequisites = mutableSetOf(PrerequisiteEntity(name = "PR 1", description = " PR 1 Desc")),
         ),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updatePrerequisites(
+      courseService.updatePrerequisites(
         listOf(
           NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
         ),
@@ -149,9 +160,9 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updatePrerequisites(
+      courseService.updatePrerequisites(
         listOf(
           NewPrerequisite(name = "PR 1", description = "PR 1 Desc", identifier = "C1"),
           NewPrerequisite(name = "PR 2", description = "PR 2 Desc", identifier = "C1"),
@@ -176,9 +187,9 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updatePrerequisites(
+      courseService.updatePrerequisites(
         listOf(
           NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "C1"),
           NewPrerequisite(name = "PR 1", description = "Don't care", identifier = "CX"),
@@ -200,9 +211,9 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C-1"),
         CourseEntity(name = "Course 2", identifier = "C-2"),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updatePrerequisites(
+      courseService.updatePrerequisites(
         listOf(
           NewPrerequisite(name = "PR 1", description = "D1", identifier = " C-1 , C-2 "),
           NewPrerequisite(name = "PR 2", description = "D2", identifier = "C-2,C-X"),
@@ -221,7 +232,7 @@ class CourseServiceTest {
   inner class UpdateOfferingsTests {
     @Test
     fun `updateOfferings with an empty list clears the repository`() {
-      service.updateOfferings(emptyList()).shouldBeEmpty()
+      courseService.updateOfferings(emptyList()).shouldBeEmpty()
     }
 
     @Test
@@ -237,9 +248,9 @@ class CourseServiceTest {
           addOffering(theOffering)
         },
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updateOfferings(emptyList()).shouldBeEmpty()
+      courseService.updateOfferings(emptyList()).shouldBeEmpty()
 
       val updatedOfferings = allCourses.flatMap { it.offerings }
       updatedOfferings shouldHaveSize 1
@@ -258,9 +269,9 @@ class CourseServiceTest {
           addOffering(theOffering)
         },
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updateOfferings(
+      courseService.updateOfferings(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
         ),
@@ -286,9 +297,9 @@ class CourseServiceTest {
           addOffering(oldOffering)
         },
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updateOfferings(
+      courseService.updateOfferings(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
         ),
@@ -314,9 +325,9 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updateOfferings(
+      courseService.updateOfferings(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "admin@mdi.net"),
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
@@ -341,9 +352,9 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updateOfferings(
+      courseService.updateOfferings(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI", contactEmail = "x@y.net"),
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
@@ -366,9 +377,9 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { repository.getAllCourses() } returns allCourses
+      every { courseRepository.getAllCourses() } returns allCourses
 
-      service.updateOfferings(
+      courseService.updateOfferings(
         listOf(
           OfferingUpdate(identifier = "C1", prisonId = "MDI"),
           OfferingUpdate(identifier = "C1", prisonId = "BWI", contactEmail = "x@y.net"),
@@ -392,27 +403,27 @@ class CourseServiceTest {
       val withdrawnOffering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
       val offering = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
 
-      every { repository.getAllOfferingsByCourseId(any()) } returns listOf(withdrawnOffering, offering)
+      every { courseRepository.getAllOfferingsByCourseId(any()) } returns listOf(withdrawnOffering, offering)
 
-      service.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(offering)
+      courseService.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(offering)
     }
 
     @Test
     fun `A withdrawn Offering should not be returned from getOfferingById`() {
       val withdrawnOffering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
 
-      every { repository.getOfferingById(any()) } returns withdrawnOffering
+      every { courseRepository.getOfferingById(any()) } returns withdrawnOffering
 
-      service.getOfferingById(UUID.randomUUID()).shouldBeNull()
+      courseService.getOfferingById(UUID.randomUUID()).shouldBeNull()
     }
 
     @Test
     fun `An active Offering should be returned from getOfferingById`() {
       val offering = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
 
-      every { repository.getOfferingById(any()) } returns offering
+      every { courseRepository.getOfferingById(any()) } returns offering
 
-      service.getOfferingById(UUID.randomUUID()) shouldBe offering
+      courseService.getOfferingById(UUID.randomUUID()) shouldBe offering
     }
   }
 
@@ -422,23 +433,23 @@ class CourseServiceTest {
     @Test
     fun `A withdrawn course should not be returned from getCourseById`() {
       val withdrawnCourse = CourseEntity(name = "Course", identifier = "C", withdrawn = true)
-      every { repository.getCourseById(any()) } returns withdrawnCourse
-      service.getCourseById(UUID.randomUUID()).shouldBeNull()
+      every { courseRepository.getCourseById(any()) } returns withdrawnCourse
+      courseService.getCourseById(UUID.randomUUID()).shouldBeNull()
     }
 
     @Test
     fun `An active course should  be returned from getCourseById`() {
       val activeCourse = CourseEntity(name = "Course", identifier = "C")
-      every { repository.getCourseById(any()) } returns activeCourse
-      service.getCourseById(UUID.randomUUID()) shouldBe activeCourse
+      every { courseRepository.getCourseById(any()) } returns activeCourse
+      courseService.getCourseById(UUID.randomUUID()) shouldBe activeCourse
     }
 
     @Test
     fun `getAllCourses should exclude withdrawn courses`() {
       val withdrawnCourse = CourseEntity(name = "Withdrawn", identifier = "W", withdrawn = true)
       val activeCourse = CourseEntity(name = "Active", identifier = "A")
-      every { repository.getAllCourses() } returns listOf(activeCourse, withdrawnCourse)
-      service.getAllCourses().shouldContainExactly(activeCourse)
+      every { courseRepository.getAllCourses() } returns listOf(activeCourse, withdrawnCourse)
+      courseService.getAllCourses().shouldContainExactly(activeCourse)
     }
   }
 }
