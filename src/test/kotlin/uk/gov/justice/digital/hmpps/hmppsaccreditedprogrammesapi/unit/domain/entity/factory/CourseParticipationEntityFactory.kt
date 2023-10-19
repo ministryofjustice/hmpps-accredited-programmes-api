@@ -15,8 +15,6 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
   private var courseName: Yielded<String?> = { null }
-  private var courseId: Yielded<UUID?> = { UUID.randomUUID() }
-  private var otherCourseName: Yielded<String?> = { null }
   private var source: Yielded<String?> = { null }
   private var detail: Yielded<String?> = { null }
   private var setting: Yielded<CourseParticipationSetting> = { CourseParticipationSetting(type = CourseSetting.CUSTODY) }
@@ -32,14 +30,6 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
 
   fun withCourseName(courseName: String?) = apply {
     this.courseName = { courseName }
-  }
-
-  fun withCourseId(courseId: UUID?) = apply {
-    this.courseId = { courseId }
-  }
-
-  fun withOtherCourseName(otherCourseName: String?) = apply {
-    this.otherCourseName = { otherCourseName }
   }
 
   fun withSource(source: String?) = apply {
@@ -60,8 +50,8 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
 
   override fun produce(): CourseParticipationEntity {
     return CourseParticipationEntity(
-      courseName = this.courseName(),
       id = this.id(),
+      courseName = this.courseName(),
       prisonNumber = this.prisonNumber(),
       source = this.source(),
       detail = this.detail(),
