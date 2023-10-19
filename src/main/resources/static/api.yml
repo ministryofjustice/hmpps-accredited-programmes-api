@@ -55,6 +55,22 @@ paths:
                 items:
                   $ref: '#/components/schemas/CourseRecord'
 
+  /courses/course-names:
+    get:
+      tags:
+        - Courses
+      summary: Get all unique course names
+      operationId: getAllCourseNames
+      responses:
+        200:
+          description: Return a JSON representation of all unique course names that are not withdrawn.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: string
+
   /courses/prerequisites/csv:
     put:
       tags:
