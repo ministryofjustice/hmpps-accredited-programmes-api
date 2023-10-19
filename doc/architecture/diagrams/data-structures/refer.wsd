@@ -17,12 +17,10 @@ package "Things we own" {
 
   entity HistoricCourse {
     e.g. Previous course that the person has been on, that aren't in our own service
-    Will have either a courseId or otherCourseName
     --
     * id: uuid
     * prisonNumber: text
-    courseId?: uuid
-    otherCourseName?: text
+    courseName: text
     yearStarted?: integer
     setting?: "Custody" | "Community"
     outcome?: Outcome

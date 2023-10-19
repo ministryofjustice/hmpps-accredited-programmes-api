@@ -46,13 +46,12 @@ constructor(
   inner class AddCourseParticipationTests {
     @Test
     fun `createCourseParticipation with JWT and valid payload with valid id returns 201 with correct body`() {
-      val uuid = UUID.randomUUID()
-      val courseId = UUID.randomUUID()
+      val courseParticipationId = UUID.randomUUID()
       val courseParticipationSlot = slot<CourseParticipationEntity>()
       every { courseParticipationService.createCourseParticipation(capture(courseParticipationSlot)) } returns
         CourseParticipationEntity(
+          id = courseParticipationId,
           courseName = "Course name",
-          id = uuid,
           source = "Source of information",
           detail = "Course detail",
           prisonNumber = "A1234AA",
@@ -65,9 +64,8 @@ constructor(
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
         content = """
           { 
+            "id": "$courseParticipationId",
             "courseName": "Course name",
-            "otherCourseName": null,
-            "courseId": "$courseId",
             "prisonNumber": "A1234AA",
             "source": "Source of information",
             "detail": "Course detail",
@@ -82,7 +80,7 @@ constructor(
       }.andExpect {
         status { isCreated() }
         content {
-          json(""" { "id": "$uuid" } """)
+          json(""" { "id": "$courseParticipationId" } """)
         }
       }
       verify { courseParticipationService.createCourseParticipation(any()) }
@@ -128,8 +126,6 @@ constructor(
         content = """
           { 
             "courseName": "Course name",
-            "otherCourseName": null,
-            "courseId": "${UUID.randomUUID()}",
             "prisonNumber": "A1234AA",
             "source": "Source of information",
             "detail": "Course detail",
@@ -154,8 +150,8 @@ constructor(
       val courseParticipationId = UUID.randomUUID()
 
       every { courseParticipationService.getCourseParticipationById(any()) } returns CourseParticipationEntity(
-        courseName = "Course name",
         id = courseParticipationId,
+        courseName = "Course name",
         prisonNumber = "A1234BC",
         source = "Source of information",
         detail = "Course detail",
@@ -175,8 +171,8 @@ constructor(
           json(
             """
             { 
-              "courseName": "Course name",
               "id": "$courseParticipationId",
+              "courseName": "Course name",
               "prisonNumber": "A1234BC",
               "source": "Source of information",
               "detail": "Course detail",
