@@ -75,4 +75,13 @@ constructor(
           .getAllOfferingsByCourseId(id)
           .map(OfferingEntity::toApi),
       )
+  override fun getAllCourseNames(): ResponseEntity<List<String>> =
+    ResponseEntity
+      .ok(
+        courseService
+          .getAllCourses()
+          .map(CourseEntity::toApi)
+          .map(Course::name)
+          .distinct(),
+      )
 }
