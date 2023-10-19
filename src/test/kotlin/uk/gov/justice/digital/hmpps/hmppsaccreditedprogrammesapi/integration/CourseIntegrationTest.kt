@@ -55,6 +55,28 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectStatus().isUnauthorized
   }
 
+  @DirtiesContext
+  @Test
+  fun `Searching for all course names with JWT returns 200 with correct body`() {
+    val courseRecords = generateCourseRecords(3)
+    updateCourses(courseRecords.toCourseCsv())
+
+    val expectedCourseNames = courseRecords.map { it.name }.distinct()
+
+    val responseBodySpec = webTestClient
+      .get()
+      .uri("/courses/course-names")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+
+    expectedCourseNames.forEachIndexed { index, courseName ->
+      responseBodySpec.jsonPath("$[$index]").isEqualTo(courseName)
+    }
+  }
+
   @Test
   fun `Searching for a course with JWT and valid id returns 200 with correct body`() {
     webTestClient
