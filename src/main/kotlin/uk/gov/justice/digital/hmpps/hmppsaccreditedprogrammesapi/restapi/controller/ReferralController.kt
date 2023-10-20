@@ -40,9 +40,9 @@ constructor(
       ?.let { ResponseEntity.ok(it.toApi()) }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 
-  override fun updateReferralById(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> = with(referralUpdate) {
-    referralService.updateReferralById(id, reason, oasysConfirmed, hasReviewedProgrammeHistory)
-    ResponseEntity.noContent().build()
+  override fun updateReferralById(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> {
+    referralService.updateReferralById(id, referralUpdate.toDomain())
+    return ResponseEntity.noContent().build()
   }
 
   override fun updateReferralStatusById(id: UUID, referralStatusUpdate: ReferralStatusUpdate): ResponseEntity<Unit> =

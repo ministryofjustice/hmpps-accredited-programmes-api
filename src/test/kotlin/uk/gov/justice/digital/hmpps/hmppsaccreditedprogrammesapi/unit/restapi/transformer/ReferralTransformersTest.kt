@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.restapi.transformer
 
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.assessmentStarted
@@ -14,7 +15,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate as ApiReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus as DomainReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate as DomainReferralUpdate
 
 class ReferralTransformersTest {
   @ParameterizedTest
@@ -40,4 +43,73 @@ class ReferralTransformersTest {
       assessmentStarted -> domainStatus shouldBe ASSESSMENT_STARTED
     }
   }
+
+  @Test
+  fun `Transforming a ReferralUpdate with all fields should convert to its Domain equivalent`() {
+    val apiModel = ApiReferralUpdate(
+      reason = "Some reason",
+      additionalInformation = "Additional Info",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true
+    )
+
+    with(apiModel.toDomain()) {
+      reason shouldBe apiModel.reason
+      additionalInformation shouldBe apiModel.additionalInformation
+      oasysConfirmed shouldBe apiModel.oasysConfirmed
+      hasReviewedProgrammeHistory shouldBe apiModel.hasReviewedProgrammeHistory
+    }
+  }
+
+  @Test
+  fun `Transforming a ReferralUpdate with all nullable fields should tolerantly convert to Domain`() {
+    val apiModel = ApiReferralUpdate(
+      reason = null,
+      additionalInformation = null,
+      oasysConfirmed = false,
+      hasReviewedProgrammeHistory = false
+    )
+
+    with(apiModel.toDomain()) {
+      reason shouldBe null
+      additionalInformation shouldBe null
+      oasysConfirmed shouldBe false
+      hasReviewedProgrammeHistory shouldBe false
+    }
+  }
+
+  @Test
+  fun `Transforming a ReferralUpdate with all fields should convert to its API equivalent`() {
+    val domainModel = DomainReferralUpdate(
+      reason = "Some reason",
+      additionalInformation = "Additional Info",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true
+    )
+
+    with(domainModel.toApi()) {
+      reason shouldBe domainModel.reason
+      additionalInformation shouldBe domainModel.additionalInformation
+      oasysConfirmed shouldBe domainModel.oasysConfirmed
+      hasReviewedProgrammeHistory shouldBe domainModel.hasReviewedProgrammeHistory
+    }
+  }
+
+  @Test
+  fun `Transforming a ReferralUpdate with all nullable fields should tolerantly convert to API`() {
+    val domainModel = DomainReferralUpdate(
+      reason = null,
+      additionalInformation = null,
+      oasysConfirmed = false,
+      hasReviewedProgrammeHistory = false
+    )
+
+    with(domainModel.toApi()) {
+      reason shouldBe null
+      additionalInformation shouldBe null
+      oasysConfirmed shouldBe false
+      hasReviewedProgrammeHistory shouldBe false
+    }
+  }
+
 }
