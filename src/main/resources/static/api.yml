@@ -902,6 +902,9 @@ components:
       properties:
         reason:
           type: string
+          deprecated: true
+        additionalInformation:
+          type: string
         oasysConfirmed:
           type: boolean
           default: false
