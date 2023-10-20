@@ -41,6 +41,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
       reason = null,
+      additionalInformation = null,
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
     )
@@ -60,6 +61,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .bodyValue(
         ReferralUpdate(
           reason = "A Reason",
+          additionalInformation = "Additional information",
           oasysConfirmed = true,
           hasReviewedProgrammeHistory = true,
         ),
@@ -74,6 +76,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
       reason = "A Reason",
+      additionalInformation = "Additional information",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
     )
@@ -89,6 +92,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .bodyValue(
         ReferralUpdate(
           reason = "A Reason",
+          additionalInformation = "Additional information",
           oasysConfirmed = true,
         ),
       )
@@ -121,6 +125,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = ReferralStatus.referralSubmitted,
       oasysConfirmed = false,
       reason = null,
+      additionalInformation = null,
     )
   }
 

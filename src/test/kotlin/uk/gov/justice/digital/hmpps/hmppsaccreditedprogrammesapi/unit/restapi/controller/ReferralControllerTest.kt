@@ -96,6 +96,7 @@ constructor(
         jsonPath("$.oasysConfirmed") { value(true) }
         jsonPath("$.hasReviewedProgrammeHistory") { value(true) }
         jsonPath("$.reason") { doesNotExist() }
+        jsonPath("$.additionalInformation") { doesNotExist() }
       }
     }
 

@@ -14,6 +14,7 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
   private var referrerId: Yielded<String> = { randomUppercaseAlphanumericString(6) }
   private var reason: Yielded<String?> = { null }
+  private var additionalInformation: Yielded<String?> = { null }
   private var oasysConfirmed: Yielded<Boolean> = { false }
   private var hasReviewedProgrammeHistory: Yielded<Boolean> = { false }
   private var status: Yielded<ReferralEntity.ReferralStatus> = { ReferralEntity.ReferralStatus.REFERRAL_STARTED }
@@ -38,6 +39,10 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
     this.reason = { reason }
   }
 
+  fun withAdditionalInformation(additionalInformation: String?) = apply {
+    this.additionalInformation = { additionalInformation }
+  }
+
   fun withOasysConfirmed(oasysConfirmed: Boolean) = apply {
     this.oasysConfirmed = { oasysConfirmed }
   }
@@ -56,6 +61,7 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
     prisonNumber = prisonNumber(),
     referrerId = referrerId(),
     reason = reason(),
+    additionalInformation = additionalInformation(),
     oasysConfirmed = oasysConfirmed(),
     hasReviewedProgrammeHistory = hasReviewedProgrammeHistory(),
     status = status(),

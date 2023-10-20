@@ -13,6 +13,7 @@ fun DomainReferral.toApi(): ApiReferral = ApiReferral(
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   reason = reason,
+  additionalInformation = additionalInformation,
   status = status.toApi(),
 )
 
