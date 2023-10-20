@@ -50,7 +50,7 @@ class ReferralTransformersTest {
       reason = "Some reason",
       additionalInformation = "Additional Info",
       oasysConfirmed = true,
-      hasReviewedProgrammeHistory = true
+      hasReviewedProgrammeHistory = true,
     )
 
     with(apiModel.toDomain()) {
@@ -67,7 +67,7 @@ class ReferralTransformersTest {
       reason = null,
       additionalInformation = null,
       oasysConfirmed = false,
-      hasReviewedProgrammeHistory = false
+      hasReviewedProgrammeHistory = false,
     )
 
     with(apiModel.toDomain()) {
@@ -84,7 +84,7 @@ class ReferralTransformersTest {
       reason = "Some reason",
       additionalInformation = "Additional Info",
       oasysConfirmed = true,
-      hasReviewedProgrammeHistory = true
+      hasReviewedProgrammeHistory = true,
     )
 
     with(domainModel.toApi()) {
@@ -101,7 +101,7 @@ class ReferralTransformersTest {
       reason = null,
       additionalInformation = null,
       oasysConfirmed = false,
-      hasReviewedProgrammeHistory = false
+      hasReviewedProgrammeHistory = false,
     )
 
     with(domainModel.toApi()) {
@@ -111,5 +111,4 @@ class ReferralTransformersTest {
       hasReviewedProgrammeHistory shouldBe false
     }
   }
-
 }

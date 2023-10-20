@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaReferralRepository
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import kotlin.jvm.optionals.getOrNull
 
 @Service
