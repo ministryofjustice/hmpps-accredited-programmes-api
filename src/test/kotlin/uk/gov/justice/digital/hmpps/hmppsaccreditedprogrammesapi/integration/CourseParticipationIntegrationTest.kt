@@ -114,6 +114,37 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Creating a course participation with invalid year value returns 400 and validation error message`() {
+    val invalidCourseParticipation = CourseParticipationCreate(
+      courseName = "Course name",
+      prisonNumber = "A1234AA",
+      source = "Source of information",
+      detail = "Course detail",
+      setting = CourseParticipationSetting(
+        type = CourseParticipationSettingType.custody,
+        location = "location",
+      ),
+      outcome = CourseParticipationOutcome(
+        status = CourseParticipationOutcome.Status.complete,
+        yearStarted = 1985,
+        yearCompleted = 2022,
+      ),
+    )
+
+    webTestClient
+      .post()
+      .uri("/course-participations")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(invalidCourseParticipation)
+      .exchange()
+      .expectStatus().isBadRequest
+      .expectBody()
+      .jsonPath("$.userMessage").isEqualTo("Validation failure: yearStarted is not valid.")
+  }
+
+  @Test
   fun `Updating a course participation should return 200 with correct body`() {
     val startTime = LocalDateTime.now()
 
@@ -154,6 +185,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
         outcome = CourseParticipationOutcome(
           status = updated.outcome!!.status,
           yearStarted = updated.outcome?.yearStarted,
+          yearCompleted = updated.outcome?.yearCompleted,
         ),
         addedBy = TEST_USER_NAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),

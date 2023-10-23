@@ -27,6 +27,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
 import java.time.Year
 import java.util.UUID
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -139,6 +141,44 @@ constructor(
           }"""
       }.andExpect {
         status { isUnauthorized() }
+      }
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      "yearStarted, 1990, 1985",
+      "yearCompleted, 1990, 1985",
+    )
+    fun `createCourseParticipation with year below the floor returns 400 with validation error message`(
+      field: String,
+      floor: Int,
+      invalidYear: Int
+    ) {
+      mockMvc.post("/course-participations") {
+        accept = MediaType.APPLICATION_JSON
+        contentType = MediaType.APPLICATION_JSON
+        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+        content = """
+          { 
+            "courseName": "Course name",
+            "prisonNumber": "A1234AA",
+            "source": "Source of information",
+            "detail": "Course detail",
+            "setting": {
+              "type": "custody"
+            },
+            "outcome": {
+              "status": "complete",
+              "$field": $invalidYear
+            }
+          }"""
+      }.andExpect {
+        status { isBadRequest() }
+        content {
+          jsonPath("$.status") { value(400) }
+          jsonPath("$.userMessage") { value("Validation failure: $field is not valid.") }
+          jsonPath("$.developerMessage") { value("$field is not valid.") }
+        }
       }
     }
   }
