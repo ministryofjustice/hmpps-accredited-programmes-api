@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaReferralRepository
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -24,11 +25,12 @@ constructor(
 
   fun getReferralById(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
 
-  fun updateReferralById(referralId: UUID, reason: String?, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean) {
+  fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
-    referral.reason = reason
-    referral.oasysConfirmed = oasysConfirmed
-    referral.hasReviewedProgrammeHistory = hasReviewedProgrammeHistory
+    referral.reason = update.reason
+    referral.additionalInformation = update.additionalInformation
+    referral.oasysConfirmed = update.oasysConfirmed
+    referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
   }
 
   fun updateReferralStatusById(referralId: UUID, nextStatus: ReferralStatus) {

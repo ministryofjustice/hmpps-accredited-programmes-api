@@ -11,11 +11,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ran
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomSentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseAlphanumericString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.UUID
 
 class JpaReferralRepositoryTest
@@ -30,7 +30,14 @@ constructor(
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
-    val referralId = referralRepository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
+
+    val referral = ReferralEntityFactory()
+      .withReferrerId(referrerId)
+      .withPrisonNumber(prisonNumber)
+      .withOfferingId(persistentOfferingId)
+      .produce()
+
+    val referralId = referralRepository.save(referral).id!!
 
     commitAndStartNewTx()
 
@@ -48,7 +55,10 @@ constructor(
     val persistentOfferingId = persistAnOffering()
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
-    val referralId = referralRepository.save(ReferralEntity(referrerId = referrerId, prisonNumber = prisonNumber, offeringId = persistentOfferingId)).id!!
+
+    val referral = ReferralEntityFactory().withReferrerId(referrerId).withPrisonNumber(prisonNumber).withOfferingId(persistentOfferingId).produce()
+
+    val referralId = referralRepository.save(referral).id!!
 
     commitAndStartNewTx()
 
@@ -71,15 +81,19 @@ constructor(
 
   private fun persistAnOffering(): UUID {
     val courseIdentifier = randomLowercaseString(6)
-    courseRepository.saveCourse(
-      CourseEntity(
-        identifier = courseIdentifier,
-        name = randomSentence(1..3, 1..8),
-        alternateName = null,
-      ).apply {
-        addOffering(OfferingEntity(organisationId = randomUppercaseString(3), contactEmail = randomEmailAddress()))
-      },
-    )
+
+    val course = CourseEntityFactory()
+      .withIdentifier(courseIdentifier)
+      .withName(randomSentence(1..3, 1..8))
+      .withAlternateName(null)
+      .produce()
+
+    val offering = OfferingEntityFactory()
+      .withOrganisationId(randomUppercaseString(3))
+      .withContactEmail(randomEmailAddress())
+      .produce()
+
+    courseRepository.saveCourse(course.apply { addOffering(offering) })
     commitAndStartNewTx()
     return courseRepository.getAllCourses()[0].offerings.first().id!!
   }

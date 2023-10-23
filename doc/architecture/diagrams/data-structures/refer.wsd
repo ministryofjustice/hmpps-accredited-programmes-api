@@ -8,10 +8,9 @@ package "Things we own" {
     * id: uuid
     * prisonNumber: text
     * offering: CourseOffering
-    reason: text
+    additionalInformation: text
     referrerId: text
     oasysConfirmed: boolean
-    reason: text
     submitted: boolean
   }
 
