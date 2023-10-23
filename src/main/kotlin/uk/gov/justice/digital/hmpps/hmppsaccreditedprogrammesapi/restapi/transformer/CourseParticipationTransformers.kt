@@ -9,8 +9,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseParticipationUpdate
 import java.time.Year
 import java.time.format.DateTimeFormatter
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.validator.getYearFromValue
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.validator.isValidFromFloor
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation as ApiCourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationCreate as ApiCourseParticipationCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome as ApiCourseParticipationOutcome
