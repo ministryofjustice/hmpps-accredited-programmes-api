@@ -114,6 +114,37 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Creating a course participation with invalid year value returns 400 and validation error message`() {
+    val invalidCourseParticipation = CourseParticipationCreate(
+      courseName = "Course name",
+      prisonNumber = "A1234AA",
+      source = "Source of information",
+      detail = "Course detail",
+      setting = CourseParticipationSetting(
+        type = CourseParticipationSettingType.custody,
+        location = "location",
+      ),
+      outcome = CourseParticipationOutcome(
+        status = CourseParticipationOutcome.Status.complete,
+        yearStarted = 1985,
+        yearCompleted = 2022,
+      ),
+    )
+
+    webTestClient
+      .post()
+      .uri("/course-participations")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(invalidCourseParticipation)
+      .exchange()
+      .expectStatus().isBadRequest
+      .expectBody()
+      .jsonPath("$.userMessage").isEqualTo("Validation failure: yearStarted is not valid.")
+  }
+
+  @Test
   fun `Updating a course participation should return 200 with correct body`() {
     val startTime = LocalDateTime.now()
 
@@ -154,6 +185,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
         outcome = CourseParticipationOutcome(
           status = updated.outcome!!.status,
           yearStarted = updated.outcome?.yearStarted,
+          yearCompleted = updated.outcome?.yearCompleted,
         ),
         addedBy = TEST_USER_NAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
@@ -163,6 +195,34 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
     updated.shouldBeEqualToIgnoringFields(retrieved, CourseParticipation::createdAt)
     LocalDateTime.parse(updated.createdAt) shouldBeGreaterThanOrEqualTo startTime
+  }
+
+  @Test
+  fun `Attempting to update a non-existent course participation should return 404`() {
+    val nonExistentId = UUID.randomUUID()
+
+    val updateAttempt = CourseParticipationUpdate(
+      courseName = "Non-existent Course",
+      setting = CourseParticipationSetting(
+        type = CourseParticipationSettingType.custody,
+      ),
+      source = "Non-existent Source",
+      detail = "Non-existent Course Detail",
+      outcome = CourseParticipationOutcome(
+        status = CourseParticipationOutcome.Status.incomplete,
+        yearStarted = 2021,
+      ),
+    )
+
+    webTestClient
+      .put()
+      .uri("/course-participations/{id}", nonExistentId)
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(updateAttempt)
+      .exchange()
+      .expectStatus().isNotFound
   }
 
   @Test
@@ -216,10 +276,17 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     )
 
     getCourseParticipationStatusCode(created.id) shouldBe HttpStatus.OK
+
     deleteCourseParticipation(created.id)
+      .expectStatus().isNoContent
 
     getCourseParticipationStatusCode(created.id) shouldBe HttpStatus.NOT_FOUND
-    deleteCourseParticipation(created.id)
+  }
+
+  @Test
+  fun `Attempting to delete a non-existent course participation should return 404`() {
+    deleteCourseParticipation(UUID.randomUUID())
+      .expectStatus().isNotFound
   }
 
   private fun createCourseParticipation(courseParticipationToAdd: CourseParticipationCreate): CourseParticipation =
@@ -254,7 +321,6 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       .headers(jwtAuthHelper.authorizationHeaderConfigurer())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectStatus().isNoContent
 
   private fun getCourseParticipation(id: UUID): CourseParticipation =
     webTestClient

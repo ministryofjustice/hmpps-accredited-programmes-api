@@ -8,6 +8,8 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -139,6 +141,44 @@ constructor(
           }"""
       }.andExpect {
         status { isUnauthorized() }
+      }
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      "yearStarted, 1990, 1985",
+      "yearCompleted, 1990, 1985",
+    )
+    fun `createCourseParticipation with year below the floor returns 400 with validation error message`(
+      field: String,
+      floor: Int,
+      invalidYear: Int,
+    ) {
+      mockMvc.post("/course-participations") {
+        accept = MediaType.APPLICATION_JSON
+        contentType = MediaType.APPLICATION_JSON
+        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+        content = """
+          { 
+            "courseName": "Course name",
+            "prisonNumber": "A1234AA",
+            "source": "Source of information",
+            "detail": "Course detail",
+            "setting": {
+              "type": "custody"
+            },
+            "outcome": {
+              "status": "complete",
+              "$field": $invalidYear
+            }
+          }"""
+      }.andExpect {
+        status { isBadRequest() }
+        content {
+          jsonPath("$.status") { value(400) }
+          jsonPath("$.userMessage") { value("Validation failure: $field is not valid.") }
+          jsonPath("$.developerMessage") { value("$field is not valid.") }
+        }
       }
     }
   }

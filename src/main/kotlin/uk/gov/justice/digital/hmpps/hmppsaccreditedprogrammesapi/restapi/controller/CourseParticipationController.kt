@@ -21,21 +21,23 @@ constructor(
   private val courseParticipationService: CourseParticipationService,
 ) : CourseParticipationsApiDelegate {
   override fun createCourseParticipation(courseParticipationCreate: CourseParticipationCreate): ResponseEntity<CourseParticipation> =
-    courseParticipationService.createCourseParticipation(courseParticipationCreate.toDomain())
-      ?.let {
-        ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
-      } ?: throw Exception("Unable to add to course participation")
+    courseParticipationService.createCourseParticipation(courseParticipationCreate.toDomain())?.let {
+      ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
+    } ?: throw Exception("Unable to add to course participation")
   override fun getCourseParticipationById(id: UUID): ResponseEntity<CourseParticipation> =
-    courseParticipationService.getCourseParticipationById(id)
-      ?.let {
-        ResponseEntity.ok(it.toApi())
-      } ?: throw NotFoundException("No course participation found for id $id")
+    courseParticipationService.getCourseParticipationById(id)?.let {
+      ResponseEntity.ok(it.toApi())
+    } ?: throw NotFoundException("No course participation found for id $id")
 
   override fun updateCourseParticipationById(id: UUID, courseParticipationUpdate: CourseParticipationUpdate): ResponseEntity<CourseParticipation> =
-    ResponseEntity.ok(courseParticipationService.updateCourseParticipationById(id, courseParticipationUpdate.toDomain()).toApi())
+    courseParticipationService.updateCourseParticipationById(id, courseParticipationUpdate.toDomain()).let {
+      ResponseEntity.ok(it.toApi())
+    } ?: throw NotFoundException("No course participation found for id $id")
 
   override fun deleteCourseParticipationById(id: UUID): ResponseEntity<Unit> {
-    courseParticipationService.deleteCourseParticipationById(id)
-    return ResponseEntity.noContent().build()
+    courseParticipationService.getCourseParticipationById(id)?.let {
+      courseParticipationService.deleteCourseParticipationById(id)
+      return ResponseEntity.noContent().build()
+    } ?: throw NotFoundException("No course participation found for id $id")
   }
 }
