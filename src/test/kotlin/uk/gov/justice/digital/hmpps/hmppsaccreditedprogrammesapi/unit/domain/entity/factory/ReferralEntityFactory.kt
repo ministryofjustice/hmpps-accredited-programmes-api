@@ -13,7 +13,6 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
   private var offeringId: Yielded<UUID> = { UUID.randomUUID() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
   private var referrerId: Yielded<String> = { randomUppercaseAlphanumericString(6) }
-  private var reason: Yielded<String?> = { null }
   private var additionalInformation: Yielded<String?> = { null }
   private var oasysConfirmed: Yielded<Boolean> = { false }
   private var hasReviewedProgrammeHistory: Yielded<Boolean> = { false }
@@ -33,10 +32,6 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
 
   fun withReferrerId(referrerId: String) = apply {
     this.referrerId = { referrerId }
-  }
-
-  fun withReason(reason: String?) = apply {
-    this.reason = { reason }
   }
 
   fun withAdditionalInformation(additionalInformation: String?) = apply {
@@ -60,7 +55,6 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
     offeringId = offeringId(),
     prisonNumber = prisonNumber(),
     referrerId = referrerId(),
-    reason = reason(),
     additionalInformation = additionalInformation(),
     oasysConfirmed = oasysConfirmed(),
     hasReviewedProgrammeHistory = hasReviewedProgrammeHistory(),
