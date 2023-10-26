@@ -900,9 +900,6 @@ components:
     ReferralUpdate:
       type: object
       properties:
-        reason:
-          type: string
-          deprecated: true
         additionalInformation:
           type: string
         oasysConfirmed:

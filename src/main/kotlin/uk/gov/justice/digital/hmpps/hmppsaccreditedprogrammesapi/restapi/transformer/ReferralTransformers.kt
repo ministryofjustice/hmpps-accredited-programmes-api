@@ -14,7 +14,6 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   referrerId = referrerId,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
-  reason = reason,
   additionalInformation = additionalInformation,
   status = status.toApi(),
 )
@@ -34,14 +33,12 @@ fun ApiReferralStatus.toDomain(): ReferralStatus = when (this) {
 }
 
 fun ApiReferralUpdate.toDomain() = ReferralUpdate(
-  reason = reason,
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
 )
 
 fun ReferralUpdate.toApi() = ApiReferralUpdate(
-  reason = reason,
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,

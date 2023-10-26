@@ -27,7 +27,6 @@ constructor(
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
-    referral.reason = update.reason
     referral.additionalInformation = update.additionalInformation
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory

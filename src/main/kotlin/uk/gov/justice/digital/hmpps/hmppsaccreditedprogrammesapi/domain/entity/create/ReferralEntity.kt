@@ -26,8 +26,6 @@ data class ReferralEntity(
   val offeringId: UUID,
   val prisonNumber: String,
   val referrerId: String,
-  @Deprecated(message = "please use ReferralEntity.additionalInformation instead")
-  var reason: String? = null,
   var additionalInformation: String? = null,
   var oasysConfirmed: Boolean = false,
   var hasReviewedProgrammeHistory: Boolean = false,

@@ -47,14 +47,12 @@ class ReferralTransformersTest {
   @Test
   fun `Transforming a ReferralUpdate with all fields should convert to its Domain equivalent`() {
     val apiModel = ApiReferralUpdate(
-      reason = "Some reason",
       additionalInformation = "Additional Info",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
     )
 
     with(apiModel.toDomain()) {
-      reason shouldBe apiModel.reason
       additionalInformation shouldBe apiModel.additionalInformation
       oasysConfirmed shouldBe apiModel.oasysConfirmed
       hasReviewedProgrammeHistory shouldBe apiModel.hasReviewedProgrammeHistory
@@ -64,14 +62,12 @@ class ReferralTransformersTest {
   @Test
   fun `Transforming a ReferralUpdate with all nullable fields should tolerantly convert to Domain`() {
     val apiModel = ApiReferralUpdate(
-      reason = null,
       additionalInformation = null,
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
     )
 
     with(apiModel.toDomain()) {
-      reason shouldBe null
       additionalInformation shouldBe null
       oasysConfirmed shouldBe false
       hasReviewedProgrammeHistory shouldBe false
@@ -81,14 +77,12 @@ class ReferralTransformersTest {
   @Test
   fun `Transforming a ReferralUpdate with all fields should convert to its API equivalent`() {
     val domainModel = DomainReferralUpdate(
-      reason = "Some reason",
       additionalInformation = "Additional Info",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
     )
 
     with(domainModel.toApi()) {
-      reason shouldBe domainModel.reason
       additionalInformation shouldBe domainModel.additionalInformation
       oasysConfirmed shouldBe domainModel.oasysConfirmed
       hasReviewedProgrammeHistory shouldBe domainModel.hasReviewedProgrammeHistory
@@ -98,14 +92,12 @@ class ReferralTransformersTest {
   @Test
   fun `Transforming a ReferralUpdate with all nullable fields should tolerantly convert to API`() {
     val domainModel = DomainReferralUpdate(
-      reason = null,
       additionalInformation = null,
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
     )
 
     with(domainModel.toApi()) {
-      reason shouldBe null
       additionalInformation shouldBe null
       oasysConfirmed shouldBe false
       hasReviewedProgrammeHistory shouldBe false
