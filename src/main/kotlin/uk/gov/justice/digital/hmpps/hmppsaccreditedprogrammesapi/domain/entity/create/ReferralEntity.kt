@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
+import java.time.LocalDateTime
 import java.util.EnumMap
 import java.util.EnumSet
 import java.util.UUID
@@ -24,13 +25,21 @@ data class ReferralEntity(
   val id: UUID? = null,
 
   val offeringId: UUID,
+
   val prisonNumber: String,
+
   val referrerId: String,
+
   var additionalInformation: String? = null,
+
   var oasysConfirmed: Boolean = false,
+
   var hasReviewedProgrammeHistory: Boolean = false,
+
   @Enumerated(STRING)
   var status: ReferralStatus = REFERRAL_STARTED,
+
+  var submittedOn: LocalDateTime? = null,
 ) {
 
   enum class ReferralStatus {

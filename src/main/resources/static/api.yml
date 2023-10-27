@@ -406,6 +406,30 @@ paths:
         409:
           description: The referral may not change its status to the supplied value.
 
+  /referrals/{id}/submit:
+    post:
+      summary: Submit a completed referral
+      tags:
+        - Referrals
+      operationId: submitReferralById
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Submitted a completed referral.
+        401:
+          description: The request was unauthorised.
+        403:
+          description: Forbidden. The client is not authorised to access this referral.
+        404:
+          description: The referral does not exist.
+
   /offerings/{id}/course:
     get:
       tags:
@@ -924,6 +948,8 @@ components:
               format: uuid
             status:
               $ref: "#/components/schemas/ReferralStatus"
+            submittedOn:
+              type: string
           required:
             - id
             - offeringId
