@@ -50,4 +50,11 @@ constructor(
       referralService.updateReferralStatusById(id, status.toDomain())
       ResponseEntity.noContent().build()
     }
+
+  override fun submitReferralById(id: UUID): ResponseEntity<Unit> {
+    referralService.getReferralById(id)?.let {
+      referralService.submitReferralById(id)
+      return ResponseEntity.noContent().build()
+    } ?: throw NotFoundException("No referral found at /referral/$id")
+  }
 }

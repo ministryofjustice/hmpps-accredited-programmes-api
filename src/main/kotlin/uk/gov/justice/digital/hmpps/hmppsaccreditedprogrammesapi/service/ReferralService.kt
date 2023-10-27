@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import jakarta.validation.ValidationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -7,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaReferralRepository
+import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -38,6 +40,42 @@ constructor(
       referral.status = nextStatus
     } else {
       throw IllegalArgumentException("Transition from ${referral.status} to $nextStatus is not valid")
+    }
+  }
+
+  fun submitReferralById(referralId: UUID) {
+    val referral = referralRepository.getReferenceById(referralId)
+
+    val requiredFields = listOf(
+      referral.offeringId to "offeringId",
+      referral.prisonNumber to "prisonNumber",
+      referral.referrerId to "referrerId",
+      referral.additionalInformation to "additionalInformation",
+      referral.oasysConfirmed to "oasysConfirmed",
+      referral.hasReviewedProgrammeHistory to "hasReviewedProgrammeHistory",
+    )
+
+    for ((value, fieldName) in requiredFields) {
+      when (value) {
+        null -> throw ValidationException("$fieldName is not valid: null")
+        is String -> if (value.isBlank()) throw ValidationException("$fieldName is not valid: blank")
+      }
+    }
+
+    when (referral.status) {
+      ReferralStatus.REFERRAL_STARTED -> {
+        referral.status = ReferralStatus.REFERRAL_SUBMITTED
+        referral.submittedOn = LocalDateTime.now()
+      }
+      ReferralStatus.REFERRAL_SUBMITTED -> {
+        throw IllegalArgumentException("Referral $referralId is already submitted")
+      }
+      ReferralStatus.AWAITING_ASSESSMENT -> {
+        throw IllegalArgumentException("Referral $referralId is already submitted and awaiting assessment")
+      }
+      ReferralStatus.ASSESSMENT_STARTED -> {
+        throw IllegalArgumentException("Referral $referralId is already submitted and currently being assessed")
+      }
     }
   }
 }

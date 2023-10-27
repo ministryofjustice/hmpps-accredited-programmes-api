@@ -16,6 +16,7 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
   status = status.toApi(),
+  submittedOn = submittedOn?.toString(),
 )
 
 fun ReferralStatus.toApi(): ApiReferralStatus = when (this) {
