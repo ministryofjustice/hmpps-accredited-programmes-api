@@ -43,6 +43,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       additionalInformation = null,
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
+      submittedOn = null,
     )
   }
 
@@ -52,20 +53,13 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offeringId = getFirstOfferingIdForCourse(courseId)
     val createdReferralId = createReferral(offeringId).referralId
 
-    webTestClient
-      .put()
-      .uri("/referrals/$createdReferralId")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        ReferralUpdate(
-          additionalInformation = "Additional information",
-          oasysConfirmed = true,
-          hasReviewedProgrammeHistory = true,
-        ),
-      )
-      .exchange()
-      .expectStatus().isNoContent
+    val referralUpdate = ReferralUpdate(
+      additionalInformation = "Additional information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+    )
+
+    updateReferral(createdReferralId, referralUpdate)
 
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
@@ -76,6 +70,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       additionalInformation = "Additional information",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
+      submittedOn = null,
     )
   }
 
@@ -90,6 +85,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         ReferralUpdate(
           additionalInformation = "Additional information",
           oasysConfirmed = true,
+          hasReviewedProgrammeHistory = true,
         ),
       )
       .exchange().expectStatus().isNotFound
@@ -121,7 +117,39 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = ReferralStatus.referralSubmitted,
       oasysConfirmed = false,
       additionalInformation = null,
+      submittedOn = null,
     )
+  }
+
+  @Test
+  fun `Submitting a referral with all fields set should return 204 with no body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val createdReferralId = createReferral(offeringId).referralId
+
+    val referralUpdate = ReferralUpdate(
+      additionalInformation = "Additional information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+    )
+
+    updateReferral(createdReferralId, referralUpdate)
+    val readyToSubmitReferral = getReferralById(createdReferralId)
+
+    submitReferral(readyToSubmitReferral.id)
+
+    getReferralById(readyToSubmitReferral.id).status shouldBeEqual ReferralStatus.referralSubmitted
+  }
+
+  @Test
+  fun `Submitting a nonexistent referral should return 404 with error body`() {
+    webTestClient
+      .post()
+      .uri("/referrals/${UUID.randomUUID()}/submit")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNotFound
   }
 
   fun createReferral(offeringId: UUID) = webTestClient
@@ -151,4 +179,23 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     .expectStatus().isOk
     .expectBody<Referral>()
     .returnResult().responseBody!!
+
+  fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate): Any = webTestClient
+    .put()
+    .uri("/referrals/$referralId")
+    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(referralUpdate)
+    .exchange()
+    .expectStatus().isNoContent
+
+  private fun submitReferral(createdReferralId: UUID) {
+    webTestClient
+      .post()
+      .uri("/referrals/$createdReferralId/submit")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNoContent
+  }
 }
