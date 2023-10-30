@@ -430,6 +430,37 @@ paths:
         404:
           description: The referral does not exist.
 
+  /referrals/organisation/:organisationId/dashboard:
+    get:
+      summary: Get referrals by organisationId
+      tags:
+        - Referrals
+      operationId: getReferralSummaryByOrgId
+      parameters:
+        - name: organisationId
+          in: path
+          description: The organisationId (UUID) of an organisation
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Summary of referrals for an organisation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReferralSummary'
+        401:
+          description: The request was unauthorised
+        403:
+          description: Forbidden.  The client is not authorised to access this offering.
+        404:
+          description: No referrals for supplied organisationId (Not Found).
+
+
   /offerings/{id}/course:
     get:
       tags:
@@ -983,3 +1014,29 @@ components:
         - referral_submitted
         - awaiting_assessment
         - assessment_started
+    ReferralSummary:
+      type: object
+      properties:
+        referralId:
+          description: The unique id (UUID) of the new referral.
+          type: string
+          format: uuid
+        referralStatus:
+          $ref: "#/components/schemas/ReferralStatus"
+        person:
+          $ref: "#/components/schemas/Person"
+
+      required:
+      - referralId
+      - referralStatus
+      - person
+
+    Person:
+      type: object
+      properties:
+        prisonNumber:
+          description: The prison number of the person who is being referred.
+          example: "A1234AA"
+          type: string
+      required:
+        - prisonNumber
