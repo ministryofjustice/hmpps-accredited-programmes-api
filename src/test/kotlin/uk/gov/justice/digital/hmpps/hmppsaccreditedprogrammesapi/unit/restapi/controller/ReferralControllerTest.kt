@@ -6,6 +6,7 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.verify
+import jakarta.validation.ValidationException
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -19,6 +20,8 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomReferrerId
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
@@ -44,8 +47,8 @@ constructor(
   fun `createReferral with JWT and valid payload returns 201 with correct body`() {
     val referral = ReferralEntityFactory()
       .withOfferingId(UUID.randomUUID())
-      .withPrisonNumber("A1234BC")
-      .withReferrerId("XWK1234MN")
+      .withPrisonNumber(randomPrisonNumber())
+      .withReferrerId(randomReferrerId())
       .produce()
 
     val payload = mapOf(
@@ -197,5 +200,65 @@ constructor(
     }
 
     verify { referralService.updateReferralStatusById(referral.id!!, AWAITING_ASSESSMENT) }
+  }
+
+  @Test
+  fun `submitReferralById with valid ID returns 204 with no body`() {
+    val referral = ReferralEntityFactory()
+      .withOfferingId(UUID.randomUUID())
+      .withPrisonNumber(randomPrisonNumber())
+      .withReferrerId(randomReferrerId())
+      .withAdditionalInformation("Additional Info")
+      .withOasysConfirmed(true)
+      .withHasReviewedProgrammeHistory(true)
+      .produce()
+
+    every { referralService.getReferralById(referral.id!!) } returns referral
+    every { referralService.submitReferralById(referral.id!!) } just Runs
+
+    mockMvc.post("/referrals/${referral.id}/submit") {
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    }.andExpect {
+      status { isNoContent() }
+    }
+
+    verify { referralService.getReferralById(referral.id!!) }
+    verify { referralService.submitReferralById(referral.id!!) }
+  }
+
+  @Test
+  fun `submitReferralById with invalid ID returns 404 with error body`() {
+    val invalidReferralId = UUID.randomUUID()
+
+    every { referralService.getReferralById(invalidReferralId) } returns null
+
+    mockMvc.post("/referrals/$invalidReferralId/submit") {
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    }.andExpect {
+      status { isNotFound() }
+    }
+
+    verify { referralService.getReferralById(invalidReferralId) }
+  }
+
+  @Test
+  fun `submitReferralById with incomplete referral returns 400 with error body`() {
+    val referral = ReferralEntityFactory()
+      .withOfferingId(UUID.randomUUID())
+      .withPrisonNumber(randomPrisonNumber())
+      .withReferrerId(randomReferrerId())
+      .produce()
+
+    every { referralService.getReferralById(referral.id!!) } returns referral
+    every { referralService.submitReferralById(referral.id!!) } throws ValidationException("additionalInformation is not valid: null")
+
+    mockMvc.post("/referrals/${referral.id}/submit") {
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    }.andExpect {
+      status { isBadRequest() }
+    }
+
+    verify { referralService.getReferralById(referral.id!!) }
+    verify { referralService.submitReferralById(referral.id!!) }
   }
 }
