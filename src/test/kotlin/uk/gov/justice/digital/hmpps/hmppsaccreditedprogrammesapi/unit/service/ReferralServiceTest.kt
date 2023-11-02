@@ -47,9 +47,9 @@ class ReferralServiceTest {
           .produce(),
       )
 
-      every { referralRepository.getReferralsByOrgId(orgId) } returns referralEntities
+      every { referralRepository.getReferralsByOrganisationId(orgId) } returns referralEntities
 
-      val referralSummaries = referralService.getReferralSummaryByOrgId(orgId)
+      val referralSummaries = referralService.getReferralsByOrganisationId(orgId)
       referralSummaries.shouldNotBeNull()
       referralSummaries.size.shouldBe(referralEntities.size)
       referralSummaries[0].prisonNumber.shouldBe(prisonNumber)

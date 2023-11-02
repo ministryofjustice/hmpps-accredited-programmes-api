@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Person
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Person as ApiPerson
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary as ApiReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate as ApiReferralUpdate
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
@@ -47,11 +47,10 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
 )
 
-fun ReferralEntity.toReferralSummary(): ReferralSummary =
-  ReferralSummary(
-    referralId = id!!,
-    referralStatus = status.toApi(),
-    person = Person(
-      prisonNumber = prisonNumber,
-    ),
-  )
+fun ReferralEntity.toReferralSummary() = ApiReferralSummary(
+  referralId = id!!,
+  referralStatus = status.toApi(),
+  person = ApiPerson(
+    prisonNumber = prisonNumber,
+  ),
+)

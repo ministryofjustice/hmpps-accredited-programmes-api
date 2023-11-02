@@ -60,9 +60,8 @@ constructor(
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
 
-  override fun getReferralSummaryByOrgId(organisationId: String): ResponseEntity<List<ReferralSummary>> =
-    referralService
-      .getReferralSummaryByOrgId(organisationId)
+  override fun getReferralSummariesByOrganisationId(organisationId: String): ResponseEntity<List<ReferralSummary>> =
+    referralService.getReferralsByOrganisationId(organisationId)
       .let { ResponseEntity.ok(it.map { referral -> referral.toReferralSummary() }) }
       ?: throw NotFoundException("No ReferralSummary found at /referrals/organisation/$organisationId/dashboard")
 }

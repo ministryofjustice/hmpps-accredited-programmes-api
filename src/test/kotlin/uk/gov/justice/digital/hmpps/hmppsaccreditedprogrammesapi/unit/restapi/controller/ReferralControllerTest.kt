@@ -275,7 +275,7 @@ constructor(
         .produce(),
     )
 
-    every { referralService.getReferralSummaryByOrgId(organisationId) } returns referrals
+    every { referralService.getReferralsByOrganisationId(organisationId) } returns referrals
 
     mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
@@ -286,12 +286,12 @@ constructor(
         contentType(MediaType.APPLICATION_JSON)
         referrals.forEachIndexed { index, referral ->
           jsonPath("$[$index].referralId") { value(referral.id.toString()) }
-          jsonPath("$[$index].person.prisonNumber") { value(referral.prisonNumber.toString()) }
+          jsonPath("$[$index].person.prisonNumber") { value(referral.prisonNumber) }
           jsonPath("$[$index].status") { REFERRAL_STARTED }
         }
       }
     }
-    verify { referralService.getReferralSummaryByOrgId(organisationId) }
+    verify { referralService.getReferralsByOrganisationId(organisationId) }
   }
 
   @Test
@@ -307,7 +307,7 @@ constructor(
   fun `getReferralSummaryByOrgId with random orgId returns 200 with empty body`() {
     val orgId = UUID.randomUUID().toString()
 
-    every { referralService.getReferralSummaryByOrgId(orgId) } returns emptyList()
+    every { referralService.getReferralsByOrganisationId(orgId) } returns emptyList()
 
     mockMvc.get("/referrals/organisation/$orgId/dashboard") {
       accept = MediaType.APPLICATION_JSON
@@ -320,6 +320,6 @@ constructor(
       }
     }
 
-    verify { referralService.getReferralSummaryByOrgId(orgId) }
+    verify { referralService.getReferralsByOrganisationId(orgId) }
   }
 }

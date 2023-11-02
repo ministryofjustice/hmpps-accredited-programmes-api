@@ -435,11 +435,11 @@ paths:
       summary: Get referrals by organisationId
       tags:
         - Referrals
-      operationId: getReferralSummaryByOrgId
+      operationId: getReferralSummariesByOrganisationId
       parameters:
         - name: organisationId
           in: path
-          description: The organisationId  of an organisation
+          description: The organisationId of an organisation
           required: true
           schema:
             type: string
