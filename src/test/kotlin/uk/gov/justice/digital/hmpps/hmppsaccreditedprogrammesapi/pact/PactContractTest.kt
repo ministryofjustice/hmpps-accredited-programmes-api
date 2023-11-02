@@ -74,6 +74,9 @@ class PactContractTest {
   @State("Referral status can be updated")
   fun `ensure referral status can be updated`() {}
 
+  @State("Referral can be submitted")
+  fun `ensure referral can be submitted`() {}
+
   @TestTemplate
   @ExtendWith(PactVerificationSpringProvider::class)
   fun template(context: PactVerificationContext, request: HttpRequest) {

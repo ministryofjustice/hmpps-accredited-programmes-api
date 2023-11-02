@@ -28,5 +28,5 @@ VALUES
 
 INSERT INTO referral (referral_id, offering_id, prison_number, referrer_id, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on)
 VALUES
-    ('0c46ed09-170b-4c0f-aee8-a24eeaeeddaa', 'd460428c-5cb8-4d73-a3ae-b7ac37b65fbc','1uXTfdH','038019','',false,false,'REFERRAL_STARTED',null),
-    ('fae2ed00-057e-4179-9e55-f6a4f4874cf0', 'd460428c-5cb8-4d73-a3ae-b7ac37b65fbc','1uXTfdH','038019','',false,false,'REFERRAL_STARTED',null);
+    ('0c46ed09-170b-4c0f-aee8-a24eeaeeddaa', 'd460428c-5cb8-4d73-a3ae-b7ac37b65fbc','1uXTfdH','038019','more info',false,false,'REFERRAL_STARTED',null),
+    ('fae2ed00-057e-4179-9e55-f6a4f4874cf0', 'd460428c-5cb8-4d73-a3ae-b7ac37b65fbc','1uXTfdH','038019','more info',false,false,'REFERRAL_STARTED',null);
