@@ -8,7 +8,9 @@ import java.util.*
 
 @Repository
 interface JpaReferralRepository : JpaRepository<ReferralEntity, UUID> {
-  @Query
-  ("SELECT r.id, r.status, r.prisonNumber, r.referrerId, r.offeringId from ReferralEntity r INNER JOIN OfferingEntity o ON o.id = r.offeringId where o.organisationId = :orgId")
-  fun getReferralsByOrgId(orgId: String): List<ReferralEntity>
+  @Query(
+    value = "SELECT r.* FROM referral r INNER JOIN offering o ON o.offering_id = r.offering_id WHERE o.organisation_id = :organisationId",
+    nativeQuery = true,
+  )
+  fun getReferralsByOrganisationId(organisationId: String): List<ReferralEntity>
 }
