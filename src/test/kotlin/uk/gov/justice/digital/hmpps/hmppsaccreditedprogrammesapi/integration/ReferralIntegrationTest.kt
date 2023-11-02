@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import io.kotest.matchers.collections.shouldContainAnyOf
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -17,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -155,18 +158,29 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Should return referral summary with correct body`() {
+  fun `Retrieving a list of referrals for an organisation should return 200 with correct body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
-    val createdReferralId = createReferral(offeringId).referralId
-    val orgId = "MDI"
-    createdReferralId.shouldNotBeNull()
+    val createdReferral = createReferral(offeringId)
+    val organisationId = "MDI"
 
-    getReferralSummaryByOrgId(orgId) shouldBeEqual ReferralSummary(
-      referralId = createdReferralId,
-      person = Person(prisonNumber = PRISON_NUMBER),
-      referralStatus = ReferralStatus.referralStarted,
+    createdReferral.referralId.shouldNotBeNull()
+
+    val referralSummaries = getReferralSummariesByOrganisationId(organisationId)
+
+    referralSummaries shouldContainAnyOf listOf(
+      ReferralSummary(
+        referralId = createdReferral.referralId,
+        person = Person(prisonNumber = PRISON_NUMBER),
+        referralStatus = ReferralStatus.referralStarted,
+      ),
     )
+  }
+
+  @Test
+  fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
+    val randomOrganisationId = randomUppercaseString(3)
+    getReferralSummariesByOrganisationId(randomOrganisationId) shouldBe emptyList()
   }
 
   fun createReferral(offeringId: UUID) = webTestClient
@@ -216,13 +230,16 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNoContent
   }
 
-  private fun getReferralSummaryByOrgId(orgId: String) = webTestClient
-    .get()
-    .uri("/referrals/organisation/$orgId/dashboard")
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<List<ReferralSummary>>()
-    .returnResult().responseBody!!
+  private fun getReferralSummariesByOrganisationId(organisationId: String): List<ReferralSummary> {
+    val getReferralsByOrganisationId = webTestClient
+      .get()
+      .uri("/referrals/organisation/$organisationId/dashboard")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<ReferralSummary>>()
+      .returnResult().responseBody!!
+    return getReferralsByOrganisationId
+  }
 }
