@@ -430,7 +430,7 @@ paths:
         404:
           description: The referral does not exist.
 
-  /referrals/organisation/:organisationId/dashboard:
+  /referrals/organisation/{organisationId}/dashboard:
     get:
       summary: Get referrals by organisationId
       tags:
@@ -439,11 +439,11 @@ paths:
       parameters:
         - name: organisationId
           in: path
-          description: The organisationId (UUID) of an organisation
+          description: The organisationId  of an organisation
           required: true
           schema:
             type: string
-            format: uuid
+            format: string
       responses:
         200:
           description: Summary of referrals for an organisation
