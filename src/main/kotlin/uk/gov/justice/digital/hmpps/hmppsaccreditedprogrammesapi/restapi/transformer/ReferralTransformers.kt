@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Person
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
@@ -44,3 +46,12 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
 )
+
+fun ReferralEntity.toReferralSummary(): ReferralSummary =
+  ReferralSummary(
+    referralId = id!!,
+    referralStatus = status.toApi(),
+    person = Person(
+      prisonNumber = prisonNumber,
+    ),
+  )
