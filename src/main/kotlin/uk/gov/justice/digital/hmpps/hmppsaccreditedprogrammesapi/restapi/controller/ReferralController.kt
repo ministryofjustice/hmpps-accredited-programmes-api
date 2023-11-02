@@ -9,10 +9,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import java.util.UUID
 
@@ -57,4 +59,10 @@ constructor(
       return ResponseEntity.noContent().build()
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
+
+  override fun getReferralSummaryByOrgId(organisationId: String): ResponseEntity<List<ReferralSummary>> =
+    referralService
+      .getReferralSummaryByOrgId(organisationId)
+      .let { ResponseEntity.ok(it.map { referral -> referral.toReferralSummary() }) }
+      ?: throw NotFoundException("No ReferralSummary found at /referrals/organisation/$organisationId/dashboard")
 }

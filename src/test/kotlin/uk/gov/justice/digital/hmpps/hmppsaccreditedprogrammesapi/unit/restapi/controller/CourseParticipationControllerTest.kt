@@ -151,7 +151,6 @@ constructor(
     )
     fun `createCourseParticipation with year below the floor returns 400 with validation error message`(
       field: String,
-      floor: Int,
       invalidYear: Int,
     ) {
       mockMvc.post("/course-participations") {

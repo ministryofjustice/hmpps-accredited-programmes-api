@@ -8,11 +8,13 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Person
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import java.util.UUID
@@ -152,6 +154,21 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNotFound
   }
 
+  @Test
+  fun `Should return referral summary with correct body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val createdReferralId = createReferral(offeringId).referralId
+    val orgId = "MDI"
+    createdReferralId.shouldNotBeNull()
+
+    getReferralSummaryByOrgId(orgId) shouldBeEqual ReferralSummary(
+      referralId = createdReferralId,
+      person = Person(prisonNumber = PRISON_NUMBER),
+      referralStatus = ReferralStatus.referralStarted,
+    )
+  }
+
   fun createReferral(offeringId: UUID) = webTestClient
     .post()
     .uri("/referrals")
@@ -198,4 +215,14 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isNoContent
   }
+
+  private fun getReferralSummaryByOrgId(orgId: String) = webTestClient
+    .get()
+    .uri("/referrals/organisation/$orgId/dashboard")
+    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<ReferralSummary>>()
+    .returnResult().responseBody!!
 }

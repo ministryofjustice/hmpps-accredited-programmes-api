@@ -187,7 +187,8 @@ constructor(
       "status" to "awaiting_assessment",
     )
 
-    val illegalArgumentException = IllegalArgumentException("Transition from $REFERRAL_STARTED to $AWAITING_ASSESSMENT is not valid")
+    val illegalArgumentException =
+      IllegalArgumentException("Transition from $REFERRAL_STARTED to $AWAITING_ASSESSMENT is not valid")
 
     every { referralService.updateReferralStatusById(any(), any()) } throws illegalArgumentException
 
@@ -260,5 +261,65 @@ constructor(
 
     verify { referralService.getReferralById(referral.id!!) }
     verify { referralService.submitReferralById(referral.id!!) }
+  }
+
+  @Test
+  fun `shdould return referral summary for a given orgId`() {
+    val organisationId = "MDI"
+    val referrals = listOf(
+      ReferralEntityFactory()
+        .withOfferingId(UUID.randomUUID())
+        .withPrisonNumber(randomPrisonNumber())
+        .withReferrerId(randomReferrerId())
+        .withStatus(REFERRAL_STARTED)
+        .produce(),
+    )
+
+    every { referralService.getReferralSummaryByOrgId(organisationId) } returns referrals
+
+    mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      accept = MediaType.APPLICATION_JSON
+    }.andExpect {
+      status { isOk() }
+      content {
+        contentType(MediaType.APPLICATION_JSON)
+        referrals.forEachIndexed { index, referral ->
+          jsonPath("$[$index].referralId") { value(referral.id.toString()) }
+          jsonPath("$[$index].person.prisonNumber") { value(referral.prisonNumber.toString()) }
+          jsonPath("$[$index].status") { REFERRAL_STARTED }
+        }
+      }
+    }
+    verify { referralService.getReferralSummaryByOrgId(organisationId) }
+  }
+
+  @Test
+  fun `getReferralSummaryByOrgId without JWT returns 401`() {
+    mockMvc.get("/referrals/organisation/${UUID.randomUUID()}/dashboard") {
+      accept = MediaType.APPLICATION_JSON
+    }.andExpect {
+      status { isUnauthorized() }
+    }
+  }
+
+  @Test
+  fun `getReferralSummaryByOrgId with random orgId returns 200 with empty body`() {
+    val orgId = UUID.randomUUID().toString()
+
+    every { referralService.getReferralSummaryByOrgId(orgId) } returns emptyList()
+
+    mockMvc.get("/referrals/organisation/$orgId/dashboard") {
+      accept = MediaType.APPLICATION_JSON
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    }.andExpect {
+      status { isOk() }
+      content {
+        contentType(MediaType.APPLICATION_JSON)
+        jsonPath("$") { isEmpty() }
+      }
+    }
+
+    verify { referralService.getReferralSummaryByOrgId(orgId) }
   }
 }

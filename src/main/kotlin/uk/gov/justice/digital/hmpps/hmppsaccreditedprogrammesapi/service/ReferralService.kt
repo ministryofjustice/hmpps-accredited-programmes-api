@@ -78,4 +78,6 @@ constructor(
       }
     }
   }
+
+  fun getReferralSummaryByOrgId(orgId: String) = referralRepository.getReferralsByOrgId(orgId)
 }
