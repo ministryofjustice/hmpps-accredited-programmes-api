@@ -44,27 +44,15 @@ fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
   location = location,
 )
 
-fun ApiCourseParticipationOutcome.toDomain() =
-  run {
-    val yearStarted = yearStarted?.let(Year::of)
-    val yearCompleted = yearCompleted?.let(Year::of)
-    fun Year.isOrAfter(base: Year) = this.value in (base.value..Year.now().value)
+fun ApiCourseParticipationOutcome.toDomain() = CourseParticipationOutcome(
+  status = status.toDomain(),
+  yearStarted = yearStarted?.toValidYear("yearStarted"),
+  yearCompleted = yearCompleted?.toValidYear("yearCompleted")
+)
 
-    // the earliest possible programme history values are from 1990, which is why we validate from there onwards
-    when {
-      (yearStarted != null) && !(yearStarted.isOrAfter(Year.of(1990))) -> {
-        throw ValidationException("yearStarted is not valid.")
-      }
-      (yearCompleted != null) && !(yearCompleted.isOrAfter(Year.of(1990))) -> {
-        throw ValidationException("yearCompleted is not valid.")
-      }
-      else -> CourseParticipationOutcome(
-        status = status.toDomain(),
-        yearStarted = yearStarted,
-        yearCompleted = yearCompleted,
-      )
-    }
-  }
+fun Int.toValidYear(fieldName: String): Year = Year.of(this).also {
+  if (it.value < 1990) throw ValidationException("$fieldName is not valid.")
+}
 
 fun ApiCourseParticipationOutcome.Status.toDomain() = when (this) {
   ApiCourseParticipationOutcome.Status.complete -> CourseStatus.COMPLETE
