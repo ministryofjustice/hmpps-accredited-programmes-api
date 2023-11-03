@@ -146,12 +146,11 @@ constructor(
 
     @ParameterizedTest
     @CsvSource(
-      "yearStarted, 1990, 1985",
-      "yearCompleted, 1990, 1985",
+      "yearStarted, 1989",
+      "yearCompleted, 1985",
     )
-    fun `createCourseParticipation with year below the floor returns 400 with validation error message`(
+    fun `createCourseParticipation with invalid year fields returns 400 with validation error message`(
       field: String,
-      floor: Int,
       invalidYear: Int,
     ) {
       mockMvc.post("/course-participations") {

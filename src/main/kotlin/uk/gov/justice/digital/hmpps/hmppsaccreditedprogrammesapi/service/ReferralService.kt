@@ -25,7 +25,7 @@ constructor(
     referrerId: String,
   ): UUID? = referralRepository.save(ReferralEntity(offeringId = offeringId, prisonNumber = prisonNumber, referrerId = referrerId)).id
 
-  fun getReferralById(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
+  fun getReferralById(referralId: UUID): ReferralEntity? = referralRepository.findById(referralId).getOrNull()
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
@@ -78,4 +78,6 @@ constructor(
       }
     }
   }
+
+  fun getReferralsByOrganisationId(organisationId: String) = referralRepository.getReferralsByOrganisationId(organisationId)
 }

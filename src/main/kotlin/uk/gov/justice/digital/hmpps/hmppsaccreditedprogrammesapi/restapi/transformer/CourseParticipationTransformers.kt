@@ -16,6 +16,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType as ApiCourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
 
+val referralProgramStartYear = Year.of(1990)
+
 fun ApiCourseParticipationCreate.toDomain() =
   CourseParticipationEntity(
     courseName = courseName,
@@ -45,26 +47,18 @@ fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
 )
 
 fun ApiCourseParticipationOutcome.toDomain() =
-  run {
-    val yearStarted = yearStarted?.let(Year::of)
-    val yearCompleted = yearCompleted?.let(Year::of)
-    fun Year.isOrAfter(base: Year) = this.value in (base.value..Year.now().value)
+  CourseParticipationOutcome(
+    status = status.toDomain(),
+    yearStarted = yearStarted?.let(Year::of)?.isValidYear("yearStarted"),
+    yearCompleted = yearCompleted?.let(Year::of)?.isValidYear("yearCompleted"),
+  )
 
-    // the earliest possible programme history values are from 1990, which is why we validate from there onwards
-    when {
-      (yearStarted != null) && !(yearStarted.isOrAfter(Year.of(1990))) -> {
-        throw ValidationException("yearStarted is not valid.")
-      }
-      (yearCompleted != null) && !(yearCompleted.isOrAfter(Year.of(1990))) -> {
-        throw ValidationException("yearCompleted is not valid.")
-      }
-      else -> CourseParticipationOutcome(
-        status = status.toDomain(),
-        yearStarted = yearStarted,
-        yearCompleted = yearCompleted,
-      )
-    }
+fun Year.isValidYear(fieldName: String) = run {
+  if (this.value < referralProgramStartYear.value) {
+    throw ValidationException("$fieldName is not valid.")
   }
+  this
+}
 
 fun ApiCourseParticipationOutcome.Status.toDomain() = when (this) {
   ApiCourseParticipationOutcome.Status.complete -> CourseStatus.COMPLETE
