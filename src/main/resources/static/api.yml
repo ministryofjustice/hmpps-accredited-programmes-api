@@ -460,6 +460,28 @@ paths:
         404:
           description: No referrals for supplied organisationId (Not Found).
 
+  /referrals/me/dashboard:
+    get:
+      summary: Get referrals for user from token
+      tags:
+        - Referrals
+      operationId: getReferralsForUser
+      responses:
+        200:
+          description: Summary of referrals for logged in user
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReferralSummary'
+        401:
+          description: The request was unauthorised
+        403:
+          description: Forbidden.  The client is not authorised to access this offering.
+        404:
+          description: No referrals for supplied organisationId (Not Found).
+
 
   /offerings/{id}/course:
     get:

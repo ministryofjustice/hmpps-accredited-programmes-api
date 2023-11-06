@@ -80,4 +80,5 @@ constructor(
   }
 
   fun getReferralsByOrganisationId(organisationId: String) = referralRepository.getReferralsByOrganisationId(organisationId)
+  fun getReferralForUser(username: String) = referralRepository.getReferralsByReferrerId(username)
 }

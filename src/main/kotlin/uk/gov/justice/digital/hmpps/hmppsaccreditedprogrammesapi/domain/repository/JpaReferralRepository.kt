@@ -13,4 +13,6 @@ interface JpaReferralRepository : JpaRepository<ReferralEntity, UUID> {
     nativeQuery = true,
   )
   fun getReferralsByOrganisationId(organisationId: String): List<ReferralEntity>
+
+  fun getReferralsByReferrerId(referrerId: String): List<ReferralEntity>
 }

@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.authorization.UserMapper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
@@ -23,6 +24,7 @@ class ReferralController
 @Autowired
 constructor(
   private val referralService: ReferralService,
+  private val userMapper: UserMapper,
 ) : ReferralsApiDelegate {
 
   override fun createReferral(referralCreate: ReferralCreate): ResponseEntity<ReferralCreated> =
@@ -64,4 +66,13 @@ constructor(
     referralService.getReferralsByOrganisationId(organisationId)
       .let { ResponseEntity.ok(it.map { referral -> referral.toReferralSummary() }) }
       ?: throw NotFoundException("No ReferralSummary found at /referrals/organisation/$organisationId/dashboard")
+
+  override fun getReferralsForUser(): ResponseEntity<List<ReferralSummary>> =
+    userMapper.getUsername()?.let { username ->
+      referralService.getReferralForUser(username)
+        .let { ResponseEntity.ok(it.map { referral -> referral.toReferralSummary() }) }
+        ?: throw NotFoundException("No ReferralSummary found for username $username at /referrals/me/dashboard")
+    } ?: throw NotFoundException("Could not find username from token")
 }
+
+
