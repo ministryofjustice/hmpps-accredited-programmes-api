@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Person
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
@@ -166,13 +167,15 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     createdReferral.referralId.shouldNotBeNull()
 
-    val referralSummaries = getReferralSummariesByOrganisationId(organisationId)
+    val paginatedReferralSummaries = getReferralSummariesByOrganisationId(organisationId)
 
-    referralSummaries shouldContainAnyOf listOf(
-      ReferralSummary(
-        referralId = createdReferral.referralId,
-        person = Person(prisonNumber = PRISON_NUMBER),
-        referralStatus = ReferralStatus.referralStarted,
+    paginatedReferralSummaries.content?.shouldContainAnyOf(
+      listOf(
+        ReferralSummary(
+          referralId = createdReferral.referralId,
+          person = Person(prisonNumber = PRISON_NUMBER),
+          referralStatus = ReferralStatus.referralStarted,
+        ),
       ),
     )
   }
@@ -180,7 +183,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
     val randomOrganisationId = randomUppercaseString(3)
-    getReferralSummariesByOrganisationId(randomOrganisationId) shouldBe emptyList()
+    val paginatedReferralSummaries = getReferralSummariesByOrganisationId(randomOrganisationId)
+    paginatedReferralSummaries.content shouldBe emptyList()
   }
 
   fun createReferral(offeringId: UUID) = webTestClient
@@ -230,16 +234,13 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNoContent
   }
 
-  private fun getReferralSummariesByOrganisationId(organisationId: String): List<ReferralSummary> {
-    val getReferralsByOrganisationId = webTestClient
-      .get()
-      .uri("/referrals/organisation/$organisationId/dashboard")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<ReferralSummary>>()
-      .returnResult().responseBody!!
-    return getReferralsByOrganisationId
-  }
+  private fun getReferralSummariesByOrganisationId(organisationId: String): PaginatedReferralSummary = webTestClient
+    .get()
+    .uri("/referrals/organisation/$organisationId/dashboard")
+    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<PaginatedReferralSummary>()
+    .returnResult().responseBody!!
 }
