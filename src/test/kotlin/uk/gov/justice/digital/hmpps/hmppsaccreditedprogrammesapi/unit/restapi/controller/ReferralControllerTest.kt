@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -264,8 +266,9 @@ constructor(
   }
 
   @Test
-  fun `shdould return referral summary for a given orgId`() {
+  fun `getReferralsByOrganisationId with valid organisationId returns 200 with paginated body`() {
     val organisationId = "MDI"
+    val pageable = PageRequest.of(0, 10)
     val referrals = listOf(
       ReferralEntityFactory()
         .withOfferingId(UUID.randomUUID())
@@ -275,27 +278,33 @@ constructor(
         .produce(),
     )
 
-    every { referralService.getReferralsByOrganisationId(organisationId) } returns referrals
+    every { referralService.getReferralsByOrganisationId(organisationId, pageable) } returns PageImpl(referrals, pageable, referrals.size.toLong())
 
     mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
+      param("page", "0")
+      param("size", "10")
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
       status { isOk() }
       content {
         contentType(MediaType.APPLICATION_JSON)
-        referrals.forEachIndexed { index, referral ->
-          jsonPath("$[$index].referralId") { value(referral.id.toString()) }
-          jsonPath("$[$index].person.prisonNumber") { value(referral.prisonNumber) }
-          jsonPath("$[$index].status") { REFERRAL_STARTED }
-        }
+        jsonPath("$.content[0].referralId") { value(referrals[0].id.toString()) }
+        jsonPath("$.content[0].person.prisonNumber") { value(referrals[0].prisonNumber) }
+        jsonPath("$.content[0].referralStatus") { REFERRAL_STARTED }
+        jsonPath("$.pageSize") { value(10) }
+        jsonPath("$.totalElements") { value(1) }
+        jsonPath("$.totalPages") { value(1) }
+        jsonPath("$.pageNumber") { value(0) }
+        jsonPath("$.pageIsEmpty") { value(false) }
       }
     }
-    verify { referralService.getReferralsByOrganisationId(organisationId) }
+
+    verify { referralService.getReferralsByOrganisationId(organisationId, pageable) }
   }
 
   @Test
-  fun `getReferralSummaryByOrgId without JWT returns 401`() {
+  fun `getReferralsByOrganisationId without JWT returns 401`() {
     mockMvc.get("/referrals/organisation/${UUID.randomUUID()}/dashboard") {
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
@@ -304,22 +313,29 @@ constructor(
   }
 
   @Test
-  fun `getReferralSummaryByOrgId with random orgId returns 200 with empty body`() {
+  fun `getReferralsByOrganisationId with random organisationId returns 200 with paginated empty body`() {
     val orgId = UUID.randomUUID().toString()
+    val pageable = PageRequest.of(0, 10)
 
-    every { referralService.getReferralsByOrganisationId(orgId) } returns emptyList()
+    every { referralService.getReferralsByOrganisationId(orgId, pageable) } returns PageImpl(emptyList(), pageable, 0)
 
     mockMvc.get("/referrals/organisation/$orgId/dashboard") {
+      param("page", "0")
+      param("size", "10")
       accept = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
       status { isOk() }
       content {
         contentType(MediaType.APPLICATION_JSON)
-        jsonPath("$") { isEmpty() }
+        jsonPath("$.pageSize") { value(10) }
+        jsonPath("$.totalElements") { value(0) }
+        jsonPath("$.totalPages") { value(0) }
+        jsonPath("$.pageNumber") { value(0) }
+        jsonPath("$.pageIsEmpty") { value(true) }
       }
     }
 
-    verify { referralService.getReferralsByOrganisationId(orgId) }
+    verify { referralService.getReferralsByOrganisationId(orgId, pageable) }
   }
 }

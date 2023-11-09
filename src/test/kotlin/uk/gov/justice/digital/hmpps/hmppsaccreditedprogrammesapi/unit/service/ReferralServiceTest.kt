@@ -1,16 +1,19 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.UUID
@@ -20,7 +23,7 @@ private const val prisonNumber = "ABC123"
 class ReferralServiceTest {
 
   @MockK(relaxed = true)
-  private lateinit var referralRepository: JpaReferralRepository
+  private lateinit var referralRepository: ReferralRepository
 
   private lateinit var referralService: ReferralService
 
@@ -31,12 +34,13 @@ class ReferralServiceTest {
   }
 
   @Nested
-  @DisplayName("Get referral summary for an orgId")
-  inner class ReferralSummaryTest {
+  @DisplayName("Get Referral Summaries")
+  inner class ReferralSummaryTests {
     @Test
-    fun `list of referralEntities returned for an orgId`() {
+    fun `getReferralsByOrganisationId with valid organisationId should return pageable ReferralSummary objects`() {
       val orgId = "MDI"
       val id = UUID.randomUUID()
+      val pageable = PageRequest.of(0, 10)
       val referralEntities = listOf(
         ReferralEntityFactory()
           .withId(id)
@@ -46,16 +50,36 @@ class ReferralServiceTest {
           .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
           .produce(),
       )
+      val pageOfReferrals = PageImpl(referralEntities, pageable, referralEntities.size.toLong())
 
-      every { referralRepository.getReferralsByOrganisationId(orgId) } returns referralEntities
+      every { referralRepository.getReferralsByOrganisationId(orgId, pageable) } returns pageOfReferrals
 
-      val referralSummaries = referralService.getReferralsByOrganisationId(orgId)
-      referralSummaries.shouldNotBeNull()
-      referralSummaries.size.shouldBe(referralEntities.size)
-      referralSummaries[0].prisonNumber.shouldBe(prisonNumber)
-      referralSummaries[0].id.shouldBe(id)
-      referralSummaries[0].offeringId.shouldBe(id)
-      referralSummaries[0].referrerId.shouldBe(id.toString())
+      val referralSummariesPage = referralService.getReferralsByOrganisationId(orgId, pageable)
+      referralSummariesPage.content shouldHaveSize referralEntities.size
+      referralSummariesPage.totalElements shouldBe referralEntities.size.toLong()
+
+      with(referralSummariesPage.content[0]) {
+        prisonNumber shouldBe prisonNumber
+        id shouldBe id
+        offeringId shouldBe id
+        referrerId shouldBe id.toString()
+      }
+
+      verify { referralRepository.getReferralsByOrganisationId(orgId, pageable) }
+    }
+
+    @Test
+    fun `getReferralsByOrganisationId with random organisationid should return pageable empty list`() {
+      val orgId = UUID.randomUUID().toString()
+      val pageable = PageRequest.of(0, 10)
+
+      every { referralRepository.getReferralsByOrganisationId(orgId, pageable) } returns PageImpl(emptyList())
+
+      val referralSummariesPage = referralService.getReferralsByOrganisationId(orgId, pageable)
+      referralSummariesPage.content shouldBe emptyList()
+      referralSummariesPage.totalElements shouldBe 0
+
+      verify { referralRepository.getReferralsByOrganisationId(orgId, pageable) }
     }
   }
 }

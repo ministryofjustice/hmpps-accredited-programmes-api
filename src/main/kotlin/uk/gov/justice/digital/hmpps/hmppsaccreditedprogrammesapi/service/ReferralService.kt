@@ -2,12 +2,14 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import jakarta.validation.ValidationException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -17,7 +19,7 @@ import kotlin.jvm.optionals.getOrNull
 class ReferralService
 @Autowired
 constructor(
-  private val referralRepository: JpaReferralRepository,
+  private val referralRepository: ReferralRepository,
 ) {
   fun createReferral(
     prisonNumber: String,
@@ -79,5 +81,6 @@ constructor(
     }
   }
 
-  fun getReferralsByOrganisationId(organisationId: String) = referralRepository.getReferralsByOrganisationId(organisationId)
+  fun getReferralsByOrganisationId(organisationId: String, pageable: Pageable): Page<ReferralEntity> =
+    referralRepository.getReferralsByOrganisationId(organisationId, pageable)
 }

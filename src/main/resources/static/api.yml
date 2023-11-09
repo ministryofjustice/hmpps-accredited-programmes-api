@@ -432,7 +432,7 @@ paths:
 
   /referrals/organisation/{organisationId}/dashboard:
     get:
-      summary: Get referrals by organisationId
+      summary: Get paginated referrals by organisationId
       tags:
         - Referrals
       operationId: getReferralSummariesByOrganisationId
@@ -443,23 +443,33 @@ paths:
           required: true
           schema:
             type: string
-            format: string
+        - name: page
+          in: query
+          description: Page number of the requested page
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
       responses:
         200:
-          description: Summary of referrals for an organisation
+          description: Paginated summary of referrals for an organisation
           content:
             'application/json':
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ReferralSummary'
+                $ref: '#/components/schemas/PaginatedReferralSummary'
         401:
           description: The request was unauthorised
         403:
-          description: Forbidden.  The client is not authorised to access this offering.
+          description: Forbidden. The client is not authorised to access this offering.
         404:
           description: No referrals for supplied organisationId (Not Found).
-
 
   /offerings/{id}/course:
     get:
@@ -1014,6 +1024,7 @@ components:
         - referral_submitted
         - awaiting_assessment
         - assessment_started
+
     ReferralSummary:
       type: object
       properties:
@@ -1025,11 +1036,28 @@ components:
           $ref: "#/components/schemas/ReferralStatus"
         person:
           $ref: "#/components/schemas/Person"
-
       required:
       - referralId
       - referralStatus
       - person
+
+    PaginatedReferralSummary:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferralSummary'
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        pageSize:
+          type: integer
+        pageNumber:
+          type: integer
+        pageIsEmpty:
+          type: boolean
 
     Person:
       type: object

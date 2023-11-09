@@ -1,15 +1,17 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.RequestParam
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
@@ -60,8 +62,24 @@ constructor(
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
 
-  override fun getReferralSummariesByOrganisationId(organisationId: String): ResponseEntity<List<ReferralSummary>> =
-    referralService.getReferralsByOrganisationId(organisationId)
-      .let { ResponseEntity.ok(it.map { referral -> referral.toReferralSummary() }) }
-      ?: throw NotFoundException("No ReferralSummary found at /referrals/organisation/$organisationId/dashboard")
+  override fun getReferralSummariesByOrganisationId(
+    organisationId: String,
+    @RequestParam(value = "page", defaultValue = "0") page: Int,
+    @RequestParam(value = "size", defaultValue = "10") size: Int,
+  ): ResponseEntity<PaginatedReferralSummary> {
+    val pageable = PageRequest.of(page, size)
+    val referralPage = referralService.getReferralsByOrganisationId(organisationId, pageable)
+    val referralSummaries = referralPage.content.map { it.toReferralSummary() }
+
+    val paginatedReferralSummary = PaginatedReferralSummary(
+      content = referralSummaries,
+      totalPages = referralPage.totalPages,
+      totalElements = referralPage.totalElements.toInt(),
+      pageSize = referralPage.size,
+      pageNumber = referralPage.number,
+      pageIsEmpty = referralPage.isEmpty,
+    )
+
+    return ResponseEntity.ok(paginatedReferralSummary)
+  }
 }
