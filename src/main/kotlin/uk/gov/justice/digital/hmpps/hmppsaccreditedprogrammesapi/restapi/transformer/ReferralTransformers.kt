@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   id = id!!,
-  offeringId = offeringId,
+  offeringId = offering.id!!,
   prisonNumber = prisonNumber,
   referrerId = referrerId,
   oasysConfirmed = oasysConfirmed,
