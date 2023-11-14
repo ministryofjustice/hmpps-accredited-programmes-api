@@ -1028,18 +1028,28 @@ components:
     ReferralSummary:
       type: object
       properties:
-        referralId:
+        id:
           description: The unique id (UUID) of the new referral.
           type: string
           format: uuid
-        referralStatus:
+        courseName:
+          type: string
+        audiences:
+          type: array
+          items:
+            type: string
+        status:
           $ref: "#/components/schemas/ReferralStatus"
-        person:
-          $ref: "#/components/schemas/Person"
+        submittedOn:
+          type: string
+        prisonNumber:
+          type: string
       required:
-      - referralId
-      - referralStatus
-      - person
+      - id
+      - courseName
+      - audiences
+      - status
+      - prisonNumber
 
     PaginatedReferralSummary:
       type: object
