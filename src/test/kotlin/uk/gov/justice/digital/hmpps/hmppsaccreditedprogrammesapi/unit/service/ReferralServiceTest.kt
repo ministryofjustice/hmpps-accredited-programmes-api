@@ -13,24 +13,28 @@ import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.UUID
 
-private const val prisonNumber = "ABC123"
+private const val PRISON_NUMBER = "ABC123"
 
 class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var referralRepository: ReferralRepository
 
+  @MockK(relaxed = true)
+  private lateinit var offeringRepository: JpaOfferingRepository
+
   private lateinit var referralService: ReferralService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    referralService = ReferralService(referralRepository)
+    referralService = ReferralService(referralRepository, offeringRepository)
   }
 
   @Nested

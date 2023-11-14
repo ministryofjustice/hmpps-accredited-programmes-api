@@ -48,13 +48,17 @@ constructor(
   @Test
   fun `createReferral with JWT and valid payload returns 201 with correct body`() {
     val referral = ReferralEntityFactory()
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withPrisonNumber(randomPrisonNumber())
       .withReferrerId(randomReferrerId())
       .produce()
 
     val payload = mapOf(
-      "offeringId" to referral.offeringId,
+      "offeringId" to referral.offering.id,
       "prisonNumber" to referral.prisonNumber,
       "referrerId" to referral.referrerId,
     )
@@ -73,14 +77,18 @@ constructor(
       }
     }
 
-    verify { referralService.createReferral(referral.prisonNumber, referral.offeringId, referral.referrerId) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId) }
   }
 
   @Test
   fun `getReferralById with JWT returns 200 with correct body`() {
     val referral = ReferralEntityFactory()
       .withId(UUID.randomUUID())
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withOasysConfirmed(true)
       .withHasReviewedProgrammeHistory(true)
       .produce()
@@ -94,7 +102,7 @@ constructor(
       status { isOk() }
       content {
         contentType(MediaType.APPLICATION_JSON)
-        jsonPath("$.offeringId") { value(referral.offeringId.toString()) }
+        jsonPath("$.offeringId") { value(referral.offering.id.toString()) }
         jsonPath("$.prisonNumber") { value(referral.prisonNumber) }
         jsonPath("$.referrerId") { value(referral.referrerId) }
         jsonPath("$.status") { REFERRAL_STARTED }
@@ -208,7 +216,11 @@ constructor(
   @Test
   fun `submitReferralById with valid ID returns 204 with no body`() {
     val referral = ReferralEntityFactory()
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withPrisonNumber(randomPrisonNumber())
       .withReferrerId(randomReferrerId())
       .withAdditionalInformation("Additional Info")
@@ -247,7 +259,11 @@ constructor(
   @Test
   fun `submitReferralById with incomplete referral returns 400 with error body`() {
     val referral = ReferralEntityFactory()
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withPrisonNumber(randomPrisonNumber())
       .withReferrerId(randomReferrerId())
       .produce()

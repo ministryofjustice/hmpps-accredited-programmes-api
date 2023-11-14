@@ -3,13 +3,17 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import jakarta.validation.ValidationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -20,13 +24,17 @@ class ReferralService
 @Autowired
 constructor(
   private val referralRepository: ReferralRepository,
+  private val offeringRepository: JpaOfferingRepository,
 ) {
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
     referrerId: String,
-  ): UUID? = referralRepository.save(ReferralEntity(offeringId = offeringId, prisonNumber = prisonNumber, referrerId = referrerId)).id
-
+  ): UUID? {
+    val offering = offeringRepository.findById(offeringId).orElseThrow { Exception("Offering not found") }
+    val referral = ReferralEntity(offering = offering, prisonNumber = prisonNumber, referrerId = referrerId)
+    return referralRepository.save(referral).id
+  }
   fun getReferralById(referralId: UUID): ReferralEntity? = referralRepository.findById(referralId).getOrNull()
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
@@ -49,7 +57,7 @@ constructor(
     val referral = referralRepository.getReferenceById(referralId)
 
     val requiredFields = listOf(
-      referral.offeringId to "offeringId",
+      referral.offering.id to "offeringId",
       referral.prisonNumber to "prisonNumber",
       referral.referrerId to "referrerId",
       referral.additionalInformation to "additionalInformation",
@@ -81,6 +89,9 @@ constructor(
     }
   }
 
-  fun getReferralsByOrganisationId(organisationId: String, pageable: Pageable): Page<ReferralEntity> =
-    referralRepository.getReferralsByOrganisationId(organisationId, pageable)
+  fun getReferralsByOrganisationId(organisationId: String, pageable: Pageable): Page<ReferralSummary> {
+    val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable)
+    val apiContent = referralProjectionPage.content.toApi()
+    return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
+  }
 }
