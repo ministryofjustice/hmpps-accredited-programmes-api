@@ -1,6 +1,6 @@
 oauth:
   client:
-    id: whereabouts-api-client
+    id: hmpps-accredited-programmes-client-1
     secret: clientsecret
 
 hmpps:
