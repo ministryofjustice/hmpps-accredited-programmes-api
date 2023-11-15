@@ -11,6 +11,7 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
     HMPPS_AUTH_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+    PRISON-API_BASE-URL: https://prison-api-dev.prison.service.justice.gov.uk
     SENTRY_ENVIRONMENT: dev
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack

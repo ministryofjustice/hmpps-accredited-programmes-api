@@ -23,6 +23,16 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${hmpps.auth.url}/.well-known/jwks.json
+      client:
+        registration:
+          prison-api:
+            provider: hmpps-auth
+            client-id: hmpps-accredited-programmes-client-1
+            client-secret: clientsecret
+            authorization-grant-type: client_credentials
+        provider:
+          hmpps-auth:
+            token-uri: ${hmpps.auth.url}/oauth/token
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -77,4 +87,13 @@ management:
       cache:
         time-to-live: 2000ms
 
+
+services:
+  prison-api:
+    base-url: ${PRISON-API_BASE-URL}
+
 log-client-credentials-jwt-info: false
+
+upstream-timeout-ms: 10000
+case-notes-service-upstream-timeout-ms: 30000
+max-response-in-memory-size-bytes: 750000
