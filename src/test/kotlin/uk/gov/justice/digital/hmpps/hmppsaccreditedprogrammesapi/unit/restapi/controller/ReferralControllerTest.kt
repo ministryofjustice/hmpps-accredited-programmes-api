@@ -2,6 +2,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.restapi.c
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -21,14 +25,21 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomReferrerId
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
+import java.time.LocalDateTime
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,19 +53,27 @@ constructor(
   val jwtAuthHelper: JwtAuthHelper,
 ) {
 
+  companion object {
+    const val PRISON_NUMBER = "A1234AA"
+  }
+
   @MockkBean
   private lateinit var referralService: ReferralService
 
   @Test
   fun `createReferral with JWT and valid payload returns 201 with correct body`() {
     val referral = ReferralEntityFactory()
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withPrisonNumber(randomPrisonNumber())
       .withReferrerId(randomReferrerId())
       .produce()
 
     val payload = mapOf(
-      "offeringId" to referral.offeringId,
+      "offeringId" to referral.offering.id,
       "prisonNumber" to referral.prisonNumber,
       "referrerId" to referral.referrerId,
     )
@@ -73,14 +92,18 @@ constructor(
       }
     }
 
-    verify { referralService.createReferral(referral.prisonNumber, referral.offeringId, referral.referrerId) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId) }
   }
 
   @Test
   fun `getReferralById with JWT returns 200 with correct body`() {
     val referral = ReferralEntityFactory()
       .withId(UUID.randomUUID())
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withOasysConfirmed(true)
       .withHasReviewedProgrammeHistory(true)
       .produce()
@@ -94,7 +117,7 @@ constructor(
       status { isOk() }
       content {
         contentType(MediaType.APPLICATION_JSON)
-        jsonPath("$.offeringId") { value(referral.offeringId.toString()) }
+        jsonPath("$.offeringId") { value(referral.offering.id.toString()) }
         jsonPath("$.prisonNumber") { value(referral.prisonNumber) }
         jsonPath("$.referrerId") { value(referral.referrerId) }
         jsonPath("$.status") { REFERRAL_STARTED }
@@ -208,7 +231,11 @@ constructor(
   @Test
   fun `submitReferralById with valid ID returns 204 with no body`() {
     val referral = ReferralEntityFactory()
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withPrisonNumber(randomPrisonNumber())
       .withReferrerId(randomReferrerId())
       .withAdditionalInformation("Additional Info")
@@ -247,7 +274,11 @@ constructor(
   @Test
   fun `submitReferralById with incomplete referral returns 400 with error body`() {
     val referral = ReferralEntityFactory()
-      .withOfferingId(UUID.randomUUID())
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
       .withPrisonNumber(randomPrisonNumber())
       .withReferrerId(randomReferrerId())
       .produce()
@@ -269,38 +300,165 @@ constructor(
   fun `getReferralsByOrganisationId with valid organisationId returns 200 with paginated body`() {
     val organisationId = "MDI"
     val pageable = PageRequest.of(0, 10)
-    val referrals = listOf(
-      ReferralEntityFactory()
-        .withOfferingId(UUID.randomUUID())
-        .withPrisonNumber(randomPrisonNumber())
-        .withReferrerId(randomReferrerId())
-        .withStatus(REFERRAL_STARTED)
-        .produce(),
-    )
 
-    every { referralService.getReferralsByOrganisationId(organisationId, pageable) } returns PageImpl(referrals, pageable, referrals.size.toLong())
+    val firstReferralId = UUID.randomUUID()
+    val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
+    val projectionsForFirstReferral = audiencesForFirstReferral.map { audience ->
+      ReferralSummaryProjectionFactory()
+        .withReferralId(firstReferralId)
+        .withCourseName("Course name")
+        .withAudience(audience)
+        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
+        .withPrisonNumber(PRISON_NUMBER)
+        .produce()
+    }
 
-    mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
+    val secondReferralId = UUID.randomUUID()
+    val audiencesForSecondReferral = listOf("Audience 4", "Audience 5", "Audience 6")
+    val projectionsForSecondReferral = audiencesForSecondReferral.map { audience ->
+      ReferralSummaryProjectionFactory()
+        .withReferralId(secondReferralId)
+        .withCourseName("Another course name")
+        .withAudience(audience)
+        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
+        .withSubmittedOn(LocalDateTime.MIN)
+        .withPrisonNumber(PRISON_NUMBER)
+        .produce()
+    }
+
+    every { referralService.getReferralsByOrganisationId(organisationId, pageable) } returns
+      PageImpl(projectionsForFirstReferral.toApi() + projectionsForSecondReferral.toApi(), pageable, 2L)
+
+    val mvcResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
       param("size", "10")
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
       status { isOk() }
-      content {
-        contentType(MediaType.APPLICATION_JSON)
-        jsonPath("$.content[0].referralId") { value(referrals[0].id.toString()) }
-        jsonPath("$.content[0].person.prisonNumber") { value(referrals[0].prisonNumber) }
-        jsonPath("$.content[0].referralStatus") { REFERRAL_STARTED }
-        jsonPath("$.pageSize") { value(10) }
-        jsonPath("$.totalElements") { value(1) }
-        jsonPath("$.totalPages") { value(1) }
-        jsonPath("$.pageNumber") { value(0) }
-        jsonPath("$.pageIsEmpty") { value(false) }
-      }
+      content { contentType(MediaType.APPLICATION_JSON) }
+    }.andReturn()
+
+    val jsonResponse = mvcResult.response.contentAsString
+    val paginatedReferralSummary = jacksonObjectMapper()
+      .readValue(jsonResponse, PaginatedReferralSummary::class.java)
+
+    paginatedReferralSummary.pageSize shouldBe 10
+    paginatedReferralSummary.totalPages shouldBe 1
+    paginatedReferralSummary.content?.shouldHaveSize(2)
+    paginatedReferralSummary.totalElements shouldBe 2L
+
+    val firstReferral = paginatedReferralSummary.content?.find { it.id == firstReferralId }
+    firstReferral shouldNotBe null
+    firstReferral?.let { referral ->
+      referral.courseName shouldBe "Course name"
+      referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
+      referral.status shouldBe ReferralStatus.referralStarted
+      referral.prisonNumber shouldBe PRISON_NUMBER
+    }
+
+    val secondReferral = paginatedReferralSummary.content?.find { it.id == secondReferralId }
+    secondReferral shouldNotBe null
+    secondReferral?.let { referral ->
+      referral.courseName shouldBe "Another course name"
+      referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
+      referral.status shouldBe ReferralStatus.referralSubmitted
+      referral.submittedOn shouldBe LocalDateTime.MIN.toString()
+      referral.prisonNumber shouldBe PRISON_NUMBER
     }
 
     verify { referralService.getReferralsByOrganisationId(organisationId, pageable) }
+  }
+
+  @Test
+  fun `getReferralsByOrganisationId with valid organisationId and custom pagination count will return 200 with paginated body for each page`() {
+    val organisationId = "MDI"
+    val pageSize = 1
+
+    val firstReferralId = UUID.randomUUID()
+    val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
+    val projectionsForFirstReferral = audiencesForFirstReferral.map { audience ->
+      ReferralSummaryProjectionFactory()
+        .withReferralId(firstReferralId)
+        .withCourseName("Course name")
+        .withAudience(audience)
+        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
+        .withPrisonNumber(PRISON_NUMBER)
+        .produce()
+    }
+
+    val secondReferralId = UUID.randomUUID()
+    val audiencesForSecondReferral = listOf("Audience 4", "Audience 5", "Audience 6")
+    val projectionsForSecondReferral = audiencesForSecondReferral.map { audience ->
+      ReferralSummaryProjectionFactory()
+        .withReferralId(secondReferralId)
+        .withCourseName("Another course name")
+        .withAudience(audience)
+        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
+        .withSubmittedOn(LocalDateTime.MIN)
+        .withPrisonNumber(PRISON_NUMBER)
+        .produce()
+    }
+
+    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize)) } returns
+      PageImpl(projectionsForFirstReferral.toApi(), PageRequest.of(0, pageSize), 2)
+
+    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize)) } returns
+      PageImpl(projectionsForSecondReferral.toApi(), PageRequest.of(1, pageSize), 2)
+
+    val firstPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
+      param("page", "0")
+      param("size", pageSize.toString())
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      accept = MediaType.APPLICATION_JSON
+    }.andExpect {
+      status { isOk() }
+      content { contentType(MediaType.APPLICATION_JSON) }
+    }.andReturn()
+
+    val firstPageResponse = jacksonObjectMapper()
+      .readValue(firstPageResult.response.contentAsString, PaginatedReferralSummary::class.java)
+
+    firstPageResponse.pageSize shouldBe 1
+    firstPageResponse.totalPages shouldBe 2
+    firstPageResponse.content?.shouldHaveSize(1)
+    firstPageResponse.totalElements shouldBe 2
+
+    firstPageResponse.content?.find { it.id == firstReferralId }?.let { referral ->
+      referral.courseName shouldBe "Course name"
+      referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
+      referral.status shouldBe ReferralStatus.referralStarted
+      referral.prisonNumber shouldBe PRISON_NUMBER
+    }
+
+    val secondPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
+      param("page", "1")
+      param("size", pageSize.toString())
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      accept = MediaType.APPLICATION_JSON
+    }.andExpect {
+      status { isOk() }
+      content { contentType(MediaType.APPLICATION_JSON) }
+    }.andReturn()
+
+    val secondPageResponse = jacksonObjectMapper()
+      .readValue(secondPageResult.response.contentAsString, PaginatedReferralSummary::class.java)
+
+    secondPageResponse.pageSize shouldBe 1
+    secondPageResponse.totalPages shouldBe 2
+    secondPageResponse.content?.shouldHaveSize(1)
+    secondPageResponse.totalElements shouldBe 2
+
+    secondPageResponse.content?.find { it.id == secondReferralId }?.let { referral ->
+      referral.courseName shouldBe "Another course name"
+      referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
+      referral.status shouldBe ReferralStatus.referralSubmitted
+      referral.submittedOn shouldBe LocalDateTime.MIN.toString()
+      referral.prisonNumber shouldBe PRISON_NUMBER
+    }
+
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize)) }
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize)) }
   }
 
   @Test

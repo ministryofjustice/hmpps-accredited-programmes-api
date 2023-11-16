@@ -32,6 +32,17 @@ abstract class IntegrationTestBase {
       .expectBody<List<Course>>()
       .returnResult().responseBody!!
 
+  fun getCourseById(courseId: UUID): Course =
+    webTestClient
+      .get()
+      .uri("/courses/$courseId")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Course>()
+      .returnResult().responseBody!!
+
   fun getCourseIds(): List<UUID> = getAllCourses().map { it.id }
 
   fun getFirstCourseId(): UUID = getCourseIds().first()

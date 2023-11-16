@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
-import io.kotest.matchers.collections.shouldContainAnyOf
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -11,7 +12,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Person
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
@@ -162,29 +162,41 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun `Retrieving a list of referrals for an organisation should return 200 with correct body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
-    val createdReferral = createReferral(offeringId)
+    val referralCreated = createReferral(offeringId)
+    val createdReferral = getReferralById(referralCreated.referralId)
     val organisationId = "MDI"
 
-    createdReferral.referralId.shouldNotBeNull()
+    referralCreated.referralId.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
 
-    val paginatedReferralSummaries = getReferralSummariesByOrganisationId(organisationId)
+    val summary = getReferralSummariesByOrganisationId(organisationId)
 
-    paginatedReferralSummaries.content?.shouldContainAnyOf(
+    summary.content?.forEach { actualSummary ->
       listOf(
         ReferralSummary(
-          referralId = createdReferral.referralId,
-          person = Person(prisonNumber = PRISON_NUMBER),
-          referralStatus = ReferralStatus.referralStarted,
+          id = createdReferral.id,
+          courseName = getCourseById(courseId).name,
+          audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+          status = createdReferral.status,
+          submittedOn = createdReferral.submittedOn,
+          prisonNumber = createdReferral.prisonNumber,
         ),
-      ),
-    )
+      ).forEach { expectedSummary ->
+        actualSummary.id shouldBe expectedSummary.id
+        actualSummary.courseName shouldBe expectedSummary.courseName
+        actualSummary.audiences shouldContainExactlyInAnyOrder expectedSummary.audiences
+        actualSummary.status shouldBe expectedSummary.status
+        actualSummary.submittedOn shouldBe expectedSummary.submittedOn
+        actualSummary.prisonNumber shouldBe expectedSummary.prisonNumber
+      }
+    }
   }
 
   @Test
   fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
     val randomOrganisationId = randomUppercaseString(3)
     val paginatedReferralSummaries = getReferralSummariesByOrganisationId(randomOrganisationId)
-    paginatedReferralSummaries.content shouldBe emptyList()
+    paginatedReferralSummaries.content?.shouldBeEmpty()
   }
 
   fun createReferral(offeringId: UUID) = webTestClient
@@ -224,7 +236,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     .exchange()
     .expectStatus().isNoContent
 
-  private fun submitReferral(createdReferralId: UUID) {
+  fun submitReferral(createdReferralId: UUID) {
     webTestClient
       .post()
       .uri("/referrals/$createdReferralId/submit")
@@ -234,13 +246,14 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNoContent
   }
 
-  private fun getReferralSummariesByOrganisationId(organisationId: String): PaginatedReferralSummary = webTestClient
-    .get()
-    .uri("/referrals/organisation/$organisationId/dashboard")
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<PaginatedReferralSummary>()
-    .returnResult().responseBody!!
+  fun getReferralSummariesByOrganisationId(organisationId: String): PaginatedReferralSummary =
+    webTestClient
+      .get()
+      .uri("/referrals/organisation/$organisationId/dashboard")
+      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<PaginatedReferralSummary>()
+      .returnResult().responseBody!!
 }
