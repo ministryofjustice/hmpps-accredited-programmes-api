@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
@@ -8,12 +10,18 @@ import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
+import java.util.*
 
 @Configuration
 @EnableWebSecurity
@@ -92,6 +100,56 @@ class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
     const val CLAIM_CLIENT_ID = "client_id"
     const val CLAIM_AUTHORITY = "authorities"
   }
+}
+
+@Configuration
+class AuthorizedClientServiceConfiguration(
+  @Value("\${log-client-credentials-jwt-info}") private val logClientCredentialsJwtInfo: Boolean,
+  private val clientRegistrationRepository: ClientRegistrationRepository,
+  private val objectMapper: ObjectMapper,
+) {
+  @Bean
+  fun inMemoryOAuth2AuthorizedClientService(): OAuth2AuthorizedClientService {
+    if (logClientCredentialsJwtInfo) return LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository, objectMapper)
+
+    return InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
+  }
+}
+
+class LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository: ClientRegistrationRepository, private val objectMapper: ObjectMapper) : OAuth2AuthorizedClientService {
+  private val backingImplementation = InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
+  private val log = LoggerFactory.getLogger(this::class.java)
+
+  override fun <T : OAuth2AuthorizedClient?> loadAuthorizedClient(
+    clientRegistrationId: String?,
+    principalName: String?,
+  ): T = backingImplementation.loadAuthorizedClient<T>(clientRegistrationId, principalName)
+
+  override fun saveAuthorizedClient(authorizedClient: OAuth2AuthorizedClient?, principal: Authentication?) {
+    val tokenValue = authorizedClient?.accessToken?.tokenValue
+
+    if (tokenValue != null) {
+      try {
+        val tokenBodyBase64 = tokenValue.split(".")[1]
+        val tokenBodyRaw = Base64.getDecoder().decode(tokenBodyBase64)
+        val info = objectMapper.readValue(tokenBodyRaw, JwtLogInfo::class.java)
+        log.info("Retrieved a client_credentials JWT for service->service calls for client ${authorizedClient.clientRegistration.clientId} with authorities: ${info.authorities}, scopes: ${info.scope}, expiry: ${info.exp}")
+      } catch (exception: Exception) {
+        // Deliberately not logging exception message
+        log.error("Unable to get token info to log, exception of type: ${exception::class.java.name}")
+      }
+    }
+
+    backingImplementation.saveAuthorizedClient(authorizedClient, principal)
+  }
+
+  data class JwtLogInfo(
+    val authorities: List<String>,
+    val scope: List<String>,
+    val exp: Long,
+  )
+
+  override fun removeAuthorizedClient(clientRegistrationId: String?, principalName: String?) = backingImplementation.removeAuthorizedClient(clientRegistrationId, principalName)
 }
 
 class AuthAwareAuthenticationToken(

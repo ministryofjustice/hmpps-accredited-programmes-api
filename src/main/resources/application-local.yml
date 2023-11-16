@@ -1,6 +1,6 @@
 oauth:
   client:
-    id: whereabouts-api-client
+    id: hmpps-accredited-programmes-client-1
     secret: clientsecret
 
 hmpps:
@@ -12,3 +12,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: admin
     password: admin_password
+
+services:
+  prison-api:
+    base-url: http://localhost:9094
