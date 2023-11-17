@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.restapi.transformer
 
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -9,14 +8,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.awaitingAssessment
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralStarted
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralSubmitted
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.ASSESSMENT_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
 import java.util.*
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate as ApiReferralUpdate
@@ -24,6 +22,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate as DomainReferralUpdate
 
 class ReferralTransformersTest {
+
+  companion object {
+    const val PRISON_NUMBER = "A1234AA"
+  }
 
   @ParameterizedTest
   @EnumSource
@@ -110,19 +112,25 @@ class ReferralTransformersTest {
   }
 
   @Test
-  fun `toReferralSummary should convert ReferralEntity to ReferralSummary`() {
-    val referralEntity = ReferralEntity(
-      id = UUID.randomUUID(),
-      offeringId = UUID.randomUUID(),
-      status = REFERRAL_STARTED,
-      prisonNumber = "ABC123",
-      referrerId = "Z123",
-    )
+  fun `Transforming a ReferralSummary with all fields should convert to its API equivalent`() {
+    val referralId = UUID.randomUUID()
+    val collatedAudiences = listOf("Audience 1", "Audience 2", "Audience 3")
+    val referralSummaryProjections = collatedAudiences.map { audience ->
+      ReferralSummaryProjectionFactory()
+        .withReferralId(referralId)
+        .withCourseName("Course name")
+        .withAudience(audience)
+        .withStatus(REFERRAL_STARTED)
+        .withPrisonNumber(PRISON_NUMBER)
+        .produce()
+    }
 
-    val referralSummary = referralEntity.toReferralSummary()
-
-    assertEquals(referralEntity.id, referralSummary.referralId)
-    assertEquals(referralEntity.prisonNumber, referralSummary.person.prisonNumber)
-    assertEquals("referralStarted", referralSummary.referralStatus.name)
+    with(referralSummaryProjections.toApi().first()) {
+      id shouldBe referralId
+      courseName shouldBe "Course name"
+      audiences shouldBe collatedAudiences
+      status shouldBe referralStarted
+      prisonNumber shouldBe PRISON_NUMBER
+    }
   }
 }
