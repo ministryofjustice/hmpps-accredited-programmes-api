@@ -53,5 +53,6 @@ VALUES ('28e47d30-30bf-4dab-a8eb-9fda3f6400e8', '7fffcc6a-11f8-4713-be35-cf5ff1a
        ('1811faa6-d568-4fc4-83ce-41118b90242e', '7fffcc6a-11f8-4713-be35-cf5ff1aee519'),
        ('2280539a-9b98-44e0-bf7b-f0fc8baf1524', '7fffcc6a-11f8-4713-be35-cf5ff1aee510');
 
-INSERT INTO referral (referral_id, offering_id, prison_number, referrer_id)
-VALUES ('c11fab18-dc8d-420c-9c82-d0edd373732d', '20f3abc8-dd92-43ae-b88e-5797a0ad3f4b', 'ABC1234', '5105a589-75b3-4ca0-9433-b96228c1c8f3');
+INSERT INTO referral (referral_id, offering_id, prison_number, referrer_id, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on)
+VALUES ('c11fab18-dc8d-420c-9c82-d0edd373732d', '20f3abc8-dd92-43ae-b88e-5797a0ad3f4b', 'ABC1234', '5105a589-75b3-4ca0-9433-b96228c1c8f3', '', false, false, 'REFERRAL_STARTED', null);
+VALUES ('9d38204c-bfe9-42e6-b751-f46cec067e57', '20f3abc8-dd92-43ae-b88e-5797a0ad3f4b', 'ABC1234', '5105a589-75b3-4ca0-9433-b96228c1c8f3', 'Loren ipsun dolor sit anet, consectetur adipisci elit, sed eiusnod tenpor incidunt ut labore et dolore nagna aliqua. Ut enin ad ninin venian, quis nostrun exercitationen ullan corporis suscipit laboriosan, nisi ut aliquid ex ea connodi consequatur. Quis aute iure reprehenderit in voluptate velit esse cillun dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt nollit anin id est laborun.', true, true, 'REFERRAL_SUBMITTED', '2023-10-05T12:48:20');
