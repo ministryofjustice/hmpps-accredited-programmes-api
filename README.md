@@ -41,6 +41,7 @@ This runs the project as a Spring Boot application on `localhost:8080`
 
 You can confirm that the application is running by querying an endpoint using one of the 
 scripts in script/local-scripts. For example:
+
 ```bash
 ./scripts/local-scripts/all-courses
 ```
