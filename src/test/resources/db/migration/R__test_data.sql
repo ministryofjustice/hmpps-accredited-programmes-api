@@ -1,10 +1,3 @@
-DELETE from course_audience;
-DELETE from offering;
-DELETE from prerequisite;
-DELETE from audience;
-DELETE from course;
-DELETE from referral;
-
 INSERT INTO course(course_id, identifier, name, description, alternate_name, referable)
 VALUES ('d3abc217-75ee-46e9-a010-368f30282367', 'LC', 'Lime Course', 'Sample description', 'LC', true),
        ('1811faa6-d568-4fc4-83ce-41118b902421', 'SC', 'Super Course', 'Sample description', 'AC++', true),
