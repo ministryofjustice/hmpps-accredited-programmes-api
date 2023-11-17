@@ -31,14 +31,10 @@ constructor(
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
 
-    val offering = OfferingEntityFactory()
-      .withId(persistentOfferingId)
-      .produce()
-
     val referral = ReferralEntityFactory()
       .withReferrerId(referrerId)
       .withPrisonNumber(prisonNumber)
-      .withOffering(offering)
+      .withOfferingId(persistentOfferingId)
       .produce()
 
     val referralId = referralRepository.save(referral).id!!
@@ -48,7 +44,7 @@ constructor(
     referralRepository.findById(referralId) shouldBePresent {
       referrerId shouldBe referrerId
       prisonNumber shouldBe prisonNumber
-      offering shouldBe offering
+      offeringId shouldBe persistentOfferingId
       oasysConfirmed shouldBe false
       hasReviewedProgrammeHistory shouldBe false
     }
@@ -60,15 +56,7 @@ constructor(
     val prisonNumber = randomPrisonNumber()
     val referrerId = randomUppercaseAlphanumericString(10)
 
-    val offering = OfferingEntityFactory()
-      .withId(persistentOfferingId)
-      .produce()
-
-    val referral = ReferralEntityFactory()
-      .withReferrerId(referrerId)
-      .withPrisonNumber(prisonNumber)
-      .withOffering(offering)
-      .produce()
+    val referral = ReferralEntityFactory().withReferrerId(referrerId).withPrisonNumber(prisonNumber).withOfferingId(persistentOfferingId).produce()
 
     val referralId = referralRepository.save(referral).id!!
 
@@ -85,7 +73,7 @@ constructor(
     referralRepository.findById(referralId) shouldBePresent {
       referrerId shouldBe referrerId
       prisonNumber shouldBe prisonNumber
-      offering shouldBe offering
+      offeringId shouldBe persistentOfferingId
       oasysConfirmed shouldBe true
       hasReviewedProgrammeHistory shouldBe true
     }

@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import java.util.UUID
 
@@ -67,15 +68,16 @@ constructor(
     @RequestParam(value = "size", defaultValue = "10") size: Int,
   ): ResponseEntity<PaginatedReferralSummary> {
     val pageable = PageRequest.of(page, size)
-    val apiReferralSummaryPage = referralService.getReferralsByOrganisationId(organisationId, pageable)
+    val referralPage = referralService.getReferralsByOrganisationId(organisationId, pageable)
+    val referralSummaries = referralPage.content.map { it.toReferralSummary() }
 
     val paginatedReferralSummary = PaginatedReferralSummary(
-      content = apiReferralSummaryPage.content,
-      totalPages = apiReferralSummaryPage.totalPages,
-      totalElements = apiReferralSummaryPage.totalElements.toInt(),
-      pageSize = apiReferralSummaryPage.size,
-      pageNumber = apiReferralSummaryPage.number,
-      pageIsEmpty = apiReferralSummaryPage.isEmpty,
+      content = referralSummaries,
+      totalPages = referralPage.totalPages,
+      totalElements = referralPage.totalElements.toInt(),
+      pageSize = referralPage.size,
+      pageNumber = referralPage.number,
+      pageIsEmpty = referralPage.isEmpty,
     )
 
     return ResponseEntity.ok(paginatedReferralSummary)

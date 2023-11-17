@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.read.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Person as ApiPerson
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary as ApiReferralSummary
@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   id = id!!,
-  offeringId = offering.id!!,
+  offeringId = offeringId,
   prisonNumber = prisonNumber,
   referrerId = referrerId,
   oasysConfirmed = oasysConfirmed,
@@ -47,18 +47,10 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
 )
 
-fun List<ReferralSummaryProjection>.toApi(): List<ApiReferralSummary> {
-  return this.groupBy { it.referralId }
-    .map { (id, projections) ->
-      val firstProjection = projections.first()
-
-      ApiReferralSummary(
-        id = id,
-        courseName = firstProjection.courseName,
-        audiences = projections.map { it.audience }.distinct(),
-        status = firstProjection.status.toApi(),
-        submittedOn = firstProjection.submittedOn?.toString(),
-        prisonNumber = firstProjection.prisonNumber,
-      )
-    }
-}
+fun ReferralEntity.toReferralSummary() = ApiReferralSummary(
+  referralId = id!!,
+  referralStatus = status.toApi(),
+  person = ApiPerson(
+    prisonNumber = prisonNumber,
+  ),
+)

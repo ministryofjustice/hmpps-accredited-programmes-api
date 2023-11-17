@@ -1,2 +1,2 @@
 ALTER TABLE referral
-    ADD COLUMN IF NOT EXISTS submitted_on TIMESTAMP;
+    ADD COLUMN submitted_on TIMESTAMP;
