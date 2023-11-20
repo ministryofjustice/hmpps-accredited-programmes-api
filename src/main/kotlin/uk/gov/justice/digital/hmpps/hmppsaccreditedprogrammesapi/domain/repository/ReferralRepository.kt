@@ -13,26 +13,37 @@ import java.util.*
 interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
   @Query(
     value = """
-      SELECT NEW uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.read.ReferralSummaryProjection(
-        r.id AS referralId,
-        c.name AS courseName, 
-        a.value as audience,
-        r.status AS status,
-        r.submittedOn AS submittedOn,
-        r.prisonNumber AS prisonNumber
-      ) FROM ReferralEntity r
-      JOIN r.offering o
-      JOIN o.course c
-      JOIN c.audiences a
-      WHERE o.organisationId = :organisationId
-    """,
+    SELECT NEW uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.read.ReferralSummaryProjection(
+      r.id AS referralId,
+      c.name AS courseName, 
+      a.value as audience,
+      r.status AS status,
+      r.submittedOn AS submittedOn,
+      r.prisonNumber AS prisonNumber
+    ) FROM ReferralEntity r
+    JOIN r.offering o
+    JOIN o.course c
+    JOIN c.audiences a
+    WHERE o.organisationId = :organisationId
+      AND (:status IS NULL OR r.status = :status)
+      AND (:audience IS NULL OR a.value = :audience)
+  """,
     countQuery = """
-      SELECT COUNT(DISTINCT r.id)
-      FROM ReferralEntity r
-      INNER JOIN r.offering o
-      WHERE o.organisationId = :organisationId
-    """,
+    SELECT COUNT(DISTINCT r.id)
+    FROM ReferralEntity r
+    INNER JOIN r.offering o
+    INNER JOIN o.course c
+    INNER JOIN c.audiences a
+    WHERE o.organisationId = :organisationId
+      AND (:status IS NULL OR r.status = :status)
+      AND (:audience IS NULL OR a.value = :audience)
+  """,
     nativeQuery = false,
   )
-  fun getReferralsByOrganisationId(organisationId: String, pageable: Pageable): Page<ReferralSummaryProjection>
+  fun getReferralsByOrganisationId(
+    organisationId: String,
+    pageable: Pageable,
+    status: ReferralEntity.ReferralStatus?,
+    audience: String?,
+  ): Page<ReferralSummaryProjection>
 }
