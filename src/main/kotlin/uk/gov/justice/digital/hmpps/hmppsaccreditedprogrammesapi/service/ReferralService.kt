@@ -89,8 +89,15 @@ constructor(
     }
   }
 
-  fun getReferralsByOrganisationId(organisationId: String, pageable: Pageable): Page<ReferralSummary> {
-    val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable)
+  fun getReferralsByOrganisationId(
+    organisationId: String,
+    pageable: Pageable,
+    status: String?,
+    audience: String?,
+    courseName: String?,
+  ): Page<ReferralSummary> {
+    val statusEnum = status?.let { ReferralEntity.ReferralStatus.valueOf(it) }
+    val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnum, audience, courseName)
     val apiContent = referralProjectionPage.content.toApi()
     return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
   }

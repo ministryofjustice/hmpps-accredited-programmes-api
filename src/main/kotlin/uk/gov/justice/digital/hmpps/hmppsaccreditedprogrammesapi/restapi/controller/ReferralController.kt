@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.contro
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -65,19 +66,22 @@ constructor(
     organisationId: String,
     @RequestParam(value = "page", defaultValue = "0") page: Int,
     @RequestParam(value = "size", defaultValue = "10") size: Int,
+    @RequestParam(value = "status", required = false) status: String?,
+    @RequestParam(value = "audience", required = false) audience: String?,
+    @RequestParam(value = "courseName", required = false) courseName: String?,
   ): ResponseEntity<PaginatedReferralSummary> {
-    val pageable = PageRequest.of(page, size)
-    val apiReferralSummaryPage = referralService.getReferralsByOrganisationId(organisationId, pageable)
+    val pageable = PageRequest.of(page, size, Sort.by("referralId"))
+    val apiReferralSummaryPage = referralService.getReferralsByOrganisationId(organisationId, pageable, status, audience, courseName)
 
-    val paginatedReferralSummary = PaginatedReferralSummary(
-      content = apiReferralSummaryPage.content,
-      totalPages = apiReferralSummaryPage.totalPages,
-      totalElements = apiReferralSummaryPage.totalElements.toInt(),
-      pageSize = apiReferralSummaryPage.size,
-      pageNumber = apiReferralSummaryPage.number,
-      pageIsEmpty = apiReferralSummaryPage.isEmpty,
+    return ResponseEntity.ok(
+      PaginatedReferralSummary(
+        content = apiReferralSummaryPage.content,
+        totalPages = apiReferralSummaryPage.totalPages,
+        totalElements = apiReferralSummaryPage.totalElements.toInt(),
+        pageSize = apiReferralSummaryPage.size,
+        pageNumber = apiReferralSummaryPage.number,
+        pageIsEmpty = apiReferralSummaryPage.isEmpty,
+      ),
     )
-
-    return ResponseEntity.ok(paginatedReferralSummary)
   }
 }

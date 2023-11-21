@@ -12,12 +12,16 @@ import io.mockk.just
 import io.mockk.verify
 import jakarta.validation.ValidationException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -27,6 +31,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomReferrerId
@@ -41,6 +46,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
 import java.time.LocalDateTime
 import java.util.UUID
+import java.util.stream.Stream
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -55,6 +61,46 @@ constructor(
 
   companion object {
     const val PRISON_NUMBER = "A1234AA"
+
+    private val referralSummary1 = ReferralSummary(
+      id = UUID.randomUUID(),
+      courseName = "Course for referralSummary1",
+      audiences = listOf("Audience 1", "Audience 2"),
+      status = ReferralStatus.referralStarted,
+      prisonNumber = PRISON_NUMBER,
+    )
+
+    private val referralSummary2 = ReferralSummary(
+      id = UUID.randomUUID(),
+      courseName = "Course for referralSummary2",
+      audiences = listOf("Audience 2", "Audience 3"),
+      status = ReferralStatus.referralSubmitted,
+      submittedOn = LocalDateTime.MIN.toString(),
+      prisonNumber = PRISON_NUMBER,
+    )
+
+    private val referralSummary3 = ReferralSummary(
+      id = UUID.randomUUID(),
+      courseName = "Course for referralSummary3",
+      audiences = listOf("Audience 3", "Audience 4"),
+      status = ReferralStatus.referralSubmitted,
+      submittedOn = LocalDateTime.MIN.toString(),
+      prisonNumber = PRISON_NUMBER,
+    )
+
+    @JvmStatic
+    fun parametersForGetReferralsByOrganisationIdWithFiltering(): Stream<Arguments> {
+      return Stream.of(
+        Arguments.of("REFERRAL_STARTED", null, "referralSummary1", listOf(referralSummary1)),
+        Arguments.of(null, "Audience 2", null, listOf(referralSummary1, referralSummary2)),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", null, listOf(referralSummary2, referralSummary3)),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", "referralSummary3", listOf(referralSummary3)),
+        Arguments.of(null, null, "Course", listOf(referralSummary1, referralSummary2, referralSummary3)),
+        Arguments.of("AWAITING_ASSESSMENT", null, null, emptyList<ReferralSummary>()),
+        Arguments.of(null, "Audience X", null, emptyList<ReferralSummary>()),
+        Arguments.of(null, null, "Course for referralSummaryX", emptyList<ReferralSummary>()),
+      )
+    }
   }
 
   @MockkBean
@@ -299,7 +345,7 @@ constructor(
   @Test
   fun `getReferralsByOrganisationId with valid organisationId returns 200 with paginated body`() {
     val organisationId = "MDI"
-    val pageable = PageRequest.of(0, 10)
+    val pageable = PageRequest.of(0, 10, Sort.by("referralId"))
 
     val firstReferralId = UUID.randomUUID()
     val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
@@ -326,7 +372,7 @@ constructor(
         .produce()
     }
 
-    every { referralService.getReferralsByOrganisationId(organisationId, pageable) } returns
+    every { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null, null) } returns
       PageImpl(projectionsForFirstReferral.toApi() + projectionsForSecondReferral.toApi(), pageable, 2L)
 
     val mvcResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
@@ -367,13 +413,15 @@ constructor(
       referral.prisonNumber shouldBe PRISON_NUMBER
     }
 
-    verify { referralService.getReferralsByOrganisationId(organisationId, pageable) }
+    verify { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null, null) }
   }
 
   @Test
   fun `getReferralsByOrganisationId with valid organisationId and custom pagination count will return 200 with paginated body for each page`() {
     val organisationId = "MDI"
     val pageSize = 1
+    val pageableFirstPage = PageRequest.of(0, pageSize, Sort.by("referralId"))
+    val pageableSecondPage = PageRequest.of(1, pageSize, Sort.by("referralId"))
 
     val firstReferralId = UUID.randomUUID()
     val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
@@ -400,11 +448,11 @@ constructor(
         .produce()
     }
 
-    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize)) } returns
-      PageImpl(projectionsForFirstReferral.toApi(), PageRequest.of(0, pageSize), 2)
+    every { referralService.getReferralsByOrganisationId(organisationId, pageableFirstPage, null, null, null) } returns
+      PageImpl(projectionsForFirstReferral.toApi(), pageableFirstPage, 2)
 
-    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize)) } returns
-      PageImpl(projectionsForSecondReferral.toApi(), PageRequest.of(1, pageSize), 2)
+    every { referralService.getReferralsByOrganisationId(organisationId, pageableSecondPage, null, null, null) } returns
+      PageImpl(projectionsForSecondReferral.toApi(), pageableSecondPage, 2)
 
     val firstPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
@@ -457,8 +505,45 @@ constructor(
       referral.prisonNumber shouldBe PRISON_NUMBER
     }
 
-    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize)) }
-    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize)) }
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, pageableFirstPage, null, null, null) }
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, pageableSecondPage, null, null, null) }
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGetReferralsByOrganisationIdWithFiltering")
+  fun `getReferralsByOrganisationId with valid organisationId and filtering will return 200 with paginated body`(
+    statusFilter: String?,
+    audienceFilter: String?,
+    courseNameFilter: String?,
+    expectedReferralSummaries: List<ReferralSummary>,
+  ) {
+    val organisationId = "MDI"
+    val pageable = PageRequest.of(0, 10, Sort.by("referralId"))
+
+    every { referralService.getReferralsByOrganisationId(organisationId, pageable, statusFilter, audienceFilter, courseNameFilter) } returns
+      PageImpl(expectedReferralSummaries, pageable, 1)
+
+    val result = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
+      param("page", "0")
+      param("size", "10")
+      statusFilter?.let { param("status", it) }
+      audienceFilter?.let { param("audience", it) }
+      courseNameFilter?.let { param("courseName", it) }
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      accept = MediaType.APPLICATION_JSON
+    }.andExpect {
+      status { isOk() }
+      content { contentType(MediaType.APPLICATION_JSON) }
+    }.andReturn()
+
+    val response = jacksonObjectMapper()
+      .readValue(result.response.contentAsString, PaginatedReferralSummary::class.java)
+
+    response.content?.shouldContainExactlyInAnyOrder(expectedReferralSummaries)
+
+    verify(exactly = 1) {
+      referralService.getReferralsByOrganisationId(organisationId, pageable, statusFilter, audienceFilter, courseNameFilter)
+    }
   }
 
   @Test
@@ -473,9 +558,10 @@ constructor(
   @Test
   fun `getReferralsByOrganisationId with random organisationId returns 200 with paginated empty body`() {
     val orgId = UUID.randomUUID().toString()
-    val pageable = PageRequest.of(0, 10)
+    val pageable = PageRequest.of(0, 10, Sort.by("referralId"))
 
-    every { referralService.getReferralsByOrganisationId(orgId, pageable) } returns PageImpl(emptyList(), pageable, 0)
+    every { referralService.getReferralsByOrganisationId(orgId, pageable, null, null, null) } returns
+      PageImpl(emptyList(), pageable, 0)
 
     mockMvc.get("/referrals/organisation/$orgId/dashboard") {
       param("page", "0")
@@ -494,6 +580,6 @@ constructor(
       }
     }
 
-    verify { referralService.getReferralsByOrganisationId(orgId, pageable) }
+    verify { referralService.getReferralsByOrganisationId(orgId, pageable, null, null, null) }
   }
 }

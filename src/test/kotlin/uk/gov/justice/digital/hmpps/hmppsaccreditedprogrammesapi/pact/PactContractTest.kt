@@ -77,6 +77,9 @@ class PactContractTest {
   @State("Referral can be submitted")
   fun `ensure referral can be submitted`() {}
 
+  @State("Referral summaries exist for an organisation with the ID a026cc07-8e0b-40dd-9b66-1b3dacecc63d")
+  fun `ensure referral summaries exist for an organisation with the ID a026cc07-8e0b-40dd-9b66-1b3dacecc63d`() {}
+
   @TestTemplate
   @ExtendWith(PactVerificationSpringProvider::class)
   fun template(context: PactVerificationContext, request: HttpRequest) {

@@ -1,31 +1,76 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
-import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
-import java.time.LocalDateTime
 import java.util.UUID
+import java.util.stream.Stream
 
 class ReferralServiceTest {
 
   companion object {
-    const val PRISON_NUMBER = "A1234AA"
+    private const val PRISON_NUMBER = "A1234AA"
+
+    @JvmStatic
+    fun parametersForGetReferralsByOrganisationId(): Stream<Arguments> {
+      val projections1 = listOf("Audience 1", "Audience 2").map { audience ->
+        ReferralSummaryProjectionFactory()
+          .withReferralId(UUID.randomUUID())
+          .withCourseName("Course for referralSummary1")
+          .withAudience(audience)
+          .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
+          .withPrisonNumber(PRISON_NUMBER)
+          .produce()
+      }
+
+      val projections2 = listOf("Audience 2", "Audience 3").map { audience ->
+        ReferralSummaryProjectionFactory()
+          .withReferralId(UUID.randomUUID())
+          .withCourseName("Course for referralSummary2")
+          .withAudience(audience)
+          .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
+          .withPrisonNumber(PRISON_NUMBER)
+          .produce()
+      }
+
+      val projections3 = listOf("Audience 3", "Audience 4").map { audience ->
+        ReferralSummaryProjectionFactory()
+          .withReferralId(UUID.randomUUID())
+          .withCourseName("Course for referralSummary3")
+          .withAudience(audience)
+          .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
+          .withPrisonNumber(PRISON_NUMBER)
+          .produce()
+      }
+
+      return Stream.of(
+        Arguments.of("REFERRAL_STARTED", null, "referralSummary1", projections1),
+        Arguments.of(null, "Audience 2", null, projections1 + projections2),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", null, projections2 + projections3),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", "referralSummary3", projections3),
+        Arguments.of(null, null, "Course", projections1 + projections2 + projections3),
+        Arguments.of("AWAITING_ASSESSMENT", null, null, emptyList<ReferralSummaryProjection>()),
+        Arguments.of(null, "Audience X", null, emptyList<ReferralSummaryProjection>()),
+        Arguments.of(null, null, "Course for referralSummaryX", emptyList<ReferralSummaryProjection>()),
+      )
+    }
   }
 
   @MockK(relaxed = true)
@@ -42,86 +87,45 @@ class ReferralServiceTest {
     referralService = ReferralService(referralRepository, offeringRepository)
   }
 
-  @Nested
-  @DisplayName("Get Referral Summaries")
-  inner class ReferralSummaryTests {
-    @Test
-    fun `getReferralsByOrganisationId with valid organisationId should return pageable ReferralSummary objects`() {
-      val orgId = "MDI"
-      val pageable = PageRequest.of(0, 10)
+  @ParameterizedTest
+  @MethodSource("parametersForGetReferralsByOrganisationId")
+  fun `getReferralsByOrganisationId with valid organisationId and filtering should return pageable ReferralSummary objects`(
+    statusFilter: String?,
+    audienceFilter: String?,
+    courseFilter: String?,
+    expectedReferralSummaryProjections: List<ReferralSummaryProjection>,
+  ) {
+    val orgId = "MDI"
+    val pageable = PageRequest.of(0, 10)
+    val status = statusFilter?.let { ReferralEntity.ReferralStatus.valueOf(it) }
 
-      val firstReferralId = UUID.randomUUID()
-      val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
-      val projectionsForFirstReferral = audiencesForFirstReferral.map { audience ->
-        ReferralSummaryProjectionFactory()
-          .withReferralId(firstReferralId)
-          .withCourseName("Course name")
-          .withAudience(audience)
-          .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
-          .withPrisonNumber(PRISON_NUMBER)
-          .produce()
-      }
+    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter, courseFilter) } returns
+      PageImpl(expectedReferralSummaryProjections, pageable, expectedReferralSummaryProjections.size.toLong())
 
-      val secondReferralId = UUID.randomUUID()
-      val audiencesForSecondReferral = listOf("Audience 4", "Audience 5", "Audience 6")
-      val projectionsForSecondReferral = audiencesForSecondReferral.map { audience ->
-        ReferralSummaryProjectionFactory()
-          .withReferralId(secondReferralId)
-          .withCourseName("Another course name")
-          .withAudience(audience)
-          .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
-          .withSubmittedOn(LocalDateTime.MIN)
-          .withPrisonNumber(PRISON_NUMBER)
-          .produce()
-      }
+    val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, statusFilter, audienceFilter, courseFilter)
 
-      every { referralRepository.getReferralsByOrganisationId(orgId, pageable) } returns
-        PageImpl(projectionsForFirstReferral + projectionsForSecondReferral, pageable, 2L)
+    resultPage.totalElements shouldBe expectedReferralSummaryProjections.size.toLong()
 
-      val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable)
+    val expectedTotalPages = (expectedReferralSummaryProjections.size + pageable.pageSize - 1) / pageable.pageSize
+    resultPage.totalPages shouldBe expectedTotalPages
 
-      resultPage.totalPages shouldBe 1
-      resultPage.content shouldHaveSize 2
-      resultPage.totalElements shouldBe 2
+    val expectedApiReferralSummaries = expectedReferralSummaryProjections.toApi()
+    resultPage.content shouldContainAll expectedApiReferralSummaries
 
-      val firstReferral = resultPage.content.find { it.id == firstReferralId }
-      firstReferral shouldNotBe null
-      firstReferral?.let { referral ->
-        with(referral) {
-          courseName shouldBe "Course name"
-          audiences shouldBe listOf("Audience 1", "Audience 2", "Audience 3")
-          status shouldBe ReferralStatus.referralStarted
-          prisonNumber shouldBe PRISON_NUMBER
-        }
-      }
+    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter, courseFilter) }
+  }
 
-      val secondReferral = resultPage.content.find { it.id == secondReferralId }
-      secondReferral shouldNotBe null
-      secondReferral?.let { referral ->
-        with(referral) {
-          courseName shouldBe "Another course name"
-          audiences shouldBe listOf("Audience 4", "Audience 5", "Audience 6")
-          status shouldBe ReferralStatus.referralSubmitted
-          submittedOn shouldBe LocalDateTime.MIN.toString()
-          prisonNumber shouldBe PRISON_NUMBER
-        }
-      }
+  @Test
+  fun `getReferralsByOrganisationId with random organisationId should return pageable empty list`() {
+    val orgId = UUID.randomUUID().toString()
+    val pageable = PageRequest.of(0, 10)
 
-      verify { referralRepository.getReferralsByOrganisationId(orgId, pageable) }
-    }
+    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, null, null, null) } returns PageImpl(emptyList())
 
-    @Test
-    fun `getReferralsByOrganisationId with random organisationId should return pageable empty list`() {
-      val orgId = UUID.randomUUID().toString()
-      val pageable = PageRequest.of(0, 10)
+    val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, null, null, null)
+    resultPage.content shouldBe emptyList()
+    resultPage.totalElements shouldBe 0
 
-      every { referralRepository.getReferralsByOrganisationId(orgId, pageable) } returns PageImpl(emptyList())
-
-      val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable)
-      resultPage.content shouldBe emptyList()
-      resultPage.totalElements shouldBe 0
-
-      verify { referralRepository.getReferralsByOrganisationId(orgId, pageable) }
-    }
+    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, null, null, null) }
   }
 }

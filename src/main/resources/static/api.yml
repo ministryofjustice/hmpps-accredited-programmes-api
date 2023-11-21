@@ -457,6 +457,24 @@ paths:
           schema:
             type: integer
             default: 10
+        - name: status
+          in: query
+          description: Filter by the status of the referral
+          required: false
+          schema:
+            type: string
+        - name: audience
+          in: query
+          description: Filter by the audience of the referral
+          required: false
+          schema:
+            type: string
+        - name: courseName
+          in: query
+          description: Filter by the name of the course associated with this referral
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: Paginated summary of referrals for an organisation
