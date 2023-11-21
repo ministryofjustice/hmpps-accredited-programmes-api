@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -344,7 +345,7 @@ constructor(
   @Test
   fun `getReferralsByOrganisationId with valid organisationId returns 200 with paginated body`() {
     val organisationId = "MDI"
-    val pageable = PageRequest.of(0, 10)
+    val pageable = PageRequest.of(0, 10, Sort.by("referralId"))
 
     val firstReferralId = UUID.randomUUID()
     val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
@@ -419,6 +420,8 @@ constructor(
   fun `getReferralsByOrganisationId with valid organisationId and custom pagination count will return 200 with paginated body for each page`() {
     val organisationId = "MDI"
     val pageSize = 1
+    val pageableFirstPage = PageRequest.of(0, pageSize, Sort.by("referralId"))
+    val pageableSecondPage = PageRequest.of(1, pageSize, Sort.by("referralId"))
 
     val firstReferralId = UUID.randomUUID()
     val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
@@ -445,11 +448,11 @@ constructor(
         .produce()
     }
 
-    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize), null, null, null) } returns
-      PageImpl(projectionsForFirstReferral.toApi(), PageRequest.of(0, pageSize), 2)
+    every { referralService.getReferralsByOrganisationId(organisationId, pageableFirstPage, null, null, null) } returns
+      PageImpl(projectionsForFirstReferral.toApi(), pageableFirstPage, 2)
 
-    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize), null, null, null) } returns
-      PageImpl(projectionsForSecondReferral.toApi(), PageRequest.of(1, pageSize), 2)
+    every { referralService.getReferralsByOrganisationId(organisationId, pageableSecondPage, null, null, null) } returns
+      PageImpl(projectionsForSecondReferral.toApi(), pageableSecondPage, 2)
 
     val firstPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
@@ -502,8 +505,8 @@ constructor(
       referral.prisonNumber shouldBe PRISON_NUMBER
     }
 
-    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize), null, null, null) }
-    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize), null, null, null) }
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, pageableFirstPage, null, null, null) }
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, pageableSecondPage, null, null, null) }
   }
 
   @ParameterizedTest
@@ -515,7 +518,7 @@ constructor(
     expectedReferralSummaries: List<ReferralSummary>,
   ) {
     val organisationId = "MDI"
-    val pageable = PageRequest.of(0, 10)
+    val pageable = PageRequest.of(0, 10, Sort.by("referralId"))
 
     every { referralService.getReferralsByOrganisationId(organisationId, pageable, statusFilter, audienceFilter, courseNameFilter) } returns
       PageImpl(expectedReferralSummaries, pageable, 1)
@@ -555,7 +558,7 @@ constructor(
   @Test
   fun `getReferralsByOrganisationId with random organisationId returns 200 with paginated empty body`() {
     val orgId = UUID.randomUUID().toString()
-    val pageable = PageRequest.of(0, 10)
+    val pageable = PageRequest.of(0, 10, Sort.by("referralId"))
 
     every { referralService.getReferralsByOrganisationId(orgId, pageable, null, null, null) } returns
       PageImpl(emptyList(), pageable, 0)

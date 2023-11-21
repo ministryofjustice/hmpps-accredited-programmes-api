@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.contro
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -69,7 +70,7 @@ constructor(
     @RequestParam(value = "audience", required = false) audience: String?,
     @RequestParam(value = "courseName", required = false) courseName: String?,
   ): ResponseEntity<PaginatedReferralSummary> {
-    val pageable = PageRequest.of(page, size)
+    val pageable = PageRequest.of(page, size, Sort.by("referralId"))
     val apiReferralSummaryPage = referralService.getReferralsByOrganisationId(organisationId, pageable, status, audience, courseName)
 
     return ResponseEntity.ok(
