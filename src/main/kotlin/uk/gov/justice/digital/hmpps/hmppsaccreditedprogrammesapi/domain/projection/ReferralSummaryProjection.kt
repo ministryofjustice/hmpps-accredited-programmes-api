@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.read
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import java.time.LocalDateTime
