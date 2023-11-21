@@ -13,7 +13,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.read.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
@@ -62,13 +61,14 @@ class ReferralServiceTest {
       }
 
       return Stream.of(
-        Arguments.of("REFERRAL_STARTED", null, projections1),
-        Arguments.of(null, "Audience 2", projections1 + projections2),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", projections2 + projections3),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", projections3),
-        Arguments.of(null, null, projections1 + projections2 + projections3),
-        Arguments.of("AWAITING_ASSESSMENT", null, emptyList<ReferralSummaryProjection>()),
-        Arguments.of(null, "Audience X", emptyList<ReferralSummaryProjection>()),
+        Arguments.of("REFERRAL_STARTED", null, "referralSummary1", projections1),
+        Arguments.of(null, "Audience 2", null, projections1 + projections2),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", null, projections2 + projections3),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", "referralSummary3", projections3),
+        Arguments.of(null, null, "Course", projections1 + projections2 + projections3),
+        Arguments.of("AWAITING_ASSESSMENT", null, null, emptyList<ReferralSummaryProjection>()),
+        Arguments.of(null, "Audience X", null, emptyList<ReferralSummaryProjection>()),
+        Arguments.of(null, null, "Course for referralSummaryX", emptyList<ReferralSummaryProjection>()),
       )
     }
   }
@@ -92,16 +92,17 @@ class ReferralServiceTest {
   fun `getReferralsByOrganisationId with valid organisationId and filtering should return pageable ReferralSummary objects`(
     statusFilter: String?,
     audienceFilter: String?,
+    courseFilter: String?,
     expectedReferralSummaryProjections: List<ReferralSummaryProjection>,
   ) {
     val orgId = "MDI"
     val pageable = PageRequest.of(0, 10)
     val status = statusFilter?.let { ReferralEntity.ReferralStatus.valueOf(it) }
 
-    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter) } returns
+    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter, courseFilter) } returns
       PageImpl(expectedReferralSummaryProjections, pageable, expectedReferralSummaryProjections.size.toLong())
 
-    val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, statusFilter, audienceFilter)
+    val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, statusFilter, audienceFilter, courseFilter)
 
     resultPage.totalElements shouldBe expectedReferralSummaryProjections.size.toLong()
 
@@ -111,7 +112,7 @@ class ReferralServiceTest {
     val expectedApiReferralSummaries = expectedReferralSummaryProjections.toApi()
     resultPage.content shouldContainAll expectedApiReferralSummaries
 
-    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter) }
+    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter, courseFilter) }
   }
 
   @Test
@@ -119,12 +120,12 @@ class ReferralServiceTest {
     val orgId = UUID.randomUUID().toString()
     val pageable = PageRequest.of(0, 10)
 
-    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, null, null) } returns PageImpl(emptyList())
+    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, null, null, null) } returns PageImpl(emptyList())
 
-    val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, null, null)
+    val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, null, null, null)
     resultPage.content shouldBe emptyList()
     resultPage.totalElements shouldBe 0
 
-    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, null, null) }
+    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, null, null, null) }
   }
 }

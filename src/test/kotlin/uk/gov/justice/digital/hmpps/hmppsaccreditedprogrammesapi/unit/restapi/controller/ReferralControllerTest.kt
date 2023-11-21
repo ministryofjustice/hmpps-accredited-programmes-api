@@ -90,13 +90,14 @@ constructor(
     @JvmStatic
     fun parametersForGetReferralsByOrganisationIdWithFiltering(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of("REFERRAL_STARTED", null, listOf(referralSummary1)),
-        Arguments.of(null, "Audience 2", listOf(referralSummary1, referralSummary2)),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", listOf(referralSummary2, referralSummary3)),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", listOf(referralSummary3)),
-        Arguments.of(null, null, listOf(referralSummary1, referralSummary2, referralSummary3)),
-        Arguments.of("AWAITING_ASSESSMENT", null, emptyList<ReferralSummary>()),
-        Arguments.of(null, "Audience X", emptyList<ReferralSummary>()),
+        Arguments.of("REFERRAL_STARTED", null, "referralSummary1", listOf(referralSummary1)),
+        Arguments.of(null, "Audience 2", null, listOf(referralSummary1, referralSummary2)),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", null, listOf(referralSummary2, referralSummary3)),
+        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", "referralSummary3", listOf(referralSummary3)),
+        Arguments.of(null, null, "Course", listOf(referralSummary1, referralSummary2, referralSummary3)),
+        Arguments.of("AWAITING_ASSESSMENT", null, null, emptyList<ReferralSummary>()),
+        Arguments.of(null, "Audience X", null, emptyList<ReferralSummary>()),
+        Arguments.of(null, null, "Course for referralSummaryX", emptyList<ReferralSummary>()),
       )
     }
   }
@@ -370,7 +371,7 @@ constructor(
         .produce()
     }
 
-    every { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null) } returns
+    every { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null, null) } returns
       PageImpl(projectionsForFirstReferral.toApi() + projectionsForSecondReferral.toApi(), pageable, 2L)
 
     val mvcResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
@@ -411,7 +412,7 @@ constructor(
       referral.prisonNumber shouldBe PRISON_NUMBER
     }
 
-    verify { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null) }
+    verify { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null, null) }
   }
 
   @Test
@@ -444,10 +445,10 @@ constructor(
         .produce()
     }
 
-    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize), null, null) } returns
+    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize), null, null, null) } returns
       PageImpl(projectionsForFirstReferral.toApi(), PageRequest.of(0, pageSize), 2)
 
-    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize), null, null) } returns
+    every { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize), null, null, null) } returns
       PageImpl(projectionsForSecondReferral.toApi(), PageRequest.of(1, pageSize), 2)
 
     val firstPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
@@ -501,8 +502,8 @@ constructor(
       referral.prisonNumber shouldBe PRISON_NUMBER
     }
 
-    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize), null, null) }
-    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize), null, null) }
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(0, pageSize), null, null, null) }
+    verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, PageRequest.of(1, pageSize), null, null, null) }
   }
 
   @ParameterizedTest
@@ -510,12 +511,13 @@ constructor(
   fun `getReferralsByOrganisationId with valid organisationId and filtering will return 200 with paginated body`(
     statusFilter: String?,
     audienceFilter: String?,
+    courseNameFilter: String?,
     expectedReferralSummaries: List<ReferralSummary>,
   ) {
     val organisationId = "MDI"
     val pageable = PageRequest.of(0, 10)
 
-    every { referralService.getReferralsByOrganisationId(organisationId, pageable, statusFilter, audienceFilter) } returns
+    every { referralService.getReferralsByOrganisationId(organisationId, pageable, statusFilter, audienceFilter, courseNameFilter) } returns
       PageImpl(expectedReferralSummaries, pageable, 1)
 
     val result = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
@@ -523,6 +525,7 @@ constructor(
       param("size", "10")
       statusFilter?.let { param("status", it) }
       audienceFilter?.let { param("audience", it) }
+      courseNameFilter?.let { param("courseName", it) }
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       accept = MediaType.APPLICATION_JSON
     }.andExpect {
@@ -536,7 +539,7 @@ constructor(
     response.content?.shouldContainExactlyInAnyOrder(expectedReferralSummaries)
 
     verify(exactly = 1) {
-      referralService.getReferralsByOrganisationId(organisationId, pageable, statusFilter, audienceFilter)
+      referralService.getReferralsByOrganisationId(organisationId, pageable, statusFilter, audienceFilter, courseNameFilter)
     }
   }
 
@@ -554,7 +557,7 @@ constructor(
     val orgId = UUID.randomUUID().toString()
     val pageable = PageRequest.of(0, 10)
 
-    every { referralService.getReferralsByOrganisationId(orgId, pageable, null, null) } returns
+    every { referralService.getReferralsByOrganisationId(orgId, pageable, null, null, null) } returns
       PageImpl(emptyList(), pageable, 0)
 
     mockMvc.get("/referrals/organisation/$orgId/dashboard") {
@@ -574,6 +577,6 @@ constructor(
       }
     }
 
-    verify { referralService.getReferralsByOrganisationId(orgId, pageable, null, null) }
+    verify { referralService.getReferralsByOrganisationId(orgId, pageable, null, null, null) }
   }
 }

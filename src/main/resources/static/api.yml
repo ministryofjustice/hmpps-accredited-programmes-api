@@ -469,6 +469,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: courseName
+          in: query
+          description: Filter by the name of the course associated with this referral
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: Paginated summary of referrals for an organisation

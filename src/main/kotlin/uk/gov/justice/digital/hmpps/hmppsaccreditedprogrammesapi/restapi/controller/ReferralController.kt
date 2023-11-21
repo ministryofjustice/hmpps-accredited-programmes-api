@@ -67,9 +67,10 @@ constructor(
     @RequestParam(value = "size", defaultValue = "10") size: Int,
     @RequestParam(value = "status", required = false) status: String?,
     @RequestParam(value = "audience", required = false) audience: String?,
+    @RequestParam(value = "courseName", required = false) courseName: String?,
   ): ResponseEntity<PaginatedReferralSummary> {
     val pageable = PageRequest.of(page, size)
-    val apiReferralSummaryPage = referralService.getReferralsByOrganisationId(organisationId, pageable, status, audience)
+    val apiReferralSummaryPage = referralService.getReferralsByOrganisationId(organisationId, pageable, status, audience, courseName)
 
     return ResponseEntity.ok(
       PaginatedReferralSummary(
