@@ -64,4 +64,34 @@ class WebClientConfiguration(
       .filter(oauth2Client)
       .build()
   }
+
+  @Bean(name = ["prisonerSearchApiWebClient"])
+  fun prisonerSearchApiWebClient(
+    clientRegistrations: ClientRegistrationRepository,
+    authorizedClients: OAuth2AuthorizedClientRepository,
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    @Value("\${services.prisoner-search-api.base-url}") prisonerSearchApiBaseUrl: String,
+  ): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+
+    oauth2Client.setDefaultClientRegistrationId("prisoner-search-api")
+
+    return WebClient.builder()
+      .baseUrl(prisonerSearchApiBaseUrl)
+      .clientConnector(
+        ReactorClientHttpConnector(
+          HttpClient
+            .create()
+            .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
+        ),
+      )
+      .exchangeStrategies(
+        ExchangeStrategies.builder().codecs {
+          it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
+        }.build(),
+      )
+      .filter(oauth2Client)
+      .build()
+  }
 }
