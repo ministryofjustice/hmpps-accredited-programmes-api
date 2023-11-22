@@ -1,9 +1,10 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.response.model.SentenceAndOffenceDetails
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceAndOffenceDetails
 
 @Component
 class PrisonApiClient(

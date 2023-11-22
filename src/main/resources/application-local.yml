@@ -16,3 +16,5 @@ spring:
 services:
   prison-api:
     base-url: http://localhost:9094
+  prisoner-search-api:
+    base-url: http://localhost:9095
