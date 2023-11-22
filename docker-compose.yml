@@ -31,6 +31,16 @@ services:
     ports:
       - '9094:8080'
 
+  prisoner-search:
+    image: wiremock/wiremock:2.35.0
+    networks:
+      - hmpps
+    container_name: prisoner-search
+    ports:
+      - "9095:8080"
+    volumes:
+      - ./prisoner-search-data:/home/wiremock
+
   postgresql:
     image: postgres
     container_name: postgres
