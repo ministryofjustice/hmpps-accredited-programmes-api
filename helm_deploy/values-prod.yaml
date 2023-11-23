@@ -10,6 +10,7 @@ generic-service:
     HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
     PRISON-API_BASE-URL: https://api.prison.service.justice.gov.uk
     PRISONER-SEARCH-API_BASE-URL: https://prisoner-search-preprod.prison.service.justice.gov.uk
+    PRISON-REGISTER-API_BASE-URL: https://prison-register.hmpps.service.justice.gov.uk
     SENTRY_ENVIRONMENT: prod
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
