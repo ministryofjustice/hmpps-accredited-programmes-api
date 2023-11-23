@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi
-import com.fasterxml.jackson.databind.ObjectMapper
+
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import java.util.UUID
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -8,11 +10,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonAp
 
 @Component
 class PrisonApiClient(
-  @Qualifier("prisonApiWebClient") webClient: WebClient,
-  objectMapper: ObjectMapper,
-) : BaseHMPPSClient(webClient, objectMapper) {
+  @Qualifier("prisonApiWebClient")
+  webClient: WebClient,
+) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getSentencesAndOffencesByBookingId(bookingID: Int) = getRequest<List<SentenceAndOffenceDetails>> {
-    path = "/api/offender-sentences/booking/$bookingID/sentences-and-offences"
+  fun getSentencesAndOffencesByBookingId(bookingId: UUID) = getRequest<List<SentenceAndOffenceDetails>> {
+    path = "/api/offender-sentences/booking/$bookingId/sentences-and-offences"
   }
 }
