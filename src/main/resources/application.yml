@@ -35,6 +35,11 @@ spring:
             client-id: hmpps-accredited-programmes-client-1
             client-secret: clientsecret
             authorization-grant-type: client_credentials
+          prison-register-api:
+            provider: hmpps-auth
+            client-id: hmpps-accredited-programmes-client-1
+            client-secret: clientsecret
+            authorization-grant-type: client_credentials
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
@@ -98,6 +103,8 @@ services:
     base-url: ${PRISON-API_BASE-URL}
   prisoner-search-api:
     base-url: ${PRISONER-SEARCH-API_BASE-URL}
+  prison-register-api:
+    base-url: ${PRISON-REGISTER-API_BASE-URL}
 
 log-client-credentials-jwt-info: false
 
