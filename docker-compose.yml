@@ -41,6 +41,22 @@ services:
     volumes:
       - ./prisoner-search-data:/home/wiremock
 
+  prison-register:
+    image: quay.io/hmpps/prison-register:latest
+    networks:
+      - hmpps
+    container_name: prison-register
+    depends_on:
+      - hmpps-auth
+    ports:
+      - "9096:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - OAUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth
+
   postgresql:
     image: postgres
     container_name: postgres
