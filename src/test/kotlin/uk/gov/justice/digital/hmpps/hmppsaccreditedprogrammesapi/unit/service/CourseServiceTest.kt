@@ -452,4 +452,28 @@ class CourseServiceTest {
       courseService.getAllCourses().shouldContainExactly(activeCourse)
     }
   }
+
+  @Nested
+  @DisplayName("Get Offerings by organisationId")
+  inner class GetOfferingsByOrganisationId {
+
+    @Test
+    fun `should return empty list when no offerings exist for an organisationId`() {
+      val offering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
+
+      every { courseRepository.getAllOfferings() } returns listOf(offering)
+
+      courseService.getAllOfferingsByOrganisationId("xxx").isEmpty()
+    }
+
+    @Test
+    fun `should return only offerings for requested organisationID`() {
+      val offering1 = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
+      val offering2 = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
+
+      every { courseRepository.getAllOfferings() } returns listOf(offering1, offering2)
+
+      courseService.getAllOfferingsByOrganisationId(offering1.organisationId).shouldContainExactly(offering1)
+    }
+  }
 }

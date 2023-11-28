@@ -27,6 +27,7 @@ constructor(
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.getCourseByOfferingId(offeringId)
 
   fun getAllOfferings(): List<OfferingEntity> = courseRepository.getAllOfferings().filterNot(OfferingEntity::withdrawn)
+  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> = courseRepository.getAllOfferings().filter { it.organisationId == organisationId }
 
   fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> = courseRepository
     .getAllOfferingsByCourseId(courseId)
