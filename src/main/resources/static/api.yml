@@ -164,6 +164,29 @@ paths:
                 items:
                   $ref: '#/components/schemas/CourseOffering'
 
+  /organisations/{organisationId}/courses:
+    get:
+      tags:
+        - Course Offerings
+      summary: List all courses for an organisationId
+      operationId: getAllCoursesByOrganisationId
+      parameters:
+        - name: organisationId
+          in: path
+          description: A organisation identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+
   /offerings/csv:
     put:
       tags:
