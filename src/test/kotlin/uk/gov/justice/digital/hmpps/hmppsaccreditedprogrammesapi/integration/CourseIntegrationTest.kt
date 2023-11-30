@@ -140,8 +140,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
         """
         [
           { "organisationId": "MDI", "contactEmail":"nobody-mdi@digital.justice.gov.uk" },
-          { "organisationId": "BWN", "contactEmail":"nobody-bwn@digital.justice.gov.uk" },
-          { "organisationId": "BXI", "contactEmail":"nobody-bxi@digital.justice.gov.uk" }
+          { "organisationId": "BWN", "contactEmail":"nobody-bwn@digital.justice.gov.uk" }
         ]
       """,
       )
