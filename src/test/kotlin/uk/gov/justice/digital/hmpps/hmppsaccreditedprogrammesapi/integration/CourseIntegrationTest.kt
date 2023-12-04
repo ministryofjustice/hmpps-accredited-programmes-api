@@ -9,6 +9,7 @@ import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
@@ -66,7 +67,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     val responseBodySpec = webTestClient
       .get()
       .uri("/courses/course-names")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -82,7 +83,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/courses/$COURSE_ID")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -98,7 +99,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/courses/$randomId")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isNotFound
@@ -116,7 +117,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/offerings/$COURSE_OFFERING_ID/course")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -130,7 +131,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/courses/$COURSE_ID/offerings")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -151,7 +152,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/offerings/$COURSE_OFFERING_ID")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -215,7 +216,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     val downloadedCoursesCsv = webTestClient
       .get()
       .uri("/courses/csv")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MEDIA_TYPE_TEXT_CSV)
       .exchange()
       .expectStatus().isOk
@@ -263,7 +264,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     val downloadedPrerequisitesCsv = webTestClient
       .get()
       .uri("/courses/prerequisites/csv")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MEDIA_TYPE_TEXT_CSV)
       .exchange()
       .expectStatus().isOk
@@ -340,7 +341,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     val downloadedOfferingsCsv = webTestClient
       .get()
       .uri("/offerings/csv")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MEDIA_TYPE_TEXT_CSV)
       .exchange()
       .expectStatus().isOk
@@ -362,7 +363,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .put()
       .uri("/courses/csv")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(coursesCsvData)
       .exchange()
@@ -373,7 +374,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .put()
       .uri("/offerings/csv")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(offeringsCsvData)
       .exchange()
@@ -383,7 +384,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     webTestClient
       .put()
       .uri("/courses/prerequisites/csv")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MEDIA_TYPE_TEXT_CSV)
       .bodyValue(prerequisitesCsvData)
       .exchange()
