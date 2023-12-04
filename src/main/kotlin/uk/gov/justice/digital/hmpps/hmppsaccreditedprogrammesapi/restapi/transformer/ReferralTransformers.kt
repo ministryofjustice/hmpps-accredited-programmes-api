@@ -13,6 +13,7 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   id = id!!,
   offeringId = offering.id!!,
   prisonNumber = prisonNumber,
+  referrerUsername = referrer.username,
   referrerId = referrerId,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
@@ -54,6 +55,7 @@ fun List<ReferralSummaryProjection>.toApi(): List<ApiReferralSummary> {
 
       ApiReferralSummary(
         id = id,
+        referrerUsername = firstProjection.referrerUsername,
         courseName = firstProjection.courseName,
         audiences = projections.map { it.audience }.distinct(),
         status = firstProjection.status.toApi(),

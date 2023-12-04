@@ -19,11 +19,13 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       a.value as audience,
       r.status AS status,
       r.submittedOn AS submittedOn,
-      r.prisonNumber AS prisonNumber
+      r.prisonNumber AS prisonNumber,
+      ru.username AS referralUsername
     ) FROM ReferralEntity r
     JOIN r.offering o
     JOIN o.course c
     JOIN c.audiences a
+    JOIN r.referrer ru
     WHERE o.organisationId = :organisationId
       AND (:status IS NULL OR r.status = :status)
       AND (:audience IS NULL OR a.value = :audience)
@@ -32,9 +34,9 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
     countQuery = """
     SELECT COUNT(DISTINCT r.id)
     FROM ReferralEntity r
-    INNER JOIN r.offering o
-    INNER JOIN o.course c
-    INNER JOIN c.audiences a
+    JOIN r.offering o
+    JOIN o.course c
+    JOIN c.audiences a
     WHERE o.organisationId = :organisationId
       AND (:status IS NULL OR r.status = :status)
       AND (:audience IS NULL OR a.value = :audience)

@@ -11,4 +11,5 @@ data class ReferralSummaryProjection(
   val status: ReferralEntity.ReferralStatus,
   val submittedOn: LocalDateTime?,
   val prisonNumber: String,
+  val referrerUsername: String,
 )
