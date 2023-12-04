@@ -74,8 +74,11 @@ class PactContractTest {
   @State("Referral(s) exist for organisation BWN")
   fun `ensure referrals exist for organisation BWN`() {}
 
-  @State("Referral(s) exist for organisation BWM with status REFERRAL_SUBMITTED to offerings for courses with audience General offence")
-  fun `ensure referral(s) exist for organisation BWM with status REFERRAL_SUBMITTED to offerings for courses with audience General offence`() {}
+  @State("Organisation BWN has courses d3abc217-75ee-46e9-a010-368f30282367, 28e47d30-30bf-4dab-a8eb-9fda3f6400e8, and 1811faa6-d568-4fc4-83ce-41118b90242e and no others")
+  fun `ensure organisation BWN has courses d3abc217-75ee-46e9-a010-368f30282367, 28e47d30-30bf-4dab-a8eb-9fda3f6400e8, and 1811faa6-d568-4fc4-83ce-41118b90242e and no others`() {}
+
+  @State("Super Course referral(s) exist for organisation BWM with status REFERRAL_SUBMITTED to offerings for courses with audience General offence")
+  fun `ensure Super Course referral(s) exist for organisation BWM with status REFERRAL_SUBMITTED to offerings for courses with audience General offence`() {}
 
   @TestTemplate
   @ExtendWith(PactVerificationSpringProvider::class)
