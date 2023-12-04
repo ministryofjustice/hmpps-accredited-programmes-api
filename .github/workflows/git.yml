@@ -1,0 +1,15 @@
+name: Git
+
+on:
+  pull_request:
+
+jobs:
+  message-check:
+    name: Block fixup, squash and merge commits
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Block fixup and squash commits
+        uses: 13rac1/block-fixup-merge-action@v2.0.0
