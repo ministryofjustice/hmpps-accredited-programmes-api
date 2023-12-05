@@ -17,6 +17,8 @@ import org.springframework.test.web.reactive.server.EntityExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_ID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.MEDIA_TYPE_TEXT_CSV
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generateCourseRecords
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generateOfferingRecords
@@ -30,10 +32,6 @@ import java.util.UUID
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class CourseIntegrationTest : IntegrationTestBase() {
-  companion object {
-    val COURSE_ID: UUID = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
-    val COURSE_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
-  }
 
   @Test
   fun `Searching for all courses with JWT returns 200 with correct body`() {

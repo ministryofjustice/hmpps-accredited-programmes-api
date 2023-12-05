@@ -22,6 +22,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.util.UUID
@@ -30,10 +32,6 @@ import java.util.UUID
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class ReferralIntegrationTest : IntegrationTestBase() {
-  companion object {
-    const val PRISON_NUMBER = "A1234AA"
-    const val REFERRER_ID = "MWX0001"
-  }
 
   @Test
   fun `Creating a referral should return 201 with correct body`() {

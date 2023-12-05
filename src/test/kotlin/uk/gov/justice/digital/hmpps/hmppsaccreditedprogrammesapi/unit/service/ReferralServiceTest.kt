@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
@@ -26,7 +27,6 @@ import java.util.stream.Stream
 class ReferralServiceTest {
 
   companion object {
-    private const val PRISON_NUMBER = "A1234AA"
 
     @JvmStatic
     fun parametersForGetReferralsByOrganisationId(): Stream<Arguments> {

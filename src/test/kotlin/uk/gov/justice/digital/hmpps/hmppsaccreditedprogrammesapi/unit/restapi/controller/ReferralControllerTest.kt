@@ -60,8 +60,6 @@ constructor(
 ) {
 
   companion object {
-    const val PRISON_NUMBER = "A1234AA"
-
     private val referralSummary1 = ReferralSummary(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary1",
