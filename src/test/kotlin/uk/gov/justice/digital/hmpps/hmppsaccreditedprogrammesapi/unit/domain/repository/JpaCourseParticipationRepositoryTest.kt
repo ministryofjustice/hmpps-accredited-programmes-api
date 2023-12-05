@@ -41,6 +41,7 @@ constructor(
           yearCompleted = Year.parse("2022"),
         ),
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = "location"),
+        createdByUsername = CLIENT_USERNAME,
       ),
     ).id!!
 
@@ -80,6 +81,7 @@ constructor(
         detail = null,
         setting = null,
         outcome = null,
+        createdByUsername = CLIENT_USERNAME,
       ),
     ).id!!
 
@@ -105,7 +107,7 @@ constructor(
   }
 
   @Test
-  fun `CourseParticipationRepository should save and update CouseParticipationEntity objects, having all auditable fields set`() {
+  fun `CourseParticipationRepository should save and update CourseParticipationEntity objects, having all auditable fields set`() {
     val startTime = LocalDateTime.now()
 
     val participationId = courseParticipationRepository.save(
@@ -116,6 +118,7 @@ constructor(
         detail = null,
         setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
         outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
+        createdByUsername = CLIENT_USERNAME,
       ),
     ).id!!
 

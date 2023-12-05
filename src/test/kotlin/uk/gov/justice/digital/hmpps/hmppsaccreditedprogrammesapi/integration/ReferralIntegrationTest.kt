@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.util.UriComponentsBuilder
@@ -22,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
@@ -34,7 +36,7 @@ import java.util.UUID
 class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
-  fun `Creating a referral should return 201 with correct body`() {
+  fun `Creating a referral with an existing user should return 201 with correct body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
     val createdReferralId = createReferral(offeringId).referralId
@@ -44,6 +46,30 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
       offeringId = offeringId,
+      referrerUsername = CLIENT_USERNAME,
+      referrerId = REFERRER_ID,
+      prisonNumber = PRISON_NUMBER,
+      status = ReferralStatus.referralStarted,
+      additionalInformation = null,
+      oasysConfirmed = false,
+      hasReviewedProgrammeHistory = false,
+      submittedOn = null,
+    )
+  }
+
+  @Test
+  @WithMockUser(username = "NONEXISTENT_USER")
+  fun `Creating a referral with a nonexistent user should return 201 with correct body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val createdReferralId = createReferral(offeringId).referralId
+
+    createdReferralId.shouldNotBeNull()
+
+    getReferralById(createdReferralId) shouldBeEqual Referral(
+      id = createdReferralId,
+      offeringId = offeringId,
+      referrerUsername = "NONEXISTENT_USER",
       referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
@@ -71,6 +97,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
       offeringId = offeringId,
+      referrerUsername = CLIENT_USERNAME,
       referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
@@ -119,6 +146,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
       offeringId = offeringId,
+      referrerUsername = CLIENT_USERNAME,
       referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralSubmitted,
@@ -183,6 +211,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           status = createdReferral.status,
           submittedOn = createdReferral.submittedOn,
           prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = CLIENT_USERNAME,
         ),
       ).forEach { expectedSummary ->
         actualSummary.id shouldBe expectedSummary.id

@@ -4,7 +4,10 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,14 +16,24 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
+import java.util.Optional
 import java.util.UUID
 import java.util.stream.Stream
 
@@ -77,14 +90,110 @@ class ReferralServiceTest {
   private lateinit var referralRepository: ReferralRepository
 
   @MockK(relaxed = true)
+  private lateinit var referrerUserRepository: ReferrerUserRepository
+
+  @MockK(relaxed = true)
   private lateinit var offeringRepository: JpaOfferingRepository
 
+  @InjectMockKs
   private lateinit var referralService: ReferralService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    referralService = ReferralService(referralRepository, offeringRepository)
+  }
+
+  private fun mockSecurityContext(username: String) {
+    val authentication = mockk<Authentication>()
+    every { authentication.name } returns username
+
+    val securityContext = mockk<SecurityContext>()
+    every { securityContext.authentication } returns authentication
+
+    mockkStatic(SecurityContextHolder::class)
+    every { SecurityContextHolder.getContext() } returns securityContext
+  }
+
+  @Test
+  fun `createReferral with existing user should create referral successfully`() {
+    mockSecurityContext(CLIENT_USERNAME)
+
+    val referrer = ReferrerUserEntityFactory()
+      .withUsername(CLIENT_USERNAME)
+      .produce()
+    every { referrerUserRepository.findById(CLIENT_USERNAME) } returns Optional.of(referrer)
+
+    val offering = OfferingEntityFactory()
+      .withId(UUID.randomUUID())
+      .produce()
+    every { offeringRepository.findById(any()) } returns Optional.of(offering)
+
+    val referralId = UUID.randomUUID()
+    every { referralRepository.save(any<ReferralEntity>()) } answers {
+      firstArg<ReferralEntity>().apply { id = referralId }
+    }
+
+    val createdReferralId = referralService.createReferral(PRISON_NUMBER, offering.id!!, REFERRER_ID)
+
+    createdReferralId shouldBe referralId
+
+    verify { referrerUserRepository.findById(CLIENT_USERNAME) }
+    verify { offeringRepository.findById(offering.id!!) }
+    verify {
+      referralRepository.save(
+        match {
+          it.prisonNumber == PRISON_NUMBER &&
+            it.referrerId == REFERRER_ID &&
+            it.referrer.username == CLIENT_USERNAME &&
+            it.offering.id == offering.id
+        },
+      )
+    }
+  }
+
+  @Test
+  fun `createReferral with nonexistent user should create user and referral successfully`() {
+    mockSecurityContext("NONEXISTENT_USER")
+
+    every { referrerUserRepository.findById("NONEXISTENT_USER") } returns Optional.empty()
+
+    every { referrerUserRepository.save(any<ReferrerUserEntity>()) } answers {
+      firstArg<ReferrerUserEntity>().apply { username = "NONEXISTENT_USER" }
+    }
+
+    val offering = OfferingEntityFactory()
+      .withId(UUID.randomUUID())
+      .produce()
+    every { offeringRepository.findById(any()) } returns Optional.of(offering)
+
+    val referralId = UUID.randomUUID()
+    every { referralRepository.save(any<ReferralEntity>()) } answers {
+      firstArg<ReferralEntity>().apply { id = referralId }
+    }
+
+    val createdReferralId = referralService.createReferral(PRISON_NUMBER, offering.id!!, REFERRER_ID)
+
+    createdReferralId shouldBe referralId
+
+    verify {
+      referrerUserRepository.save(
+        match {
+          it.username == "NONEXISTENT_USER"
+        },
+      )
+    }
+
+    verify { offeringRepository.findById(offering.id!!) }
+    verify {
+      referralRepository.save(
+        match {
+          it.prisonNumber == PRISON_NUMBER &&
+            it.referrerId == REFERRER_ID &&
+            it.referrer.username == "NONEXISTENT_USER" &&
+            it.offering.id == offering.id
+        },
+      )
+    }
   }
 
   @ParameterizedTest

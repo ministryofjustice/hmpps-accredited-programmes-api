@@ -17,6 +17,7 @@ dependencies {
   val springdocVersion = "2.2.0"
   val sentryVersion = "6.30.0"
   val jsonWebtokenVersion = "0.12.2"
+  val springSecurityVersion = "6.2.0"
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 
@@ -43,6 +44,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.3")
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
+  testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
 }
 
 java {

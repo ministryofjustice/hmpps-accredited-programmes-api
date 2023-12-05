@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationSetting
@@ -59,6 +60,7 @@ constructor(
           prisonNumber = "A1234AA",
           outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = Year.of(2020)),
           setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
+          createdByUsername = CLIENT_USERNAME,
         )
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
@@ -96,6 +98,7 @@ constructor(
           yearStarted = Year.of(2020),
         ),
         setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
+        createdByUsername = CLIENT_USERNAME,
       )
     }
 
