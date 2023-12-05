@@ -29,6 +29,7 @@ dependencies {
   implementation("org.flywaydb:flyway-core")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.2")
   implementation("com.google.guava:guava:32.1.2-jre")
+  implementation("org.zalando:problem-spring-web-starter:0.27.0")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")

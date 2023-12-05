@@ -2,14 +2,12 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -19,6 +17,9 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
@@ -40,7 +41,6 @@ import java.util.stream.Stream
 class ReferralServiceTest {
 
   companion object {
-
     @JvmStatic
     fun parametersForGetReferralsByOrganisationId(): Stream<Arguments> {
       val projections1 = listOf("Audience 1", "Audience 2").map { audience ->
@@ -98,10 +98,15 @@ class ReferralServiceTest {
   @InjectMockKs
   private lateinit var referralService: ReferralService
 
-  @BeforeEach
-  fun setup() {
-    MockKAnnotations.init(this)
-  }
+  @MockK(relaxed = true)
+  private lateinit var prisonRegisterService: PrisonRegisterService
+
+  @MockK(relaxed = true)
+  private lateinit var prisonerSearchApiService: PrisonerSearchApiService
+
+  val prisons = mapOf<String?, String>("AA123A" to "New prison name")
+  val prisoners = mapOf<String?, List<Prisoner>>("123" to listOf(Prisoner(prisonerNumber = "123")))
+  val organisationId = UUID.randomUUID().toString()
 
   private fun mockSecurityContext(username: String) {
     val authentication = mockk<Authentication>()
@@ -218,7 +223,7 @@ class ReferralServiceTest {
     val expectedTotalPages = (expectedReferralSummaryProjections.size + pageable.pageSize - 1) / pageable.pageSize
     resultPage.totalPages shouldBe expectedTotalPages
 
-    val expectedApiReferralSummaries = expectedReferralSummaryProjections.toApi()
+    val expectedApiReferralSummaries = expectedReferralSummaryProjections.toApi(prisoners, prisons, organisationId)
     resultPage.content shouldContainAll expectedApiReferralSummaries
 
     verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter, courseFilter) }

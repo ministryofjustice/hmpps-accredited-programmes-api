@@ -14,7 +14,11 @@ class PrisonRegisterApiClient(
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getPrisonDetailsByPrisonId(prisonId: UUID) = getRequest<List<PrisonDetails>> {
+  fun getPrisonDetailsByPrisonId(prisonId: String) = getRequest<List<PrisonDetails>> {
     path = "/prisons/id/$prisonId"
+  }
+
+  fun getAllPrisonDetails() = getRequest<List<PrisonDetails>> {
+    path = "/prisons/names"
   }
 }

@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.awaitingAssessment
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralStarted
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralSubmitted
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.ASSESSMENT_STARTED
@@ -24,6 +25,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate as DomainReferralUpdate
 
 class ReferralTransformersTest {
+
+  companion object {
+    const val PRISON_NUMBER = "A1234AA"
+  }
+  val prisons: Map<String?, String> = mapOf("AA123A" to "New prison name")
+  val prisoners: Map<String?, List<Prisoner>> = mapOf("123" to listOf(Prisoner(prisonerNumber = "123")))
 
   @ParameterizedTest
   @EnumSource
@@ -112,6 +119,7 @@ class ReferralTransformersTest {
   @Test
   fun `Transforming a ReferralSummary with all fields should convert to its API equivalent`() {
     val referralId = UUID.randomUUID()
+    val organisationId = "MDI"
     val collatedAudiences = listOf("Audience 1", "Audience 2", "Audience 3")
     val referralSummaryProjections = collatedAudiences.map { audience ->
       ReferralSummaryProjectionFactory()
@@ -124,7 +132,7 @@ class ReferralTransformersTest {
         .produce()
     }
 
-    with(referralSummaryProjections.toApi().first()) {
+    with(referralSummaryProjections.toApi(prisoners, prisons, organisationId).first()) {
       id shouldBe referralId
       courseName shouldBe "Course name"
       audiences shouldBe collatedAudiences

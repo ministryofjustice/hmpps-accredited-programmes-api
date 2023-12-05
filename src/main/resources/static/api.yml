@@ -1092,6 +1092,17 @@ components:
           type: string
         prisonNumber:
           type: string
+        prisonName:
+          type: string
+          description: Name of the prison
+        organisationId:
+          type: string
+          description: ID of the organisation
+        sentenceDate:
+          $ref: '#/components/schemas/SentenceDate'
+        prisonerName:
+          $ref: '#/components/schemas/Name'
+
       required:
       - id
       - referrerUsername
@@ -1127,3 +1138,35 @@ components:
           type: string
       required:
         - prisonNumber
+
+    Name:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: First name of the person
+        lastName:
+          type: string
+          description: Last name of the person
+
+    SentenceDate:
+      type: object
+      properties:
+        conditionalReleaseDate:
+          type: string
+          format: date
+          description: Conditional release date
+        tariffExpiryDate:
+          type: string
+          format: date
+          description: Tariff expiry date
+        paroleEligibilityDate:
+          type: string
+          format: date
+          description: Parole eligibility date
+        indeterminateSentence:
+          type: boolean
+          description: Indicates if it's an indeterminate sentence
+        nonDtoReleaseDateType:
+          type: string
+          description: Non-DTO release date type

@@ -34,6 +34,7 @@ import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
@@ -111,6 +112,8 @@ constructor(
 
   @MockkBean
   private lateinit var referralService: ReferralService
+  val prisons: Map<String?, String> = mapOf("AA123A" to "New prison name")
+  val prisoners: Map<String?, List<Prisoner>> = mapOf("123" to listOf(Prisoner(prisonerNumber = "123")))
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {
@@ -445,7 +448,7 @@ constructor(
     }
 
     every { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null, null) } returns
-      PageImpl(projectionsForFirstReferral.toApi() + projectionsForSecondReferral.toApi(), pageable, 2L)
+      PageImpl(projectionsForFirstReferral.toApi(prisoners, prisons, organisationId) + projectionsForSecondReferral.toApi(prisoners, prisons, organisationId), pageable, 2L)
 
     val mvcResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
@@ -525,10 +528,10 @@ constructor(
     }
 
     every { referralService.getReferralsByOrganisationId(organisationId, pageableFirstPage, null, null, null) } returns
-      PageImpl(projectionsForFirstReferral.toApi(), pageableFirstPage, 2)
+      PageImpl(projectionsForFirstReferral.toApi(prisoners, prisons, organisationId), pageableFirstPage, 2)
 
     every { referralService.getReferralsByOrganisationId(organisationId, pageableSecondPage, null, null, null) } returns
-      PageImpl(projectionsForSecondReferral.toApi(), pageableSecondPage, 2)
+      PageImpl(projectionsForSecondReferral.toApi(prisoners, prisons, organisationId), pageableSecondPage, 2)
 
     val firstPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
