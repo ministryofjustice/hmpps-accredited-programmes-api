@@ -104,6 +104,16 @@ file](src/test/resources/db/migration/R__test_data.sql) which retains state
 between tests, and is unfortunately very brittle. We would like to refactor this
 as soon as possible to set up and clear state between tests.
 
+### End to End Tests
+
+[We use Playwright](doc/adr/0002-use-playwright-for-end-to-end-tests.md) for
+running our end to end tests. These are run against the deployed development
+environment on each merge to `main`. These tests log in with a test user account
+`ACP_TEST`, linked to one of the developers' email addresses. From time to time
+the password needs to be reset, causing the tests to fail. When this happens, we
+need to update the `HMPPS_AUTH_PASSWORD` environment variable set in the
+[CircleCI project settings](https://app.circleci.com/settings/project/github/ministryofjustice/hmpps-accredited-programmes-api/environment-variables).
+
 ## OpenAPI documentation
 
 The API which is offered to front-end UI apps is documented using
