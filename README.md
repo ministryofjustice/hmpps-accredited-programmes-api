@@ -88,6 +88,22 @@ To run linting and tests, do:
 Repository integration tests use an embedded H2 database. REST API tests start a
 local server which listens on a random port.
 
+### Pact
+
+[We use
+Pact](https://github.com/ministryofjustice/hmpps-accredited-programmes-ui/blob/main/doc/adr/0002-use-pact-for-contract-testing.md)
+for testing the interactions between the UI and API services:
+
+- [UI Course client tests](https://github.com/ministryofjustice/hmpps-accredited-programmes-ui/blob/5d9e92aca4f89177be1b464f6317e9a04867ae9a/server/data/accreditedProgrammesApi/courseClient.test.ts#L15)
+- [UI Referral client tests](https://github.com/ministryofjustice/hmpps-accredited-programmes-ui/blob/5d9e92aca4f89177be1b464f6317e9a04867ae9a/server/data/accreditedProgrammesApi/referralClient.test.ts#L11)
+
+When the client tests are updated, the [API tests](src/test/kotlin/uk/gov/justice/digital/hmpps/hmppsaccreditedprogrammesapi/pact/PactContractTest.kt)
+need to be kept in sync, otherwise the build will fail. Test state is currently
+set up in [an SQL migration
+file](src/test/resources/db/migration/R__test_data.sql) which retains state
+between tests, and is unfortunately very brittle. We would like to refactor this
+as soon as possible to set up and clear state between tests.
+
 ## OpenAPI documentation
 
 The API which is offered to front-end UI apps is documented using
