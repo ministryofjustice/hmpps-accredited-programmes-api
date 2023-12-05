@@ -998,6 +998,7 @@ components:
         referrerId:
           description: A permanent identifier for the person creating the referral. StaffId for prison staff.
           type: string
+          deprecated: true
       required:
         - offeringId
         - prisonNumber
@@ -1030,12 +1031,15 @@ components:
               format: uuid
             status:
               $ref: "#/components/schemas/ReferralStatus"
+            referrerUsername:
+              type: string
             submittedOn:
               type: string
           required:
             - id
             - offeringId
             - prisonNumber
+            - referrerUsername
             - referrerId
             - oasysConfirmed
             - status
@@ -1073,6 +1077,9 @@ components:
           description: The unique id (UUID) of the new referral.
           type: string
           format: uuid
+        referrerUsername:
+          description: The unique HMPPS username of the user who created this referral.
+          type: string
         courseName:
           type: string
         audiences:
@@ -1087,6 +1094,7 @@ components:
           type: string
       required:
       - id
+      - referrerUsername
       - courseName
       - audiences
       - status

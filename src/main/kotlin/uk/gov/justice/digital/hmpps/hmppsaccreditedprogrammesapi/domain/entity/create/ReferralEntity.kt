@@ -25,7 +25,7 @@ data class ReferralEntity(
   @Id
   @GeneratedValue
   @Column(name = "referral_id")
-  val id: UUID? = null,
+  var id: UUID? = null,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "offering_id", referencedColumnName = "offering_id")
@@ -33,6 +33,11 @@ data class ReferralEntity(
 
   val prisonNumber: String,
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "referrer_username", referencedColumnName = "referrer_username")
+  var referrer: ReferrerUserEntity,
+
+  @Deprecated("Use referrer_user.username instead.")
   val referrerId: String,
 
   var additionalInformation: String? = null,

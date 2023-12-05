@@ -9,6 +9,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
@@ -22,7 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TEST_USER_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -75,7 +76,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
           yearStarted = created.outcome?.yearStarted,
           yearCompleted = created.outcome?.yearCompleted,
         ),
-        addedBy = TEST_USER_NAME,
+        addedBy = CLIENT_USERNAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,
@@ -106,7 +107,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
         detail = null,
         setting = null,
         outcome = null,
-        addedBy = TEST_USER_NAME,
+        addedBy = CLIENT_USERNAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,
@@ -134,7 +135,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .post()
       .uri("/course-participations")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(invalidCourseParticipation)
@@ -187,7 +188,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
           yearStarted = updated.outcome?.yearStarted,
           yearCompleted = updated.outcome?.yearCompleted,
         ),
-        addedBy = TEST_USER_NAME,
+        addedBy = CLIENT_USERNAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,
@@ -217,7 +218,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .put()
       .uri("/course-participations/{id}", nonExistentId)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(updateAttempt)
@@ -293,7 +294,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .post()
       .uri("/course-participations")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(courseParticipationToAdd)
@@ -306,7 +307,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .put()
       .uri("/course-participations/{id}", id)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(update)
       .exchange()
@@ -318,7 +319,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .delete()
       .uri("/course-participations/{id}", id)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
 
@@ -326,7 +327,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/course-participations/{id}", id)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -337,7 +338,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/course-participations/{id}", id)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .returnResult<Any>().status
@@ -346,7 +347,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/people/{prisonNumber}/course-participations", prisonNumber)
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk

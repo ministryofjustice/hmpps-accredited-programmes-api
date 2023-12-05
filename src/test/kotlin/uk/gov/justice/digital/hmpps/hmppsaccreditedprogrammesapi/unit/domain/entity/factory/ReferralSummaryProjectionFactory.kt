@@ -4,6 +4,7 @@ import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomSentence
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import java.time.LocalDateTime
@@ -17,6 +18,7 @@ class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
   private var status: Yielded<ReferralEntity.ReferralStatus> = { ReferralEntity.ReferralStatus.REFERRAL_STARTED }
   private var submittedOn: Yielded<LocalDateTime> = { LocalDateTime.now() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
+  private var referrerUsername: Yielded<String> = { randomUppercaseString(9) }
 
   fun withReferralId(referralId: UUID) = apply {
     this.referralId = { referralId }
@@ -42,6 +44,10 @@ class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
     this.prisonNumber = { prisonNumber }
   }
 
+  fun withReferrerUsername(referrerUsername: String) = apply {
+    this.referrerUsername = { referrerUsername }
+  }
+
   override fun produce() = ReferralSummaryProjection(
     referralId = this.referralId(),
     courseName = this.courseName(),
@@ -49,5 +55,6 @@ class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
     status = this.status(),
     submittedOn = this.submittedOn(),
     prisonNumber = this.prisonNumber(),
+    referrerUsername = this.referrerUsername(),
   )
 }

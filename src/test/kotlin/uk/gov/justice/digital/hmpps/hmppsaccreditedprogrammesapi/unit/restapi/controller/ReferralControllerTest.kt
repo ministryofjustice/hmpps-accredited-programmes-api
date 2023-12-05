@@ -24,6 +24,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
@@ -33,6 +35,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Pagin
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomReferrerId
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -44,6 +48,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.stream.Stream
@@ -60,14 +65,13 @@ constructor(
 ) {
 
   companion object {
-    const val PRISON_NUMBER = "A1234AA"
-
     private val referralSummary1 = ReferralSummary(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary1",
       audiences = listOf("Audience 1", "Audience 2"),
       status = ReferralStatus.referralStarted,
       prisonNumber = PRISON_NUMBER,
+      referrerUsername = CLIENT_USERNAME,
     )
 
     private val referralSummary2 = ReferralSummary(
@@ -77,6 +81,7 @@ constructor(
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
       prisonNumber = PRISON_NUMBER,
+      referrerUsername = CLIENT_USERNAME,
     )
 
     private val referralSummary3 = ReferralSummary(
@@ -86,6 +91,7 @@ constructor(
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
       prisonNumber = PRISON_NUMBER,
+      referrerUsername = CLIENT_USERNAME,
     )
 
     @JvmStatic
@@ -107,7 +113,7 @@ constructor(
   private lateinit var referralService: ReferralService
 
   @Test
-  fun `createReferral with JWT and valid payload returns 201 with correct body`() {
+  fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {
     val referral = ReferralEntityFactory()
       .withOffering(
         OfferingEntityFactory()
@@ -115,8 +121,56 @@ constructor(
           .produce(),
       )
       .withPrisonNumber(randomPrisonNumber())
+      .withReferrer(
+        ReferrerUserEntityFactory()
+          .withUsername(CLIENT_USERNAME)
+          .produce(),
+      )
       .withReferrerId(randomReferrerId())
       .produce()
+
+    val payload = mapOf(
+      "offeringId" to referral.offering.id,
+      "prisonNumber" to referral.prisonNumber,
+      "referrerId" to referral.referrerId,
+    )
+
+    every { referralService.createReferral(any(), any(), any()) } returns referral.id
+
+    mockMvc.post("/referrals") {
+      contentType = MediaType.APPLICATION_JSON
+      headers { set(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken()) }
+      content = jacksonObjectMapper().writeValueAsString(payload)
+    }.andExpect {
+      status { isCreated() }
+      content {
+        contentType(MediaType.APPLICATION_JSON)
+        jsonPath("$.referralId") { value(referral.id.toString()) }
+      }
+    }
+
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId) }
+  }
+
+  @Test
+  @WithMockUser(username = "NONEXISTENT_USER")
+  fun `createReferral with JWT, nonexistent user, and valid payload returns 201 with correct body`() {
+    val referral = ReferralEntityFactory()
+      .withOffering(
+        OfferingEntityFactory()
+          .withId(UUID.randomUUID())
+          .produce(),
+      )
+      .withPrisonNumber(randomPrisonNumber())
+      .withReferrer(
+        ReferrerUserEntityFactory()
+          .withUsername(SecurityContextHolder.getContext().authentication?.name.toString())
+          .produce(),
+      )
+      .withReferrerId(randomReferrerId())
+      .produce()
+
+    SecurityContextHolder.getContext().authentication?.name shouldBe "NONEXISTENT_USER"
 
     val payload = mapOf(
       "offeringId" to referral.offering.id,
@@ -150,6 +204,11 @@ constructor(
           .withId(UUID.randomUUID())
           .produce(),
       )
+      .withReferrer(
+        ReferrerUserEntityFactory()
+          .withUsername(CLIENT_USERNAME)
+          .produce(),
+      )
       .withOasysConfirmed(true)
       .withHasReviewedProgrammeHistory(true)
       .produce()
@@ -165,6 +224,7 @@ constructor(
         contentType(MediaType.APPLICATION_JSON)
         jsonPath("$.offeringId") { value(referral.offering.id.toString()) }
         jsonPath("$.prisonNumber") { value(referral.prisonNumber) }
+        jsonPath("$.referrerUsername") { value(referral.referrer.username) }
         jsonPath("$.referrerId") { value(referral.referrerId) }
         jsonPath("$.status") { REFERRAL_STARTED }
         jsonPath("$.oasysConfirmed") { value(true) }
@@ -283,6 +343,11 @@ constructor(
           .produce(),
       )
       .withPrisonNumber(randomPrisonNumber())
+      .withReferrer(
+        ReferrerUserEntityFactory()
+          .withUsername(CLIENT_USERNAME)
+          .produce(),
+      )
       .withReferrerId(randomReferrerId())
       .withAdditionalInformation("Additional Info")
       .withOasysConfirmed(true)
@@ -326,6 +391,11 @@ constructor(
           .produce(),
       )
       .withPrisonNumber(randomPrisonNumber())
+      .withReferrer(
+        ReferrerUserEntityFactory()
+          .withUsername(CLIENT_USERNAME)
+          .produce(),
+      )
       .withReferrerId(randomReferrerId())
       .produce()
 
@@ -356,6 +426,7 @@ constructor(
         .withAudience(audience)
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
         .withPrisonNumber(PRISON_NUMBER)
+        .withReferrerUsername(CLIENT_USERNAME)
         .produce()
     }
 
@@ -369,6 +440,7 @@ constructor(
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
         .withSubmittedOn(LocalDateTime.MIN)
         .withPrisonNumber(PRISON_NUMBER)
+        .withReferrerUsername(CLIENT_USERNAME)
         .produce()
     }
 
@@ -401,6 +473,7 @@ constructor(
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
     val secondReferral = paginatedReferralSummary.content?.find { it.id == secondReferralId }
@@ -411,6 +484,7 @@ constructor(
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
       referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
     verify { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null, null) }
@@ -432,6 +506,7 @@ constructor(
         .withAudience(audience)
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
         .withPrisonNumber(PRISON_NUMBER)
+        .withReferrerUsername(CLIENT_USERNAME)
         .produce()
     }
 
@@ -445,6 +520,7 @@ constructor(
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
         .withSubmittedOn(LocalDateTime.MIN)
         .withPrisonNumber(PRISON_NUMBER)
+        .withReferrerUsername(CLIENT_USERNAME)
         .produce()
     }
 
@@ -477,6 +553,7 @@ constructor(
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
     val secondPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
@@ -503,6 +580,7 @@ constructor(
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
       referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
     verify(exactly = 1) { referralService.getReferralsByOrganisationId(organisationId, pageableFirstPage, null, null, null) }

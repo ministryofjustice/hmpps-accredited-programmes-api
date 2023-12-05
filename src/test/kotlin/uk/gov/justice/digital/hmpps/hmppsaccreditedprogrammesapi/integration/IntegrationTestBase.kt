@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -25,7 +26,7 @@ abstract class IntegrationTestBase {
     webTestClient
       .get()
       .uri("/courses")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -36,7 +37,7 @@ abstract class IntegrationTestBase {
     webTestClient
       .get()
       .uri("/courses/$courseId")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -51,7 +52,7 @@ abstract class IntegrationTestBase {
     webTestClient
       .get()
       .uri("/courses/$courseId/offerings")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk

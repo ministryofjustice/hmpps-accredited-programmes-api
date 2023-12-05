@@ -8,7 +8,9 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.util.UriComponentsBuilder
@@ -21,6 +23,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.util.UUID
@@ -29,13 +34,9 @@ import java.util.UUID
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class ReferralIntegrationTest : IntegrationTestBase() {
-  companion object {
-    const val PRISON_NUMBER = "A1234AA"
-    const val REFERRER_ID = "MWX0001"
-  }
 
   @Test
-  fun `Creating a referral should return 201 with correct body`() {
+  fun `Creating a referral with an existing user should return 201 with correct body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
     val createdReferralId = createReferral(offeringId).referralId
@@ -45,6 +46,30 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
       offeringId = offeringId,
+      referrerUsername = CLIENT_USERNAME,
+      referrerId = REFERRER_ID,
+      prisonNumber = PRISON_NUMBER,
+      status = ReferralStatus.referralStarted,
+      additionalInformation = null,
+      oasysConfirmed = false,
+      hasReviewedProgrammeHistory = false,
+      submittedOn = null,
+    )
+  }
+
+  @Test
+  @WithMockUser(username = "NONEXISTENT_USER")
+  fun `Creating a referral with a nonexistent user should return 201 with correct body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val createdReferralId = createReferral(offeringId).referralId
+
+    createdReferralId.shouldNotBeNull()
+
+    getReferralById(createdReferralId) shouldBeEqual Referral(
+      id = createdReferralId,
+      offeringId = offeringId,
+      referrerUsername = "NONEXISTENT_USER",
       referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
@@ -72,6 +97,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
       offeringId = offeringId,
+      referrerUsername = CLIENT_USERNAME,
       referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
@@ -87,7 +113,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     webTestClient
       .put()
       .uri("/referrals/${UUID.randomUUID()}")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(
         ReferralUpdate(
@@ -108,7 +134,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     webTestClient
       .put()
       .uri("/referrals/$createdReferralId/status")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(
         ReferralStatusUpdate(
@@ -120,6 +146,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
       offeringId = offeringId,
+      referrerUsername = CLIENT_USERNAME,
       referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralSubmitted,
@@ -154,7 +181,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     webTestClient
       .post()
       .uri("/referrals/${UUID.randomUUID()}/submit")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isNotFound
@@ -184,6 +211,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           status = createdReferral.status,
           submittedOn = createdReferral.submittedOn,
           prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = CLIENT_USERNAME,
         ),
       ).forEach { expectedSummary ->
         actualSummary.id shouldBe expectedSummary.id
@@ -203,48 +231,51 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     paginatedReferralSummaries.content?.shouldBeEmpty()
   }
 
-  fun createReferral(offeringId: UUID) = webTestClient
-    .post()
-    .uri("/referrals")
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .contentType(MediaType.APPLICATION_JSON)
-    .accept(MediaType.APPLICATION_JSON)
-    .bodyValue(
-      ReferralCreate(
-        offeringId = offeringId,
-        referrerId = REFERRER_ID,
-        prisonNumber = PRISON_NUMBER,
-      ),
-    )
-    .exchange()
-    .expectStatus().isCreated
-    .expectBody<ReferralCreated>()
-    .returnResult().responseBody!!
+  fun createReferral(offeringId: UUID) =
+    webTestClient
+      .post()
+      .uri("/referrals")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        ReferralCreate(
+          offeringId = offeringId,
+          prisonNumber = PRISON_NUMBER,
+          referrerId = REFERRER_ID,
+        ),
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectBody<ReferralCreated>()
+      .returnResult().responseBody!!
 
-  fun getReferralById(createdReferralId: UUID) = webTestClient
-    .get()
-    .uri("/referrals/$createdReferralId")
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<Referral>()
-    .returnResult().responseBody!!
+  fun getReferralById(createdReferralId: UUID) =
+    webTestClient
+      .get()
+      .uri("/referrals/$createdReferralId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Referral>()
+      .returnResult().responseBody!!
 
-  fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate): Any = webTestClient
-    .put()
-    .uri("/referrals/$referralId")
-    .headers(jwtAuthHelper.authorizationHeaderConfigurer())
-    .contentType(MediaType.APPLICATION_JSON)
-    .bodyValue(referralUpdate)
-    .exchange()
-    .expectStatus().isNoContent
+  fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate): Any =
+    webTestClient
+      .put()
+      .uri("/referrals/$referralId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(referralUpdate)
+      .exchange()
+      .expectStatus().isNoContent
 
   fun submitReferral(createdReferralId: UUID) {
     webTestClient
       .post()
       .uri("/referrals/$createdReferralId/submit")
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isNoContent
@@ -262,7 +293,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     return webTestClient
       .get()
       .uri(uriBuilder.toUriString())
-      .headers(jwtAuthHelper.authorizationHeaderConfigurer())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk

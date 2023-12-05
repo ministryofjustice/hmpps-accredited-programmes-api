@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.servlet.MockHttpServletRequestDsl
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
@@ -79,7 +78,7 @@ constructor(
 
       mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON
-        authorizationHeader()
+        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
         content {
@@ -123,7 +122,7 @@ constructor(
 
       mockMvc.get("/people/{prisonNumber}/course-participations", "A1234AA") {
         accept = MediaType.APPLICATION_JSON
-        authorizationHeader()
+        header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
         content {
@@ -132,6 +131,4 @@ constructor(
       }
     }
   }
-
-  private fun MockHttpServletRequestDsl.authorizationHeader() = header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
 }

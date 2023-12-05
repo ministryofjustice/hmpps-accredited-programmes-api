@@ -15,6 +15,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import org.springframework.security.core.context.SecurityContextHolder
 import java.time.LocalDateTime
 import java.time.Year
 import java.util.UUID
@@ -41,7 +42,7 @@ data class CourseParticipationEntity(
   var outcome: CourseParticipationOutcome? = null,
 
   @CreatedBy
-  var createdByUsername: String = "anonymous",
+  var createdByUsername: String = SecurityContextHolder.getContext().authentication?.name ?: "UNKNOWN_USER",
 
   @CreatedDate
   var createdDateTime: LocalDateTime = LocalDateTime.MIN,

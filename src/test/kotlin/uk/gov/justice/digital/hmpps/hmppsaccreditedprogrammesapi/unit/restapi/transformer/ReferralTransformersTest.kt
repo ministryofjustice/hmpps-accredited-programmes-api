@@ -8,6 +8,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.awaitingAssessment
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralStarted
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralSubmitted
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.ASSESSMENT_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
@@ -22,10 +24,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate as DomainReferralUpdate
 
 class ReferralTransformersTest {
-
-  companion object {
-    const val PRISON_NUMBER = "A1234AA"
-  }
 
   @ParameterizedTest
   @EnumSource
@@ -122,6 +120,7 @@ class ReferralTransformersTest {
         .withAudience(audience)
         .withStatus(REFERRAL_STARTED)
         .withPrisonNumber(PRISON_NUMBER)
+        .withReferrerUsername(CLIENT_USERNAME)
         .produce()
     }
 
@@ -131,6 +130,7 @@ class ReferralTransformersTest {
       audiences shouldBe collatedAudiences
       status shouldBe referralStarted
       prisonNumber shouldBe PRISON_NUMBER
+      referrerUsername shouldBe CLIENT_USERNAME
     }
   }
 }

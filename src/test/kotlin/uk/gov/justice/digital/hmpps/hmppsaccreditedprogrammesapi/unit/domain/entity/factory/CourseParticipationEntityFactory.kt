@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.en
 
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
@@ -17,8 +18,10 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
   private var courseName: Yielded<String?> = { null }
   private var source: Yielded<String?> = { null }
   private var detail: Yielded<String?> = { null }
-  private var setting: Yielded<CourseParticipationSetting> = { CourseParticipationSetting(type = CourseSetting.CUSTODY) }
-  private var outcome: Yielded<CourseParticipationOutcome> = { CourseParticipationOutcome(status = CourseStatus.INCOMPLETE) }
+  private var setting: Yielded<CourseParticipationSetting?> = { CourseParticipationSetting(type = CourseSetting.CUSTODY) }
+  private var outcome: Yielded<CourseParticipationOutcome?> = { CourseParticipationOutcome(status = CourseStatus.INCOMPLETE) }
+  private var createdByUsername: Yielded<String> = { CLIENT_USERNAME }
+  private var lastModifiedByUsername: Yielded<String?> = { null }
 
   fun withId(id: UUID) = apply {
     this.id = { id }
@@ -40,12 +43,20 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
     this.detail = { detail }
   }
 
-  fun withSetting(setting: CourseParticipationSetting) = apply {
+  fun withSetting(setting: CourseParticipationSetting?) = apply {
     this.setting = { setting }
   }
 
-  fun withOutcome(outcome: CourseParticipationOutcome) = apply {
+  fun withOutcome(outcome: CourseParticipationOutcome?) = apply {
     this.outcome = { outcome }
+  }
+
+  fun withCreatedByUsername(createdByUsername: String) = apply {
+    this.createdByUsername = { createdByUsername }
+  }
+
+  fun withLastModifiedByUsername(lastModifiedByUsername: String) = apply {
+    this.lastModifiedByUsername = { lastModifiedByUsername }
   }
 
   override fun produce(): CourseParticipationEntity {
@@ -57,6 +68,8 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
       detail = this.detail(),
       setting = this.setting(),
       outcome = this.outcome(),
+      createdByUsername = this.createdByUsername(),
+      lastModifiedByUsername = this.lastModifiedByUsername(),
     )
   }
 }

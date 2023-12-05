@@ -3,11 +3,11 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.SIG.RS256
 import org.springframework.context.annotation.Bean
-import org.springframework.http.HttpHeaders
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TEST_USER_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
@@ -28,33 +28,23 @@ class JwtAuthHelper {
   @Bean
   fun jwtDecoder(): JwtDecoder = NimbusJwtDecoder.withPublicKey(keyPair.public as RSAPublicKey).build()
 
-  fun authorizationHeaderConfigurer() = { headers: HttpHeaders -> headers.set(HttpHeaders.AUTHORIZATION, bearerToken()) }
+  fun bearerToken(): String {
+    val auth = SecurityContextHolder.getContext().authentication
 
-  fun bearerToken(): String = createJwt(
-    subject = TEST_USER_NAME,
-    expiryTime = Duration.ofHours(1L),
-  ).let { "Bearer $it" }
-
-  private fun createJwt(
-    subject: String?,
-    scope: List<String>? = listOf(),
-    roles: List<String>? = listOf(),
-    expiryTime: Duration = Duration.ofHours(1),
-    jwtId: String = UUID.randomUUID().toString(),
-  ): String {
-    val claims = mutableMapOf<String, Any>()
-
-    subject?.let { claims["user_name"] = it }
-    roles?.let { claims["authorities"] = it }
-    scope?.let { claims["scope"] = it }
-    claims["client_id"] = "hmpps-accredited-programmes-ui"
+    val claims = mutableMapOf<String, Any>().apply {
+      put("user_name", auth?.name ?: CLIENT_USERNAME)
+      put("authorities", auth?.authorities?.map { it.authority } ?: listOf<String>())
+      put("scope", listOf<String>())
+      put("client_id", "hmpps-accredited-programmes-ui")
+    }
 
     return Jwts.builder()
-      .id(jwtId)
-      .subject(subject)
+      .id(UUID.randomUUID().toString())
+      .subject(auth?.name ?: CLIENT_USERNAME)
       .claims(claims)
-      .expiration(Date(System.currentTimeMillis() + expiryTime.toMillis()))
+      .expiration(Date(System.currentTimeMillis() + Duration.ofHours(1).toMillis()))
       .signWith(keyPair.private, RS256)
       .compact()
+      .let { "Bearer $it" }
   }
 }

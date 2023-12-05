@@ -5,14 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.time.LocalDateTime
 import java.util.UUID
@@ -24,17 +27,35 @@ class ReferralService
 @Autowired
 constructor(
   private val referralRepository: ReferralRepository,
+  private val referrerUserRepository: ReferrerUserRepository,
   private val offeringRepository: JpaOfferingRepository,
 ) {
+
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
     referrerId: String,
   ): UUID? {
-    val offering = offeringRepository.findById(offeringId).orElseThrow { Exception("Offering not found") }
-    val referral = ReferralEntity(offering = offering, prisonNumber = prisonNumber, referrerId = referrerId)
-    return referralRepository.save(referral).id
+    val username = SecurityContextHolder.getContext().authentication?.name
+      ?: throw SecurityException("Authentication information not found")
+
+    val referrerUser = referrerUserRepository.findById(username).orElseGet {
+      referrerUserRepository.save(ReferrerUserEntity(username = username))
+    }
+
+    val offering = offeringRepository.findById(offeringId)
+      .orElseThrow { Exception("Offering not found") }
+
+    return referralRepository.save(
+      ReferralEntity(
+        offering = offering,
+        prisonNumber = prisonNumber,
+        referrerId = referrerId,
+        referrer = referrerUser,
+      ),
+    ).id ?: throw Exception("Referral creation failed")
   }
+
   fun getReferralById(referralId: UUID): ReferralEntity? = referralRepository.findById(referralId).getOrNull()
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
@@ -59,6 +80,7 @@ constructor(
     val requiredFields = listOf(
       referral.offering.id to "offeringId",
       referral.prisonNumber to "prisonNumber",
+      referral.referrer to "referrer",
       referral.referrerId to "referrerId",
       referral.additionalInformation to "additionalInformation",
       referral.oasysConfirmed to "oasysConfirmed",
