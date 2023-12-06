@@ -31,7 +31,6 @@ fun capitalisedWord(length: IntRange) = upperCase(1) + lowerCase((length).random
 fun randomEmailAddress() = (lowerCase(5) + ".".asSequence() + lowerCase(8) + "@".asSequence() + lowerCase(6) + ".com".asSequence()).asString()
 
 fun randomPrisonNumber(): String = (upperCase(1) + digits(4) + upperCase(2)).asString()
-fun randomPrisonName(): String = (upperCase(1) + digits(4) + upperCase(2)).asString()
 fun randomReferrerId(): String = (upperCase(3) + digits(4) + upperCase(2)).asString()
 
 fun Sequence<Char>.asString() = fold(StringBuilder(), StringBuilder::append).toString()
