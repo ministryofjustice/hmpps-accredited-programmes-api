@@ -43,7 +43,6 @@ class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
   fun withPrisonNumber(prisonNumber: String) = apply {
     this.prisonNumber = { prisonNumber }
   }
-
   fun withReferrerUsername(referrerUsername: String) = apply {
     this.referrerUsername = { referrerUsername }
   }
