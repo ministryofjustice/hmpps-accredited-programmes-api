@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomEmailAddress
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomLowercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomSentence
@@ -52,7 +51,6 @@ constructor(
 
     val referral = ReferralEntityFactory()
       .withReferrer(referrer)
-      .withReferrerId(REFERRER_ID)
       .withPrisonNumber(PRISON_NUMBER)
       .withOffering(offering)
       .produce()
@@ -61,7 +59,6 @@ constructor(
 
     referralRepository.findById(referral.id!!) shouldBePresent {
       referrer shouldBe referrer
-      referrerId shouldBe referrerId
       prisonNumber shouldBe prisonNumber
       offering shouldBe offering
       offering.course shouldBe course
@@ -93,7 +90,6 @@ constructor(
 
     val referral = ReferralEntityFactory()
       .withReferrer(referrer)
-      .withReferrerId(REFERRER_ID)
       .withPrisonNumber(PRISON_NUMBER)
       .withOffering(offering)
       .produce()
@@ -107,7 +103,6 @@ constructor(
 
     referralRepository.findById(referral.id!!) shouldBePresent {
       referrer shouldBe referrer
-      referrerId shouldBe referrerId
       prisonNumber shouldBe prisonNumber
       offering shouldBe offering
       offering.course shouldBe course

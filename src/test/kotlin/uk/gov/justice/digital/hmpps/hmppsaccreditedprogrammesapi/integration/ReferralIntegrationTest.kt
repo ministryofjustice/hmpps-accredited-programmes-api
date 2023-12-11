@@ -30,7 +30,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.util.UUID
@@ -52,7 +51,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = CLIENT_USERNAME,
-      referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
       additionalInformation = null,
@@ -75,7 +73,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = "NONEXISTENT_USER",
-      referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
       additionalInformation = null,
@@ -103,7 +100,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = CLIENT_USERNAME,
-      referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralStarted,
       additionalInformation = "Additional information",
@@ -146,7 +142,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = CLIENT_USERNAME,
-      referrerId = REFERRER_ID,
       prisonNumber = PRISON_NUMBER,
       status = ReferralStatus.referralSubmitted,
       oasysConfirmed = false,
@@ -346,7 +341,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         ReferralCreate(
           offeringId = offeringId,
           prisonNumber = PRISON_NUMBER,
-          referrerId = REFERRER_ID,
         ),
       )
       .exchange()

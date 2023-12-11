@@ -50,7 +50,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TARIFF_EXPIRYDATE
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomReferrerId
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
@@ -74,10 +73,6 @@ constructor(
   val mockMvc: MockMvc,
   val jwtAuthHelper: JwtAuthHelper,
 ) {
-
-  private val objectMapper = jacksonObjectMapper().apply {
-    registerModule(JavaTimeModule())
-  }
 
   companion object {
     private val referralSummary1 = ReferralSummary(
@@ -121,29 +116,16 @@ constructor(
         Arguments.of(null, "Audience X", null, emptyList<ReferralSummary>()),
         Arguments.of(null, null, "Course for referralSummaryX", emptyList<ReferralSummary>()),
         Arguments.of(listOf("REFERRAL_STARTED", "REFERRAL_SUBMITTED"), null, null, listOf(referralSummary1, referralSummary2, referralSummary3)),
-
       )
+    }
+
+    private val objectMapper = jacksonObjectMapper().apply {
+      registerModule(JavaTimeModule())
     }
   }
 
   @MockkBean
   private lateinit var referralService: ReferralService
-  private val prisons = mapOf<String?, String>(ORGANISATION_ID to PRISON_NAME)
-  private val prisoners = mapOf<String?, List<Prisoner>>(
-    PRISON_NUMBER to listOf(
-      Prisoner(
-        prisonerNumber = PRISON_NUMBER,
-        bookingId = BOOKING_ID,
-        firstName = PRISONER_FIRST_NAME,
-        lastName = PRISONER_LAST_NAME,
-        nonDtoReleaseDateType = NONDTORELEASE_DATETYPE,
-        conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
-        tariffDate = TARIFF_EXPIRYDATE,
-        paroleEligibilityDate = PAROLE_ELIGIBILITYDATE,
-        indeterminateSentence = INDETERMINATE_SENTENCE,
-      ),
-    ),
-  )
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {
@@ -159,16 +141,14 @@ constructor(
           .withUsername(CLIENT_USERNAME)
           .produce(),
       )
-      .withReferrerId(randomReferrerId())
       .produce()
 
     val payload = mapOf(
       "offeringId" to referral.offering.id,
       "prisonNumber" to referral.prisonNumber,
-      "referrerId" to referral.referrerId,
     )
 
-    every { referralService.createReferral(any(), any(), any()) } returns referral.id
+    every { referralService.createReferral(any(), any()) } returns referral.id
 
     mockMvc.post("/referrals") {
       contentType = MediaType.APPLICATION_JSON
@@ -182,7 +162,7 @@ constructor(
       }
     }
 
-    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId!!) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) }
   }
 
   @Test
@@ -200,7 +180,6 @@ constructor(
           .withUsername(SecurityContextHolder.getContext().authentication?.name.toString())
           .produce(),
       )
-      .withReferrerId(randomReferrerId())
       .produce()
 
     SecurityContextHolder.getContext().authentication?.name shouldBe "NONEXISTENT_USER"
@@ -208,10 +187,9 @@ constructor(
     val payload = mapOf(
       "offeringId" to referral.offering.id,
       "prisonNumber" to referral.prisonNumber,
-      "referrerId" to referral.referrerId,
     )
 
-    every { referralService.createReferral(any(), any(), any()) } returns referral.id
+    every { referralService.createReferral(any(), any()) } returns referral.id
 
     mockMvc.post("/referrals") {
       contentType = MediaType.APPLICATION_JSON
@@ -225,7 +203,7 @@ constructor(
       }
     }
 
-    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId!!) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) }
   }
 
   @Test
@@ -258,7 +236,6 @@ constructor(
         jsonPath("$.offeringId") { value(referral.offering.id.toString()) }
         jsonPath("$.prisonNumber") { value(referral.prisonNumber) }
         jsonPath("$.referrerUsername") { value(referral.referrer.username) }
-        jsonPath("$.referrerId") { value(referral.referrerId) }
         jsonPath("$.status") { REFERRAL_STARTED }
         jsonPath("$.oasysConfirmed") { value(true) }
         jsonPath("$.hasReviewedProgrammeHistory") { value(true) }
@@ -381,7 +358,6 @@ constructor(
           .withUsername(CLIENT_USERNAME)
           .produce(),
       )
-      .withReferrerId(randomReferrerId())
       .withAdditionalInformation("Additional Info")
       .withOasysConfirmed(true)
       .withHasReviewedProgrammeHistory(true)
@@ -429,7 +405,6 @@ constructor(
           .withUsername(CLIENT_USERNAME)
           .produce(),
       )
-      .withReferrerId(randomReferrerId())
       .produce()
 
     every { referralService.getReferralById(referral.id!!) } returns referral
@@ -529,7 +504,7 @@ constructor(
 
     val firstReferralId = UUID.randomUUID()
     val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
-    val projectionsForFirstReferral = audiencesForFirstReferral.map { audience ->
+    audiencesForFirstReferral.map { audience ->
       ReferralSummaryProjectionFactory()
         .withReferralId(firstReferralId)
         .withCourseName("Course name")
@@ -542,7 +517,7 @@ constructor(
 
     val secondReferralId = UUID.randomUUID()
     val audiencesForSecondReferral = listOf("Audience 4", "Audience 5", "Audience 6")
-    val projectionsForSecondReferral = audiencesForSecondReferral.map { audience ->
+    audiencesForSecondReferral.map { audience ->
       ReferralSummaryProjectionFactory()
         .withReferralId(secondReferralId)
         .withCourseName("Another course name")
