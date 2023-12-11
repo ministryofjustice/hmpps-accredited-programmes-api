@@ -131,17 +131,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offeringId = getFirstOfferingIdForCourse(courseId)
     val createdReferralId = createReferral(offeringId).referralId
 
-    webTestClient
-      .put()
-      .uri("/referrals/$createdReferralId/status")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        ReferralStatusUpdate(
-          status = ReferralStatus.referralSubmitted,
-        ),
-      )
-      .exchange().expectStatus().isNoContent
+    val referralStatusUpdate = ReferralStatusUpdate(
+      status = ReferralStatus.referralSubmitted,
+    )
+
+    updateReferralStatus(createdReferralId, referralStatusUpdate)
 
     getReferralById(createdReferralId) shouldBeEqual Referral(
       id = createdReferralId,
@@ -225,6 +219,75 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Retrieving a list of multi-status-filtered referrals for an organisation should return 200 with correct body`() {
+    val courseId = getFirstCourseId()
+    val offeringId = getFirstOfferingIdForCourse(courseId)
+    val organisationId = "MDI"
+
+    val firstReferralCreated = createReferral(offeringId)
+    val firstCreatedReferral = getReferralById(firstReferralCreated.referralId)
+
+    val secondReferralCreated = createReferral(offeringId)
+    val secondCreatedReferral = getReferralById(secondReferralCreated.referralId)
+
+    firstReferralCreated.referralId.shouldNotBeNull()
+    firstCreatedReferral.shouldNotBeNull()
+
+    secondReferralCreated.referralId.shouldNotBeNull()
+    secondCreatedReferral.shouldNotBeNull()
+
+    val secondReferralStatusUpdate = ReferralStatusUpdate(
+      status = ReferralStatus.referralSubmitted,
+    )
+
+    updateReferralStatus(secondCreatedReferral.id, secondReferralStatusUpdate)
+
+    getReferralById(secondCreatedReferral.id).status shouldBe secondReferralStatusUpdate.status
+
+    val firstReferralStatus = firstCreatedReferral.status.toDomain().name
+    val secondReferralStatus = secondCreatedReferral.status.toDomain().name
+
+    val statusFilter = listOf(firstReferralStatus, secondReferralStatus)
+    val audienceFilter = getCourseById(courseId).audiences.map { it.value }.first()
+    val summary = getReferralSummariesByOrganisationId(organisationId, statusFilter, audienceFilter)
+
+    val expectedFirstSummary = ReferralSummary(
+      id = firstCreatedReferral.id,
+      courseName = getCourseById(courseId).name,
+      audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+      status = firstCreatedReferral.status,
+      submittedOn = firstCreatedReferral.submittedOn,
+      prisonNumber = firstCreatedReferral.prisonNumber,
+      referrerUsername = CLIENT_USERNAME,
+    )
+
+    val expectedSecondSummary = ReferralSummary(
+      id = secondCreatedReferral.id,
+      courseName = getCourseById(courseId).name,
+      audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+      status = secondCreatedReferral.status,
+      submittedOn = secondCreatedReferral.submittedOn,
+      prisonNumber = secondCreatedReferral.prisonNumber,
+      referrerUsername = CLIENT_USERNAME,
+    )
+
+    val expectedSummaries = setOf(expectedFirstSummary, expectedSecondSummary)
+
+    summary.content?.forEach { actualSummary ->
+      val expectedSummary = expectedSummaries.find { it.id == actualSummary.id }
+      expectedSummary.shouldNotBeNull()
+
+      actualSummary.id shouldBe expectedSummary.id
+      actualSummary.courseName shouldBe expectedSummary.courseName
+      actualSummary.audiences shouldContainExactlyInAnyOrder expectedSummary.audiences
+      actualSummary.status shouldBe expectedSummary.status
+      actualSummary.submittedOn shouldBe expectedSummary.submittedOn
+      actualSummary.prisonNumber shouldBe expectedSummary.prisonNumber
+      actualSummary.referrerUsername shouldBe expectedSummary.referrerUsername
+    }
+  }
+
+  @Test
   fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
     val randomOrganisationId = randomUppercaseString(3)
     val paginatedReferralSummaries = getReferralSummariesByOrganisationId(randomOrganisationId)
@@ -270,6 +333,15 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .bodyValue(referralUpdate)
       .exchange()
       .expectStatus().isNoContent
+
+  private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) =
+    webTestClient
+      .put()
+      .uri("/referrals/$createdReferralId/status")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(referralStatusUpdate)
+      .exchange().expectStatus().isNoContent
 
   fun submitReferral(createdReferralId: UUID) {
     webTestClient
