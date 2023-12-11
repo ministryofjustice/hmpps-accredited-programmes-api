@@ -74,14 +74,15 @@ class ReferralServiceTest {
       }
 
       return Stream.of(
-        Arguments.of("REFERRAL_STARTED", null, "referralSummary1", projections1),
+        Arguments.of(listOf("REFERRAL_STARTED"), null, "referralSummary1", projections1),
         Arguments.of(null, "Audience 2", null, projections1 + projections2),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", null, projections2 + projections3),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", "referralSummary3", projections3),
+        Arguments.of(listOf("REFERRAL_SUBMITTED"), "Audience 3", null, projections2 + projections3),
+        Arguments.of(listOf("REFERRAL_SUBMITTED"), "Audience 4", "referralSummary3", projections3),
         Arguments.of(null, null, "Course", projections1 + projections2 + projections3),
-        Arguments.of("AWAITING_ASSESSMENT", null, null, emptyList<ReferralSummaryProjection>()),
+        Arguments.of(listOf("AWAITING_ASSESSMENT"), null, null, emptyList<ReferralSummaryProjection>()),
         Arguments.of(null, "Audience X", null, emptyList<ReferralSummaryProjection>()),
         Arguments.of(null, null, "Course for referralSummaryX", emptyList<ReferralSummaryProjection>()),
+        Arguments.of(listOf("REFERRAL_STARTED", "REFERRAL_SUBMITTED"), null, null, projections1 + projections2 + projections3),
       )
     }
   }
@@ -199,16 +200,16 @@ class ReferralServiceTest {
   @ParameterizedTest
   @MethodSource("parametersForGetReferralsByOrganisationId")
   fun `getReferralsByOrganisationId with valid organisationId and filtering should return pageable ReferralSummary objects`(
-    statusFilter: String?,
+    statusFilter: List<String>?,
     audienceFilter: String?,
     courseFilter: String?,
     expectedReferralSummaryProjections: List<ReferralSummaryProjection>,
   ) {
     val orgId = "MDI"
     val pageable = PageRequest.of(0, 10)
-    val status = statusFilter?.let { ReferralEntity.ReferralStatus.valueOf(it) }
+    val statusEnums = statusFilter?.map { ReferralEntity.ReferralStatus.valueOf(it) }
 
-    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter, courseFilter) } returns
+    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, statusEnums, audienceFilter, courseFilter) } returns
       PageImpl(expectedReferralSummaryProjections, pageable, expectedReferralSummaryProjections.size.toLong())
 
     val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, statusFilter, audienceFilter, courseFilter)
@@ -221,7 +222,7 @@ class ReferralServiceTest {
     val expectedApiReferralSummaries = expectedReferralSummaryProjections.toApi()
     resultPage.content shouldContainAll expectedApiReferralSummaries
 
-    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, status, audienceFilter, courseFilter) }
+    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, statusEnums, audienceFilter, courseFilter) }
   }
 
   @Test

@@ -97,14 +97,16 @@ constructor(
     @JvmStatic
     fun parametersForGetReferralsByOrganisationIdWithFiltering(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of("REFERRAL_STARTED", null, "referralSummary1", listOf(referralSummary1)),
+        Arguments.of(listOf("REFERRAL_STARTED"), null, "referralSummary1", listOf(referralSummary1)),
         Arguments.of(null, "Audience 2", null, listOf(referralSummary1, referralSummary2)),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 3", null, listOf(referralSummary2, referralSummary3)),
-        Arguments.of("REFERRAL_SUBMITTED", "Audience 4", "referralSummary3", listOf(referralSummary3)),
+        Arguments.of(listOf("REFERRAL_SUBMITTED"), "Audience 3", null, listOf(referralSummary2, referralSummary3)),
+        Arguments.of(listOf("REFERRAL_SUBMITTED"), "Audience 4", "referralSummary3", listOf(referralSummary3)),
         Arguments.of(null, null, "Course", listOf(referralSummary1, referralSummary2, referralSummary3)),
-        Arguments.of("AWAITING_ASSESSMENT", null, null, emptyList<ReferralSummary>()),
+        Arguments.of(listOf("AWAITING_ASSESSMENT"), null, null, emptyList<ReferralSummary>()),
         Arguments.of(null, "Audience X", null, emptyList<ReferralSummary>()),
         Arguments.of(null, null, "Course for referralSummaryX", emptyList<ReferralSummary>()),
+        Arguments.of(listOf("REFERRAL_STARTED", "REFERRAL_SUBMITTED"), null, null, listOf(referralSummary1, referralSummary2, referralSummary3)),
+
       )
     }
   }
@@ -590,7 +592,7 @@ constructor(
   @ParameterizedTest
   @MethodSource("parametersForGetReferralsByOrganisationIdWithFiltering")
   fun `getReferralsByOrganisationId with valid organisationId and filtering will return 200 with paginated body`(
-    statusFilter: String?,
+    statusFilter: List<String>?,
     audienceFilter: String?,
     courseNameFilter: String?,
     expectedReferralSummaries: List<ReferralSummary>,
@@ -604,7 +606,7 @@ constructor(
     val result = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
       param("size", "10")
-      statusFilter?.let { param("status", it) }
+      statusFilter?.let { param("status", it.joinToString(",")) }
       audienceFilter?.let { param("audience", it) }
       courseNameFilter?.let { param("courseName", it) }
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
