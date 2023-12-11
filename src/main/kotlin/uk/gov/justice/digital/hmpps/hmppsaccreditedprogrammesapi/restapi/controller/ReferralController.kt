@@ -66,7 +66,7 @@ constructor(
     organisationId: String,
     @RequestParam(value = "page", defaultValue = "0") page: Int,
     @RequestParam(value = "size", defaultValue = "10") size: Int,
-    @RequestParam(value = "status", required = false) status: String?,
+    @RequestParam(value = "status", required = false) status: List<String>?,
     @RequestParam(value = "audience", required = false) audience: String?,
     @RequestParam(value = "courseName", required = false) courseName: String?,
   ): ResponseEntity<PaginatedReferralSummary> {

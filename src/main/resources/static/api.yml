@@ -484,8 +484,12 @@ paths:
           in: query
           description: Filter by the status of the referral
           required: false
+          style: form
+          explode: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
         - name: audience
           in: query
           description: Filter by the audience of the referral

@@ -27,8 +27,8 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
     JOIN c.audiences a
     JOIN r.referrer ru
     WHERE o.organisationId = :organisationId
-      AND (:status IS NULL OR r.status = :status)
-      AND (:audience IS NULL OR a.value = :audience)
+      AND (:status IS NULL OR r.status IN :status)
+      AND (:audience IS NULL OR :audience = '' OR a.value = :audience)
       AND (:courseName IS NULL OR :courseName = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :courseName, '%')))
   """,
     countQuery = """
@@ -38,8 +38,8 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
     JOIN o.course c
     JOIN c.audiences a
     WHERE o.organisationId = :organisationId
-      AND (:status IS NULL OR r.status = :status)
-      AND (:audience IS NULL OR a.value = :audience)
+      AND (:status IS NULL OR :status = '' OR r.status IN :status)
+      AND (:audience IS NULL OR :audience = '' OR a.value = :audience)
       AND (:courseName IS NULL OR :courseName = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :courseName, '%')))
   """,
     nativeQuery = false,
@@ -47,7 +47,7 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
   fun getReferralsByOrganisationId(
     organisationId: String,
     pageable: Pageable,
-    status: ReferralEntity.ReferralStatus?,
+    status: List<ReferralEntity.ReferralStatus>?,
     audience: String?,
     courseName: String?,
   ): Page<ReferralSummaryProjection>
