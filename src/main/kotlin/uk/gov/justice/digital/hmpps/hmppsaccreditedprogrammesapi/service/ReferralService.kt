@@ -114,12 +114,12 @@ constructor(
   fun getReferralsByOrganisationId(
     organisationId: String,
     pageable: Pageable,
-    status: String?,
+    status: List<String>?,
     audience: String?,
     courseName: String?,
   ): Page<ReferralSummary> {
-    val statusEnum = status?.let { ReferralEntity.ReferralStatus.valueOf(it) }
-    val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnum, audience, courseName)
+    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
+    val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnums, audience, courseName)
     val apiContent = referralProjectionPage.content.toApi()
     return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
   }
