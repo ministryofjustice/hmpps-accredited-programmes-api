@@ -24,7 +24,7 @@ VALUES ('TEST_REFERRER_USER_1'),
        ('TEST_REFERRER_USER_2'),
        ('TEST_REFERRER_USER_3');
 
-INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, referrer_id, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on)
-VALUES ('0c46ed09-170b-4c0f-aee8-a24eeaeeddaa', '7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'B2345BB', 'TEST_REFERRER_USER_1', '123456', 'This referral will be updated', false, false, 'REFERRAL_STARTED', NULL),
-       ('fae2ed00-057e-4179-9e55-f6a4f4874cf0', '790a2dfe-7de5-4504-bb9c-83e6e53a6537', 'C3456CC', 'TEST_REFERRER_USER_2', '234567', 'more information', true, true, 'REFERRAL_SUBMITTED', '2023-11-12T19:11:00'),
-       ('153383a4-b250-46a8-9950-43eb358c2805', '790a2dfe-7de5-4504-bb9c-83e6e53a6537', 'D3456DD', 'TEST_REFERRER_USER_2', '234567', 'more information', true, true, 'REFERRAL_SUBMITTED', '2023-11-13T19:11:00');
+INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on)
+VALUES ('0c46ed09-170b-4c0f-aee8-a24eeaeeddaa', '7fffcc6a-11f8-4713-be35-cf5ff1aee517', 'B2345BB', 'TEST_REFERRER_USER_1', 'This referral will be updated', false, false, 'REFERRAL_STARTED', NULL),
+       ('fae2ed00-057e-4179-9e55-f6a4f4874cf0', '790a2dfe-7de5-4504-bb9c-83e6e53a6537', 'C3456CC', 'TEST_REFERRER_USER_2', 'more information', true, true, 'REFERRAL_SUBMITTED', '2023-11-12T19:11:00'),
+       ('153383a4-b250-46a8-9950-43eb358c2805', '790a2dfe-7de5-4504-bb9c-83e6e53a6537', 'D3456DD', 'TEST_REFERRER_USER_2', 'more information', true, true, 'REFERRAL_SUBMITTED', '2023-11-13T19:11:00');

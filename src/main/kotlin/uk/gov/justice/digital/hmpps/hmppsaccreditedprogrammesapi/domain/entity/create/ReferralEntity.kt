@@ -37,9 +37,6 @@ data class ReferralEntity(
   @JoinColumn(name = "referrer_username", referencedColumnName = "referrer_username")
   var referrer: ReferrerUserEntity,
 
-  @Deprecated("Use referrer_user.username instead.")
-  val referrerId: String? = null,
-
   var additionalInformation: String? = null,
 
   var oasysConfirmed: Boolean = false,
