@@ -198,7 +198,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     referralCreated.referralId.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
-    val statusFilter = createdReferral.status.toDomain().name
+    val statusFilter = listOf(createdReferral.status.toDomain().name)
     val audienceFilter = getCourseById(courseId).audiences.map { it.value }.first()
     val summary = getReferralSummariesByOrganisationId(organisationId, statusFilter, audienceFilter)
 
@@ -283,12 +283,14 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   fun getReferralSummariesByOrganisationId(
     organisationId: String,
-    statusFilter: String? = null,
+    statusFilter: List<String>? = null,
     audienceFilter: String? = null,
+    courseNameFilter: String? = null,
   ): PaginatedReferralSummary {
     val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/organisation/$organisationId/dashboard")
-    statusFilter?.let { uriBuilder.queryParam("status", it) }
+    statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
     audienceFilter?.let { uriBuilder.queryParam("audience", it) }
+    courseNameFilter?.let { uriBuilder.queryParam("courseName", it) }
 
     return webTestClient
       .get()
