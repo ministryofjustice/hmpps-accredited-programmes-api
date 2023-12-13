@@ -151,7 +151,7 @@ constructor(
       }
     }
 
-    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId!!) }
   }
 
   @Test
@@ -194,7 +194,7 @@ constructor(
       }
     }
 
-    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!, referral.referrerId!!) }
   }
 
   @Test
