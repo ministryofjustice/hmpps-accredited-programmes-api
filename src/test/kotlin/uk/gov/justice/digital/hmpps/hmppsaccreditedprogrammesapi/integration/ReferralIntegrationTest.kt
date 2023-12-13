@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.equals.shouldBeEqual
@@ -22,8 +23,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
@@ -188,7 +193,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val referralCreated = createReferral(offeringId)
     val createdReferral = getReferralById(referralCreated.referralId)
     val organisationId = "MDI"
-
+    val prisoners = listOf<Prisoner>(Prisoner(firstName = "John"))
+    val prisons = listOf<PrisonDetails>(PrisonDetails(prisonId = ORGANISATION_ID, prisonName = PRISON_NAME))
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    mockPrisonerSearchResponse(prisoners)
+    mockPrisonRegisterResponse(prisons)
     referralCreated.referralId.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
@@ -217,6 +226,32 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       }
     }
   }
+
+  private fun mockPrisonerSearchResponse(prisoners: List<Prisoner>) =
+    wiremockServer.stubFor(
+      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers"))
+        .willReturn(
+          WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withStatus(200)
+            .withBody(
+              objectMapper.writeValueAsString(prisoners),
+            ),
+        ),
+    )
+
+  private fun mockPrisonRegisterResponse(prisons: List<PrisonDetails>) =
+    wiremockServer.stubFor(
+      WireMock.get(WireMock.urlEqualTo("/prisons/names"))
+        .willReturn(
+          WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withStatus(200)
+            .withBody(
+              objectMapper.writeValueAsString(prisons),
+            ),
+        ),
+    )
 
   @Test
   fun `Retrieving a list of multi-status-filtered referrals for an organisation should return 200 with correct body`() {
@@ -290,6 +325,12 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
     val randomOrganisationId = randomUppercaseString(3)
+    val prisoners = listOf<Prisoner>(Prisoner(firstName = "John"))
+    val prisons = listOf<PrisonDetails>(PrisonDetails(prisonId = ORGANISATION_ID, prisonName = PRISON_NAME))
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    mockPrisonerSearchResponse(prisoners)
+    mockPrisonRegisterResponse(prisons)
+
     val paginatedReferralSummaries = getReferralSummariesByOrganisationId(randomOrganisationId)
     paginatedReferralSummaries.content?.shouldBeEmpty()
   }

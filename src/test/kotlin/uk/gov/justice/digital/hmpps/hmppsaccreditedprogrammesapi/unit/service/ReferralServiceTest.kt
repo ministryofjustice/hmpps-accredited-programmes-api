@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
-import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -19,17 +18,30 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.model.Prisoner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.BOOKING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CONDITIONAL_RELEASE_DATE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.INDETERMINATE_SENTENCE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.NONDTORELEASE_DATETYPE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PAROLE_ELIGIBILITYDATE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_FIRST_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_LAST_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_ID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TARIFF_EXPIRYDATE
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralSummaryBuilderService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
@@ -96,12 +108,41 @@ class ReferralServiceTest {
   @MockK(relaxed = true)
   private lateinit var offeringRepository: JpaOfferingRepository
 
+  @MockK(relaxed = true)
+  private lateinit var prisonRegisterApiService: PrisonRegisterApiService
+
+  @MockK(relaxed = true)
+  private lateinit var prisonerSearchApiService: PrisonerSearchApiService
+
+  @MockK(relaxed = true)
+  private lateinit var referralSummaryBuilderService: ReferralSummaryBuilderService
+
   @InjectMockKs
   private lateinit var referralService: ReferralService
+
+  private val prisons = mapOf<String?, String>(ORGANISATION_ID to PRISON_NAME)
+  private val prisoners = mapOf<String?, List<Prisoner>>(
+    PRISON_NUMBER to listOf(
+      Prisoner(
+        prisonerNumber = PRISON_NUMBER,
+        bookingId = BOOKING_ID,
+        firstName = PRISONER_FIRST_NAME,
+        lastName = PRISONER_LAST_NAME,
+        nonDtoReleaseDateType = NONDTORELEASE_DATETYPE,
+        conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
+        tariffDate = TARIFF_EXPIRYDATE,
+        paroleEligibilityDate = PAROLE_ELIGIBILITYDATE,
+        indeterminateSentence = INDETERMINATE_SENTENCE,
+      ),
+    ),
+  )
+  val organisationId = "MDI"
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
+    every { prisonRegisterApiService.getAllPrisons() } returns prisons
+    every { prisonerSearchApiService.getPrisoners(any()) } returns prisoners
   }
 
   private fun mockSecurityContext(username: String) {
@@ -219,10 +260,12 @@ class ReferralServiceTest {
     val expectedTotalPages = (expectedReferralSummaryProjections.size + pageable.pageSize - 1) / pageable.pageSize
     resultPage.totalPages shouldBe expectedTotalPages
 
-    val expectedApiReferralSummaries = expectedReferralSummaryProjections.toApi()
-    resultPage.content shouldContainAll expectedApiReferralSummaries
-
     verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, statusEnums, audienceFilter, courseFilter) }
+    verify { prisonRegisterApiService.getAllPrisons() }
+    verify { prisonerSearchApiService.getPrisoners(any()) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), any()) }
+    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, statusEnums, audienceFilter, courseFilter) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), any()) }
   }
 
   @Test

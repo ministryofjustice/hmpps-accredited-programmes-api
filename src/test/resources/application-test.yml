@@ -22,14 +22,14 @@ spring:
 
 hmpps:
   auth:
-    url: http://localhost:9090/auth
+    url: http://localhost:#WIREMOCK_PORT/auth
     client-id: integration-test-client-id
     client-secret: secret
 
 services:
   prison-api:
-    base-url: http://localhost:9094
+    base-url: http://localhost:#WIREMOCK_PORT
   prisoner-search-api:
-    base-url: http://localhost:9095
+    base-url: http://localhost:#WIREMOCK_PORT
   prison-register-api:
-    base-url: http://localhost:9096
+    base-url: http://localhost:#WIREMOCK_PORT

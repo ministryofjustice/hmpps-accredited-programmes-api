@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.SIG.RS256
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.context.annotation.Bean
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.JwtDecoder
@@ -21,6 +22,36 @@ class JwtAuthHelper {
     initialize(2048)
     generateKeyPair()
   }
+
+  internal fun createValidClientCredentialsJwt() = createClientCredentialsJwt(
+    expiryTime = Duration.ofMinutes(2),
+    roles = listOf("ROLE_COMMUNITY"),
+  )
+
+  internal fun createClientCredentialsJwt(
+    username: String? = null,
+    scope: List<String>? = listOf(),
+    roles: List<String>? = listOf(),
+    authSource: String = if (username == null) "none" else "nomis",
+    expiryTime: Duration = Duration.ofHours(1),
+    jwtId: String = UUID.randomUUID().toString(),
+  ): String =
+    mutableMapOf<String, Any>()
+      .also { it["user_name"] = username ?: "integration-test-client-id" }
+      .also { it["client_id"] = "integration-test-client-id" }
+      .also { it["grant_type"] = "client_credentials" }
+      .also { it["auth_source"] = authSource }
+      .also { roles?.let { roles -> it["authorities"] = roles } }
+      .also { scope?.let { scope -> it["scope"] = scope } }
+      .let {
+        Jwts.builder()
+          .setId(jwtId)
+          .setSubject(username ?: "integration-test-client-id")
+          .addClaims(it.toMap())
+          .setExpiration(Date(System.currentTimeMillis() + expiryTime.toMillis()))
+          .signWith(SignatureAlgorithm.RS256, keyPair.private)
+          .compact()
+      }
 
   /**
    * The jwtDecoder bean is injected into the Spring OAuth2 configuration.
