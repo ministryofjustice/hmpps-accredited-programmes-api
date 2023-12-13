@@ -73,3 +73,4 @@ sonar-project.properties
 
 # CSV files
 **/*.csv
+.run/*
