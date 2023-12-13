@@ -20,17 +20,10 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.BOOKING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CONDITIONAL_RELEASE_DATE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.INDETERMINATE_SENTENCE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.NONDTORELEASE_DATETYPE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PAROLE_ELIGIBILITYDATE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_FIRST_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_LAST_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONERS
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONS
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
@@ -120,8 +113,8 @@ class ReferralServiceTest {
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    every { prisonRegisterApiService.getAllPrisons() } returns prisons
-    every { prisonerSearchApiService.getPrisoners(any()) } returns prisoners
+    every { prisonRegisterApiService.getAllPrisons() } returns PRISONS
+    every { prisonerSearchApiService.getPrisoners(any()) } returns PRISONERS
   }
 
   private fun mockSecurityContext(username: String) {
@@ -223,25 +216,24 @@ class ReferralServiceTest {
     courseFilter: String?,
     expectedReferralSummaryProjections: List<ReferralSummaryProjection>,
   ) {
-    val orgId = "MDI"
     val pageable = PageRequest.of(0, 10)
     val statusEnums = statusFilter?.map { ReferralEntity.ReferralStatus.valueOf(it) }
 
-    every { referralRepository.getReferralsByOrganisationId(orgId, pageable, statusEnums, audienceFilter, courseFilter) } returns
+    every { referralRepository.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusEnums, audienceFilter, courseFilter) } returns
       PageImpl(expectedReferralSummaryProjections, pageable, expectedReferralSummaryProjections.size.toLong())
 
-    val resultPage = referralService.getReferralsByOrganisationId(orgId, pageable, statusFilter, audienceFilter, courseFilter)
+    val resultPage = referralService.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusFilter, audienceFilter, courseFilter)
 
     resultPage.totalElements shouldBe expectedReferralSummaryProjections.size.toLong()
 
     val expectedTotalPages = (expectedReferralSummaryProjections.size + pageable.pageSize - 1) / pageable.pageSize
     resultPage.totalPages shouldBe expectedTotalPages
 
-    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, statusEnums, audienceFilter, courseFilter) }
+    verify { referralRepository.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusEnums, audienceFilter, courseFilter) }
     verify { prisonRegisterApiService.getAllPrisons() }
     verify { prisonerSearchApiService.getPrisoners(any()) }
     verify { referralSummaryBuilderService.build(any(), any(), any(), any()) }
-    verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, statusEnums, audienceFilter, courseFilter) }
+    verify { referralRepository.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusEnums, audienceFilter, courseFilter) }
     verify { referralSummaryBuilderService.build(any(), any(), any(), any()) }
   }
 

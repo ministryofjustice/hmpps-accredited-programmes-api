@@ -10,14 +10,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
-
-private const val PRISON_ID_1 = "1"
-
-private const val PRISON_NAME_1 = "Prison 1"
-
-private const val PRISON_ID_2 = "2"
-
-private const val PRISON_NAME_2 = "Prison 2"
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_ID_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_ID_2
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME_2
 
 class PrisonRegisterApiServiceTest {
 

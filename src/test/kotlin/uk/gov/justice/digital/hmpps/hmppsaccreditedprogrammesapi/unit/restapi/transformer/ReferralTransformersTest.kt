@@ -8,17 +8,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.awaitingAssessment
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralStarted
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus.referralSubmitted
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.BOOKING_ID
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CONDITIONAL_RELEASE_DATE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.INDETERMINATE_SENTENCE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.NONDTORELEASE_DATETYPE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PAROLE_ELIGIBILITYDATE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_FIRST_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_LAST_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TARIFF_EXPIRYDATE
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.ASSESSMENT_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
@@ -31,23 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate as DomainReferralUpdate
 
 class ReferralTransformersTest {
-
-  private val prisons = mapOf<String?, String>(ORGANISATION_ID to PRISON_NAME)
-  private val prisoners = mapOf<String?, List<Prisoner>>(
-    uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER to listOf(
-      Prisoner(
-        prisonerNumber = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER,
-        bookingId = BOOKING_ID,
-        firstName = PRISONER_FIRST_NAME,
-        lastName = PRISONER_LAST_NAME,
-        nonDtoReleaseDateType = NONDTORELEASE_DATETYPE,
-        conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
-        tariffDate = TARIFF_EXPIRYDATE,
-        paroleEligibilityDate = PAROLE_ELIGIBILITYDATE,
-        indeterminateSentence = INDETERMINATE_SENTENCE,
-      ),
-    ),
-  )
 
   @ParameterizedTest
   @EnumSource

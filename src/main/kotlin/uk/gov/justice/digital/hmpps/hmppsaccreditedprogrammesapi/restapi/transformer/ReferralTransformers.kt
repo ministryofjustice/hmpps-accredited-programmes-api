@@ -3,12 +3,9 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary as ApiReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate as ApiReferralUpdate
-
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   id = id!!,
   offeringId = offering.id!!,
@@ -46,20 +43,3 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
 )
-
-fun List<ReferralSummaryProjection>.toApi(): List<ApiReferralSummary> {
-  return this.groupBy { it.referralId }
-    .map { (id, projections) ->
-      val firstProjection = projections.first()
-
-      ApiReferralSummary(
-        id = id,
-        referrerUsername = firstProjection.referrerUsername,
-        courseName = firstProjection.courseName,
-        audiences = projections.map { it.audience }.distinct(),
-        status = firstProjection.status.toApi(),
-        submittedOn = firstProjection.submittedOn?.toString(),
-        prisonNumber = firstProjection.prisonNumber,
-      )
-    }
-}

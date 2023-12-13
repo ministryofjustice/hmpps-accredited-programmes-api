@@ -27,7 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
@@ -187,9 +187,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offeringId = getFirstOfferingIdForCourse(courseId)
     val referralCreated = createReferral(offeringId)
     val createdReferral = getReferralById(referralCreated.referralId)
-    val organisationId = "MDI"
-    val prisoners = listOf<Prisoner>(Prisoner(firstName = "John"))
-    val prisons = listOf<PrisonDetails>(PrisonDetails(prisonId = ORGANISATION_ID, prisonName = PRISON_NAME))
+    val prisoners = listOf(Prisoner(firstName = "John"))
+    val prisons = listOf(PrisonDetails(prisonId = ORGANISATION_ID_MDI, prisonName = PRISON_NAME))
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     mockPrisonerSearchResponse(prisoners)
     mockPrisonRegisterResponse(prisons)
@@ -198,7 +197,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val statusFilter = listOf(createdReferral.status.toDomain().name)
     val audienceFilter = getCourseById(courseId).audiences.map { it.value }.first()
-    val summary = getReferralSummariesByOrganisationId(organisationId, statusFilter, audienceFilter)
+    val summary = getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter)
 
     summary.content?.forEach { actualSummary ->
       listOf(
@@ -252,7 +251,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun `Retrieving a list of multi-status-filtered referrals for an organisation should return 200 with correct body`() {
     val courseId = getFirstCourseId()
     val offeringId = getFirstOfferingIdForCourse(courseId)
-    val organisationId = "MDI"
 
     val firstReferralCreated = createReferral(offeringId)
     val firstCreatedReferral = getReferralById(firstReferralCreated.referralId)
@@ -279,7 +277,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val statusFilter = listOf(firstReferralStatus, secondReferralStatus)
     val audienceFilter = getCourseById(courseId).audiences.map { it.value }.first()
-    val summary = getReferralSummariesByOrganisationId(organisationId, statusFilter, audienceFilter)
+    val summary = getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter)
 
     val expectedFirstSummary = ReferralSummary(
       id = firstCreatedReferral.id,
@@ -320,8 +318,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
     val randomOrganisationId = randomUppercaseString(3)
-    val prisoners = listOf<Prisoner>(Prisoner(firstName = "John"))
-    val prisons = listOf<PrisonDetails>(PrisonDetails(prisonId = ORGANISATION_ID, prisonName = PRISON_NAME))
+    val prisoners = listOf(Prisoner(firstName = "John"))
+    val prisons = listOf(PrisonDetails(prisonId = ORGANISATION_ID_MDI, prisonName = PRISON_NAME))
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     mockPrisonerSearchResponse(prisoners)
     mockPrisonRegisterResponse(prisons)
