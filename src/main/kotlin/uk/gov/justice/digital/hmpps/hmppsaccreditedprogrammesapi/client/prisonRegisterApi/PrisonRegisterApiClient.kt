@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
-import java.util.*
 
 @Component
 class PrisonRegisterApiClient(
@@ -14,7 +13,11 @@ class PrisonRegisterApiClient(
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getPrisonDetailsByPrisonId(prisonId: UUID) = getRequest<List<PrisonDetails>> {
+  fun getPrisonDetailsByPrisonId(prisonId: String) = getRequest<List<PrisonDetails>> {
     path = "/prisons/id/$prisonId"
+  }
+
+  fun getAllPrisonDetails() = getRequest<List<PrisonDetails>> {
+    path = "/prisons/names"
   }
 }
