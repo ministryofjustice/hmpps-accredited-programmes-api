@@ -31,7 +31,7 @@ constructor(
     with(referralCreate) {
       referralService.createReferral(
         prisonNumber = prisonNumber,
-        referrerId = referrerId,
+        referrerId = referrerId.orEmpty(),
         offeringId = offeringId,
       )?.let {
         ResponseEntity.status(HttpStatus.CREATED).body(ReferralCreated(it))
