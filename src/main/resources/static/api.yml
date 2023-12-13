@@ -1006,7 +1006,6 @@ components:
       required:
         - offeringId
         - prisonNumber
-        - referrerId
 
     ReferralUpdate:
       type: object
