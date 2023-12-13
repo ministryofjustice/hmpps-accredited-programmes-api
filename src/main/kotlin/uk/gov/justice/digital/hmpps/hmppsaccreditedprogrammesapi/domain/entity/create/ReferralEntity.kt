@@ -38,7 +38,7 @@ data class ReferralEntity(
   var referrer: ReferrerUserEntity,
 
   @Deprecated("Use referrer_user.username instead.")
-  val referrerId: String,
+  val referrerId: String? = null,
 
   var additionalInformation: String? = null,
 
