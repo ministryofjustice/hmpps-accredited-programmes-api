@@ -81,7 +81,6 @@ constructor(
       referral.offering.id to "offeringId",
       referral.prisonNumber to "prisonNumber",
       referral.referrer to "referrer",
-      referral.referrerId to "referrerId",
       referral.additionalInformation to "additionalInformation",
       referral.oasysConfirmed to "oasysConfirmed",
       referral.hasReviewedProgrammeHistory to "hasReviewedProgrammeHistory",
