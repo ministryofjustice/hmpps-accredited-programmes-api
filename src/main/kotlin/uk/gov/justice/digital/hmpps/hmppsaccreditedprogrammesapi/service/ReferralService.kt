@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
@@ -16,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.u
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -29,6 +30,9 @@ constructor(
   private val referralRepository: ReferralRepository,
   private val referrerUserRepository: ReferrerUserRepository,
   private val offeringRepository: JpaOfferingRepository,
+  private val prisonRegisterApiService: PrisonRegisterApiService,
+  private val prisonerSearchApiService: PrisonerSearchApiService,
+  private val referralSummaryBuilderService: ReferralSummaryBuilderService,
 ) {
 
   fun createReferral(
@@ -119,7 +123,13 @@ constructor(
   ): Page<ReferralSummary> {
     val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
     val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnums, audience, courseName)
-    val apiContent = referralProjectionPage.content.toApi()
+    val content = referralProjectionPage.content
+    val prisonersDetails =
+      prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
+    val allPrisons = prisonRegisterApiService.getAllPrisons()
+
+    val apiContent = referralSummaryBuilderService.build(content, prisonersDetails, allPrisons, organisationId)
+
     return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
   }
 }

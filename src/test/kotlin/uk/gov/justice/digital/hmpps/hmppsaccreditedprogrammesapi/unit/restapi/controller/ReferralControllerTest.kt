@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.restapi.controller
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -34,16 +35,26 @@ import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.BOOKING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CONDITIONAL_RELEASE_DATE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.INDETERMINATE_SENTENCE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.NONDTORELEASE_DATETYPE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PAROLE_ELIGIBILITYDATE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_FIRST_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_LAST_NAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TARIFF_EXPIRYDATE
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomReferrerId
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
@@ -63,6 +74,10 @@ constructor(
   val mockMvc: MockMvc,
   val jwtAuthHelper: JwtAuthHelper,
 ) {
+
+  private val objectMapper = jacksonObjectMapper().apply {
+    registerModule(JavaTimeModule())
+  }
 
   companion object {
     private val referralSummary1 = ReferralSummary(
@@ -113,6 +128,22 @@ constructor(
 
   @MockkBean
   private lateinit var referralService: ReferralService
+  private val prisons = mapOf<String?, String>(ORGANISATION_ID to PRISON_NAME)
+  private val prisoners = mapOf<String?, List<Prisoner>>(
+    PRISON_NUMBER to listOf(
+      Prisoner(
+        prisonerNumber = PRISON_NUMBER,
+        bookingId = BOOKING_ID,
+        firstName = PRISONER_FIRST_NAME,
+        lastName = PRISONER_LAST_NAME,
+        nonDtoReleaseDateType = NONDTORELEASE_DATETYPE,
+        conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
+        tariffDate = TARIFF_EXPIRYDATE,
+        paroleEligibilityDate = PAROLE_ELIGIBILITYDATE,
+        indeterminateSentence = INDETERMINATE_SENTENCE,
+      ),
+    ),
+  )
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {
@@ -420,34 +451,31 @@ constructor(
     val pageable = PageRequest.of(0, 10, Sort.by("referralId"))
 
     val firstReferralId = UUID.randomUUID()
-    val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
-    val projectionsForFirstReferral = audiencesForFirstReferral.map { audience ->
-      ReferralSummaryProjectionFactory()
-        .withReferralId(firstReferralId)
-        .withCourseName("Course name")
-        .withAudience(audience)
-        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
-        .withPrisonNumber(PRISON_NUMBER)
-        .withReferrerUsername(CLIENT_USERNAME)
-        .produce()
-    }
-
     val secondReferralId = UUID.randomUUID()
+    val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
     val audiencesForSecondReferral = listOf("Audience 4", "Audience 5", "Audience 6")
-    val projectionsForSecondReferral = audiencesForSecondReferral.map { audience ->
-      ReferralSummaryProjectionFactory()
-        .withReferralId(secondReferralId)
-        .withCourseName("Another course name")
-        .withAudience(audience)
-        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
-        .withSubmittedOn(LocalDateTime.MIN)
-        .withPrisonNumber(PRISON_NUMBER)
-        .withReferrerUsername(CLIENT_USERNAME)
-        .produce()
-    }
+
+    val referralSummary1 = ReferralSummary(
+      id = firstReferralId,
+      courseName = "Course for referralSummary1",
+      audiences = audiencesForFirstReferral,
+      status = ReferralStatus.referralStarted,
+      prisonNumber = PRISON_NUMBER,
+      referrerUsername = CLIENT_USERNAME,
+    )
+
+    val referralSummary2 = ReferralSummary(
+      id = secondReferralId,
+      courseName = "Course for referralSummary2",
+      audiences = audiencesForSecondReferral,
+      status = ReferralStatus.referralSubmitted,
+      submittedOn = LocalDateTime.MIN.toString(),
+      prisonNumber = PRISON_NUMBER,
+      referrerUsername = CLIENT_USERNAME,
+    )
 
     every { referralService.getReferralsByOrganisationId(organisationId, pageable, null, null, null) } returns
-      PageImpl(projectionsForFirstReferral.toApi() + projectionsForSecondReferral.toApi(), pageable, 2L)
+      PageImpl(listOf(referralSummary1, referralSummary2), pageable, 2L)
 
     val mvcResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
@@ -460,7 +488,7 @@ constructor(
     }.andReturn()
 
     val jsonResponse = mvcResult.response.contentAsString
-    val paginatedReferralSummary = jacksonObjectMapper()
+    val paginatedReferralSummary = objectMapper
       .readValue(jsonResponse, PaginatedReferralSummary::class.java)
 
     paginatedReferralSummary.pageSize shouldBe 10
@@ -471,7 +499,7 @@ constructor(
     val firstReferral = paginatedReferralSummary.content?.find { it.id == firstReferralId }
     firstReferral shouldNotBe null
     firstReferral?.let { referral ->
-      referral.courseName shouldBe "Course name"
+      referral.courseName shouldBe "Course for referralSummary1"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER
@@ -481,7 +509,7 @@ constructor(
     val secondReferral = paginatedReferralSummary.content?.find { it.id == secondReferralId }
     secondReferral shouldNotBe null
     secondReferral?.let { referral ->
-      referral.courseName shouldBe "Another course name"
+      referral.courseName shouldBe "Course for referralSummary2"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
@@ -527,10 +555,10 @@ constructor(
     }
 
     every { referralService.getReferralsByOrganisationId(organisationId, pageableFirstPage, null, null, null) } returns
-      PageImpl(projectionsForFirstReferral.toApi(), pageableFirstPage, 2)
+      PageImpl(listOf(referralSummary1), pageableFirstPage, 2)
 
     every { referralService.getReferralsByOrganisationId(organisationId, pageableSecondPage, null, null, null) } returns
-      PageImpl(projectionsForSecondReferral.toApi(), pageableSecondPage, 2)
+      PageImpl(listOf(referralSummary2), pageableSecondPage, 2)
 
     val firstPageResult = mockMvc.get("/referrals/organisation/$organisationId/dashboard") {
       param("page", "0")
@@ -542,7 +570,7 @@ constructor(
       content { contentType(MediaType.APPLICATION_JSON) }
     }.andReturn()
 
-    val firstPageResponse = jacksonObjectMapper()
+    val firstPageResponse = objectMapper
       .readValue(firstPageResult.response.contentAsString, PaginatedReferralSummary::class.java)
 
     firstPageResponse.pageSize shouldBe 1
@@ -568,7 +596,7 @@ constructor(
       content { contentType(MediaType.APPLICATION_JSON) }
     }.andReturn()
 
-    val secondPageResponse = jacksonObjectMapper()
+    val secondPageResponse = objectMapper
       .readValue(secondPageResult.response.contentAsString, PaginatedReferralSummary::class.java)
 
     secondPageResponse.pageSize shouldBe 1
