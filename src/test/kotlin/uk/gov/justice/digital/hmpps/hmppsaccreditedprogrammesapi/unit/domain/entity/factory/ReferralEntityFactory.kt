@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.en
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseAlphanumericString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
@@ -16,7 +15,6 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
   private var offering: Yielded<OfferingEntity> = { OfferingEntityFactory().produce() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
   private var referrer: Yielded<ReferrerUserEntity> = { ReferrerUserEntityFactory().produce() }
-  private var referrerId: Yielded<String> = { randomUppercaseAlphanumericString(6) }
   private var additionalInformation: Yielded<String?> = { null }
   private var oasysConfirmed: Yielded<Boolean> = { false }
   private var hasReviewedProgrammeHistory: Yielded<Boolean> = { false }
@@ -37,10 +35,6 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
 
   fun withReferrer(referrer: ReferrerUserEntity) = apply {
     this.referrer = { referrer }
-  }
-
-  fun withReferrerId(referrerId: String) = apply {
-    this.referrerId = { referrerId }
   }
 
   fun withAdditionalInformation(additionalInformation: String?) = apply {
@@ -68,7 +62,6 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
     offering = this.offering(),
     prisonNumber = this.prisonNumber(),
     referrer = this.referrer(),
-    referrerId = this.referrerId(),
     additionalInformation = this.additionalInformation(),
     oasysConfirmed = this.oasysConfirmed(),
     hasReviewedProgrammeHistory = this.hasReviewedProgrammeHistory(),

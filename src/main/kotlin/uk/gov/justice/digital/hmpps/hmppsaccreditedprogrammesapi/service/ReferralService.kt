@@ -38,7 +38,6 @@ constructor(
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
-    referrerId: String,
   ): UUID? {
     val username = SecurityContextHolder.getContext().authentication?.name
       ?: throw SecurityException("Authentication information not found")
@@ -54,7 +53,6 @@ constructor(
       ReferralEntity(
         offering = offering,
         prisonNumber = prisonNumber,
-        referrerId = referrerId,
         referrer = referrerUser,
       ),
     ).id ?: throw Exception("Referral creation failed")

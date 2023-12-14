@@ -320,12 +320,6 @@ paths:
           required: false
           schema:
             type: string
-        - name: referrerId
-          in: query
-          description: A permanent identifier for the person creating the referral. StaffId for prison staff. If present, only return referrals for that referrer.
-          required: false
-          schema:
-            type: string
       responses:
         200:
           description: Returns information about matching referrals
@@ -999,10 +993,6 @@ components:
           description: The prison number of the person who is being referred.
           example: "A1234AA"
           type: string
-        referrerId:
-          description: A permanent identifier for the person creating the referral. StaffId for prison staff.
-          type: string
-          deprecated: true
       required:
         - offeringId
         - prisonNumber
@@ -1043,7 +1033,6 @@ components:
             - offeringId
             - prisonNumber
             - referrerUsername
-            - referrerId
             - oasysConfirmed
             - status
 

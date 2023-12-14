@@ -11,7 +11,6 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   offeringId = offering.id!!,
   prisonNumber = prisonNumber,
   referrerUsername = referrer.username,
-  referrerId = referrerId.orEmpty(),
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
