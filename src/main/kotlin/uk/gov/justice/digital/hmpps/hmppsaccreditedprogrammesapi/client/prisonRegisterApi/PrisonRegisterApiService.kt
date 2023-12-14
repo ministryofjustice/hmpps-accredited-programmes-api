@@ -23,11 +23,11 @@ constructor(
     val prisonDetailsResult = when (val allPrisonDetails = prisonRegisterApiClient.getAllPrisonDetails()) {
       is ClientResult.Success -> AuthorisableActionResult.Success(allPrisonDetails.body)
       is ClientResult.Failure.StatusCode -> {
-        log.warn("Failure to retrieve data. Status code ${allPrisonDetails.status}")
+        log.warn("Failure to retrieve data. Status code ${allPrisonDetails.status} reason ${allPrisonDetails.toException().message}")
         AuthorisableActionResult.Success(listOf<PrisonDetails>())
       }
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data")
+        log.warn("Failure to retrieve data ${allPrisonDetails.toException().message}")
         AuthorisableActionResult.Success(listOf<PrisonDetails>())
       }
     }
