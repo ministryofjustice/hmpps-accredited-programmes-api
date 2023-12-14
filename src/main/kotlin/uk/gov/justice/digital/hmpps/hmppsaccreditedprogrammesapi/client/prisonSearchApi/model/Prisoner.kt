@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonSearchApi.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Prisoner(
   var prisonerNumber: String? = null,
   var bookingId: String? = null,
