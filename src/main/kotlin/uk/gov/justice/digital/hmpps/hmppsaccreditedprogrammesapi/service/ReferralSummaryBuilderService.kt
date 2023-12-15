@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Sente
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
+import java.time.LocalDate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary as ApiReferralSummary
 
 @Service
@@ -16,10 +17,12 @@ class ReferralSummaryBuilderService {
     prisoners: Map<String?, List<Prisoner>>,
     prisons: Map<String?, String?>,
     organisationId: String,
+    includeEarliestReleaseDate: Boolean,
   ): List<ApiReferralSummary> {
     return content.groupBy { it.referralId }
       .map { (id, projections) ->
         val firstProjection = projections.first()
+        val sentence = getSentence(firstProjection, prisoners)
 
         ApiReferralSummary(
           id = id,
@@ -32,7 +35,8 @@ class ReferralSummaryBuilderService {
           organisationId = organisationId,
           prisonName = prisons[organisationId].orEmpty(),
           prisonerName = getPrisonerName(firstProjection, prisoners),
-          sentence = getSentence(firstProjection, prisoners),
+          sentence = sentence,
+          earliestReleaseDate = if (includeEarliestReleaseDate) getEarliestReleaseDate(sentence) else null,
         )
       }
   }
@@ -46,6 +50,15 @@ class ReferralSummaryBuilderService {
         indeterminateSentence = it.indeterminateSentence,
         nonDtoReleaseDateType = it.nonDtoReleaseDateType,
       )
+    }
+  }
+
+  private fun getEarliestReleaseDate(sentence: Sentence?): LocalDate? {
+    return when {
+      sentence?.indeterminateSentence == true -> sentence.tariffExpiryDate
+      sentence?.paroleEligibilityDate != null -> sentence.paroleEligibilityDate
+      sentence?.conditionalReleaseDate != null -> sentence.conditionalReleaseDate
+      else -> null
     }
   }
 
