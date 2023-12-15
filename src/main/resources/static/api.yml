@@ -1092,6 +1092,10 @@ components:
           description: ID of the organisation
         sentence:
           $ref: '#/components/schemas/Sentence'
+        earliestReleaseDate:
+          type: string
+          format: date
+          description: Earliest release date, if applicable, to this individual. Derived from Sentence information.
         prisonerName:
           $ref: '#/components/schemas/Name'
 
