@@ -232,9 +232,9 @@ class ReferralServiceTest {
     verify { referralRepository.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusEnums, audienceFilter, courseFilter) }
     verify { prisonRegisterApiService.getAllPrisons() }
     verify { prisonerSearchApiService.getPrisoners(any()) }
-    verify { referralSummaryBuilderService.build(any(), any(), any(), any()) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), any(), false) }
     verify { referralRepository.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusEnums, audienceFilter, courseFilter) }
-    verify { referralSummaryBuilderService.build(any(), any(), any(), any()) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), any(), false) }
   }
 
   @Test

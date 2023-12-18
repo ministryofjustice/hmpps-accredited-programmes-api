@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_2
 
-class PrisonerSearchApiServiceTest {
+class PrisonSearchApiServiceTest {
 
   private val prisonerSearchApiClient = mockk<PrisonerSearchApiClient>()
   val service = PrisonerSearchApiService(prisonerSearchApiClient)
