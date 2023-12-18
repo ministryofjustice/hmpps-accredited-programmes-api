@@ -2,6 +2,20 @@ info.app:
   name: HMPPS Accredited Programmes API
   version: 1.0
 
+logging:
+  level:
+    root: DEBUG
+    org:
+      springframework:
+        web: DEBUG
+      hibernate: DEBUG
+    uk:
+      gov:
+        justice:
+          digital:
+            hmpps:
+              hmppsaccreditedprogrammesapi: DEBUG
+
 spring:
   application:
     name: hmpps-accredited-programmes-api
