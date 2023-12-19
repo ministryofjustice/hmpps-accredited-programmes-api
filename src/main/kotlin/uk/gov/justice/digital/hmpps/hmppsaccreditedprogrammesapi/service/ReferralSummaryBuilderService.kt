@@ -16,7 +16,6 @@ class ReferralSummaryBuilderService {
     content: List<ReferralSummaryProjection>,
     prisoners: Map<String?, List<Prisoner>>,
     prisons: Map<String?, String?>,
-    organisationId: String,
     includeEarliestReleaseDate: Boolean,
   ): List<ApiReferralSummary> {
     return content.groupBy { it.referralId }
@@ -32,8 +31,8 @@ class ReferralSummaryBuilderService {
           status = firstProjection.status.toApi(),
           submittedOn = firstProjection.submittedOn?.toString(),
           prisonNumber = firstProjection.prisonNumber,
-          organisationId = organisationId,
-          prisonName = prisons[organisationId].orEmpty(),
+          organisationId = firstProjection.organisationId,
+          prisonName = prisons[firstProjection.organisationId].orEmpty(),
           prisonerName = getPrisonerName(firstProjection, prisoners),
           sentence = sentence,
           earliestReleaseDate = if (includeEarliestReleaseDate) getEarliestReleaseDate(sentence) else null,
