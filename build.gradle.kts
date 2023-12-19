@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.10.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.11.0"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "1.9.20"
+  kotlin("plugin.spring") version "1.9.21"
   kotlin("plugin.jpa") version "1.9.10"
   id("org.openapi.generator") version "7.0.1"
 }
@@ -49,12 +49,12 @@ dependencies {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(19))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 kotlin {
   kotlinDaemonJvmArgs = listOf("-Xmx1024m")
-  jvmToolchain(19)
+  jvmToolchain(21)
 }
 
 testing {
@@ -80,7 +80,7 @@ testing {
 tasks {
   withType<KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "19"
+      jvmTarget = "21"
     }
 
     kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/kotlin"))
