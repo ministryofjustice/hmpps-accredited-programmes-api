@@ -10,12 +10,12 @@ WHERE r.referrer_username IS NOT NULL
     WHERE ru.referrer_username = r.referrer_username
 );
 
-INSERT INTO referrer_user(referrer_username) VALUES ('UNKNOWN_USER');
+INSERT INTO referrer_user(referrer_username) VALUES ('ACP_TEST');
 
 -- Always ensure that referrals have an associated user, even if that user is a placeholder for now.
 UPDATE referral
-SET referrer_username = 'UNKNOWN_USER'
-WHERE referrer_username IS NULL OR referrer_username = '';
+SET referrer_username = 'ACP_TEST'
+WHERE referrer_username IS NULL OR referrer_username = '' OR referrer_username = 'UNKNOWN_USER';
 
 
 -- Delete the old field.
