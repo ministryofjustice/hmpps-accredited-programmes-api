@@ -4,17 +4,7 @@ info.app:
 
 logging:
   level:
-    root: DEBUG
-    org:
-      springframework:
-        web: DEBUG
-      hibernate: DEBUG
-    uk:
-      gov:
-        justice:
-          digital:
-            hmpps:
-              hmppsaccreditedprogrammesapi: DEBUG
+    root: INFO
 
 spring:
   application:
