@@ -124,3 +124,17 @@ This is available in development at
 
 There's currently a slight issue with one of the environments, so you may need
 to refresh a couple of times before the OpenAPI documentation loads.
+
+## Dependency updates
+
+As with other MOJ projects, we use [Renovate](https://github.com/renovatebot/renovate) to automate dependency updates.
+
+This will open PRs for us to update any outdated packages. We'll want to ensure the build is passing on these and
+ideally smoke test after merging to dev to ensure all is still working as expected. There may be some that require
+manual intervention to get working with our build.
+
+### HMPPS Gradle Spring Boot package
+
+We may get reports of vulnerabilities in our dependencies through Trivy. Most of these can be resolved by updating
+the `uk.gov.justice.hmpps.gradle-spring-boot` package in `build.gradle.kts`, as the team managing that package have
+fixed them for us.
