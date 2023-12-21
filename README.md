@@ -15,7 +15,7 @@ docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](http
 For building and running:
 
 - Docker
-- Java 19
+- Java 21
 
 Additionally, for running scripts:
 
