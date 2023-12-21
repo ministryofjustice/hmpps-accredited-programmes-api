@@ -506,9 +506,66 @@ paths:
         401:
           description: The request was unauthorised
         403:
-          description: Forbidden. The client is not authorised to access this offering.
+          description: Not authorised to access this endpoint/these referrals
         404:
           description: No referrals for supplied organisationId (Not Found).
+
+  /referrals/me/dashboard:
+    get:
+      summary: Get paginated referrals by logged in user
+      tags:
+        - Referrals
+      operationId: getReferralSummariesByUsername
+      parameters:
+        - name: page
+          in: query
+          description: Page number of the requested page
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: Filter by the status of the referral
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: audience
+          in: query
+          description: Filter by the audience of the referral
+          required: false
+          schema:
+            type: string
+        - name: courseName
+          in: query
+          description: Filter by the name of the course associated with this referral
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: Paginated summary of referrals for logged in user
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/PaginatedReferralSummary'
+        401:
+          description: The request was unauthorised
+        403:
+          description: Not authorised to access this endpoint/these referrals
+        404:
+          description: No referrals for logged in user (Not Found).
 
   /offerings/{id}/course:
     get:

@@ -4,6 +4,7 @@ import jakarta.validation.ValidationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -124,7 +125,19 @@ constructor(
     val content = referralProjectionPage.content
     val prisonersDetails = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
     val allPrisons = prisonRegisterApiService.getAllPrisons()
-    val apiContent = referralSummaryBuilderService.build(content, prisonersDetails, allPrisons, organisationId, false)
+    val apiContent = referralSummaryBuilderService.build(content, prisonersDetails, allPrisons, false)
+
+    return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
+  }
+
+  fun getReferralsByUsername(username: String, pageable: PageRequest, status: List<String>?, audience: String?, courseName: String?): Page<ReferralSummary> {
+    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
+    val referralProjectionPage = referralRepository.getReferralsByUsername(username, pageable, statusEnums, audience, courseName)
+    val content = referralProjectionPage.content
+
+    val prisonersDetails = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
+    val allPrisons = prisonRegisterApiService.getAllPrisons()
+    val apiContent = referralSummaryBuilderService.build(content, prisonersDetails, allPrisons, true)
 
     return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
   }

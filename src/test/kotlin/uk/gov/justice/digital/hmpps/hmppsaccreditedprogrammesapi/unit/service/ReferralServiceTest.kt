@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORG
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONERS
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONS
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
@@ -44,7 +45,7 @@ class ReferralServiceTest {
 
   companion object {
     @JvmStatic
-    fun parametersForGetReferralsByOrganisationId(): Stream<Arguments> {
+    fun parametersForGetReferrals(): Stream<Arguments> {
       val projections1 = listOf("Audience 1", "Audience 2").map { audience ->
         ReferralSummaryProjectionFactory()
           .withReferralId(UUID.randomUUID())
@@ -52,6 +53,7 @@ class ReferralServiceTest {
           .withAudience(audience)
           .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
           .withPrisonNumber(PRISON_NUMBER)
+          .withReferrerUsername(REFERRER_USERNAME)
           .produce()
       }
 
@@ -62,6 +64,7 @@ class ReferralServiceTest {
           .withAudience(audience)
           .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
           .withPrisonNumber(PRISON_NUMBER)
+          .withReferrerUsername(REFERRER_USERNAME)
           .produce()
       }
 
@@ -72,6 +75,7 @@ class ReferralServiceTest {
           .withAudience(audience)
           .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
           .withPrisonNumber(PRISON_NUMBER)
+          .withReferrerUsername(REFERRER_USERNAME)
           .produce()
       }
 
@@ -209,7 +213,7 @@ class ReferralServiceTest {
   }
 
   @ParameterizedTest
-  @MethodSource("parametersForGetReferralsByOrganisationId")
+  @MethodSource("parametersForGetReferrals")
   fun `getReferralsByOrganisationId with valid organisationId and filtering should return pageable ReferralSummary objects`(
     statusFilter: List<String>?,
     audienceFilter: String?,
@@ -232,9 +236,9 @@ class ReferralServiceTest {
     verify { referralRepository.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusEnums, audienceFilter, courseFilter) }
     verify { prisonRegisterApiService.getAllPrisons() }
     verify { prisonerSearchApiService.getPrisoners(any()) }
-    verify { referralSummaryBuilderService.build(any(), any(), any(), any(), false) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), false) }
     verify { referralRepository.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageable, statusEnums, audienceFilter, courseFilter) }
-    verify { referralSummaryBuilderService.build(any(), any(), any(), any(), false) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), false) }
   }
 
   @Test
@@ -249,5 +253,48 @@ class ReferralServiceTest {
     resultPage.totalElements shouldBe 0
 
     verify { referralRepository.getReferralsByOrganisationId(orgId, pageable, null, null, null) }
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGetReferrals")
+  fun `getReferralsByUsername from logged in user details and filtering should return pageable ReferralSummary objects`(
+    statusFilter: List<String>?,
+    audienceFilter: String?,
+    courseFilter: String?,
+    expectedReferralSummaryProjections: List<ReferralSummaryProjection>,
+  ) {
+    val pageable = PageRequest.of(0, 10)
+    val statusEnums = statusFilter?.map { ReferralEntity.ReferralStatus.valueOf(it) }
+
+    every { referralRepository.getReferralsByUsername(REFERRER_USERNAME, pageable, statusEnums, audienceFilter, courseFilter) } returns
+      PageImpl(expectedReferralSummaryProjections, pageable, expectedReferralSummaryProjections.size.toLong())
+
+    val resultPage = referralService.getReferralsByUsername(REFERRER_USERNAME, pageable, statusFilter, audienceFilter, courseFilter)
+
+    resultPage.totalElements shouldBe expectedReferralSummaryProjections.size.toLong()
+
+    val expectedTotalPages = (expectedReferralSummaryProjections.size + pageable.pageSize - 1) / pageable.pageSize
+    resultPage.totalPages shouldBe expectedTotalPages
+
+    verify { referralRepository.getReferralsByUsername(REFERRER_USERNAME, pageable, statusEnums, audienceFilter, courseFilter) }
+    verify { prisonRegisterApiService.getAllPrisons() }
+    verify { prisonerSearchApiService.getPrisoners(any()) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), true) }
+    verify { referralRepository.getReferralsByUsername(REFERRER_USERNAME, pageable, statusEnums, audienceFilter, courseFilter) }
+    verify { referralSummaryBuilderService.build(any(), any(), any(), true) }
+  }
+
+  @Test
+  fun `getReferralsByUsername with unknown user should return pageable empty list`() {
+    val unknownUsername = "UNKNOWN_USER"
+    val pageable = PageRequest.of(0, 10)
+
+    every { referralRepository.getReferralsByUsername(unknownUsername, pageable, null, null, null) } returns PageImpl(emptyList())
+
+    val resultPage = referralService.getReferralsByUsername(unknownUsername, pageable, null, null, null)
+    resultPage.content shouldBe emptyList()
+    resultPage.totalElements shouldBe 0
+
+    verify { referralRepository.getReferralsByUsername(unknownUsername, pageable, null, null, null) }
   }
 }

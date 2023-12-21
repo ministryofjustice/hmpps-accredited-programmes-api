@@ -38,6 +38,7 @@ class ReferralSummaryBuilderServiceTest {
       submittedOn = LocalDateTime.now(),
       prisonNumber = PRISON_NUMBER,
       referrerUsername = REFERRER_USERNAME,
+      organisationId = ORGANISATION_ID_MDI,
     )
 
     private val referralSummaryProjection2 = ReferralSummaryProjection(
@@ -48,13 +49,14 @@ class ReferralSummaryBuilderServiceTest {
       submittedOn = LocalDateTime.now(),
       prisonNumber = PRISON_NUMBER,
       referrerUsername = REFERRER_USERNAME,
+      organisationId = ORGANISATION_ID_MDI,
     )
   }
 
   @Test
   fun `Building a referral summary requiring all sentence information should succeed`() {
     val referralSummaries =
-      referralSummaryBuilderService.build(listOf(referralSummaryProjection1, referralSummaryProjection2), PRISONERS, PRISONS, ORGANISATION_ID_MDI, false)
+      referralSummaryBuilderService.build(listOf(referralSummaryProjection1, referralSummaryProjection2), PRISONERS, PRISONS, false)
 
     assertEquals(2, referralSummaries.size)
 
@@ -94,7 +96,7 @@ class ReferralSummaryBuilderServiceTest {
   @Test
   fun `Building a referral summary requiring only earliest release date should succeed`() {
     val referralSummaries =
-      referralSummaryBuilderService.build(listOf(referralSummaryProjection1, referralSummaryProjection2), PRISONERS, PRISONS, ORGANISATION_ID_MDI, true)
+      referralSummaryBuilderService.build(listOf(referralSummaryProjection1, referralSummaryProjection2), PRISONERS, PRISONS, true)
 
     assertEquals(2, referralSummaries.size)
 

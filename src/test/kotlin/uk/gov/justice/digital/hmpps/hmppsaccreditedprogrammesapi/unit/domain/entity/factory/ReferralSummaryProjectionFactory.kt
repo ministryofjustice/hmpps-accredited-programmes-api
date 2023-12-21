@@ -19,6 +19,7 @@ class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
   private var submittedOn: Yielded<LocalDateTime> = { LocalDateTime.now() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
   private var referrerUsername: Yielded<String> = { randomUppercaseString(9) }
+  private var organisationId: Yielded<String> = { "MDI" }
 
   fun withReferralId(referralId: UUID) = apply {
     this.referralId = { referralId }
@@ -56,5 +57,6 @@ class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
     submittedOn = this.submittedOn(),
     prisonNumber = this.prisonNumber(),
     referrerUsername = this.referrerUsername(),
+    organisationId = this.organisationId(),
   )
 }
