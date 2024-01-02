@@ -31,16 +31,6 @@ services:
     ports:
       - '9094:8080'
 
-  prisoner-search:
-    image: wiremock/wiremock:2.35.0
-    networks:
-      - hmpps
-    container_name: prisoner-search
-    ports:
-      - "9095:8080"
-    volumes:
-      - ./prisoner-search-data:/home/wiremock
-
   prison-register-api:
     container_name: prison-register-api
     depends_on:
@@ -90,6 +80,16 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin_password
 
+  wiremock:
+    image: wiremock/wiremock:2.35.0
+    networks:
+      - hmpps
+    container_name: wiremock
+    ports:
+      - "9095:8080"
+    volumes:
+      - ./wiremock:/home/wiremock
+
   hmpps-accredited-programmes-api:
     image: quay.io/hmpps/hmpps-accredited-programmes-api:latest
     container_name: hmpps-accredited-programmes-api
@@ -109,6 +109,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev,local,seed
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
+      - SERVICES_PRISONER-SEARCH-API_BASE-URL=http://wiremock:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/postgres
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin_password
