@@ -101,11 +101,15 @@ management:
 
 services:
   prison-api:
-    base-url: ${PRISON-API_BASE-URL}
+    base-url: http://localhost:9094
   prisoner-search-api:
-    base-url: ${PRISONER-SEARCH-API_BASE-URL}
+    base-url: http://localhost:9095
   prison-register-api:
-    base-url: ${PRISON-REGISTER-API_BASE-URL}
+    base-url: http://localhost:9096
+
+hmpps:
+  auth:
+    url: http://localhost:9090/auth
 
 log-client-credentials-jwt-info: false
 

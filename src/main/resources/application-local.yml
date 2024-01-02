@@ -1,17 +1,5 @@
-hmpps:
-  auth:
-    url: http://localhost:9090/auth
-
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: admin
     password: admin_password
-
-services:
-  prison-api:
-    base-url: http://localhost:9094
-  prisoner-search-api:
-    base-url: http://localhost:9095
-  prison-register-api:
-    base-url: http://localhost:9096
