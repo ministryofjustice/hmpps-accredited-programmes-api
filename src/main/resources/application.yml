@@ -56,8 +56,6 @@ spring:
       ddl-auto: none
 
   datasource:
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
     hikari:
       connectionTimeout: 1000
       validationTimeout: 500
