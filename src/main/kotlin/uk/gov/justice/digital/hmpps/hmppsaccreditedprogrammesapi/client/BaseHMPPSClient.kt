@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -49,6 +50,7 @@ abstract class BaseHMPPSClient(
 
       val result = request.retrieve().toEntity(String::class.java).block()!!
 
+      objectMapper.apply { registerModule((JavaTimeModule())) }
       val deserialized = objectMapper.readValue(result.body, typeReference)
 
       return ClientResult.Success(result.statusCode, deserialized)
