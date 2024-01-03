@@ -60,4 +60,8 @@ constructor(
   override fun saveAudiences(audiences: Set<AudienceEntity>) {
     audienceRepository.saveAll(audiences)
   }
+
+  override fun deleteAll() {
+    courseRepository.deleteAll()
+  }
 }
