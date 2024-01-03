@@ -5,8 +5,10 @@ import au.com.dius.pact.provider.junitsupport.Provider
 import au.com.dius.pact.provider.junitsupport.State
 import au.com.dius.pact.provider.junitsupport.VerificationReports
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker
+import au.com.dius.pact.provider.junitsupport.loader.PactFolder
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider
 import org.apache.hc.core5.http.HttpRequest
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,16 +20,23 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-@PactBroker
+@PactFolder("pacts")
 @Provider("Accredited Programmes API")
 @VerificationReports(value = ["markdown", "console"], reportDir = "build/pact")
 class PactContractTest {
   @Autowired
   lateinit var jwtAuthHelper: JwtAuthHelper
+
+  @Autowired
+  lateinit var courseRepository: CourseRepository
 
   @MockBean
   lateinit var prisonRegisterApiService: PrisonRegisterApiService
@@ -41,14 +50,33 @@ class PactContractTest {
   @State("A participation can be created")
   fun `ensure a participation can be created`() {}
 
+  @BeforeEach
+  fun setup() {
+    courseRepository.deleteAll()
+  }
+
   @State("Course d3abc217-75ee-46e9-a010-368f30282367 exists")
-  fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 exists`() {}
+  fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 exists`() {
+    val course = CourseEntityFactory().withId(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")).produce()
+    courseRepository.saveCourse(course)
+  }
 
   @State("Course d3abc217-75ee-46e9-a010-368f30282367 has offerings 790a2dfe-7de5-4504-bb9c-83e6e53a6537 and 7fffcc6a-11f8-4713-be35-cf5ff1aee517")
-  fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 has offerings 790a2dfe-7de5-4504-bb9c-83e6e53a6537 and 7fffcc6a-11f8-4713-be35-cf5ff1aee517`() {}
+  fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 has offerings 790a2dfe-7de5-4504-bb9c-83e6e53a6537 and 7fffcc6a-11f8-4713-be35-cf5ff1aee517`() {
+    val offering1 = OfferingEntityFactory().withId(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537")).produce()
+    val offering2 = OfferingEntityFactory().withId(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")).produce()
+    val course = CourseEntityFactory().withId(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")).withMutableOfferings(
+      mutableSetOf(offering1, offering2)
+    ).produce()
+
+    courseRepository.saveCourse(course)
+  }
 
   @State("Courses d3abc217-75ee-46e9-a010-368f30282367, 28e47d30-30bf-4dab-a8eb-9fda3f6400e8, and 1811faa6-d568-4fc4-83ce-41118b90242e and no others exist")
-  fun `ensure courses d3abc217-75ee-46e9-a010-368f30282367, 28e47d30-30bf-4dab-a8eb-9fda3f6400e8, and 1811faa6-d568-4fc4-83ce-41118b90242e and no others exist`() {}
+  fun `ensure courses d3abc217-75ee-46e9-a010-368f30282367, 28e47d30-30bf-4dab-a8eb-9fda3f6400e8, and 1811faa6-d568-4fc4-83ce-41118b90242e and no others exist`() {
+    val course = CourseEntityFactory().withId(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")).produce()
+    courseRepository.saveCourse(course)
+  }
 
   @State("In order, the names of all the courses are Super Course, Custom Course, and RAPID Course")
   fun `ensure in order, the names of all the courses are Super Course, Custom Course, and RAPID Course`() {}

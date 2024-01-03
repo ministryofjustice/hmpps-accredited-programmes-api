@@ -15,4 +15,5 @@ interface CourseRepository {
   fun getOfferingById(offeringId: UUID): OfferingEntity?
   fun getAllAudiences(): Set<AudienceEntity>
   fun saveAudiences(audiences: Set<AudienceEntity>)
+  fun deleteAll()
 }
