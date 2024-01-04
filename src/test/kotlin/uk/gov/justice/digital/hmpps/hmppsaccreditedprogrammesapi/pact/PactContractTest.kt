@@ -21,6 +21,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import java.util.*
@@ -38,22 +40,30 @@ class PactContractTest {
   @Autowired
   lateinit var courseRepository: CourseRepository
 
+  @Autowired
+  lateinit var jpaOfferingRepository: JpaOfferingRepository
+
+  @Autowired
+  lateinit var referralRepository: ReferralRepository
+
   @MockBean
   lateinit var prisonRegisterApiService: PrisonRegisterApiService
 
   @MockBean
   lateinit var prisonerSearchApiService: PrisonerSearchApiService
 
+  @BeforeEach
+  fun setUp() {
+    referralRepository.deleteAll()
+    courseRepository.deleteAll()
+    jpaOfferingRepository.deleteAll()
+  }
+
   @State("Server is healthy")
   fun `ensure server is healthy`() {}
 
   @State("A participation can be created")
   fun `ensure a participation can be created`() {}
-
-  @BeforeEach
-  fun setup() {
-    courseRepository.deleteAll()
-  }
 
   @State("Course d3abc217-75ee-46e9-a010-368f30282367 exists")
   fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 exists`() {
@@ -79,13 +89,38 @@ class PactContractTest {
   }
 
   @State("In order, the names of all the courses are Super Course, Custom Course, and RAPID Course")
-  fun `ensure in order, the names of all the courses are Super Course, Custom Course, and RAPID Course`() {}
+  fun `ensure in order, the names of all the courses are Super Course, Custom Course, and RAPID Course`() {
+
+    courseRepository.saveCourse(CourseEntityFactory().withName("Super Course").produce())
+    courseRepository.saveCourse(CourseEntityFactory().withName("Custom Course").produce())
+    courseRepository.saveCourse(CourseEntityFactory().withName("RAPID Course").produce())
+  }
 
   @State("Offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists for course d3abc217-75ee-46e9-a010-368f30282367")
-  fun `ensure offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists for course d3abc217-75ee-46e9-a010-368f30282367`() {}
+  fun `ensure offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists for course d3abc217-75ee-46e9-a010-368f30282367`() {
+
+    val courseEntity = CourseEntityFactory().withId(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")).produce()
+
+    val offering = OfferingEntityFactory()
+      .withId(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"))
+      .produceWithCourse(courseEntity)
+
+    courseRepository.saveCourse(courseEntity)
+    jpaOfferingRepository.save(offering)
+  }
 
   @State("Offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists")
-  fun `ensure offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists`() {}
+  fun `ensure offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists`() {
+
+    val offering = OfferingEntityFactory()
+      .withId(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537")).produce()
+
+    val courseEntity = CourseEntityFactory().withId(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"))
+      .withMutableOfferings(mutableSetOf(offering)).produce()
+
+    courseRepository.saveCourse(courseEntity)
+    jpaOfferingRepository.save(offering)
+  }
 
   @State("Offering 7fffcc6a-11f8-4713-be35-cf5ff1aee517 exists")
   fun `ensure offering 7fffcc6a-11f8-4713-be35-cf5ff1aee517 exists`() {}

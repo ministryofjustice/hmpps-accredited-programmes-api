@@ -2,8 +2,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.en
 
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomAlphanumericString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomEmailAddress
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import java.util.UUID
 
@@ -35,4 +37,16 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
     contactEmail = this.contactEmail(),
     secondaryContactEmail = this.secondaryContactEmail(),
   )
+
+  fun produceWithCourse(course: CourseEntity): OfferingEntity {
+
+    val offeringEntity = OfferingEntity(
+      id = this.id(),
+      organisationId = this.organisationId(),
+      contactEmail = this.contactEmail(),
+      secondaryContactEmail = this.secondaryContactEmail(),
+    )
+    offeringEntity.course = course
+    return offeringEntity;
+  }
 }
