@@ -14,6 +14,7 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
   private var organisationId: Yielded<String> = { randomAlphanumericString(6) }
   private var contactEmail: Yielded<String> = { randomEmailAddress() }
   private var secondaryContactEmail: Yielded<String> = { randomEmailAddress() }
+  private var course: Yielded<CourseEntity> = { CourseEntityFactory().produce() }
 
   fun withId(id: UUID) = apply {
     this.id = { id }
@@ -29,6 +30,10 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
 
   fun withSecondaryContactEmail(secondaryContactEmail: String) = apply {
     this.secondaryContactEmail = { secondaryContactEmail }
+  }
+
+  fun withCourse(course: CourseEntity) = apply {
+    this.course = { course }
   }
 
   override fun produce(): OfferingEntity = OfferingEntity(

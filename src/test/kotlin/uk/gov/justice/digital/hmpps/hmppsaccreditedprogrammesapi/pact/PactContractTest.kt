@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
@@ -98,12 +99,18 @@ class PactContractTest {
 
   @State("Offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists for course d3abc217-75ee-46e9-a010-368f30282367")
   fun `ensure offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists for course d3abc217-75ee-46e9-a010-368f30282367`() {
-
-    val courseEntity = CourseEntityFactory().withId(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")).produce()
+    val courseEntity = CourseEntityFactory()
+      .withId(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"))
+      .withMutableOfferings(mutableSetOf())
+      .produce()
 
     val offering = OfferingEntityFactory()
       .withId(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"))
-      .produceWithCourse(courseEntity)
+      .produce().apply {
+        course = courseEntity
+      }
+
+    courseEntity.addOffering(offering)
 
     courseRepository.saveCourse(courseEntity)
     jpaOfferingRepository.save(offering)
