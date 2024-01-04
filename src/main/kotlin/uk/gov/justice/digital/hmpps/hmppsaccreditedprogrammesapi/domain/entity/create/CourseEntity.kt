@@ -14,7 +14,6 @@ import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
-import jakarta.persistence.Transient
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.SUBSELECT
 import org.hibernate.annotations.Immutable
@@ -42,7 +41,7 @@ data class CourseEntity(
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true)
   @Column(name = "offerings")
   @Fetch(SUBSELECT)
-  private val mutableOfferings: MutableSet<OfferingEntity> = mutableSetOf(),
+  val mutableOfferings: MutableSet<OfferingEntity> = mutableSetOf(),
 
   @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
   @Fetch(SUBSELECT)
@@ -53,16 +52,7 @@ data class CourseEntity(
   )
   var audiences: MutableSet<AudienceEntity> = mutableSetOf(),
   var withdrawn: Boolean = false,
-) {
-  @get:Transient
-  val offerings: Set<OfferingEntity>
-    get() = mutableOfferings
-
-  fun addOffering(offering: OfferingEntity) {
-    offering.course = this
-    mutableOfferings += offering
-  }
-}
+)
 
 @Embeddable
 @Immutable

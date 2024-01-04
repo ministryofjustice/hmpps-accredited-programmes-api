@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
@@ -11,7 +12,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.NewPrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.OfferingUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AudienceRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import java.util.UUID
 
 @Service
@@ -20,27 +23,39 @@ class CourseService
 @Autowired
 constructor(
   private val courseRepository: CourseRepository,
+  private val offeringRepository: OfferingRepository,
+  private val audienceRepository: AudienceRepository,
 ) {
-  fun getAllCourses(): List<CourseEntity> = courseRepository.getAllCourses().filterNot(CourseEntity::withdrawn)
+  fun getAllCourses(): List<CourseEntity> = courseRepository
+    .findAll()
+    .filterNot { it.withdrawn }
 
-  fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.getCourseById(courseId)?.takeIf { !it.withdrawn }
-  fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.getCourseByOfferingId(offeringId)
+  fun getCourseById(courseId: UUID): CourseEntity? = courseRepository
+    .findByIdOrNull(courseId)
+    ?.takeIf { !it.withdrawn }
+  fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository
+    .findByMutableOfferingsId(offeringId)
 
-  fun getAllOfferings(): List<OfferingEntity> = courseRepository.getAllOfferings().filterNot(OfferingEntity::withdrawn)
-  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> = courseRepository.getAllOfferings().filter { it.organisationId == organisationId }
+  fun getAllOfferings(): List<OfferingEntity> = offeringRepository
+    .findAll()
+    .filterNot { it.withdrawn }
 
-  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> = courseRepository
-    .getAllOfferingsByCourseId(courseId)
-    .filterNot(OfferingEntity::withdrawn)
+  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> = offeringRepository
+    .findAll()
+    .filter { it.organisationId == organisationId }
 
-  fun getOfferingById(offeringId: UUID): OfferingEntity? = courseRepository
-    .getOfferingById(offeringId)
+  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> = offeringRepository
+    .findAllByCourseId(courseId)
+    .filterNot { it.withdrawn }
+
+  fun getOfferingById(offeringId: UUID): OfferingEntity? = offeringRepository
+    .findByIdOrNull(offeringId)
     ?.takeIf { !it.withdrawn }
 
   fun updateCourses(courseData: List<CourseUpdate>) {
     updateAudiences(courseData)
-    val allAudiences: Map<String, AudienceEntity> = courseRepository.getAllAudiences().associateBy { it.value }
-    val coursesByIdentifier = courseRepository.getAllCourses().associateBy(CourseEntity::identifier)
+    val allAudiences: Map<String, AudienceEntity> = audienceRepository.findAll().associateBy { it.value }
+    val coursesByIdentifier = courseRepository.findAll().associateBy(CourseEntity::identifier)
     val courseDataByIdentifier = courseData.associateBy(CourseUpdate::identifier)
 
     val toAdd = courseDataByIdentifier.keys - coursesByIdentifier.keys
@@ -58,7 +73,7 @@ constructor(
           referable = update.referable,
         )
       }
-    }.forEach(courseRepository::saveCourse)
+    }.forEach(courseRepository::save)
 
     toUpdate.forEach { courseIdentifier ->
       courseDataByIdentifier[courseIdentifier]?.let { update ->
@@ -86,18 +101,18 @@ constructor(
 
   private fun updateAudiences(courseData: List<CourseUpdate>) {
     val desiredAudienceValues = courseData.flatMap { audienceStrings(it.audience) }.toSet()
-    val actualAudienceValues = courseRepository.getAllAudiences().map { it.value }.toSet()
+    val actualAudienceValues = audienceRepository.findAll().map { it.value }.toSet()
 
     val audienceValuesToSave = desiredAudienceValues - actualAudienceValues
-    val audiencesToSave = audienceValuesToSave.map(::AudienceEntity).toSet()
+    val audiencesToSave = audienceValuesToSave.map { AudienceEntity(value = it) }.toSet()
 
-    courseRepository.saveAudiences(audiencesToSave)
+    audienceRepository.saveAll(audiencesToSave)
   }
 
   private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
   fun updatePrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
-    val allCourses = courseRepository.getAllCourses()
+    val allCourses = courseRepository.findAll()
     clearPrerequisites(allCourses)
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     replacements.forEach { record ->
@@ -127,7 +142,7 @@ constructor(
   }
 
   fun updateOfferings(updates: List<OfferingUpdate>): List<LineMessage> {
-    val allCourses = courseRepository.getAllCourses()
+    val allCourses = courseRepository.findAll()
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
     val desiredOfferingsByCourseIdentifier = updates.groupBy(OfferingUpdate::identifier)
     coursesByIdentifier.forEach { (courseIdentifier, course) ->
@@ -138,19 +153,19 @@ constructor(
   }
 
   private fun updateOfferingsForCourse(course: CourseEntity, desiredOfferings: List<OfferingUpdate>) {
-    val offeringsByOrganisationId = course.offerings.associateBy(OfferingEntity::organisationId)
+    val offeringsByOrganisationId = course.mutableOfferings.associateBy(OfferingEntity::organisationId)
     val updatesByPrisonId = desiredOfferings.associateBy(OfferingUpdate::prisonId)
 
     val toAdd = updatesByPrisonId.keys - offeringsByOrganisationId.keys
     toAdd.forEach {
       val update = updatesByPrisonId[it]
-      course.addOffering(
-        OfferingEntity(
-          organisationId = it,
-          contactEmail = update?.contactEmail ?: "",
-          secondaryContactEmail = update?.secondaryContactEmail,
-        ),
+      val offeringToAdd = OfferingEntity(
+        organisationId = it,
+        contactEmail = update?.contactEmail ?: "",
+        secondaryContactEmail = update?.secondaryContactEmail,
       )
+
+      addOfferingToCourse(course.id!!, offeringToAdd)
     }
 
     val toUpdate = updatesByPrisonId.keys.intersect(offeringsByOrganisationId.keys)
@@ -194,6 +209,16 @@ constructor(
           )
         }
       }.filterNotNull()
+
+  fun addOfferingToCourse(courseId: UUID, offering: OfferingEntity) {
+    val course = courseRepository.findByIdOrNull(courseId)
+
+    offering.course = course!!
+    course.mutableOfferings += offering
+
+    offeringRepository.save(offering)
+    courseRepository.save(course)
+  }
 
   companion object {
     private fun indexToCsvRowNumber(index: Int) = index + 2

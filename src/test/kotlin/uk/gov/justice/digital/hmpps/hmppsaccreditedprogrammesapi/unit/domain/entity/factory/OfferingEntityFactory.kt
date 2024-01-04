@@ -12,6 +12,7 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
   private var organisationId: Yielded<String> = { randomAlphanumericString(6) }
   private var contactEmail: Yielded<String> = { randomEmailAddress() }
   private var secondaryContactEmail: Yielded<String> = { randomEmailAddress() }
+  private var withdrawn: Yielded<Boolean> = { false }
 
   fun withId(id: UUID) = apply {
     this.id = { id }
@@ -29,10 +30,15 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
     this.secondaryContactEmail = { secondaryContactEmail }
   }
 
+  fun withWithdrawn(withdrawn: Boolean) = apply {
+    this.withdrawn = { withdrawn }
+  }
+
   override fun produce(): OfferingEntity = OfferingEntity(
     id = this.id(),
     organisationId = this.organisationId(),
     contactEmail = this.contactEmail(),
     secondaryContactEmail = this.secondaryContactEmail(),
+    withdrawn = this.withdrawn(),
   )
 }

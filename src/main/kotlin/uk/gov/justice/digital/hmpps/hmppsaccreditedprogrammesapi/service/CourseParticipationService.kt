@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseParticipationUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaCourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -14,7 +14,7 @@ import kotlin.jvm.optionals.getOrNull
 class CourseParticipationService
 @Autowired
 constructor(
-  private val courseParticipationRepository: JpaCourseParticipationRepository,
+  private val courseParticipationRepository: CourseParticipationRepository,
 ) {
   fun createCourseParticipation(courseParticipation: CourseParticipationEntity): CourseParticipationEntity? =
     courseParticipation.let {

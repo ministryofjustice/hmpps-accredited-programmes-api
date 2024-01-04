@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ran
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomSentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
@@ -28,6 +29,9 @@ constructor(
   @Autowired
   private lateinit var entityManager: EntityManager
 
+  @Autowired
+  private lateinit var courseService: CourseService
+
   @Test
   fun `ReferralRepository should save and retrieve ReferralEntity objects`() {
     val course = CourseEntityFactory()
@@ -41,7 +45,7 @@ constructor(
       .withContactEmail(randomEmailAddress())
       .produce()
 
-    entityManager.merge(course.apply { addOffering(offering) })
+    entityManager.merge(course.apply { course.id?.let { courseService.addOfferingToCourse(it, offering) } })
 
     val referrer = ReferrerUserEntityFactory()
       .withUsername(CLIENT_USERNAME)
@@ -80,7 +84,7 @@ constructor(
       .withContactEmail(randomEmailAddress())
       .produce()
 
-    entityManager.merge(course.apply { addOffering(offering) })
+    entityManager.merge(course.apply { course.id?.let { courseService.addOfferingToCourse(it, offering) } })
 
     val referrer = ReferrerUserEntityFactory()
       .withUsername(CLIENT_USERNAME)

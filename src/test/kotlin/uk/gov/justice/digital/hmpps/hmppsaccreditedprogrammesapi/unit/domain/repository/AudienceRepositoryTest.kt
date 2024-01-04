@@ -10,16 +10,16 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaAudienceRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AudienceRepository
 
-class JpaAudienceRepositoryTest
+class AudienceRepositoryTest
 @Autowired
 constructor(
-  val audienceRepository: JpaAudienceRepository,
+  val audienceRepository: AudienceRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test
-  fun `JpaAudienceRepository successfully saves and retrieves AudienceEntity objects`() {
+  fun `AudienceRepository successfully saves and retrieves AudienceEntity objects`() {
     val transientAudience = AudienceEntity("A")
     audienceRepository.save(transientAudience)
 
@@ -37,7 +37,7 @@ constructor(
   }
 
   @Test
-  fun `JpaAudienceRepository ignores duplicate AudienceEntity objects on persist`() {
+  fun `AudienceRepository ignores duplicate AudienceEntity objects on persist`() {
     val a1 = AudienceEntity("A")
     val a2 = AudienceEntity("A")
     audienceRepository.saveAll(listOf(a1, a2))

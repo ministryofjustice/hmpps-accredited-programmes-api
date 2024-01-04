@@ -24,38 +24,46 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.NewPrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.OfferingUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AudienceRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.eqCourse
-import java.util.UUID
+import java.util.*
 
 class CourseServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var courseRepository: CourseRepository
 
+  @MockK(relaxed = true)
+  private lateinit var offeringRepository: OfferingRepository
+
+  @MockK(relaxed = true)
+  private lateinit var audienceRepository: AudienceRepository
+
   private lateinit var courseService: CourseService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    courseService = CourseService(courseRepository)
+    courseService = CourseService(courseRepository, offeringRepository, audienceRepository)
   }
 
   @Nested
   @DisplayName("Update Courses")
   inner class UpdateCoursesTests {
     @Test
-    fun `updateCourses with an empty list clears the repository`() {
+    fun `updateCourses with an empty list clears the audience repository`() {
       courseService.updateCourses(emptyList())
-      verify { courseRepository.saveAudiences(emptySet()) }
+      verify { audienceRepository.saveAll(emptySet()) }
     }
 
     @Test
     fun `updateCourses with one valid CourseEntity object clears and persists to the repository`() {
       val a1 = AudienceEntity("Audience 1", id = UUID.randomUUID())
 
-      every { courseRepository.getAllAudiences() } returns setOf(a1)
+      every { audienceRepository.findAll() } returns listOf(a1)
 
       courseService.updateCourses(
         listOf(
@@ -64,7 +72,7 @@ class CourseServiceTest {
       )
 
       verify {
-        courseRepository.saveCourse(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1), referable = true)))
+        courseRepository.save(eqCourse(CourseEntity(name = "Course", identifier = "C", description = "Description", audiences = mutableSetOf(a1), referable = true)))
       }
     }
 
@@ -74,7 +82,7 @@ class CourseServiceTest {
       val a2 = AudienceEntity("Audience 2", id = UUID.randomUUID())
       val a3 = AudienceEntity("Audience 3", id = UUID.randomUUID())
 
-      every { courseRepository.getAllAudiences() } returns setOf(a1, a2, a3)
+      every { audienceRepository.findAll() } returns listOf(a1, a2, a3)
 
       courseService.updateCourses(
         listOf(
@@ -82,8 +90,8 @@ class CourseServiceTest {
           CourseUpdate(name = "Course 2", identifier = "C2", description = "Description 2", audience = "${a1.value}, ${a3.value}", alternateName = "222", referable = true),
         ),
       )
-      verify { courseRepository.saveCourse(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2), referable = true))) }
-      verify { courseRepository.saveCourse(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3), referable = true))) }
+      verify { courseRepository.save(eqCourse(CourseEntity(name = "Course 1", identifier = "C1", description = "Description 1", audiences = mutableSetOf(a1, a2), referable = true))) }
+      verify { courseRepository.save(eqCourse(CourseEntity(name = "Course 2", identifier = "C2", description = "Description 2", audiences = mutableSetOf(a1, a3), referable = true))) }
     }
 
     @Test
@@ -92,7 +100,7 @@ class CourseServiceTest {
       val a2 = AudienceEntity("Audience 2", id = UUID.randomUUID())
       val a3 = AudienceEntity("Audience 3", id = UUID.randomUUID())
 
-      every { courseRepository.getAllAudiences() } returns setOf()
+      every { audienceRepository.findAll() } returns listOf()
 
       courseService.updateCourses(
         listOf(
@@ -103,7 +111,7 @@ class CourseServiceTest {
         ),
       )
 
-      verify { courseRepository.saveAudiences(setOf(AudienceEntity(a1.value), AudienceEntity(a2.value), AudienceEntity(a3.value))) }
+      verify { audienceRepository.saveAll(setOf(AudienceEntity(a1.value), AudienceEntity(a2.value), AudienceEntity(a3.value))) }
     }
   }
 
@@ -127,7 +135,7 @@ class CourseServiceTest {
           ),
         ),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updatePrerequisites(emptyList()).shouldBeEmpty()
 
@@ -143,7 +151,7 @@ class CourseServiceTest {
           prerequisites = mutableSetOf(PrerequisiteEntity(name = "PR 1", description = " PR 1 Desc")),
         ),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updatePrerequisites(
         listOf(
@@ -160,7 +168,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updatePrerequisites(
         listOf(
@@ -187,7 +195,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updatePrerequisites(
         listOf(
@@ -211,7 +219,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C-1"),
         CourseEntity(name = "Course 2", identifier = "C-2"),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updatePrerequisites(
         listOf(
@@ -245,14 +253,14 @@ class CourseServiceTest {
           identifier = "C1",
           description = "Description 1",
         ).apply {
-          addOffering(theOffering)
+          this.id?.let { courseService.addOfferingToCourse(it, theOffering) }
         },
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updateOfferings(emptyList()).shouldBeEmpty()
 
-      val updatedOfferings = allCourses.flatMap { it.offerings }
+      val updatedOfferings = allCourses.flatMap { it.mutableOfferings }
       updatedOfferings shouldHaveSize 1
       updatedOfferings[0] shouldBeSameInstanceAs theOffering
       theOffering.withdrawn shouldBe true
@@ -266,10 +274,10 @@ class CourseServiceTest {
           name = "Course 1",
           identifier = "C1",
         ).apply {
-          addOffering(theOffering)
+          this.id?.let { courseService.addOfferingToCourse(it, theOffering) }
         },
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updateOfferings(
         listOf(
@@ -277,7 +285,7 @@ class CourseServiceTest {
         ),
       ).shouldBeEmpty()
 
-      val updatedOfferings = allCourses.flatMap { it.offerings }
+      val updatedOfferings = allCourses.flatMap { it.mutableOfferings }
       updatedOfferings shouldHaveSize 1
       updatedOfferings[0] shouldBeSameInstanceAs theOffering
       theOffering.shouldBeEqualToIgnoringFields(
@@ -294,10 +302,10 @@ class CourseServiceTest {
           name = "Course 1",
           identifier = "C1",
         ).apply {
-          addOffering(oldOffering)
+          this.id?.let { courseService.addOfferingToCourse(it, oldOffering) }
         },
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updateOfferings(
         listOf(
@@ -305,7 +313,7 @@ class CourseServiceTest {
         ),
       ).shouldBeEmpty()
 
-      val offeringsByOrganisationId = allCourses[0].offerings.associateBy(OfferingEntity::organisationId)
+      val offeringsByOrganisationId = allCourses[0].mutableOfferings.associateBy(OfferingEntity::organisationId)
 
       offeringsByOrganisationId["MDI"]!!.shouldBeEqualToIgnoringFields(
         OfferingEntity(organisationId = "MDI", contactEmail = "x@y.net", secondaryContactEmail = "z@y.net"),
@@ -325,7 +333,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updateOfferings(
         listOf(
@@ -335,7 +343,7 @@ class CourseServiceTest {
         ),
       ).shouldBeEmpty()
 
-      allCourses.associateBy(CourseEntity::name, CourseEntity::offerings) shouldBeEqual mapOf(
+      allCourses.associateBy(CourseEntity::name, CourseEntity::mutableOfferings) shouldBeEqual mapOf(
         "Course 1" to mutableSetOf(
           OfferingEntity(organisationId = "MDI", contactEmail = "admin@mdi.net"),
           OfferingEntity(organisationId = "BWI", contactEmail = "admin@bwi.net", secondaryContactEmail = "admin2@bwi.net"),
@@ -352,7 +360,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updateOfferings(
         listOf(
@@ -377,7 +385,7 @@ class CourseServiceTest {
         CourseEntity(name = "Course 1", identifier = "C1"),
         CourseEntity(name = "Course 2", identifier = "C2"),
       )
-      every { courseRepository.getAllCourses() } returns allCourses
+      every { courseRepository.findAll() } returns allCourses
 
       courseService.updateOfferings(
         listOf(
@@ -403,7 +411,7 @@ class CourseServiceTest {
       val withdrawnOffering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
       val offering = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
 
-      every { courseRepository.getAllOfferingsByCourseId(any()) } returns listOf(withdrawnOffering, offering)
+      every { offeringRepository.findAllByCourseId(any()) } returns listOf(withdrawnOffering, offering)
 
       courseService.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(offering)
     }
@@ -412,7 +420,7 @@ class CourseServiceTest {
     fun `A withdrawn Offering should not be returned from getOfferingById`() {
       val withdrawnOffering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
 
-      every { courseRepository.getOfferingById(any()) } returns withdrawnOffering
+      every { offeringRepository.findById(any()) } returns Optional.of(withdrawnOffering)
 
       courseService.getOfferingById(UUID.randomUUID()).shouldBeNull()
     }
@@ -421,7 +429,7 @@ class CourseServiceTest {
     fun `An active Offering should be returned from getOfferingById`() {
       val offering = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
 
-      every { courseRepository.getOfferingById(any()) } returns offering
+      every { offeringRepository.findById(any()) } returns Optional.of(offering)
 
       courseService.getOfferingById(UUID.randomUUID()) shouldBe offering
     }
@@ -433,14 +441,14 @@ class CourseServiceTest {
     @Test
     fun `A withdrawn course should not be returned from getCourseById`() {
       val withdrawnCourse = CourseEntity(name = "Course", identifier = "C", withdrawn = true)
-      every { courseRepository.getCourseById(any()) } returns withdrawnCourse
+      every { courseRepository.findById(any()) } returns Optional.of(withdrawnCourse)
       courseService.getCourseById(UUID.randomUUID()).shouldBeNull()
     }
 
     @Test
     fun `An active course should  be returned from getCourseById`() {
       val activeCourse = CourseEntity(name = "Course", identifier = "C")
-      every { courseRepository.getCourseById(any()) } returns activeCourse
+      every { courseRepository.findById(any()) } returns Optional.of(activeCourse)
       courseService.getCourseById(UUID.randomUUID()) shouldBe activeCourse
     }
 
@@ -448,7 +456,7 @@ class CourseServiceTest {
     fun `getAllCourses should exclude withdrawn courses`() {
       val withdrawnCourse = CourseEntity(name = "Withdrawn", identifier = "W", withdrawn = true)
       val activeCourse = CourseEntity(name = "Active", identifier = "A")
-      every { courseRepository.getAllCourses() } returns listOf(activeCourse, withdrawnCourse)
+      every { courseRepository.findAll() } returns listOf(activeCourse, withdrawnCourse)
       courseService.getAllCourses().shouldContainExactly(activeCourse)
     }
   }
@@ -461,7 +469,7 @@ class CourseServiceTest {
     fun `should return empty list when no offerings exist for an organisationId`() {
       val offering = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
 
-      every { courseRepository.getAllOfferings() } returns listOf(offering)
+      every { offeringRepository.findAll() } returns listOf(offering)
 
       courseService.getAllOfferingsByOrganisationId("xxx").isEmpty()
     }
@@ -471,7 +479,7 @@ class CourseServiceTest {
       val offering1 = OfferingEntity(withdrawn = true, organisationId = "BWI", contactEmail = "a@b.com")
       val offering2 = OfferingEntity(organisationId = "MDI", contactEmail = "a@b.com")
 
-      every { courseRepository.getAllOfferings() } returns listOf(offering1, offering2)
+      every { offeringRepository.findAll() } returns listOf(offering1, offering2)
 
       courseService.getAllOfferingsByOrganisationId(offering1.organisationId).shouldContainExactly(offering1)
     }
