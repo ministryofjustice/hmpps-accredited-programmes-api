@@ -33,3 +33,5 @@ services:
     base-url: http://localhost:#WIREMOCK_PORT
   prison-register-api:
     base-url: http://localhost:#WIREMOCK_PORT
+  oasys-api:
+    base-url: http://localhost:#WIREMOCK_PORT

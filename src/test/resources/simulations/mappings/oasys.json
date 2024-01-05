@@ -1,0 +1,30 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/eor/oasys/ass/allasslist/pris/A9999BB/ALLOW",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "assessments.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/eor/oasys/ass/section2/ALLOW/2114584",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "offence-detail.json"
+      }
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
@@ -41,7 +42,8 @@ object WiremockPortHolder {
       }
 
       possiblePorts.forEach { portToTry ->
-        val lockFilePath = Paths.get("${System.getProperty("java.io.tmpdir")}${System.getProperty("file.separator")}ap-int-port-lock-$portToTry.lock")
+        val lockFilePath =
+          Paths.get("${System.getProperty("java.io.tmpdir")}${System.getProperty("file.separator")}ap-int-port-lock-$portToTry.lock")
 
         try {
           channel = FileChannel.open(lockFilePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)
@@ -89,10 +91,13 @@ abstract class IntegrationTestBase {
 
   @BeforeEach
   fun beforeEach() {
-    wiremockServer = WireMockServer(wiremockPort.toInt())
+    wiremockServer = WireMockServer(
+      WireMockConfiguration()
+        .port(wiremockPort.toInt())
+        .usingFilesUnderClasspath("simulations")
+        .maxLoggedResponseSize(100_000),
+    )
     wiremockServer.start()
-
-    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
   }
 
   @AfterEach
