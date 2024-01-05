@@ -10,7 +10,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class ReferralEntityFactory : Factory<ReferralEntity> {
-
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
   private var offering: Yielded<OfferingEntity> = { OfferingEntityFactory().produce() }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
@@ -19,9 +18,9 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
   private var oasysConfirmed: Yielded<Boolean> = { false }
   private var hasReviewedProgrammeHistory: Yielded<Boolean> = { false }
   private var status: Yielded<ReferralEntity.ReferralStatus> = { ReferralEntity.ReferralStatus.REFERRAL_STARTED }
-  private var submittedOn: Yielded<LocalDateTime> = { LocalDateTime.now() }
+  private var submittedOn: Yielded<LocalDateTime?> = { null }
 
-  fun withId(id: UUID) = apply {
+  fun withId(id: UUID?) = apply {
     this.id = { id }
   }
 
@@ -53,11 +52,11 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
     this.status = { status }
   }
 
-  fun withSubmittedOn(submittedOn: LocalDateTime) = apply {
+  fun withSubmittedOn(submittedOn: LocalDateTime?) = apply {
     this.submittedOn = { submittedOn }
   }
 
-  override fun produce(): ReferralEntity = ReferralEntity(
+  override fun produce() = ReferralEntity(
     id = this.id(),
     offering = this.offering(),
     prisonNumber = this.prisonNumber(),

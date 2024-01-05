@@ -11,12 +11,11 @@ import java.time.LocalDateTime
 import java.util.*
 
 class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
-
   private var referralId: Yielded<UUID> = { UUID.randomUUID() }
   private var courseName: Yielded<String> = { randomSentence(3..4, 6..8) }
   private var audience: Yielded<String> = { "Audience 1" }
   private var status: Yielded<ReferralEntity.ReferralStatus> = { ReferralEntity.ReferralStatus.REFERRAL_STARTED }
-  private var submittedOn: Yielded<LocalDateTime> = { LocalDateTime.now() }
+  private var submittedOn: Yielded<LocalDateTime?> = { null }
   private var prisonNumber: Yielded<String> = { randomPrisonNumber() }
   private var referrerUsername: Yielded<String> = { randomUppercaseString(9) }
   private var organisationId: Yielded<String> = { "MDI" }
@@ -37,7 +36,7 @@ class ReferralSummaryProjectionFactory : Factory<ReferralSummaryProjection> {
     this.status = { status }
   }
 
-  fun withSubmittedOn(submittedOn: LocalDateTime) = apply {
+  fun withSubmittedOn(submittedOn: LocalDateTime?) = apply {
     this.submittedOn = { submittedOn }
   }
 
