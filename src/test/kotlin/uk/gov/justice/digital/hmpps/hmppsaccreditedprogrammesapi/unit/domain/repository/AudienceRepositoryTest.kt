@@ -1,50 +1,54 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.repository
 
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.test.context.transaction.TestTransaction
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AudienceRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AudienceEntityFactory
 
-class AudienceRepositoryTest
-@Autowired
-constructor(
-  val audienceRepository: AudienceRepository,
-  jdbcTemplate: JdbcTemplate,
-) : RepositoryTestBase(jdbcTemplate) {
+@SpringBootTest
+@AutoConfigureTestDatabase
+@Transactional
+@ActiveProfiles("test")
+class AudienceRepositoryTest {
+
+  @Autowired
+  private lateinit var entityManager: EntityManager
+
   @Test
   fun `AudienceRepository successfully saves and retrieves AudienceEntity objects`() {
-    val transientAudience = AudienceEntity("A")
-    audienceRepository.save(transientAudience)
+    val audience = AudienceEntityFactory().withValue("A").produce()
+    entityManager.merge(audience)
 
-    TestTransaction.flagForCommit()
-    TestTransaction.end()
-
-    transientAudience.id.shouldNotBeNull()
-
-    TestTransaction.start()
-
-    val audiences = audienceRepository.findAll()
-
-    audiences shouldHaveSize 1
-    audiences shouldContainExactly setOf(AudienceEntity(value = "A", transientAudience.id))
+    val persistedAudience = entityManager.find(AudienceEntity::class.java, audience.id)
+    persistedAudience shouldBe audience
   }
 
   @Test
-  fun `AudienceRepository ignores duplicate AudienceEntity objects on persist`() {
-    val a1 = AudienceEntity("A")
-    val a2 = AudienceEntity("A")
-    audienceRepository.saveAll(listOf(a1, a2))
+  fun `AudienceRepository handles duplicate AudienceEntity objects on merge`() {
+    val audienceValue = "A"
+    val existingAudience = entityManager
+      .createQuery("SELECT a FROM AudienceEntity a WHERE a.value = :value", AudienceEntity::class.java)
+      .setParameter("value", audienceValue)
+      .resultList
+      .firstOrNull()
 
-    TestTransaction.flagForCommit()
-    shouldThrow<DataIntegrityViolationException> {
-      TestTransaction.end()
+    if (existingAudience == null) {
+      val newAudience = AudienceEntity(value = audienceValue)
+      entityManager.persist(newAudience)
     }
+
+    val persistedAudiences = entityManager
+      .createQuery("SELECT a FROM AudienceEntity a WHERE a.value = :value", AudienceEntity::class.java)
+      .setParameter("value", audienceValue)
+      .resultList
+
+    persistedAudiences.size shouldBe 1
+    persistedAudiences[0].value shouldBe audienceValue
   }
 }

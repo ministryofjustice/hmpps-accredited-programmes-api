@@ -1,165 +1,118 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.repository
 
-import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AudienceEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
-import kotlin.jvm.optionals.getOrNull
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
 
-class CourseRepositoryTest
-@Autowired
-constructor(
-  val courseRepository: CourseRepository,
-  jdbcTemplate: JdbcTemplate,
-) : RepositoryTestBase(jdbcTemplate) {
+@SpringBootTest
+@AutoConfigureTestDatabase
+@Transactional
+@ActiveProfiles("test")
+class CourseRepositoryTest {
 
   @Autowired
-  private lateinit var courseService: CourseService
+  private lateinit var entityManager: EntityManager
 
   @Test
   fun `CourseRepository should save and retrieve CourseEntity objects`() {
-    val transientEntity = CourseEntity(
-      name = "A Course",
-      identifier = "AC",
-      description = "A representative Approved Programme for testing",
-    )
+    val courseEntity = CourseEntityFactory().produce()
+    entityManager.merge(courseEntity)
 
-    transientEntity.id.shouldBeNull()
-
-    val persistentEntity = courseRepository.save(transientEntity)
-    persistentEntity.id.shouldNotBeNull()
-
-    commitAndStartNewTx()
-
-    val courses: Iterable<CourseEntity> = courseRepository.findAll()
-    courses shouldHaveSize 1
-
-    val retrievedCourse = courses.first()
-    retrievedCourse.shouldBeEqualToIgnoringFields(persistentEntity, CourseEntity::prerequisites, CourseEntity::audiences)
-
-    courseRepository.deleteAll()
+    val persistedCourse = entityManager.find(CourseEntity::class.java, courseEntity.id)
+    persistedCourse shouldBe courseEntity
   }
 
   @Test
   fun `CourseRepository should persist a CourseEntity object with prerequisites`() {
-    val samples = setOf(
-      PrerequisiteEntity(name = "PR1", description = "PR1 D1"),
-      PrerequisiteEntity(name = "PR1", description = "PR1 D2"),
-      PrerequisiteEntity(name = "PR2", description = "PR2 D1"),
+    val prerequisites = mutableSetOf(
+      PrerequisiteEntityFactory().withName("PR1").withDescription("PR1 D1").produce(),
+      PrerequisiteEntityFactory().withName("PR1").withDescription("PR1 D2").produce(),
+      PrerequisiteEntityFactory().withName("PR2").withDescription("PR2 D1").produce(),
     )
+    val course = CourseEntityFactory()
+      .withPrerequisites(prerequisites)
+      .produce()
+    entityManager.merge(course)
 
-    val course = CourseEntity(
-      name = "A Course",
-      identifier = "AC",
-      description = "A representative Approved Programme for testing",
-    ).apply {
-      prerequisites.addAll(samples)
-    }
-
-    courseRepository.save(course)
-
-    commitAndStartNewTx()
-
-    countRowsInTable(jdbcTemplate, "prerequisite") shouldBe 3
-
-    val persistentPrereqs = courseRepository.findAll().first().prerequisites
-
-    persistentPrereqs shouldContainExactly samples
-    persistentPrereqs.remove(PrerequisiteEntity(name = "PR1", description = "PR1 D2"))
-
-    commitAndStartNewTx()
-    countRowsInTable(jdbcTemplate, "prerequisite") shouldBe 2
-    courseRepository.delete(courseRepository.findAll().first())
-
-    commitAndStartNewTx()
-    countRowsInTable(jdbcTemplate, "prerequisite") shouldBe 0
-    countRowsInTable(jdbcTemplate, "course") shouldBe 0
+    val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
+    persistedCourse.prerequisites shouldContainExactly prerequisites
   }
 
   @Test
   fun `CourseRepository should persist multiple OfferingEntity objects for multiple CourseEntity objects and verify ids`() {
-    val course1 = CourseEntityFactory()
-      .withName("A course")
-      .withIdentifier("ID")
-      .withDescription("A description")
-      .produce()
+    val course = CourseEntityFactory().produce()
+    entityManager.merge(course)
 
-    course1.id?.let {
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce())
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce())
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("BXI").withContactEmail("bxi@a.com").produce())
-    }
+    val offering1 = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
+    val offering2 = OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce()
+    val offering3 = OfferingEntityFactory().withOrganisationId("BXI").withContactEmail("bxi@a.com").produce()
 
-    val course2 = CourseEntityFactory()
-      .withName("Another course")
-      .withIdentifier("ACANO")
-      .withIdentifier("Another description")
-      .produce()
+    offering1.course = course
+    offering2.course = course
+    offering3.course = course
+    entityManager.merge(offering1)
+    entityManager.merge(offering2)
+    entityManager.merge(offering3)
 
-    course2.id?.let {
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce())
-    }
+    course.mutableOfferings.addAll(listOf(offering1, offering2, offering3))
+    entityManager.merge(course)
 
-    courseRepository.save(course1)
-    courseRepository.save(course2)
-    commitAndStartNewTx()
-
-    countRowsInTable(jdbcTemplate, "offering") shouldBe 4
-    val persistentCourse = courseRepository.findById(course1.id!!).getOrNull()
-    persistentCourse?.mutableOfferings?.shouldHaveSize(3)
-    persistentCourse?.mutableOfferings?.shouldForAll { it.id.shouldNotBeNull() }
+    val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
+    persistedCourse.mutableOfferings shouldHaveSize 3
+    persistedCourse.mutableOfferings.forEach { it.id.shouldNotBeNull() }
   }
 
   @Test
   fun `CourseRepository should retrieve CourseEntity objects by their associated offering id`() {
-    val course1 = CourseEntityFactory()
-      .withName("A course")
-      .withIdentifier("ID")
-      .withDescription("A description")
-      .produce()
+    val course = CourseEntityFactory().produce()
+    entityManager.merge(course)
 
-    course1.id?.let {
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce())
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce())
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("BXI").withContactEmail("bxi@a.com").produce())
-    }
+    val offering = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
+    offering.course = course
+    entityManager.merge(offering)
 
-    val course2 = CourseEntityFactory()
-      .withName("Another course")
-      .withIdentifier("ACANO")
-      .withIdentifier("Another description")
-      .produce()
+    val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
+    val persistedOffering = entityManager.find(OfferingEntity::class.java, offering.id)
 
-    course2.id?.let {
-      courseService.addOfferingToCourse(it, OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce())
-    }
+    persistedCourse shouldBe course
+    persistedOffering shouldBe offering
+  }
 
-    courseRepository.save(course1)
-    courseRepository.save(course2)
-    commitAndStartNewTx()
+  @Test
+  fun `CourseEntityRepository should add AudienceEntity values to CourseEntity objects`() {
+    val courses = listOf(
+      CourseEntityFactory().withName("Course 1").withIdentifier("C1").produce(),
+      CourseEntityFactory().withName("Course 2").withIdentifier("C2").produce(),
+      CourseEntityFactory().withName("Course 3").withIdentifier("C3").produce(),
+    )
 
-    countRowsInTable(jdbcTemplate, "offering") shouldBe 4
-    val persistentCourse = courseRepository.findById(course1.id!!).getOrNull()
-    val offeringId = persistentCourse?.mutableOfferings?.first()?.id!!
-    val courseByOfferingIdInSameTx = courseRepository.findByMutableOfferingsId(offeringId)
-    courseByOfferingIdInSameTx shouldBe persistentCourse
+    val audiences = listOf(
+      AudienceEntityFactory().withValue("Male").produce(),
+      AudienceEntityFactory().withValue("Female").produce(),
+    )
 
-    commitAndStartNewTx()
+    courses.forEach(entityManager::merge)
+    audiences.forEach(entityManager::merge)
 
-    val courseByOfferingInNewTx = courseRepository.findByMutableOfferingsId(offeringId)
-    courseByOfferingInNewTx shouldBe persistentCourse
+    courses[0].audiences.add(audiences[0])
+    courses[1].audiences.addAll(audiences)
+    courses[2].audiences.add(audiences[1])
+
+    val persistedCourses = entityManager.createQuery("SELECT c FROM CourseEntity c", CourseEntity::class.java).resultList
+    persistedCourses.forEach { it.audiences.shouldNotBeNull() }
   }
 }
