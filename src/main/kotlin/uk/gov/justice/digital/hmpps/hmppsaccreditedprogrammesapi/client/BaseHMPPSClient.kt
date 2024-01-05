@@ -9,10 +9,13 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClientCache
+import java.util.concurrent.atomic.AtomicInteger
 
 abstract class BaseHMPPSClient(
   private val webClient: WebClient,
   private val objectMapper: ObjectMapper,
+  private val webClientCache: WebClientCache,
 ) {
   protected inline fun <reified ResponseType : Any> getRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
     request(HttpMethod.GET, requestBuilderConfiguration)
@@ -29,20 +32,36 @@ abstract class BaseHMPPSClient(
   protected inline fun <reified ResponseType : Any> patchRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
     request(HttpMethod.PATCH, requestBuilderConfiguration)
 
-  protected inline fun <reified ResponseType : Any> request(method: HttpMethod, noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> {
+  protected inline fun <reified ResponseType : Any> request(
+    method: HttpMethod,
+    noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+  ): ClientResult<ResponseType> {
     val typeReference = object : TypeReference<ResponseType>() {}
 
     return doRequest(typeReference, method, requestBuilderConfiguration)
   }
 
-  fun <ResponseType : Any> doRequest(typeReference: TypeReference<ResponseType>, method: HttpMethod, requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> {
+  fun <ResponseType : Any> doRequest(
+    typeReference: TypeReference<ResponseType>,
+    method: HttpMethod,
+    requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+  ): ClientResult<ResponseType> {
     val requestBuilder = HMPPSRequestConfiguration()
     requestBuilderConfiguration(requestBuilder)
 
+    val cacheConfig = requestBuilder.preemptiveCacheConfig
+
+    val attempt = AtomicInteger(1)
+
     try {
-      val request = webClient.method(method)
-        .uri(requestBuilder.path ?: "")
-        .headers { it.addAll(requestBuilder.headers) }
+      if (cacheConfig != null) {
+        webClientCache.tryGetCachedValue(typeReference, requestBuilder, cacheConfig, attempt)?.let {
+          return it
+        }
+      }
+
+      val request =
+        webClient.method(method).uri(requestBuilder.path ?: "").headers { it.addAll(requestBuilder.headers) }
 
       if (requestBuilder.body != null) {
         request.bodyValue(requestBuilder.body!!)
@@ -56,7 +75,12 @@ abstract class BaseHMPPSClient(
       return ClientResult.Success(result.statusCode, deserialized)
     } catch (exception: WebClientResponseException) {
       if (!exception.statusCode.is2xxSuccessful) {
-        return ClientResult.Failure.StatusCode(method, requestBuilder.path ?: "", exception.statusCode, exception.responseBodyAsString)
+        return ClientResult.Failure.StatusCode(
+          method,
+          requestBuilder.path ?: "",
+          exception.statusCode,
+          exception.responseBodyAsString,
+        )
       } else {
         throw exception
       }
@@ -69,6 +93,8 @@ abstract class BaseHMPPSClient(
     internal var path: String? = null
     internal var body: Any? = null
     internal var headers = HttpHeaders()
+    internal val preemptiveCacheConfig: WebClientCache.PreemptiveCacheConfig? = null
+    internal var preemptiveCacheKey: String? = null
 
     fun withHeader(key: String, value: String) = headers.add(key, value)
   }
@@ -80,14 +106,41 @@ sealed interface ClientResult<ResponseType> {
     fun throwException(): Nothing = throw toException()
     fun toException(): Throwable
 
-    class StatusCode<ResponseType>(val method: HttpMethod, val path: String, val status: HttpStatusCode, val body: String?) : Failure<ResponseType> {
+    class StatusCode<ResponseType>(
+      val method: HttpMethod,
+      val path: String,
+      val status: HttpStatusCode,
+      val body: String?,
+    ) : Failure<ResponseType> {
       override fun toException(): Throwable = RuntimeException("Unable to complete $method request to $path: $status")
 
-      inline fun <reified ResponseType> deserializeTo(): ResponseType = jacksonObjectMapper().readValue(body, ResponseType::class.java)
+      inline fun <reified ResponseType> deserializeTo(): ResponseType =
+        jacksonObjectMapper().readValue(body, ResponseType::class.java)
     }
 
-    class Other<ResponseType>(val method: HttpMethod, val path: String, val exception: Exception) : Failure<ResponseType> {
+    class CachedValueUnavailable<ResponseType>(val cacheKey: String) : Failure<ResponseType> {
+      override fun toException(): Throwable = RuntimeException("No Redis entry exists for $cacheKey")
+    }
+
+    class Other<ResponseType>(val method: HttpMethod, val path: String, val exception: Exception) :
+      Failure<ResponseType> {
       override fun toException(): Throwable = RuntimeException("Unable to complete $method request to $path", exception)
     }
   }
+}
+
+class CacheKeySet(
+  private val prefix: String,
+  private val cacheName: String,
+  private val key: String,
+) {
+  val metadataKey: String
+    get() {
+      return "$prefix-$cacheName-$key-metadata"
+    }
+
+  val dataKey: String
+    get() {
+      return "$prefix-$cacheName-$key-data"
+    }
 }

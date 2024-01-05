@@ -123,3 +123,6 @@ log-client-credentials-jwt-info: false
 upstream-timeout-ms: 10000
 case-notes-service-upstream-timeout-ms: 30000
 max-response-in-memory-size-bytes: 750000
+
+preemptive-cache-key-prefix: ""
+preemptive-cache-logging-enabled: false
