@@ -90,9 +90,9 @@ constructor(
       val offering3 = OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce()
 
       val courses = listOf(
-        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering1)).produce(),
-        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering2)).produce(),
-        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering3)).produce(),
+        CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering1)).produce(),
+        CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering2)).produce(),
+        CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering3)).produce(),
         CourseEntityFactory().withName("Course2").produce(),
         CourseEntityFactory().withName("Course3").produce(),
       )

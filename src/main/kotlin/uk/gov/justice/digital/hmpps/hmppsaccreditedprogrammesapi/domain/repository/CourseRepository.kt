@@ -13,7 +13,7 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
     """
     SELECT c FROM CourseEntity c 
     JOIN FETCH c.audiences 
-    JOIN FETCH c.mutableOfferings 
+    JOIN FETCH c.offerings 
     WHERE c.id = :courseId
   """,
   )
@@ -22,9 +22,9 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
   @Query(
     """
     SELECT c FROM CourseEntity c 
-    JOIN FETCH c.mutableOfferings o 
+    JOIN FETCH c.offerings o 
     WHERE o.id = :offeringId
   """,
   )
-  fun findByMutableOfferingsId(offeringId: UUID): CourseEntity?
+  fun findByOfferingsId(offeringId: UUID): CourseEntity?
 }

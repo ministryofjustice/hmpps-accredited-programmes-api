@@ -68,12 +68,12 @@ class CourseRepositoryTest {
     entityManager.merge(offering2)
     entityManager.merge(offering3)
 
-    course.mutableOfferings.addAll(listOf(offering1, offering2, offering3))
+    course.offerings.addAll(listOf(offering1, offering2, offering3))
     entityManager.merge(course)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
-    persistedCourse.mutableOfferings shouldHaveSize 3
-    persistedCourse.mutableOfferings.forEach { it.id.shouldNotBeNull() }
+    persistedCourse.offerings shouldHaveSize 3
+    persistedCourse.offerings.forEach { it.id.shouldNotBeNull() }
   }
 
   @Test

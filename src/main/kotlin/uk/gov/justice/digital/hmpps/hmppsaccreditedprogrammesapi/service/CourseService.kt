@@ -34,7 +34,7 @@ constructor(
     .findByIdOrNull(courseId)
     ?.takeIf { !it.withdrawn }
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository
-    .findByMutableOfferingsId(offeringId)
+    .findByOfferingsId(offeringId)
 
   fun getAllOfferings(): List<OfferingEntity> = offeringRepository
     .findAll()
@@ -153,7 +153,7 @@ constructor(
   }
 
   private fun updateOfferingsForCourse(course: CourseEntity, desiredOfferings: List<OfferingUpdate>) {
-    val offeringsByOrganisationId = course.mutableOfferings.associateBy(OfferingEntity::organisationId)
+    val offeringsByOrganisationId = course.offerings.associateBy(OfferingEntity::organisationId)
     val updatesByPrisonId = desiredOfferings.associateBy(OfferingUpdate::prisonId)
 
     val toAdd = updatesByPrisonId.keys - offeringsByOrganisationId.keys
@@ -214,7 +214,7 @@ constructor(
     val course = courseRepository.findByIdOrNull(courseId)
 
     offering.course = course!!
-    course.mutableOfferings += offering
+    course.offerings += offering
 
     offeringRepository.save(offering)
     courseRepository.save(course)

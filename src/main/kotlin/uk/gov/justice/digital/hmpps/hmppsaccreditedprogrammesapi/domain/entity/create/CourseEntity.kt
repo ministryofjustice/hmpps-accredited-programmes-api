@@ -41,7 +41,7 @@ data class CourseEntity(
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true)
   @Column(name = "offerings")
   @Fetch(SUBSELECT)
-  val mutableOfferings: MutableSet<OfferingEntity> = mutableSetOf(),
+  val offerings: MutableSet<OfferingEntity> = mutableSetOf(),
 
   @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
   @Fetch(SUBSELECT)
