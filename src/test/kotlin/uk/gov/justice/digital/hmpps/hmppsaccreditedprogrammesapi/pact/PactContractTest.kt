@@ -80,6 +80,15 @@ class PactContractTest {
   @State("Referral 0c46ed09-170b-4c0f-aee8-a24eeaeeddaa exists")
   fun `ensure referral 0c46ed09-170b-4c0f-aee8-a24eeaeeddaa exists`() {}
 
+  @State("Referral(s) exist for the logged in user")
+  fun `ensure referrals exist for the logged in user`() {
+    // TODO: implement this once we've moved away from re-using test setup in `R__test_data.sql`
+    // TODO: as this can't cope with the previously-created referral having a `null` `submittedOn` instead of a string.
+  }
+
+  @State("Referral(s) exist for logged in user with status REFERRAL_SUBMITTED")
+  fun `ensure referrals exist for logged in user with status REFERRAL_SUBMITTED`() {}
+
   @State("Referral(s) exist for organisation BWN")
   fun `ensure referrals exist for organisation BWN`() {}
 
