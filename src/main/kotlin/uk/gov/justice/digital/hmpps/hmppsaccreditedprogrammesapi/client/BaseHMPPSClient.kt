@@ -32,6 +32,12 @@ abstract class BaseHMPPSClient(
   protected inline fun <reified ResponseType : Any> patchRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
     request(HttpMethod.PATCH, requestBuilderConfiguration)
 
+  protected fun checkPreemptiveCacheStatus(
+    cacheConfig: WebClientCache.PreemptiveCacheConfig,
+    key: String,
+  ): PreemptiveCacheEntryStatus =
+    webClientCache.checkPreemptiveCacheStatus(cacheConfig, key)
+
   protected inline fun <reified ResponseType : Any> request(
     method: HttpMethod,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
@@ -143,4 +149,8 @@ class CacheKeySet(
     get() {
       return "$prefix-$cacheName-$key-data"
     }
+}
+
+enum class PreemptiveCacheEntryStatus {
+  MISS, REQUIRES_REFRESH, EXISTS
 }

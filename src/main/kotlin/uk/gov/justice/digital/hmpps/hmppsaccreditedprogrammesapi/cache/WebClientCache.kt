@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.CacheKeySet
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.PreemptiveCacheEntryStatus
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -21,6 +22,19 @@ class WebClientCache(
   private val redisTemplate: RedisTemplate<String, String>,
   @Value("\${preemptive-cache-key-prefix}") private val preemptiveCacheKeyPrefix: String,
 ) {
+
+  fun checkPreemptiveCacheStatus(cacheConfig: PreemptiveCacheConfig, key: String): PreemptiveCacheEntryStatus {
+    val cacheKeySet = CacheKeySet(preemptiveCacheKeyPrefix, cacheConfig.cacheName, key)
+
+    val cacheEntryMetadata = getCacheEntryMetadataIfExists(cacheKeySet.metadataKey)
+
+    return when {
+      cacheEntryMetadata == null -> PreemptiveCacheEntryStatus.MISS
+      cacheEntryMetadata.refreshableAfter < Instant.now() -> PreemptiveCacheEntryStatus.REQUIRES_REFRESH
+      else -> PreemptiveCacheEntryStatus.EXISTS
+    }
+  }
+
   fun <ResponseType : Any> tryGetCachedValue(
     typeReference: TypeReference<ResponseType>,
     requestBuilder: BaseHMPPSClient.HMPPSRequestConfiguration,

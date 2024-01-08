@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.PrisonerNumbers
+import java.time.Duration
 
 @Component
 class PrisonerSearchApiClient(
@@ -15,6 +16,21 @@ class PrisonerSearchApiClient(
   webClient: WebClient,
   webClientCache: WebClientCache,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper(), webClientCache) {
+
+  private val prisonerSearchApiCacheConfig = WebClientCache.PreemptiveCacheConfig(
+    cacheName = "prisonerDetails",
+    successSoftTtlSeconds = Duration.ofHours(6).toSeconds().toInt(),
+    failureSoftTtlBackoffSeconds =
+    listOf(
+      30,
+      Duration.ofMinutes(5).toSeconds().toInt(),
+      Duration.ofMinutes(10).toSeconds().toInt(),
+      Duration.ofMinutes(30).toSeconds().toInt(),
+    ),
+    hardTtlSeconds = Duration.ofHours(12).toSeconds().toInt(),
+  )
+
+  fun getPrisonerDetailsCacheEntryStatus(crn: String) = checkPreemptiveCacheStatus(prisonerSearchApiCacheConfig, crn)
 
   fun getPrisonersByPrisonNumbers(prisonNumbers: List<String>) = postRequest<List<Prisoner>> {
     path = "/prisoner-search/prisoner-numbers"
