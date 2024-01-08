@@ -95,4 +95,14 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
     audience: String?,
     courseName: String?,
   ): Page<ReferralSummaryProjection>
+
+  @Query(
+    value = """
+    SELECT 
+     DISTINCT r.prisonNumber AS prisonNumber
+     FROM ReferralEntity r
+  """,
+    nativeQuery = false,
+  )
+  fun getDistinctPrisonNumbers(): List<String>
 }
