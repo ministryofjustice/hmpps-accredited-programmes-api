@@ -26,5 +26,5 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
     WHERE o.id = :offeringId
   """,
   )
-  fun findByOfferingsId(offeringId: UUID): CourseEntity?
+  fun findByOfferingId(offeringId: UUID): CourseEntity?
 }

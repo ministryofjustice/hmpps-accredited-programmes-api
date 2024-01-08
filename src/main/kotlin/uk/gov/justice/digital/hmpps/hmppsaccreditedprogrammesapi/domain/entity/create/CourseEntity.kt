@@ -52,7 +52,13 @@ data class CourseEntity(
   )
   var audiences: MutableSet<AudienceEntity> = mutableSetOf(),
   var withdrawn: Boolean = false,
-)
+) {
+
+  fun addOffering(offering: OfferingEntity) {
+    offering.course = this
+    offerings += offering
+  }
+}
 
 @Embeddable
 @Immutable
