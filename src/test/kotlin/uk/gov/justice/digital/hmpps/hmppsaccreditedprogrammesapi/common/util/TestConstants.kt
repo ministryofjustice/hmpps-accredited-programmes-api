@@ -41,9 +41,30 @@ val PRISONERS = mapOf<String?, List<Prisoner>>(
 )
 const val PRISON_ID_1 = "1"
 const val PRISON_ID_2 = "2"
-const val PRISON_NUMBER_1 = "001"
-const val PRISON_NUMBER_2 = "002"
+const val PRISON_NUMBER_1 = "C3456CC"
+const val PRISON_NUMBER_2 = "D3456DD"
 const val PRISON_NAME_1 = "PRISON_ONE"
 const val PRISON_NAME_2 = "PRISON_TWO"
-val PRISONER_1 = Prisoner(prisonerNumber = PRISON_NUMBER_1, firstName = "John", lastName = "Doe")
-val PRISONER_2 = Prisoner(prisonerNumber = PRISON_NUMBER_2, firstName = "Ella", lastName = "Smith")
+
+val PRISONER_1 = Prisoner(
+  prisonerNumber = PRISON_NUMBER_1,
+  bookingId = BOOKING_ID,
+  firstName = PRISONER_FIRST_NAME,
+  lastName = PRISONER_LAST_NAME,
+  nonDtoReleaseDateType = NON_DTO_RELEASE_DATE_TYPE,
+  conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
+  tariffDate = TARIFF_EXPIRY_DATE,
+  paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
+  indeterminateSentence = INDETERMINATE_SENTENCE,
+)
+val PRISONER_2 = Prisoner(
+  prisonerNumber = PRISON_NUMBER_2,
+  bookingId = BOOKING_ID,
+  firstName = "Ella",
+  lastName = "Smith",
+  nonDtoReleaseDateType = NON_DTO_RELEASE_DATE_TYPE,
+  conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
+  tariffDate = TARIFF_EXPIRY_DATE,
+  paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
+  indeterminateSentence = INDETERMINATE_SENTENCE,
+)
