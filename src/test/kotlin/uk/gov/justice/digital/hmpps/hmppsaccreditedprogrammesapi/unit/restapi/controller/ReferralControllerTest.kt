@@ -38,7 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -74,7 +74,7 @@ constructor(
       courseName = "Course for referralSummary1",
       audiences = listOf("Audience 1", "Audience 2"),
       status = ReferralStatus.referralStarted,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = CLIENT_USERNAME,
     )
 
@@ -84,7 +84,7 @@ constructor(
       audiences = listOf("Audience 2", "Audience 3"),
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = CLIENT_USERNAME,
     )
 
@@ -94,7 +94,7 @@ constructor(
       audiences = listOf("Audience 3", "Audience 4"),
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = CLIENT_USERNAME,
     )
 
@@ -431,7 +431,7 @@ constructor(
       courseName = "Course for referralSummary1",
       audiences = audiencesForFirstReferral,
       status = ReferralStatus.referralStarted,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = CLIENT_USERNAME,
     )
 
@@ -441,7 +441,7 @@ constructor(
       audiences = audiencesForSecondReferral,
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = CLIENT_USERNAME,
     )
 
@@ -473,7 +473,7 @@ constructor(
       referral.courseName shouldBe "Course for referralSummary1"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.status shouldBe ReferralStatus.referralStarted
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
@@ -484,7 +484,7 @@ constructor(
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
@@ -505,7 +505,7 @@ constructor(
         .withCourseName("Course name")
         .withAudience(audience)
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
-        .withPrisonNumber(PRISON_NUMBER)
+        .withPrisonNumber(PRISON_NUMBER_1)
         .withReferrerUsername(REFERRER_USERNAME)
         .produce()
     }
@@ -519,7 +519,7 @@ constructor(
         .withAudience(audience)
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
         .withSubmittedOn(LocalDateTime.MIN)
-        .withPrisonNumber(PRISON_NUMBER)
+        .withPrisonNumber(PRISON_NUMBER_1)
         .withReferrerUsername(REFERRER_USERNAME)
         .produce()
     }
@@ -552,7 +552,7 @@ constructor(
       referral.courseName shouldBe "Course name"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.status shouldBe ReferralStatus.referralStarted
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
@@ -579,7 +579,7 @@ constructor(
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe CLIENT_USERNAME
     }
 
@@ -674,7 +674,7 @@ constructor(
       courseName = "Course for referralSummary1",
       audiences = audiencesForFirstReferral,
       status = ReferralStatus.referralStarted,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = REFERRER_USERNAME,
     )
 
@@ -684,7 +684,7 @@ constructor(
       audiences = audiencesForSecondReferral,
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = REFERRER_USERNAME,
     )
 
@@ -717,7 +717,7 @@ constructor(
       referral.courseName shouldBe "Course for referralSummary1"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.status shouldBe ReferralStatus.referralStarted
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe REFERRER_USERNAME
     }
 
@@ -728,7 +728,7 @@ constructor(
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe REFERRER_USERNAME
     }
 
@@ -749,7 +749,7 @@ constructor(
         .withCourseName("Course name")
         .withAudience(audience)
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
-        .withPrisonNumber(PRISON_NUMBER)
+        .withPrisonNumber(PRISON_NUMBER_1)
         .withReferrerUsername(REFERRER_USERNAME)
         .produce()
     }
@@ -763,7 +763,7 @@ constructor(
         .withAudience(audience)
         .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
         .withSubmittedOn(LocalDateTime.MIN)
-        .withPrisonNumber(PRISON_NUMBER)
+        .withPrisonNumber(PRISON_NUMBER_1)
         .withReferrerUsername(REFERRER_USERNAME)
         .produce()
     }
@@ -797,7 +797,7 @@ constructor(
       referral.courseName shouldBe "Course name"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.status shouldBe ReferralStatus.referralStarted
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe REFERRER_USERNAME
     }
 
@@ -824,7 +824,7 @@ constructor(
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
-      referral.prisonNumber shouldBe PRISON_NUMBER
+      referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe REFERRER_USERNAME
     }
 
