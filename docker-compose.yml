@@ -116,5 +116,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin_password
 
+  redis:
+    image: "bitnami/redis:5.0"
+    container_name: accredited-programmes-redis-dev
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+
 networks:
   hmpps:
