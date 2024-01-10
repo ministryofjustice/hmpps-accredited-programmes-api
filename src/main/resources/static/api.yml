@@ -745,14 +745,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /oasys/{prisonerId}/offence-details:
+  /oasys/{prisonNumber}/offence-details:
     get:
       tags:
         - Oasys Offence Details
       summary: Offence details as held by Oasys
       operationId: getOffenceDetails
       parameters:
-        - name: prisonerId
+        - name: prisonNumber
           in: path
           description: Prison nomis identifier
           example: "A1234AA"
@@ -771,7 +771,39 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prisoner id
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /oasys/{prisonNumber}/relationships:
+    get:
+      tags:
+        - Oasys Relationships Details
+      summary: Relationships details as held by Oasys
+      operationId: getRelationships
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Relationships'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
           content:
             'application/json':
               schema:
@@ -1310,3 +1342,25 @@ components:
         patternOffending:
           type: string
           example: This person has a long history of robbery
+
+    Relationships:
+      type: object
+      properties:
+        dvEvidence:
+          type: boolean
+          default: false
+        victimFormerPartner:
+          type: boolean
+          default: false
+        victimFamilyMember:
+          type: boolean
+          default: false
+        victimOfPartnerFamily:
+          type: boolean
+          default: false
+        perpOfPartnerOrFamily:
+          type: boolean
+          default: false
+        relIssuesDetails:
+          type: string
+          example: This person has a history of domestic violence

@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetailWrapper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationshipsWrapper
 
 @Component
 class OasysApiClient(
@@ -22,5 +23,9 @@ class OasysApiClient(
 
   fun getOffenceDetail(assessmentPk: Long) = getRequest<OasysOffenceDetailWrapper> {
     path = "/eor/oasys/ass/section2/ALLOW/$assessmentPk"
+  }
+
+  fun getRelationships(assessmentPk: Long) = getRequest<OasysRelationshipsWrapper> {
+    path = "/eor/oasys/ass/section6/ALLOW/$assessmentPk"
   }
 }

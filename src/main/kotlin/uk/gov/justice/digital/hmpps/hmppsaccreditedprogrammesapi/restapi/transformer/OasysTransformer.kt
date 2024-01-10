@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 
 fun OasysOffenceDetail.toModel(): OffenceDetail {
   return OffenceDetail(
@@ -20,6 +22,17 @@ fun OasysOffenceDetail.toModel(): OffenceDetail {
     offenceMotivation,
     acceptsResponsibility == YES,
     patternOffending,
+  )
+}
+
+fun OasysRelationships.toModel(): Relationships {
+  return Relationships(
+    prevOrCurrentDomesticAbuse == YES,
+    victimOfPartner == YES,
+    victimOfFamily == YES,
+    perpAgainstFamily == YES,
+    perpAgainstPartner == YES,
+    relIssuesDetails,
   )
 }
 

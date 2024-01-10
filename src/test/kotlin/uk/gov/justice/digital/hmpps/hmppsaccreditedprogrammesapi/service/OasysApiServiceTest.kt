@@ -10,6 +10,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetailWrapper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationshipsWrapper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import java.time.LocalDateTime
 
@@ -63,6 +65,30 @@ class OasysApiServiceTest {
     )
 
     val result = service.getOffenceDetail(123123)
+
+    assertEquals(response, result)
+  }
+
+  @Test
+  fun `should return relationships`() {
+    val oasysRelationships = OasysRelationships(
+      "Yes",
+      "Yes",
+      "Yes",
+      "Yes",
+      "Yes",
+      "Free text",
+    )
+    val response = OasysRelationshipsWrapper(
+      listOf(oasysRelationships),
+    )
+
+    every { oasysApiClient.getRelationships(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      response,
+    )
+
+    val result = service.getRelationships(123123)
 
     assertEquals(response, result)
   }
