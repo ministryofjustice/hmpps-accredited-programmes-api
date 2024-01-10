@@ -6,18 +6,19 @@ import au.com.dius.pact.provider.junitsupport.State
 import au.com.dius.pact.provider.junitsupport.VerificationReports
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider
+import com.github.tomakehurst.wiremock.client.WireMock
 import org.apache.hc.core5.http.HttpRequest
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_2
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
@@ -25,15 +26,22 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 @PactBroker
 @Provider("Accredited Programmes API")
 @VerificationReports(value = ["markdown", "console"], reportDir = "build/pact")
-class PactContractTest {
-  @Autowired
-  lateinit var jwtAuthHelper: JwtAuthHelper
-
-  @MockBean
-  lateinit var prisonRegisterApiService: PrisonRegisterApiService
-
-  @MockBean
-  lateinit var prisonerSearchApiService: PrisonerSearchApiService
+class PactContractTest : IntegrationTestBase() {
+  @BeforeEach
+  fun setup() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    wiremockServer.stubFor(
+      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers"))
+        .willReturn(
+          WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withStatus(200)
+            .withBody(
+              objectMapper.writeValueAsString(listOf(PRISONER_1, PRISONER_2)),
+            ),
+        ),
+    )
+  }
 
   @State("Server is healthy")
   fun `ensure server is healthy`() {}
