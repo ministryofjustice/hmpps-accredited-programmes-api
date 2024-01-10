@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomEmailAddress
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomLowercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomSentence
@@ -51,7 +51,7 @@ constructor(
 
     val referral = ReferralEntityFactory()
       .withReferrer(referrer)
-      .withPrisonNumber(PRISON_NUMBER)
+      .withPrisonNumber(PRISON_NUMBER_1)
       .withOffering(offering)
       .produce()
 
@@ -90,7 +90,7 @@ constructor(
 
     val referral = ReferralEntityFactory()
       .withReferrer(referrer)
-      .withPrisonNumber(PRISON_NUMBER)
+      .withPrisonNumber(PRISON_NUMBER_1)
       .withOffering(offering)
       .produce()
 
