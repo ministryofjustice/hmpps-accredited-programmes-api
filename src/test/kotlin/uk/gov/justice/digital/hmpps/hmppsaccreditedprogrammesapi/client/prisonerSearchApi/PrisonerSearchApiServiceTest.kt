@@ -26,10 +26,7 @@ class PrisonerSearchApiServiceTest {
     every { prisonerSearchApiClient.getPrisonersByPrisonNumbers(any()) } returns ClientResult.Success(HttpStatus.OK, prisonerDetails)
 
     val result = service.getPrisoners(listOf(PRISON_NUMBER_1, PRISON_NUMBER_2))
-
-    val expectedMap = mapOf(PRISON_NUMBER_1 to listOf(PRISONER_1), PRISON_NUMBER_2 to listOf(PRISONER_2))
-
-    assertEquals(expectedMap, result)
+    assertEquals(listOf(PRISONER_1, PRISONER_2), result)
   }
 
   @Test

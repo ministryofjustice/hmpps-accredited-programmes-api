@@ -123,9 +123,9 @@ constructor(
     val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
     val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnums, audience, courseName)
     val content = referralProjectionPage.content
-    val prisonersDetails = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
-    val allPrisons = prisonRegisterApiService.getAllPrisons()
-    val apiContent = referralSummaryBuilderService.build(content, prisonersDetails, allPrisons, false)
+    val prisoners = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
+    val prisons = prisonRegisterApiService.getAllPrisons()
+    val apiContent = referralSummaryBuilderService.build(content, prisoners, prisons, false)
 
     return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
   }

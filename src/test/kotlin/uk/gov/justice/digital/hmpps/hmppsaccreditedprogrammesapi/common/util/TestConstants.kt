@@ -25,21 +25,7 @@ val CONDITIONAL_RELEASE_DATE: LocalDate = LocalDate.now()
 val TARIFF_EXPIRY_DATE: LocalDate = LocalDate.now().minusDays(5)
 val PAROLE_ELIGIBILITY_DATE: LocalDate = LocalDate.now().plusYears(1)
 val PRISONS = mapOf<String?, String>(ORGANISATION_ID_MDI to PRISON_NAME)
-val PRISONERS = mapOf<String?, List<Prisoner>>(
-  PRISON_NUMBER_1 to listOf(
-    Prisoner(
-      prisonerNumber = PRISON_NUMBER_1,
-      bookingId = BOOKING_ID,
-      firstName = PRISONER_FIRST_NAME,
-      lastName = PRISONER_LAST_NAME,
-      nonDtoReleaseDateType = NON_DTO_RELEASE_DATE_TYPE,
-      conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
-      tariffDate = TARIFF_EXPIRY_DATE,
-      paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
-      indeterminateSentence = INDETERMINATE_SENTENCE,
-    ),
-  ),
-)
+
 const val PRISON_ID_1 = "1"
 const val PRISON_ID_2 = "2"
 const val PRISON_NAME_1 = "PRISON_ONE"
@@ -67,3 +53,4 @@ val PRISONER_2 = Prisoner(
   paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
   indeterminateSentence = INDETERMINATE_SENTENCE,
 )
+val PRISONERS = listOf(PRISONER_1, PRISONER_2)

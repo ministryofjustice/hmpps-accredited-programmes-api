@@ -14,7 +14,7 @@ class ReferralSummaryBuilderService {
 
   fun build(
     content: List<ReferralSummaryProjection>,
-    prisoners: Map<String?, List<Prisoner>>,
+    prisoners: List<Prisoner>,
     prisons: Map<String?, String?>,
     includeEarliestReleaseDate: Boolean,
   ): List<ApiReferralSummary> {
@@ -40,8 +40,8 @@ class ReferralSummaryBuilderService {
       }
   }
 
-  private fun getSentence(referralSummaryProjection: ReferralSummaryProjection, prisonersDetails: Map<String?, List<Prisoner>>): Sentence? {
-    return prisonersDetails[referralSummaryProjection.prisonNumber]?.getOrNull(0)?.let {
+  private fun getSentence(referralSummaryProjection: ReferralSummaryProjection, prisoners: List<Prisoner>): Sentence? {
+    return prisoners.find { it.prisonerNumber == referralSummaryProjection.prisonNumber }?.let {
       Sentence(
         conditionalReleaseDate = it.conditionalReleaseDate,
         tariffExpiryDate = it.tariffDate,
@@ -61,8 +61,8 @@ class ReferralSummaryBuilderService {
     }
   }
 
-  private fun getPrisonerName(referralSummaryProjection: ReferralSummaryProjection, prisonersDetails: Map<String?, List<Prisoner>>): Name? {
-    return prisonersDetails[referralSummaryProjection.prisonNumber]?.getOrNull(0)?.let {
+  private fun getPrisonerName(referralSummaryProjection: ReferralSummaryProjection, prisoners: List<Prisoner>): Name? {
+    return prisoners.find { it.prisonerNumber == referralSummaryProjection.prisonNumber }?.let {
       Name(
         firstName = it.firstName,
         lastName = it.lastName,
