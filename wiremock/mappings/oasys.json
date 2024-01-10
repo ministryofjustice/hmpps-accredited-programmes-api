@@ -1,0 +1,148 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/eor/oasys/ass/allasslist/pris/A9999BB/ALLOW",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "source": "OASys",
+          "inputs": {
+            "crnSource": "pris",
+            "crn": "B3897HV",
+            "laoPrivilege": "ALLOW"
+          },
+          "probNumber": "D006518",
+          "prisNumber": "A9999BB",
+          "limitedAccessOffender": false,
+          "timeline": [
+            {
+              "assessmentPk": 2114584,
+              "assessmentType": "LAYER1",
+              "initiationDate": "2012-06-13T09:46:08",
+              "status": "COMPLETE",
+              "completedDate": "2012-06-13T09:59:22"
+            },
+            {
+              "assessmentPk": 2114588,
+              "assessmentType": "LAYER3",
+              "initiationDate": "2012-06-13T11:17:30",
+              "status": "LOCKED_INCOMPLETE",
+              "partcompStatus": "Unsigned",
+              "completedDate": "2012-06-20T23:00:06"
+            },
+            {
+              "assessmentPk": 10083387,
+              "assessmentType": "LAYER3",
+              "initiationDate": "2023-12-20T09:03:55",
+              "status": "OPEN"
+            }
+          ],
+          "assessments": [
+            {},
+            {},
+            {}
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/eor/oasys/ass/section2/ALLOW/2114584",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "source": "OASys",
+          "inputs": {
+            "laoPrivilege": "ALLOW",
+            "assessmentPk": 10083387
+          },
+          "probNumber": "D006518",
+          "prisNumber": "B3897HV",
+          "limitedAccessOffender": false,
+          "assessments": [
+            {
+              "assessmentPk": 10083387,
+              "assessmentType": "LAYER3",
+              "dateCompleted": null,
+              "assessorSignedDate": null,
+              "initiationDate": "2023-12-20T09:03:55",
+              "assessmentStatus": "OPEN",
+              "superStatus": "WIP",
+              "laterWIPAssessmentExists": false,
+              "latestWIPDate": "2023-12-20T09:03:55",
+              "laterSignLockAssessmentExists": false,
+              "latestSignLockDate": null,
+              "laterPartCompUnsignedAssessmentExists": false,
+              "latestPartCompUnsignedDate": "2012-06-13T11:17:30",
+              "laterPartCompSignedAssessmentExists": false,
+              "latestPartCompSignedDate": null,
+              "laterCompleteAssessmentExists": false,
+              "latestCompleteDate": "2012-06-13T09:59:22",
+              "offenceAnalysis": "An attack took place on christmas eve in Alfreds ex partners house. The children were in bed and the dog was left out side.",
+              "whatWasInvolved": null,
+              "othersInvolved": null,
+              "typeOfWeapon": null,
+              "victimInfo": null,
+              "numberOfOthersInvolved": null,
+              "thrillSeeking": "No",
+              "sexual": "Yes",
+              "racial": "No",
+              "other": "Yes",
+              "financial": "Yes",
+              "emotional": "Yes",
+              "addictions": "Yes",
+              "offenceLinkedToHarm": "Yes",
+              "offenceLinkedToReoffending": "Hopefully Alfred has learned his lesson this time and is on the long road to recovery. He is addressing his anger issues directly by channeling them though art - painting.",
+              "otherMotivationText": "A description from other.",
+              "offenceMotivation": "Mainly due to jealousy and fuelled by drug use",
+              "peerGroupInfluences": "No",
+              "otherInvolved": "No",
+              "recognisesImpact": "No",
+              "victimImpact": "pretty messed up",
+              "victimPerpetratorRel": "The victim was the ex partner of Alfred",
+              "whatOccurred": [
+                "Response to a specific victim (eg revenge, settling grudges)",
+                "Were the victim(s) stranger(s) to the offender",
+                "Were any of the victim(s) targeted because of racial motivation or hatred of other identifiable group",
+                "Were there any direct victim(s) eg contact targeting",
+                "Physical violence towards partner",
+                "Repeat victimisation of the same person",
+                "Stalking"
+              ],
+              "involveCarryingWeapon": "Yes",
+              "involveSexualElement": "Yes",
+              "involvePhysicalDamage": "Yes",
+              "involveExcessiveViolence": "Yes",
+              "involveDomesticAbuse": "Yes",
+              "involveArson": "Yes",
+              "involveViolenceOrThreat": "Yes",
+              "whichWeapon": "knife",
+              "partOfEstablishedPattern": "Yes",
+              "escalationOfSeriousness": "Yes",
+              "patternOffending": "This has happened numerous times in the past",
+              "acceptsResponsibility": "he accepts that he is totally to blame",
+              "acceptsResponsibilityYesNo": "Yes",
+              "disinhibitors": [
+                "Drugs"
+              ],
+              "assessor": {
+                "name": "Stephen McAllister"
+              }
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

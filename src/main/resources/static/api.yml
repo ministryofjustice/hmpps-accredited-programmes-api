@@ -745,6 +745,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /oasys/{prisonerId}/offence-details:
+    get:
+      tags:
+        - Oasys Offence Details
+      summary: Offence details as held by Oasys
+      operationId: getOffenceDetails
+      parameters:
+        - name: prisonerId
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/OffenceDetail'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prisoner id
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     Course:
@@ -950,7 +982,7 @@ components:
           type: integer
         userMessage:
           type: string
-          example: "Course not found"
+          example: "Not found"
         developerMessage:
           type: string
         moreInfo:
@@ -1223,3 +1255,55 @@ components:
         nonDtoReleaseDateType:
           type: string
           description: Non-DTO release date type
+
+    OffenceDetail:
+      type: object
+      properties:
+        offenceDetails:
+          type: string
+          example: Armed robbery
+        contactTargeting:
+          type: boolean
+          default: false
+        raciallyMotivated:
+          type: boolean
+          default: false
+        revenge:
+          type: boolean
+          default: false
+        domesticViolence:
+          type: boolean
+          default: false
+        repeatVictimisation:
+          type: boolean
+          default: false
+        victimWasStranger:
+          type: boolean
+          default: false
+        stalking:
+          type: boolean
+          default: false
+        recognisesImpact:
+          type: boolean
+          default: false
+        numberOfOthersInvolved:
+          type: integer
+          default: 0
+        othersInvolvedDetail:
+          type: string
+          example: There were two others involved who absconded at the scene
+        peerGroupInfluences:
+          type: string
+          example: This person is easily lead
+        motivationAndTriggers:
+          type: string
+          example: Drug misuse fuels this persons motivation
+        acceptsResponsibility:
+          type: boolean
+          default: false
+        acceptsResponsibilityDetail:
+          type: string
+          example: This person fully accepts their actions
+        patternOffending:
+          type: string
+          example: This person has a long history of robbery
