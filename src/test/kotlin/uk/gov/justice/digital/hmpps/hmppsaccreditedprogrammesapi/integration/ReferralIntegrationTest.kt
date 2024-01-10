@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
@@ -187,7 +188,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offeringId = getFirstOfferingIdForCourse(courseId)
     val referralCreated = createReferral(offeringId)
     val createdReferral = getReferralById(referralCreated.referralId)
-    val prisoners = listOf(Prisoner(firstName = "John"))
+    val prisoners = listOf(PRISONER_1)
     val prisons = listOf(PrisonDetails(prisonId = ORGANISATION_ID_MDI, prisonName = PRISON_NAME))
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     mockPrisonerSearchResponse(prisoners)
@@ -318,7 +319,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
     val randomOrganisationId = randomUppercaseString(3)
-    val prisoners = listOf(Prisoner(firstName = "John"))
+    val prisoners = listOf(PRISONER_1)
     val prisons = listOf(PrisonDetails(prisonId = ORGANISATION_ID_MDI, prisonName = PRISON_NAME))
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     mockPrisonerSearchResponse(prisoners)
