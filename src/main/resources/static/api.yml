@@ -1233,6 +1233,9 @@ components:
         lastName:
           type: string
           description: Last name of the person
+      required:
+        - firstName
+        - lastName
 
     Sentence:
       type: object
