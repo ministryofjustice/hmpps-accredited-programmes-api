@@ -5,10 +5,10 @@ import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Prisoner(
-  var prisonerNumber: String? = null,
+  var prisonerNumber: String,
   var bookingId: String? = null,
-  var firstName: String? = null,
-  var lastName: String? = null,
+  var firstName: String,
+  var lastName: String,
   var indeterminateSentence: Boolean? = null,
   var nonDtoReleaseDateType: String? = null,
   var conditionalReleaseDate: LocalDate? = null,
