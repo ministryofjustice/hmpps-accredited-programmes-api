@@ -29,7 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.util.UUID
@@ -51,7 +51,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = CLIENT_USERNAME,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       status = ReferralStatus.referralStarted,
       additionalInformation = null,
       oasysConfirmed = false,
@@ -73,7 +73,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = "NONEXISTENT_USER",
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       status = ReferralStatus.referralStarted,
       additionalInformation = null,
       oasysConfirmed = false,
@@ -100,7 +100,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = CLIENT_USERNAME,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       status = ReferralStatus.referralStarted,
       additionalInformation = "Additional information",
       oasysConfirmed = true,
@@ -142,7 +142,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = createdReferralId,
       offeringId = offeringId,
       referrerUsername = CLIENT_USERNAME,
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       status = ReferralStatus.referralSubmitted,
       oasysConfirmed = false,
       additionalInformation = null,
@@ -338,7 +338,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .bodyValue(
         ReferralCreate(
           offeringId = offeringId,
-          prisonNumber = PRISON_NUMBER,
+          prisonNumber = PRISON_NUMBER_1,
         ),
       )
       .exchange()

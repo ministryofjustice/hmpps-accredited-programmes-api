@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_LAST_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONS
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.SEXUAL_OFFENCE
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.TARIFF_EXPIRY_DATE
@@ -36,7 +36,7 @@ class ReferralSummaryBuilderServiceTest {
       audience = SEXUAL_OFFENCE,
       status = ReferralEntity.ReferralStatus.ASSESSMENT_STARTED,
       submittedOn = LocalDateTime.now(),
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = REFERRER_USERNAME,
       organisationId = ORGANISATION_ID_MDI,
     )
@@ -47,7 +47,7 @@ class ReferralSummaryBuilderServiceTest {
       audience = EXTREMISM_OFFENCE,
       status = ReferralEntity.ReferralStatus.ASSESSMENT_STARTED,
       submittedOn = LocalDateTime.now(),
-      prisonNumber = PRISON_NUMBER,
+      prisonNumber = PRISON_NUMBER_1,
       referrerUsername = REFERRER_USERNAME,
       organisationId = ORGANISATION_ID_MDI,
     )
@@ -64,7 +64,7 @@ class ReferralSummaryBuilderServiceTest {
       organisationId shouldBe ORGANISATION_ID_MDI
       id shouldBe referralSummaryProjection1.referralId
       courseName shouldBe INDIGO_COURSE
-      prisonNumber shouldBe PRISON_NUMBER
+      prisonNumber shouldBe PRISON_NUMBER_1
       prisonName shouldBe PRISON_NAME
       prisonerName?.firstName shouldBe PRISONER_FIRST_NAME
       prisonerName?.lastName shouldBe PRISONER_LAST_NAME
@@ -80,7 +80,7 @@ class ReferralSummaryBuilderServiceTest {
       organisationId shouldBe ORGANISATION_ID_MDI
       id shouldBe referralSummaryProjection2.referralId
       courseName shouldBe WHITE_COURSE
-      prisonNumber shouldBe PRISON_NUMBER
+      prisonNumber shouldBe PRISON_NUMBER_1
       prisonName shouldBe PRISON_NAME
       prisonerName?.firstName shouldBe PRISONER_FIRST_NAME
       prisonerName?.lastName shouldBe PRISONER_LAST_NAME
@@ -104,7 +104,7 @@ class ReferralSummaryBuilderServiceTest {
       organisationId shouldBe ORGANISATION_ID_MDI
       id shouldBe referralSummaryProjection1.referralId
       courseName shouldBe INDIGO_COURSE
-      prisonNumber shouldBe PRISON_NUMBER
+      prisonNumber shouldBe PRISON_NUMBER_1
       prisonName shouldBe PRISON_NAME
       prisonerName?.firstName shouldBe PRISONER_FIRST_NAME
       prisonerName?.lastName shouldBe PRISONER_LAST_NAME
@@ -120,7 +120,7 @@ class ReferralSummaryBuilderServiceTest {
       organisationId shouldBe ORGANISATION_ID_MDI
       id shouldBe referralSummaryProjection2.referralId
       courseName shouldBe WHITE_COURSE
-      prisonNumber shouldBe PRISON_NUMBER
+      prisonNumber shouldBe PRISON_NUMBER_1
       prisonName shouldBe PRISON_NAME
       prisonerName?.firstName shouldBe PRISONER_FIRST_NAME
       prisonerName?.lastName shouldBe PRISONER_LAST_NAME

@@ -18,11 +18,11 @@ constructor(
     private val log = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getPrisoners(prisonerNumbers: List<String>): Map<String?, List<Prisoner>> {
-    val prisonerDetails = when (val allPrisonDetails = prisonerSearchApiClient.getPrisonersByPrisonNumbers(prisonerNumbers)) {
-      is ClientResult.Success -> AuthorisableActionResult.Success(allPrisonDetails.body)
+  fun getPrisoners(prisonerNumbers: List<String>): List<Prisoner> {
+    val prisoners = when (val response = prisonerSearchApiClient.getPrisonersByPrisonNumbers(prisonerNumbers)) {
+      is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
       is ClientResult.Failure.StatusCode -> {
-        log.warn("Failure to retrieve data. Status code ${allPrisonDetails.status}")
+        log.warn("Failure to retrieve data. Status code ${response.status}")
         AuthorisableActionResult.Success(listOf<Prisoner>())
       }
 
@@ -31,6 +31,7 @@ constructor(
         AuthorisableActionResult.Success(listOf<Prisoner>())
       }
     }
-    return prisonerDetails.entity.groupBy { it.prisonerNumber }
+
+    return prisoners.entity
   }
 }

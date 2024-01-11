@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONERS
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONS
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
@@ -52,7 +52,7 @@ class ReferralServiceTest {
           .withCourseName("Course for referralSummary1")
           .withAudience(audience)
           .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
-          .withPrisonNumber(PRISON_NUMBER)
+          .withPrisonNumber(PRISON_NUMBER_1)
           .withReferrerUsername(REFERRER_USERNAME)
           .produce()
       }
@@ -63,7 +63,7 @@ class ReferralServiceTest {
           .withCourseName("Course for referralSummary2")
           .withAudience(audience)
           .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
-          .withPrisonNumber(PRISON_NUMBER)
+          .withPrisonNumber(PRISON_NUMBER_1)
           .withReferrerUsername(REFERRER_USERNAME)
           .produce()
       }
@@ -74,7 +74,7 @@ class ReferralServiceTest {
           .withCourseName("Course for referralSummary3")
           .withAudience(audience)
           .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
-          .withPrisonNumber(PRISON_NUMBER)
+          .withPrisonNumber(PRISON_NUMBER_1)
           .withReferrerUsername(REFERRER_USERNAME)
           .produce()
       }
@@ -151,7 +151,7 @@ class ReferralServiceTest {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
 
-    val createdReferralId = referralService.createReferral(PRISON_NUMBER, offering.id!!)
+    val createdReferralId = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
 
     createdReferralId shouldBe referralId
 
@@ -160,7 +160,7 @@ class ReferralServiceTest {
     verify {
       referralRepository.save(
         match {
-          it.prisonNumber == PRISON_NUMBER &&
+          it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == CLIENT_USERNAME &&
             it.offering.id == offering.id
         },
@@ -188,7 +188,7 @@ class ReferralServiceTest {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
 
-    val createdReferralId = referralService.createReferral(PRISON_NUMBER, offering.id!!)
+    val createdReferralId = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
 
     createdReferralId shouldBe referralId
 
@@ -204,7 +204,7 @@ class ReferralServiceTest {
     verify {
       referralRepository.save(
         match {
-          it.prisonNumber == PRISON_NUMBER &&
+          it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == "NONEXISTENT_USER" &&
             it.offering.id == offering.id
         },
