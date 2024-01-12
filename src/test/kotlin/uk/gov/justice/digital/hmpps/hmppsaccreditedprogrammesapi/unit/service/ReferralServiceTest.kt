@@ -29,7 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
@@ -100,7 +100,7 @@ class ReferralServiceTest {
   private lateinit var referrerUserRepository: ReferrerUserRepository
 
   @MockK(relaxed = true)
-  private lateinit var offeringRepository: JpaOfferingRepository
+  private lateinit var offeringRepository: OfferingRepository
 
   @MockK(relaxed = true)
   private lateinit var prisonRegisterApiService: PrisonRegisterApiService

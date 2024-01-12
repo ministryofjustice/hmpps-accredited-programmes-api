@@ -8,14 +8,14 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.transaction.TestTransaction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaAudienceRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaCourseEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AudienceRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseEntityRepository
 
 class CourseAudienceRelationshipTest
 @Autowired
 constructor(
-  val courseEntityRepository: JpaCourseEntityRepository,
-  val audienceRepository: JpaAudienceRepository,
+  val courseEntityRepository: CourseEntityRepository,
+  val audienceRepository: AudienceRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test

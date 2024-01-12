@@ -13,16 +13,16 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaCourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.Year
 import kotlin.jvm.optionals.getOrNull
 
-class JpaCourseParticipationRepositoryTest
+class CourseParticipationRepositoryTest
 @Autowired
 constructor(
-  val courseParticipationRepository: JpaCourseParticipationRepository,
+  val courseParticipationRepository: CourseParticipationRepository,
   jdbcTemplate: JdbcTemplate,
 ) : RepositoryTestBase(jdbcTemplate) {
   @Test

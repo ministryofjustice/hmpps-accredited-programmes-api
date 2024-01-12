@@ -10,12 +10,12 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
 @Component
-class JpaCourseRepository
+class CombinedCourseRepository
 @Autowired
 constructor(
-  private val courseRepository: JpaCourseEntityRepository,
-  private val offeringRepository: JpaOfferingRepository,
-  private val audienceRepository: JpaAudienceRepository,
+  private val courseRepository: CourseEntityRepository,
+  private val offeringRepository: OfferingRepository,
+  private val audienceRepository: AudienceRepository,
 ) : CourseRepository {
   override fun getAllCourses(): List<CourseEntity> = courseRepository
     .findAll()

@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.JpaOfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import java.time.LocalDateTime
@@ -30,7 +30,7 @@ class ReferralService
 constructor(
   private val referralRepository: ReferralRepository,
   private val referrerUserRepository: ReferrerUserRepository,
-  private val offeringRepository: JpaOfferingRepository,
+  private val offeringRepository: OfferingRepository,
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val referralSummaryBuilderService: ReferralSummaryBuilderService,
