@@ -25,6 +25,19 @@
         },
         "bodyFileName": "offence-detail.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/eor/oasys/ass/section6/ALLOW/2114584",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "relationships.json"
+      }
     }
   ]
 }

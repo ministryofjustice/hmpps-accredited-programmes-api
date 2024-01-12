@@ -11,6 +11,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
 
@@ -22,8 +23,8 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Get offence details from Oasys`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val prisonId = "A9999BB"
-    val offenceDetail = getOffenceDetailsByPrisonId(prisonId)
+    val prisonNumber = "A9999BB"
+    val offenceDetail = getOffenceDetailsByPrisonNumber(prisonNumber)
 
     offenceDetail.shouldNotBeNull()
     offenceDetail shouldBeEqual OffenceDetail(
@@ -49,8 +50,8 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Get offence details from Oasys with invalid prison number`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val prisonId = "Z9999ZZ"
-    val errorResponse = getOffenceDetailsByPrisonId404(prisonId)
+    val prisonNumber = "Z9999ZZ"
+    val errorResponse = getOffenceDetailsByPrisonNumber404(prisonNumber)
     errorResponse shouldBeEqual
       ErrorResponse(
         status = HttpStatus.NOT_FOUND,
@@ -59,10 +60,38 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       )
   }
 
-  fun getOffenceDetailsByPrisonId(prisonId: String) =
+  @Test
+  fun `Get relationships from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val relationships = getRelationshipsByPrisonNumber(prisonNumber)
+
+    relationships.shouldNotBeNull()
+    relationships shouldBeEqual Relationships(
+      dvEvidence = true,
+      victimFormerPartner = true,
+      victimFamilyMember = true,
+      victimOfPartnerFamily = true,
+      perpOfPartnerOrFamily = true,
+      relIssuesDetails = "Free text",
+    )
+  }
+
+  fun getRelationshipsByPrisonNumber(prisonNumber: String) =
     webTestClient
       .get()
-      .uri("/oasys/$prisonId/offence-details")
+      .uri("/oasys/$prisonNumber/relationships")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Relationships>()
+      .returnResult().responseBody!!
+
+  fun getOffenceDetailsByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/offence-details")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -70,10 +99,10 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       .expectBody<OffenceDetail>()
       .returnResult().responseBody!!
 
-  fun getOffenceDetailsByPrisonId404(prisonId: String) =
+  fun getOffenceDetailsByPrisonNumber404(prisonNumber: String) =
     webTestClient
       .get()
-      .uri("/oasys/$prisonId/offence-details")
+      .uri("/oasys/$prisonNumber/offence-details")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
