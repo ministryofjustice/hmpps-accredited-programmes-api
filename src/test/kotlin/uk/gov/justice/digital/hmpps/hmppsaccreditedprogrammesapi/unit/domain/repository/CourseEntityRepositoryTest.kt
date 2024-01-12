@@ -14,7 +14,6 @@ import org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseEntityRepository
 
 class CourseEntityRepositoryTest
 @Autowired
