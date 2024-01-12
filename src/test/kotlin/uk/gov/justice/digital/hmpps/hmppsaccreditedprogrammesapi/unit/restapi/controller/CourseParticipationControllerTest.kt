@@ -1,7 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.restapi.controller
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
-import io.kotest.matchers.equality.shouldBeEqualToComparingFields
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.slot
@@ -23,11 +27,12 @@ import org.springframework.test.web.servlet.post
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationSettingFactory
 import java.time.Year
 import java.util.UUID
 
@@ -42,6 +47,12 @@ constructor(
   val jwtAuthHelper: JwtAuthHelper,
 ) {
 
+  val objectMapper = jacksonObjectMapper().apply {
+    registerModule(JavaTimeModule())
+    configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true)
+    configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true)
+  }
+
   @MockkBean
   private lateinit var courseParticipationService: CourseParticipationService
 
@@ -51,55 +62,30 @@ constructor(
     fun `createCourseParticipation with JWT and valid payload with valid id returns 201 with correct body`() {
       val courseParticipationId = UUID.randomUUID()
       val courseParticipationSlot = slot<CourseParticipationEntity>()
-      every { courseParticipationService.createCourseParticipation(capture(courseParticipationSlot)) } returns
-        CourseParticipationEntity(
-          id = courseParticipationId,
-          courseName = "Course name",
-          source = "Source of information",
-          detail = "Course detail",
-          prisonNumber = "A1234AA",
-          outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = Year.of(2020)),
-          setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
-          createdByUsername = CLIENT_USERNAME,
-        )
+      val courseParticipation = CourseParticipationEntityFactory()
+        .withId(courseParticipationId)
+        .withCourseName("Course name")
+        .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).withYearStarted(Year.of(2020)).produce())
+        .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).produce())
+        .withCreatedByUsername(CLIENT_USERNAME)
+        .produce()
+
+      every { courseParticipationService.createCourseParticipation(capture(courseParticipationSlot)) } returns courseParticipation
+
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = """
-          { 
-            "id": "$courseParticipationId",
-            "courseName": "Course name",
-            "prisonNumber": "A1234AA",
-            "source": "Source of information",
-            "detail": "Course detail",
-            "setting": {
-              "type": "custody"
-            },
-            "outcome": {
-              "status": "complete",
-              "yearStarted": 2020
-            }
-          }"""
+        content = objectMapper.writeValueAsString(courseParticipation)
       }.andExpect {
         status { isCreated() }
-        content {
-          json(""" { "id": "$courseParticipationId" } """)
-        }
+        content { contentType(MediaType.APPLICATION_JSON) }
+        jsonPath("$.id") { value(courseParticipationId.toString()) }
       }
+
       verify { courseParticipationService.createCourseParticipation(any()) }
-      courseParticipationSlot.captured shouldBeEqualToComparingFields CourseParticipationEntity(
-        courseName = "Course name",
-        prisonNumber = "A1234AA",
-        source = "Source of information",
-        detail = "Course detail",
-        outcome = CourseParticipationOutcome(
-          status = CourseStatus.COMPLETE,
-          yearStarted = Year.of(2020),
-        ),
-        setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
-        createdByUsername = CLIENT_USERNAME,
-      )
+
+      courseParticipationSlot.captured.shouldBeEqualToIgnoringFields(courseParticipation, CourseParticipationEntity::id)
     }
 
     @Test
@@ -125,23 +111,17 @@ constructor(
 
     @Test
     fun `createCourseParticipation without JWT returns 401`() {
+      val courseParticipation = CourseParticipationEntityFactory()
+        .withCourseName("Course name")
+        .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).withYearStarted(Year.of(2020)).produce())
+        .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).produce())
+        .withCreatedByUsername(CLIENT_USERNAME)
+        .produce()
+
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
-        content = """
-          { 
-            "courseName": "Course name",
-            "prisonNumber": "A1234AA",
-            "source": "Source of information",
-            "detail": "Course detail",
-            "setting": {
-              "type": "custody"
-            },
-            "outcome": {
-              "status": "complete",
-              "yearStarted": 2020
-            }
-          }"""
+        content = objectMapper.writeValueAsString(courseParticipation)
       }.andExpect {
         status { isUnauthorized() }
       }
@@ -156,24 +136,24 @@ constructor(
       field: String,
       invalidYear: Int,
     ) {
+      val courseParticipation = CourseParticipationEntityFactory()
+        .withCourseName("Course name")
+        .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).produce())
+        .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).produce())
+        .produce()
+
+      val modifiedOutcome = when (field) {
+        "yearStarted" -> courseParticipation.outcome!!.copy(yearStarted = Year.of(invalidYear))
+        "yearCompleted" -> courseParticipation.outcome!!.copy(yearCompleted = Year.of(invalidYear))
+        else -> courseParticipation.outcome
+      }
+      val modifiedCourseParticipation = courseParticipation.copy(outcome = modifiedOutcome)
+
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = """
-          { 
-            "courseName": "Course name",
-            "prisonNumber": "A1234AA",
-            "source": "Source of information",
-            "detail": "Course detail",
-            "setting": {
-              "type": "custody"
-            },
-            "outcome": {
-              "status": "complete",
-              "$field": $invalidYear
-            }
-          }"""
+        content = objectMapper.writeValueAsString(modifiedCourseParticipation)
       }.andExpect {
         status { isBadRequest() }
         content {
@@ -190,44 +170,25 @@ constructor(
     @Test
     fun `getCourseParticipationById with JWT returns 200 with correct body`() {
       val courseParticipationId = UUID.randomUUID()
+      val courseParticipation = CourseParticipationEntityFactory()
+        .withId(courseParticipationId)
+        .withCourseName("Course name")
+        .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.COMMUNITY).produce())
+        .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.INCOMPLETE).withYearStarted(Year.of(2020)).produce())
+        .produce()
 
-      every { courseParticipationService.getCourseParticipationById(any()) } returns CourseParticipationEntity(
-        id = courseParticipationId,
-        courseName = "Course name",
-        prisonNumber = "A1234BC",
-        source = "Source of information",
-        detail = "Course detail",
-        setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY),
-        outcome = CourseParticipationOutcome(
-          status = CourseStatus.INCOMPLETE,
-          yearStarted = Year.of(2020),
-        ),
-      )
+      every { courseParticipationService.getCourseParticipationById(any()) } returns courseParticipation
 
       mockMvc.get("/course-participations/{id}", courseParticipationId) {
         accept = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
-        content {
-          json(
-            """
-            { 
-              "id": "$courseParticipationId",
-              "courseName": "Course name",
-              "prisonNumber": "A1234BC",
-              "source": "Source of information",
-              "detail": "Course detail",
-              "setting": {
-                type: "community"
-              },
-              "outcome": {
-                "status": "incomplete",
-                "yearStarted": 2020
-              }
-            }""",
-          )
-        }
+        content { contentType(MediaType.APPLICATION_JSON) }
+        jsonPath("$.courseName") { value(courseParticipation.courseName) }
+        jsonPath("$.setting.type") { value(courseParticipation.setting!!.type.name.lowercase()) }
+        jsonPath("$.outcome.status") { value(courseParticipation.outcome!!.status.name.lowercase()) }
+        jsonPath("$.outcome.yearStarted") { value(courseParticipation.outcome!!.yearStarted?.value) }
       }
 
       verify { courseParticipationService.getCourseParticipationById(courseParticipationId) }

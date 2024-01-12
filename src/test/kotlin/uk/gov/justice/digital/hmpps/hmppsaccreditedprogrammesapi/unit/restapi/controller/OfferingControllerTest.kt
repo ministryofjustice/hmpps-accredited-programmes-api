@@ -34,7 +34,7 @@ constructor(
   @Test
   fun `getCourseByOfferingId with JWT returns 200 with correct body`() {
     val offering = OfferingEntityFactory().withId(UUID.randomUUID()).produce()
-    val course = CourseEntityFactory().withId(UUID.randomUUID()).withMutableOfferings(mutableSetOf(offering)).produce()
+    val course = CourseEntityFactory().withId(UUID.randomUUID()).withOfferings(mutableSetOf(offering)).produce()
 
     every { courseService.getCourseByOfferingId(any()) } returns course
 
