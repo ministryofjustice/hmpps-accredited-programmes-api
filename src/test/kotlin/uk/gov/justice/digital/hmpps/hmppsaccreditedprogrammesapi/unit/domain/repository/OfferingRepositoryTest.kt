@@ -1,85 +1,67 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.repository
 
-import io.kotest.matchers.equality.shouldBeEqualToComparingFields
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.shouldBe
+import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
-import kotlin.jvm.optionals.getOrNull
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 
-class OfferingRepositoryTest
-@Autowired
-constructor(
-  val courseEntityRepository: CourseEntityRepository,
-  val offeringRepository: OfferingRepository,
-  jdbcTemplate: JdbcTemplate,
-) : RepositoryTestBase(jdbcTemplate) {
-  @Test
-  fun `JpaOfferingRepository should retrieve the correct offering for a CourseEntity object given a valid offeringId`() {
-    val course1 = CourseEntity(
-      name = "A Course",
-      identifier = "AC",
-      description = "A description",
-      referable = true,
-    ).apply {
-      addOffering(OfferingEntity(organisationId = "BWI", contactEmail = "bwi@a.com"))
-      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
-      addOffering(OfferingEntity(organisationId = "BXI", contactEmail = "bxi@a.com"))
-    }
+@SpringBootTest
+@AutoConfigureTestDatabase
+@Transactional
+@ActiveProfiles("test")
+class OfferingRepositoryTest {
 
-    val course2 = CourseEntity(
-      name = "Another Course",
-      identifier = "ACANO",
-      description = "Another description",
-      referable = false,
-    ).apply {
-      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
-    }
+  @Autowired
+  private lateinit var entityManager: EntityManager
 
-    val offering = courseEntityRepository.save(course1).offerings.first()
-    courseEntityRepository.save(course2)
+  @ParameterizedTest
+  @ValueSource(booleans = [true, false])
+  fun `OfferingRepository should retrieve the correct offering for a CourseEntity object given a valid offeringId`(isWithdrawn: Boolean) {
+    val course = CourseEntityFactory().produce()
+    entityManager.merge(course)
 
-    commitAndStartNewTx()
+    val offering = OfferingEntityFactory().withWithdrawn(isWithdrawn).produce()
+    offering.course = course
+    entityManager.merge(offering)
 
-    val persistentOffering = offeringRepository.findById(offering.id!!).getOrNull()
+    val persistedOfferings = entityManager
+      .createQuery("SELECT o FROM OfferingEntity o WHERE o.course.id = :courseId", OfferingEntity::class.java)
+      .setParameter("courseId", course.id)
+      .resultList
 
-    persistentOffering.shouldNotBeNull()
-    persistentOffering shouldBeEqualToComparingFields offering
+    persistedOfferings.first().withdrawn shouldBe isWithdrawn
+    persistedOfferings.first().course.id shouldBe course.id
   }
 
   @Test
-  fun `JpaOfferingepository should retrieve the correct offering for a CourseEntity object given a valid withdrawn offeringId`() {
-    val course1 = CourseEntity(
-      name = "A Course",
-      identifier = "AC",
-      description = "A description",
-      referable = true,
-    ).apply {
-      addOffering(OfferingEntity(organisationId = "BWI", contactEmail = "bwi@a.com", withdrawn = true))
-      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com", withdrawn = true))
-      addOffering(OfferingEntity(organisationId = "BXI", contactEmail = "bxi@a.com", withdrawn = true))
-    }
+  fun `Given an offering that is subsequently replaced by another, OfferingRepository should return both the new and withdrawn offerings`() {
+    val course = CourseEntityFactory().produce()
+    entityManager.merge(course)
 
-    val course2 = CourseEntity(
-      name = "Another Course",
-      identifier = "ACANO",
-      description = "Another description",
-      referable = false,
-    ).apply {
-      addOffering(OfferingEntity(organisationId = "MDI", contactEmail = "mdi@a.com"))
-    }
+    val offeringWithdrawnFalse = OfferingEntityFactory().withWithdrawn(false).produce()
+    offeringWithdrawnFalse.course = course
+    entityManager.merge(offeringWithdrawnFalse)
 
-    val offering = courseEntityRepository.save(course1).offerings.first()
-    courseEntityRepository.save(course2)
+    val offeringWithdrawnTrue = OfferingEntityFactory().withWithdrawn(true).produce()
+    offeringWithdrawnTrue.course = course
+    entityManager.merge(offeringWithdrawnTrue)
 
-    commitAndStartNewTx()
+    val persistedOfferings = entityManager
+      .createQuery("SELECT o FROM OfferingEntity o WHERE o.course.id = :courseId", OfferingEntity::class.java)
+      .setParameter("courseId", course.id)
+      .resultList
 
-    val persistentOffering = offeringRepository.findById(offering.id!!).getOrNull()
-
-    persistentOffering.shouldNotBeNull()
-    persistentOffering shouldBeEqualToComparingFields offering
+    persistedOfferings shouldContainExactlyInAnyOrder listOf(offeringWithdrawnFalse, offeringWithdrawnTrue)
+    persistedOfferings.forEach { it.course.id shouldBe course.id }
   }
 }

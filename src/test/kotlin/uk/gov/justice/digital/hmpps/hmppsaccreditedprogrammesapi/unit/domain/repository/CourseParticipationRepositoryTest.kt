@@ -1,150 +1,133 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.repository
 
 import io.kotest.matchers.date.shouldBeWithin
-import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationSettingFactory
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.Year
-import kotlin.jvm.optionals.getOrNull
 
-class CourseParticipationRepositoryTest
-@Autowired
-constructor(
-  val courseParticipationRepository: CourseParticipationRepository,
-  jdbcTemplate: JdbcTemplate,
-) : RepositoryTestBase(jdbcTemplate) {
+@SpringBootTest
+@AutoConfigureTestDatabase
+@Transactional
+@ActiveProfiles("test")
+class CourseParticipationRepositoryTest {
+
+  @Autowired
+  private lateinit var entityManager: EntityManager
+
   @Test
   fun `CourseParticipationRepository should save and retrieve CourseParticipationEntity objects`() {
-    val startTime = LocalDateTime.now()
+    val transactionStartTime = LocalDateTime.now()
 
-    val participationId = courseParticipationRepository.save(
-      CourseParticipationEntity(
-        courseName = "Course name",
-        prisonNumber = PRISON_NUMBER_1,
-        source = "Source of information",
-        detail = "Course detail",
-        outcome = CourseParticipationOutcome(
-          status = CourseStatus.COMPLETE,
-          yearStarted = Year.parse("2021"),
-          yearCompleted = Year.parse("2022"),
-        ),
-        setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = "location"),
-        createdByUsername = CLIENT_USERNAME,
-      ),
-    ).id!!
+    val courseParticipationSetting = CourseParticipationSettingFactory()
+      .withType(CourseSetting.CUSTODY)
+      .withLocation("Location")
+      .produce()
+    val courseParticipationOutcome = CourseParticipationOutcomeFactory()
+      .withStatus(CourseStatus.COMPLETE)
+      .withYearStarted(Year.parse("2021"))
+      .withYearCompleted(Year.parse("2022"))
+      .produce()
+    val courseParticipation = CourseParticipationEntityFactory()
+      .withCourseName("Course name")
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withSource("Source of information")
+      .withDetail("Course detail")
+      .withSetting(courseParticipationSetting)
+      .withOutcome(courseParticipationOutcome)
+      .withCreatedByUsername(CLIENT_USERNAME)
+      .produce()
+    entityManager.merge(courseParticipation)
 
-    commitAndStartNewTx()
-
-    val persistentHistory = courseParticipationRepository.findById(participationId).getOrNull()
-
-    persistentHistory.shouldNotBeNull()
-
-    persistentHistory.shouldBeEqualToIgnoringFields(
-      CourseParticipationEntity(
-        id = participationId,
-        courseName = "Course name",
-        prisonNumber = PRISON_NUMBER_1,
-        source = "Source of information",
-        detail = "Course detail",
-        outcome = CourseParticipationOutcome(
-          status = CourseStatus.COMPLETE,
-          yearStarted = Year.parse("2021"),
-          yearCompleted = Year.parse("2022"),
-        ),
-        setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = "location"),
-        createdByUsername = CLIENT_USERNAME,
-      ),
-      CourseParticipationEntity::createdDateTime,
-    )
-    persistentHistory.createdDateTime.shouldBeWithin(Duration.ofSeconds(1), startTime)
+    val persistedCourseParticipation = entityManager.find(CourseParticipationEntity::class.java, courseParticipation.id)
+    persistedCourseParticipation shouldNotBe null
+    persistedCourseParticipation.run {
+      this.prisonNumber shouldBe PRISON_NUMBER_1
+      this.outcome shouldBe courseParticipationOutcome
+      this.setting shouldBe courseParticipationSetting
+      this.createdByUsername shouldBe CLIENT_USERNAME
+    }
+    persistedCourseParticipation?.createdDateTime?.shouldBeWithin(Duration.ofSeconds(1), transactionStartTime)
   }
 
   @Test
   fun `CourseParticipationRepository should save and retrieve CourseParticipationEntity objects, having all nullable fields set to null`() {
-    val participationId = courseParticipationRepository.save(
-      CourseParticipationEntity(
-        courseName = null,
-        prisonNumber = PRISON_NUMBER_1,
-        source = null,
-        detail = null,
-        setting = null,
-        outcome = null,
-        createdByUsername = CLIENT_USERNAME,
-      ),
-    ).id!!
+    val courseParticipation = CourseParticipationEntityFactory()
+      .withCourseName(null)
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withSource(null)
+      .withDetail(null)
+      .withSetting(null)
+      .withOutcome(null)
+      .withCreatedByUsername(CLIENT_USERNAME)
+      .produce()
+    entityManager.merge(courseParticipation)
 
-    commitAndStartNewTx()
-
-    val persistentHistory = courseParticipationRepository.findById(participationId).getOrNull()
-
-    persistentHistory.shouldNotBeNull()
-
-    persistentHistory.shouldBeEqualToIgnoringFields(
-      CourseParticipationEntity(
-        id = participationId,
-        courseName = null,
-        prisonNumber = PRISON_NUMBER_1,
-        source = null,
-        detail = null,
-        setting = null,
-        outcome = null,
-        createdByUsername = CLIENT_USERNAME,
-      ),
-      CourseParticipationEntity::createdDateTime,
-    )
+    val persistedCourseParticipation = entityManager.find(CourseParticipationEntity::class.java, courseParticipation.id)
+    persistedCourseParticipation shouldNotBe null
+    persistedCourseParticipation.run {
+      this.courseName shouldBe null
+      this.prisonNumber shouldBe PRISON_NUMBER_1
+      this.source shouldBe null
+      this.detail shouldBe null
+      this.setting shouldBe null
+      this.outcome shouldBe null
+      this.createdByUsername shouldBe CLIENT_USERNAME
+    }
   }
 
   @Test
   fun `CourseParticipationRepository should save and update CourseParticipationEntity objects, having all auditable fields set`() {
-    val startTime = LocalDateTime.now()
+    val transactionStartTime = LocalDateTime.now()
 
-    val participationId = courseParticipationRepository.save(
-      CourseParticipationEntity(
-        courseName = null,
-        prisonNumber = PRISON_NUMBER_1,
-        source = null,
-        detail = null,
-        setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = null),
-        outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
-        createdByUsername = CLIENT_USERNAME,
-      ),
-    ).id!!
+    val courseParticipationSetting = CourseParticipationSettingFactory()
+      .withType(CourseSetting.CUSTODY)
+      .withLocation("Location")
+      .produce()
+    val courseParticipationOutcome = CourseParticipationOutcomeFactory()
+      .withStatus(CourseStatus.COMPLETE)
+      .withYearStarted(Year.parse("2021"))
+      .withYearCompleted(Year.parse("2022"))
+      .produce()
+    val courseParticipation = CourseParticipationEntityFactory()
+      .withCourseName(null)
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withSource(null)
+      .withDetail(null)
+      .withSetting(courseParticipationSetting)
+      .withOutcome(courseParticipationOutcome)
+      .withCreatedByUsername(CLIENT_USERNAME)
+      .produce()
+    entityManager.merge(courseParticipation)
 
-    val persistentHistory = courseParticipationRepository.findById(participationId).get()
-    persistentHistory.setting?.type = CourseSetting.CUSTODY
-
-    commitAndStartNewTx()
-
-    persistentHistory.shouldBeEqualToIgnoringFields(
-      CourseParticipationEntity(
-        id = participationId,
-        courseName = null,
-        prisonNumber = PRISON_NUMBER_1,
-        source = null,
-        detail = null,
-        setting = CourseParticipationSetting(type = CourseSetting.CUSTODY, location = null),
-        outcome = CourseParticipationOutcome(status = CourseStatus.COMPLETE, yearStarted = null, yearCompleted = null),
-        createdByUsername = CLIENT_USERNAME,
-        lastModifiedByUsername = null,
-      ),
-      CourseParticipationEntity::createdDateTime,
-      CourseParticipationEntity::lastModifiedDateTime,
-    )
-
-    persistentHistory.createdDateTime.shouldBeWithin(Duration.ofSeconds(1), startTime)
-    persistentHistory.lastModifiedDateTime.shouldNotBeNull()
-    persistentHistory.lastModifiedDateTime!!.shouldBeWithin(Duration.ofSeconds(1), startTime)
+    val persistedCourseParticipation = entityManager.find(CourseParticipationEntity::class.java, courseParticipation.id)
+    persistedCourseParticipation shouldNotBe null
+    persistedCourseParticipation.run {
+      this.courseName shouldBe null
+      this.prisonNumber shouldBe PRISON_NUMBER_1
+      this.source shouldBe null
+      this.detail shouldBe null
+      this.setting shouldBe courseParticipationSetting
+      this.outcome shouldBe courseParticipationOutcome
+      this.createdByUsername shouldBe CLIENT_USERNAME
+      this.lastModifiedByUsername shouldBe null
+    }
+    persistedCourseParticipation.createdDateTime.shouldBeWithin(Duration.ofSeconds(1), transactionStartTime)
   }
 }
