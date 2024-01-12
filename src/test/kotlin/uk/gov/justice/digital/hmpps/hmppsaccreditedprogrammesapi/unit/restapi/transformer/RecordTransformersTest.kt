@@ -5,31 +5,26 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
-import java.util.UUID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AudienceEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
 
 class RecordTransformersTest {
   @Test
   fun `Transforming a course entity with all required fields should convert to its API equivalent`() {
-    val entity = CourseEntity(
-      id = UUID.randomUUID(),
-      name = "A Course",
-      identifier = "AC",
-      prerequisites = mutableSetOf(
-        PrerequisiteEntity(name = "gender", description = "female"),
-        PrerequisiteEntity(name = "risk score", description = "ORGS: 50+"),
-      ),
-      audiences = mutableSetOf(
-        AudienceEntity(value = "A", id = UUID.randomUUID()),
-        AudienceEntity(value = "B", id = UUID.randomUUID()),
-        AudienceEntity(value = "C", id = UUID.randomUUID()),
-      ),
-      referable = true,
-    )
+    val p1 = PrerequisiteEntityFactory().withName("gender").withDescription("female").produce()
+    val p2 = PrerequisiteEntityFactory().withName("risk score").withDescription("ORGS: 50+").produce()
+    val prerequisites = mutableSetOf(p1, p2)
+    val a1 = AudienceEntityFactory().withValue("A").produce()
+    val a2 = AudienceEntityFactory().withValue("B").produce()
+    val a3 = AudienceEntityFactory().withValue("C").produce()
+    val audiences = mutableSetOf(a1, a2, a3)
+    val entity = CourseEntityFactory()
+      .withPrerequisites(prerequisites)
+      .withAudiences(audiences)
+      .produce()
 
     with(entity.toApi()) {
       coursePrerequisites shouldContainExactlyInAnyOrder listOf(
@@ -42,14 +37,7 @@ class RecordTransformersTest {
 
   @Test
   fun `Transforming a course entity with missing fields should tolerantly convert`() {
-    val entity = CourseEntity(
-      id = UUID.randomUUID(),
-      name = "A Course",
-      identifier = "AC",
-      prerequisites = mutableSetOf(),
-      audiences = mutableSetOf(),
-      referable = true,
-    )
+    val entity = CourseEntityFactory().produce()
 
     with(entity.toApi()) {
       id shouldBe entity.id
@@ -63,16 +51,10 @@ class RecordTransformersTest {
 
   @Test
   fun `Transforming a course entity with empty prerequisites and audiences should tolerantly convert`() {
-    val entity = CourseEntity(
-      id = UUID.randomUUID(),
-      name = "A Course",
-      identifier = "AC",
-      description = "A description",
-      alternateName = "AA++",
-      prerequisites = mutableSetOf(),
-      audiences = mutableSetOf(),
-      referable = true,
-    )
+    val entity = CourseEntityFactory()
+      .withDescription("A description")
+      .withAlternateName("AA++")
+      .produce()
 
     with(entity.toApi()) {
       description shouldBe entity.description
@@ -82,25 +64,19 @@ class RecordTransformersTest {
 
   @Test
   fun `Transforming a course prerequisite entity should convert to its API equivalent`() {
-    val entity = PrerequisiteEntity(
-      name = "gender",
-      description = "female",
-    )
+    val entity = PrerequisiteEntityFactory().produce()
 
     with(entity.toApi()) {
       name shouldBe entity.name
-      description shouldBe description
+      description shouldBe entity.description
     }
   }
 
   @Test
   fun `Transforming an offering entity should convert to its API equivalent`() {
-    val offering = OfferingEntity(
-      id = UUID.randomUUID(),
-      organisationId = "BXI",
-      contactEmail = "nobody-bwn@digital.justice.gov.uk",
-      secondaryContactEmail = "nobody-bwn2@digital.justice.gov.uk",
-    )
+    val offering = OfferingEntityFactory()
+      .withSecondaryContactEmail("nobody-bwn2@digital.justice.gov.uk")
+      .produce()
 
     with(offering.toApi()) {
       id shouldBe offering.id
@@ -112,7 +88,8 @@ class RecordTransformersTest {
 
   @Test
   fun `Transforming an audience entity should convert to its API equivalent`() {
-    val audience = AudienceEntity(value = "An audience", id = UUID.randomUUID())
+    val audience = AudienceEntityFactory().produce()
+
     with(audience.toApi()) {
       id shouldBe audience.id
       value shouldBe audience.value
