@@ -72,5 +72,21 @@ data class CourseParticipationOutcome(
   var yearCompleted: Year? = null,
 )
 
-enum class CourseSetting { CUSTODY, COMMUNITY }
-enum class CourseStatus { INCOMPLETE, COMPLETE }
+enum class CourseSetting {
+  CUSTODY,
+  COMMUNITY,
+  ;
+
+  override fun toString(): String {
+    return this.name.lowercase()
+  }
+}
+enum class CourseStatus {
+  INCOMPLETE,
+  COMPLETE,
+  ;
+
+  override fun toString(): String {
+    return this.name.lowercase()
+  }
+}

@@ -23,7 +23,7 @@ data class OfferingEntity(
   var secondaryContactEmail: String? = null,
   var withdrawn: Boolean = false,
 ) {
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")
   lateinit var course: CourseEntity
 }

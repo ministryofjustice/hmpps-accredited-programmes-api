@@ -65,7 +65,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
     alternateName = this.alternateName(),
     referable = this.referable(),
     prerequisites = this.prerequisites(),
-    mutableOfferings = this.mutableOfferings(),
+    offerings = this.mutableOfferings(),
     audiences = this.audiences(),
   )
 }
