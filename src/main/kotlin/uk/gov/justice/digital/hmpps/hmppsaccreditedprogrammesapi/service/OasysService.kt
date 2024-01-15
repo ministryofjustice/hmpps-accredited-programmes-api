@@ -51,14 +51,14 @@ class OasysService(val oasysApiClient: OasysApiClient) {
       assessments.entity
         .timeline
         .filter { it.status == "COMPLETE" }
-        .sortedByDescending { it.completedDate }
+        .sortedByDescending { it.completedAt }
         .firstOrNull()
 
     return if (assessment == null) {
       log.warn("No completed assessment found for prison id $prisonerNumber")
       null
     } else {
-      assessment.assessmentPk
+      assessment.id
     }
   }
 

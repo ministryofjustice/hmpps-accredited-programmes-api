@@ -36,7 +36,7 @@ class OasysApiServiceTest {
 
     val result = service.getAssessmentId("A9999BB")
 
-    assertEquals(assessment1.assessmentPk, result)
+    assertEquals(assessment1.id, result)
   }
 
   @Test

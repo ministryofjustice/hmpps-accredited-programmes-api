@@ -12,9 +12,8 @@ data class OasysAssessmentTimeline(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Timeline(
-  val assessmentPk: Long,
+  val id: Long,
   val status: String,
-  val assessmentType: String,
-  val completedDate: LocalDateTime?,
-  val initiationDate: LocalDateTime?,
+  val type: String,
+  val completedAt: LocalDateTime?,
 )
