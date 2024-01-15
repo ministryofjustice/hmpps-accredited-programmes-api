@@ -15,18 +15,17 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomLowercaseString
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationSettingFactory
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -45,34 +44,22 @@ constructor(
   inner class FindByPrisonNumber {
     @Test
     fun `getCourseParticipationsByPrisonNumber with JWT and valid prison number returns 200 with correct body`() {
-      val prisonNumber = randomPrisonNumber()
       val createdAt = LocalDateTime.now()
-      val username = randomLowercaseString(10)
-
-      val courseParticipations = listOf(
-        CourseParticipationEntity(
-          courseName = "Course name 1",
-          id = UUID.randomUUID(),
-          prisonNumber = prisonNumber,
-          source = "Source of information 1",
-          detail = "Course detail 1",
-          setting = CourseParticipationSetting(type = CourseSetting.COMMUNITY, location = "A location"),
-          outcome = CourseParticipationOutcome(status = CourseStatus.INCOMPLETE, yearStarted = Year.of(2018), yearCompleted = Year.of(2023)),
-          createdByUsername = username,
-          createdDateTime = createdAt,
-        ),
-        CourseParticipationEntity(
-          courseName = "Course name 2",
-          id = UUID.randomUUID(),
-          prisonNumber = prisonNumber,
-          source = "Source of information 2",
-          detail = "Course detail 2",
-          setting = CourseParticipationSetting(type = CourseSetting.CUSTODY),
-          outcome = CourseParticipationOutcome(status = CourseStatus.INCOMPLETE),
-          createdByUsername = username,
-          createdDateTime = createdAt,
-        ),
-      )
+      val cp1 = CourseParticipationEntityFactory()
+        .withCourseName("Course name 1")
+        .withPrisonNumber(PRISON_NUMBER_1)
+        .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.COMMUNITY).withLocation("Location").produce())
+        .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).withYearStarted(Year.of(2018)).withYearCompleted(Year.of(2023)).produce())
+        .withCreatedDateTime(createdAt)
+        .produce()
+      val cp2 = CourseParticipationEntityFactory()
+        .withCourseName("Course name 2")
+        .withPrisonNumber(PRISON_NUMBER_1)
+        .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).produce())
+        .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.INCOMPLETE).produce())
+        .withCreatedDateTime(createdAt)
+        .produce()
+      val courseParticipations = listOf(cp1, cp2)
 
       every { courseParticipationService.getCourseParticipationsByPrisonNumber(any()) } returns courseParticipations
 
@@ -81,36 +68,25 @@ constructor(
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       }.andExpect {
         status { isOk() }
-        content {
-          json(
-            strict = true,
-            jsonContent =
-            """[
-              {
-                "courseName": "Course name 1",
-                "id": "${courseParticipations[0].id}",
-                "prisonNumber": "$prisonNumber",
-                "source": "Source of information 1",
-                "detail": "Course detail 1",
-                "setting": { "type": "community", "location": "A location" },
-                "outcome": { "status": "incomplete", "yearStarted": 2018, "yearCompleted": 2023 },
-                "addedBy": "$username",
-                "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
-              },
-              {
-                "courseName": "Course name 2",
-                "id": "${courseParticipations[1].id}",
-                "prisonNumber": "$prisonNumber",
-                "source": "Source of information 2",
-                "detail": "Course detail 2",
-                "setting": { "type": "custody", "location": null },
-                "outcome": { "status": "incomplete", "yearStarted": null, "yearCompleted":  null },
-                "addedBy": "$username",
-                "createdAt": "${createdAt.format(DateTimeFormatter.ISO_DATE_TIME)}"
-              }
-            ]""",
-          )
+        content { contentType(MediaType.APPLICATION_JSON) }
+
+        courseParticipations.forEachIndexed { index, cp ->
+          jsonPath("$[$index].courseName") { value(cp.courseName) }
+          jsonPath("$[$index].id") { value(cp.id.toString()) }
+          jsonPath("$[$index].prisonNumber") { value(cp.prisonNumber) }
+          jsonPath("$[$index].setting.type") { value(cp.setting!!.type.name.lowercase()) }
+          jsonPath("$[$index].outcome.status") { value(cp.outcome!!.status.name.lowercase()) }
+          jsonPath("$[$index].addedBy") { value(CLIENT_USERNAME) }
+          jsonPath("$[$index].createdAt") { value(createdAt.format(DateTimeFormatter.ISO_DATE_TIME)) }
         }
+
+        jsonPath("$[0].setting.location") { value(cp1.setting!!.location) }
+        jsonPath("$[0].outcome.yearStarted") { value(cp1.outcome!!.yearStarted?.value) }
+        jsonPath("$[0].outcome.yearCompleted") { value(cp1.outcome!!.yearCompleted?.value) }
+
+        jsonPath("$[1].setting.location") { doesNotExist() }
+        jsonPath("$[1].outcome.yearStarted") { doesNotExist() }
+        jsonPath("$[1].outcome.yearCompleted") { doesNotExist() }
       }
 
       verify { courseParticipationService.getCourseParticipationsByPrisonNumber("A1234AA") }

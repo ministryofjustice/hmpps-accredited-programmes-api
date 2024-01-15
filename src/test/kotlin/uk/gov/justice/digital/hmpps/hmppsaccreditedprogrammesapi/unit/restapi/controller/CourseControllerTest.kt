@@ -23,15 +23,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.MED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generateCourseRecords
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generateOfferingRecords
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generatePrerequisiteRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomSentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toCourseCsv
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toOfferingCsv
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toPrerequisiteCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -90,9 +89,9 @@ constructor(
       val offering3 = OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce()
 
       val courses = listOf(
-        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering1)).produce(),
-        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering2)).produce(),
-        CourseEntityFactory().withName("Course1").withMutableOfferings(mutableSetOf(offering3)).produce(),
+        CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering1)).produce(),
+        CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering2)).produce(),
+        CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering3)).produce(),
         CourseEntityFactory().withName("Course2").produce(),
         CourseEntityFactory().withName("Course3").produce(),
       )
@@ -118,8 +117,8 @@ constructor(
     @Test
     fun `getCourseById with correct UUID returns 200 with correct body`() {
       val prerequisites = mutableSetOf(
-        PrerequisiteEntity(name = "Prerequisite1", description = randomSentence(1..10)),
-        PrerequisiteEntity(name = "Prerequisite2", description = randomSentence(1..10)),
+        PrerequisiteEntityFactory().withName("Prerequisite1").produce(),
+        PrerequisiteEntityFactory().withName("Prerequisite2").produce(),
       )
 
       val expectedCourse = CourseEntityFactory()

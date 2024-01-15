@@ -6,8 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ran
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 
 class ReferrerUserEntityFactory : Factory<ReferrerUserEntity> {
-
-  private var username: Yielded<String> = { randomUppercaseString(9) }
+  private var username: Yielded<String> = { randomUppercaseString() }
 
   fun withUsername(username: String) = apply {
     this.username = { username }

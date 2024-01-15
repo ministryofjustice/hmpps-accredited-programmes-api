@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposit
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import java.util.UUID
 
 @Repository
-interface JpaOfferingRepository : JpaRepository<OfferingEntity, UUID>
+interface AudienceRepository : JpaRepository<AudienceEntity, UUID>
