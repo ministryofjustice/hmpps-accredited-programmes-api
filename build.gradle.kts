@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.11.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.14.1"
   `jvm-test-suite`
   kotlin("plugin.spring") version "1.9.21"
   kotlin("plugin.jpa") version "1.9.10"
@@ -136,6 +136,6 @@ allOpen {
   annotations(
     "jakarta.persistence.Entity",
     "jakarta.persistence.MappedSuperclass",
-    "jakarta.persistence.Embeddable"
+    "jakarta.persistence.Embeddable",
   )
 }
