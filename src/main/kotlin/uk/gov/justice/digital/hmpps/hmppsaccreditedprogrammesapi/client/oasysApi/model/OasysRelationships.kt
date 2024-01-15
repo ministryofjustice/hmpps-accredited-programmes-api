@@ -3,11 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysAp
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class OasysRelationshipsWrapper(
-  val assessments: List<OasysRelationships>?,
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class OasysRelationships(
   val prevOrCurrentDomesticAbuse: String?,
   val victimOfPartner: String?,

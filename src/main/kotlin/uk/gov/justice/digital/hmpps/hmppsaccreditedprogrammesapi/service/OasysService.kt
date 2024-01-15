@@ -7,8 +7,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relat
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetailWrapper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationshipsWrapper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 
@@ -19,11 +19,11 @@ class OasysService(val oasysApiClient: OasysApiClient) {
       getOffenceDetail(it)
     }
 
-    if (oasysOffenceDetail == null || oasysOffenceDetail.assessments?.isEmpty() == true) {
+    if (oasysOffenceDetail == null) {
       throw NotFoundException("No Offence detail found for prisoner id $prisonerId")
     }
 
-    return oasysOffenceDetail.assessments!!.first().toModel()
+    return oasysOffenceDetail.toModel()
   }
 
   fun getRelationships(prisonerId: String): Relationships? {
@@ -31,11 +31,11 @@ class OasysService(val oasysApiClient: OasysApiClient) {
       getRelationships(it)
     }
 
-    if (oasysRelationships == null || oasysRelationships.assessments?.isEmpty() == true) {
+    if (oasysRelationships == null) {
       throw NotFoundException("No relationships found for prisoner id $prisonerId")
     }
 
-    return oasysRelationships.assessments!!.first().toModel()
+    return oasysRelationships.toModel()
   }
 
   fun getAssessmentId(prisonerNumber: String): Long? {
@@ -62,7 +62,7 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
   }
 
-  fun getOffenceDetail(assessmentId: Long): OasysOffenceDetailWrapper? {
+  fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? {
     val offenceDetail = when (val response = oasysApiClient.getOffenceDetail(assessmentId)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve data")
@@ -77,7 +77,7 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     return offenceDetail.entity
   }
 
-  fun getRelationships(assessmentId: Long): OasysRelationshipsWrapper? {
+  fun getRelationships(assessmentId: Long): OasysRelationships? {
     val relationships = when (val response = oasysApiClient.getRelationships(assessmentId)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve data")

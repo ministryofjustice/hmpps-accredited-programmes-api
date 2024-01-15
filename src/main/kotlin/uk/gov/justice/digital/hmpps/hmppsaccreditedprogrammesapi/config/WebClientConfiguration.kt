@@ -137,7 +137,7 @@ class WebClientConfiguration(
     oauth2Client.setDefaultClientRegistrationId("oasys-api")
 
     return WebClient.builder()
-      .baseUrl(oasysApiBaseUrl)
+      .baseUrl("$oasysApiBaseUrl/assessments")
       .clientConnector(
         ReactorClientHttpConnector(
           HttpClient

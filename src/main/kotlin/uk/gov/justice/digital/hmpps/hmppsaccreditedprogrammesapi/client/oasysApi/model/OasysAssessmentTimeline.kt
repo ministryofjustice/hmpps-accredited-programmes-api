@@ -5,6 +5,8 @@ import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OasysAssessmentTimeline(
+  val probNumber: String?,
+  val prisNumber: String?,
   val timeline: List<Timeline>,
 )
 

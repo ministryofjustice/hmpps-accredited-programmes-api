@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/eor/oasys/ass/allasslist/pris/A9999BB/ALLOW",
+        "urlPattern": "/assessments/timeline/A9999BB",
         "method": "GET"
       },
       "response": {
@@ -15,7 +15,7 @@
     },
     {
       "request": {
-        "urlPattern": "/eor/oasys/ass/section2/ALLOW/2114584",
+        "urlPattern": "/assessments/2114584/section/section2",
         "method": "GET"
       },
       "response": {
@@ -28,7 +28,7 @@
     },
     {
       "request": {
-        "urlPattern": "/eor/oasys/ass/section6/ALLOW/2114584",
+        "urlPattern": "/assessments/2114584/section/section6",
         "method": "GET"
       },
       "response": {
