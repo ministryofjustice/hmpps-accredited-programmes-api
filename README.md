@@ -65,11 +65,11 @@ courses.
 To run from IntelliJ, first start `hmpps-auth` and the `postgresql` database in
 Docker as above.
 
-You may need to manually install the Java 19 SDK to run the application. We've
-used `temurin-19` for this in most developer environments.
+You may need to manually install the Java 21 SDK to run the application. We've
+used `temurin-21` for this in most developer environments.
 
 To set this, in the "Project Structure" window (`File -> Project Structure`),
-expand the SDK select, and if the version you need (e.g. `temurin-19`) isn't
+expand the SDK select, and if the version you need (e.g. `temurin-21`) isn't
 available, click `Add SDK -> Download JDK...`, then search for it and download
 it.
 
