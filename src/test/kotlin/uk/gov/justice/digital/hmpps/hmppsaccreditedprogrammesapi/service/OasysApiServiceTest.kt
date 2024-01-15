@@ -21,22 +21,21 @@ class OasysApiServiceTest {
   @Test
   fun `should return assessmentId`() {
     val assessment1 =
-      Timeline(123123, "COMPLETE", "LAYER3", LocalDateTime.now(), LocalDateTime.now().minusDays(10))
+      Timeline(123123, "COMPLETE", "LAYER3", LocalDateTime.now())
     val assessment2 = Timeline(
       999999,
       "COMPLETE",
       "LAYER3",
       LocalDateTime.now().minusDays(1),
-      LocalDateTime.now().minusDays(10),
     )
-    val assessment3 = Timeline(111111, "STARTED", "LAYER3", null, LocalDateTime.now().minusDays(10))
+    val assessment3 = Timeline(111111, "STARTED", "LAYER3", null)
     val oasysAssessmentTimeline = OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
 
     every { oasysApiClient.getAssessments(any()) } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
 
     val result = service.getAssessmentId("A9999BB")
 
-    assertEquals(assessment1.assessmentPk, result)
+    assertEquals(assessment1.id, result)
   }
 
   @Test

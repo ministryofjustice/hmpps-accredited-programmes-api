@@ -3,24 +3,20 @@
   "prisNumber": "A9999BB",
   "timeline": [
     {
-      "assessmentPk": 2114584,
-      "assessmentType": "LAYER1",
-      "initiationDate": "2012-06-13T09:46:08",
+      "id": 2114584,
+      "type": "LAYER1",
       "status": "COMPLETE",
-      "completedDate": "2012-06-13T09:59:22"
+      "completedAt": "2012-06-13T09:59:22"
     },
     {
-      "assessmentPk": 2114588,
-      "assessmentType": "LAYER3",
-      "initiationDate": "2012-06-13T11:17:30",
+      "id": 2114588,
+      "type": "LAYER3",
       "status": "LOCKED_INCOMPLETE",
-      "partcompStatus": "Unsigned",
-      "completedDate": "2012-06-20T23:00:06"
+      "completedAt": "2012-06-20T23:00:06"
     },
     {
-      "assessmentPk": 10083387,
-      "assessmentType": "LAYER3",
-      "initiationDate": "2023-12-20T09:03:55",
+      "id": 10083387,
+      "type": "LAYER3",
       "status": "OPEN"
     }
   ]
