@@ -9,9 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetailWrapper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationshipsWrapper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import java.time.LocalDateTime
 
@@ -32,7 +30,7 @@ class OasysApiServiceTest {
       LocalDateTime.now().minusDays(10),
     )
     val assessment3 = Timeline(111111, "STARTED", "LAYER3", null, LocalDateTime.now().minusDays(10))
-    val oasysAssessmentTimeline = OasysAssessmentTimeline(listOf(assessment1, assessment2, assessment3))
+    val oasysAssessmentTimeline = OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
 
     every { oasysApiClient.getAssessments(any()) } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
 
@@ -55,18 +53,15 @@ class OasysApiServiceTest {
       "fully",
       "pattern",
     )
-    val response = OasysOffenceDetailWrapper(
-      listOf(offenceDetail),
-    )
 
     every { oasysApiClient.getOffenceDetail(any()) } returns ClientResult.Success(
       HttpStatus.OK,
-      response,
+      offenceDetail,
     )
 
     val result = service.getOffenceDetail(123123)
 
-    assertEquals(response, result)
+    assertEquals(offenceDetail, result)
   }
 
   @Test
@@ -79,17 +74,14 @@ class OasysApiServiceTest {
       "Yes",
       "Free text",
     )
-    val response = OasysRelationshipsWrapper(
-      listOf(oasysRelationships),
-    )
 
     every { oasysApiClient.getRelationships(any()) } returns ClientResult.Success(
       HttpStatus.OK,
-      response,
+      oasysRelationships,
     )
 
     val result = service.getRelationships(123123)
 
-    assertEquals(response, result)
+    assertEquals(oasysRelationships, result)
   }
 }

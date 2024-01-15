@@ -7,8 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClientCache
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetailWrapper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationshipsWrapper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 
 @Component
 class OasysApiClient(
@@ -18,14 +18,14 @@ class OasysApiClient(
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper(), webClientCache) {
 
   fun getAssessments(prisonerNumber: String) = getRequest<OasysAssessmentTimeline> {
-    path = "/eor/oasys/ass/allasslist/pris/$prisonerNumber/ALLOW"
+    path = "/timeline/$prisonerNumber"
   }
 
-  fun getOffenceDetail(assessmentPk: Long) = getRequest<OasysOffenceDetailWrapper> {
-    path = "/eor/oasys/ass/section2/ALLOW/$assessmentPk"
+  fun getOffenceDetail(assessmentPk: Long) = getRequest<OasysOffenceDetail> {
+    path = "/$assessmentPk/section/section2"
   }
 
-  fun getRelationships(assessmentPk: Long) = getRequest<OasysRelationshipsWrapper> {
-    path = "/eor/oasys/ass/section6/ALLOW/$assessmentPk"
+  fun getRelationships(assessmentPk: Long) = getRequest<OasysRelationships> {
+    path = "/$assessmentPk/section/section6"
   }
 }
