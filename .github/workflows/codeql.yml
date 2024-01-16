@@ -32,7 +32,7 @@ jobs:
         # Use only 'java' to analyze code written in Java, Kotlin or both
 
     - name: Set up JDK 21
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 21
