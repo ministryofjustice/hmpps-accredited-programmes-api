@@ -28,7 +28,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-data-redis")
   implementation("org.flywaydb:flyway-core")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.16.1")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.2")
   implementation("com.google.guava:guava:32.1.3-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
