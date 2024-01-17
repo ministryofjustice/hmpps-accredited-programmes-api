@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.PrisonerOrgProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import java.util.*
 
@@ -99,10 +100,12 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
   @Query(
     value = """
     SELECT 
-     DISTINCT r.prisonNumber AS prisonNumber
+     DISTINCT r.prisonNumber AS prisonNumber, 
+     o.organisationId AS organisationId
      FROM ReferralEntity r
+     JOIN r.offering o
   """,
     nativeQuery = false,
   )
-  fun getDistinctPrisonNumbers(): List<String>
+  fun getPrisonersWithOrgId(): List<PrisonerOrgProjection>
 }

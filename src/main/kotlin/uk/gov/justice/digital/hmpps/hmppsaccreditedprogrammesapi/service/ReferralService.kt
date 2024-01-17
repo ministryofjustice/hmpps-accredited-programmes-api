@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
@@ -33,6 +34,7 @@ constructor(
   private val offeringRepository: JpaOfferingRepository,
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val prisonerSearchApiService: PrisonerSearchApiService,
+  private val prisonerSearchApiClient: PrisonerSearchApiService,
   private val referralSummaryBuilderService: ReferralSummaryBuilderService,
 ) {
 
@@ -123,6 +125,10 @@ constructor(
     val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
     val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnums, audience, courseName)
     val content = referralProjectionPage.content
+
+    prisonerSearchApiClient.getPrisoners(prisonerNumbers)
+
+    organisationId
     val prisoners = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
     val prisons = prisonRegisterApiService.getAllPrisons()
     val apiContent = referralSummaryBuilderService.build(content, prisoners, prisons, false)

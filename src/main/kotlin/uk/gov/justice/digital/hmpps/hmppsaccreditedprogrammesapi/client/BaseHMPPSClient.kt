@@ -99,8 +99,10 @@ abstract class BaseHMPPSClient(
     internal var path: String? = null
     internal var body: Any? = null
     internal var headers = HttpHeaders()
-    internal val preemptiveCacheConfig: WebClientCache.PreemptiveCacheConfig? = null
+    internal var preemptiveCacheConfig: WebClientCache.PreemptiveCacheConfig? = null
+    internal var isPreemptiveCall = false
     internal var preemptiveCacheKey: String? = null
+    internal var preemptiveCacheTimeoutMs: Int = 10000
 
     fun withHeader(key: String, value: String) = headers.add(key, value)
   }

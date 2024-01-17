@@ -30,10 +30,25 @@ class PrisonerSearchApiClient(
     hardTtlSeconds = Duration.ofHours(12).toSeconds().toInt(),
   )
 
-  fun getPrisonerDetailsCacheEntryStatus(crn: String) = checkPreemptiveCacheStatus(prisonerSearchApiCacheConfig, crn)
-
   fun getPrisonersByPrisonNumbers(prisonNumbers: List<String>) = postRequest<List<Prisoner>> {
     path = "/prisoner-search/prisoner-numbers"
     body = PrisonerNumbers(prisonNumbers)
   }
+
+  fun getPrisonerDetailsCacheEntryStatus(crn: String) = checkPreemptiveCacheStatus(prisonerSearchApiCacheConfig, crn)
+
+  fun getPrisonersByPrisonNumbersWait(crn: String)  = postRequest<List<Prisoner>> {
+    preemptiveCacheConfig = prisonerSearchApiCacheConfig
+    preemptiveCacheKey = crn
+    preemptiveCacheTimeoutMs = 0
+  }
+
+  fun getPrisonersByPrisonNumbers(key: String, prisonNumbers: List<String>) = postRequest<List<Prisoner>> {
+    path = "/prisoner-search/prisoner-numbers"
+    isPreemptiveCall = true
+    preemptiveCacheConfig = prisonerSearchApiCacheConfig
+    preemptiveCacheKey = key
+    body = PrisonerNumbers(prisonNumbers)
+  }
+
 }
