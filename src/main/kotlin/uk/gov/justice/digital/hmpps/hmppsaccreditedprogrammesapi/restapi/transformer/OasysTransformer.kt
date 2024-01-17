@@ -2,8 +2,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 
 fun OasysOffenceDetail.toModel(): OffenceDetail {
   return OffenceDetail(
@@ -33,6 +35,18 @@ fun OasysRelationships.toModel(): Relationships {
     perpAgainstFamily == YES,
     perpAgainstPartner == YES,
     relIssuesDetails,
+  )
+}
+
+fun OasysRoshFull.toModel(): RoshAnalysis {
+  return RoshAnalysis(
+    currentOffenceDetails,
+    currentWhereAndWhen,
+    currentHowDone,
+    currentWhoVictims,
+    currentAnyoneElsePresent,
+    currentWhyDone,
+    currentSources,
   )
 }
 
