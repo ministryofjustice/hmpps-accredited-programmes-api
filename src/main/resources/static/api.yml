@@ -841,6 +841,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /oasys/{prisonNumber}/lifestyle:
+    get:
+      tags:
+        - Oasys lifestyle Details
+      summary: ROSH lifestyle details as held by Oasys
+      operationId: getLifestyle
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Lifestyle'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 
 components:
   schemas:
@@ -1422,3 +1454,13 @@ components:
         source:
           type: string
           example: crown court
+
+    Lifestyle:
+      type: object
+      properties:
+        activitiesEncourageOffending:
+          type: string
+          example: Drug addiction
+        lifestyleIssues:
+          type: string
+          example: Commits robbery to fund drug addiction

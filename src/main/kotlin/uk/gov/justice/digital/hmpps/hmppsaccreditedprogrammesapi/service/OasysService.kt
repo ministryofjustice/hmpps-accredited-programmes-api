@@ -2,12 +2,14 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
@@ -50,6 +52,18 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return oasysRoshFull.toModel()
+  }
+
+  fun getLifestyle(prisonNumber: String): Lifestyle? {
+    val oasysLifestyle = getAssessmentId(prisonNumber)?.let {
+      getLifestyle(it)
+    }
+
+    if (oasysLifestyle == null) {
+      throw NotFoundException("No lifestyle found for prison number $prisonNumber")
+    }
+
+    return oasysLifestyle.toModel()
   }
 
   fun getAssessmentId(prisonerNumber: String): Long? {
@@ -120,6 +134,21 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return relationships.entity
+  }
+
+  fun getLifestyle(assessmentId: Long): OasysLifestyle? {
+    val lifestyle = when (val response = oasysApiClient.getLifestyle(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return lifestyle.entity
   }
 
   companion object {

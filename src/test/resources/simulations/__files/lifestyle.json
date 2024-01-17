@@ -1,0 +1,31 @@
+{
+  "assessmentPk": 2114584,
+  "assessmentType": "LAYER1",
+  "dateCompleted": "2012-06-13T09:59:22",
+  "assessorSignedDate": "2012-06-13T09:59:22",
+  "initiationDate": "2012-06-13T09:46:08",
+  "assessmentStatus": "COMPLETE",
+  "superStatus": "COMPLETE",
+  "laterWIPAssessmentExists": true,
+  "latestWIPDate": "2023-12-20T09:03:55",
+  "laterSignLockAssessmentExists": false,
+  "latestSignLockDate": null,
+  "laterPartCompUnsignedAssessmentExists": true,
+  "latestPartCompUnsignedDate": "2012-06-13T11:17:30",
+  "laterPartCompSignedAssessmentExists": false,
+  "latestPartCompSignedDate": null,
+  "laterCompleteAssessmentExists": false,
+  "latestCompleteDate": "2012-06-13T09:59:22",
+  "regActivitiesEncourageOffending": "drug taking",
+  "manipulativePredatory": null,
+  "easilyInfluenced": null,
+  "communityIntegration": null,
+  "lifestyleLinkedToReoffending": null,
+  "lifestyleLinkedToHarm": null,
+  "recklessness": null,
+  "lifestyleIssuesDetails": "regularly takes drugs and struggles to support this without resorting to crime",
+  "assessor": {
+    "name": "Test Wark"
+  },
+  "crn": "D006518"
+}
