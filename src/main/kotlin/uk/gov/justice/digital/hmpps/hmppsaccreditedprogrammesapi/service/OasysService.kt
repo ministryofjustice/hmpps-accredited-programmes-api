@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
@@ -11,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -60,10 +62,22 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     if (oasysLifestyle == null) {
-      throw NotFoundException("No lifestyle found for prison number $prisonNumber")
+      throw NotFoundException("No lifestyle information found for prison number $prisonNumber")
     }
 
     return oasysLifestyle.toModel()
+  }
+
+  fun getPsychiatric(prisonNumber: String): Psychiatric? {
+    val oasysPsychiatric = getAssessmentId(prisonNumber)?.let {
+      getPsychiatric(it)
+    }
+
+    if (oasysPsychiatric == null) {
+      throw NotFoundException("No psychiatric information found for prison number $prisonNumber")
+    }
+
+    return oasysPsychiatric.toModel()
   }
 
   fun getAssessmentId(prisonerNumber: String): Long? {
@@ -149,6 +163,21 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return lifestyle.entity
+  }
+
+  fun getPsychiatric(assessmentId: Long): OasysPsychiatric? {
+    val psychiatric = when (val response = oasysApiClient.getPsychiatric(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return psychiatric.entity
   }
 
   companion object {

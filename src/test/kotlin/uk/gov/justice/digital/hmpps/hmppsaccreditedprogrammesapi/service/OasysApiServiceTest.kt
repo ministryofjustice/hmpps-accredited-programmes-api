@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
@@ -105,5 +106,21 @@ class OasysApiServiceTest {
     val result = service.getRoshFull(123123)
 
     assertEquals(oasysRoshFull, result)
+  }
+
+  @Test
+  fun `should return psychiatric details`() {
+    val psychiatric = OasysPsychiatric(
+      "0 - no problems",
+    )
+
+    every { oasysApiClient.getPsychiatric(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      psychiatric,
+    )
+
+    val result = service.getPsychiatric(123123)
+
+    assertEquals(psychiatric, result)
   }
 }

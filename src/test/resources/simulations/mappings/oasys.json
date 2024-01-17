@@ -64,6 +64,19 @@
         },
         "bodyFileName": "lifestyle.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/assessments/2114584/section/section10",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "psychiatric.json"
+      }
     }
   ]
 }
