@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
@@ -47,6 +49,13 @@ fun OasysRoshFull.toModel(): RoshAnalysis {
     currentAnyoneElsePresent,
     currentWhyDone,
     currentSources,
+  )
+}
+
+fun OasysLifestyle.toModel(): Lifestyle {
+  return Lifestyle(
+    regActivitiesEncourageOffending,
+    lifestyleIssuesDetails,
   )
 }
 
