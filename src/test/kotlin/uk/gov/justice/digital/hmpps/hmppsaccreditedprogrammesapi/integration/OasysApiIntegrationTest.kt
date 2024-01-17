@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
 
@@ -55,8 +56,8 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
     errorResponse shouldBeEqual
       ErrorResponse(
         status = HttpStatus.NOT_FOUND,
-        userMessage = "Not Found: No assessment found for prisoner id: Z9999ZZ",
-        developerMessage = "No assessment found for prisoner id: Z9999ZZ",
+        userMessage = "Not Found: No assessment found for prison number: Z9999ZZ",
+        developerMessage = "No assessment found for prison number: Z9999ZZ",
       )
   }
 
@@ -76,6 +77,35 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       relIssuesDetails = "Free text",
     )
   }
+
+  @Test
+  fun `Get rosh analysis from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val roshAnalysis = getRoshAnalysisByPrisonNumber(prisonNumber)
+
+    roshAnalysis.shouldNotBeNull()
+    roshAnalysis shouldBeEqual RoshAnalysis(
+      offenceDetails = "Assault with a base ball bat",
+      whereAndWhen = "in the park",
+      howDone = "with a base ball bat",
+      whoVictims = "the gardener",
+      anyoneElsePresent = "noone",
+      whyDone = "anger issues",
+      source = "local police",
+    )
+  }
+
+  fun getRoshAnalysisByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/rosh-analysis")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<RoshAnalysis>()
+      .returnResult().responseBody!!
 
   fun getRelationshipsByPrisonNumber(prisonNumber: String) =
     webTestClient

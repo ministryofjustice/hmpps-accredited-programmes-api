@@ -38,6 +38,19 @@
         },
         "bodyFileName": "relationships.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/assessments/2114584/section/sectionroshfull",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "rosh-analysis.json"
+      }
     }
   ]
 }

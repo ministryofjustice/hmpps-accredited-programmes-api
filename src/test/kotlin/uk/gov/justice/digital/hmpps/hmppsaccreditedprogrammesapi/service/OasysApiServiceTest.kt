@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import java.time.LocalDateTime
 
@@ -82,5 +83,27 @@ class OasysApiServiceTest {
     val result = service.getRelationships(123123)
 
     assertEquals(oasysRelationships, result)
+  }
+
+  @Test
+  fun `should return Rosh Analysis`() {
+    val oasysRoshFull = OasysRoshFull(
+      "Offence detail",
+      "where when",
+      "how done",
+      "who were victims",
+      "Any one else involved",
+      "motivation",
+      "source",
+    )
+
+    every { oasysApiClient.getRoshFull(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysRoshFull,
+    )
+
+    val result = service.getRoshFull(123123)
+
+    assertEquals(oasysRoshFull, result)
   }
 }

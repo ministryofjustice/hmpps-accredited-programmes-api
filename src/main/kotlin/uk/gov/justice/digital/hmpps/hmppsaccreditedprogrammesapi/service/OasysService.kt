@@ -4,44 +4,59 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 
 @Service
 class OasysService(val oasysApiClient: OasysApiClient) {
-  fun getOffenceDetail(prisonerId: String): OffenceDetail? {
-    val oasysOffenceDetail = getAssessmentId(prisonerId)?.let {
+  fun getOffenceDetail(prisonNumber: String): OffenceDetail? {
+    val oasysOffenceDetail = getAssessmentId(prisonNumber)?.let {
       getOffenceDetail(it)
     }
 
     if (oasysOffenceDetail == null) {
-      throw NotFoundException("No Offence detail found for prisoner id $prisonerId")
+      throw NotFoundException("No Offence detail found for prison number $prisonNumber")
     }
 
     return oasysOffenceDetail.toModel()
   }
 
-  fun getRelationships(prisonerId: String): Relationships? {
-    val oasysRelationships = getAssessmentId(prisonerId)?.let {
+  fun getRelationships(prisonNumber: String): Relationships? {
+    val oasysRelationships = getAssessmentId(prisonNumber)?.let {
       getRelationships(it)
     }
 
     if (oasysRelationships == null) {
-      throw NotFoundException("No relationships found for prisoner id $prisonerId")
+      throw NotFoundException("No relationships found for prison number $prisonNumber")
     }
 
     return oasysRelationships.toModel()
   }
 
+  fun getRoshFull(prisonNumber: String): RoshAnalysis? {
+    val oasysRoshFull = getAssessmentId(prisonNumber)?.let {
+      getRoshFull(it)
+    }
+
+    if (oasysRoshFull == null) {
+      throw NotFoundException("No relationships found for prison number $prisonNumber")
+    }
+
+    return oasysRoshFull.toModel()
+  }
+
   fun getAssessmentId(prisonerNumber: String): Long? {
     val assessments = when (val result = oasysApiClient.getAssessments(prisonerNumber)) {
       is ClientResult.Failure -> {
-        throw NotFoundException("No assessment found for prisoner id: $prisonerNumber")
+        log.warn("Failure to retrieve data ${result.toException().cause}")
+        throw NotFoundException("No assessment found for prison number: $prisonerNumber")
       }
       is ClientResult.Success -> AuthorisableActionResult.Success(result.body)
     }
@@ -55,7 +70,7 @@ class OasysService(val oasysApiClient: OasysApiClient) {
         .firstOrNull()
 
     return if (assessment == null) {
-      log.warn("No completed assessment found for prison id $prisonerNumber")
+      log.warn("No completed assessment found for prison number $prisonerNumber")
       null
     } else {
       assessment.id
@@ -65,7 +80,7 @@ class OasysService(val oasysApiClient: OasysApiClient) {
   fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? {
     val offenceDetail = when (val response = oasysApiClient.getOffenceDetail(assessmentId)) {
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data")
+        log.warn("Failure to retrieve data ${response.toException().cause}")
         AuthorisableActionResult.Success(null)
       }
 
@@ -77,10 +92,25 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     return offenceDetail.entity
   }
 
+  fun getRoshFull(assessmentId: Long): OasysRoshFull? {
+    val roshFull = when (val response = oasysApiClient.getRoshFull(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return roshFull.entity
+  }
+
   fun getRelationships(assessmentId: Long): OasysRelationships? {
     val relationships = when (val response = oasysApiClient.getRelationships(assessmentId)) {
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data")
+        log.warn("Failure to retrieve data ${response.toException().cause}")
         AuthorisableActionResult.Success(null)
       }
 

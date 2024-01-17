@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPP
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 
 @Component
 class OasysApiClient(
@@ -27,5 +28,9 @@ class OasysApiClient(
 
   fun getRelationships(assessmentPk: Long) = getRequest<OasysRelationships> {
     path = "/$assessmentPk/section/section6"
+  }
+
+  fun getRoshFull(assessmentPk: Long) = getRequest<OasysRoshFull> {
+    path = "/$assessmentPk/section/sectionroshfull"
   }
 }

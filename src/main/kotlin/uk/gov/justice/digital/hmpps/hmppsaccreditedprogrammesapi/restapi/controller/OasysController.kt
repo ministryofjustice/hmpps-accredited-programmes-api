@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.OasysApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OasysService
 
 @Service
@@ -21,5 +22,12 @@ class OasysController(val oasysService: OasysService) : OasysApiDelegate {
       .ok(
         oasysService
           .getRelationships(prisonNumber),
+      )
+
+  override fun getRoshAnalysis(prisonNumber: String): ResponseEntity<RoshAnalysis> =
+    ResponseEntity
+      .ok(
+        oasysService
+          .getRoshFull(prisonNumber),
       )
 }
