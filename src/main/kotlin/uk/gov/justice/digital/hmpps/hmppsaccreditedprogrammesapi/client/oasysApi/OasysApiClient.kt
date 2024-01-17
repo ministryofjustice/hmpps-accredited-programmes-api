@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPP
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 
@@ -37,5 +38,9 @@ class OasysApiClient(
 
   fun getLifestyle(assessmentPk: Long) = getRequest<OasysLifestyle> {
     path = "/$assessmentPk/section/section7"
+  }
+
+  fun getPsychiatric(assessmentPk: Long) = getRequest<OasysPsychiatric> {
+    path = "/$assessmentPk/section/section10"
   }
 }

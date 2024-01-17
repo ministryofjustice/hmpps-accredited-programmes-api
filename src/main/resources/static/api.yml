@@ -873,6 +873,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /oasys/{prisonNumber}/psychiatric:
+    get:
+      tags:
+        - Oasys psychiatric Details
+      summary: ROSH psychiatric details as held by Oasys
+      operationId: getPsychiatric
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Psychiatric'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 
 components:
   schemas:
@@ -1464,3 +1496,11 @@ components:
         lifestyleIssues:
           type: string
           example: Commits robbery to fund drug addiction
+
+    Psychiatric:
+      type: object
+      properties:
+        description:
+          type: string
+          example: 0-No problems
+
