@@ -115,7 +115,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - fix-owasp-nightly-failure
           requires:
             - validate
             - build_docker
@@ -176,11 +176,11 @@ workflows:
   security:
     triggers:
       - schedule:
-          cron: "10 5 * * 1-5"
+          cron: "*/5 * * * *"
           filters:
             branches:
               only:
-                - main
+                - fix-owasp-nightly-failure
     jobs:
       - hmpps/gradle_owasp_dependency_check:
           slack_channel: << pipeline.parameters.alerts-slack-channel >>
