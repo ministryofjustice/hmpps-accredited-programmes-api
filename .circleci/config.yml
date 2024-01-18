@@ -94,6 +94,11 @@ workflows:
   version: 2
   build-test-and-deploy:
     jobs:
+      - hmpps/gradle_owasp_dependency_check:
+            jdk_tag: "21.0"
+            slack_channel: << pipeline.parameters.alerts-slack-channel >>
+            context:
+              - hmpps-common-vars
       - validate:
           context: [ hmpps-common-vars ]
           filters:
@@ -115,7 +120,7 @@ workflows:
           filters:
             branches:
               only:
-                - fix-owasp-nightly-failure
+                - main
           requires:
             - validate
             - build_docker
@@ -176,11 +181,11 @@ workflows:
   security:
     triggers:
       - schedule:
-          cron: "*/5 * * * *"
+          cron: "10 5 * * 1-5"
           filters:
             branches:
               only:
-                - fix-owasp-nightly-failure
+                - main
     jobs:
       - hmpps/gradle_owasp_dependency_check:
           jdk_tag: "21.0"
