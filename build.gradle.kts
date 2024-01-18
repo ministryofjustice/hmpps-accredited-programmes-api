@@ -134,7 +134,6 @@ ktlint {
   }
 }
 
-
 allOpen {
   annotations(
     "jakarta.persistence.Entity",
@@ -142,4 +141,3 @@ allOpen {
     "jakarta.persistence.Embeddable",
   )
 }
-
