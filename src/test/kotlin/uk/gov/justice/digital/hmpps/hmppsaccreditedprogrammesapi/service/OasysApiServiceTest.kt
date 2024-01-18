@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
@@ -122,5 +123,26 @@ class OasysApiServiceTest {
     val result = service.getPsychiatric(123123)
 
     assertEquals(psychiatric, result)
+  }
+
+  @Test
+  fun `should return behaviour details`() {
+    val behaviour = OasysBehaviour(
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+    )
+
+    every { oasysApiClient.getBehaviour(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      behaviour,
+    )
+
+    val result = service.getBehaviour(123123)
+
+    assertEquals(behaviour, result)
   }
 }
