@@ -1,0 +1,979 @@
+{
+	"info": {
+		"name": "Accredited Programmes API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/courses",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/courses",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"courses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/courses/:courseId",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/courses/:courseId",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"courses",
+						":courseId"
+					],
+					"variable": [
+						{
+							"key": "courseId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/offerings/:offeringId/course",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/offerings/:offeringId/course",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"offerings",
+						":offeringId",
+						"course"
+					],
+					"variable": [
+						{
+							"key": "offeringId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/health",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/health",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "offerings/:offeringId",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/offerings/:offeringId",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"offerings",
+						":offeringId"
+					],
+					"variable": [
+						{
+							"key": "offeringId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/referrals",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"referrerId\": \"a-referrer-id\",\n    \"prisonNumber\": \"a-prison-number\",\n    \"offeringId\": \"20f3abc8-dd92-43ae-b88e-5797a0ad3f4b\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{accredited_programmes_api}}/referrals",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"referrals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/referrals/:referralId",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/referrals/:referralId",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"referrals",
+						":referralId"
+					],
+					"variable": [
+						{
+							"key": "referralId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/referrals/:referralId/status",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\": \"awaiting_assessment\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{accredited_programmes_api}}/referrals/:referralId/status",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"referrals",
+						":referralId",
+						"status"
+					],
+					"variable": [
+						{
+							"key": "referralId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/referrals/organisation/:organisationId/dashboard",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/referrals/organisation/:organisationId/dashboard",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"referrals",
+						"organisation",
+						":organisationId",
+						"dashboard"
+					],
+					"variable": [
+						{
+							"key": "organisationId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/referrals/me/dashboard",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenRequestParams",
+							"value": [
+								{
+									"key": "username",
+									"value": "ACP_REFERRER",
+									"enabled": true,
+									"send_as": "request_url"
+								}
+							],
+							"type": "any"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/referrals/me/dashboard",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"referrals",
+						"me",
+						"dashboard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Participations",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{accredited_programmes_api}}/course-participations/:courseParticipationId",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"course-participations",
+						":courseParticipationId"
+					],
+					"variable": [
+						{
+							"key": "courseParticipationId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Participations",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "refreshTokenUrl",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"courseId\": \"d3abc217-75ee-46e9-a010-368f30282367\",\n  \"otherCourseName\": null,\n  \"setting\": {\n    \"location\": \"Somewhere\",\n    \"type\": \"custody\"\n  },\n  \"outcome\": {\n    \"status\": \"incomplete\",\n    \"detail\": \"string\",\n    \"yearStarted\": 0,\n    \"yearCompleted\": 0\n  },\n  \"source\": \"The source test\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{accredited_programmes_api}}/course-participations/:courseParticipationId",
+					"host": [
+						"{{accredited_programmes_api}}"
+					],
+					"path": [
+						"course-participations",
+						":courseParticipationId"
+					],
+					"variable": [
+						{
+							"key": "courseParticipationId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "TOKEN",
+			"value": ""
+		}
+	]
+}

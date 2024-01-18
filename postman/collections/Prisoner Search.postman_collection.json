@@ -1,0 +1,169 @@
+{
+	"info": {
+		"name": "Prisoner Search",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "prisoner/:prisonNumber",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{prisoner_search_api}}/prisoner/:prisonNumber",
+					"host": [
+						"{{prisoner_search_api}}"
+					],
+					"path": [
+						"prisoner",
+						":prisonNumber"
+					],
+					"variable": [
+						{
+							"key": "prisonNumber",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "prisoner-search/prisoner-numbers",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "prisonerNumbers",
+							"value": "[\"\"]",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{prisoner_search_api}}/prisoner-search/prisoner-numbers",
+					"host": [
+						"{{prisoner_search_api}}"
+					],
+					"path": [
+						"prisoner-search",
+						"prisoner-numbers"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
