@@ -81,12 +81,14 @@ testing {
 tasks {
   withType<KotlinCompile> {
     kotlinOptions {
+      freeCompilerArgs = listOf("-Xjvm-default=all")
       jvmTarget = "21"
     }
 
     kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/kotlin"))
     kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/resources"))
 
+    dependsOn("dependencyCheckUpdate")
     dependsOn("openApiGenerate")
   }
 
@@ -132,6 +134,7 @@ ktlint {
   }
 }
 
+
 allOpen {
   annotations(
     "jakarta.persistence.Entity",
@@ -139,3 +142,4 @@ allOpen {
     "jakarta.persistence.Embeddable",
   )
 }
+
