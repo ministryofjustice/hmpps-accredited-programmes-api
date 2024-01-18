@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.contro
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.OasysApiDelegate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -45,5 +46,12 @@ class OasysController(val oasysService: OasysService) : OasysApiDelegate {
       .ok(
         oasysService
           .getPsychiatric(prisonNumber),
+      )
+
+  override fun getBehaviour(prisonNumber: String): ResponseEntity<Behaviour> =
+    ResponseEntity
+      .ok(
+        oasysService
+          .getBehaviour(prisonNumber),
       )
 }

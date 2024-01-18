@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -94,6 +95,23 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Get behaviour from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val lifestyle = getBehaviourByPrisonNumber(prisonNumber)
+
+    lifestyle.shouldNotBeNull()
+    lifestyle shouldBeEqual Behaviour(
+      "4 - massive problems",
+      "2 - slight problems",
+      "0 - no problems",
+      "3 - big problems",
+      "1 - some problems",
+      "1 - some problems",
+    )
+  }
+
+  @Test
   fun `Get rosh analysis from Oasys`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
@@ -165,6 +183,17 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<Psychiatric>()
+      .returnResult().responseBody!!
+
+  fun getBehaviourByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/behaviour")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Behaviour>()
       .returnResult().responseBody!!
 
   fun getOffenceDetailsByPrisonNumber(prisonNumber: String) =

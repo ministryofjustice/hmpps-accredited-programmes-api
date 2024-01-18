@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -10,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshA
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
@@ -66,6 +68,18 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return oasysLifestyle.toModel()
+  }
+
+  fun getBehaviour(prisonNumber: String): Behaviour? {
+    val oasysBehaviour = getAssessmentId(prisonNumber)?.let {
+      getBehaviour(it)
+    }
+
+    if (oasysBehaviour == null) {
+      throw NotFoundException("No behaviour information found for prison number $prisonNumber")
+    }
+
+    return oasysBehaviour.toModel()
   }
 
   fun getPsychiatric(prisonNumber: String): Psychiatric? {
@@ -178,6 +192,21 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return psychiatric.entity
+  }
+
+  fun getBehaviour(assessmentId: Long): OasysBehaviour? {
+    val behaviour = when (val response = oasysApiClient.getBehaviour(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return behaviour.entity
   }
 
   companion object {
