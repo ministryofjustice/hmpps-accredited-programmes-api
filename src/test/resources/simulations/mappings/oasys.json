@@ -90,6 +90,32 @@
         },
         "bodyFileName": "behaviour.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/assessments/2114584/section/section12",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "attitude.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/assessments/2114584/section/section13",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "health.json"
+      }
     }
   ]
 }

@@ -937,6 +937,71 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /oasys/{prisonNumber}/attitude:
+    get:
+      tags:
+        - Oasys attitude Details
+      summary: Attitude details as held by Oasys
+      operationId: getAttitude
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Attitude'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /oasys/{prisonNumber}/health:
+    get:
+      tags:
+        - Oasys health Details
+      summary: Health details as held by Oasys
+      operationId: getHealth
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Health'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
 components:
   schemas:
     Course:
@@ -1556,3 +1621,25 @@ components:
         concreteAbstractThinking:
           type: string
           example: 0-No problems
+
+    Attitude:
+      type: object
+      properties:
+        proCriminalAttitudes:
+          type: string
+          example: 0-No problems
+        motivationToAddressBehaviour:
+          type: string
+          example: 0-No problems
+
+    Health:
+      type: object
+      properties:
+        anyHealthConditions:
+          type: boolean
+          default: false
+        description:
+          type: string
+          example: Blind in one eye
+
+

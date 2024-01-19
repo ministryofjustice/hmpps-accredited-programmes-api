@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -11,7 +13,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshA
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
@@ -82,6 +86,30 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     return oasysBehaviour.toModel()
   }
 
+  fun getHealth(prisonNumber: String): Health? {
+    val oasysHealth = getAssessmentId(prisonNumber)?.let {
+      getHealth(it)
+    }
+
+    if (oasysHealth == null) {
+      throw NotFoundException("No health information found for prison number $prisonNumber")
+    }
+
+    return oasysHealth.toModel()
+  }
+
+  fun getAttitude(prisonNumber: String): Attitude? {
+    val oasysAttitude = getAssessmentId(prisonNumber)?.let {
+      getAttitude(it)
+    }
+
+    if (oasysAttitude == null) {
+      throw NotFoundException("No attitude information found for prison number $prisonNumber")
+    }
+
+    return oasysAttitude.toModel()
+  }
+
   fun getPsychiatric(prisonNumber: String): Psychiatric? {
     val oasysPsychiatric = getAssessmentId(prisonNumber)?.let {
       getPsychiatric(it)
@@ -98,8 +126,10 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     val assessments = when (val result = oasysApiClient.getAssessments(prisonerNumber)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve data ${result.toException().cause}")
+
         throw NotFoundException("No assessment found for prison number: $prisonerNumber")
       }
+
       is ClientResult.Success -> AuthorisableActionResult.Success(result.body)
     }
 
@@ -207,6 +237,36 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return behaviour.entity
+  }
+
+  fun getHealth(assessmentId: Long): OasysHealth? {
+    val health = when (val response = oasysApiClient.getHealth(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return health.entity
+  }
+
+  fun getAttitude(assessmentId: Long): OasysAttitude? {
+    val attitude = when (val response = oasysApiClient.getAttitude(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return attitude.entity
   }
 
   companion object {

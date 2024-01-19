@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -141,6 +143,31 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
     )
   }
 
+  @Test
+  fun `Get health data from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val health = getHealthByPrisonNumber(prisonNumber)
+
+    health.shouldNotBeNull()
+    health shouldBeEqual Health(
+      true,
+      "Has a prosthetic leg",
+    )
+  }
+
+  fun `Get attitude data from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val attitude = getAttitudeByPrisonNumber(prisonNumber)
+
+    attitude.shouldNotBeNull()
+    attitude shouldBeEqual Attitude(
+      "1-Some problems",
+      "0-Very motivated",
+    )
+  }
+
   fun getRoshAnalysisByPrisonNumber(prisonNumber: String) =
     webTestClient
       .get()
@@ -196,6 +223,27 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       .expectBody<Behaviour>()
       .returnResult().responseBody!!
 
+  fun getHealthByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/health")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Health>()
+      .returnResult().responseBody!!
+
+  fun getAttitudeByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/attitude")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Attitude>()
+      .returnResult().responseBody!!
   fun getOffenceDetailsByPrisonNumber(prisonNumber: String) =
     webTestClient
       .get()
