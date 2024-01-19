@@ -1,0 +1,129 @@
+{
+	"info": {
+		"name": "Prison Register API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/prisons",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{prison_register_api}}/prisons",
+					"host": [
+						"{{prison_register_api}}"
+					],
+					"path": [
+						"prisons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/prisons/:id",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "{{hmpps_auth_sign_in}}",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{system_client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{system_client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "HMPPS Auth",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{prison_register_api}}/prisons/:prisonId",
+					"host": [
+						"{{prison_register_api}}"
+					],
+					"path": [
+						"prisons",
+						":prisonId"
+					],
+					"variable": [
+						{
+							"key": "prisonId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
