@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
@@ -144,5 +146,39 @@ class OasysApiServiceTest {
     val result = service.getBehaviour(123123)
 
     assertEquals(behaviour, result)
+  }
+
+  @Test
+  fun `should return health details`() {
+    val health = OasysHealth(
+      "Yes",
+      "blind",
+    )
+
+    every { oasysApiClient.getHealth(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      health,
+    )
+
+    val result = service.getHealth(123123)
+
+    assertEquals(health, result)
+  }
+
+  @Test
+  fun `should return attitude details`() {
+    val attitude = OasysAttitude(
+      "0-no problems",
+      "1-some problems",
+    )
+
+    every { oasysApiClient.getAttitude(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      attitude,
+    )
+
+    val result = service.getAttitude(123123)
+
+    assertEquals(attitude, result)
   }
 }
