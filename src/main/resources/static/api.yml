@@ -1579,7 +1579,7 @@ components:
         whyDone:
           type: string
           example: Greed
-        source:
+        sources:
           type: string
           example: crown court
 

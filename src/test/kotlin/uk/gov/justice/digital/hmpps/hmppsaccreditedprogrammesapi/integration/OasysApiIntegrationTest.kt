@@ -127,7 +127,7 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       whoVictims = "the gardener",
       anyoneElsePresent = "noone",
       whyDone = "anger issues",
-      source = "local police",
+      sources = "local police",
     )
   }
 
