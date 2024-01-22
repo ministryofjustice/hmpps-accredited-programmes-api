@@ -61,10 +61,13 @@ class JwtAuthHelper {
 
   fun bearerToken(): String {
     val auth = SecurityContextHolder.getContext().authentication
+    val authorities = auth?.authorities?.map { it.authority }?.let {
+      listOf("ROLE_ACCREDITED_PROGRAMMES_API") + it
+    } ?: listOf("ROLE_ACCREDITED_PROGRAMMES_API")
 
     val claims = mutableMapOf<String, Any>().apply {
       put("user_name", auth?.name ?: CLIENT_USERNAME)
-      put("authorities", auth?.authorities?.map { it.authority } ?: listOf<String>())
+      put("authorities", authorities)
       put("scope", listOf<String>())
       put("client_id", "hmpps-accredited-programmes-ui")
     }
