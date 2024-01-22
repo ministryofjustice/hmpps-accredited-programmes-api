@@ -6,6 +6,7 @@ import io.kotest.matchers.collections.shouldHaveAtLeastSize
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.hamcrest.Matchers.startsWith
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -26,12 +27,34 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.gen
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toCourseCsv
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toOfferingCsv
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toPrerequisiteCsv
+import java.time.LocalDateTime
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class CourseIntegrationTest : IntegrationTestBase() {
+
+  @BeforeEach
+  fun setUp() {
+    persistenceHelper.clearAllTableContent()
+
+    persistenceHelper.createAudience(UUID.fromString("1f7fdb91-49b3-4eae-9815-dbf30ddd30a0"), "General offence")
+    persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", true)
+    persistenceHelper.createCourseAudience(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), UUID.fromString("1f7fdb91-49b3-4eae-9815-dbf30ddd30a0"))
+    persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk")
+    persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk")
+
+    persistenceHelper.createCourse(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"), "CC", "Custom Course", "Sample description", "CC", true)
+    persistenceHelper.createCourse(UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"), "RC", "RAPID Course", "Sample description", "RC", false)
+
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_2")
+
+    persistenceHelper.createReferral(UUID.fromString("0c46ed09-170b-4c0f-aee8-a24eeaeeddaa"), UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), "B2345BB", "TEST_REFERRER_USER_1", "This referral will be updated", false, false, "REFERRAL_STARTED", null)
+    persistenceHelper.createReferral(UUID.fromString("fae2ed00-057e-4179-9e55-f6a4f4874cf0"), UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), "C3456CC", "TEST_REFERRER_USER_2", "more information", true, true, "REFERRAL_SUBMITTED", LocalDateTime.parse("2023-11-12T19:11:00"))
+    persistenceHelper.createReferral(UUID.fromString("153383a4-b250-46a8-9950-43eb358c2805"), UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), "D3456DD", "TEST_REFERRER_USER_2", "more information", true, true, "REFERRAL_SUBMITTED", LocalDateTime.parse("2023-11-13T19:11:00"))
+  }
 
   @Test
   fun `Searching for all courses with JWT returns 200 with correct body`() {
