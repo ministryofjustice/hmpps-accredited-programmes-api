@@ -13,6 +13,7 @@ import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -156,6 +157,7 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
     )
   }
 
+  @Test
   fun `Get attitude data from Oasys`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
@@ -165,6 +167,24 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
     attitude shouldBeEqual Attitude(
       "1-Some problems",
       "0-Very motivated",
+    )
+  }
+
+  @Test
+  fun `Get learning needs data from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val attitude = getLearningNeedsByPrisonNumber(prisonNumber)
+
+    attitude.shouldNotBeNull()
+    attitude shouldBeEqual LearningNeeds(
+      true,
+      "0 - No problems",
+      "1 - Some problems",
+      "3 - big problems",
+      "0 - no qualifications",
+      "33",
+
     )
   }
 
@@ -244,6 +264,18 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody<Attitude>()
       .returnResult().responseBody!!
+
+  fun getLearningNeedsByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/learning-needs")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<LearningNeeds>()
+      .returnResult().responseBody!!
+
   fun getOffenceDetailsByPrisonNumber(prisonNumber: String) =
     webTestClient
       .get()

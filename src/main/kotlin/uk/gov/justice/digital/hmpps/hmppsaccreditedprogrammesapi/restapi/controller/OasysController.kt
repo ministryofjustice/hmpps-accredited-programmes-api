@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.OasysApiDel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -69,5 +70,12 @@ class OasysController(val oasysService: OasysService) : OasysApiDelegate {
       .ok(
         oasysService
           .getAttitude(prisonNumber),
+      )
+
+  override fun getLearningNeeds(prisonNumber: String): ResponseEntity<LearningNeeds> =
+    ResponseEntity
+      .ok(
+        oasysService
+          .getLearningNeeds(prisonNumber),
       )
 }

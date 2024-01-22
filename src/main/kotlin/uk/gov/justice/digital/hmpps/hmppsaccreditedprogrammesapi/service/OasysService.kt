@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
@@ -13,15 +14,18 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshA
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.learningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 
 @Service
@@ -120,6 +124,15 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return oasysPsychiatric.toModel()
+  }
+
+  fun getLearningNeeds(prisonNumber: String): LearningNeeds {
+    val assessmentId = getAssessmentId(prisonNumber)
+      ?: throw NotFoundException("No learning needs information found for prison number $prisonNumber")
+
+    val oasysLearning = getLearning(assessmentId)
+    val oasysAccommodation = getAccommodation(assessmentId)
+    return learningNeeds(oasysAccommodation, oasysLearning)
   }
 
   fun getAssessmentId(prisonerNumber: String): Long? {
@@ -267,6 +280,36 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return attitude.entity
+  }
+
+  fun getLearning(assessmentId: Long): OasysLearning? {
+    val learning = when (val response = oasysApiClient.getLearning(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return learning.entity
+  }
+
+  fun getAccommodation(assessmentId: Long): OasysAccommodation? {
+    val accommodation = when (val response = oasysApiClient.getAccommodation(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return accommodation.entity
   }
 
   companion object {
