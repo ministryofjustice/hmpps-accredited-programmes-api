@@ -40,7 +40,8 @@ class SecurityConfiguration(
           "/api.yml",
           "/info",
         ).permitAll()
-        .anyRequest().authenticated()
+        .anyRequest()
+        .hasRole("ACCREDITED_PROGRAMMES_API")
     }
     .anonymous { it.disable() }
     .oauth2ResourceServer { resourceServer ->
