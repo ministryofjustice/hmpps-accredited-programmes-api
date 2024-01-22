@@ -7,10 +7,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
@@ -180,5 +182,33 @@ class OasysApiServiceTest {
     val result = service.getAttitude(123123)
 
     assertEquals(attitude, result)
+  }
+
+  @Test
+  fun `should return learning needs details`() {
+    val oasysLearning = OasysLearning(
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+    )
+    val oasysAccommodation = OasysAccommodation(
+      "Yes",
+    )
+    every { oasysApiClient.getLearning(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysLearning,
+    )
+
+    every { oasysApiClient.getAccommodation(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysAccommodation,
+    )
+
+    val learning = service.getLearning(123123)
+    assertEquals(oasysLearning, learning)
+    val accommodation = service.getAccommodation(123123)
+    assertEquals(oasysAccommodation, accommodation)
   }
 }

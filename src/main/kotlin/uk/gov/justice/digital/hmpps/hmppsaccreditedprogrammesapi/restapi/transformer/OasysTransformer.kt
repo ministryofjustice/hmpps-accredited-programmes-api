@@ -3,14 +3,17 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
@@ -97,6 +100,15 @@ fun OasysAttitude.toModel(): Attitude {
     motivationToAddressBehaviour,
   )
 }
+
+fun learningNeeds(oasysAccommodation: OasysAccommodation?, oasysLearning: OasysLearning?) = LearningNeeds(
+  oasysAccommodation?.noFixedAbodeOrTransient == YES,
+  oasysLearning?.workRelatedSkills,
+  oasysLearning?.problemsReadWriteNum,
+  oasysLearning?.learningDifficulties,
+  oasysLearning?.qualifications,
+  oasysLearning?.basicSkillsScore,
+)
 
 enum class WhatOccurred(val desc: String) {
   TARGETING("Were there any direct victim(s) eg contact targeting"),
