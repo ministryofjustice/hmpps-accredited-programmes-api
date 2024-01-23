@@ -38,7 +38,7 @@ data class CourseEntity(
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   val prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
-  @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true)
+  @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
   @Column(name = "offerings")
   @Fetch(SUBSELECT)
   val offerings: MutableSet<OfferingEntity> = mutableSetOf(),

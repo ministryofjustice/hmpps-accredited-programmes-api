@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.TestPropertiesI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.PersistenceHelper
 import java.nio.channels.FileChannel
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
@@ -81,6 +82,9 @@ abstract class IntegrationTestBase {
   lateinit var jwtAuthHelper: JwtAuthHelper
 
   lateinit var wiremockServer: WireMockServer
+
+  @Autowired
+  lateinit var persistenceHelper: PersistenceHelper
 
   @Value("\${wiremock.port}")
   lateinit var wiremockPort: Integer
