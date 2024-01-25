@@ -16,6 +16,7 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
   private var contactEmail: Yielded<String> = { randomEmailAddress() }
   private var secondaryContactEmail: Yielded<String?> = { null }
   private var withdrawn: Yielded<Boolean> = { false }
+  private var referable: Yielded<Boolean> = { true }
 
   fun withId(id: UUID?) = apply {
     this.id = { id }
@@ -43,6 +44,7 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
     contactEmail = this.contactEmail(),
     secondaryContactEmail = this.secondaryContactEmail(),
     withdrawn = this.withdrawn(),
+    referable = this.referable(),
   )
 }
 
@@ -51,6 +53,7 @@ class OfferingUpdateFactory : Factory<OfferingUpdate> {
   private var identifier: Yielded<String> = { randomUppercaseString() }
   private var contactEmail: Yielded<String?> = { null }
   private var secondaryContactEmail: Yielded<String?> = { null }
+  private var referable: Yielded<Boolean> = { true }
 
   fun withPrisonId(prisonId: String) = apply {
     this.prisonId = { prisonId }
@@ -69,5 +72,6 @@ class OfferingUpdateFactory : Factory<OfferingUpdate> {
     identifier = this.identifier(),
     contactEmail = this.contactEmail(),
     secondaryContactEmail = this.secondaryContactEmail(),
+    referable = this.referable(),
   )
 }
