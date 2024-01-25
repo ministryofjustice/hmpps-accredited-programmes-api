@@ -171,6 +171,7 @@ constructor(
         organisationId = it,
         contactEmail = update?.contactEmail ?: "",
         secondaryContactEmail = update?.secondaryContactEmail,
+        referable = update?.referable ?: true,
       )
 
       course.addOffering(offeringToAdd)
@@ -183,6 +184,7 @@ constructor(
         withdrawn = false
         contactEmail = update?.contactEmail ?: ""
         secondaryContactEmail = update?.secondaryContactEmail
+        referable = update?.referable ?: true
       }
     }
 
