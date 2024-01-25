@@ -22,6 +22,7 @@ fun CourseEntity.toApi(): Course = Course(
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
   audiences = audiences.map(AudienceEntity::toApi),
+  audience = audience,
   referable = referable,
 )
 
@@ -31,7 +32,7 @@ fun CourseEntity.toCourseRecord(): CourseRecord = CourseRecord(
   alternateName = alternateName,
   referable = referable,
   identifier = identifier,
-  audience = audiences.joinToString { it.value },
+  audience = audience,
 )
 
 fun PrerequisiteEntity.toApi(): CoursePrerequisite = CoursePrerequisite(

@@ -23,6 +23,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
   private var prerequisites: Yielded<MutableSet<PrerequisiteEntity>> = { mutableSetOf() }
   private var offerings: Yielded<MutableSet<OfferingEntity>> = { mutableSetOf() }
   private var audiences: Yielded<MutableSet<AudienceEntity>> = { mutableSetOf() }
+  private var audience: Yielded<String> = { randomUppercaseString() }
   private var withdrawn: Yielded<Boolean> = { false }
 
   fun withId(id: UUID?) = apply {
@@ -71,6 +72,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
     prerequisites = this.prerequisites(),
     offerings = this.offerings(),
     audiences = this.audiences(),
+    audience = this.audience(),
     withdrawn = this.withdrawn(),
   )
 }
