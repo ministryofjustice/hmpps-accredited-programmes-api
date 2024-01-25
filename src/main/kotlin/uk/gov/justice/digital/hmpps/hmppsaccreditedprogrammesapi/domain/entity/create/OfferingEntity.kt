@@ -22,6 +22,7 @@ data class OfferingEntity(
   var contactEmail: String,
   var secondaryContactEmail: String? = null,
   var withdrawn: Boolean = false,
+  var referable: Boolean = true,
 ) {
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")

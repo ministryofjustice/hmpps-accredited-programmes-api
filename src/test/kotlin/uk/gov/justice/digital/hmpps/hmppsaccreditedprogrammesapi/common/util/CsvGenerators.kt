@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Prere
 
 const val COURSES_PREFIX = "name,identifier,description,audience,referable,alternateName,comments\n"
 const val PREREQUISITES_PREFIX = "name,description,course,identifier,comments,,,,\n"
-const val OFFERINGS_PREFIX = "course,identifier,organisation,contact email,secondary contact email,prisonId\n"
+const val OFFERINGS_PREFIX = "course,identifier,organisation,contact email,secondary contact email,prisonId,referable\n"
 
 fun generateCourseRecords(count: Int): List<CourseRecord> {
   return (1..count).map {
@@ -44,6 +44,7 @@ fun generateOfferingRecords(count: Int): List<OfferingRecord> {
       contactEmail = "email-$it@example.com",
       secondaryContactEmail = "secondaryEmail-$it@example.com",
       prisonId = "PrisonID-$it",
+      referable = true,
     )
   }
 }
@@ -76,7 +77,7 @@ fun List<OfferingRecord>.toOfferingCsv(): String = if (isEmpty()) {
   joinToString(
     prefix = OFFERINGS_PREFIX,
     separator = "\n",
-    transform = { """"${it.course}","${it.identifier}","${it.organisation}","${it.contactEmail}",${it.secondaryContactEmail?.let { secondaryContactEmail -> "\"$secondaryContactEmail\"" } ?: ""},${it.prisonId}""" },
+    transform = { """"${it.course}","${it.identifier}","${it.organisation}","${it.contactEmail}",${it.secondaryContactEmail?.let { secondaryContactEmail -> "\"$secondaryContactEmail\"" } ?: ""},${it.prisonId},${it.referable}""" },
     postfix = "\n",
   )
 }

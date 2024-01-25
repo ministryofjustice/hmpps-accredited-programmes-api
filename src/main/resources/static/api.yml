@@ -1065,6 +1065,7 @@ components:
         referable:
           type: boolean
           default: true
+          deprecated: true
       required:
         - id
         - name
@@ -1092,6 +1093,7 @@ components:
         referable:
           type: boolean
           default: true
+          deprecated: true
       required:
         - name
         - identifier
@@ -1163,10 +1165,14 @@ components:
           format: email
           example: "ap-admin-2@digital.justice.gov.uk"
           description: "An optional secondary email address of a contact for this offering."
+        referable:
+          type: boolean
+          default: true
       required:
         - id
         - organisationId
         - contactEmail
+        - referable
 
     OfferingRecord:
       type: object
@@ -1196,10 +1202,14 @@ components:
           type: string
           example: "MDI"
           description: "The prison id for the prison associated with this Offering. This is usually three capital letters."
+        referable:
+          type: boolean
+          default: true
       required:
         - course
         - prisonId
         - identifier
+        - referable
 
     CourseAudience:
       type: object

@@ -45,6 +45,7 @@ fun OfferingEntity.toApi(): CourseOffering = CourseOffering(
   organisationId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
+  referable = referable,
 )
 
 fun OfferingEntity.toOfferingRecord() = OfferingRecord(
@@ -53,6 +54,7 @@ fun OfferingEntity.toOfferingRecord() = OfferingRecord(
   prisonId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
+  referable = referable,
 )
 
 fun AudienceEntity.toApi(): CourseAudience = CourseAudience(
@@ -75,6 +77,7 @@ fun OfferingRecord.toDomain(): OfferingUpdate = OfferingUpdate(
   contactEmail = contactEmail?.trim(),
   // The controller treats an absent value as an empty string. The Domain expects an absent value to be null.
   secondaryContactEmail = secondaryContactEmail?.let { it.trim().ifEmpty { null } },
+  referable = referable,
 )
 
 fun PrerequisiteRecord.toDomain(): NewPrerequisite = NewPrerequisite(

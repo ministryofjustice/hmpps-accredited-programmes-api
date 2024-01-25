@@ -5,4 +5,5 @@ data class OfferingUpdate(
   val identifier: String,
   val contactEmail: String? = null,
   val secondaryContactEmail: String? = null,
+  val referable: Boolean = true,
 )
