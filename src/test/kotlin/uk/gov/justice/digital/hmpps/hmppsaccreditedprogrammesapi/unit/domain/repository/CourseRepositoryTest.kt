@@ -103,6 +103,7 @@ class CourseRepositoryTest {
     val audiences = listOf(
       AudienceEntityFactory().withValue("Male").produce(),
       AudienceEntityFactory().withValue("Female").produce(),
+      AudienceEntityFactory().withValue("Other").produce(),
     )
 
     courses.forEach(entityManager::merge)
@@ -112,7 +113,12 @@ class CourseRepositoryTest {
     courses[1].audiences.addAll(audiences)
     courses[2].audiences.add(audiences[1])
 
+    courses[0].audience = audiences[0]
+    courses[1].audience = audiences[1]
+    courses[2].audience = audiences[2]
+
     val persistedCourses = entityManager.createQuery("SELECT c FROM CourseEntity c", CourseEntity::class.java).resultList
     persistedCourses.forEach { it.audiences.shouldNotBeNull() }
+    persistedCourses.forEach { it.audience.shouldNotBeNull() }
   }
 }

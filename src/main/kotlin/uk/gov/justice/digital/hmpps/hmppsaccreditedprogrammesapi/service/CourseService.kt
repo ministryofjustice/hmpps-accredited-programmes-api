@@ -63,6 +63,7 @@ constructor(
           alternateName = update.alternateName,
           audiences = audienceStrings(update.audience).mapNotNull { audienceName -> allAudiences[audienceName] }
             .toMutableSet(),
+          audience = allAudiences[update.audience]!!,
           referable = update.referable,
         )
       }
@@ -92,6 +93,7 @@ constructor(
           val audiencesToRemove = audiencesByValue.keys - expectedAudienceStrings
           audiences.addAll(audiencesToAdd.mapNotNull { allAudiences[it] })
           audiences.removeAll(audiencesToRemove.mapNotNull { allAudiences[it] }.toSet())
+          audience = allAudiences[update.audience]!!
         }
       }
     }
@@ -108,9 +110,9 @@ constructor(
 
   private fun updateAudiences(courseUpdates: List<CourseUpdate>) {
     val newAudiencesFromCourseUpdate = courseUpdates.flatMap { audienceStrings(it.audience) }.toSet()
-    val currentAudiences = audienceRepository.findAll().map { it.value }.toSet()
+    val allAudiences = audienceRepository.findAll().map { it.value }.toSet()
 
-    val audienceValuesToSave = newAudiencesFromCourseUpdate - currentAudiences
+    val audienceValuesToSave = newAudiencesFromCourseUpdate - allAudiences
     val audiencesToSave = audienceValuesToSave.map { AudienceEntity(value = it) }.toSet()
 
     audienceRepository.saveAll(audiencesToSave)

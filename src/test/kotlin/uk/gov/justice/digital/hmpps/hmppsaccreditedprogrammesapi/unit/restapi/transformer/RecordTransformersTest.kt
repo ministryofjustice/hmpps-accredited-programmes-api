@@ -24,6 +24,7 @@ class RecordTransformersTest {
     val entity = CourseEntityFactory()
       .withPrerequisites(prerequisites)
       .withAudiences(audiences)
+      .withAudience(a3)
       .produce()
 
     with(entity.toApi()) {
@@ -32,6 +33,7 @@ class RecordTransformersTest {
         CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
       )
       audiences.map { it.value } shouldContainExactlyInAnyOrder listOf("C", "B", "A")
+      audience?.value shouldBe "C"
     }
   }
 

@@ -22,6 +22,7 @@ fun CourseEntity.toApi(): Course = Course(
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
   audiences = audiences.map(AudienceEntity::toApi),
+  audience = audience.toApi(),
   referable = referable,
 )
 

@@ -74,6 +74,7 @@ class CourseServiceTest {
       val cu1 = CourseUpdateFactory().withIdentifier("C1").withAudience("A1").produce()
       courseService.updateCourses(listOf(cu1))
 
+      courses[0].audience shouldBe a1
       courses[0].audiences shouldContainExactly audiences
     }
 
@@ -83,7 +84,8 @@ class CourseServiceTest {
       val audiences = mutableListOf(a1)
       every { audienceRepository.findAll() } returns audiences
 
-      val c1 = CourseEntityFactory().withIdentifier("C1").withAudiences(mutableSetOf(a1)).produce()
+      val c1 = CourseEntityFactory().withIdentifier("C1").withAudiences(mutableSetOf(a1))
+        .withAudience(a1).produce()
       val courses = mutableListOf(c1)
       every { courseRepository.findAll() } returns courses
 
@@ -91,6 +93,7 @@ class CourseServiceTest {
       val courseUpdates = listOf(cu1)
 
       courseService.updateCourses(courseUpdates)
+      verify { audienceRepository.save<AudienceEntity>(match { it.value == "A2" }) }
       verify { audienceRepository.saveAll<AudienceEntity>(match { it.any { audience -> audience.value == "A2" } }) }
     }
 

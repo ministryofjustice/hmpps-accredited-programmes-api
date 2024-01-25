@@ -220,7 +220,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         ReferralSummary(
           id = createdReferral.id,
           courseName = getCourseById(courseId).name,
-          audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+          audiences = listOfNotNull(getCourseById(courseId).audience?.value).sorted(),
           status = createdReferral.status,
           submittedOn = createdReferral.submittedOn,
           prisonNumber = createdReferral.prisonNumber,
@@ -236,7 +236,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       }
     }
   }
-
   private fun mockPrisonerSearchResponse(prisoners: List<Prisoner>) =
     wiremockServer.stubFor(
       WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers"))
@@ -292,13 +291,13 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val secondReferralStatus = secondCreatedReferral.status.toDomain().name
 
     val statusFilter = listOf(firstReferralStatus, secondReferralStatus)
-    val audienceFilter = getCourseById(courseId).audiences.map { it.value }.first()
+    val audienceFilter = getCourseById(courseId).audience?.value
     val summary = getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter)
 
     val expectedFirstSummary = ReferralSummary(
       id = firstCreatedReferral.id,
       courseName = getCourseById(courseId).name,
-      audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+      audiences = listOfNotNull(getCourseById(courseId).audience?.value).sorted(),
       status = firstCreatedReferral.status,
       submittedOn = firstCreatedReferral.submittedOn,
       prisonNumber = firstCreatedReferral.prisonNumber,
@@ -308,7 +307,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val expectedSecondSummary = ReferralSummary(
       id = secondCreatedReferral.id,
       courseName = getCourseById(courseId).name,
-      audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+      audiences = listOfNotNull(getCourseById(courseId).audience?.value).sorted(),
       status = secondCreatedReferral.status,
       submittedOn = secondCreatedReferral.submittedOn,
       prisonNumber = secondCreatedReferral.prisonNumber,

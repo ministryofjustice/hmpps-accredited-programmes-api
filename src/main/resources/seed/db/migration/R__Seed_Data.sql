@@ -20,6 +20,7 @@ VALUES ('3feba9e7-a716-4a3d-9d7b-258171ba1166', 'Indigo Course', 'IC0', 'Alo ver
        ('72e4d75f-32a3-4de4-b354-561f98fbf161', 'Blue Course', 'BC7', 'Perspiciatis sperno aequitas contigo vicinus suscipit adimpleo vulnero. Vulgo summopere hic aqua amplus umquam tres. Eligendi certe minus ater desidero. Tamquam caelum decipio asper creptio attonbitus videlicet suadeo. Adstringo ullus tergo asperiores. Alveus antea ascisco vulgaris error beatae corporis deprecator.', 'BC', true),
        ('a4cebc23-9298-47cd-b91f-242f2b7cfce4', 'Yellow Course', 'YC8', 'Admiratio ea aetas confugo. Succedo sui quam pecco acquiro. Studio anser minima commemoro apto damno consectetur quibusdam ater tego. Sol numquam barba attero adopto tabernus. Cunae iure corpus bibo tempore celer combibo.', 'YC', false),
        ('a9b9572f-2e90-47e8-ab09-9d112bfa6db3', 'Teal Course', 'TC9', 'Ipsam annus tot aiunt casus labore argentum abstergo. Vacuus accusator calamitas hic. Adsum sordeo voluptates cruentus talis amita damnatio labore brevis voluptatum.', 'TC', false);
+       ('a9b9572f-2e90-47e8-ab09-9d112bfa6db4', 'Teal Course', 'TC9', 'Ipsam annus tot aiunt casus labore argentum abstergo. Vacuus accusator calamitas hic. Adsum sordeo voluptates cruentus talis amita damnatio labore brevis voluptatum.', 'TC', false);
 
 INSERT INTO prerequisite(course_id, name, description)
 VALUES ('3feba9e7-a716-4a3d-9d7b-258171ba1166', 'Setting', 'Custody'),
@@ -71,7 +72,8 @@ VALUES ('3feba9e7-a716-4a3d-9d7b-258171ba1166', '83c404c7-4dbc-4193-aa1f-75d393e
        ('5148cfcd-0daf-45e4-a560-4d899409944a', '4344a2ec-3cff-44c6-9cbf-cd703871965c'),
        ('72e4d75f-32a3-4de4-b354-561f98fbf161', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
        ('a4cebc23-9298-47cd-b91f-242f2b7cfce4', '1c2ea59d-26e8-45ec-9408-fa5a68c8277e'),
-       ('a9b9572f-2e90-47e8-ab09-9d112bfa6db3', '7da9bab6-a981-4ec7-8fd8-8f315b690622');
+       ('a9b9572f-2e90-47e8-ab09-9d112bfa6db3', '7da9bab6-a981-4ec7-8fd8-8f315b690622'),
+       ('a9b9572f-2e90-47e8-ab09-9d112bfa6db4', '7da9bab6-a981-4ec7-8fd8-8f315b690622');
 
 INSERT INTO offering(offering_id, course_id, organisation_id, contact_email, secondary_contact_email)
 VALUES ('d5b71397-50e4-471b-a25c-a92dcad20472', '77dbf5d0-4c86-434d-9d26-aff276447698', 'MRI', 'nobody-mri@digital.justice.gov.uk', null),

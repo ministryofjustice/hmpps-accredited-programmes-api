@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.SUBSELECT
@@ -51,6 +52,14 @@ data class CourseEntity(
     inverseJoinColumns = [JoinColumn(name = "audience_id")],
   )
   var audiences: MutableSet<AudienceEntity> = mutableSetOf(),
+
+  @OneToOne(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+  @JoinTable(
+    name = "course_audience",
+    joinColumns = [JoinColumn(name = "course_id")],
+    inverseJoinColumns = [JoinColumn(name = "audience_id")],
+  )
+  var audience: AudienceEntity,
   var withdrawn: Boolean = false,
 ) {
   fun addOffering(offering: OfferingEntity) {

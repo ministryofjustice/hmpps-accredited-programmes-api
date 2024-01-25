@@ -37,7 +37,7 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       FROM ReferralEntity r
       JOIN r.offering o
       JOIN o.course c
-      JOIN c.audiences a
+      JOIN c.audience a
       WHERE o.organisationId = :organisationId
         AND (:status IS NULL OR :status = '' OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR a.value = :audience)
@@ -67,7 +67,7 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       ) FROM ReferralEntity r
       JOIN r.offering o
       JOIN o.course c
-      JOIN c.audiences a
+      JOIN c.audience a
       JOIN r.referrer ru
       WHERE ru.username = :username
         AND (:status IS NULL OR r.status IN :status)
@@ -79,7 +79,7 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       FROM ReferralEntity r
       JOIN r.offering o
       JOIN o.course c
-      JOIN c.audiences a
+      JOIN c.audience a
       JOIN r.referrer ru
       WHERE ru.username = :username
         AND (:status IS NULL OR :status = '' OR r.status IN :status)
