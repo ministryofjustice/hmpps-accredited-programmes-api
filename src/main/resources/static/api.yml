@@ -1055,9 +1055,13 @@ components:
           items:
             $ref: '#/components/schemas/CoursePrerequisite'
         audiences:
+          deprecated: true
           type: array
           items:
             $ref: '#/components/schemas/CourseAudience'
+        audience:
+          type: string
+          example: 'Gang offence'
         referable:
           type: boolean
           default: true
@@ -1066,6 +1070,7 @@ components:
         - name
         - coursePrerequisites
         - audiences
+        - audience
         - referable
 
     CourseRecord:

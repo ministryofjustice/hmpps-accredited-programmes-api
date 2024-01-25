@@ -31,14 +31,15 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, referable: Boolean) {
-    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, referable) VALUES (:id, :identifier, :name, :description, :altName, :referable)")
+  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, referable: Boolean, audience: String = "Gang offence") {
+    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, referable, audience) VALUES (:id, :identifier, :name, :description, :altName, :referable, :audience)")
       .setParameter("id", courseId)
       .setParameter("identifier", identifier)
       .setParameter("name", name)
       .setParameter("description", description)
       .setParameter("altName", altName)
       .setParameter("referable", referable)
+      .setParameter("audience", audience)
       .executeUpdate()
   }
 

@@ -63,6 +63,7 @@ constructor(
           alternateName = update.alternateName,
           audiences = audienceStrings(update.audience).mapNotNull { audienceName -> allAudiences[audienceName] }
             .toMutableSet(),
+          audience = update.audience,
           referable = update.referable,
         )
       }

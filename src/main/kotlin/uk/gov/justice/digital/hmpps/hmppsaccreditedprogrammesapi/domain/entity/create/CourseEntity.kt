@@ -51,6 +51,7 @@ data class CourseEntity(
     inverseJoinColumns = [JoinColumn(name = "audience_id")],
   )
   var audiences: MutableSet<AudienceEntity> = mutableSetOf(),
+  var audience: String,
   var withdrawn: Boolean = false,
 ) {
   fun addOffering(offering: OfferingEntity) {
