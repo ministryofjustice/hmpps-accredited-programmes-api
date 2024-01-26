@@ -31,8 +31,6 @@ data class CourseEntity(
   var identifier: String,
   var description: String? = null,
   var alternateName: String? = null,
-  @Deprecated("Referrals are now made to specific offerings of a course, not the course itself")
-  var referable: Boolean = true,
 
   @ElementCollection(fetch = FetchType.EAGER)
   @Fetch(SUBSELECT)

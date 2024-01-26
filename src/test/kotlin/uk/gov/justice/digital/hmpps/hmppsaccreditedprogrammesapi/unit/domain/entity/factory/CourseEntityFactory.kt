@@ -19,7 +19,6 @@ class CourseEntityFactory : Factory<CourseEntity> {
   private var identifier: Yielded<String> = { randomUppercaseString() }
   private var description: Yielded<String?> = { null }
   private var alternateName: Yielded<String?> = { null }
-  private var referable: Yielded<Boolean> = { true }
   private var prerequisites: Yielded<MutableSet<PrerequisiteEntity>> = { mutableSetOf() }
   private var offerings: Yielded<MutableSet<OfferingEntity>> = { mutableSetOf() }
   private var audiences: Yielded<MutableSet<AudienceEntity>> = { mutableSetOf() }
@@ -68,7 +67,6 @@ class CourseEntityFactory : Factory<CourseEntity> {
     identifier = this.identifier(),
     description = this.description(),
     alternateName = this.alternateName(),
-    referable = this.referable(),
     prerequisites = this.prerequisites(),
     offerings = this.offerings(),
     audiences = this.audiences(),
@@ -83,7 +81,6 @@ class CourseUpdateFactory : Factory<CourseUpdate> {
   private var description: Yielded<String> = { randomSentence() }
   private var audience: Yielded<String> = { randomUppercaseString() }
   private var alternateName: Yielded<String?> = { null }
-  private var referable: Yielded<Boolean> = { true }
 
   fun withIdentifier(identifier: String) = apply {
     this.identifier = { identifier }
@@ -99,7 +96,6 @@ class CourseUpdateFactory : Factory<CourseUpdate> {
     identifier = this.identifier(),
     audience = this.audience(),
     alternateName = this.alternateName(),
-    referable = this.referable(),
   )
 }
 
