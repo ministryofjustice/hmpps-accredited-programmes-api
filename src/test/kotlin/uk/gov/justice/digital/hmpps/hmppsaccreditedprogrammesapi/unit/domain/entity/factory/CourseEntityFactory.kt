@@ -5,7 +5,6 @@ import io.github.bluegroundltd.kfactory.Yielded
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomLowercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomSentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
@@ -22,7 +21,6 @@ class CourseEntityFactory : Factory<CourseEntity> {
   private var referable: Yielded<Boolean> = { true }
   private var prerequisites: Yielded<MutableSet<PrerequisiteEntity>> = { mutableSetOf() }
   private var offerings: Yielded<MutableSet<OfferingEntity>> = { mutableSetOf() }
-  private var audiences: Yielded<MutableSet<AudienceEntity>> = { mutableSetOf() }
   private var audience: Yielded<String> = { randomUppercaseString() }
   private var withdrawn: Yielded<Boolean> = { false }
 
@@ -54,10 +52,6 @@ class CourseEntityFactory : Factory<CourseEntity> {
     this.offerings = { offerings }
   }
 
-  fun withAudiences(audienceEntities: MutableSet<AudienceEntity>) = apply {
-    this.audiences = { audienceEntities }
-  }
-
   fun withWithdrawn(withdrawn: Boolean) = apply {
     this.withdrawn = { withdrawn }
   }
@@ -71,7 +65,6 @@ class CourseEntityFactory : Factory<CourseEntity> {
     referable = this.referable(),
     prerequisites = this.prerequisites(),
     offerings = this.offerings(),
-    audiences = this.audiences(),
     audience = this.audience(),
     withdrawn = this.withdrawn(),
   )

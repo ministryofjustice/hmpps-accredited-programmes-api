@@ -1,13 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseAudience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
@@ -21,7 +19,6 @@ fun CourseEntity.toApi(): Course = Course(
   description = description,
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
-  audiences = audiences.map(AudienceEntity::toApi),
   audience = audience,
   referable = referable,
 )
@@ -55,11 +52,6 @@ fun OfferingEntity.toOfferingRecord() = OfferingRecord(
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
   referable = referable,
-)
-
-fun AudienceEntity.toApi(): CourseAudience = CourseAudience(
-  id = id!!,
-  value = value,
 )
 
 fun CourseRecord.toDomain(): CourseUpdate = CourseUpdate(

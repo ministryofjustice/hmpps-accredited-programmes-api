@@ -18,14 +18,11 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AudienceRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AudienceEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseUpdateFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.NewPrerequisiteFactory
@@ -42,105 +39,25 @@ class CourseServiceTest {
   @MockK(relaxed = true)
   private lateinit var offeringRepository: OfferingRepository
 
-  @MockK(relaxed = true)
-  private lateinit var audienceRepository: AudienceRepository
-
   private lateinit var courseService: CourseService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    courseService = CourseService(courseRepository, offeringRepository, audienceRepository)
+    courseService = CourseService(courseRepository, offeringRepository)
   }
 
   @Nested
   @DisplayName("Update Courses")
   inner class UpdateCoursesTests {
-    @Test
-    fun `updateCourses with an empty list clears the audience repository`() {
-      courseService.updateCourses(emptyList())
-      verify { audienceRepository.saveAll(emptySet()) }
-    }
-
-    @Test
-    fun `updateCourses with an existing audience value should add the audience to the course`() {
-      val a1 = AudienceEntityFactory().withValue("A1").produce()
-      val audiences = listOf(a1)
-      every { audienceRepository.findAll() } returns audiences
-      val c1 = CourseEntityFactory().withIdentifier("C1").produce()
-      val courses = listOf(c1)
-      every { courseRepository.findAll() } returns courses
-
-      val cu1 = CourseUpdateFactory().withIdentifier("C1").withAudience("A1").produce()
-      courseService.updateCourses(listOf(cu1))
-
-      courses[0].audiences shouldContainExactly audiences
-    }
-
-    @Test
-    fun `updateCourses containing an additional audience value should persist the new audience`() {
-      val a1 = AudienceEntityFactory().withValue("A1").produce()
-      val audiences = mutableListOf(a1)
-      every { audienceRepository.findAll() } returns audiences
-
-      val c1 = CourseEntityFactory().withIdentifier("C1").withAudiences(mutableSetOf(a1)).produce()
-      val courses = mutableListOf(c1)
-      every { courseRepository.findAll() } returns courses
-
-      val cu1 = CourseUpdateFactory().withIdentifier("C1").withAudience("A1,A2").produce()
-      val courseUpdates = listOf(cu1)
-
-      courseService.updateCourses(courseUpdates)
-      verify { audienceRepository.saveAll<AudienceEntity>(match { it.any { audience -> audience.value == "A2" } }) }
-    }
 
     @Test
     fun `updateCourses with one valid CourseEntity object clears and persists to the repository`() {
-      val a1 = AudienceEntityFactory().withValue("A1").produce()
-      val audiences = listOf(a1)
-      every { audienceRepository.findAll() } returns audiences
-
       val cu1 = CourseUpdateFactory().withIdentifier("C1").withAudience("A1").produce()
       val courseUpdates = listOf(cu1)
 
       courseService.updateCourses(courseUpdates)
       verify { courseRepository.saveAll<CourseEntity>(match { it.any { course -> course.identifier == "C1" } }) }
-    }
-
-    @Test
-    fun `updateCourses with two valid CourseEntity objects clears and persists to the repository`() {
-      val a1 = AudienceEntityFactory().withValue("A1").produce()
-      val a2 = AudienceEntityFactory().withValue("A2").produce()
-      val a3 = AudienceEntityFactory().withValue("A3").produce()
-      val audiences = listOf(a1, a2, a3)
-      every { audienceRepository.findAll() } returns audiences
-
-      val cu1 = CourseUpdateFactory().withIdentifier("C1").withAudience("A1, A2").produce()
-      val cu2 = CourseUpdateFactory().withIdentifier("C2").withAudience("A1, A3").produce()
-      val courseUpdates = listOf(cu1, cu2)
-
-      courseService.updateCourses(courseUpdates)
-      verify { courseRepository.saveAll<CourseEntity>(match { it.any { course -> course.identifier == "C1" } }) }
-      verify { courseRepository.saveAll<CourseEntity>(match { it.any { course -> course.identifier == "C2" } }) }
-    }
-
-    @Test
-    fun `updateCourses with duplicate AudienceEntity values only persists unique values to the repository`() {
-      every { audienceRepository.findAll() } returns listOf()
-
-      val a1 = AudienceEntityFactory().withValue("A1").produce()
-      val a2 = AudienceEntityFactory().withValue("A2").produce()
-      val a3 = AudienceEntityFactory().withValue("A3").produce()
-      val audienceValues = listOf(a1.value, a2.value, a3.value)
-
-      val cu1 = CourseUpdateFactory().withIdentifier("C1").withAudience("A1, A2").produce()
-      val cu2 = CourseUpdateFactory().withIdentifier("C2").withAudience("A1, A3").produce()
-      val cu3 = CourseUpdateFactory().withIdentifier("C3").withAudience("A1").produce()
-      val cu4 = CourseUpdateFactory().withIdentifier("C4").withAudience("A1").produce()
-      val courseUpdates = listOf(cu1, cu2, cu3, cu4)
-
-      courseService.updateCourses(courseUpdates)
-      verify { audienceRepository.saveAll<AudienceEntity>(match { list -> list.all { it.value in audienceValues } && list.distinctBy { it.value }.size == list.count() }) }
     }
   }
 

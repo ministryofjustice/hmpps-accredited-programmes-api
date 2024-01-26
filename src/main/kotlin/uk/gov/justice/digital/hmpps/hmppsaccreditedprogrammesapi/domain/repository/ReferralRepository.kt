@@ -16,7 +16,7 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       SELECT NEW uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection(
         r.id AS referralId,
         c.name AS courseName, 
-        a.value as audience,
+        c.audience AS audience, 
         r.status AS status,
         r.submittedOn AS submittedOn,
         r.prisonNumber AS prisonNumber,
@@ -25,11 +25,10 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       ) FROM ReferralEntity r
       JOIN r.offering o
       JOIN o.course c
-      JOIN c.audiences a
       JOIN r.referrer ru
       WHERE o.organisationId = :organisationId
         AND (:status IS NULL OR r.status IN :status)
-        AND (:audience IS NULL OR :audience = '' OR a.value = :audience)
+        AND (:audience IS NULL OR :audience = '' OR c.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :courseName, '%')))
     """,
     countQuery = """
@@ -37,10 +36,9 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       FROM ReferralEntity r
       JOIN r.offering o
       JOIN o.course c
-      JOIN c.audiences a
       WHERE o.organisationId = :organisationId
         AND (:status IS NULL OR :status = '' OR r.status IN :status)
-        AND (:audience IS NULL OR :audience = '' OR a.value = :audience)
+        AND (:audience IS NULL OR :audience = '' OR c.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :courseName, '%')))
      """,
     nativeQuery = false,
@@ -58,7 +56,7 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       SELECT NEW uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection(
         r.id AS referralId,
         c.name AS courseName, 
-        a.value as audience,
+        c.audience as audience,
         r.status AS status,
         r.submittedOn AS submittedOn,
         r.prisonNumber AS prisonNumber,
@@ -67,11 +65,10 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       ) FROM ReferralEntity r
       JOIN r.offering o
       JOIN o.course c
-      JOIN c.audiences a
       JOIN r.referrer ru
       WHERE ru.username = :username
         AND (:status IS NULL OR r.status IN :status)
-        AND (:audience IS NULL OR :audience = '' OR a.value = :audience)
+        AND (:audience IS NULL OR :audience = '' OR c.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :courseName, '%')))
     """,
     countQuery = """
@@ -79,11 +76,10 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
       FROM ReferralEntity r
       JOIN r.offering o
       JOIN o.course c
-      JOIN c.audiences a
       JOIN r.referrer ru
       WHERE ru.username = :username
         AND (:status IS NULL OR :status = '' OR r.status IN :status)
-        AND (:audience IS NULL OR :audience = '' OR a.value = :audience)
+        AND (:audience IS NULL OR :audience = '' OR c.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :courseName, '%')))
     """,
     nativeQuery = false,

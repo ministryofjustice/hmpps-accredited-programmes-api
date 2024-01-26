@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -45,9 +44,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun setUp() {
     persistenceHelper.clearAllTableContent()
 
-    persistenceHelper.createAudience(UUID.fromString("1f7fdb91-49b3-4eae-9815-dbf30ddd30a0"), "General offence")
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", true, "General offence")
-    persistenceHelper.createCourseAudience(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), UUID.fromString("1f7fdb91-49b3-4eae-9815-dbf30ddd30a0"))
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk")
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk")
 
@@ -212,7 +209,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     createdReferral.shouldNotBeNull()
 
     val statusFilter = listOf(createdReferral.status.toDomain().name)
-    val audienceFilter = getCourseById(courseId).audiences.map { it.value }.first()
+    val audienceFilter = getCourseById(courseId).audience
     val summary = getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter)
 
     summary.content?.forEach { actualSummary ->
@@ -221,7 +218,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           id = createdReferral.id,
           courseName = getCourseById(courseId).name,
           audience = getCourseById(courseId).audience,
-          audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
           status = createdReferral.status,
           submittedOn = createdReferral.submittedOn,
           prisonNumber = createdReferral.prisonNumber,
@@ -230,7 +226,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       ).forEach { expectedSummary ->
         actualSummary.id shouldBe expectedSummary.id
         actualSummary.courseName shouldBe expectedSummary.courseName
-        actualSummary.audiences shouldContainExactlyInAnyOrder expectedSummary.audiences
+        actualSummary.audience shouldBe expectedSummary.audience
         actualSummary.audience shouldBe expectedSummary.audience
         actualSummary.status shouldBe expectedSummary.status
         actualSummary.submittedOn shouldBe expectedSummary.submittedOn
@@ -294,13 +290,12 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val secondReferralStatus = secondCreatedReferral.status.toDomain().name
 
     val statusFilter = listOf(firstReferralStatus, secondReferralStatus)
-    val audienceFilter = getCourseById(courseId).audiences.map { it.value }.first()
+    val audienceFilter = getCourseById(courseId).audience
     val summary = getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter)
 
     val expectedFirstSummary = ReferralSummary(
       id = firstCreatedReferral.id,
       courseName = getCourseById(courseId).name,
-      audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
       audience = getCourseById(courseId).audience,
       status = firstCreatedReferral.status,
       submittedOn = firstCreatedReferral.submittedOn,
@@ -311,7 +306,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val expectedSecondSummary = ReferralSummary(
       id = secondCreatedReferral.id,
       courseName = getCourseById(courseId).name,
-      audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
       audience = getCourseById(courseId).audience,
       status = secondCreatedReferral.status,
       submittedOn = secondCreatedReferral.submittedOn,
@@ -328,7 +322,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       actualSummary.id shouldBe expectedSummary.id
       actualSummary.courseName shouldBe expectedSummary.courseName
       actualSummary.audience shouldBe expectedSummary.audience
-      actualSummary.audiences shouldContainExactlyInAnyOrder expectedSummary.audiences
       actualSummary.status shouldBe expectedSummary.status
       actualSummary.submittedOn shouldBe expectedSummary.submittedOn
       actualSummary.prisonNumber shouldBe expectedSummary.prisonNumber

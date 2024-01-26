@@ -10,8 +10,6 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.JoinTable
-import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.hibernate.annotations.Fetch
@@ -44,14 +42,6 @@ data class CourseEntity(
   @Fetch(SUBSELECT)
   val offerings: MutableSet<OfferingEntity> = mutableSetOf(),
 
-  @ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-  @Fetch(SUBSELECT)
-  @JoinTable(
-    name = "course_audience",
-    joinColumns = [JoinColumn(name = "course_id")],
-    inverseJoinColumns = [JoinColumn(name = "audience_id")],
-  )
-  var audiences: MutableSet<AudienceEntity> = mutableSetOf(),
   var audience: String,
   var withdrawn: Boolean = false,
 ) {
