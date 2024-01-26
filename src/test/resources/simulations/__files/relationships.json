@@ -34,8 +34,8 @@
   "experienceOfChildhood": "0-No problems",
   "emotionalCongruence": "0-No problems",
   "SARA": {
-    "imminentRiskOfViolenceTowardsPartner": null,
-    "imminentRiskOfViolenceTowardsOthers": null
+    "imminentRiskOfViolenceTowardsPartner": "Low",
+    "imminentRiskOfViolenceTowardsOthers": "Low"
   },
   "assessor": {
     "name": "LevelTwo CentralSupport"

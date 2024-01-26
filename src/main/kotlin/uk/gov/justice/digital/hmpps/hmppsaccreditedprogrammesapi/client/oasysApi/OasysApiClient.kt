@@ -14,9 +14,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
 
 @Component
 class OasysApiClient(
@@ -27,6 +29,10 @@ class OasysApiClient(
 
   fun getAssessments(prisonerNumber: String) = getRequest<OasysAssessmentTimeline> {
     path = "/timeline/$prisonerNumber"
+  }
+
+  fun getOffendingInfo(assessmentPk: Long) = getRequest<OasysOffendingInfo> {
+    path = "/$assessmentPk/section/section1"
   }
 
   fun getOffenceDetail(assessmentPk: Long) = getRequest<OasysOffenceDetail> {
@@ -43,10 +49,6 @@ class OasysApiClient(
 
   fun getRelationships(assessmentPk: Long) = getRequest<OasysRelationships> {
     path = "/$assessmentPk/section/section6"
-  }
-
-  fun getRoshFull(assessmentPk: Long) = getRequest<OasysRoshFull> {
-    path = "/$assessmentPk/section/sectionroshfull"
   }
 
   fun getLifestyle(assessmentPk: Long) = getRequest<OasysLifestyle> {
@@ -67,5 +69,13 @@ class OasysApiClient(
 
   fun getHealth(assessmentPk: Long) = getRequest<OasysHealth> {
     path = "/$assessmentPk/section/section13"
+  }
+
+  fun getRoshFull(assessmentPk: Long) = getRequest<OasysRoshFull> {
+    path = "/$assessmentPk/section/sectionroshfull"
+  }
+
+  fun getRoshSummary(assessmentPk: Long) = getRequest<OasysRoshSummary> {
+    path = "/$assessmentPk/section/sectionroshsumm"
   }
 }

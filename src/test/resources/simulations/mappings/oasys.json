@@ -15,6 +15,19 @@
     },
     {
       "request": {
+        "urlPattern": "/assessments/2114584/section/section1",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "offending-info.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/assessments/2114584/section/section2",
         "method": "GET"
       },
@@ -141,6 +154,46 @@
           "Content-Type": "application/json"
         },
         "bodyFileName": "learning.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/assessments/2114584/section/sectionroshsumm",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "rosh-summary.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/risks/crn/X739590/predictors/all",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "arns-predictors.json"
+      }
+    }
+  ,
+    {
+      "request": {
+        "urlPattern": "/risks/crn/X739590/summary",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "arns-summary.json"
       }
     }
   ]

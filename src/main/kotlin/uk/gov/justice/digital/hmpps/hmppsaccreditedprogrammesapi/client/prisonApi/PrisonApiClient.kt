@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClientCache
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceAndOffenceDetails
 
 @Component
@@ -17,5 +18,9 @@ class PrisonApiClient(
 
   fun getSentencesAndOffencesByBookingId(bookingID: Int) = getRequest<List<SentenceAndOffenceDetails>> {
     path = "/api/offender-sentences/booking/$bookingID/sentences-and-offences"
+  }
+
+  fun getAlertsByPrisonNumber(prisonNumber: String) = getRequest<List<NomisAlert>> {
+    path = "/api/offenders/$prisonNumber/alerts/v2"
   }
 }
