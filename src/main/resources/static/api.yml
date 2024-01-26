@@ -1034,7 +1034,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 
-  /oasys/{prisonNumber}/risks:
+  /oasys/{prisonNumber}/risks-and-alerts:
     get:
       tags:
         - Oasys risks Details

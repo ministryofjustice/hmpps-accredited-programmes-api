@@ -251,7 +251,7 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
   fun getRisksByPrisonNumber(prisonNumber: String) =
     webTestClient
       .get()
-      .uri("/oasys/$prisonNumber/risks")
+      .uri("/oasys/$prisonNumber/risks-and-alerts")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
