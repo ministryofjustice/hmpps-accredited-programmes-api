@@ -1104,17 +1104,12 @@ components:
         audience:
           type: string
           example: 'Gang offence'
-        referable:
-          type: boolean
-          default: true
-          deprecated: true
       required:
         - id
         - name
         - coursePrerequisites
         - audiences
         - audience
-        - referable
 
     CourseRecord:
       title: 'CourseRecord'
@@ -1132,16 +1127,11 @@ components:
           type: string
         comments:
           type: string
-        referable:
-          type: boolean
-          default: true
-          deprecated: true
       required:
         - name
         - identifier
         - description
         - audience
-        - referable
 
     CoursePrerequisite:
       type: object
