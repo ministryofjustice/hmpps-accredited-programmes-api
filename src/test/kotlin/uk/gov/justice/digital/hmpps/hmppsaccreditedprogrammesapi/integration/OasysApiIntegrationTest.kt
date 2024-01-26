@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Alert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
@@ -18,9 +19,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifes
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -81,6 +85,40 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       victimOfPartnerFamily = true,
       perpOfPartnerOrFamily = true,
       relIssuesDetails = "Free text",
+    )
+  }
+
+  @Test
+  fun `Get risk information from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val risks = getRisksByPrisonNumber(prisonNumber)
+
+    risks.shouldNotBeNull()
+    risks shouldBeEqual Risks(
+      ogrsYear1 = BigDecimal(8),
+      ogrsYear2 = BigDecimal(15),
+      ogrsRisk = "LOW",
+      ovpYear1 = BigDecimal(8),
+      ovpYear2 = BigDecimal(15),
+      ovpRisk = "LOW",
+      rsrScore = BigDecimal(1.46).setScale(2, RoundingMode.HALF_UP),
+      rsrRisk = "LOW",
+      ospcScore = "Medium",
+      ospiScore = "Low",
+      overallRoshLevel = "MEDIUM",
+      riskPrisonersCustody = "Low",
+      riskStaffCustody = "Low",
+      riskKnownAdultCustody = "Low",
+      riskPublicCustody = "Low",
+      riskChildrenCustody = "Low",
+      riskStaffCommunity = "Low",
+      riskKnownAdultCommunity = "Low",
+      riskPublicCommunity = "Medium",
+      riskChildrenCommunity = "Low",
+      imminentRiskOfViolenceTowardsPartner = "Low",
+      imminentRiskOfViolenceTowardsOthers = "Low",
+      alerts = listOf(Alert(description = "Self Harm"), Alert(description = "Child Communication Measures")),
     )
   }
 
@@ -208,6 +246,17 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<Relationships>()
+      .returnResult().responseBody!!
+
+  fun getRisksByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/risks")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Risks>()
       .returnResult().responseBody!!
 
   fun getLifestyleByPrisonNumber(prisonNumber: String) =

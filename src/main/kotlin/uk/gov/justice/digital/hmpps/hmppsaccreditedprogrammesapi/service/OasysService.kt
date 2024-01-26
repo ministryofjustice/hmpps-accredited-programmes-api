@@ -10,9 +10,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifes
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.ArnsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
@@ -21,15 +25,24 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.learningNeeds
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 
 @Service
-class OasysService(val oasysApiClient: OasysApiClient) {
+class OasysService(
+  val oasysApiClient: OasysApiClient,
+  val arnsApiClient: ArnsApiClient,
+  val prisonApiClient: PrisonApiClient,
+) {
   fun getOffenceDetail(prisonNumber: String): OffenceDetail? {
     val oasysOffenceDetail = getAssessmentId(prisonNumber)?.let {
       getOffenceDetail(it)
@@ -133,6 +146,20 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     val oasysLearning = getLearning(assessmentId)
     val oasysAccommodation = getAccommodation(assessmentId)
     return learningNeeds(oasysAccommodation, oasysLearning)
+  }
+
+  fun getRisks(prisonNumber: String): Risks {
+    val assessmentId = getAssessmentId(prisonNumber)
+      ?: throw NotFoundException("No Risks information found for prison number $prisonNumber")
+
+    val oasysOffendingInfo = getOffendingInfo(assessmentId)
+    val oasysRelationships = getRelationships(assessmentId)
+    val oasysRoshSummary = getRoshSummary(assessmentId)
+    val oasysArnsSummary = oasysOffendingInfo?.crn?.let { getArnsSummary(it) }
+    val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { getArnsPredictorSummary(it) }
+    val activeAlerts = getActiveAlerts(prisonNumber)
+
+    return risks(oasysOffendingInfo, oasysRelationships, oasysRoshSummary, oasysArnsSummary, oasysArnsPredictor, activeAlerts)
   }
 
   fun getAssessmentId(prisonerNumber: String): Long? {
@@ -310,6 +337,83 @@ class OasysService(val oasysApiClient: OasysApiClient) {
     }
 
     return accommodation.entity
+  }
+
+  fun getOffendingInfo(assessmentId: Long): OasysOffendingInfo? {
+    val offendingInfo = when (val response = oasysApiClient.getOffendingInfo(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return offendingInfo.entity
+  }
+
+  fun getActiveAlerts(prisonNumber: String): List<NomisAlert>? {
+    val nomisAlerts = when (val response = prisonApiClient.getAlertsByPrisonNumber(prisonNumber)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+    return nomisAlerts.entity?.filter { it.active && !it.expired }?.sortedByDescending { it.dateCreated }
+  }
+
+  fun getRoshSummary(assessmentId: Long): OasysRoshSummary? {
+    val roshSummary = when (val response = oasysApiClient.getRoshSummary(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return roshSummary.entity
+  }
+
+  private fun getArnsSummary(crn: String): ArnsSummary? {
+    val arnsSummary = when (val response = arnsApiClient.getSummary(crn)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return arnsSummary.entity
+  }
+
+  private fun getArnsPredictorSummary(crn: String): ArnsScores? {
+    val arnsPredictors = when (val response = arnsApiClient.getPredictorsAll(crn)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+
+    return arnsPredictors.entity
+      ?.filter { it.assessmentStatus == "COMPLETE" }
+      ?.sortedByDescending { it.completedDate }
+      ?.firstOrNull()
   }
 
   companion object {

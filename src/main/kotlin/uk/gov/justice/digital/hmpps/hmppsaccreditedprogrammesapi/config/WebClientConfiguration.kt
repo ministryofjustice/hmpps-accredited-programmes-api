@@ -154,4 +154,34 @@ class WebClientConfiguration(
       .filter(oauth2Client)
       .build()
   }
+
+  @Bean(name = ["arnsApiWebClient"])
+  fun arnsApiWebClient(
+    clientRegistrations: ClientRegistrationRepository,
+    authorizedClients: OAuth2AuthorizedClientRepository,
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    @Value("\${services.arns-api.base-url}") arnsApiBaseUrl: String,
+  ): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+
+    oauth2Client.setDefaultClientRegistrationId("arns-api")
+
+    return WebClient.builder()
+      .baseUrl("$arnsApiBaseUrl")
+      .clientConnector(
+        ReactorClientHttpConnector(
+          HttpClient
+            .create()
+            .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
+        ),
+      )
+      .exchangeStrategies(
+        ExchangeStrategies.builder().codecs {
+          it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
+        }.build(),
+      )
+      .filter(oauth2Client)
+      .build()
+  }
 }

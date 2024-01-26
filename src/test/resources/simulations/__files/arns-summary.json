@@ -1,0 +1,28 @@
+{
+  "whoIsAtRisk": "test text",
+  "natureOfRisk": "test text",
+  "riskImminence": "test text",
+  "riskIncreaseFactors": "test text",
+  "riskMitigationFactors": "test text",
+  "riskInCommunity": {
+    "LOW": [
+      "Children",
+      "Known Adult",
+      "Staff"
+    ],
+    "MEDIUM": [
+      "Public"
+    ]
+  },
+  "riskInCustody": {
+    "LOW": [
+      "Children",
+      "Public",
+      "Known Adult",
+      "Staff",
+      "Prisoners"
+    ]
+  },
+  "assessedOn": "2024-01-22T12:16:44",
+  "overallRiskLevel": "MEDIUM"
+}

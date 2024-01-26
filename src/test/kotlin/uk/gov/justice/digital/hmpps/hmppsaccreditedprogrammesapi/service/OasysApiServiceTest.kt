@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.ArnsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
@@ -18,12 +19,15 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
 import java.time.LocalDateTime
 
 class OasysApiServiceTest {
 
   private val oasysApiClient = mockk<OasysApiClient>()
-  val service = OasysService(oasysApiClient)
+  private val arnsApiClient = mockk<ArnsApiClient>()
+  private val prisonApiClient = mockk<PrisonApiClient>()
+  val service = OasysService(oasysApiClient, arnsApiClient, prisonApiClient)
 
   @Test
   fun `should return assessmentId`() {
@@ -36,7 +40,8 @@ class OasysApiServiceTest {
       LocalDateTime.now().minusDays(1),
     )
     val assessment3 = Timeline(111111, "STARTED", "LAYER3", null)
-    val oasysAssessmentTimeline = OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
+    val oasysAssessmentTimeline =
+      OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
 
     every { oasysApiClient.getAssessments(any()) } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
 
@@ -79,6 +84,7 @@ class OasysApiServiceTest {
       "Yes",
       "Yes",
       "Free text",
+      null,
     )
 
     every { oasysApiClient.getRelationships(any()) } returns ClientResult.Success(

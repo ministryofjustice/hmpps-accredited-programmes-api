@@ -12,6 +12,7 @@ generic-service:
     SERVICES_PRISONER-SEARCH-API_BASE-URL: https://prisoner-search.prison.service.justice.gov.uk
     SERVICES_PRISON-REGISTER-API_BASE-URL: https://prison-register.hmpps.service.justice.gov.uk
     SERVICES_OASYS-API_BASE-URL: https://accredited-programmes-and-oasys.hmpps.service.justice.gov.uk/
+    SERVICES_ARNS-API_BASE-URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk/
     SENTRY_ENVIRONMENT: prod
 
   allowlist:

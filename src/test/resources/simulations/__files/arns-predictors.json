@@ -1,0 +1,96 @@
+[
+  {
+    "completedDate": "2024-01-24T14:52:18",
+    "assessmentStatus": "COMPLETE",
+    "groupReconvictionScore": {
+      "oneYear": 8,
+      "twoYears": 15,
+      "scoreLevel": "LOW"
+    },
+    "violencePredictorScore": {
+      "oneYear": 8,
+      "twoYears": 15,
+      "scoreLevel": "LOW"
+    },
+    "generalPredictorScore": {
+      "oneYear": 8,
+      "twoYears": 15,
+      "scoreLevel": "LOW"
+    },
+    "riskOfSeriousRecidivismScore": {
+      "percentageScore": 1.46,
+      "staticOrDynamic": "DYNAMIC",
+      "source": "OASYS",
+      "algorithmVersion": "4",
+      "scoreLevel": "LOW"
+    },
+    "sexualPredictorScore": {
+      "ospIndecentPercentageScore": 0.11,
+      "ospContactPercentageScore": 1.07,
+      "ospIndecentScoreLevel": "LOW",
+      "ospContactScoreLevel": "MEDIUM"
+    }
+  },
+  {
+    "completedDate": "2023-12-19T16:57:25",
+    "assessmentStatus": "COMPLETE",
+    "groupReconvictionScore": {
+      "oneYear": 45,
+      "twoYears": 63,
+      "scoreLevel": "MEDIUM"
+    },
+    "violencePredictorScore": {
+      "ovpStaticWeightedScore": 34,
+      "ovpDynamicWeightedScore": 12,
+      "ovpTotalWeightedScore": 46,
+      "oneYear": 23,
+      "twoYears": 36,
+      "ovpRisk": "MEDIUM"
+    },
+    "generalPredictorScore": {
+      "ogpStaticWeightedScore": 38,
+      "ogpDynamicWeightedScore": 7,
+      "ogpTotalWeightedScore": 45,
+      "ogp1Year": 29,
+      "ogp2Year": 42,
+      "ogpRisk": "MEDIUM"
+    },
+    "riskOfSeriousRecidivismScore": {
+      "percentageScore": 3.45,
+      "staticOrDynamic": "DYNAMIC",
+      "source": "OASYS",
+      "algorithmVersion": "4",
+      "scoreLevel": "MEDIUM"
+    },
+    "sexualPredictorScore": {
+      "ospIndecentPercentageScore": 0.11,
+      "ospContactPercentageScore": 2,
+      "ospIndecentScoreLevel": "LOW",
+      "ospContactScoreLevel": "HIGH"
+    }
+  },
+  {
+    "completedDate": "2024-01-22T12:16:44",
+    "assessmentStatus": "COMPLETE",
+    "groupReconvictionScore": {
+      "oneYear": 8,
+      "twoYears": 15,
+      "scoreLevel": "LOW"
+    },
+    "violencePredictorScore": {},
+    "generalPredictorScore": {},
+    "riskOfSeriousRecidivismScore": {
+      "percentageScore": 1.46,
+      "staticOrDynamic": "DYNAMIC",
+      "source": "OASYS",
+      "algorithmVersion": "4",
+      "scoreLevel": "LOW"
+    },
+    "sexualPredictorScore": {
+      "ospIndecentPercentageScore": 0.11,
+      "ospContactPercentageScore": 1.07,
+      "ospIndecentScoreLevel": "LOW",
+      "ospContactScoreLevel": "MEDIUM"
+    }
+  }
+]

@@ -1033,6 +1033,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+
+  /oasys/{prisonNumber}/risks:
+    get:
+      tags:
+        - Oasys risks Details
+      summary: Risks details as held by Oasys
+      operationId: getRisks
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Risks'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     Course:
@@ -1709,6 +1742,88 @@ components:
         basicSkillsScore:
           type: string
           example: 6
+
+    Risks:
+      type: object
+      properties:
+        ogrsYear1:
+          type: number
+          example: 45
+        ogrsYear2:
+          type: number
+          example: 65
+        ogrsRisk:
+          type: string
+          example: High
+        ovpYear1:
+          type: number
+          example: 23
+        ovpYear2:
+          type: number
+          example: 32
+        ovpRisk:
+          type: string
+          example: Medium
+        rsrScore:
+          type: number
+          example: 3.45
+        rsrRisk:
+          type: string
+          example: Medium
+        ospcScore:
+          type: string
+          example: Low
+        ospiScore:
+          type: string
+          example: High
+        overallRoshLevel:
+          type: string
+          example: Low
+        riskPrisonersCustody:
+          type: string
+          example: Medium
+        riskStaffCustody:
+          type: string
+          example: Medium
+        riskKnownAdultCustody:
+          type: string
+          example: Medium
+        riskPublicCustody:
+          type: string
+          example: Medium
+        riskChildrenCustody:
+          type: string
+          example: Medium
+        riskStaffCommunity:
+          type: string
+          example: Medium
+        riskKnownAdultCommunity:
+          type: string
+          example: Medium
+        riskPublicCommunity:
+          type: string
+          example: Medium
+        riskChildrenCommunity:
+          type: string
+          example: Medium
+        imminentRiskOfViolenceTowardsPartner:
+          type: string
+          example: Low
+        imminentRiskOfViolenceTowardsOthers:
+          type: string
+          example: Low
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alert'
+
+    Alert:
+      type: object
+      properties:
+        description:
+          type: string
+          example: Violence
+
 
 
 
