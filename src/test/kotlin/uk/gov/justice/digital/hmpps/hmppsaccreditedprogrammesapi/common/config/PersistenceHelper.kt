@@ -31,14 +31,13 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, referable: Boolean, audience: String = "Gang offence") {
-    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, referable, audience) VALUES (:id, :identifier, :name, :description, :altName, :referable, :audience)")
+  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String = "Gang offence") {
+    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience) VALUES (:id, :identifier, :name, :description, :altName, :audience)")
       .setParameter("id", courseId)
       .setParameter("identifier", identifier)
       .setParameter("name", name)
       .setParameter("description", description)
       .setParameter("altName", altName)
-      .setParameter("referable", referable)
       .setParameter("audience", audience)
       .executeUpdate()
   }
@@ -50,13 +49,14 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createOffering(offeringId: UUID, courseId: UUID, orgId: String, contactEmail: String, secondaryContactEmail: String) {
-    entityManager.createNativeQuery("INSERT INTO offering (offering_id, course_id, organisation_id, contact_email, secondary_contact_email) VALUES (:id, :courseId, :orgId, :contactEmail, :secondaryContactEmail)")
+  fun createOffering(offeringId: UUID, courseId: UUID, orgId: String, contactEmail: String, secondaryContactEmail: String, referable: Boolean) {
+    entityManager.createNativeQuery("INSERT INTO offering (offering_id, course_id, organisation_id, contact_email, secondary_contact_email, referable) VALUES (:id, :courseId, :orgId, :contactEmail, :secondaryContactEmail, :referable)")
       .setParameter("id", offeringId)
       .setParameter("courseId", courseId)
       .setParameter("orgId", orgId)
       .setParameter("contactEmail", contactEmail)
       .setParameter("secondaryContactEmail", secondaryContactEmail)
+      .setParameter("referable", referable)
       .executeUpdate()
   }
 
