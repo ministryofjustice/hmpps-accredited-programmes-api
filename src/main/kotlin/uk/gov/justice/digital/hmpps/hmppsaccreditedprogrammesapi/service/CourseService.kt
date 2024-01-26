@@ -64,7 +64,6 @@ constructor(
           audiences = audienceStrings(update.audience).mapNotNull { audienceName -> allAudiences[audienceName] }
             .toMutableSet(),
           audience = update.audience,
-          referable = update.referable,
         )
       }
     }
@@ -86,7 +85,6 @@ constructor(
           name = update.name
           description = update.description
           alternateName = update.alternateName
-          referable = update.referable
 
           val audiencesByValue = audiences.associateBy(AudienceEntity::value)
           val audiencesToAdd = expectedAudienceStrings - audiencesByValue.keys
