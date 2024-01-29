@@ -127,13 +127,13 @@ fun risks(
 ) = Risks(
   ogrsYear1 = oasysArnsPredictor?.groupReconvictionScore?.oneYear,
   ogrsYear2 = oasysArnsPredictor?.groupReconvictionScore?.twoYears,
-  ogrsRisk = oasysArnsPredictor?.groupReconvictionScore?.scoreLevel,
+  ogrsRisk = oasysArnsPredictor?.groupReconvictionScore?.scoreLevel?.fixCase(),
 
   ovpYear1 = oasysArnsPredictor?.violencePredictorScore?.oneYear,
   ovpYear2 = oasysArnsPredictor?.violencePredictorScore?.twoYears,
-  ovpRisk = oasysArnsPredictor?.violencePredictorScore?.scoreLevel,
+  ovpRisk = oasysArnsPredictor?.violencePredictorScore?.ovpRisk?.fixCase(),
   rsrScore = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore,
-  rsrRisk = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.scoreLevel,
+  rsrRisk = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.scoreLevel?.fixCase(),
 
   ospcScore = oasysOffendingInfo?.ospCRisk,
   ospiScore = oasysOffendingInfo?.ospIRisk,
@@ -151,9 +151,11 @@ fun risks(
   imminentRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
   imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
 
-  overallRoshLevel = oasysArnsSummary?.overallRiskLevel,
+  overallRoshLevel = oasysArnsSummary?.overallRiskLevel?.fixCase(),
   alerts = activeAlerts?.map { Alert(it.alertTypeDescription) },
 )
+
+fun String.fixCase(): String = this.lowercase().replaceFirstChar(Char::titlecase)
 
 enum class WhatOccurred(val desc: String) {
   TARGETING("Were there any direct victim(s) eg contact targeting"),

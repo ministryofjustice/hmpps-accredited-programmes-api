@@ -98,26 +98,26 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
     risks shouldBeEqual Risks(
       ogrsYear1 = BigDecimal(8),
       ogrsYear2 = BigDecimal(15),
-      ogrsRisk = "LOW",
+      ogrsRisk = LOW,
       ovpYear1 = BigDecimal(8),
       ovpYear2 = BigDecimal(15),
-      ovpRisk = "LOW",
+      ovpRisk = MEDIUM,
       rsrScore = BigDecimal(1.46).setScale(2, RoundingMode.HALF_UP),
-      rsrRisk = "LOW",
-      ospcScore = "Medium",
-      ospiScore = "Low",
-      overallRoshLevel = "MEDIUM",
-      riskPrisonersCustody = "Low",
-      riskStaffCustody = "Low",
-      riskKnownAdultCustody = "Low",
-      riskPublicCustody = "Low",
-      riskChildrenCustody = "Low",
-      riskStaffCommunity = "Low",
-      riskKnownAdultCommunity = "Low",
-      riskPublicCommunity = "Medium",
-      riskChildrenCommunity = "Low",
-      imminentRiskOfViolenceTowardsPartner = "Low",
-      imminentRiskOfViolenceTowardsOthers = "Low",
+      rsrRisk = LOW,
+      ospcScore = MEDIUM,
+      ospiScore = LOW,
+      overallRoshLevel = MEDIUM,
+      riskPrisonersCustody = LOW,
+      riskStaffCustody = LOW,
+      riskKnownAdultCustody = LOW,
+      riskPublicCustody = LOW,
+      riskChildrenCustody = LOW,
+      riskStaffCommunity = LOW,
+      riskKnownAdultCommunity = LOW,
+      riskPublicCommunity = MEDIUM,
+      riskChildrenCommunity = LOW,
+      imminentRiskOfViolenceTowardsPartner = HIGH,
+      imminentRiskOfViolenceTowardsOthers = HIGH,
       alerts = listOf(Alert(description = "Self Harm"), Alert(description = "Child Communication Measures")),
     )
   }
@@ -346,4 +346,10 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       .expectStatus().is4xxClientError
       .expectBody<ErrorResponse>()
       .returnResult().responseBody!!
+
+  companion object {
+    private const val LOW = "Low"
+    private const val MEDIUM = "Medium"
+    private const val HIGH = "High"
+  }
 }
