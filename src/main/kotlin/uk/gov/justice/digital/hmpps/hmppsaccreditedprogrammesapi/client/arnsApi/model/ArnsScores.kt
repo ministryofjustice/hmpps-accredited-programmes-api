@@ -9,7 +9,7 @@ data class ArnsScores(
   val completedDate: LocalDateTime? = null,
   val assessmentStatus: String? = null,
   val groupReconvictionScore: Score? = null,
-  val violencePredictorScore: Score? = null,
+  val violencePredictorScore: OvpScore? = null,
   val generalPredictorScore: Score? = null,
   val riskOfSeriousRecidivismScore: RsrScore? = null,
 )
@@ -19,6 +19,13 @@ class Score(
   val oneYear: BigDecimal? = null,
   val twoYears: BigDecimal? = null,
   val scoreLevel: String? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class OvpScore(
+  val oneYear: BigDecimal? = null,
+  val twoYears: BigDecimal? = null,
+  val ovpRisk: String? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

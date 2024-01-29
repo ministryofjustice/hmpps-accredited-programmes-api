@@ -10,7 +10,7 @@
     "violencePredictorScore": {
       "oneYear": 8,
       "twoYears": 15,
-      "scoreLevel": "LOW"
+      "ovpRisk": "MEDIUM"
     },
     "generalPredictorScore": {
       "oneYear": 8,
