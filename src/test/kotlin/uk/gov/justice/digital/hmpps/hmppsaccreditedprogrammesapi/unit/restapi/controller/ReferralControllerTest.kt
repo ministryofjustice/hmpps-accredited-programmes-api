@@ -73,6 +73,7 @@ constructor(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary1",
       audiences = listOf("Audience 1", "Audience 2"),
+      audience = "Audience 1",
       status = ReferralStatus.referralStarted,
       prisonNumber = PRISON_NUMBER_1,
       referrerUsername = CLIENT_USERNAME,
@@ -82,6 +83,7 @@ constructor(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary2",
       audiences = listOf("Audience 2", "Audience 3"),
+      audience = "Audience 2",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
       prisonNumber = PRISON_NUMBER_1,
@@ -92,6 +94,7 @@ constructor(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary3",
       audiences = listOf("Audience 3", "Audience 4"),
+      audience = "Audience 3",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
       prisonNumber = PRISON_NUMBER_1,
@@ -430,6 +433,7 @@ constructor(
       id = firstReferralId,
       courseName = "Course for referralSummary1",
       audiences = audiencesForFirstReferral,
+      audience = "Audience 1",
       status = ReferralStatus.referralStarted,
       prisonNumber = PRISON_NUMBER_1,
       referrerUsername = CLIENT_USERNAME,
@@ -439,6 +443,7 @@ constructor(
       id = secondReferralId,
       courseName = "Course for referralSummary2",
       audiences = audiencesForSecondReferral,
+      audience = "Audience 2",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
       prisonNumber = PRISON_NUMBER_1,
@@ -472,6 +477,7 @@ constructor(
     firstReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary1"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
+      referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe CLIENT_USERNAME
@@ -482,6 +488,7 @@ constructor(
     secondReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary2"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
+      referral.audience shouldBe "Audience 2"
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
       referral.prisonNumber shouldBe PRISON_NUMBER_1
@@ -551,6 +558,7 @@ constructor(
     firstPageResponse.content?.find { it.id == firstReferralId }?.let { referral ->
       referral.courseName shouldBe "Course name"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
+      referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe CLIENT_USERNAME
@@ -577,6 +585,7 @@ constructor(
     secondPageResponse.content?.find { it.id == secondReferralId }?.let { referral ->
       referral.courseName shouldBe "Another course name"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
+      referral.audience shouldBe "Audience 2"
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
       referral.prisonNumber shouldBe PRISON_NUMBER_1
@@ -673,6 +682,7 @@ constructor(
       id = firstReferralId,
       courseName = "Course for referralSummary1",
       audiences = audiencesForFirstReferral,
+      audience = "Audience 1",
       status = ReferralStatus.referralStarted,
       prisonNumber = PRISON_NUMBER_1,
       referrerUsername = REFERRER_USERNAME,
@@ -682,6 +692,7 @@ constructor(
       id = secondReferralId,
       courseName = "Course for referralSummary2",
       audiences = audiencesForSecondReferral,
+      audience = "Audience 2",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
       prisonNumber = PRISON_NUMBER_1,
@@ -716,6 +727,7 @@ constructor(
     firstReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary1"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
+      referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe REFERRER_USERNAME
@@ -726,6 +738,7 @@ constructor(
     secondReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary2"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
+      referral.audience shouldBe "Audience 2"
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
       referral.prisonNumber shouldBe PRISON_NUMBER_1
@@ -796,6 +809,7 @@ constructor(
     firstPageResponse.content?.find { it.id == firstReferralId }?.let { referral ->
       referral.courseName shouldBe "Course name"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
+      referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
       referral.referrerUsername shouldBe REFERRER_USERNAME
@@ -822,6 +836,7 @@ constructor(
     secondPageResponse.content?.find { it.id == secondReferralId }?.let { referral ->
       referral.courseName shouldBe "Another course name"
       referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
+      referral.audience shouldBe "Audience 2"
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
       referral.prisonNumber shouldBe PRISON_NUMBER_1
