@@ -1468,9 +1468,13 @@ components:
         courseName:
           type: string
         audiences:
+          deprecated: true
           type: array
           items:
             type: string
+        audience:
+          type: string
+          example: 'Gang offence'
         status:
           $ref: "#/components/schemas/ReferralStatus"
         submittedOn:
@@ -1497,6 +1501,7 @@ components:
         - referrerUsername
         - courseName
         - audiences
+        - audience
         - status
         - prisonNumber
 
