@@ -4,6 +4,8 @@
 DELETE from referral;
 DELETE from referrer_user;
 DELETE from offering;
+DELETE from course_audience;
+DELETE from audience;
 DELETE from prerequisite;
 DELETE from course;
 
@@ -50,6 +52,26 @@ VALUES ('2abc9ef4-c7a9-43b3-8391-04006288e324', 'Setting', 'Custody'),
        ('1427fb3d-f6da-4f3c-bdcb-6b35a4a27efe', 'Setting', 'Custody'),
        ('1427fb3d-f6da-4f3c-bdcb-6b35a4a27efe', 'Gender', 'Male only'),
        ('1427fb3d-f6da-4f3c-bdcb-6b35a4a27efe', 'Risk criteria', 'High ESARA/SARA/OVP, High OGRS');
+
+INSERT INTO audience(audience_id, audience_value)
+VALUES ('2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3', 'Sexual offence'),
+       ('e0884c8a-5639-4b1e-8263-010a4a492eed', 'Extremism offence'),
+       ('4344a2ec-3cff-44c6-9cbf-cd703871965c', 'Gang offence'),
+       ('1c2ea59d-26e8-45ec-9408-fa5a68c8277e', 'General violence offence'),
+       ('7da9bab6-a981-4ec7-8fd8-8f315b690622', 'Intimate partner violence offence'),
+       ('83c404c7-4dbc-4193-aa1f-75d393e0675c', 'General offence');
+
+INSERT INTO course_audience(course_id, audience_id)
+VALUES ('2abc9ef4-c7a9-43b3-8391-04006288e324', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('953d6a6b-6f3d-4631-b7e8-e0e94b52e777', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('17bd04d6-f6ed-4ed2-9e35-bf5c3d63fe5d', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('79a39e0f-ef30-4597-8c14-43d258271125', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('5ea4d1a0-3fa6-4e86-bf35-52b0675c4c10', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('f81fad22-dd16-42ec-98d8-7a0c65d2bf9c', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('384fb7a0-58cf-4018-a865-3bbc7f984bd3', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('c0c6e603-d276-4f2d-9da3-a2dee5e38889', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('9c85796d-1c24-4c71-a05c-9ef725d4d423', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3'),
+       ('1427fb3d-f6da-4f3c-bdcb-6b35a4a27efe', '2154b65a-8b03-495c-b6d6-f2f1ea6b3cc3');
 
 INSERT INTO offering(offering_id, course_id, organisation_id, contact_email, referable, secondary_contact_email)
 VALUES ('2d412c72-4b73-4b01-addb-68ebc0304b5f', '384fb7a0-58cf-4018-a865-3bbc7f984bd3', 'MRI', 'nobody-mri@digital.justice.gov.uk', true, null),
