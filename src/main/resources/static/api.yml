@@ -4,6 +4,8 @@ info:
   version: 1.0.0
 servers:
   - url: /
+security:
+  - bearerAuth: []
 paths:
   /courses:
     get:
@@ -1067,6 +1069,13 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Course:
       type: object
