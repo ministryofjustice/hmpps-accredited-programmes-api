@@ -4,7 +4,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClientCache
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
@@ -24,8 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 class OasysApiClient(
   @Qualifier("oasysApiWebClient")
   webClient: WebClient,
-  webClientCache: WebClientCache,
-) : BaseHMPPSClient(webClient, jacksonObjectMapper(), webClientCache) {
+) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
   fun getAssessments(prisonerNumber: String) = getRequest<OasysAssessmentTimeline> {
     path = "/timeline/$prisonerNumber"

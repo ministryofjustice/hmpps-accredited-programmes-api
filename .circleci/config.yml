@@ -12,19 +12,11 @@ parameters:
     type: string
     default: accredited-programmes-events
 
-executors:
-  integration-test-gradle:
-    resource_class: medium+
-    docker:
-      - image: "cimg/openjdk:21.0"
-      - image: "bitnami/redis:7.0.11"
-        environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-
 jobs:
   validate:
     executor:
-      name: integration-test-gradle
+      name: hmpps/java
+      tag: "21.0"
     steps:
       - checkout
       - restore_cache:
