@@ -220,6 +220,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         ReferralSummary(
           id = createdReferral.id,
           courseName = getCourseById(courseId).name,
+          audience = getCourseById(courseId).audience,
           audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
           status = createdReferral.status,
           submittedOn = createdReferral.submittedOn,
@@ -230,6 +231,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         actualSummary.id shouldBe expectedSummary.id
         actualSummary.courseName shouldBe expectedSummary.courseName
         actualSummary.audiences shouldContainExactlyInAnyOrder expectedSummary.audiences
+        actualSummary.audience shouldBe expectedSummary.audience
         actualSummary.status shouldBe expectedSummary.status
         actualSummary.submittedOn shouldBe expectedSummary.submittedOn
         actualSummary.prisonNumber shouldBe expectedSummary.prisonNumber
@@ -299,6 +301,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = firstCreatedReferral.id,
       courseName = getCourseById(courseId).name,
       audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+      audience = getCourseById(courseId).audience,
       status = firstCreatedReferral.status,
       submittedOn = firstCreatedReferral.submittedOn,
       prisonNumber = firstCreatedReferral.prisonNumber,
@@ -309,6 +312,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = secondCreatedReferral.id,
       courseName = getCourseById(courseId).name,
       audiences = getCourseById(courseId).audiences.map { it.value }.sorted(),
+      audience = getCourseById(courseId).audience,
       status = secondCreatedReferral.status,
       submittedOn = secondCreatedReferral.submittedOn,
       prisonNumber = secondCreatedReferral.prisonNumber,
@@ -323,6 +327,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
       actualSummary.id shouldBe expectedSummary.id
       actualSummary.courseName shouldBe expectedSummary.courseName
+      actualSummary.audience shouldBe expectedSummary.audience
       actualSummary.audiences shouldContainExactlyInAnyOrder expectedSummary.audiences
       actualSummary.status shouldBe expectedSummary.status
       actualSummary.submittedOn shouldBe expectedSummary.submittedOn
