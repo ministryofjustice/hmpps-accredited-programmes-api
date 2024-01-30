@@ -9,13 +9,10 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClientCache
-import java.util.concurrent.atomic.AtomicInteger
 
 abstract class BaseHMPPSClient(
   private val webClient: WebClient,
   private val objectMapper: ObjectMapper,
-  private val webClientCache: WebClientCache,
 ) {
   protected inline fun <reified ResponseType : Any> getRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
     request(HttpMethod.GET, requestBuilderConfiguration)
@@ -49,19 +46,10 @@ abstract class BaseHMPPSClient(
     val requestBuilder = HMPPSRequestConfiguration()
     requestBuilderConfiguration(requestBuilder)
 
-    val cacheConfig = requestBuilder.preemptiveCacheConfig
-
-    val attempt = AtomicInteger(1)
-
     try {
-      if (cacheConfig != null) {
-        webClientCache.tryGetCachedValue(typeReference, requestBuilder, cacheConfig, attempt)?.let {
-          return it
-        }
-      }
-
-      val request =
-        webClient.method(method).uri(requestBuilder.path ?: "").headers { it.addAll(requestBuilder.headers) }
+      val request = webClient.method(method)
+        .uri(requestBuilder.path ?: "")
+        .headers { it.addAll(requestBuilder.headers) }
 
       if (requestBuilder.body != null) {
         request.bodyValue(requestBuilder.body!!)
@@ -93,9 +81,6 @@ abstract class BaseHMPPSClient(
     internal var path: String? = null
     internal var body: Any? = null
     internal var headers = HttpHeaders()
-    internal val preemptiveCacheConfig: WebClientCache.PreemptiveCacheConfig? = null
-    internal var preemptiveCacheKey: String? = null
-
     fun withHeader(key: String, value: String) = headers.add(key, value)
   }
 }
@@ -127,20 +112,4 @@ sealed interface ClientResult<ResponseType> {
       override fun toException(): Throwable = RuntimeException("Unable to complete $method request to $path", exception)
     }
   }
-}
-
-class CacheKeySet(
-  private val prefix: String,
-  private val cacheName: String,
-  private val key: String,
-) {
-  val metadataKey: String
-    get() {
-      return "$prefix-$cacheName-$key-metadata"
-    }
-
-  val dataKey: String
-    get() {
-      return "$prefix-$cacheName-$key-data"
-    }
 }

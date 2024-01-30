@@ -1,10 +1,9 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.cache.WebClientCache
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
@@ -13,8 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.
 class ArnsApiClient(
   @Qualifier("arnsApiWebClient")
   webClient: WebClient,
-  webClientCache: WebClientCache,
-) : BaseHMPPSClient(webClient, jacksonObjectMapper(), webClientCache) {
+) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
   fun getSummary(crn: String) = getRequest<ArnsSummary> {
     path = "/risks/crn/$crn/summary"
