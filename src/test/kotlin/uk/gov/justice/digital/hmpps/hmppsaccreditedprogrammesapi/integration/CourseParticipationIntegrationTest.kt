@@ -250,7 +250,9 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     persistenceHelper.createCourse(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"), "CC", "Custom Course", "Sample description", "CC", true, "General offence")
     persistenceHelper.createCourse(UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"), "RC", "RAPID Course", "Sample description", "RC", false, "General offence")
 
-    val expectedPrisonNumberCourseIds = getCourseIds().map {
+    val allCourseIds = getAllCourses().map { it.id }
+
+    val expectedPrisonNumberCourseIds = allCourseIds.map {
       createCourseParticipation(
         CourseParticipationCreate(
           prisonNumber = expectedPrisonNumber,
@@ -260,7 +262,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
     expectedPrisonNumberCourseIds.shouldNotBeEmpty()
 
-    val randomPrisonNumber = getCourseIds().map {
+    val randomPrisonNumber = allCourseIds.map {
       createCourseParticipation(
         CourseParticipationCreate(
           prisonNumber = otherPrisonNumber,
@@ -276,7 +278,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Finding course participations by random prison number should return 200 with no matching entries`() {
-    getCourseIds().forEach {
+    getAllCourses().map { it.id }.forEach {
       createCourseParticipation(
         CourseParticipationCreate(
           prisonNumber = randomPrisonNumber(),
@@ -325,7 +327,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   private fun updateCourseParticipation(id: UUID, update: CourseParticipationUpdate): CourseParticipation? =
     webTestClient
       .put()
-      .uri("/course-participations/{id}", id)
+      .uri("/course-participations/$id")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(update)
@@ -337,7 +339,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   private fun deleteCourseParticipation(id: UUID) =
     webTestClient
       .delete()
-      .uri("/course-participations/{id}", id)
+      .uri("/course-participations/$id")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -345,7 +347,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   private fun getCourseParticipation(id: UUID): CourseParticipation =
     webTestClient
       .get()
-      .uri("/course-participations/{id}", id)
+      .uri("/course-participations/$id")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -356,7 +358,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   private fun getCourseParticipationStatusCode(id: UUID): HttpStatusCode =
     webTestClient
       .get()
-      .uri("/course-participations/{id}", id)
+      .uri("/course-participations/$id")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -365,7 +367,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   private fun getCourseParticipationsForPrisonNumber(prisonNumber: String): List<CourseParticipation> =
     webTestClient
       .get()
-      .uri("/people/{prisonNumber}/course-participations", prisonNumber)
+      .uri("/people/$prisonNumber/course-participations")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

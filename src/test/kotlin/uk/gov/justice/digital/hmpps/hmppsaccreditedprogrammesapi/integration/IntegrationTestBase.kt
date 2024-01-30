@@ -165,21 +165,6 @@ abstract class IntegrationTestBase {
       .expectBody<List<Course>>()
       .returnResult().responseBody!!
 
-  fun getCourseById(courseId: UUID): Course =
-    webTestClient
-      .get()
-      .uri("/courses/$courseId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Course>()
-      .returnResult().responseBody!!
-
-  fun getCourseIds(): List<UUID> = getAllCourses().map { it.id }
-
-  fun getFirstCourseId(): UUID = getCourseIds().first()
-
   fun getAllOfferingsForCourse(courseId: UUID): List<CourseOffering> =
     webTestClient
       .get()
@@ -190,6 +175,4 @@ abstract class IntegrationTestBase {
       .expectStatus().isOk
       .expectBody<List<CourseOffering>>()
       .returnResult().responseBody!!
-
-  fun getFirstOfferingIdForCourse(courseId: UUID) = getAllOfferingsForCourse(courseId).first().id
 }
