@@ -5,14 +5,12 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.NewPrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.OfferingUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AudienceRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import java.util.UUID
@@ -24,7 +22,6 @@ class CourseService
 constructor(
   private val courseRepository: CourseRepository,
   private val offeringRepository: OfferingRepository,
-  private val audienceRepository: AudienceRepository,
 ) {
   fun getAllCourses(): List<CourseEntity> = courseRepository.findAll().filterNot { it.withdrawn }
   fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
@@ -35,8 +32,6 @@ constructor(
   fun getOfferingById(offeringId: UUID): OfferingEntity? = offeringRepository.findByIdOrNull(offeringId)?.takeIf { !it.withdrawn }
 
   fun updateCourses(courseUpdates: List<CourseUpdate>) {
-    updateAudiences(courseUpdates)
-    val allAudiences: Map<String, AudienceEntity> = audienceRepository.findAll().associateBy { it.value }
     val coursesByIdentifier = courseRepository.findAll().associateBy(CourseEntity::identifier)
     val courseDataByIdentifier = courseUpdates.associateBy(CourseUpdate::identifier)
 
@@ -44,15 +39,14 @@ constructor(
     val toUpdate = coursesByIdentifier.keys.intersect(courseDataByIdentifier.keys)
     val toWithdraw = coursesByIdentifier.keys - courseDataByIdentifier.keys
 
-    addCourses(toAdd, courseDataByIdentifier, allAudiences)
-    updateCourses(toUpdate, courseDataByIdentifier, coursesByIdentifier, allAudiences)
+    addCourses(toAdd, courseDataByIdentifier)
+    updateCourses(toUpdate, courseDataByIdentifier, coursesByIdentifier)
     withdrawCourses(toWithdraw, coursesByIdentifier)
   }
 
   private fun addCourses(
     toAdd: Set<String>,
     courseDataByIdentifier: Map<String, CourseUpdate>,
-    allAudiences: Map<String, AudienceEntity>,
   ) {
     val coursesToAdd = toAdd.mapNotNull {
       courseDataByIdentifier[it]?.let { update ->
@@ -61,8 +55,6 @@ constructor(
           identifier = update.identifier,
           description = update.description,
           alternateName = update.alternateName,
-          audiences = audienceStrings(update.audience).mapNotNull { audienceName -> allAudiences[audienceName] }
-            .toMutableSet(),
           audience = update.audience,
           referable = update.referable,
         )
@@ -76,23 +68,16 @@ constructor(
     toUpdate: Set<String>,
     courseDataByIdentifier: Map<String, CourseUpdate>,
     coursesByIdentifier: Map<String, CourseEntity>,
-    allAudiences: Map<String, AudienceEntity>,
   ) {
     toUpdate.forEach { courseIdentifier ->
       courseDataByIdentifier[courseIdentifier]?.let { update ->
-        val expectedAudienceStrings = audienceStrings(update.audience).toSet()
         coursesByIdentifier[courseIdentifier]?.run {
           withdrawn = false
           name = update.name
           description = update.description
           alternateName = update.alternateName
           referable = update.referable
-
-          val audiencesByValue = audiences.associateBy(AudienceEntity::value)
-          val audiencesToAdd = expectedAudienceStrings - audiencesByValue.keys
-          val audiencesToRemove = audiencesByValue.keys - expectedAudienceStrings
-          audiences.addAll(audiencesToAdd.mapNotNull { allAudiences[it] })
-          audiences.removeAll(audiencesToRemove.mapNotNull { allAudiences[it] }.toSet())
+          audience = update.audience
         }
       }
     }
@@ -106,18 +91,6 @@ constructor(
       coursesByIdentifier[it]?.withdrawn = true
     }
   }
-
-  private fun updateAudiences(courseUpdates: List<CourseUpdate>) {
-    val newAudiencesFromCourseUpdate = courseUpdates.flatMap { audienceStrings(it.audience) }.toSet()
-    val currentAudiences = audienceRepository.findAll().map { it.value }.toSet()
-
-    val audienceValuesToSave = newAudiencesFromCourseUpdate - currentAudiences
-    val audiencesToSave = audienceValuesToSave.map { AudienceEntity(value = it) }.toSet()
-
-    audienceRepository.saveAll(audiencesToSave)
-  }
-
-  private fun audienceStrings(audience: String): List<String> = audience.split(',').map(String::trim)
 
   fun updatePrerequisites(replacements: List<NewPrerequisite>): List<LineMessage> {
     val allCourses = courseRepository.findAll()

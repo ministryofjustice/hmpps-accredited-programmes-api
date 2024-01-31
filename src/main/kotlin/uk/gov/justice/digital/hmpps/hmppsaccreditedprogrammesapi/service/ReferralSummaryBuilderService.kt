@@ -28,7 +28,6 @@ class ReferralSummaryBuilderService {
           referrerUsername = firstProjection.referrerUsername,
           courseName = firstProjection.courseName,
           audience = firstProjection.audience,
-          audiences = projections.map { it.audience }.distinct(),
           status = firstProjection.status.toApi(),
           submittedOn = firstProjection.submittedOn?.toString(),
           prisonNumber = firstProjection.prisonNumber,

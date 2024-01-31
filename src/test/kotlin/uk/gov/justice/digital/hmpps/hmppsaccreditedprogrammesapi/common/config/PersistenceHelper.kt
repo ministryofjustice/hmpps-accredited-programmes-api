@@ -18,20 +18,11 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM course_participation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
-    entityManager.createNativeQuery("DELETE FROM course_audience").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course").executeUpdate()
-    entityManager.createNativeQuery("DELETE FROM audience").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referrer_user").executeUpdate()
   }
 
-  fun createAudience(audienceId: UUID, audienceValue: String) {
-    entityManager.createNativeQuery("INSERT INTO audience (audience_id, audience_value) VALUES (:id, :value)")
-      .setParameter("id", audienceId)
-      .setParameter("value", audienceValue)
-      .executeUpdate()
-  }
-
-  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, referable: Boolean, audience: String = "Gang offence") {
+  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, referable: Boolean, audience: String) {
     entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, referable, audience) VALUES (:id, :identifier, :name, :description, :altName, :referable, :audience)")
       .setParameter("id", courseId)
       .setParameter("identifier", identifier)
@@ -40,13 +31,6 @@ class PersistenceHelper {
       .setParameter("altName", altName)
       .setParameter("referable", referable)
       .setParameter("audience", audience)
-      .executeUpdate()
-  }
-
-  fun createCourseAudience(courseId: UUID, audienceId: UUID) {
-    entityManager.createNativeQuery("INSERT INTO course_audience (course_id, audience_id) VALUES (:courseId, :audienceId)")
-      .setParameter("courseId", courseId)
-      .setParameter("audienceId", audienceId)
       .executeUpdate()
   }
 

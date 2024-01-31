@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AudienceEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
@@ -17,13 +16,8 @@ class RecordTransformersTest {
     val p1 = PrerequisiteEntityFactory().withName("gender").withDescription("female").produce()
     val p2 = PrerequisiteEntityFactory().withName("risk score").withDescription("ORGS: 50+").produce()
     val prerequisites = mutableSetOf(p1, p2)
-    val a1 = AudienceEntityFactory().withValue("A").produce()
-    val a2 = AudienceEntityFactory().withValue("B").produce()
-    val a3 = AudienceEntityFactory().withValue("C").produce()
-    val audiences = mutableSetOf(a1, a2, a3)
     val entity = CourseEntityFactory()
       .withPrerequisites(prerequisites)
-      .withAudiences(audiences)
       .produce()
 
     with(entity.toApi()) {
@@ -31,7 +25,6 @@ class RecordTransformersTest {
         CoursePrerequisite(name = "gender", description = "female"),
         CoursePrerequisite(name = "risk score", description = "ORGS: 50+"),
       )
-      audiences.map { it.value } shouldContainExactlyInAnyOrder listOf("C", "B", "A")
     }
   }
 
@@ -83,16 +76,6 @@ class RecordTransformersTest {
       organisationId shouldBe offering.organisationId
       contactEmail shouldBe offering.contactEmail
       secondaryContactEmail shouldBe offering.secondaryContactEmail
-    }
-  }
-
-  @Test
-  fun `Transforming an audience entity should convert to its API equivalent`() {
-    val audience = AudienceEntityFactory().produce()
-
-    with(audience.toApi()) {
-      id shouldBe audience.id
-      value shouldBe audience.value
     }
   }
 }

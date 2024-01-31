@@ -1096,11 +1096,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CoursePrerequisite'
-        audiences:
-          deprecated: true
-          type: array
-          items:
-            $ref: '#/components/schemas/CourseAudience'
         audience:
           type: string
           example: 'Gang offence'
@@ -1112,7 +1107,6 @@ components:
         - id
         - name
         - coursePrerequisites
-        - audiences
         - audience
         - referable
 
@@ -1252,19 +1246,6 @@ components:
         - prisonId
         - identifier
         - referable
-
-    CourseAudience:
-      type: object
-      properties:
-        value:
-          type: string
-          example: "General Violence"
-        id:
-          type: string
-          format: uuid
-      required:
-        - id
-        - value
 
     LineMessage:
       description: "warnings and errors for a line in an uploaded CSV file."
@@ -1476,11 +1457,6 @@ components:
           type: string
         courseName:
           type: string
-        audiences:
-          deprecated: true
-          type: array
-          items:
-            type: string
         audience:
           type: string
           example: 'Gang offence'
@@ -1509,7 +1485,6 @@ components:
         - id
         - referrerUsername
         - courseName
-        - audiences
         - audience
         - status
         - prisonNumber

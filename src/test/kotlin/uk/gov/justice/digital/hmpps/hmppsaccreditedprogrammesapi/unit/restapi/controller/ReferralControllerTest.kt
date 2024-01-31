@@ -72,7 +72,6 @@ constructor(
     private val referralSummary1 = ReferralSummary(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary1",
-      audiences = listOf("Audience 1", "Audience 2"),
       audience = "Audience 1",
       status = ReferralStatus.referralStarted,
       prisonNumber = PRISON_NUMBER_1,
@@ -82,7 +81,6 @@ constructor(
     private val referralSummary2 = ReferralSummary(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary2",
-      audiences = listOf("Audience 2", "Audience 3"),
       audience = "Audience 2",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
@@ -93,7 +91,6 @@ constructor(
     private val referralSummary3 = ReferralSummary(
       id = UUID.randomUUID(),
       courseName = "Course for referralSummary3",
-      audiences = listOf("Audience 3", "Audience 4"),
       audience = "Audience 3",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
@@ -432,7 +429,6 @@ constructor(
     val referralSummary1 = ReferralSummary(
       id = firstReferralId,
       courseName = "Course for referralSummary1",
-      audiences = audiencesForFirstReferral,
       audience = "Audience 1",
       status = ReferralStatus.referralStarted,
       prisonNumber = PRISON_NUMBER_1,
@@ -442,7 +438,6 @@ constructor(
     val referralSummary2 = ReferralSummary(
       id = secondReferralId,
       courseName = "Course for referralSummary2",
-      audiences = audiencesForSecondReferral,
       audience = "Audience 2",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
@@ -476,7 +471,6 @@ constructor(
     firstReferral shouldNotBe null
     firstReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary1"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
@@ -487,7 +481,6 @@ constructor(
     secondReferral shouldNotBe null
     secondReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary2"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.audience shouldBe "Audience 2"
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
@@ -505,31 +498,26 @@ constructor(
     val pageableSecondPage = PageRequest.of(1, pageSize, Sort.by("referralId"))
 
     val firstReferralId = UUID.randomUUID()
-    val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
-    audiencesForFirstReferral.map { audience ->
-      ReferralSummaryProjectionFactory()
-        .withReferralId(firstReferralId)
-        .withCourseName("Course name")
-        .withAudience(audience)
-        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
-        .withPrisonNumber(PRISON_NUMBER_1)
-        .withReferrerUsername(REFERRER_USERNAME)
-        .produce()
-    }
+
+    val produce = ReferralSummaryProjectionFactory()
+      .withReferralId(firstReferralId)
+      .withCourseName("Course name")
+      .withAudience("Audience 1")
+      .withStatus(ReferralEntity.ReferralStatus.REFERRAL_STARTED)
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withReferrerUsername(REFERRER_USERNAME)
+      .produce()
 
     val secondReferralId = UUID.randomUUID()
-    val audiencesForSecondReferral = listOf("Audience 4", "Audience 5", "Audience 6")
-    audiencesForSecondReferral.map { audience ->
-      ReferralSummaryProjectionFactory()
-        .withReferralId(secondReferralId)
-        .withCourseName("Another course name")
-        .withAudience(audience)
-        .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
-        .withSubmittedOn(LocalDateTime.MIN)
-        .withPrisonNumber(PRISON_NUMBER_1)
-        .withReferrerUsername(REFERRER_USERNAME)
-        .produce()
-    }
+    ReferralSummaryProjectionFactory()
+      .withReferralId(secondReferralId)
+      .withCourseName("Another course name")
+      .withAudience("Audience 2")
+      .withStatus(ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED)
+      .withSubmittedOn(LocalDateTime.MIN)
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withReferrerUsername(REFERRER_USERNAME)
+      .produce()
 
     every { referralService.getReferralsByOrganisationId(ORGANISATION_ID_MDI, pageableFirstPage, null, null, null) } returns
       PageImpl(listOf(referralSummary1), pageableFirstPage, 2)
@@ -557,7 +545,6 @@ constructor(
 
     firstPageResponse.content?.find { it.id == firstReferralId }?.let { referral ->
       referral.courseName shouldBe "Course name"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
@@ -584,7 +571,6 @@ constructor(
 
     secondPageResponse.content?.find { it.id == secondReferralId }?.let { referral ->
       referral.courseName shouldBe "Another course name"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.audience shouldBe "Audience 2"
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
@@ -675,13 +661,10 @@ constructor(
 
     val firstReferralId = UUID.randomUUID()
     val secondReferralId = UUID.randomUUID()
-    val audiencesForFirstReferral = listOf("Audience 1", "Audience 2", "Audience 3")
-    val audiencesForSecondReferral = listOf("Audience 4", "Audience 5", "Audience 6")
 
     val referralSummary1 = ReferralSummary(
       id = firstReferralId,
       courseName = "Course for referralSummary1",
-      audiences = audiencesForFirstReferral,
       audience = "Audience 1",
       status = ReferralStatus.referralStarted,
       prisonNumber = PRISON_NUMBER_1,
@@ -691,7 +674,6 @@ constructor(
     val referralSummary2 = ReferralSummary(
       id = secondReferralId,
       courseName = "Course for referralSummary2",
-      audiences = audiencesForSecondReferral,
       audience = "Audience 2",
       status = ReferralStatus.referralSubmitted,
       submittedOn = LocalDateTime.MIN.toString(),
@@ -726,7 +708,6 @@ constructor(
     firstReferral shouldNotBe null
     firstReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary1"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
@@ -737,7 +718,6 @@ constructor(
     secondReferral shouldNotBe null
     secondReferral?.let { referral ->
       referral.courseName shouldBe "Course for referralSummary2"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
       referral.audience shouldBe "Audience 2"
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
@@ -808,7 +788,6 @@ constructor(
 
     firstPageResponse.content?.find { it.id == firstReferralId }?.let { referral ->
       referral.courseName shouldBe "Course name"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForFirstReferral
       referral.audience shouldBe "Audience 1"
       referral.status shouldBe ReferralStatus.referralStarted
       referral.prisonNumber shouldBe PRISON_NUMBER_1
@@ -835,8 +814,7 @@ constructor(
 
     secondPageResponse.content?.find { it.id == secondReferralId }?.let { referral ->
       referral.courseName shouldBe "Another course name"
-      referral.audiences shouldContainExactlyInAnyOrder audiencesForSecondReferral
-      referral.audience shouldBe "Audience 2"
+      referral.audience shouldBe audiencesForSecondReferral
       referral.status shouldBe ReferralStatus.referralSubmitted
       referral.submittedOn shouldBe LocalDateTime.MIN.toString()
       referral.prisonNumber shouldBe PRISON_NUMBER_1
