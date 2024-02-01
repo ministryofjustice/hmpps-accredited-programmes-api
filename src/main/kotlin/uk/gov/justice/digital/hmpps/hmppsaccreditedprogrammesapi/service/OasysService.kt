@@ -177,7 +177,7 @@ class OasysService(
     val assessment =
       assessments.entity
         .timeline
-        .filter { it.status == "COMPLETE" }
+        .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
         .sortedByDescending { it.completedAt }
         .firstOrNull()
 

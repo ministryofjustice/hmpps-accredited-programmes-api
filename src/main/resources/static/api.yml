@@ -1721,6 +1721,9 @@ components:
         basicSkillsScore:
           type: string
           example: 6
+        basicSkillsScoreDescription:
+          type: string
+          example: free text about this persons learning needs
 
     Risks:
       type: object

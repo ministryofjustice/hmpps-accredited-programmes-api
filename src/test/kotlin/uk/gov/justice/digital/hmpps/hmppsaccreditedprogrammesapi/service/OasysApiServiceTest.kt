@@ -198,6 +198,7 @@ class OasysApiServiceTest {
       "2",
       "3",
       "4",
+      "5",
     )
     val oasysAccommodation = OasysAccommodation(
       "Yes",

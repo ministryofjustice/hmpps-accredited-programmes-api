@@ -222,7 +222,7 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       "3 - big problems",
       "0 - no qualifications",
       "33",
-
+      "Some text about how clever or thick this person is",
     )
   }
 
