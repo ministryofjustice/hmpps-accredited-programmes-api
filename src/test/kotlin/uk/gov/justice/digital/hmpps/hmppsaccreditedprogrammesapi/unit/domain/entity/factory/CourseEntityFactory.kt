@@ -18,7 +18,6 @@ class CourseEntityFactory : Factory<CourseEntity> {
   private var identifier: Yielded<String> = { randomUppercaseString() }
   private var description: Yielded<String?> = { null }
   private var alternateName: Yielded<String?> = { null }
-  private var referable: Yielded<Boolean> = { true }
   private var prerequisites: Yielded<MutableSet<PrerequisiteEntity>> = { mutableSetOf() }
   private var offerings: Yielded<MutableSet<OfferingEntity>> = { mutableSetOf() }
   private var audience: Yielded<String> = { randomUppercaseString() }
@@ -62,7 +61,6 @@ class CourseEntityFactory : Factory<CourseEntity> {
     identifier = this.identifier(),
     description = this.description(),
     alternateName = this.alternateName(),
-    referable = this.referable(),
     prerequisites = this.prerequisites(),
     offerings = this.offerings(),
     audience = this.audience(),
@@ -92,7 +90,6 @@ class CourseUpdateFactory : Factory<CourseUpdate> {
     identifier = this.identifier(),
     audience = this.audience(),
     alternateName = this.alternateName(),
-    referable = this.referable(),
   )
 }
 

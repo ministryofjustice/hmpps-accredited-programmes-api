@@ -56,7 +56,6 @@ constructor(
           description = update.description,
           alternateName = update.alternateName,
           audience = update.audience,
-          referable = update.referable,
         )
       }
     }
@@ -76,7 +75,6 @@ constructor(
           name = update.name
           description = update.description
           alternateName = update.alternateName
-          referable = update.referable
           audience = update.audience
         }
       }

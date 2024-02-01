@@ -38,7 +38,6 @@ class RecordTransformersTest {
       description shouldBe null
       alternateName shouldBe null
       coursePrerequisites.shouldBeEmpty()
-      referable.shouldBe(true)
     }
   }
 
@@ -76,6 +75,7 @@ class RecordTransformersTest {
       organisationId shouldBe offering.organisationId
       contactEmail shouldBe offering.contactEmail
       secondaryContactEmail shouldBe offering.secondaryContactEmail
+      referable shouldBe true
     }
   }
 }
