@@ -30,11 +30,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.projection.ReferralSummaryProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralSummaryBuilderService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PersonEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralSummaryProjectionFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
 import java.util.Optional
@@ -111,6 +113,9 @@ class ReferralServiceTest {
   @MockK(relaxed = true)
   private lateinit var referralSummaryBuilderService: ReferralSummaryBuilderService
 
+  @MockK(relaxed = true)
+  private lateinit var personRepository: PersonRepository
+
   @InjectMockKs
   private lateinit var referralService: ReferralService
 
@@ -145,6 +150,12 @@ class ReferralServiceTest {
       .withId(UUID.randomUUID())
       .produce()
     every { offeringRepository.findById(any()) } returns Optional.of(offering)
+
+    val person = PersonEntityFactory()
+      .produce()
+    every { personRepository.findPersonEntityByPrisonNumber(any()) } returns person
+
+    every { personRepository.save(any()) } returns person
 
     val referralId = UUID.randomUUID()
     every { referralRepository.save(any<ReferralEntity>()) } answers {
@@ -187,6 +198,12 @@ class ReferralServiceTest {
     every { referralRepository.save(any<ReferralEntity>()) } answers {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
+
+    val person = PersonEntityFactory()
+      .produce()
+    every { personRepository.findPersonEntityByPrisonNumber(any()) } returns person
+
+    every { personRepository.save(any()) } returns person
 
     val createdReferralId = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
 

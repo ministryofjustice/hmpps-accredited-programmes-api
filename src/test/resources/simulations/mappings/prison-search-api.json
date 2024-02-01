@@ -1,0 +1,20 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/prisoner-search/prisoner-numbers",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "C6666CC"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results.json"
+      }
+    }
+  ]
+}
