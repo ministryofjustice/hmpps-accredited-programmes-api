@@ -8,6 +8,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
@@ -30,9 +31,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_3
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_3
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -42,6 +46,9 @@ import java.util.UUID
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class ReferralIntegrationTest : IntegrationTestBase() {
+
+  @Autowired
+  lateinit var personRepository: PersonRepository
 
   @BeforeEach
   fun setUp() {
@@ -57,9 +64,18 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Creating a referral with an existing user should return 201 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER_3) shouldBe null
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+
+    val personEntity = personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER_3)
+
+    personEntity.shouldNotBeNull()
+    personEntity.surname.shouldBeEqual(PRISONER_3.lastName)
+    personEntity.forename.shouldBeEqual(PRISONER_3.firstName)
 
     referralCreated.referralId.shouldNotBeNull()
 
@@ -67,7 +83,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = referralCreated.referralId,
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
-      prisonNumber = PRISON_NUMBER_1,
+      prisonNumber = PRISON_NUMBER_3,
       status = ReferralStatus.referralStarted,
       additionalInformation = null,
       oasysConfirmed = false,
@@ -327,7 +343,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     paginatedReferralSummaries.content?.shouldBeEmpty()
   }
 
-  fun createReferral(offeringId: UUID) =
+  fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =
     webTestClient
       .post()
       .uri("/referrals")
@@ -337,7 +353,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .bodyValue(
         ReferralCreate(
           offeringId = offeringId,
-          prisonNumber = PRISON_NUMBER_1,
+          prisonNumber = prisonNumber,
         ),
       )
       .exchange()

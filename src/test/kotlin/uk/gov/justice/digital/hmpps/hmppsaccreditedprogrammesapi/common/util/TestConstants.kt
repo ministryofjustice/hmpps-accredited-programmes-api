@@ -8,6 +8,7 @@ val COURSE_ID: UUID = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
 val COURSE_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
 const val PRISON_NUMBER_1 = "C3456CC"
 const val PRISON_NUMBER_2 = "D3456DD"
+const val PRISON_NUMBER_3 = "C6666CC"
 const val PRISON_NAME = "Moorland"
 const val CLIENT_USERNAME = "TEST_REFERRER_USER_1"
 const val PRISONER_FIRST_NAME = "John"
@@ -54,3 +55,15 @@ val PRISONER_2 = Prisoner(
   indeterminateSentence = INDETERMINATE_SENTENCE,
 )
 val PRISONERS = listOf(PRISONER_1, PRISONER_2)
+
+val PRISONER_3 = Prisoner(
+  prisonerNumber = PRISON_NUMBER_3,
+  bookingId = BOOKING_ID,
+  firstName = "JOHN",
+  lastName = "SMITH",
+  nonDtoReleaseDateType = NON_DTO_RELEASE_DATE_TYPE,
+  conditionalReleaseDate = CONDITIONAL_RELEASE_DATE,
+  tariffDate = TARIFF_EXPIRY_DATE,
+  paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
+  indeterminateSentence = INDETERMINATE_SENTENCE,
+)

@@ -12,13 +12,17 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -34,6 +38,7 @@ constructor(
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val referralSummaryBuilderService: ReferralSummaryBuilderService,
+  private val personRepository: PersonRepository,
 ) {
 
   fun createReferral(
@@ -50,6 +55,8 @@ constructor(
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found") }
 
+    createOrUpdatePerson(prisonNumber)
+
     return referralRepository.save(
       ReferralEntity(
         offering = offering,
@@ -57,6 +64,48 @@ constructor(
         referrer = referrerUser,
       ),
     ).id ?: throw Exception("Referral creation failed")
+  }
+
+  private fun createOrUpdatePerson(prisonNumber: String) {
+    prisonerSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
+      var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
+      if (personEntity == null) {
+        val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
+        personEntity = PersonEntity(
+          it.lastName,
+          it.firstName,
+          prisonNumber,
+          it.conditionalReleaseDate,
+          it.paroleEligibilityDate,
+          it.tariffDate,
+          earliestReleaseDateAndType.first,
+          earliestReleaseDateAndType.second,
+          it.indeterminateSentence,
+          it.nonDtoReleaseDateType,
+        )
+      } else {
+        val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
+        personEntity.surname = it.lastName
+        personEntity.forename = it.firstName
+        personEntity.conditionalReleaseDate = it.conditionalReleaseDate
+        personEntity.paroleEligibilityDate = it.paroleEligibilityDate
+        personEntity.tariffExpiryDate = it.tariffDate
+        personEntity.earliestReleaseDate = earliestReleaseDateAndType.first
+        personEntity.earliestReleaseDateType = earliestReleaseDateAndType.second
+        personEntity.indeterminateSentence = it.indeterminateSentence
+        personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
+      }
+      personRepository.save(personEntity)
+    }
+  }
+
+  private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> {
+    return when {
+      prisoner.indeterminateSentence == true -> Pair(prisoner.tariffDate, "Tariff Date")
+      prisoner.paroleEligibilityDate != null -> Pair(prisoner.paroleEligibilityDate, "Parole Eligibility Date")
+      prisoner.conditionalReleaseDate != null -> Pair(prisoner.conditionalReleaseDate, "Conditional Release Date")
+      else -> Pair(null, null)
+    }
   }
 
   fun getReferralById(referralId: UUID): ReferralEntity? = referralRepository.findById(referralId).getOrNull()
@@ -101,12 +150,15 @@ constructor(
         referral.status = ReferralStatus.REFERRAL_SUBMITTED
         referral.submittedOn = LocalDateTime.now()
       }
+
       ReferralStatus.REFERRAL_SUBMITTED -> {
         throw IllegalArgumentException("Referral $referralId is already submitted")
       }
+
       ReferralStatus.AWAITING_ASSESSMENT -> {
         throw IllegalArgumentException("Referral $referralId is already submitted and awaiting assessment")
       }
+
       ReferralStatus.ASSESSMENT_STARTED -> {
         throw IllegalArgumentException("Referral $referralId is already submitted and currently being assessed")
       }
@@ -121,7 +173,8 @@ constructor(
     courseName: String?,
   ): Page<ReferralSummary> {
     val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
-    val referralProjectionPage = referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnums, audience, courseName)
+    val referralProjectionPage =
+      referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnums, audience, courseName)
     val content = referralProjectionPage.content
     val prisoners = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
     val prisons = prisonRegisterApiService.getAllPrisons()
@@ -130,9 +183,16 @@ constructor(
     return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
   }
 
-  fun getReferralsByUsername(username: String, pageable: PageRequest, status: List<String>?, audience: String?, courseName: String?): Page<ReferralSummary> {
+  fun getReferralsByUsername(
+    username: String,
+    pageable: PageRequest,
+    status: List<String>?,
+    audience: String?,
+    courseName: String?,
+  ): Page<ReferralSummary> {
     val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
-    val referralProjectionPage = referralRepository.getReferralsByUsername(username, pageable, statusEnums, audience, courseName)
+    val referralProjectionPage =
+      referralRepository.getReferralsByUsername(username, pageable, statusEnums, audience, courseName)
     val content = referralProjectionPage.content
 
     val prisonersDetails = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())

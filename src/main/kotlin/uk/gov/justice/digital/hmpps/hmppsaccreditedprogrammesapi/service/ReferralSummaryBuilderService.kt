@@ -52,7 +52,7 @@ class ReferralSummaryBuilderService {
     }
   }
 
-  private fun getEarliestReleaseDate(sentence: Sentence?): LocalDate? {
+  fun getEarliestReleaseDate(sentence: Sentence?): LocalDate? {
     return when {
       sentence?.indeterminateSentence == true -> sentence.tariffExpiryDate
       sentence?.paroleEligibilityDate != null -> sentence.paroleEligibilityDate
