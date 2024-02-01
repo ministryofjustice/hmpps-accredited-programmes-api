@@ -223,7 +223,7 @@ constructor(
 
     every { referralService.getReferralById(any()) } returns referral
 
-    mockMvc.get("/referrals/${referral.id}") {
+    mockMvc.get("/referrals/${referral.id}?updatePerson=false") {
       accept = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
@@ -258,7 +258,7 @@ constructor(
 
     every { referralService.getReferralById(any()) } returns null
 
-    mockMvc.get("/referrals/$referralId") {
+    mockMvc.get("/referrals/$referralId?updatePerson=false") {
       accept = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
