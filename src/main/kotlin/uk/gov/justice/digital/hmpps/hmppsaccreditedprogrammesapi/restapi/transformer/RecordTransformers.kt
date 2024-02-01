@@ -20,14 +20,12 @@ fun CourseEntity.toApi(): Course = Course(
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
   audience = audience,
-  referable = referable,
 )
 
 fun CourseEntity.toCourseRecord(): CourseRecord = CourseRecord(
   name = name,
   description = description ?: "",
   alternateName = alternateName,
-  referable = referable,
   identifier = identifier,
   audience = audience,
 )
@@ -60,7 +58,6 @@ fun CourseRecord.toDomain(): CourseUpdate = CourseUpdate(
   description = description.trim(),
   audience = audience,
   alternateName = alternateName?.trim(),
-  referable = referable,
 )
 
 fun OfferingRecord.toDomain(): OfferingUpdate = OfferingUpdate(

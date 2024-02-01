@@ -5,7 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 
-const val COURSES_PREFIX = "name,identifier,description,audience,referable,alternateName,comments\n"
+const val COURSES_PREFIX = "name,identifier,description,audience,alternateName,comments\n"
 const val PREREQUISITES_PREFIX = "name,description,course,identifier,comments,,,,\n"
 const val OFFERINGS_PREFIX = "course,identifier,organisation,contact email,secondary contact email,prisonId,referable\n"
 
@@ -16,7 +16,6 @@ fun generateCourseRecords(count: Int): List<CourseRecord> {
       identifier = "Identifier-$it",
       description = "Description for Course-$it",
       audience = "Audience-$it",
-      referable = true,
       alternateName = "AltName-$it",
       comments = "Comment-$it",
     )
@@ -55,7 +54,7 @@ fun List<CourseRecord>.toCourseCsv(): String = if (isEmpty()) {
   joinToString(
     prefix = COURSES_PREFIX,
     separator = "\n",
-    transform = { """"${it.name}","${it.identifier}","${it.description}","${it.audience}","${it.referable}","${it.alternateName}",${randomSentence(1..20)}""" },
+    transform = { """"${it.name}","${it.identifier}","${it.description}","${it.audience}","${it.alternateName}",${randomSentence(1..20)}""" },
     postfix = "\n",
   )
 }
