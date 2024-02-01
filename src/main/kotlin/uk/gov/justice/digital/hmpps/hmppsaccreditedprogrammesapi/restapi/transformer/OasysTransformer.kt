@@ -115,6 +115,7 @@ fun learningNeeds(oasysAccommodation: OasysAccommodation?, oasysLearning: OasysL
   oasysLearning?.learningDifficulties,
   oasysLearning?.qualifications,
   oasysLearning?.basicSkillsScore,
+  oasysLearning?.eTEIssuesDetails,
 )
 
 fun risks(
