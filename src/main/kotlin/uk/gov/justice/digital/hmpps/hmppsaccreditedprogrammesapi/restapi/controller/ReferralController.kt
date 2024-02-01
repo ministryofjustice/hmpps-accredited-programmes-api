@@ -40,9 +40,9 @@ constructor(
       } ?: throw Exception("Unable to start referral")
     }
 
-  override fun getReferralById(id: UUID): ResponseEntity<Referral> =
+  override fun getReferralById(id: UUID, updatePerson: Boolean): ResponseEntity<Referral> =
     referralService
-      .getReferralById(id)
+      .getReferralById(id, updatePerson)
       ?.let { ResponseEntity.ok(it.toApi()) }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 

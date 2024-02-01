@@ -108,7 +108,14 @@ constructor(
     }
   }
 
-  fun getReferralById(referralId: UUID): ReferralEntity? = referralRepository.findById(referralId).getOrNull()
+  fun getReferralById(referralId: UUID, updatePersonDetails: Boolean = false): ReferralEntity? {
+    val referral = referralRepository.findById(referralId).getOrNull()
+
+    if (referral != null && updatePersonDetails) {
+      createOrUpdatePerson(referral.prisonNumber)
+    }
+    return referral
+  }
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)

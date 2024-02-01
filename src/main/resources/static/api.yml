@@ -350,6 +350,13 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: updatePerson
+          in: query
+          description: parameter to decide whether to update the local person data
+          required: false
+          schema:
+            type: boolean
+            default: true
       responses:
         200:
           description: Information about the referral
