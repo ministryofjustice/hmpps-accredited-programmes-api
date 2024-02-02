@@ -356,7 +356,7 @@ paths:
           required: false
           schema:
             type: boolean
-            default: true
+            default: false
       responses:
         200:
           description: Information about the referral
