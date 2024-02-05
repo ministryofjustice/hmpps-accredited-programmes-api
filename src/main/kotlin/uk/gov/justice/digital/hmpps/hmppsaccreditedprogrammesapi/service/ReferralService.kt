@@ -13,12 +13,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
@@ -39,6 +41,7 @@ constructor(
   private val prisonerSearchApiService: PrisonerSearchApiService,
   private val referralSummaryBuilderService: ReferralSummaryBuilderService,
   private val personRepository: PersonRepository,
+  private val organisationRepository: OrganisationRepository,
 ) {
 
   fun createReferral(
@@ -57,6 +60,8 @@ constructor(
 
     createOrUpdatePerson(prisonNumber)
 
+    createOrganisationIfNotPresent(offering.organisationId)
+
     return referralRepository.save(
       ReferralEntity(
         offering = offering,
@@ -64,6 +69,21 @@ constructor(
         referrer = referrerUser,
       ),
     ).id ?: throw Exception("Referral creation failed")
+  }
+
+  private fun createOrganisationIfNotPresent(code: String) {
+    organisationRepository.findOrganisationEntityByCode(code)?.let {
+      return
+    }
+
+    prisonRegisterApiService.getPrisonById(code)?.let { prisonDetails ->
+      organisationRepository.save(
+        OrganisationEntity(
+          code = prisonDetails.prisonId,
+          name = prisonDetails.prisonName,
+        ),
+      )
+    }
   }
 
   private fun createOrUpdatePerson(prisonNumber: String) {

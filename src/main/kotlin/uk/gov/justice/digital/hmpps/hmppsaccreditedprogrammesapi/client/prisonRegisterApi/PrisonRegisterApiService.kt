@@ -18,20 +18,29 @@ constructor(
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
   }
-
   fun getAllPrisons(): Map<String?, String?> {
-    val prisonDetailsResult = when (val allPrisonDetails = prisonRegisterApiClient.getAllPrisonDetails()) {
-      is ClientResult.Success -> AuthorisableActionResult.Success(allPrisonDetails.body)
+    return getPrisonDetails { it.associate { details -> details.prisonId to details.prisonName } }
+  }
+
+  fun getPrisonById(prisonId: String): PrisonDetails? {
+    return getPrisonDetails { it.firstOrNull() }
+  }
+
+  private inline fun <reified T> getPrisonDetails(
+    retrieveResult: (List<PrisonDetails>) -> T,
+  ): T {
+    val prisonDetailsResult = when (val result = prisonRegisterApiClient.getAllPrisonDetails()) {
+      is ClientResult.Success -> AuthorisableActionResult.Success(result.body)
       is ClientResult.Failure.StatusCode -> {
-        log.warn("Failure to retrieve data. Status code ${allPrisonDetails.status} reason ${allPrisonDetails.toException().message}")
-        AuthorisableActionResult.Success(listOf<PrisonDetails>())
+        log.warn("Failure to retrieve data. Status code ${result.status} reason ${result.toException().message}")
+        AuthorisableActionResult.Success(emptyList())
       }
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data ${allPrisonDetails.toException().message}")
-        AuthorisableActionResult.Success(listOf<PrisonDetails>())
+        log.warn("Failure to retrieve data ${result.toException().message}")
+        AuthorisableActionResult.Success(emptyList())
       }
     }
 
-    return prisonDetailsResult.entity.associate { it.prisonId to it.prisonName }
+    return retrieveResult(prisonDetailsResult.entity)
   }
 }

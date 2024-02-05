@@ -4,6 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PrisonDetails(
-  var prisonId: String? = null,
-  var prisonName: String? = null,
+  var prisonId: String,
+  var prisonName: String,
 )
