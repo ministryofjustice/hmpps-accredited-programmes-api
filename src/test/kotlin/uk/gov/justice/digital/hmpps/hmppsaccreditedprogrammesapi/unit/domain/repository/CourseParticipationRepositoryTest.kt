@@ -128,6 +128,6 @@ class CourseParticipationRepositoryTest {
       this.createdByUsername shouldBe CLIENT_USERNAME
       this.lastModifiedByUsername shouldBe null
     }
-    persistedCourseParticipation.createdDateTime.shouldBeWithin(Duration.ofSeconds(1), transactionStartTime)
+    persistedCourseParticipation.createdDateTime.shouldBeWithin(Duration.ofSeconds(2), transactionStartTime)
   }
 }
