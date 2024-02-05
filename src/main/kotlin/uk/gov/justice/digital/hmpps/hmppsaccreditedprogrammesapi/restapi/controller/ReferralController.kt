@@ -23,6 +23,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
 import java.util.UUID
 
+private const val DEFAULT_DIRECTION = "ascending"
+private const val DEFAULT_SORT = "surname"
+
 @Service
 class ReferralController
 @Autowired
@@ -124,7 +127,7 @@ constructor(
     @RequestParam(value = "sortColumn", required = false) sortColumn: String?,
     @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
   ): ResponseEntity<PaginatedReferralView> {
-    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: "surname", sortDirection ?: "ascending"))
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val apiReferralSummaryPage =
       referralService.getReferralViewByOrganisationId(organisationId, pageable, status, audience, courseName)
 
@@ -148,7 +151,7 @@ constructor(
     @RequestParam(value = "sortColumn", required = false) sortColumn: String?,
     @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
   ): ResponseEntity<PaginatedReferralView> {
-    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: "surname", sortDirection ?: "ascending"))
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val username: String =
       securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
     val apiReferralSummaryPage =
@@ -167,7 +170,7 @@ constructor(
   }
 
   private fun getSortBy(sortColumn: String, sortDirection: String): Sort {
-    return if (sortDirection == "ascending") {
+    return if (sortDirection == DEFAULT_DIRECTION) {
       Sort.by(sortColumn).ascending()
     } else {
       Sort.by(sortColumn).descending()
