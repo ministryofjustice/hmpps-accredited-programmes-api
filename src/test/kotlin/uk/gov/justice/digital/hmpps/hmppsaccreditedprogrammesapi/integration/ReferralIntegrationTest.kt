@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
@@ -25,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
@@ -54,19 +56,53 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun setUp() {
     persistenceHelper.clearAllTableContent()
 
-    persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
-    persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
-    persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
+    persistenceHelper.createCourse(
+      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      "SC",
+      "Super Course",
+      "Sample description",
+      "SC++",
+      "General offence",
+    )
+    persistenceHelper.createOffering(
+      UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
+      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      "MDI",
+      "nobody-mdi@digital.justice.gov.uk",
+      "nobody2-mdi@digital.justice.gov.uk",
+      true,
+    )
+    persistenceHelper.createOffering(
+      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
+      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      "BWN",
+      "nobody-bwn@digital.justice.gov.uk",
+      "nobody2-bwn@digital.justice.gov.uk",
+      true,
+    )
 
-    persistenceHelper.createCourse(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"), "CC", "Custom Course", "Sample description", "CC", "General offence")
-    persistenceHelper.createCourse(UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"), "RC", "RAPID Course", "Sample description", "RC", "General offence")
+    persistenceHelper.createCourse(
+      UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
+      "CC",
+      "Custom Course",
+      "Sample description",
+      "CC",
+      "General offence",
+    )
+    persistenceHelper.createCourse(
+      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
+      "RC",
+      "RAPID Course",
+      "Sample description",
+      "RC",
+      "General offence",
+    )
   }
 
   @Test
   fun `Creating a referral with an existing user should return 201 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
-    personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER_3) shouldBe null
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
@@ -233,7 +269,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val audienceFilter = course.audience
     val courseNameFilter = course.name
 
-    val summary = getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
+    val summary =
+      getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
     summary.content.shouldNotBeEmpty()
 
     summary.content?.forEach { actualSummary ->
@@ -291,7 +328,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val audienceFilter = course.audience
     val courseNameFilter = course.name
 
-    val summary = getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
+    val summary =
+      getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
     summary.content.shouldNotBeEmpty()
 
     val expectedFirstSummary = ReferralSummary(
@@ -422,6 +460,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectBody<PaginatedReferralSummary>()
       .returnResult().responseBody!!
   }
+
   private fun encodeValue(value: String): String {
     return URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
   }
@@ -451,4 +490,152 @@ class ReferralIntegrationTest : IntegrationTestBase() {
             ),
         ),
     )
+
+  @Test
+  fun `Retrieving a list of filtered referral views for an organisation should return 200 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+    val createdReferral = getReferralById(referralCreated.referralId)
+
+    referralCreated.referralId.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
+
+    val statusFilter = listOf(createdReferral.status.toDomain().name)
+    val audienceFilter = course.audience
+    val courseNameFilter = course.name
+
+    val summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
+    summary.content.shouldNotBeEmpty()
+
+    summary.content?.forEach { actualSummary ->
+      listOf(
+        ReferralView(
+          id = createdReferral.id,
+          courseName = course.name,
+          audience = course.audience,
+          status = createdReferral.status,
+          prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = CLIENT_USERNAME,
+          forename = PRISONER_3.firstName,
+          surname = PRISONER_3.lastName,
+        ),
+      ).forEach { referralView ->
+        actualSummary.id shouldBe referralView.id
+        actualSummary.courseName shouldBe referralView.courseName
+        actualSummary.audience shouldBe referralView.audience
+        actualSummary.status shouldBe referralView.status
+        actualSummary.prisonNumber shouldBe referralView.prisonNumber
+        actualSummary.referrerUsername shouldBe referralView.referrerUsername
+        actualSummary.forename shouldBe referralView.forename
+        actualSummary.surname shouldBe referralView.surname
+      }
+    }
+  }
+
+  @Test
+  fun `Retrieving a list of filtered referrals views for an organisation with unknown course filter should return 200 with empty body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+    val createdReferral = getReferralById(referralCreated.referralId)
+
+    referralCreated.referralId.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
+
+    val statusFilter = listOf(createdReferral.status.toDomain().name)
+    val audienceFilter = course.audience
+    val courseNameFilter = course.name + "not a course"
+
+    val summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
+    summary.content.shouldBeEmpty()
+  }
+
+  @Test
+  fun `Retrieving a list of filtered referral views for the current user should return 200 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+    val createdReferral = getReferralById(referralCreated.referralId)
+
+    referralCreated.referralId.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
+
+    val statusFilter = listOf(createdReferral.status.toDomain().name)
+    val audienceFilter = course.audience
+    val courseNameFilter = course.name
+
+    val summary = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter)
+    summary.content.shouldNotBeEmpty()
+
+    summary.content?.forEach { actualSummary ->
+      listOf(
+        ReferralView(
+          id = createdReferral.id,
+          courseName = course.name,
+          audience = course.audience,
+          status = createdReferral.status,
+          prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = CLIENT_USERNAME,
+          forename = PRISONER_3.firstName,
+          surname = PRISONER_3.lastName,
+        ),
+      ).forEach { referralView ->
+        actualSummary.id shouldBe referralView.id
+        actualSummary.courseName shouldBe referralView.courseName
+        actualSummary.audience shouldBe referralView.audience
+        actualSummary.status shouldBe referralView.status
+        actualSummary.prisonNumber shouldBe referralView.prisonNumber
+        actualSummary.referrerUsername shouldBe referralView.referrerUsername
+        actualSummary.forename shouldBe referralView.forename
+        actualSummary.surname shouldBe referralView.surname
+      }
+    }
+  }
+
+  fun getReferralViewsByOrganisationId(
+    organisationId: String,
+    statusFilter: List<String>? = null,
+    audienceFilter: String? = null,
+    courseNameFilter: String? = null,
+  ): PaginatedReferralView {
+    val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/organisation/$organisationId/dashboard")
+    statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
+    audienceFilter?.let { uriBuilder.queryParam("audience", encodeValue(it)) }
+    courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
+
+    return webTestClient
+      .get()
+      .uri(uriBuilder.toUriString())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<PaginatedReferralView>()
+      .returnResult().responseBody!!
+  }
+
+  fun getReferralViewsByUsername(
+    statusFilter: List<String>? = null,
+    audienceFilter: String? = null,
+    courseNameFilter: String? = null,
+  ): PaginatedReferralView {
+    val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/me/dashboard")
+    statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
+    audienceFilter?.let { uriBuilder.queryParam("audience", encodeValue(it)) }
+    courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
+
+    return webTestClient
+      .get()
+      .uri(uriBuilder.toUriString())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<PaginatedReferralView>()
+      .returnResult().responseBody!!
+  }
 }

@@ -1,11 +1,15 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
+import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus as ApiReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate as ApiReferralUpdate
+
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   id = id!!,
   offeringId = offering.id!!,
@@ -42,4 +46,23 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
+)
+
+fun ReferralViewEntity.toApi() = ReferralView(
+  id = id,
+  referrerUsername = referrerUsername,
+  courseName = courseName,
+  audience = audience,
+  status = status.toApi(),
+  submittedOn = submittedOn?.toInstant(ZoneOffset.UTC),
+  prisonNumber = prisonNumber,
+  organisationName = organisationName,
+  organisationId = organisationId,
+  conditionalReleaseDate = conditionalReleaseDate,
+  paroleEligibilityDate = paroleEligibilityDate,
+  tariffExpiryDate = tariffExpiryDate,
+  earliestReleaseDate = earliestReleaseDate,
+  earliestReleaseDateType = earliestReleaseDateType,
+  forename = forename,
+  surname = surname,
 )

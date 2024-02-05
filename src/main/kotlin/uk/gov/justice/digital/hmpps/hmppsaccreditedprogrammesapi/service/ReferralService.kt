@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.domain.Sort.Direction
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,6 +21,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
@@ -42,6 +46,7 @@ constructor(
   private val referralSummaryBuilderService: ReferralSummaryBuilderService,
   private val personRepository: PersonRepository,
   private val organisationRepository: OrganisationRepository,
+  private val referralViewRepository: ReferralViewRepository,
 ) {
 
   fun createReferral(
@@ -227,5 +232,55 @@ constructor(
     val apiContent = referralSummaryBuilderService.build(content, prisonersDetails, allPrisons, true)
 
     return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
+  }
+
+  fun getReferralViewByOrganisationId(
+    organisationId: String,
+    pageable: Pageable,
+    status: List<String>?,
+    audience: String?,
+    courseName: String?,
+    sortColumn: String = "surname",
+    sortDirection: Direction = Direction.ASC,
+    pageNumber: Int = 0,
+    pageSize: Int = 10,
+  ): Page<ReferralViewEntity> {
+    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
+
+    val referralViewPage =
+      referralViewRepository.getReferralsByOrganisationId(
+        organisationId,
+        PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortColumn)),
+        statusEnums,
+        audience,
+        courseName,
+      )
+
+    return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
+  }
+
+  fun getReferralViewByUsername(
+    username: String,
+    pageable: Pageable,
+    status: List<String>?,
+    audience: String?,
+    courseName: String?,
+    sortColumn: String = "surname",
+    sortDirection: Direction = Direction.ASC,
+    pageNumber: Int = 0,
+    pageSize: Int = 10,
+  ): Page<ReferralViewEntity> {
+    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
+
+    val referralViewPage =
+      referralViewRepository.getReferralsByUsername(
+        username,
+        PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortColumn)),
+        statusEnums,
+        audience,
+        courseName,
+      )
+
+    return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
   }
 }
