@@ -4,7 +4,6 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.domain.Page
@@ -21,7 +20,6 @@ import java.util.UUID
 @Table(name = "referral_view")
 data class ReferralViewEntity(
   @Id
-  @GeneratedValue
   @Column(name = "referral_id")
   var id: UUID? = null,
   val prisonNumber: String,
