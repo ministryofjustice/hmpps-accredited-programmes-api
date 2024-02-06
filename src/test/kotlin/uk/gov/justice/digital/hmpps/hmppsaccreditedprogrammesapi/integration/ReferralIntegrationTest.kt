@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.equals.shouldBeEqual
@@ -17,28 +16,20 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.util.UriComponentsBuilder
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_3
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_3
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.net.URLEncoder
@@ -52,9 +43,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var personRepository: PersonRepository
-
-  @Autowired
-  lateinit var referralViewRepository: ReferralViewRepository
 
   @BeforeEach
   fun setUp() {
@@ -253,138 +241,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNotFound
   }
 
-  @Test
-  fun `Retrieving a list of filtered referrals for an organisation should return 200 with correct body`() {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
-    val createdReferral = getReferralById(referralCreated.referralId)
-
-    val prisoners = listOf(PRISONER_1)
-    val prisons = listOf(PrisonDetails(prisonId = ORGANISATION_ID_MDI, prisonName = PRISON_NAME))
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    mockPrisonerSearchResponse(prisoners)
-    mockPrisonRegisterResponse(prisons)
-
-    referralCreated.referralId.shouldNotBeNull()
-    createdReferral.shouldNotBeNull()
-
-    val statusFilter = listOf(createdReferral.status.toDomain().name)
-    val audienceFilter = course.audience
-    val courseNameFilter = course.name
-
-    val summary =
-      getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
-    summary.content.shouldNotBeEmpty()
-
-    summary.content?.forEach { actualSummary ->
-      listOf(
-        ReferralSummary(
-          id = createdReferral.id,
-          courseName = course.name,
-          audience = course.audience,
-          status = createdReferral.status,
-          submittedOn = createdReferral.submittedOn,
-          prisonNumber = createdReferral.prisonNumber,
-          referrerUsername = CLIENT_USERNAME,
-        ),
-      ).forEach { expectedSummary ->
-        actualSummary.id shouldBe expectedSummary.id
-        actualSummary.courseName shouldBe expectedSummary.courseName
-        actualSummary.audience shouldBe expectedSummary.audience
-        actualSummary.status shouldBe expectedSummary.status
-        actualSummary.submittedOn shouldBe expectedSummary.submittedOn
-        actualSummary.prisonNumber shouldBe expectedSummary.prisonNumber
-        actualSummary.referrerUsername shouldBe expectedSummary.referrerUsername
-      }
-    }
-  }
-
-  @Test
-  fun `Retrieving a list of multi-status-filtered referrals for an organisation should return 200 with correct body`() {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-
-    val firstReferralCreated = createReferral(offering.id)
-    val firstCreatedReferral = getReferralById(firstReferralCreated.referralId)
-
-    val secondReferralCreated = createReferral(offering.id)
-    val secondCreatedReferral = getReferralById(secondReferralCreated.referralId)
-
-    firstReferralCreated.referralId.shouldNotBeNull()
-    firstCreatedReferral.shouldNotBeNull()
-
-    secondReferralCreated.referralId.shouldNotBeNull()
-    secondCreatedReferral.shouldNotBeNull()
-
-    val secondReferralStatusUpdate = ReferralStatusUpdate(
-      status = ReferralStatus.referralSubmitted,
-    )
-
-    updateReferralStatus(secondCreatedReferral.id, secondReferralStatusUpdate)
-
-    getReferralById(secondCreatedReferral.id).status shouldBe secondReferralStatusUpdate.status
-
-    val firstReferralStatus = firstCreatedReferral.status.toDomain().name
-    val secondReferralStatus = secondCreatedReferral.status.toDomain().name
-
-    val statusFilter = listOf(firstReferralStatus, secondReferralStatus)
-    val audienceFilter = course.audience
-    val courseNameFilter = course.name
-
-    val summary =
-      getReferralSummariesByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
-    summary.content.shouldNotBeEmpty()
-
-    val expectedFirstSummary = ReferralSummary(
-      id = firstCreatedReferral.id,
-      courseName = course.name,
-      audience = course.audience,
-      status = firstCreatedReferral.status,
-      submittedOn = firstCreatedReferral.submittedOn,
-      prisonNumber = firstCreatedReferral.prisonNumber,
-      referrerUsername = CLIENT_USERNAME,
-    )
-
-    val expectedSecondSummary = ReferralSummary(
-      id = secondCreatedReferral.id,
-      courseName = course.name,
-      audience = course.audience,
-      status = secondCreatedReferral.status,
-      submittedOn = secondCreatedReferral.submittedOn,
-      prisonNumber = secondCreatedReferral.prisonNumber,
-      referrerUsername = CLIENT_USERNAME,
-    )
-
-    val expectedSummaries = setOf(expectedFirstSummary, expectedSecondSummary)
-
-    summary.content?.forEach { actualSummary ->
-      val expectedSummary = expectedSummaries.find { it.id == actualSummary.id }
-      expectedSummary.shouldNotBeNull()
-
-      actualSummary.id shouldBe expectedSummary.id
-      actualSummary.courseName shouldBe expectedSummary.courseName
-      actualSummary.audience shouldBe expectedSummary.audience
-      actualSummary.status shouldBe expectedSummary.status
-      actualSummary.submittedOn shouldBe expectedSummary.submittedOn
-      actualSummary.prisonNumber shouldBe expectedSummary.prisonNumber
-      actualSummary.referrerUsername shouldBe expectedSummary.referrerUsername
-    }
-  }
-
-  @Test
-  fun `Retrieving a list of referrals for an organisation with no referrals should return 200 with empty body`() {
-    val randomOrganisationId = randomUppercaseString(3)
-    val prisoners = listOf(PRISONER_1)
-    val prisons = listOf(PrisonDetails(prisonId = ORGANISATION_ID_MDI, prisonName = PRISON_NAME))
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    mockPrisonerSearchResponse(prisoners)
-    mockPrisonRegisterResponse(prisons)
-
-    val paginatedReferralSummaries = getReferralSummariesByOrganisationId(randomOrganisationId)
-    paginatedReferralSummaries.content?.shouldBeEmpty()
-  }
-
   fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =
     webTestClient
       .post()
@@ -443,57 +299,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNoContent
   }
 
-  fun getReferralSummariesByOrganisationId(
-    organisationId: String,
-    statusFilter: List<String>? = null,
-    audienceFilter: String? = null,
-    courseNameFilter: String? = null,
-  ): PaginatedReferralSummary {
-    val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/organisation/$organisationId/dashboard")
-    statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
-    audienceFilter?.let { uriBuilder.queryParam("audience", encodeValue(it)) }
-    courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
-
-    return webTestClient
-      .get()
-      .uri(uriBuilder.toUriString())
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<PaginatedReferralSummary>()
-      .returnResult().responseBody!!
-  }
-
   private fun encodeValue(value: String): String {
     return URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
   }
-
-  private fun mockPrisonerSearchResponse(prisoners: List<Prisoner>) =
-    wiremockServer.stubFor(
-      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers"))
-        .willReturn(
-          WireMock.aResponse()
-            .withHeader("Content-Type", "application/json")
-            .withStatus(200)
-            .withBody(
-              objectMapper.writeValueAsString(prisoners),
-            ),
-        ),
-    )
-
-  private fun mockPrisonRegisterResponse(prisons: List<PrisonDetails>) =
-    wiremockServer.stubFor(
-      WireMock.get(WireMock.urlEqualTo("/prisons/names"))
-        .willReturn(
-          WireMock.aResponse()
-            .withHeader("Content-Type", "application/json")
-            .withStatus(200)
-            .withBody(
-              objectMapper.writeValueAsString(prisons),
-            ),
-        ),
-    )
 
   @Test
   fun `Retrieving a list of filtered referral views for an organisation should return 200 with correct body`() {
