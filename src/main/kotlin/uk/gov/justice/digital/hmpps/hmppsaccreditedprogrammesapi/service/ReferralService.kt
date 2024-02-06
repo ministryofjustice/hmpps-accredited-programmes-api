@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
-import org.springframework.data.domain.Sort.Direction
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -240,17 +238,13 @@ constructor(
     status: List<String>?,
     audience: String?,
     courseName: String?,
-    sortColumn: String = "surname",
-    sortDirection: Direction = Direction.ASC,
-    pageNumber: Int = 0,
-    pageSize: Int = 10,
   ): Page<ReferralViewEntity> {
     val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
 
     val referralViewPage =
       referralViewRepository.getReferralsByOrganisationId(
         organisationId,
-        PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortColumn)),
+        pageable,
         statusEnums,
         audience,
         courseName,
@@ -265,17 +259,13 @@ constructor(
     status: List<String>?,
     audience: String?,
     courseName: String?,
-    sortColumn: String = "surname",
-    sortDirection: Direction = Direction.ASC,
-    pageNumber: Int = 0,
-    pageSize: Int = 10,
   ): Page<ReferralViewEntity> {
     val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
 
     val referralViewPage =
       referralViewRepository.getReferralsByUsername(
         username,
-        PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortColumn)),
+        pageable,
         statusEnums,
         audience,
         courseName,

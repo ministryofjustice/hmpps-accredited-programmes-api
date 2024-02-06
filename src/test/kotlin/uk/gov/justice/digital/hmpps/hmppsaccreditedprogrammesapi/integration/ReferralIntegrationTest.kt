@@ -38,6 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_3
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.net.URLEncoder
@@ -51,6 +52,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var personRepository: PersonRepository
+
+  @Autowired
+  lateinit var referralViewRepository: ReferralViewRepository
 
   @BeforeEach
   fun setUp() {
@@ -601,11 +605,17 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     statusFilter: List<String>? = null,
     audienceFilter: String? = null,
     courseNameFilter: String? = null,
+    pageNumber: Number = 0,
+    sortColumn: String? = null,
+    sortDirection: String? = null,
   ): PaginatedReferralView {
     val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/organisation/$organisationId/dashboard")
     statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
     audienceFilter?.let { uriBuilder.queryParam("audience", encodeValue(it)) }
     courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
+    uriBuilder.queryParam("page", pageNumber)
+    sortColumn?.let { uriBuilder.queryParam("sortColumn", encodeValue(it)) }
+    sortDirection?.let { uriBuilder.queryParam("sortDirection", encodeValue(it)) }
 
     return webTestClient
       .get()
@@ -637,5 +647,51 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody<PaginatedReferralView>()
       .returnResult().responseBody!!
+  }
+
+  @Test
+  fun `Retrieving a list of referral views for an organisation should return 200 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+
+    repeat(21) {
+      createReferral(offering.id, PRISON_NUMBER_3)
+    }
+
+    val summaryPage0 =
+      getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, sortColumn = "audience", sortDirection = "descending")
+    summaryPage0.content.shouldNotBeEmpty()
+    summaryPage0.content?.size?.shouldBeEqual(10)
+    summaryPage0.totalPages.shouldBe(3)
+    summaryPage0.totalElements.shouldBe(21)
+    summaryPage0.pageNumber.shouldBe(0)
+    summaryPage0.pageSize.shouldBe(10)
+
+    val summaryPage1 = getReferralViewsByOrganisationId(
+      ORGANISATION_ID_MDI,
+      pageNumber = 1,
+      sortColumn = "audience",
+      sortDirection = "descending",
+    )
+    summaryPage1.content.shouldNotBeEmpty()
+    summaryPage1.content?.size?.shouldBeEqual(10)
+    summaryPage1.totalPages.shouldBe(3)
+    summaryPage1.totalElements.shouldBe(21)
+    summaryPage1.pageNumber.shouldBe(1)
+    summaryPage1.pageSize.shouldBe(10)
+
+    val summaryPage2 = getReferralViewsByOrganisationId(
+      ORGANISATION_ID_MDI,
+      pageNumber = 2,
+      sortColumn = "audience",
+      sortDirection = "descending",
+    )
+    summaryPage2.content.shouldNotBeEmpty()
+    summaryPage2.content?.size?.shouldBeEqual(1)
+    summaryPage2.totalPages.shouldBe(3)
+    summaryPage2.totalElements.shouldBe(21)
+    summaryPage2.pageNumber.shouldBe(2)
+    summaryPage2.pageSize.shouldBe(10)
   }
 }
