@@ -63,6 +63,7 @@ fun ReferralViewEntity.toApi() = ReferralView(
   tariffExpiryDate = tariffExpiryDate,
   earliestReleaseDate = earliestReleaseDate,
   earliestReleaseDateType = earliestReleaseDateType,
+  nonDtoReleaseDateType = nonDtoReleaseDateType,
   forename = forename,
   surname = surname,
 )

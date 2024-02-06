@@ -30,6 +30,7 @@ data class ReferralViewEntity(
   val tariffExpiryDate: LocalDate?,
   val earliestReleaseDate: LocalDate?,
   val earliestReleaseDateType: String?,
+  val nonDtoReleaseDateType: String?,
   val organisationId: String?,
   val organisationName: String?,
   @Enumerated(EnumType.STRING)
