@@ -1715,7 +1715,10 @@ components:
           description: Earliest release date, if applicable, to this individual. Derived from Sentence information.
         earliestReleaseDateType:
           type: string
-          description: Earliest release date type
+          description: Earliest release date type used
+        nonDtoReleaseDateType:
+          type: string
+          description: Release date type
         forename:
           type: string
           description: forename of the person
