@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestParam
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
@@ -21,6 +22,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
 import java.util.UUID
+
+private const val DEFAULT_DIRECTION = "ascending"
+private const val DEFAULT_SORT = "surname"
 
 @Service
 class ReferralController
@@ -73,7 +77,8 @@ constructor(
     @RequestParam(value = "courseName", required = false) courseName: String?,
   ): ResponseEntity<PaginatedReferralSummary> {
     val pageable = PageRequest.of(page, size, Sort.by("referralId"))
-    val apiReferralSummaryPage = referralService.getReferralsByOrganisationId(organisationId, pageable, status, audience, courseName)
+    val apiReferralSummaryPage =
+      referralService.getReferralsByOrganisationId(organisationId, pageable, status, audience, courseName)
 
     return ResponseEntity.ok(
       PaginatedReferralSummary(
@@ -95,8 +100,10 @@ constructor(
     @RequestParam(value = "courseName", required = false) courseName: String?,
   ): ResponseEntity<PaginatedReferralSummary> {
     val pageable = PageRequest.of(page, size, Sort.by("referralId"))
-    val username: String = securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
-    val apiReferralSummaryPage = referralService.getReferralsByUsername(username, pageable, status, audience, courseName)
+    val username: String =
+      securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
+    val apiReferralSummaryPage =
+      referralService.getReferralsByUsername(username, pageable, status, audience, courseName)
 
     return ResponseEntity.ok(
       PaginatedReferralSummary(
@@ -108,5 +115,65 @@ constructor(
         pageIsEmpty = apiReferralSummaryPage.isEmpty,
       ),
     )
+  }
+
+  override fun getReferralViewsByOrganisationId(
+    organisationId: String,
+    @RequestParam(value = "page", defaultValue = "0") page: Int,
+    @RequestParam(value = "size", defaultValue = "10") size: Int,
+    @RequestParam(value = "status", required = false) status: List<String>?,
+    @RequestParam(value = "audience", required = false) audience: String?,
+    @RequestParam(value = "courseName", required = false) courseName: String?,
+    @RequestParam(value = "sortColumn", required = false) sortColumn: String?,
+    @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
+  ): ResponseEntity<PaginatedReferralView> {
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
+    val apiReferralSummaryPage =
+      referralService.getReferralViewByOrganisationId(organisationId, pageable, status, audience, courseName)
+
+    return ResponseEntity.ok(
+      PaginatedReferralView(
+        content = apiReferralSummaryPage.content.map { it.toApi() },
+        totalPages = apiReferralSummaryPage.totalPages,
+        totalElements = apiReferralSummaryPage.totalElements.toInt(),
+        pageSize = apiReferralSummaryPage.size,
+        pageNumber = apiReferralSummaryPage.number,
+        pageIsEmpty = apiReferralSummaryPage.isEmpty,
+      ),
+    )
+  }
+  override fun getReferralViewsByCurrentUser(
+    @RequestParam(value = "page", defaultValue = "0") page: Int,
+    @RequestParam(value = "size", defaultValue = "10") size: Int,
+    @RequestParam(value = "status", required = false) status: List<String>?,
+    @RequestParam(value = "audience", required = false) audience: String?,
+    @RequestParam(value = "courseName", required = false) courseName: String?,
+    @RequestParam(value = "sortColumn", required = false) sortColumn: String?,
+    @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
+  ): ResponseEntity<PaginatedReferralView> {
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
+    val username: String =
+      securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
+    val apiReferralSummaryPage =
+      referralService.getReferralViewByUsername(username, pageable, status, audience, courseName)
+
+    return ResponseEntity.ok(
+      PaginatedReferralView(
+        content = apiReferralSummaryPage.content.map { it.toApi() },
+        totalPages = apiReferralSummaryPage.totalPages,
+        totalElements = apiReferralSummaryPage.totalElements.toInt(),
+        pageSize = apiReferralSummaryPage.size,
+        pageNumber = apiReferralSummaryPage.number,
+        pageIsEmpty = apiReferralSummaryPage.isEmpty,
+      ),
+    )
+  }
+
+  private fun getSortBy(sortColumn: String, sortDirection: String): Sort {
+    return if (sortDirection == DEFAULT_DIRECTION) {
+      Sort.by(sortColumn).ascending()
+    } else {
+      Sort.by(sortColumn).descending()
+    }
   }
 }
