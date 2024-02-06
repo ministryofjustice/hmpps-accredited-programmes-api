@@ -17,6 +17,7 @@ VALUES ('93352a36-7307-4623-b977-183167ef0f08', 'Plum Course', 'PC0', 'Torrens c
        ('2a10c1b0-1d60-4d90-8fe9-fbb298716dea', 'Fuchsia Course', 'FC6', 'Verbera sponte demoror tendo tum valens unus dolores. Corporis conor vesco deorsum cursus. Aperio cado incidunt demens arcesso arceo causa somniculosus.', 'Sexual offence', 'FC'),
        ('f0225917-82a6-42fd-a2d8-1451f02c3bbd', 'Magenta Course', 'MC7', 'Ventosus perferendis cognatus sapiente viridis excepturi alius vitium. Cotidie conventus adfero victus depono fugiat volup contigo. Surculus cum atrox curriculum demum timidus. Solitudo necessitatibus quidem damnatio nesciunt capitulus crinis tutis baiulus. Admiratio arcus tonsor.', 'Extremism offence', 'MC'),
        ('9d38ce12-a49a-434a-a1c5-3181629e7114', 'Silver Course', 'SC8', 'Reiciendis titulus quam damno careo umquam aro fuga adicio. Concido bibo studio tutamen communis. Audax coepi abeo admitto capitulus stipes perspiciatis angelus.', 'Sexual offence', 'SC'),
+       ('2abc9ef4-c7a9-43b3-8391-04006288e324', 'Drug Rehab Course', 'DRC', 'Reiciendis titulus quam damno careo ', 'Drug offence', 'DRSC'),
        ('9e414bb8-0d5f-4a39-8d50-6fe2b9b945ca', 'Orchid Course', 'OC9', 'Ullus ascit teres ver laboriosam. Attollo utrimque spiculum collum adsidue subiungo. Synagoga aurum spargo doloribus urbanus sustineo tero vulgus deporto armarium. Avarus verbum aperte a. Ad veritatis aegrotatio absorbeo carcer caecus thymbra caritas.', 'General violence offence', 'OC');
 
 INSERT INTO prerequisite(course_id, name, description)

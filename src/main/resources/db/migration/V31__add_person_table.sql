@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS person
     non_dto_release_date_type TEXT
 );
 
-CREATE INDEX idx_person_prison_number
+CREATE INDEX IF NOT EXISTS idx_person_prison_number
     ON person(prison_number);
