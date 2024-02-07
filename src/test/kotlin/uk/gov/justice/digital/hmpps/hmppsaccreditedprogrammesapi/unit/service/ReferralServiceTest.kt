@@ -156,8 +156,8 @@ class ReferralServiceTest {
 
     every { organisationRepository.findOrganisationEntityByCode(prisonCode) } returns null
 
-    val prisonDetails = PrisonDetails(prisonCode, prisonName)
-    every { prisonRegisterApiService.getPrisonById(prisonCode) } returns prisonDetails
+    val prisonDetail = PrisonDetails(prisonCode, prisonName)
+    every { prisonRegisterApiService.getPrisonById(prisonCode) } returns prisonDetail
 
     every { organisationRepository.save(any()) } returns OrganisationEntityFactory().produce()
 
