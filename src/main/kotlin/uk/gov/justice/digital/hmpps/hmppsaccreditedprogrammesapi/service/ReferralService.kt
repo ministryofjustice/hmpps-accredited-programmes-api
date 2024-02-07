@@ -136,6 +136,7 @@ constructor(
 
     if (referral != null && updatePersonDetails) {
       createOrUpdatePerson(referral.prisonNumber)
+      createOrganisationIfNotPresent(referral.offering.organisationId)
     }
     return referral
   }
