@@ -18,7 +18,7 @@ jobs:
       name: hmpps/java
       tag: "21.0"
     environment:
-      _JAVA_OPTIONS: "-Xmx3g"
+      _JAVA_OPTIONS: "-Xmx4g"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
     steps:
       - checkout
@@ -31,7 +31,7 @@ jobs:
             PACT_PROVIDER_VERSION="$CIRCLE_SHA1" \
             PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
             PACT_PUBLISH_RESULTS="true" \
-            ./gradlew check
+            ./gradlew check --debug
       - save_cache:
           paths:
             - ~/.gradle
