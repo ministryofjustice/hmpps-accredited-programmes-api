@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.match
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -220,8 +219,8 @@ class ReferralServiceTest {
 
     every { organisationRepository.findOrganisationEntityByCode(prisonCode) } returns null
 
-    val prisonDetails = PrisonDetails(prisonCode, prisonName)
-    every { prisonRegisterApiService.getPrisonById(prisonCode) } returns prisonDetails
+    val prisonDetail = PrisonDetails(prisonCode, prisonName)
+    every { prisonRegisterApiService.getPrisonById(prisonCode) } returns prisonDetail
 
     every { organisationRepository.save(any()) } returns OrganisationEntityFactory().produce()
 
