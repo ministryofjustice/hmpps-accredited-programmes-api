@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import jakarta.validation.ValidationException
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -46,7 +47,7 @@ constructor(
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
 ) {
-
+  private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
@@ -75,17 +76,16 @@ constructor(
   }
 
   private fun createOrganisationIfNotPresent(code: String) {
-    organisationRepository.findOrganisationEntityByCode(code)?.let {
-      return
-    }
+    val organisation = organisationRepository.findOrganisationEntityByCode(code)
 
-    prisonRegisterApiService.getPrisonById(code)?.let { prisonDetails ->
-      organisationRepository.save(
-        OrganisationEntity(
-          code = prisonDetails.prisonId,
-          name = prisonDetails.prisonName,
-        ),
-      )
+    if (organisation == null) {
+      prisonRegisterApiService.getPrisonById(code)?.let {
+        try {
+          organisationRepository.save(OrganisationEntity(code = it.prisonId, name = it.prisonName))
+        } catch (e: Exception) {
+          log.warn("Failed to save organisation details for prison $code", e)
+        }
+      } ?: log.warn("Prison details could not be fetched for $code")
     }
   }
 
