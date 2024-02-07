@@ -5,12 +5,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
@@ -42,7 +40,6 @@ constructor(
   private val offeringRepository: OfferingRepository,
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val prisonerSearchApiService: PrisonerSearchApiService,
-  private val referralSummaryBuilderService: ReferralSummaryBuilderService,
   private val personRepository: PersonRepository,
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
@@ -194,43 +191,6 @@ constructor(
         throw IllegalArgumentException("Referral $referralId is already submitted and currently being assessed")
       }
     }
-  }
-
-  fun getReferralsByOrganisationId(
-    organisationId: String,
-    pageable: Pageable,
-    status: List<String>?,
-    audience: String?,
-    courseName: String?,
-  ): Page<ReferralSummary> {
-    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
-    val referralProjectionPage =
-      referralRepository.getReferralsByOrganisationId(organisationId, pageable, statusEnums, audience, courseName)
-    val content = referralProjectionPage.content
-    val prisoners = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
-    val prisons = prisonRegisterApiService.getAllPrisons()
-    val apiContent = referralSummaryBuilderService.build(content, prisoners, prisons, false)
-
-    return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
-  }
-
-  fun getReferralsByUsername(
-    username: String,
-    pageable: PageRequest,
-    status: List<String>?,
-    audience: String?,
-    courseName: String?,
-  ): Page<ReferralSummary> {
-    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
-    val referralProjectionPage =
-      referralRepository.getReferralsByUsername(username, pageable, statusEnums, audience, courseName)
-    val content = referralProjectionPage.content
-
-    val prisonersDetails = prisonerSearchApiService.getPrisoners(content.map { it.prisonNumber }.distinct())
-    val allPrisons = prisonRegisterApiService.getAllPrisons()
-    val apiContent = referralSummaryBuilderService.build(content, prisonersDetails, allPrisons, true)
-
-    return PageImpl(apiContent, pageable, referralProjectionPage.totalElements)
   }
 
   fun getReferralViewByOrganisationId(

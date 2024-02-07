@@ -17,6 +17,9 @@ jobs:
     executor:
       name: hmpps/java
       tag: "21.0"
+    environment:
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=-Xmx1024m "
     steps:
       - checkout
       - restore_cache:
