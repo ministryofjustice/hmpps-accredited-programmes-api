@@ -18,8 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONERS
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONS
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
@@ -69,8 +67,6 @@ class ReferralServiceTest {
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    every { prisonRegisterApiService.getAllPrisons() } returns PRISONS
-    every { prisonerSearchApiService.getPrisoners(any()) } returns PRISONERS
   }
 
   private fun mockSecurityContext(username: String) {

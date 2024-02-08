@@ -6,7 +6,6 @@ import au.com.dius.pact.provider.junitsupport.State
 import au.com.dius.pact.provider.junitsupport.VerificationReports
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker
 import au.com.dius.pact.provider.spring.junit5.PactVerificationSpringProvider
-import com.github.tomakehurst.wiremock.client.WireMock
 import org.apache.hc.core5.http.HttpRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
@@ -16,8 +15,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_2
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import java.time.LocalDateTime
 import java.util.*
@@ -32,17 +29,6 @@ class PactContractTest : IntegrationTestBase() {
   @BeforeEach
   fun setup() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    wiremockServer.stubFor(
-      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers"))
-        .willReturn(
-          WireMock.aResponse()
-            .withHeader("Content-Type", "application/json")
-            .withStatus(200)
-            .withBody(
-              objectMapper.writeValueAsString(listOf(PRISONER_1, PRISONER_2)),
-            ),
-        ),
-    )
     persistenceHelper.clearAllTableContent()
   }
 
