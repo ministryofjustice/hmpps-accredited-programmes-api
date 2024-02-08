@@ -19,22 +19,6 @@ constructor(
     private val log = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getAllPrisons(): Map<String?, String?> {
-    val prisonDetailsResult = when (val allPrisonDetails = prisonRegisterApiClient.getAllPrisonDetails()) {
-      is ClientResult.Success -> AuthorisableActionResult.Success(allPrisonDetails.body)
-      is ClientResult.Failure.StatusCode -> {
-        log.warn("Failure to retrieve data. Status code ${allPrisonDetails.status} reason ${allPrisonDetails.toException().message}")
-        AuthorisableActionResult.Success(listOf<PrisonDetails>())
-      }
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data ${allPrisonDetails.toException().message}")
-        AuthorisableActionResult.Success(listOf<PrisonDetails>())
-      }
-    }
-
-    return prisonDetailsResult.entity.associate { it.prisonId to it.prisonName }
-  }
-
   fun getPrisonById(prisonId: String): PrisonDetails? {
     val prisonDetailsResult = when (val prison = prisonRegisterApiClient.getPrisonDetailsByPrisonId(prisonId)) {
       is ClientResult.Success -> AuthorisableActionResult.Success(prison.body)

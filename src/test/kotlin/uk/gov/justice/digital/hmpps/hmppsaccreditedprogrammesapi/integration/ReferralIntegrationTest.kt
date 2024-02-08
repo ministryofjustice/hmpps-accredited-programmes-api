@@ -29,7 +29,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_3
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_3
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.net.URLEncoder
@@ -97,9 +96,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
 
-    val personEntity = personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER_3)
+    val personEntity = personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER_1)
 
     personEntity.shouldNotBeNull()
     personEntity.surname.shouldBeEqual(PRISONER_3.lastName)
@@ -111,7 +110,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       id = referralCreated.referralId,
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
-      prisonNumber = PRISON_NUMBER_3,
+      prisonNumber = PRISON_NUMBER_1,
       status = ReferralStatus.referralStarted,
       additionalInformation = null,
       oasysConfirmed = false,
@@ -308,7 +307,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
     val createdReferral = getReferralById(referralCreated.referralId)
 
     referralCreated.referralId.shouldNotBeNull()
@@ -351,7 +350,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
     val createdReferral = getReferralById(referralCreated.referralId)
 
     referralCreated.referralId.shouldNotBeNull()
@@ -370,7 +369,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id, PRISON_NUMBER_3)
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
     val createdReferral = getReferralById(referralCreated.referralId)
 
     referralCreated.referralId.shouldNotBeNull()
@@ -464,7 +463,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offering = getAllOfferingsForCourse(course.id).first()
 
     repeat(21) {
-      createReferral(offering.id, PRISON_NUMBER_3)
+      createReferral(offering.id, PRISON_NUMBER_1)
     }
 
     val summaryPage0 =

@@ -9,10 +9,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_2
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_3
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_2
 
 class PrisonerSearchApiServiceTest {
 
@@ -21,12 +19,12 @@ class PrisonerSearchApiServiceTest {
 
   @Test
   fun `should return list of prisoners`() {
-    val prisonerDetails = listOf(PRISONER_1, PRISONER_2)
+    val prisonerDetails = listOf(PRISONER_3)
 
     every { prisonerSearchApiClient.getPrisonersByPrisonNumbers(any()) } returns ClientResult.Success(HttpStatus.OK, prisonerDetails)
 
-    val result = service.getPrisoners(listOf(PRISON_NUMBER_1, PRISON_NUMBER_2))
-    assertEquals(listOf(PRISONER_1, PRISONER_2), result)
+    val result = service.getPrisoners(listOf(PRISON_NUMBER_1))
+    assertEquals(listOf(PRISONER_3), result)
   }
 
   @Test
@@ -38,7 +36,7 @@ class PrisonerSearchApiServiceTest {
       "",
     )
 
-    val result = service.getPrisoners(listOf(PRISON_NUMBER_1, PRISON_NUMBER_2))
+    val result = service.getPrisoners(listOf(PRISON_NUMBER_1))
 
     assertTrue(result.isEmpty())
   }

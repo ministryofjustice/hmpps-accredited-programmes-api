@@ -16,8 +16,4 @@ class PrisonRegisterApiClient(
   fun getPrisonDetailsByPrisonId(prisonId: String) = getRequest<PrisonDetails> {
     path = "/prisons/id/$prisonId"
   }
-
-  fun getAllPrisonDetails() = getRequest<List<PrisonDetails>> {
-    path = "/prisons/names"
-  }
 }
