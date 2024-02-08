@@ -27,7 +27,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.flywaydb:flyway-core")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.2")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.15.3")
   implementation("com.google.guava:guava:33.0.0-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
