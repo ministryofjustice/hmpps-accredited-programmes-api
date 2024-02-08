@@ -9,14 +9,14 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.WiremockPortHolder
 
-class TestPropertiesInitializer : ApplicationContextInitializer<ConfigurableApplicationContext?> {
+class TestPropertiesInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-  override fun initialize(applicationContext: ConfigurableApplicationContext?) {
+  override fun initialize(applicationContext: ConfigurableApplicationContext) {
     val wiremockPort = WiremockPortHolder.getPort()
 
     val upstreamServiceUrlsToOverride = mutableMapOf<String, String>()
 
-    applicationContext!!.environment.propertySources
+    applicationContext.environment.propertySources
       .filterIsInstance<OriginTrackedMapPropertySource>()
       .filter { it.name.contains("application-test.yml") }
       .forEach { propertyFile ->
