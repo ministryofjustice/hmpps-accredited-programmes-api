@@ -20,7 +20,7 @@ val PAROLE_ELIGIBILITY_DATE: LocalDate = LocalDate.now().plusYears(1)
 const val PRISON_ID_1 = "1"
 const val PRISON_NAME_1 = "PRISON_ONE"
 
-val PRISONER_3 = Prisoner(
+val PRISONER_1 = Prisoner(
   prisonerNumber = PRISON_NUMBER_1,
   bookingId = BOOKING_ID,
   firstName = "JOHN",

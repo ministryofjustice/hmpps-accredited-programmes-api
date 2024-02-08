@@ -9,7 +9,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_3
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 
 class PrisonerSearchApiServiceTest {
@@ -19,12 +19,12 @@ class PrisonerSearchApiServiceTest {
 
   @Test
   fun `should return list of prisoners`() {
-    val prisonerDetails = listOf(PRISONER_3)
+    val prisonerDetails = listOf(PRISONER_1)
 
     every { prisonerSearchApiClient.getPrisonersByPrisonNumbers(any()) } returns ClientResult.Success(HttpStatus.OK, prisonerDetails)
 
     val result = service.getPrisoners(listOf(PRISON_NUMBER_1))
-    assertEquals(listOf(PRISONER_3), result)
+    assertEquals(listOf(PRISONER_1), result)
   }
 
   @Test
