@@ -87,7 +87,7 @@ abstract class IntegrationTestBase {
   lateinit var persistenceHelper: PersistenceHelper
 
   @Value("\${wiremock.port}")
-  lateinit var wiremockPort: Integer
+  var wiremockPort: Int = 0
 
   val objectMapper = jacksonObjectMapper().apply {
     registerModule(JavaTimeModule())
@@ -97,7 +97,7 @@ abstract class IntegrationTestBase {
   fun beforeEach() {
     wiremockServer = WireMockServer(
       WireMockConfiguration()
-        .port(wiremockPort.toInt())
+        .port(wiremockPort)
         .usingFilesUnderClasspath("simulations")
         .maxLoggedResponseSize(100_000),
     )
