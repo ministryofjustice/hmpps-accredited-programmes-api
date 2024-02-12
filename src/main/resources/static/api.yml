@@ -7,6 +7,41 @@ servers:
 security:
   - bearerAuth: []
 paths:
+
+  /prisoner-search:
+    post:
+      tags:
+        - Prisoner search
+      summary: Search for a prisoner via prison search api by prisoner id and caseload.
+      operationId: searchPrisoner
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/PrisonerSearchRequest'
+      responses:
+        201:
+          description: The prisoner search results.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrisonerSearchResponse'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: The client is not authorized to perform this operation.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /courses:
     get:
       tags:
@@ -1817,7 +1852,68 @@ components:
           type: string
           example: Violence
 
+    PrisonerSearchRequest:
+      type: object
+      properties:
+        prisonerIdentifier:
+          type: string
+          description: Prisoner identifier for this case we only accept prison number
+          example: A1234AA
+        prisonIds:
+          type: array
+          description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
+          example:
+            - MDI
+          items:
+            type: string
+            description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
+            example: '["MDI"]'
 
+    PrisonerSearchResponse:
+      type: object
+      properties:
+        bookingId:
+          type: string
+        conditionalReleaseDate:
+          type: string
+          format: date
+        prisonName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        ethnicity:
+          type: string
+        gender:
+          type: string
+        homeDetentionCurfewEligibilityDate:
+          type: string
+          format: date
+        indeterminateSentence:
+          type: boolean
+        firstName:
+          type: string
+        lastName:
+          type: string
+        paroleEligibilityDate:
+          type: string
+          format: date
+        prisonerNumber:
+          type: string
+        religion:
+          type: string
+        sentenceExpiryDate:
+          type: string
+          format: date
+        sentenceStartDate:
+          type: string
+          format: date
+        tariffDate:
+          type: string
+          format: date
+      required:
+        - bookingId
+        - prisonerNumber
 
 
 
