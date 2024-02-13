@@ -15,6 +15,22 @@
         },
         "bodyFileName": "prison-search-results.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/prisoner-search/match-prisoners",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "C6666DD"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results-match.json"
+      }
     }
   ]
 }
