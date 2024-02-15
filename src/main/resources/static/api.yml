@@ -1134,6 +1134,189 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /reference-data/referral-statuses:
+    get:
+      tags:
+        - reference data
+      summary: The referral status reference data
+      operationId: getReferralStatuses
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReferralStatusRefData"
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+
+  /reference-data/referral-statuses/{code}:
+    get:
+      tags:
+        - reference data
+      summary: referral status reference data
+      operationId: getReferralStatus
+      parameters:
+        - name: code
+          in: path
+          description: referral status code
+          example: "WITHDRAWN"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReferralStatusRefData'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+        404:
+          description: Reference data not found
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reference-data/referral-statuses/{referralStatusCode}/categories:
+    get:
+      tags:
+        - reference data
+      summary: The referral status categories reference data for a referral status code
+      operationId: getReferralStatusCategories
+      parameters:
+        - name: referralStatusCode
+          in: path
+          description: referral status code
+          example: "WITHDRAWN"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReferralStatusCategory"
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+
+  /reference-data/referral-statuses/categories/{code}:
+    get:
+      tags:
+        - reference data
+      summary: get a single referral status category
+      operationId: getReferralStatusCategory
+      parameters:
+        - name: code
+          in: path
+          description: category code
+          example: "ADMIN"
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReferralStatusCategory'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+        404:
+          description: Reference data not found
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reference-data/referral-statuses/{referralStatusCode}/categories/{categoryCode}/reasons:
+    get:
+      tags:
+        - reference data
+      summary: The referral status reasons reference data for a referral status code
+      operationId: getReferralStatusReasons
+      parameters:
+        - name: referralStatusCode
+          in: path
+          description: referral status code
+          example: "WITHDRAWN"
+          required: true
+          schema:
+            type: string
+        - name: categoryCode
+          in: path
+          description: referral category code
+          example: "ADMIN"
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReferralStatusReason"
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+
+  /reference-data/referral-statuses/categories/reasons/{code}:
+    get:
+      tags:
+        - reference data
+      summary: get a single referral status reason
+      operationId: getReferralStatusReason
+      parameters:
+        - name: code
+          in: path
+          description: reason code
+          example: "DUPLICATE"
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReferralStatusReason'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+        404:
+          description: Reference data not found
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
 components:
 
   securitySchemes:
@@ -1915,5 +2098,55 @@ components:
         - bookingId
         - prisonerNumber
 
+    ReferralStatusRefData:
+      type: object
+      properties:
+        code:
+          type: string
+          example: WITHDRAWN
+        description:
+          type: string
+          example: Withdrawn
+        colour:
+          type: string
+          example: light-grey
+      required:
+        - code
+        - description
+        - colour
+
+    ReferralStatusCategory:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ADMIN
+        description:
+          type: string
+          example: Administrative error
+        referralStatusCode:
+          type: string
+          example: WITHDRAWN
+      required:
+        - code
+        - description
+        - referralStatusCode
+
+    ReferralStatusReason:
+      type: object
+      properties:
+        code:
+          type: string
+          example: DUPLICATE
+        description:
+          type: string
+          example: Duplicate referral
+        referralCategoryCode:
+          type: string
+          example: ADMIN
+      required:
+        - code
+        - description
+        - referralCategoryCode
 
 
