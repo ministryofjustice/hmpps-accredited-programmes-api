@@ -16,9 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
@@ -82,12 +82,12 @@ class ReferralServiceTest {
 
   @Test
   fun `createReferral with existing user should create referral successfully`() {
-    mockSecurityContext(CLIENT_USERNAME)
+    mockSecurityContext(REFERRER_USERNAME)
 
     val referrer = ReferrerUserEntityFactory()
-      .withUsername(CLIENT_USERNAME)
+      .withUsername(REFERRER_USERNAME)
       .produce()
-    every { referrerUserRepository.findById(CLIENT_USERNAME) } returns Optional.of(referrer)
+    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
 
     val offering = OfferingEntityFactory()
       .withId(UUID.randomUUID())
@@ -113,13 +113,13 @@ class ReferralServiceTest {
 
     createdReferralId shouldBe referralId
 
-    verify { referrerUserRepository.findById(CLIENT_USERNAME) }
+    verify { referrerUserRepository.findById(REFERRER_USERNAME) }
     verify { offeringRepository.findById(offering.id!!) }
     verify {
       referralRepository.save(
         match {
           it.prisonNumber == PRISON_NUMBER_1 &&
-            it.referrer.username == CLIENT_USERNAME &&
+            it.referrer.username == REFERRER_USERNAME &&
             it.offering.id == offering.id
         },
       )
@@ -128,12 +128,12 @@ class ReferralServiceTest {
 
   @Test
   fun `createReferral with new organisation and existing user should create referral successfully`() {
-    mockSecurityContext(CLIENT_USERNAME)
+    mockSecurityContext(REFERRER_USERNAME)
 
     val referrer = ReferrerUserEntityFactory()
-      .withUsername(CLIENT_USERNAME)
+      .withUsername(REFERRER_USERNAME)
       .produce()
-    every { referrerUserRepository.findById(CLIENT_USERNAME) } returns Optional.of(referrer)
+    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
 
     val prisonCode = "XXX"
     val prisonName = "Secret Prison"
@@ -166,13 +166,13 @@ class ReferralServiceTest {
 
     createdReferralId shouldBe referralId
 
-    verify { referrerUserRepository.findById(CLIENT_USERNAME) }
+    verify { referrerUserRepository.findById(REFERRER_USERNAME) }
     verify { offeringRepository.findById(offering.id!!) }
     verify {
       referralRepository.save(
         match {
           it.prisonNumber == PRISON_NUMBER_1 &&
-            it.referrer.username == CLIENT_USERNAME &&
+            it.referrer.username == REFERRER_USERNAME &&
             it.offering.id == offering.id
         },
       )

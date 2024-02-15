@@ -5,6 +5,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 val COURSE_ID: UUID = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
+val COURSE_NAME: String = "Super course"
+val COURSE_LOCATION: String = "West Midlands"
 val COURSE_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
 
 const val REFERRAL_STARTED = "REFERRAL_STARTED"
@@ -16,7 +18,7 @@ const val REFERRAL_SUBMITTED_DESCRIPTION = "Referral Submitted"
 const val REFERRAL_SUBMITTED_COLOUR = "light-pink"
 
 const val PRISON_NUMBER_1 = "C6666CC"
-const val CLIENT_USERNAME = "TEST_REFERRER_USER_1"
+const val REFERRER_USERNAME = "TEST_REFERRER_USER_1"
 const val ORGANISATION_ID_MDI = "MDI"
 const val BOOKING_ID = "Booking id"
 const val INDETERMINATE_SENTENCE = false
@@ -39,3 +41,5 @@ val PRISONER_1 = Prisoner(
   paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
   indeterminateSentence = INDETERMINATE_SENTENCE,
 )
+
+const val PRISON_LOCATION = "Buckinghamshire"

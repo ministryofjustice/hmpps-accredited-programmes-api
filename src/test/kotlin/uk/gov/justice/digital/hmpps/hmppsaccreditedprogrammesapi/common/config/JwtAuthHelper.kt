@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
@@ -35,7 +35,7 @@ class JwtAuthHelper {
     } ?: listOf("ROLE_ACCREDITED_PROGRAMMES_API")
 
     val claims = mutableMapOf<String, Any>().apply {
-      put("user_name", auth?.name ?: CLIENT_USERNAME)
+      put("user_name", auth?.name ?: REFERRER_USERNAME)
       put("authorities", authorities)
       put("scope", listOf<String>())
       put("client_id", "hmpps-accredited-programmes-ui")
@@ -43,7 +43,7 @@ class JwtAuthHelper {
 
     return Jwts.builder()
       .id(UUID.randomUUID().toString())
-      .subject(auth?.name ?: CLIENT_USERNAME)
+      .subject(auth?.name ?: REFERRER_USERNAME)
       .claims(claims)
       .expiration(Date(System.currentTimeMillis() + Duration.ofHours(1).toMillis()))
       .signWith(keyPair.private, RS256)

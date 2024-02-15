@@ -24,7 +24,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
@@ -34,6 +33,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_DESCRIPTION
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -113,7 +113,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(referralCreated.referralId) shouldBeEqual Referral(
       id = referralCreated.referralId,
       offeringId = offering.id,
-      referrerUsername = CLIENT_USERNAME,
+      referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_STARTED.lowercase(),
       statusDescription = REFERRAL_STARTED_DESCRIPTION,
@@ -166,7 +166,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(referralCreated.referralId) shouldBeEqual Referral(
       id = referralCreated.referralId,
       offeringId = offering.id,
-      referrerUsername = CLIENT_USERNAME,
+      referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_STARTED.lowercase(),
       statusDescription = REFERRAL_STARTED_DESCRIPTION,
@@ -210,7 +210,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     getReferralById(referralCreated.referralId) shouldBeEqual Referral(
       id = referralCreated.referralId,
       offeringId = offering.id,
-      referrerUsername = CLIENT_USERNAME,
+      referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_SUBMITTED.lowercase(),
       statusDescription = REFERRAL_SUBMITTED_DESCRIPTION,
@@ -342,7 +342,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
           prisonNumber = createdReferral.prisonNumber,
-          referrerUsername = CLIENT_USERNAME,
+          referrerUsername = REFERRER_USERNAME,
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
         ),
@@ -408,7 +408,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
           prisonNumber = createdReferral.prisonNumber,
-          referrerUsername = CLIENT_USERNAME,
+          referrerUsername = REFERRER_USERNAME,
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
         ),

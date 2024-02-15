@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
 
 class SecurityServiceTest {
@@ -17,11 +17,11 @@ class SecurityServiceTest {
 
   @Test
   fun `Get username from token successful`() {
-    mockSecurityContext(CLIENT_USERNAME)
+    mockSecurityContext(REFERRER_USERNAME)
 
     val currentUserName = securityService.getCurrentUserName()
 
-    assertEquals(CLIENT_USERNAME, currentUserName)
+    assertEquals(REFERRER_USERNAME, currentUserName)
   }
 
   private fun mockSecurityContext(username: String) {

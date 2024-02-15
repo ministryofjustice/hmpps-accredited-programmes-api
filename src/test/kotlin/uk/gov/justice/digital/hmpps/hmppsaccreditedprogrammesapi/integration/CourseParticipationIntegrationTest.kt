@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -88,7 +88,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
           yearStarted = created.outcome?.yearStarted,
           yearCompleted = created.outcome?.yearCompleted,
         ),
-        addedBy = CLIENT_USERNAME,
+        addedBy = REFERRER_USERNAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,
@@ -119,7 +119,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
         detail = null,
         setting = null,
         outcome = null,
-        addedBy = CLIENT_USERNAME,
+        addedBy = REFERRER_USERNAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,
@@ -200,7 +200,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
           yearStarted = updated.outcome?.yearStarted,
           yearCompleted = updated.outcome?.yearCompleted,
         ),
-        addedBy = CLIENT_USERNAME,
+        addedBy = REFERRER_USERNAME,
         createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
       ),
       CourseParticipation::createdAt,

@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.en
 
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
@@ -21,7 +21,7 @@ class CourseParticipationEntityFactory : Factory<CourseParticipationEntity> {
   private var detail: Yielded<String?> = { null }
   private var setting: Yielded<CourseParticipationSetting?> = { CourseParticipationSettingFactory().produce() }
   private var outcome: Yielded<CourseParticipationOutcome?> = { CourseParticipationOutcomeFactory().produce() }
-  private var createdByUsername: Yielded<String> = { CLIENT_USERNAME }
+  private var createdByUsername: Yielded<String> = { REFERRER_USERNAME }
   private var createdDateTime: Yielded<LocalDateTime> = { LocalDateTime.MIN }
   private var lastModifiedByUsername: Yielded<String?> = { null }
   private var lastModifiedDateTime: Yielded<LocalDateTime?> = { null }

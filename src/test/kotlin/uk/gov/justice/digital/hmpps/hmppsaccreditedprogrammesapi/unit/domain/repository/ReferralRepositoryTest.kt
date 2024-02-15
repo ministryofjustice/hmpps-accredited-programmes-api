@@ -9,8 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -36,7 +36,7 @@ class ReferralRepositoryTest {
     entityManager.merge(offering)
 
     val referrer = ReferrerUserEntityFactory()
-      .withUsername(CLIENT_USERNAME)
+      .withUsername(REFERRER_USERNAME)
       .produce()
     entityManager.merge(referrer)
 
@@ -69,7 +69,7 @@ class ReferralRepositoryTest {
     entityManager.merge(offering)
 
     val referrer = ReferrerUserEntityFactory()
-      .withUsername(CLIENT_USERNAME)
+      .withUsername(REFERRER_USERNAME)
       .produce()
     entityManager.merge(referrer)
 

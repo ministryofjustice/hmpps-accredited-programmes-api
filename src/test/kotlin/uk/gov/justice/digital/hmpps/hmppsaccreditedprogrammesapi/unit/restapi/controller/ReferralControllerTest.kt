@@ -23,9 +23,9 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
@@ -64,7 +64,7 @@ constructor(
       .withPrisonNumber(randomPrisonNumber())
       .withReferrer(
         ReferrerUserEntityFactory()
-          .withUsername(CLIENT_USERNAME)
+          .withUsername(REFERRER_USERNAME)
           .produce(),
       )
       .produce()
@@ -143,7 +143,7 @@ constructor(
       )
       .withReferrer(
         ReferrerUserEntityFactory()
-          .withUsername(CLIENT_USERNAME)
+          .withUsername(REFERRER_USERNAME)
           .produce(),
       )
       .withOasysConfirmed(true)
@@ -257,7 +257,7 @@ constructor(
       .withPrisonNumber(randomPrisonNumber())
       .withReferrer(
         ReferrerUserEntityFactory()
-          .withUsername(CLIENT_USERNAME)
+          .withUsername(REFERRER_USERNAME)
           .produce(),
       )
       .withAdditionalInformation("Additional Info")
@@ -304,7 +304,7 @@ constructor(
       .withPrisonNumber(randomPrisonNumber())
       .withReferrer(
         ReferrerUserEntityFactory()
-          .withUsername(CLIENT_USERNAME)
+          .withUsername(REFERRER_USERNAME)
           .produce(),
       )
       .produce()
