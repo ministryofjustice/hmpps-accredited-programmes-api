@@ -20,7 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Pagin
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
@@ -29,8 +28,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED_COLOUR
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED_DESCRIPTION
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_COLOUR
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_DESCRIPTION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.UUID
@@ -111,7 +115,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
-      status = ReferralStatus.referralStarted,
+      status = REFERRAL_STARTED,
+      statusDescription = REFERRAL_STARTED_DESCRIPTION,
+      statusColour = REFERRAL_STARTED_COLOUR,
       additionalInformation = null,
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
@@ -133,7 +139,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = "NONEXISTENT_USER",
       prisonNumber = PRISON_NUMBER_1,
-      status = ReferralStatus.referralStarted,
+      status = REFERRAL_STARTED,
+      statusDescription = REFERRAL_STARTED_DESCRIPTION,
+      statusColour = REFERRAL_STARTED_COLOUR,
       additionalInformation = null,
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
@@ -160,7 +168,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
-      status = ReferralStatus.referralStarted,
+      status = REFERRAL_STARTED,
+      statusDescription = REFERRAL_STARTED_DESCRIPTION,
+      statusColour = REFERRAL_STARTED_COLOUR,
       additionalInformation = "Additional information",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
@@ -192,7 +202,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val referralCreated = createReferral(offering.id)
 
     val referralStatusUpdate = ReferralStatusUpdate(
-      status = ReferralStatus.referralSubmitted,
+      status = REFERRAL_SUBMITTED,
     )
 
     updateReferralStatus(referralCreated.referralId, referralStatusUpdate)
@@ -202,7 +212,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
-      status = ReferralStatus.referralSubmitted,
+      status = REFERRAL_SUBMITTED,
+      statusDescription = REFERRAL_SUBMITTED_DESCRIPTION,
+      statusColour = REFERRAL_SUBMITTED_COLOUR,
       oasysConfirmed = false,
       additionalInformation = null,
       submittedOn = null,
@@ -226,7 +238,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     submitReferral(readyToSubmitReferral.id)
 
-    getReferralById(readyToSubmitReferral.id).status shouldBeEqual ReferralStatus.referralSubmitted
+    getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED
   }
 
   @Test
@@ -313,7 +325,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     referralCreated.referralId.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
-    val statusFilter = listOf(createdReferral.status.toDomain().name)
+    val statusFilter = listOf(createdReferral.status)
     val audienceFilter = course.audience
     val courseNameFilter = course.name
 
@@ -327,6 +339,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           courseName = course.name,
           audience = course.audience,
           status = createdReferral.status,
+          statusDescription = createdReferral.statusDescription,
+          statusColour = createdReferral.statusColour,
           prisonNumber = createdReferral.prisonNumber,
           referrerUsername = CLIENT_USERNAME,
           forename = PRISONER_1.firstName,
@@ -337,6 +351,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         actualSummary.courseName shouldBe referralView.courseName
         actualSummary.audience shouldBe referralView.audience
         actualSummary.status shouldBe referralView.status
+        actualSummary.statusDescription shouldBe referralView.statusDescription
+        actualSummary.statusColour shouldBe referralView.statusColour
         actualSummary.prisonNumber shouldBe referralView.prisonNumber
         actualSummary.referrerUsername shouldBe referralView.referrerUsername
         actualSummary.forename shouldBe referralView.forename
@@ -356,7 +372,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     referralCreated.referralId.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
-    val statusFilter = listOf(createdReferral.status.toDomain().name)
+    val statusFilter = listOf(createdReferral.status)
     val audienceFilter = course.audience
     val courseNameFilter = course.name + "not a course"
 
@@ -375,7 +391,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     referralCreated.referralId.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
-    val statusFilter = listOf(createdReferral.status.toDomain().name)
+    val statusFilter = listOf(createdReferral.status)
     val audienceFilter = course.audience
     val courseNameFilter = course.name
 
@@ -389,6 +405,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           courseName = course.name,
           audience = course.audience,
           status = createdReferral.status,
+          statusDescription = createdReferral.statusDescription,
+          statusColour = createdReferral.statusColour,
           prisonNumber = createdReferral.prisonNumber,
           referrerUsername = CLIENT_USERNAME,
           forename = PRISONER_1.firstName,
@@ -399,6 +417,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         actualSummary.courseName shouldBe referralView.courseName
         actualSummary.audience shouldBe referralView.audience
         actualSummary.status shouldBe referralView.status
+        actualSummary.statusDescription shouldBe referralView.statusDescription
+        actualSummary.statusColour shouldBe referralView.statusColour
         actualSummary.prisonNumber shouldBe referralView.prisonNumber
         actualSummary.referrerUsername shouldBe referralView.referrerUsername
         actualSummary.forename shouldBe referralView.forename

@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.en
 
 import io.github.bluegroundltd.kfactory.Factory
 import io.github.bluegroundltd.kfactory.Yielded
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -17,7 +18,7 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
   private var additionalInformation: Yielded<String?> = { null }
   private var oasysConfirmed: Yielded<Boolean> = { false }
   private var hasReviewedProgrammeHistory: Yielded<Boolean> = { false }
-  private var status: Yielded<ReferralEntity.ReferralStatus> = { ReferralEntity.ReferralStatus.REFERRAL_STARTED }
+  private var status: Yielded<String> = { REFERRAL_STARTED }
   private var submittedOn: Yielded<LocalDateTime?> = { null }
 
   fun withId(id: UUID?) = apply {
@@ -48,7 +49,7 @@ class ReferralEntityFactory : Factory<ReferralEntity> {
     this.hasReviewedProgrammeHistory = { hasReviewedProgrammeHistory }
   }
 
-  fun withStatus(status: ReferralEntity.ReferralStatus) = apply {
+  fun withStatus(status: String) = apply {
     this.status = { status }
   }
 

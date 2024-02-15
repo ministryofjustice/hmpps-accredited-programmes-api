@@ -24,10 +24,9 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.AWAITING_ASSESSMENT
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_STARTED
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -231,7 +230,7 @@ constructor(
     val referral = ReferralEntityFactory().produce()
 
     val payload = mapOf(
-      "status" to "referral_submitted",
+      "status" to "REFERRAL_SUBMITTED",
     )
 
     every { referralService.updateReferralStatusById(any(), any()) } just Runs
@@ -245,30 +244,6 @@ constructor(
     }
 
     verify { referralService.updateReferralStatusById(referral.id!!, REFERRAL_SUBMITTED) }
-  }
-
-  @Test
-  fun `updateReferralStatusById with invalid transition returns 409 with no body`() {
-    val referral = ReferralEntityFactory().produce()
-
-    val payload = mapOf(
-      "status" to "awaiting_assessment",
-    )
-
-    val illegalArgumentException =
-      IllegalArgumentException("Transition from $REFERRAL_STARTED to $AWAITING_ASSESSMENT is not valid")
-
-    every { referralService.updateReferralStatusById(any(), any()) } throws illegalArgumentException
-
-    mockMvc.put("/referrals/${referral.id}/status") {
-      contentType = MediaType.APPLICATION_JSON
-      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      content = jacksonObjectMapper().writeValueAsString(payload)
-    }.andExpect {
-      status { isConflict() }
-    }
-
-    verify { referralService.updateReferralStatusById(referral.id!!, AWAITING_ASSESSMENT) }
   }
 
   @Test

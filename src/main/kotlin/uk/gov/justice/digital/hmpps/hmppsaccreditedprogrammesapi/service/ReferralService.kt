@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
@@ -145,13 +144,9 @@ constructor(
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
   }
 
-  fun updateReferralStatusById(referralId: UUID, nextStatus: ReferralStatus) {
+  fun updateReferralStatusById(referralId: UUID, nextStatus: String) {
     val referral = referralRepository.getReferenceById(referralId)
-    if (referral.status.isValidTransition(nextStatus)) {
-      referral.status = nextStatus
-    } else {
-      throw IllegalArgumentException("Transition from ${referral.status} to $nextStatus is not valid")
-    }
+    referral.status = nextStatus
   }
 
   fun submitReferralById(referralId: UUID) {
@@ -174,20 +169,20 @@ constructor(
     }
 
     when (referral.status) {
-      ReferralStatus.REFERRAL_STARTED -> {
-        referral.status = ReferralStatus.REFERRAL_SUBMITTED
+      "REFERRAL_STARTED" -> {
+        referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
       }
 
-      ReferralStatus.REFERRAL_SUBMITTED -> {
+      "REFERRAL_SUBMITTED" -> {
         throw IllegalArgumentException("Referral $referralId is already submitted")
       }
 
-      ReferralStatus.AWAITING_ASSESSMENT -> {
+      "AWAITING_ASSESSMENT" -> {
         throw IllegalArgumentException("Referral $referralId is already submitted and awaiting assessment")
       }
 
-      ReferralStatus.ASSESSMENT_STARTED -> {
+      "ASSESSMENT_STARTED" -> {
         throw IllegalArgumentException("Referral $referralId is already submitted and currently being assessed")
       }
     }
@@ -200,13 +195,11 @@ constructor(
     audience: String?,
     courseName: String?,
   ): Page<ReferralViewEntity> {
-    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
-
     val referralViewPage =
       referralViewRepository.getReferralsByOrganisationId(
         organisationId,
         pageable,
-        statusEnums,
+        status,
         audience,
         courseName,
       )
@@ -221,13 +214,11 @@ constructor(
     audience: String?,
     courseName: String?,
   ): Page<ReferralViewEntity> {
-    val statusEnums = status?.map { ReferralEntity.ReferralStatus.valueOf(it) }
-
     val referralViewPage =
       referralViewRepository.getReferralsByUsername(
         username,
         pageable,
-        statusEnums,
+        status,
         audience,
         courseName,
       )

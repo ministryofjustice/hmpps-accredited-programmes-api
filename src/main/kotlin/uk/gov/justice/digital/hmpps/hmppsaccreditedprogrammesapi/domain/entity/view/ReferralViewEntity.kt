@@ -2,8 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.domain.Page
@@ -11,7 +9,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -33,8 +30,9 @@ data class ReferralViewEntity(
   val nonDtoReleaseDateType: String?,
   val organisationId: String?,
   val organisationName: String?,
-  @Enumerated(EnumType.STRING)
-  var status: ReferralEntity.ReferralStatus = ReferralEntity.ReferralStatus.REFERRAL_STARTED,
+  var status: String?,
+  var statusDescription: String?,
+  var statusColour: String?,
   val referrerUsername: String?,
   val courseName: String?,
   val audience: String?,
@@ -57,7 +55,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
   fun getReferralsByOrganisationId(
     organisationId: String,
     pageable: Pageable,
-    status: List<ReferralEntity.ReferralStatus>?,
+    status: List<String>?,
     audience: String?,
     courseName: String?,
   ): Page<ReferralViewEntity>
@@ -75,7 +73,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
   fun getReferralsByUsername(
     username: String,
     pageable: Pageable,
-    status: List<ReferralEntity.ReferralStatus>?,
+    status: List<String>?,
     audience: String?,
     courseName: String?,
   ): Page<ReferralViewEntity>
