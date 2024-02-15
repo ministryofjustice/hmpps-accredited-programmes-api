@@ -1,0 +1,1 @@
+INSERT INTO referral_status VALUES ('ASSESSMENT_STARTED','Assessment started','yellow', true );
