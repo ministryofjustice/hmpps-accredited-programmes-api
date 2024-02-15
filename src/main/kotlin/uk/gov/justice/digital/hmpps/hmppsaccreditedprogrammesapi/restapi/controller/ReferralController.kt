@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
 import java.util.UUID
@@ -31,6 +32,7 @@ class ReferralController
 constructor(
   private val referralService: ReferralService,
   private val securityService: SecurityService,
+  private val referenceDataService: ReferralReferenceDataService,
 ) : ReferralsApiDelegate {
 
   override fun createReferral(referralCreate: ReferralCreate): ResponseEntity<ReferralCreated> =
@@ -46,7 +48,10 @@ constructor(
   override fun getReferralById(id: UUID, updatePerson: Boolean): ResponseEntity<Referral> =
     referralService
       .getReferralById(id, updatePerson)
-      ?.let { ResponseEntity.ok(it.toApi()) }
+      ?.let {
+        val status = referenceDataService.getReferralStatus(it.status)
+        ResponseEntity.ok(it.toApi(status))
+      }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 
   override fun updateReferralById(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> {
@@ -56,7 +61,7 @@ constructor(
 
   override fun updateReferralStatusById(id: UUID, referralStatusUpdate: ReferralStatusUpdate): ResponseEntity<Unit> =
     with(referralStatusUpdate) {
-      referralService.updateReferralStatusById(id, status.toDomain())
+      referralService.updateReferralStatusById(id, status)
       ResponseEntity.noContent().build()
     }
 

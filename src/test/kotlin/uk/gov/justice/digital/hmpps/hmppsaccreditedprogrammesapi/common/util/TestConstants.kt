@@ -7,6 +7,14 @@ import java.util.UUID
 val COURSE_ID: UUID = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
 val COURSE_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
 
+const val REFERRAL_STARTED = "REFERRAL_STARTED"
+const val REFERRAL_STARTED_DESCRIPTION = "Referral Started"
+const val REFERRAL_STARTED_COLOUR = "yellow"
+
+const val REFERRAL_SUBMITTED = "REFERRAL_SUBMITTED"
+const val REFERRAL_SUBMITTED_DESCRIPTION = "Referral Submitted"
+const val REFERRAL_SUBMITTED_COLOUR = "light-pink"
+
 const val PRISON_NUMBER_1 = "C6666CC"
 const val CLIENT_USERNAME = "TEST_REFERRER_USER_1"
 const val ORGANISATION_ID_MDI = "MDI"

@@ -342,7 +342,7 @@ paths:
           description: If present, only return referrals in the given state
           required: false
           schema:
-            $ref: "#/components/schemas/ReferralStatus"
+            type: string
         - name: offeringId
           in: query
           description: The id (UUID) of an active offering. If present, only return referrals for that offering.
@@ -1645,7 +1645,14 @@ components:
               type: string
               format: uuid
             status:
-              $ref: "#/components/schemas/ReferralStatus"
+              description: The status code of the referral.
+              type: string
+            statusDescription:
+              description: The status description.
+              type: string
+            statusColour:
+              description: The colour to display status description.
+              type: string
             referrerUsername:
               type: string
             submittedOn:
@@ -1672,17 +1679,9 @@ components:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/ReferralStatus"
+          type: string
       required:
         - status
-
-    ReferralStatus:
-      type: string
-      enum:
-        - referral_started
-        - referral_submitted
-        - awaiting_assessment
-        - assessment_started
 
     PaginatedReferralView:
       type: object
@@ -1718,7 +1717,13 @@ components:
           type: string
           example: 'Gang offence'
         status:
-          $ref: "#/components/schemas/ReferralStatus"
+          type: string
+        statusDescription:
+          description: The status description.
+          type: string
+        statusColour:
+          description: The colour to display status description.
+          type: string
         submittedOn:
           type: string
           format: date-time
