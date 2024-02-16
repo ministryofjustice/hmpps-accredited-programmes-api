@@ -195,11 +195,12 @@ constructor(
     audience: String?,
     courseName: String?,
   ): Page<ReferralViewEntity> {
+    val uppercaseStatuses = status?.map { it.uppercase() }
     val referralViewPage =
       referralViewRepository.getReferralsByOrganisationId(
         organisationId,
         pageable,
-        status,
+        uppercaseStatuses,
         audience,
         courseName,
       )
@@ -214,11 +215,12 @@ constructor(
     audience: String?,
     courseName: String?,
   ): Page<ReferralViewEntity> {
+    val uppercaseStatuses = status?.map { it.uppercase() }
     val referralViewPage =
       referralViewRepository.getReferralsByUsername(
         username,
         pageable,
-        status,
+        uppercaseStatuses,
         audience,
         courseName,
       )

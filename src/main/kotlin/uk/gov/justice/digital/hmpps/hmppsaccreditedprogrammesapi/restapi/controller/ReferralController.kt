@@ -61,7 +61,7 @@ constructor(
 
   override fun updateReferralStatusById(id: UUID, referralStatusUpdate: ReferralStatusUpdate): ResponseEntity<Unit> =
     with(referralStatusUpdate) {
-      referralService.updateReferralStatusById(id, status)
+      referralService.updateReferralStatusById(id, status.uppercase())
       ResponseEntity.noContent().build()
     }
 
