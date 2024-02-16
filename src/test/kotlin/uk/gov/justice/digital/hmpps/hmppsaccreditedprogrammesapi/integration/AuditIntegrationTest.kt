@@ -33,7 +33,7 @@ class AuditIntegrationTest {
     val auditEntity = auditRepository.save(internalAuditRecord)
 
     auditEntity.shouldNotBeNull()
-    auditEntity.auditAction.shouldBeEqual(AuditAction.CREATE)
+    auditEntity.auditAction.shouldBeEqual(AuditAction.CREATE_REFERRAL)
     auditEntity.prisonNumber.shouldBeEqual(PRISON_NUMBER_1)
   }
 
@@ -44,9 +44,10 @@ class AuditIntegrationTest {
     referrerUsername: String? = REFERRER_USERNAME,
     referralStatusFrom: String? = null,
     referralStatusTo: String? = "REFERRAL_STARTED",
+    courseId: UUID = UUID.randomUUID(),
     courseName: String? = COURSE_NAME,
     courseLocation: String? = COURSE_LOCATION,
-    auditAction: AuditAction = AuditAction.CREATE,
+    auditAction: AuditAction = AuditAction.CREATE_REFERRAL,
   ): AuditEntity {
     return AuditEntity(
       referralId = referralId,
@@ -55,6 +56,7 @@ class AuditIntegrationTest {
       referrerUsername = referrerUsername,
       referralStatusFrom = referralStatusFrom,
       referralStatusTo = referralStatusTo,
+      courseId = courseId,
       courseName = courseName,
       courseLocation = courseLocation,
       auditAction = auditAction,

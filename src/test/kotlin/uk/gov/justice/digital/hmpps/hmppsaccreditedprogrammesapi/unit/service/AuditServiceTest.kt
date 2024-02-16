@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COU
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_LOCATION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
@@ -40,12 +39,11 @@ class AuditServiceTest {
       referralId = UUID.randomUUID(),
       prisonNumber = PRISON_NUMBER_1,
       prisonerLocation = PRISON_LOCATION,
-      referrerUsername = REFERRER_USERNAME,
       referralStatusFrom = null,
       referralStatusTo = "REFERRAL_SUBMITTED",
       courseName = COURSE_NAME,
       courseLocation = COURSE_LOCATION,
-      auditAction = AuditAction.CREATE,
+      auditAction = AuditAction.CREATE_REFERRAL,
     )
 
     createAuditRecord shouldNotBe null

@@ -14,19 +14,17 @@ class AuditService(private val auditRepository: AuditRepository) {
     referralId: UUID?,
     prisonNumber: String,
     prisonerLocation: String?,
-    referrerUsername: String?,
     referralStatusFrom: String?,
     referralStatusTo: String?,
     courseName: String?,
     courseLocation: String?,
-    auditAction: AuditAction = AuditAction.CREATE,
+    auditAction: AuditAction = AuditAction.CREATE_REFERRAL,
   ): UUID {
     return auditRepository.save(
       AuditEntity(
         referralId = referralId,
         prisonNumber = prisonNumber,
         prisonerLocation = prisonerLocation,
-        referrerUsername = referrerUsername,
         referralStatusFrom = referralStatusFrom,
         referralStatusTo = referralStatusTo,
         courseName = courseName,

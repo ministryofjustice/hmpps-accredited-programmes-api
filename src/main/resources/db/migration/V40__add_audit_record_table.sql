@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS audit_record
     referrer_username TEXT,
     referral_status_from TEXT,
     referral_status_to TEXT,
+    course_id UUID,
     course_name TEXT,
     course_location TEXT,
     audit_action TEXT NOT NULL,
