@@ -115,7 +115,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
-      status = REFERRAL_STARTED,
+      status = REFERRAL_STARTED.lowercase(),
       statusDescription = REFERRAL_STARTED_DESCRIPTION,
       statusColour = REFERRAL_STARTED_COLOUR,
       additionalInformation = null,
@@ -139,7 +139,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = "NONEXISTENT_USER",
       prisonNumber = PRISON_NUMBER_1,
-      status = REFERRAL_STARTED,
+      status = REFERRAL_STARTED.lowercase(),
       statusDescription = REFERRAL_STARTED_DESCRIPTION,
       statusColour = REFERRAL_STARTED_COLOUR,
       additionalInformation = null,
@@ -168,7 +168,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
-      status = REFERRAL_STARTED,
+      status = REFERRAL_STARTED.lowercase(),
       statusDescription = REFERRAL_STARTED_DESCRIPTION,
       statusColour = REFERRAL_STARTED_COLOUR,
       additionalInformation = "Additional information",
@@ -212,7 +212,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       offeringId = offering.id,
       referrerUsername = CLIENT_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
-      status = REFERRAL_SUBMITTED,
+      status = REFERRAL_SUBMITTED.lowercase(),
       statusDescription = REFERRAL_SUBMITTED_DESCRIPTION,
       statusColour = REFERRAL_SUBMITTED_COLOUR,
       oasysConfirmed = false,
@@ -238,7 +238,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     submitReferral(readyToSubmitReferral.id)
 
-    getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED
+    getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED.lowercase()
   }
 
   @Test
@@ -338,7 +338,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           id = createdReferral.id,
           courseName = course.name,
           audience = course.audience,
-          status = createdReferral.status,
+          status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
           prisonNumber = createdReferral.prisonNumber,
@@ -404,7 +404,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           id = createdReferral.id,
           courseName = course.name,
           audience = course.audience,
-          status = createdReferral.status,
+          status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
           prisonNumber = createdReferral.prisonNumber,
