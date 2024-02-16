@@ -10,8 +10,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
@@ -51,7 +51,7 @@ class CourseParticipationRepositoryTest {
       .withDetail("Course detail")
       .withSetting(courseParticipationSetting)
       .withOutcome(courseParticipationOutcome)
-      .withCreatedByUsername(CLIENT_USERNAME)
+      .withCreatedByUsername(REFERRER_USERNAME)
       .produce()
     entityManager.merge(courseParticipation)
 
@@ -61,7 +61,7 @@ class CourseParticipationRepositoryTest {
       this.prisonNumber shouldBe PRISON_NUMBER_1
       this.outcome shouldBe courseParticipationOutcome
       this.setting shouldBe courseParticipationSetting
-      this.createdByUsername shouldBe CLIENT_USERNAME
+      this.createdByUsername shouldBe REFERRER_USERNAME
     }
     persistedCourseParticipation?.createdDateTime?.shouldBeWithin(Duration.ofSeconds(1), transactionStartTime)
   }
@@ -75,7 +75,7 @@ class CourseParticipationRepositoryTest {
       .withDetail(null)
       .withSetting(null)
       .withOutcome(null)
-      .withCreatedByUsername(CLIENT_USERNAME)
+      .withCreatedByUsername(REFERRER_USERNAME)
       .produce()
     entityManager.merge(courseParticipation)
 
@@ -88,7 +88,7 @@ class CourseParticipationRepositoryTest {
       this.detail shouldBe null
       this.setting shouldBe null
       this.outcome shouldBe null
-      this.createdByUsername shouldBe CLIENT_USERNAME
+      this.createdByUsername shouldBe REFERRER_USERNAME
     }
   }
 
@@ -112,7 +112,7 @@ class CourseParticipationRepositoryTest {
       .withDetail(null)
       .withSetting(courseParticipationSetting)
       .withOutcome(courseParticipationOutcome)
-      .withCreatedByUsername(CLIENT_USERNAME)
+      .withCreatedByUsername(REFERRER_USERNAME)
       .produce()
     entityManager.merge(courseParticipation)
 
@@ -125,7 +125,7 @@ class CourseParticipationRepositoryTest {
       this.detail shouldBe null
       this.setting shouldBe courseParticipationSetting
       this.outcome shouldBe courseParticipationOutcome
-      this.createdByUsername shouldBe CLIENT_USERNAME
+      this.createdByUsername shouldBe REFERRER_USERNAME
       this.lastModifiedByUsername shouldBe null
     }
     persistedCourseParticipation.createdDateTime.shouldBeWithin(Duration.ofSeconds(2), transactionStartTime)

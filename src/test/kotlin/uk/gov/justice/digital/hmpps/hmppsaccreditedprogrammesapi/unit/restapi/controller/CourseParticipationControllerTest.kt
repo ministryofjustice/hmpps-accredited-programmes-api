@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
@@ -67,7 +67,7 @@ constructor(
         .withCourseName("Course name")
         .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).withYearStarted(Year.of(2020)).produce())
         .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).produce())
-        .withCreatedByUsername(CLIENT_USERNAME)
+        .withCreatedByUsername(REFERRER_USERNAME)
         .produce()
 
       every { courseParticipationService.createCourseParticipation(capture(courseParticipationSlot)) } returns courseParticipation
@@ -115,7 +115,7 @@ constructor(
         .withCourseName("Course name")
         .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).withYearStarted(Year.of(2020)).produce())
         .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).produce())
-        .withCreatedByUsername(CLIENT_USERNAME)
+        .withCreatedByUsername(REFERRER_USERNAME)
         .produce()
 
       mockMvc.post("/course-participations") {

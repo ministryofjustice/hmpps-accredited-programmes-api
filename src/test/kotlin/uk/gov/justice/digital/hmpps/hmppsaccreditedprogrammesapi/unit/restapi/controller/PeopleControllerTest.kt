@@ -15,8 +15,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.CLIENT_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
@@ -76,7 +76,7 @@ constructor(
           jsonPath("$[$index].prisonNumber") { value(cp.prisonNumber) }
           jsonPath("$[$index].setting.type") { value(cp.setting!!.type.name.lowercase()) }
           jsonPath("$[$index].outcome.status") { value(cp.outcome!!.status.name.lowercase()) }
-          jsonPath("$[$index].addedBy") { value(CLIENT_USERNAME) }
+          jsonPath("$[$index].addedBy") { value(REFERRER_USERNAME) }
           jsonPath("$[$index].createdAt") { value(createdAt.format(DateTimeFormatter.ISO_DATE_TIME)) }
         }
 
