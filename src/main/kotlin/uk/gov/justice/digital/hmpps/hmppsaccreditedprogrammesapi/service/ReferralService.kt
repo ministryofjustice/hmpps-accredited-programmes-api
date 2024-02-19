@@ -42,6 +42,7 @@ constructor(
   private val personRepository: PersonRepository,
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
+  private val referralStatusHistoryService: ReferralStatusHistoryService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -62,13 +63,16 @@ constructor(
 
     createOrganisationIfNotPresent(offering.organisationId)
 
-    return referralRepository.save(
+    val referral = referralRepository.save(
       ReferralEntity(
         offering = offering,
         prisonNumber = prisonNumber,
         referrer = referrerUser,
       ),
-    ).id ?: throw Exception("Referral creation failed")
+    )
+
+    referralStatusHistoryService.createReferralHistory(referral)
+    return referral.id
   }
 
   private fun createOrganisationIfNotPresent(code: String) {

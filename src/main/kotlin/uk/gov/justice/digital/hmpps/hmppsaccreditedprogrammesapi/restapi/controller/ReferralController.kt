@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Pagin
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusHistory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
 import java.util.UUID
 
@@ -33,6 +35,8 @@ constructor(
   private val referralService: ReferralService,
   private val securityService: SecurityService,
   private val referenceDataService: ReferralReferenceDataService,
+  private val referralStatusHistoryService: ReferralStatusHistoryService,
+
 ) : ReferralsApiDelegate {
 
   override fun createReferral(referralCreate: ReferralCreate): ResponseEntity<ReferralCreated> =
@@ -97,6 +101,7 @@ constructor(
       ),
     )
   }
+
   override fun getReferralViewsByCurrentUser(
     @RequestParam(value = "page", defaultValue = "0") page: Int,
     @RequestParam(value = "size", defaultValue = "10") size: Int,
@@ -131,4 +136,9 @@ constructor(
       Sort.by(sortColumn).descending()
     }
   }
+
+  override fun statusHistory(id: UUID): ResponseEntity<List<ReferralStatusHistory>> =
+    ResponseEntity.ok(
+      referralStatusHistoryService.getReferralStatusHistories(id),
+    )
 }
