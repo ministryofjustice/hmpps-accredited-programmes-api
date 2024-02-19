@@ -491,6 +491,42 @@ paths:
         404:
           description: The referral does not exist.
 
+  /referrals/{id}/status-history/:
+    get:
+      tags:
+        - Referrals
+      summary: Returns the referral status history for this referral
+      operationId: statusHistory
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        201:
+          description: A list of status history
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReferralStatusHistory'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: The client is not authorized to perform this operation.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /referrals/view/organisation/{organisationId}/dashboard:
     get:
       summary: Get paginated referrals by organisationId
@@ -816,7 +852,7 @@ paths:
   /oasys/{prisonNumber}/offence-details:
     get:
       tags:
-        - Oasys Offence Details
+        - Oasys Integration
       summary: Offence details as held by Oasys
       operationId: getOffenceDetails
       parameters:
@@ -848,7 +884,7 @@ paths:
   /oasys/{prisonNumber}/relationships:
     get:
       tags:
-        - Oasys Relationships Details
+        - Oasys Integration
       summary: Relationships details as held by Oasys
       operationId: getRelationships
       parameters:
@@ -880,7 +916,7 @@ paths:
   /oasys/{prisonNumber}/rosh-analysis:
     get:
       tags:
-        - Oasys ROSH analysis Details
+        - Oasys Integration
       summary: ROSH analysis details as held by Oasys
       operationId: getRoshAnalysis
       parameters:
@@ -912,7 +948,7 @@ paths:
   /oasys/{prisonNumber}/lifestyle:
     get:
       tags:
-        - Oasys lifestyle Details
+        - Oasys Integration
       summary: Lifestyle details as held by Oasys
       operationId: getLifestyle
       parameters:
@@ -944,7 +980,7 @@ paths:
   /oasys/{prisonNumber}/psychiatric:
     get:
       tags:
-        - Oasys psychiatric Details
+        - Oasys Integration
       summary: Psychiatric details as held by Oasys
       operationId: getPsychiatric
       parameters:
@@ -976,7 +1012,7 @@ paths:
   /oasys/{prisonNumber}/behaviour:
     get:
       tags:
-        - Oasys behaviour Details
+        - Oasys Integration
       summary: Behaviour details as held by Oasys
       operationId: getBehaviour
       parameters:
@@ -1008,7 +1044,7 @@ paths:
   /oasys/{prisonNumber}/attitude:
     get:
       tags:
-        - Oasys attitude Details
+        - Oasys Integration
       summary: Attitude details as held by Oasys
       operationId: getAttitude
       parameters:
@@ -1040,7 +1076,7 @@ paths:
   /oasys/{prisonNumber}/health:
     get:
       tags:
-        - Oasys health Details
+        - Oasys Integration
       summary: Health details as held by Oasys
       operationId: getHealth
       parameters:
@@ -1072,7 +1108,7 @@ paths:
   /oasys/{prisonNumber}/learning-needs:
     get:
       tags:
-        - Oasys learning needs Details
+        - Oasys Integration
       summary: Learning needs details as held by Oasys
       operationId: getLearningNeeds
       parameters:
@@ -1105,7 +1141,7 @@ paths:
   /oasys/{prisonNumber}/risks-and-alerts:
     get:
       tags:
-        - Oasys risks Details
+        - Oasys Integration
       summary: Risks details as held by Oasys
       operationId: getRisks
       parameters:
@@ -1764,6 +1800,46 @@ components:
         surname:
           type: string
           description: surname of the person
+
+    ReferralStatusHistory:
+      type: object
+      properties:
+        id:
+          description: The id (UUID) of the status history record.
+          type: string
+          format: uuid
+        referralId:
+          description: The unique id (UUID) of the referral.
+          type: string
+          format: uuid
+        status:
+          description: The status of the referral.
+          type: string
+        statusDescription:
+          description: The status description.
+          type: string
+        statusColour:
+          description: The colour to display status description.
+          type: string
+        previousStatus:
+          description: The previous status of the referral.
+          type: string
+        previousStatusDescription:
+          description: The previous status description.
+          type: string
+        previousStatusColour:
+          description: The previous colour to display status description.
+          type: string
+        notes:
+          description: The notes associated with the status change.
+          type: string
+        statusStartDate:
+          type: string
+          format: date-time
+          description: Date referral was changed to this status.
+        username:
+          type: string
+          description: Username of the person who changed to this status
 
     Person:
       type: object
