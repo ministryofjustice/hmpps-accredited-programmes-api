@@ -17,7 +17,6 @@ class OfferingEntityFactory : Factory<OfferingEntity> {
   private var secondaryContactEmail: Yielded<String?> = { null }
   private var withdrawn: Yielded<Boolean> = { false }
   private var referable: Yielded<Boolean> = { true }
-
   fun withId(id: UUID?) = apply {
     this.id = { id }
   }

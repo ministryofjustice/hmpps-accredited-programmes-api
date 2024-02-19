@@ -10,7 +10,6 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_LOCATION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_NAME
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_LOCATION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
@@ -40,7 +39,6 @@ class AuditIntegrationTest {
   private fun createInternalAuditRecord(
     referralId: UUID = UUID.randomUUID(),
     prisonNumber: String = PRISON_NUMBER_1,
-    prisonerLocation: String? = PRISON_LOCATION,
     referrerUsername: String? = REFERRER_USERNAME,
     referralStatusFrom: String? = null,
     referralStatusTo: String? = "REFERRAL_STARTED",
@@ -52,7 +50,6 @@ class AuditIntegrationTest {
     return AuditEntity(
       referralId = referralId,
       prisonNumber = prisonNumber,
-      prisonerLocation = prisonerLocation,
       referrerUsername = referrerUsername,
       referralStatusFrom = referralStatusFrom,
       referralStatusTo = referralStatusTo,

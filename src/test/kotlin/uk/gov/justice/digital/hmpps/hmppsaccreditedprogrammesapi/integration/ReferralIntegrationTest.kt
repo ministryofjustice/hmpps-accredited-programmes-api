@@ -6,6 +6,7 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,6 +37,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_DESCRIPTION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -48,6 +50,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var personRepository: PersonRepository
+
+  @Autowired
+  lateinit var auditRepository: AuditRepository
 
   @Autowired
   lateinit var referralStatusHistoryRepository: ReferralStatusHistoryRepository
@@ -129,6 +134,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
     )
 
+    val auditEntity = auditRepository.findAll()
+      .firstOrNull { it.prisonNumber == PRISON_NUMBER_1 && it.referralId == referralCreated.referralId }
+
+    auditEntity shouldNotBe null
+
     // check the referral status is as expected
     val referralHistories = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
     referralHistories.size shouldBeGreaterThan 0
@@ -159,6 +169,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
     )
+
+    val auditEntity = auditRepository.findAll()
+      .firstOrNull { it.prisonNumber == PRISON_NUMBER_1 && it.referralId == referralCreated.referralId }
+
+    auditEntity shouldNotBe null
   }
 
   @Test

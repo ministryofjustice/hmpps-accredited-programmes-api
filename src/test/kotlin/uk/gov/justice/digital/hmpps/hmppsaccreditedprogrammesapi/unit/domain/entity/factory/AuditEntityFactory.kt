@@ -14,7 +14,6 @@ class AuditEntityFactory : Factory<AuditEntity> {
   private var id: Yielded<UUID?> = { UUID.randomUUID() }
   private var referralId: Yielded<UUID?> = { UUID.randomUUID() }
   private var prisonNumber: Yielded<String> = { randomLowercaseString() }
-  private var prisonLocation: Yielded<String> = { randomLowercaseString() }
   private var referrerUsername: Yielded<String> = { randomUppercaseString() }
   private var referralStatusFrom: Yielded<String?> = { randomUppercaseString() }
   private var referralStatusTo: Yielded<String?> = { randomUppercaseString() }
@@ -27,7 +26,6 @@ class AuditEntityFactory : Factory<AuditEntity> {
   fun withId(id: () -> UUID?) = apply { this.id = id }
   fun withReferralId(referralId: () -> UUID?) = apply { this.referralId = referralId }
   fun withPrisonNumber(prisonNumber: () -> String) = apply { this.prisonNumber = prisonNumber }
-  fun withPrisonLocation(prisonLocation: () -> String) = apply { this.prisonLocation = prisonLocation }
   fun withReferrerUsername(referrerUsername: () -> String) = apply { this.referrerUsername = referrerUsername }
   fun withReferralStatusFrom(referralStatusFrom: () -> String?) =
     apply { this.referralStatusFrom = referralStatusFrom }
@@ -46,7 +44,6 @@ class AuditEntityFactory : Factory<AuditEntity> {
     id = id(),
     referralId = referralId(),
     prisonNumber = prisonNumber(),
-    prisonerLocation = prisonLocation(),
     referrerUsername = referrerUsername(),
     referralStatusFrom = referralStatusFrom(),
     referralStatusTo = referralStatusTo(),
