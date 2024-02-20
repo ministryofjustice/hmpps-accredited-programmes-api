@@ -20,6 +20,7 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referrer_user").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM audit_record").executeUpdate()
   }
 
   fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String) {

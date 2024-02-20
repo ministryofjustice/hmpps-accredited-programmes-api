@@ -20,7 +20,6 @@ class AuditEntity(
   var id: UUID? = null,
   var referralId: UUID? = null,
   var prisonNumber: String,
-  var prisonerLocation: String? = null,
   var referrerUsername: String? = null,
   var referralStatusFrom: String? = null,
   var referralStatusTo: String? = null,

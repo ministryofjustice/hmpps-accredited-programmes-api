@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -61,6 +62,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var organisationRepository: OrganisationRepository
+
+  @MockK(relaxed = true)
+  private lateinit var auditService: AuditService
 
   @MockK(relaxed = true)
   private lateinit var referralStatusHistoryService: ReferralStatusHistoryService
@@ -128,6 +132,16 @@ class ReferralServiceTest {
         },
       )
     }
+    verify {
+      auditService.createAuditRecord(
+        match {
+          it.prisonNumber == PRISON_NUMBER_1 &&
+            it.referrer.username == REFERRER_USERNAME &&
+            it.offering.id == offering.id
+        },
+        null,
+      )
+    }
   }
 
   @Test
@@ -190,6 +204,17 @@ class ReferralServiceTest {
         },
       )
     }
+
+    verify {
+      auditService.createAuditRecord(
+        match {
+          it.prisonNumber == PRISON_NUMBER_1 &&
+            it.referrer.username == REFERRER_USERNAME &&
+            it.offering.id == offering.id
+        },
+        null,
+      )
+    }
   }
 
   @Test
@@ -238,6 +263,17 @@ class ReferralServiceTest {
             it.referrer.username == "NONEXISTENT_USER" &&
             it.offering.id == offering.id
         },
+      )
+    }
+
+    verify {
+      auditService.createAuditRecord(
+        match {
+          it.prisonNumber == PRISON_NUMBER_1 &&
+            it.referrer.username == "NONEXISTENT_USER" &&
+            it.offering.id == offering.id
+        },
+        null,
       )
     }
   }
