@@ -155,6 +155,7 @@ constructor(
 
   fun submitReferralById(referralId: UUID) {
     val referral = referralRepository.getReferenceById(referralId)
+    val existingStatus = referral.status
 
     val requiredFields = listOf(
       referral.offering.id to "offeringId",
@@ -190,6 +191,8 @@ constructor(
         throw IllegalArgumentException("Referral $referralId is already submitted and currently being assessed")
       }
     }
+
+    referralStatusHistoryService.updateReferralHistory(referral, existingStatus)
   }
 
   fun getReferralViewByOrganisationId(
