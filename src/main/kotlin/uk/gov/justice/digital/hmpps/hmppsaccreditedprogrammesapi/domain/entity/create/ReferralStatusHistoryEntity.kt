@@ -42,8 +42,8 @@ data class ReferralStatusHistoryEntity(
   @JoinColumn(name = "reason")
   val reason: ReferralStatusReasonEntity? = null,
   val notes: String? = null,
-  val statusEndDate: LocalDateTime? = null,
-  val durationAtThisStatus: Long? = null,
+  var statusEndDate: LocalDateTime? = null,
+  var durationAtThisStatus: Long? = null,
 )
 
 @Repository

@@ -251,6 +251,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     submitReferral(readyToSubmitReferral.id)
 
     getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED.lowercase()
+
+    val statusHistories = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+    statusHistories.size shouldBeEqual 2
+    statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
+    statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
   }
 
   @Test

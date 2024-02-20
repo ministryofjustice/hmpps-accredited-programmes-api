@@ -8,7 +8,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.getByCode
+import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @Service
@@ -43,6 +45,27 @@ class ReferralStatusHistoryService(
       ReferralStatusHistoryEntity(
         referralId = referral.id!!,
         status = status,
+      ),
+    )
+  }
+
+  fun updateReferralHistory(referral: ReferralEntity, previousStatusCode: String) {
+    val status = referralStatusRepository.getByCode(referral.status)
+    val previousStatus = referralStatusRepository.getByCode(previousStatusCode)
+    val datetime = LocalDateTime.now()
+
+    val statusHistory = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referral.id!!)
+    statusHistory.firstOrNull()?.let {
+      it.statusEndDate = datetime
+      it.durationAtThisStatus = ChronoUnit.MILLIS.between(datetime, it.statusStartDate)
+    }
+
+    referralStatusHistoryRepository.save(
+      ReferralStatusHistoryEntity(
+        referralId = referral.id!!,
+        status = status,
+        previousStatus = previousStatus,
+        statusEndDate = datetime,
       ),
     )
   }
