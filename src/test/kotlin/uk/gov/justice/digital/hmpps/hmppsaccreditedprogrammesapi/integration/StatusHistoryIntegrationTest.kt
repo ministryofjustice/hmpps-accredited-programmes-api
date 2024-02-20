@@ -106,7 +106,7 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
   fun getStatusHistories(id: UUID?) =
     webTestClient
       .get()
-      .uri("/referrals/$id/status-history/")
+      .uri("/referrals/$id/status-history")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

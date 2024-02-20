@@ -491,7 +491,7 @@ paths:
         404:
           description: The referral does not exist.
 
-  /referrals/{id}/status-history/:
+  /referrals/{id}/status-history:
     get:
       tags:
         - Referrals
