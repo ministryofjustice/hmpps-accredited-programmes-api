@@ -12,13 +12,13 @@ import java.util.UUID
 @Transactional
 class AuditService(private val auditRepository: AuditRepository) {
   fun createAuditRecord(
-    referralId: UUID?,
+    referralId: UUID? = null,
     prisonNumber: String,
-    referralStatusFrom: String?,
-    referralStatusTo: String?,
-    courseId: UUID?,
-    courseName: String?,
-    courseLocation: String?,
+    referralStatusFrom: String? = null,
+    referralStatusTo: String? = null,
+    courseId: UUID? = null,
+    courseName: String? = null,
+    courseLocation: String? = null,
     auditAction: AuditAction,
   ): UUID {
     return auditRepository.save(

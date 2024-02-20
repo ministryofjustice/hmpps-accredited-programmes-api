@@ -2132,6 +2132,9 @@ components:
             type: string
             description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
             example: '["MDI"]'
+      required:
+        - prisonerIdentifier
+
 
     PrisonerSearchResponse:
       type: object
