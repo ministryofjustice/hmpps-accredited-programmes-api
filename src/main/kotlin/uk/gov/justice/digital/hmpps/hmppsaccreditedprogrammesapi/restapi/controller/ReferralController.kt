@@ -83,12 +83,13 @@ constructor(
     @RequestParam(value = "status", required = false) status: List<String>?,
     @RequestParam(value = "audience", required = false) audience: String?,
     @RequestParam(value = "courseName", required = false) courseName: String?,
+    @RequestParam(value = "statusGroup", required = false) statusGroup: String?,
     @RequestParam(value = "sortColumn", required = false) sortColumn: String?,
     @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
   ): ResponseEntity<PaginatedReferralView> {
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val apiReferralSummaryPage =
-      referralService.getReferralViewByOrganisationId(organisationId, pageable, status, audience, courseName)
+      referralService.getReferralViewByOrganisationId(organisationId, pageable, status, audience, courseName, statusGroup)
 
     return ResponseEntity.ok(
       PaginatedReferralView(
@@ -108,14 +109,16 @@ constructor(
     @RequestParam(value = "status", required = false) status: List<String>?,
     @RequestParam(value = "audience", required = false) audience: String?,
     @RequestParam(value = "courseName", required = false) courseName: String?,
+    @RequestParam(value = "statusGroup", required = false) statusGroup: String?,
     @RequestParam(value = "sortColumn", required = false) sortColumn: String?,
     @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
   ): ResponseEntity<PaginatedReferralView> {
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val username: String =
       securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
+
     val apiReferralSummaryPage =
-      referralService.getReferralViewByUsername(username, pageable, status, audience, courseName)
+      referralService.getReferralViewByUsername(username, pageable, status, audience, courseName, statusGroup)
 
     return ResponseEntity.ok(
       PaginatedReferralView(

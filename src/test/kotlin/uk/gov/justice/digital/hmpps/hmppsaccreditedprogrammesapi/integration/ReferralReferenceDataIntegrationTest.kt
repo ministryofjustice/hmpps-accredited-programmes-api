@@ -24,7 +24,7 @@ private const val REASON_DUPLICATE = "W_DUPLICATE"
 @Import(JwtAuthHelper::class)
 class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
 
-  val withdrawnStatusExpected = ReferralStatusRefData(code = WITHDRAWN, description = "Withdrawn", colour = "light-grey")
+  val withdrawnStatusExpected = ReferralStatusRefData(code = WITHDRAWN, description = "Withdrawn", colour = "light-grey", draft = false, closed = true)
   val categoryExpected = ReferralStatusCategory(code = CATEGORY_ADMIN, description = "Administrative error", referralStatusCode = WITHDRAWN)
   val reasonExpected = ReferralStatusReason(code = REASON_DUPLICATE, description = "Duplicate referral", referralCategoryCode = CATEGORY_ADMIN)
 

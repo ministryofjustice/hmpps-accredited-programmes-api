@@ -5,7 +5,7 @@ info:
 servers:
   - url: /
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
 paths:
 
   /prisoner-search:
@@ -576,6 +576,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: statusGroup
+          in: query
+          description: Additional filter to only show "open", "closed" or "draft" referrals
+          required: false
+          schema:
+            type: string
         - name: sortColumn
           in: query
           description: Column to sort by default "surname"
@@ -642,6 +648,12 @@ paths:
         - name: courseName
           in: query
           description: Filter by the name of the course associated with this referral
+          required: false
+          schema:
+            type: string
+        - name: statusGroup
+          in: query
+          description: Additional filter to only show "open", "closed" or "draft" referrals
           required: false
           schema:
             type: string
@@ -2194,6 +2206,12 @@ components:
         colour:
           type: string
           example: light-grey
+        closed:
+          description: flag to show this is a closed status
+          type: boolean
+        draft:
+          description: flag to show this is a draft status
+          type: boolean
       required:
         - code
         - description

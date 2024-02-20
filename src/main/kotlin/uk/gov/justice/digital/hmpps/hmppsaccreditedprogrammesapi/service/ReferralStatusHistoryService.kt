@@ -57,7 +57,7 @@ class ReferralStatusHistoryService(
     val statusHistory = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referral.id!!)
     statusHistory.firstOrNull()?.let {
       it.statusEndDate = datetime
-      it.durationAtThisStatus = ChronoUnit.MILLIS.between(datetime, it.statusStartDate)
+      it.durationAtThisStatus = ChronoUnit.MILLIS.between(it.statusStartDate, datetime)
     }
 
     referralStatusHistoryRepository.save(
@@ -65,7 +65,6 @@ class ReferralStatusHistoryService(
         referralId = referral.id!!,
         status = status,
         previousStatus = previousStatus,
-        statusEndDate = datetime,
       ),
     )
   }
