@@ -19,7 +19,7 @@ dependencies {
   val jsonWebtokenVersion = "0.12.5"
   val springSecurityVersion = "6.2.1"
 
-  runtimeOnly("org.postgresql:postgresql:42.7.1")
+  runtimeOnly("org.postgresql:postgresql:42.7.2")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
