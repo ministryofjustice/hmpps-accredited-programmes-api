@@ -6,6 +6,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.getByCode
 import java.time.LocalDateTime
@@ -49,12 +52,18 @@ class ReferralStatusHistoryService(
     )
   }
 
-  fun updateReferralHistory(referral: ReferralEntity, previousStatusCode: String) {
-    val status = referralStatusRepository.getByCode(referral.status)
+  fun updateReferralHistory(
+    referralId: UUID,
+    previousStatusCode: String,
+    newStatus: ReferralStatusEntity,
+    newCategory: ReferralStatusCategoryEntity? = null,
+    newReason: ReferralStatusReasonEntity? = null,
+    newNotes: String? = null,
+  ) {
     val previousStatus = referralStatusRepository.getByCode(previousStatusCode)
     val datetime = LocalDateTime.now()
 
-    val statusHistory = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referral.id!!)
+    val statusHistory = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralId)
     statusHistory.firstOrNull()?.let {
       it.statusEndDate = datetime
       it.durationAtThisStatus = ChronoUnit.MILLIS.between(it.statusStartDate, datetime)
@@ -62,9 +71,12 @@ class ReferralStatusHistoryService(
 
     referralStatusHistoryRepository.save(
       ReferralStatusHistoryEntity(
-        referralId = referral.id!!,
-        status = status,
+        referralId = referralId,
+        status = newStatus,
         previousStatus = previousStatus,
+        category = newCategory,
+        reason = newReason,
+        notes = newNotes,
       ),
     )
   }

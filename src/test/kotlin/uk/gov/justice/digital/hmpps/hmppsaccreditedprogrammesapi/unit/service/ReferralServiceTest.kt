@@ -21,6 +21,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
@@ -72,6 +74,12 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var referralStatusRepository: ReferralStatusRepository
+
+  @MockK(relaxed = true)
+  private lateinit var referralStatusCategoryRepository: ReferralStatusCategoryRepository
+
+  @MockK(relaxed = true)
+  private lateinit var referralStatusReasonRepository: ReferralStatusReasonRepository
 
   @InjectMockKs
   private lateinit var referralService: ReferralService

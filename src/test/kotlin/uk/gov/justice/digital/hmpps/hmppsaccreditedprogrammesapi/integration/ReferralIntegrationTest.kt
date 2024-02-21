@@ -35,6 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_DESCRIPTION
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
@@ -140,7 +141,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     auditEntity shouldNotBe null
 
     // check the referral status is as expected
-    val referralHistories = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+    val referralHistories =
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
     referralHistories.size shouldBeGreaterThan 0
 
     val referralHistory = referralHistories[0]
@@ -249,6 +251,43 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Updating a referral status should insert a status history record`() {
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+
+    val statusHistory1 =
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+    statusHistory1.size shouldBeEqual 2
+    statusHistory1[0].status.code shouldBeEqual REFERRAL_SUBMITTED
+    statusHistory1[1].status.code shouldBeEqual REFERRAL_STARTED
+
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = REFERRAL_WITHDRAWN,
+      category = "W_ADMIN",
+      reason = "W_DUPLICATE",
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate2)
+
+    val statusHistory2 =
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+    statusHistory2.size shouldBeEqual 3
+    statusHistory2[0].status.code shouldBeEqual REFERRAL_WITHDRAWN
+    statusHistory2[0].category!!.code shouldBeEqual "W_ADMIN"
+    statusHistory2[0].reason!!.code shouldBeEqual "W_DUPLICATE"
+    statusHistory2[0].previousStatus!!.code shouldBeEqual REFERRAL_SUBMITTED
+    statusHistory2[0].statusEndDate shouldBe (null)
+
+    statusHistory2[1].status.code shouldBeEqual REFERRAL_SUBMITTED
+    statusHistory2[2].status.code shouldBeEqual REFERRAL_STARTED
+  }
+
+  @Test
   fun `Submitting a referral with all fields set should return 204 with no body`() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
@@ -267,7 +306,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED.lowercase()
 
-    val statusHistories = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+    val statusHistories =
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
     statusHistories.size shouldBeEqual 2
     statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
     statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"

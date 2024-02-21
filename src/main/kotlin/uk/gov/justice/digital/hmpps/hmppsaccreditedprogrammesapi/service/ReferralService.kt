@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
@@ -16,7 +17,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.getByCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
@@ -46,6 +53,8 @@ constructor(
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
   private val referralStatusRepository: ReferralStatusRepository,
+  private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
+  private val referralStatusReasonRepository: ReferralStatusReasonRepository,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -152,9 +161,42 @@ constructor(
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
   }
 
-  fun updateReferralStatusById(referralId: UUID, nextStatus: String) {
+  fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
-    referral.status = nextStatus
+    val statuses = validateStatus(referralStatusUpdate)
+    val existingStatus = referral.status
+    // create the referral history
+    referralStatusHistoryService.updateReferralHistory(
+      referralId = referralId,
+      previousStatusCode = existingStatus,
+      newStatus = statuses.first,
+      newCategory = statuses.second,
+      newReason = statuses.third,
+      newNotes = referralStatusUpdate.notes,
+    )
+    // update the status
+    referral.status = referralStatusUpdate.status
+    // audit the interaction
+    auditService.createAuditRecord(referral, existingStatus)
+  }
+
+  private fun validateStatus(
+    referralStatusUpdate: ReferralStatusUpdate,
+  ): Triple<ReferralStatusEntity, ReferralStatusCategoryEntity?, ReferralStatusReasonEntity?> {
+    // validate that the status exists:
+    val status = referralStatusRepository.getByCode(referralStatusUpdate.status.uppercase())
+    val category = if (referralStatusUpdate.category != null) {
+      referralStatusCategoryRepository.getByCode(referralStatusUpdate.category.uppercase())
+    } else {
+      null
+    }
+    val reason = if (referralStatusUpdate.reason != null) {
+      referralStatusReasonRepository.getByCode(referralStatusUpdate.reason.uppercase())
+    } else {
+      null
+    }
+
+    return Triple(status, category, reason)
   }
 
   fun submitReferralById(referralId: UUID) {
@@ -196,7 +238,11 @@ constructor(
       }
     }
 
-    referralStatusHistoryService.updateReferralHistory(referral, existingStatus)
+    referralStatusHistoryService.updateReferralHistory(
+      referralId = referralId,
+      previousStatusCode = existingStatus,
+      newStatus = referralStatusRepository.getByCode(referral.status),
+    )
   }
 
   fun getReferralViewByOrganisationId(
