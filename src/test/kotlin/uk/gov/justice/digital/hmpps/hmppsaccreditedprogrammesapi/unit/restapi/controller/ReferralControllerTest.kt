@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
@@ -243,7 +244,7 @@ constructor(
       status { isNoContent() }
     }
 
-    verify { referralService.updateReferralStatusById(referral.id!!, REFERRAL_SUBMITTED) }
+    verify { referralService.updateReferralStatusById(referral.id!!, ReferralStatusUpdate(status = REFERRAL_SUBMITTED)) }
   }
 
   @Test

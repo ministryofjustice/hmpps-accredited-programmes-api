@@ -1728,6 +1728,12 @@ components:
       properties:
         status:
           type: string
+        category:
+          type: string
+        reason:
+          type: string
+        notes:
+          type: string
       required:
         - status
 
