@@ -14,6 +14,7 @@ class AuditService(private val auditRepository: AuditRepository) {
   fun createAuditRecord(
     referralId: UUID? = null,
     prisonNumber: String,
+    referrerUsername: String? = null,
     referralStatusFrom: String? = null,
     referralStatusTo: String? = null,
     courseId: UUID? = null,
@@ -25,6 +26,7 @@ class AuditService(private val auditRepository: AuditRepository) {
       AuditEntity(
         referralId = referralId,
         prisonNumber = prisonNumber,
+        referrerUsername = referrerUsername,
         referralStatusFrom = referralStatusFrom,
         referralStatusTo = referralStatusTo,
         courseId = courseId,
@@ -39,6 +41,7 @@ class AuditService(private val auditRepository: AuditRepository) {
     createAuditRecord(
       referralId = referralEntity.id,
       prisonNumber = referralEntity.prisonNumber,
+      referrerUsername = referralEntity.referrer.username,
       referralStatusFrom = currentStatus,
       referralStatusTo = referralEntity.status,
       courseId = referralEntity.offering.course.id,
