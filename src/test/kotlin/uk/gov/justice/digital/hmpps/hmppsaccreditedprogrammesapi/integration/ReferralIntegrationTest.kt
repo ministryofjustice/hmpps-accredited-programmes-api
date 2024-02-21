@@ -394,6 +394,51 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Retrieving a list of open referral views for an organisation should return 200 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
+    val createdReferral = getReferralById(referralCreated.referralId)
+
+    referralCreated.referralId.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
+
+    val statusGroup = "open"
+
+    val summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = statusGroup)
+    summary.content.shouldNotBeEmpty()
+
+    summary.content?.forEach { actualSummary ->
+      listOf(
+        ReferralView(
+          id = createdReferral.id,
+          courseName = course.name,
+          audience = course.audience,
+          status = createdReferral.status.lowercase(),
+          statusDescription = createdReferral.statusDescription,
+          statusColour = createdReferral.statusColour,
+          prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = REFERRER_USERNAME,
+          forename = PRISONER_1.firstName,
+          surname = PRISONER_1.lastName,
+        ),
+      ).forEach { referralView ->
+        actualSummary.id shouldBe referralView.id
+        actualSummary.courseName shouldBe referralView.courseName
+        actualSummary.audience shouldBe referralView.audience
+        actualSummary.status shouldBe referralView.status
+        actualSummary.statusDescription shouldBe referralView.statusDescription
+        actualSummary.statusColour shouldBe referralView.statusColour
+        actualSummary.prisonNumber shouldBe referralView.prisonNumber
+        actualSummary.referrerUsername shouldBe referralView.referrerUsername
+        actualSummary.forename shouldBe referralView.forename
+        actualSummary.surname shouldBe referralView.surname
+      }
+    }
+  }
+
+  @Test
   fun `Retrieving a list of filtered referrals views for an organisation with unknown course filter should return 200 with empty body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
@@ -464,6 +509,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     statusFilter: List<String>? = null,
     audienceFilter: String? = null,
     courseNameFilter: String? = null,
+    statusGroupFilter: String? = null,
     pageNumber: Number = 0,
     sortColumn: String? = null,
     sortDirection: String? = null,
@@ -472,6 +518,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
     audienceFilter?.let { uriBuilder.queryParam("audience", encodeValue(it)) }
     courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
+    statusGroupFilter?.let { uriBuilder.queryParam("statusGroup", encodeValue(it)) }
     uriBuilder.queryParam("page", pageNumber)
     sortColumn?.let { uriBuilder.queryParam("sortColumn", encodeValue(it)) }
     sortDirection?.let { uriBuilder.queryParam("sortDirection", encodeValue(it)) }

@@ -13,9 +13,11 @@ import java.util.UUID
 data class ReferralStatusEntity(
   @Id
   val code: String,
-  var description: String,
-  var colour: String,
-  var active: Boolean,
+  val description: String,
+  val colour: String,
+  val active: Boolean,
+  val draft: Boolean,
+  val closed: Boolean,
 )
 
 @Entity
@@ -23,9 +25,9 @@ data class ReferralStatusEntity(
 data class ReferralStatusCategoryEntity(
   @Id
   val code: String,
-  var description: String,
-  var referralStatusCode: String,
-  var active: Boolean,
+  val description: String,
+  val referralStatusCode: String,
+  val active: Boolean,
 )
 
 @Entity
@@ -33,15 +35,24 @@ data class ReferralStatusCategoryEntity(
 data class ReferralStatusReasonEntity(
   @Id
   val code: String,
-  var description: String,
-  var referralStatusCategoryCode: String,
-  var active: Boolean,
+  val description: String,
+  val referralStatusCategoryCode: String,
+  val active: Boolean,
 )
 
 @Repository
 interface ReferralStatusRepository : JpaRepository<ReferralStatusEntity, UUID> {
   fun findByCode(code: String): ReferralStatusEntity?
   fun findAllByActiveIsTrue(): List<ReferralStatusEntity>
+
+  // get draft statuses only
+  fun findAllByActiveIsTrueAndDraftIsTrue(): List<ReferralStatusEntity>
+
+  // get closed statuses only
+  fun findAllByActiveIsTrueAndClosedIsTrue(): List<ReferralStatusEntity>
+
+  // get open statuses only
+  fun findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalse(): List<ReferralStatusEntity>
 }
 
 fun ReferralStatusRepository.getByCode(code: String) =

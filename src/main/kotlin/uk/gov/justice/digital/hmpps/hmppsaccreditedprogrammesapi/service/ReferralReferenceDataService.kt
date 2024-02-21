@@ -22,12 +22,14 @@ class ReferralReferenceDataService(
           code = it.code,
           description = it.description,
           colour = it.colour,
+          closed = it.closed,
+          draft = it.draft,
         )
       }
 
   fun getReferralStatus(code: String) =
     referralStatusRepository.getByCode(code).let {
-      ReferralStatusRefData(it.code, it.description, it.colour)
+      ReferralStatusRefData(it.code, it.description, it.colour, it.closed, it.draft)
     }
 
   fun getReferralStatusCategories(statusCode: String) =

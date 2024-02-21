@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
@@ -44,6 +45,7 @@ constructor(
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
+  private val referralStatusRepository: ReferralStatusRepository,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -203,8 +205,10 @@ constructor(
     status: List<String>?,
     audience: String?,
     courseName: String?,
+    statusGroup: String?,
   ): Page<ReferralViewEntity> {
-    val uppercaseStatuses = status?.map { it.uppercase() }
+    val uppercaseStatuses = getFilterStatuses(status, statusGroup)
+
     val referralViewPage =
       referralViewRepository.getReferralsByOrganisationId(
         organisationId,
@@ -217,14 +221,42 @@ constructor(
     return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
   }
 
+  private fun getFilterStatuses(
+    status: List<String>?,
+    statusGroup: String?,
+  ): List<String>? {
+    var uppercaseStatuses = status?.map { it.uppercase() }
+    if (uppercaseStatuses != null && uppercaseStatuses.isEmpty() && statusGroup != null) {
+      uppercaseStatuses = when (statusGroup) {
+        "closed" -> {
+          referralStatusRepository.findAllByActiveIsTrueAndClosedIsTrue().map { it.code }
+        }
+
+        "draft" -> {
+          referralStatusRepository.findAllByActiveIsTrueAndDraftIsTrue().map { it.code }
+        }
+
+        "open" -> {
+          referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalse().map { it.code }
+        }
+
+        else -> {
+          null
+        }
+      }
+    }
+    return uppercaseStatuses
+  }
+
   fun getReferralViewByUsername(
     username: String,
     pageable: Pageable,
     status: List<String>?,
     audience: String?,
     courseName: String?,
+    statusGroup: String?,
   ): Page<ReferralViewEntity> {
-    val uppercaseStatuses = status?.map { it.uppercase() }
+    val uppercaseStatuses = getFilterStatuses(status, statusGroup)
     val referralViewPage =
       referralViewRepository.getReferralsByUsername(
         username,
