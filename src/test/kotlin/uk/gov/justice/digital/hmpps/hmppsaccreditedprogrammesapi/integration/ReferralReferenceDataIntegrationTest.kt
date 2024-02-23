@@ -24,9 +24,20 @@ private const val REASON_DUPLICATE = "W_DUPLICATE"
 @Import(JwtAuthHelper::class)
 class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
 
-  val withdrawnStatusExpected = ReferralStatusRefData(code = WITHDRAWN, description = "Withdrawn", colour = "light-grey", draft = false, closed = true)
-  val categoryExpected = ReferralStatusCategory(code = CATEGORY_ADMIN, description = "Administrative error", referralStatusCode = WITHDRAWN)
-  val reasonExpected = ReferralStatusReason(code = REASON_DUPLICATE, description = "Duplicate referral", referralCategoryCode = CATEGORY_ADMIN)
+  val withdrawnStatusExpected = ReferralStatusRefData(
+      code = WITHDRAWN,
+      description = "Withdrawn",
+      colour = "light-grey",
+      draft = false,
+      closed = true,
+  )
+  val categoryExpected =
+    ReferralStatusCategory(code = CATEGORY_ADMIN, description = "Administrative error", referralStatusCode = WITHDRAWN)
+  val reasonExpected = ReferralStatusReason(
+      code = REASON_DUPLICATE,
+      description = "Duplicate referral",
+      referralCategoryCode = CATEGORY_ADMIN,
+  )
 
   @Test
   fun `get all referral statuses`() {
@@ -88,6 +99,16 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     response shouldBeEqual reasonExpected
   }
 
+
+  @Test
+  fun `get diagram`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val response = getStatusTransitionDiagram()
+    response.shouldNotBeNull()
+    println(response)
+  }
+
   fun getReferralStatuses() =
     webTestClient
       .get()
@@ -108,6 +129,17 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<ReferralStatusRefData>()
+      .returnResult().responseBody!!
+
+  fun getStatusTransitionDiagram() =
+    webTestClient
+      .get()
+      .uri("/status-transition-diagram")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<String>()
       .returnResult().responseBody!!
 
   fun getReferralStatusCategories(statusCode: String) =
