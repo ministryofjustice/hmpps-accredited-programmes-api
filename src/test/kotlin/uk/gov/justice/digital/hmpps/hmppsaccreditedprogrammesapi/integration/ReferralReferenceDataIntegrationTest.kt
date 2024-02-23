@@ -25,18 +25,18 @@ private const val REASON_DUPLICATE = "W_DUPLICATE"
 class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
 
   val withdrawnStatusExpected = ReferralStatusRefData(
-      code = WITHDRAWN,
-      description = "Withdrawn",
-      colour = "light-grey",
-      draft = false,
-      closed = true,
+    code = WITHDRAWN,
+    description = "Withdrawn",
+    colour = "light-grey",
+    draft = false,
+    closed = true,
   )
   val categoryExpected =
     ReferralStatusCategory(code = CATEGORY_ADMIN, description = "Administrative error", referralStatusCode = WITHDRAWN)
   val reasonExpected = ReferralStatusReason(
-      code = REASON_DUPLICATE,
-      description = "Duplicate referral",
-      referralCategoryCode = CATEGORY_ADMIN,
+    code = REASON_DUPLICATE,
+    description = "Duplicate referral",
+    referralCategoryCode = CATEGORY_ADMIN,
   )
 
   @Test
@@ -98,7 +98,6 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     response.shouldNotBeNull()
     response shouldBeEqual reasonExpected
   }
-
 
   @Test
   fun `get diagram`() {
