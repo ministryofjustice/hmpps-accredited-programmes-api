@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestParam
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
@@ -14,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusHistory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -89,7 +91,14 @@ constructor(
   ): ResponseEntity<PaginatedReferralView> {
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val apiReferralSummaryPage =
-      referralService.getReferralViewByOrganisationId(organisationId, pageable, status, audience, courseName, statusGroup)
+      referralService.getReferralViewByOrganisationId(
+        organisationId,
+        pageable,
+        status,
+        audience,
+        courseName,
+        statusGroup,
+      )
 
     return ResponseEntity.ok(
       PaginatedReferralView(
@@ -113,6 +122,7 @@ constructor(
     @RequestParam(value = "sortColumn", required = false) sortColumn: String?,
     @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
   ): ResponseEntity<PaginatedReferralView> {
+    SecurityContextHolder.getContext().authentication?.authorities
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val username: String =
       securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
@@ -140,8 +150,19 @@ constructor(
     }
   }
 
-  override fun statusHistory(id: UUID): ResponseEntity<List<ReferralStatusHistory>> =
-    ResponseEntity.ok(
+  override fun statusHistory(id: UUID, updatePerson: Boolean): ResponseEntity<List<ReferralStatusHistory>> {
+    // This is just to update the person cache can remove this when the domain events are processed
+    referralService
+      .getReferralById(id, updatePerson)
+    return ResponseEntity.ok(
       referralStatusHistoryService.getReferralStatusHistories(id),
     )
+  }
+
+  override fun getNextStatusTransitions(id: UUID, ptUser: Boolean): ResponseEntity<List<ReferralStatusRefData>> {
+    val referral = referralService.getReferralById(id)
+    return ResponseEntity.ok(
+      referenceDataService.getNextStatusTransitions(referral!!.status, ptUser),
+    )
+  }
 }

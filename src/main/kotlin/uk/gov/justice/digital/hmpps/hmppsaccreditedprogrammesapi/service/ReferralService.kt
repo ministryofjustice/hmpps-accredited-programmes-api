@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -55,6 +56,7 @@ constructor(
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
+  private val referralReferenceDataService: ReferralReferenceDataService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -163,7 +165,7 @@ constructor(
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
-    val statuses = validateStatus(referralStatusUpdate)
+    val statuses = validateStatus(referral, referralStatusUpdate)
     val existingStatus = referral.status
     // create the referral history
     referralStatusHistoryService.updateReferralHistory(
@@ -181,6 +183,7 @@ constructor(
   }
 
   private fun validateStatus(
+    referral: ReferralEntity,
     referralStatusUpdate: ReferralStatusUpdate,
   ): Triple<ReferralStatusEntity, ReferralStatusCategoryEntity?, ReferralStatusReasonEntity?> {
     // validate that the status exists:
@@ -195,6 +198,8 @@ constructor(
     } else {
       null
     }
+
+    validateStatusTransition(referral.id!!, referral.status, referralStatusUpdate.status.uppercase(), referralStatusUpdate.ptUser!!)
 
     return Triple(status, category, reason)
   }
@@ -313,5 +318,12 @@ constructor(
       )
 
     return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
+  }
+
+  fun validateStatusTransition(referralId: UUID, currentStatus: String, newStatus: String, ptUser: Boolean) {
+    val validTransitions = referralReferenceDataService.getNextStatusTransitions(currentStatus, ptUser)
+    if (validTransitions.none { it.code == newStatus }) {
+      throw BusinessException("Cannot transition referral $referralId from $currentStatus to $newStatus")
+    }
   }
 }

@@ -7,13 +7,16 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusTransitionRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.getByCode
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 
 @Service
 class ReferralReferenceDataService(
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
+  private val referralStatusTransitionRepository: ReferralStatusTransitionRepository,
 ) {
   fun getReferralStatuses() =
     referralStatusRepository.findAllByActiveIsTrue()
@@ -67,4 +70,12 @@ class ReferralReferenceDataService(
         referralCategoryCode = it.referralStatusCategoryCode,
       )
     }
+
+  fun getNextStatusTransitions(currentStatus: String, ptRole: Boolean = false): List<ReferralStatusRefData> {
+    return if (ptRole) {
+      referralStatusTransitionRepository.getNextPTTransitions(currentStatus).map { it.toStatus.toModel() }
+    } else {
+      referralStatusTransitionRepository.getNextPOMTransitions(currentStatus).map { it.toStatus.toModel() }
+    }
+  }
 }

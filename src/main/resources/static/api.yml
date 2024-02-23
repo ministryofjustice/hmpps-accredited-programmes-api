@@ -435,6 +435,43 @@ paths:
         404:
           description: The referral does not exist
 
+  /referrals/{id}/status-transitions:
+    get:
+      tags:
+        - Referrals
+      summary: Retrieve the next available status transitions for a referral
+      operationId: getNextStatusTransitions
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: ptUser
+          in: query
+          description: is the user a Programme Team user
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        200:
+          description: The list of statuses a referral can move on to
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReferralStatusRefData'
+        401:
+          description: The request was unauthorised
+        403:
+          description: Forbidden.  The client is not authorised to access this referral.
+        404:
+          description: The referral does not exist
+
   /referrals/{id}/status:
     put:
       summary: Change a referral's status
@@ -505,6 +542,13 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: updatePerson
+          in: query
+          description: parameter to decide whether to update the local person data
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         201:
           description: A list of status history
@@ -1734,6 +1778,10 @@ components:
           type: string
         notes:
           type: string
+        ptUser:
+          type: boolean
+          description: is the user a pt user
+          default: false
       required:
         - status
 
