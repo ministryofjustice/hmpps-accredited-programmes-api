@@ -105,7 +105,6 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
 
     val response = getStatusTransitionDiagram()
     response.shouldNotBeNull()
-    println(response)
   }
 
   fun getReferralStatuses() =
