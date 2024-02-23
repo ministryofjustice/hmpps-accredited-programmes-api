@@ -18,6 +18,17 @@ generic-service:
     SERVICES_ARNS-API_BASE-URL: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk/
     SENTRY_ENVIRONMENT: dev
 
+# Temporary whitelist to allow for MoJ Cymulate pen-testing.
+  allowlist:
+    cymulate-1: 54.217.50.18/32
+    cymulate-2: 52.208.202.111/32
+    cymulate-3: 52.49.144.209/32
+    local-dev-laptop-1: 51.155.102.238/32
+    groups:
+      - internal
+      - prisons
+      - private_prisons
+
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
 generic-prometheus-alerts:
