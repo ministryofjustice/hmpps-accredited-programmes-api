@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainAnyOf
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -22,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Pagin
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
@@ -258,6 +260,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val referralStatusUpdate1 = ReferralStatusUpdate(
       status = REFERRAL_SUBMITTED,
+      ptUser = true,
     )
     updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
 
@@ -271,6 +274,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = REFERRAL_WITHDRAWN,
       category = "W_ADMIN",
       reason = "W_DUPLICATE",
+      ptUser = true,
     )
     updateReferralStatus(referralCreated.referralId, referralStatusUpdate2)
 
@@ -285,6 +289,27 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     statusHistory2[1].status.code shouldBeEqual REFERRAL_SUBMITTED
     statusHistory2[2].status.code shouldBeEqual REFERRAL_STARTED
+  }
+
+  @Test
+  fun `Get referral status transitions`() {
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+
+    val statuses = getReferralTransitions(referralCreated.referralId)
+    statuses.size shouldBeEqual 2
+
+    val withdrawnStatus = ReferralStatusRefData(code = "WITHDRAWN", description = "Withdrawn", colour = "light-grey", closed = true, draft = false)
+    val onHoldStatus = ReferralStatusRefData(code = "ON_HOLD_REFERRAL_SUBMITTED", description = "On hold - referral submitted", colour = "pink", closed = false, draft = false)
+
+    statuses shouldContainAnyOf listOf(withdrawnStatus, onHoldStatus)
   }
 
   @Test
@@ -432,6 +457,17 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       }
     }
   }
+
+  fun getReferralTransitions(referralId: UUID) =
+    webTestClient
+      .get()
+      .uri("/referrals/$referralId/status-transitions")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<ReferralStatusRefData>>()
+      .returnResult().responseBody!!
 
   @Test
   fun `Retrieving a list of open referral views for an organisation should return 200 with correct body`() {
