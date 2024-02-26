@@ -28,6 +28,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED_COLOUR
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED_DESCRIPTION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
@@ -38,6 +41,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED_DESCRIPTION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_DESCRIPTION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
@@ -306,8 +311,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val statuses = getReferralTransitions(referralCreated.referralId)
     statuses.size shouldBeEqual 2
 
-    val withdrawnStatus = ReferralStatusRefData(code = "WITHDRAWN", description = "Withdrawn", colour = "light-grey", closed = true, draft = false)
-    val onHoldStatus = ReferralStatusRefData(code = "ON_HOLD_REFERRAL_SUBMITTED", description = "On hold - referral submitted", colour = "pink", closed = false, draft = false)
+    val withdrawnStatus = ReferralStatusRefData(code = REFERRAL_WITHDRAWN, description = REFERRAL_WITHDRAWN_DESCRIPTION, colour = REFERRAL_WITHDRAWN_COLOUR, closed = true, draft = false)
+    val onHoldStatus = ReferralStatusRefData(code = ON_HOLD_REFERRAL_SUBMITTED, description = ON_HOLD_REFERRAL_SUBMITTED_DESCRIPTION, colour = ON_HOLD_REFERRAL_SUBMITTED_COLOUR, closed = false, draft = false)
 
     statuses shouldContainAnyOf listOf(withdrawnStatus, onHoldStatus)
   }

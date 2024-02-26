@@ -14,6 +14,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_DESCRIPTION
 
 private const val WITHDRAWN = "WITHDRAWN"
 private const val CATEGORY_ADMIN = "W_ADMIN"
@@ -26,8 +28,8 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
 
   val withdrawnStatusExpected = ReferralStatusRefData(
     code = WITHDRAWN,
-    description = "Withdrawn",
-    colour = "light-grey",
+    description = REFERRAL_WITHDRAWN_DESCRIPTION,
+    colour = REFERRAL_WITHDRAWN_COLOUR,
     draft = false,
     closed = true,
   )
