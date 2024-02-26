@@ -27,10 +27,10 @@ class OfferingRepositoryTest {
   @ParameterizedTest
   @ValueSource(booleans = [true, false])
   fun `OfferingRepository should retrieve the correct offering for a CourseEntity object given a valid offeringId`(isWithdrawn: Boolean) {
-    val course = CourseEntityFactory().produce()
-    entityManager.merge(course)
+    var course = CourseEntityFactory().produce()
+    course = entityManager.merge(course)
 
-    val offering = OfferingEntityFactory().withWithdrawn(isWithdrawn).produce()
+    var offering = OfferingEntityFactory().withWithdrawn(isWithdrawn).produce()
     offering.course = course
     entityManager.merge(offering)
 
@@ -45,16 +45,16 @@ class OfferingRepositoryTest {
 
   @Test
   fun `Given an offering that is subsequently replaced by another, OfferingRepository should return both the new and withdrawn offerings`() {
-    val course = CourseEntityFactory().produce()
-    entityManager.merge(course)
+    var course = CourseEntityFactory().produce()
+    course = entityManager.merge(course)
 
-    val offeringWithdrawnFalse = OfferingEntityFactory().withWithdrawn(false).produce()
+    var offeringWithdrawnFalse = OfferingEntityFactory().withWithdrawn(false).produce()
     offeringWithdrawnFalse.course = course
-    entityManager.merge(offeringWithdrawnFalse)
+    offeringWithdrawnFalse = entityManager.merge(offeringWithdrawnFalse)
 
-    val offeringWithdrawnTrue = OfferingEntityFactory().withWithdrawn(true).produce()
+    var offeringWithdrawnTrue = OfferingEntityFactory().withWithdrawn(true).produce()
     offeringWithdrawnTrue.course = course
-    entityManager.merge(offeringWithdrawnTrue)
+    offeringWithdrawnTrue = entityManager.merge(offeringWithdrawnTrue)
 
     val persistedOfferings = entityManager
       .createQuery("SELECT o FROM OfferingEntity o WHERE o.course.id = :courseId", OfferingEntity::class.java)
