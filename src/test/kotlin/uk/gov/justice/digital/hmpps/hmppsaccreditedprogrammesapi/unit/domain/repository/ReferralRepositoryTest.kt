@@ -28,24 +28,24 @@ class ReferralRepositoryTest {
 
   @Test
   fun `ReferralRepository should save and retrieve ReferralEntity objects`() {
-    val course = CourseEntityFactory().produce()
-    entityManager.merge(course)
+    var course = CourseEntityFactory().produce()
+    course = entityManager.merge(course)
 
-    val offering = OfferingEntityFactory().produce()
+    var offering = OfferingEntityFactory().produce()
     offering.course = course
-    entityManager.merge(offering)
+    offering = entityManager.merge(offering)
 
-    val referrer = ReferrerUserEntityFactory()
+    var referrer = ReferrerUserEntityFactory()
       .withUsername(REFERRER_USERNAME)
       .produce()
-    entityManager.merge(referrer)
+    referrer = entityManager.merge(referrer)
 
-    val referral = ReferralEntityFactory()
+    var referral = ReferralEntityFactory()
       .withReferrer(referrer)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withOffering(offering)
       .produce()
-    entityManager.merge(referral)
+    referral = entityManager.merge(referral)
 
     val persistedReferral = entityManager.find(ReferralEntity::class.java, referral.id)
     persistedReferral shouldNotBe null
@@ -61,25 +61,25 @@ class ReferralRepositoryTest {
 
   @Test
   fun `ReferralRepository should update and retrieve ReferralEntity objects`() {
-    val course = CourseEntityFactory().produce()
-    entityManager.merge(course)
+    var course = CourseEntityFactory().produce()
+    course = entityManager.merge(course)
 
-    val offering = OfferingEntityFactory().produce()
+    var offering = OfferingEntityFactory().produce()
     offering.course = course
-    entityManager.merge(offering)
+    offering = entityManager.merge(offering)
 
-    val referrer = ReferrerUserEntityFactory()
+    var referrer = ReferrerUserEntityFactory()
       .withUsername(REFERRER_USERNAME)
       .produce()
-    entityManager.merge(referrer)
+    referrer = entityManager.merge(referrer)
 
-    val referral = ReferralEntityFactory()
+    var referral = ReferralEntityFactory()
       .withReferrer(referrer)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withOffering(offering)
       .withOasysConfirmed(false)
       .produce()
-    entityManager.merge(referral)
+    referral = entityManager.merge(referral)
 
     val persistedReferral = entityManager.find(ReferralEntity::class.java, referral.id)
     persistedReferral shouldNotBe null

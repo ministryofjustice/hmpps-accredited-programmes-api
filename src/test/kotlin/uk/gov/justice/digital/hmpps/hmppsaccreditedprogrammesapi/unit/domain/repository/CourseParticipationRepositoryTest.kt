@@ -44,7 +44,7 @@ class CourseParticipationRepositoryTest {
       .withYearStarted(Year.parse("2021"))
       .withYearCompleted(Year.parse("2022"))
       .produce()
-    val courseParticipation = CourseParticipationEntityFactory()
+    var courseParticipation = CourseParticipationEntityFactory()
       .withCourseName("Course name")
       .withPrisonNumber(PRISON_NUMBER_1)
       .withSource("Source of information")
@@ -53,9 +53,10 @@ class CourseParticipationRepositoryTest {
       .withOutcome(courseParticipationOutcome)
       .withCreatedByUsername(REFERRER_USERNAME)
       .produce()
-    entityManager.merge(courseParticipation)
+    courseParticipation = entityManager.merge(courseParticipation)
 
     val persistedCourseParticipation = entityManager.find(CourseParticipationEntity::class.java, courseParticipation.id)
+
     persistedCourseParticipation shouldNotBe null
     persistedCourseParticipation.run {
       this.prisonNumber shouldBe PRISON_NUMBER_1
@@ -68,7 +69,7 @@ class CourseParticipationRepositoryTest {
 
   @Test
   fun `CourseParticipationRepository should save and retrieve CourseParticipationEntity objects, having all nullable fields set to null`() {
-    val courseParticipation = CourseParticipationEntityFactory()
+    var courseParticipation = CourseParticipationEntityFactory()
       .withCourseName(null)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withSource(null)
@@ -77,7 +78,7 @@ class CourseParticipationRepositoryTest {
       .withOutcome(null)
       .withCreatedByUsername(REFERRER_USERNAME)
       .produce()
-    entityManager.merge(courseParticipation)
+    courseParticipation = entityManager.merge(courseParticipation)
 
     val persistedCourseParticipation = entityManager.find(CourseParticipationEntity::class.java, courseParticipation.id)
     persistedCourseParticipation shouldNotBe null
@@ -105,7 +106,7 @@ class CourseParticipationRepositoryTest {
       .withYearStarted(Year.parse("2021"))
       .withYearCompleted(Year.parse("2022"))
       .produce()
-    val courseParticipation = CourseParticipationEntityFactory()
+    var courseParticipation = CourseParticipationEntityFactory()
       .withCourseName(null)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withSource(null)
@@ -114,7 +115,7 @@ class CourseParticipationRepositoryTest {
       .withOutcome(courseParticipationOutcome)
       .withCreatedByUsername(REFERRER_USERNAME)
       .produce()
-    entityManager.merge(courseParticipation)
+    courseParticipation = entityManager.merge(courseParticipation)
 
     val persistedCourseParticipation = entityManager.find(CourseParticipationEntity::class.java, courseParticipation.id)
     persistedCourseParticipation shouldNotBe null

@@ -28,8 +28,8 @@ class CourseRepositoryTest {
 
   @Test
   fun `CourseRepository should save and retrieve CourseEntity objects`() {
-    val courseEntity = CourseEntityFactory().produce()
-    entityManager.merge(courseEntity)
+    var courseEntity = CourseEntityFactory().produce()
+    courseEntity = entityManager.merge(courseEntity)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, courseEntity.id)
     persistedCourse shouldBe courseEntity
@@ -42,10 +42,10 @@ class CourseRepositoryTest {
       PrerequisiteEntityFactory().withName("PR1").withDescription("PR1 D2").produce(),
       PrerequisiteEntityFactory().withName("PR2").withDescription("PR2 D1").produce(),
     )
-    val course = CourseEntityFactory()
+    var course = CourseEntityFactory()
       .withPrerequisites(prerequisites)
       .produce()
-    entityManager.merge(course)
+    course = entityManager.merge(course)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
     persistedCourse.prerequisites shouldContainExactly prerequisites
@@ -53,8 +53,8 @@ class CourseRepositoryTest {
 
   @Test
   fun `CourseRepository should persist multiple OfferingEntity objects for multiple CourseEntity objects and verify ids`() {
-    val course = CourseEntityFactory().produce()
-    entityManager.merge(course)
+    var course = CourseEntityFactory().produce()
+    course = entityManager.merge(course)
 
     val offering1 = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
     val offering2 = OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce()
@@ -68,7 +68,7 @@ class CourseRepositoryTest {
     entityManager.merge(offering3)
 
     course.offerings.addAll(listOf(offering1, offering2, offering3))
-    entityManager.merge(course)
+    course = entityManager.merge(course)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
     persistedCourse.offerings shouldHaveSize 3
@@ -77,12 +77,12 @@ class CourseRepositoryTest {
 
   @Test
   fun `CourseRepository should retrieve CourseEntity objects by their associated offering id`() {
-    val course = CourseEntityFactory().produce()
-    entityManager.merge(course)
+    var course = CourseEntityFactory().produce()
+    course = entityManager.merge(course)
 
-    val offering = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
+    var offering = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
     offering.course = course
-    entityManager.merge(offering)
+    offering = entityManager.merge(offering)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
     val persistedOffering = entityManager.find(OfferingEntity::class.java, offering.id)
