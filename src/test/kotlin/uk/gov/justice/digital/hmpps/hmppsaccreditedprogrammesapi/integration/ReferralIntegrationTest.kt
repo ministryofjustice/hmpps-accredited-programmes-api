@@ -475,7 +475,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody!!
 
   @Test
-  fun `Retrieving a list of open referral views for an organisation should return 200 with correct body`() {
+  fun `Retrieving a list of draft referral views for an organisation using regerralGroup should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
@@ -485,9 +485,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     referralCreated.referralId.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
-    val statusGroup = "open"
+    var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = "open")
+    summary.content.shouldBeEmpty()
 
-    val summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = statusGroup)
+    summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = "draft")
     summary.content.shouldNotBeEmpty()
 
     summary.content?.forEach { actualSummary ->
