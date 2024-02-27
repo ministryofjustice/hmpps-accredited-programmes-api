@@ -277,7 +277,7 @@ constructor(
     statusGroup: String?,
   ): List<String>? {
     var uppercaseStatuses = status?.map { it.uppercase() }
-    if (uppercaseStatuses != null && uppercaseStatuses.isEmpty() && statusGroup != null) {
+    if (uppercaseStatuses == null || (uppercaseStatuses.isEmpty() && statusGroup != null)) {
       uppercaseStatuses = when (statusGroup) {
         "closed" -> {
           referralStatusRepository.findAllByActiveIsTrueAndClosedIsTrue().map { it.code }
