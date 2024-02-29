@@ -13,24 +13,24 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AuditEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.*
 
-class AuditServiceTest {
+class InternalAuditServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var auditRepository: AuditRepository
 
-  private lateinit var auditService: AuditService
+  private lateinit var internalAuditService: InternalAuditService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    auditService = AuditService(auditRepository)
+    internalAuditService = InternalAuditService(auditRepository)
   }
 
   @Test
@@ -39,7 +39,7 @@ class AuditServiceTest {
 
     every { auditRepository.save(any()) } returns auditEntity
 
-    val createAuditRecord = auditService.createAuditRecord(
+    val createAuditRecord = internalAuditService.createInternalAuditRecord(
       referralId = UUID.randomUUID(),
       prisonNumber = PRISON_NUMBER_1,
       referralStatusFrom = null,
@@ -63,7 +63,7 @@ class AuditServiceTest {
 
     every { auditRepository.save(any()) } returns AuditEntityFactory().produce()
 
-    auditService.createAuditRecord(referralEntity)
+    internalAuditService.createInternalAuditRecord(referralEntity)
 
     verify {
       auditRepository.save(

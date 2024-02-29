@@ -52,7 +52,7 @@ constructor(
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
-  private val auditService: AuditService,
+  private val internalAuditService: InternalAuditService,
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
@@ -86,7 +86,7 @@ constructor(
     ) ?: throw Exception("Referral creation failed")
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
-    auditService.createAuditRecord(savedReferral, null)
+    internalAuditService.createInternalAuditRecord(savedReferral, null)
     return savedReferral.id
   }
 
@@ -179,7 +179,7 @@ constructor(
     // update the status
     referral.status = referralStatusUpdate.status
     // audit the interaction
-    auditService.createAuditRecord(referral, existingStatus)
+    internalAuditService.createInternalAuditRecord(referral, existingStatus)
   }
 
   private fun validateStatus(

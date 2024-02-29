@@ -30,7 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
@@ -68,7 +68,7 @@ class ReferralServiceTest {
   private lateinit var organisationRepository: OrganisationRepository
 
   @MockK(relaxed = true)
-  private lateinit var auditService: AuditService
+  private lateinit var internalAuditService: InternalAuditService
 
   @MockK(relaxed = true)
   private lateinit var referralStatusHistoryService: ReferralStatusHistoryService
@@ -149,7 +149,7 @@ class ReferralServiceTest {
       )
     }
     verify {
-      auditService.createAuditRecord(
+      internalAuditService.createInternalAuditRecord(
         match {
           it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == REFERRER_USERNAME &&
@@ -222,7 +222,7 @@ class ReferralServiceTest {
     }
 
     verify {
-      auditService.createAuditRecord(
+      internalAuditService.createInternalAuditRecord(
         match {
           it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == REFERRER_USERNAME &&
@@ -283,7 +283,7 @@ class ReferralServiceTest {
     }
 
     verify {
-      auditService.createAuditRecord(
+      internalAuditService.createInternalAuditRecord(
         match {
           it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == "NONEXISTENT_USER" &&
