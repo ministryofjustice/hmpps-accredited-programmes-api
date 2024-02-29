@@ -33,6 +33,7 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     colour = REFERRAL_WITHDRAWN_COLOUR,
     hintText = REFERRAL_WITHDRAWN_HINT,
     hasNotes = true,
+    hasConfirmation = false,
     draft = false,
     closed = true,
   )
