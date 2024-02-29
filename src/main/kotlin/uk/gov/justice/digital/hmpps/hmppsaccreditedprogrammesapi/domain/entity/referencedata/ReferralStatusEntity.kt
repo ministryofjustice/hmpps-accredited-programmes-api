@@ -14,7 +14,11 @@ data class ReferralStatusEntity(
   @Id
   val code: String,
   val description: String,
+  val hintText: String,
   val colour: String,
+  val hasNotes: Boolean,
+  val hasConfirmation: Boolean,
+  val confirmationText: String,
   val active: Boolean,
   val draft: Boolean,
   val closed: Boolean,

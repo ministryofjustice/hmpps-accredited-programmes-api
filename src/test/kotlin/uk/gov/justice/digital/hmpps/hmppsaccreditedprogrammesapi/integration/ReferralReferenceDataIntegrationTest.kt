@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_DESCRIPTION
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_HINT
 
 private const val WITHDRAWN = "WITHDRAWN"
 private const val CATEGORY_ADMIN = "W_ADMIN"
@@ -30,6 +31,8 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     code = WITHDRAWN,
     description = REFERRAL_WITHDRAWN_DESCRIPTION,
     colour = REFERRAL_WITHDRAWN_COLOUR,
+    hintText = REFERRAL_WITHDRAWN_HINT,
+    hasNotes = true,
     draft = false,
     closed = true,
   )

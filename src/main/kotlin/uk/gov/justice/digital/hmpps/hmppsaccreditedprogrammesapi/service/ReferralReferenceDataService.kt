@@ -24,6 +24,8 @@ class ReferralReferenceDataService(
         ReferralStatusRefData(
           code = it.code,
           description = it.description,
+          hintText = it.hintText,
+          hasNotes = it.hasNotes,
           colour = it.colour,
           closed = it.closed,
           draft = it.draft,
@@ -32,7 +34,15 @@ class ReferralReferenceDataService(
 
   fun getReferralStatus(code: String) =
     referralStatusRepository.getByCode(code).let {
-      ReferralStatusRefData(it.code, it.description, it.colour, it.closed, it.draft)
+      ReferralStatusRefData(
+        code = it.code,
+        description = it.description,
+        colour = it.colour,
+        hintText = it.hintText,
+        hasNotes = it.hasNotes,
+        closed = it.closed,
+        draft = it.draft,
+      )
     }
 
   fun getReferralStatusCategories(statusCode: String) =
