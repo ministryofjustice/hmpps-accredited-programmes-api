@@ -1,6 +1,7 @@
 ---
 generic-service:
   nameOverride: hmpps-accredited-programmes-api
+  serviceAccountName: hmpps-accredited-programmes-api
 
   replicaCount: 4
 
@@ -24,6 +25,11 @@ generic-service:
     SENTRY_SAMPLE-RATE: 1
     SENTRY_TRACES-SAMPLE-RATE: 0.2
     SPRING_DATASOURCE_URL: "jdbc:postgresql://${DB_HOST}/${DB_NAME}"
+    env:
+      HMPPS_SQS_USE_WEB_TOKEN: "true"
+      namespace_secrets:
+        sqs-hmpps-audit-secret:
+          HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-dev-hmpps_audit_queue"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

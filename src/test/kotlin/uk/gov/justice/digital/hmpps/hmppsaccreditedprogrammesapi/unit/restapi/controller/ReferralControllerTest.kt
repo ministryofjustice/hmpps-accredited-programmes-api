@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -33,6 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Securit
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsauditsdk.AuditService
 import java.util.UUID
 
 private const val MY_REFERRALS_ENDPOINT = "/referrals/me/dashboard"
@@ -53,6 +55,9 @@ constructor(
 
   @MockkBean
   private lateinit var securityService: SecurityService
+
+  @MockBean
+  private lateinit var auditService: AuditService
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {

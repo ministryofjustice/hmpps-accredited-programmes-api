@@ -8,17 +8,17 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Priso
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonerSearchResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
 
 @Service
 class PrisonSearchController
 @Autowired
 constructor(
   private val prisonerSearchApiService: PrisonerSearchApiService,
-  private val auditService: AuditService,
+  private val internalAuditService: InternalAuditService,
 ) : PrisonerSearchApiDelegate {
   override fun searchPrisoner(prisonerSearchRequest: PrisonerSearchRequest): ResponseEntity<List<PrisonerSearchResponse>> {
-    auditService.createAuditRecord(
+    internalAuditService.createInternalAuditRecord(
       prisonNumber = prisonerSearchRequest.prisonerIdentifier,
       auditAction = AuditAction.SEARCH_FOR_PERSON,
     )

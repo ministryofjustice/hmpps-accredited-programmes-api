@@ -10,8 +10,8 @@ import java.util.UUID
 
 @Service
 @Transactional
-class AuditService(private val auditRepository: AuditRepository) {
-  fun createAuditRecord(
+class InternalAuditService(private val auditRepository: AuditRepository) {
+  fun createInternalAuditRecord(
     referralId: UUID? = null,
     prisonNumber: String,
     referrerUsername: String? = null,
@@ -34,11 +34,11 @@ class AuditService(private val auditRepository: AuditRepository) {
         courseLocation = courseLocation,
         auditAction = auditAction,
       ),
-    ).id ?: throw Exception("Audit creation failed")
+    ).id ?: throw Exception("Internal audit record creation failed for referralId: $referralId prisonNumber: $prisonNumber")
   }
 
-  fun createAuditRecord(referralEntity: ReferralEntity, currentStatus: String? = null) {
-    createAuditRecord(
+  fun createInternalAuditRecord(referralEntity: ReferralEntity, currentStatus: String? = null) {
+    createInternalAuditRecord(
       referralId = referralEntity.id,
       prisonNumber = referralEntity.prisonNumber,
       referrerUsername = referralEntity.referrer.username,
