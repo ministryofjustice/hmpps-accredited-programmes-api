@@ -14,8 +14,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Interna
 class PrisonSearchController
 @Autowired
 constructor(
-    private val prisonerSearchApiService: PrisonerSearchApiService,
-    private val internalAuditService: InternalAuditService,
+  private val prisonerSearchApiService: PrisonerSearchApiService,
+  private val internalAuditService: InternalAuditService,
 ) : PrisonerSearchApiDelegate {
   override fun searchPrisoner(prisonerSearchRequest: PrisonerSearchRequest): ResponseEntity<List<PrisonerSearchResponse>> {
     internalAuditService.createInternalAuditRecord(
