@@ -1,3 +1,4 @@
+
 INSERT INTO referral_status VALUES ('REFERRAL_STARTED','Referral Started','yellow', true );
 INSERT INTO referral_status VALUES ('REFERRAL_SUBMITTED','Referral Submitted','light-pink', true );
 INSERT INTO referral_status VALUES ('AWAITING_ASSESSMENT','Awaiting Assessment','orange', true );

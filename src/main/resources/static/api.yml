@@ -2257,6 +2257,18 @@ components:
         description:
           type: string
           example: Withdrawn
+        hintText:
+          type: string
+          example: The application has been withdrawn
+        confirmationText:
+          type: string
+          example: I confirm that this person is eligible.
+        hasNotes:
+          description: flag to show this status has notes text box
+          type: boolean
+        hasConfirmation:
+          description: flag to show this status has confirmation box
+          type: boolean
         colour:
           type: string
           example: light-grey

@@ -20,10 +20,12 @@ const val REFERRAL_SUBMITTED_COLOUR = "green"
 const val REFERRAL_WITHDRAWN = "WITHDRAWN"
 const val REFERRAL_WITHDRAWN_DESCRIPTION = "Withdrawn"
 const val REFERRAL_WITHDRAWN_COLOUR = "red"
+const val REFERRAL_WITHDRAWN_HINT = "The referral will be closed."
 
 const val ON_HOLD_REFERRAL_SUBMITTED = "ON_HOLD_REFERRAL_SUBMITTED"
 const val ON_HOLD_REFERRAL_SUBMITTED_DESCRIPTION = "On hold - referral submitted"
 const val ON_HOLD_REFERRAL_SUBMITTED_COLOUR = "yellow"
+const val ON_HOLD_REFERRAL_SUBMITTED_HINT = "The referral will be paused until the person is ready to continue."
 
 const val PRISON_NUMBER_1 = "C6666CC"
 const val REFERRER_USERNAME = "TEST_REFERRER_USER_1"
