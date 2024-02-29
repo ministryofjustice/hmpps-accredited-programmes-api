@@ -26,6 +26,8 @@ class ReferralReferenceDataService(
           description = it.description,
           hintText = it.hintText,
           hasNotes = it.hasNotes,
+          hasConfirmation = it.hasConfirmation,
+          confirmationText = it.confirmationText,
           colour = it.colour,
           closed = it.closed,
           draft = it.draft,
@@ -40,6 +42,8 @@ class ReferralReferenceDataService(
         colour = it.colour,
         hintText = it.hintText,
         hasNotes = it.hasNotes,
+        hasConfirmation = it.hasConfirmation,
+        confirmationText = it.confirmationText,
         closed = it.closed,
         draft = it.draft,
       )
