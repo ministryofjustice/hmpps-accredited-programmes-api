@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -33,6 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseP
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationSettingFactory
+import uk.gov.justice.digital.hmpps.hmppsauditsdk.AuditService
 import java.time.Year
 import java.util.UUID
 
@@ -55,6 +57,9 @@ constructor(
 
   @MockkBean
   private lateinit var courseParticipationService: CourseParticipationService
+
+  @MockBean
+  private lateinit var auditService: AuditService
 
   @Nested
   inner class AddCourseParticipationTests {
