@@ -1739,6 +1739,9 @@ components:
             status:
               description: The status code of the referral.
               type: string
+            closed:
+              description: Is the status of the referral a closed one.
+              type: boolean
             statusDescription:
               description: The status description.
               type: string
