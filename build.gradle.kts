@@ -35,7 +35,6 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:$springdocVersion")
-  implementation("uk.gov.justice.service.hmpps:hmpps-audit-sdk:1.0.0")
 
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")

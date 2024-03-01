@@ -5,7 +5,6 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
@@ -16,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
-import uk.gov.justice.digital.hmpps.hmppsauditsdk.AuditService
 import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,9 +24,6 @@ class AuditIntegrationTest {
 
   @Autowired
   lateinit var auditRepository: AuditRepository
-
-  @MockBean
-  private lateinit var auditService: AuditService
 
   @Test
   fun `Creating an interal audit record is successful with expected body`() {
