@@ -1,11 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
-import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsauditsdk.AuditService as ExternalAuditEventService
 
-@Service
+// @Service
 @Transactional
 class ExternalAuditService(private val externalAuditEventService: ExternalAuditEventService) {
   fun publishAuditEvent(
