@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import io.kotest.assertions.print.print
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.Test
@@ -15,7 +16,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ExternalAuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsauditsdk.AuditService
 import java.util.*
 
@@ -27,19 +34,45 @@ class AuditIntegrationTest {
   @Autowired
   lateinit var auditRepository: AuditRepository
 
+  @Autowired
+  lateinit var internalAuditService: InternalAuditService
+
   @MockBean
   private lateinit var auditService: AuditService
 
+
   @Test
   fun `Creating an interal audit record is successful with expected body`() {
-    val internalAuditRecord = createInternalAuditRecord(prisonNumber = PRISON_NUMBER_1)
 
-    val auditEntity = auditRepository.save(internalAuditRecord)
+    ReferralEntityFactory()
+      .withOffering(OfferingEntityFactory().produce())
+      .with
+      .produce()
+
+    val referralEntity = ReferralEntityFactory().withOffering(OfferingEntityFactory().produce()).produce()
+
+
+    internalAuditService.createInternalAuditRecord(referralEntity, AuditAction.CREATE_REFERRAL.name)
+
+    val auditEntity = auditRepository.findAll()
+      .firstOrNull { (it.prisonNumber == referralEntity.prisonNumber) && (it.auditAction.name == AuditAction.CREATE_REFERRAL.name) }
 
     auditEntity.shouldNotBeNull()
     auditEntity.auditAction.shouldBeEqual(AuditAction.CREATE_REFERRAL)
-    auditEntity.prisonNumber.shouldBeEqual(PRISON_NUMBER_1)
+    auditEntity.prisonNumber.shouldBeEqual(referralEntity.prisonNumber)
+
   }
+//
+//  @Test
+//  fun `Creating an interal audit record is successful with expected body`() {
+//    val internalAuditRecord = createInternalAuditRecord(prisonNumber = PRISON_NUMBER_1)
+//
+//    val auditEntity = auditRepository.save(internalAuditRecord)
+//
+//    auditEntity.shouldNotBeNull()
+//    auditEntity.auditAction.shouldBeEqual(AuditAction.CREATE_REFERRAL)
+//    auditEntity.prisonNumber.shouldBeEqual(PRISON_NUMBER_1)
+//  }
 
   private fun createInternalAuditRecord(
     referralId: UUID = UUID.randomUUID(),
