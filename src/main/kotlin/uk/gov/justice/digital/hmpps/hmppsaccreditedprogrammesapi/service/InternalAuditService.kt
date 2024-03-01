@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Service
 @Transactional
-class InternalAuditService(private val auditRepository: AuditRepository) {
+class InternalAuditService(private val auditRepository: AuditRepository, private val externalAuditService: ExternalAuditService) {
   fun createInternalAuditRecord(
     referralId: UUID? = null,
     prisonNumber: String,
@@ -38,6 +38,8 @@ class InternalAuditService(private val auditRepository: AuditRepository) {
   }
 
   fun createInternalAuditRecord(referralEntity: ReferralEntity, currentStatus: String? = null) {
+    externalAuditService.publishExternalAuditEvent(referralEntity, AuditAction.CREATE_REFERRAL.name)
+
     createInternalAuditRecord(
       referralId = referralEntity.id,
       prisonNumber = referralEntity.prisonNumber,

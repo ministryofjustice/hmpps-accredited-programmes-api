@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ExternalAuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AuditEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
@@ -27,10 +28,13 @@ class InternalAuditServiceTest {
 
   private lateinit var internalAuditService: InternalAuditService
 
+  @MockK(relaxed = true)
+  private lateinit var externalAuditService: ExternalAuditService
+
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    internalAuditService = InternalAuditService(auditRepository)
+    internalAuditService = InternalAuditService(auditRepository, externalAuditService)
   }
 
   @Test
