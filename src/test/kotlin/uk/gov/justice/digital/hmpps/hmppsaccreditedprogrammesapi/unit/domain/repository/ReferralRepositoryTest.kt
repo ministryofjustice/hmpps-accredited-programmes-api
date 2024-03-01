@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
@@ -17,7 +16,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsauditsdk.AuditService
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -27,9 +25,6 @@ class ReferralRepositoryTest {
 
   @Autowired
   private lateinit var entityManager: EntityManager
-
-  @MockBean
-  private lateinit var auditService: AuditService
 
   @Test
   fun `ReferralRepository should save and retrieve ReferralEntity objects`() {
