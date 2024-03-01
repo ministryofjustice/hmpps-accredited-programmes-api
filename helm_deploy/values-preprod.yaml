@@ -16,6 +16,11 @@ generic-service:
     SERVICES_ARNS-API_BASE-URL: https://assess-risks-and-needs-preprod.hmpps.service.justice.gov.uk/
     SENTRY_ENVIRONMENT: preprod
 
+  namespace_secrets:
+    sqs-hmpps-audit-secret:
+      HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-preprod-hmpps_audit_queue"
+
+
   allowlist:
     groups:
       - internal
