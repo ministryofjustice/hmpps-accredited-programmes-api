@@ -18,6 +18,7 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferr
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
   status = status.code.lowercase(),
+  closed = status.closed,
   statusDescription = status.description,
   statusColour = status.colour,
   submittedOn = submittedOn?.toString(),
