@@ -15,6 +15,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,15 +29,23 @@ class AuditIntegrationTest {
   @Autowired
   lateinit var auditRepository: AuditRepository
 
+  @Autowired
+  lateinit var auditService: InternalAuditService
+
   @Test
   fun `Creating an interal audit record is successful with expected body`() {
-    val internalAuditRecord = createInternalAuditRecord(prisonNumber = PRISON_NUMBER_1)
+    val offeringEntity = OfferingEntityFactory().produce()
+    offeringEntity.course = CourseEntityFactory().produce()
+    val referralEntity = ReferralEntityFactory().withOffering(offeringEntity).produce()
 
-    val auditEntity = auditRepository.save(internalAuditRecord)
+    auditService.createInternalAuditRecord(referralEntity, "Referral Submitted")
+
+    val auditEntity = auditRepository.findAll()
+      .firstOrNull { it.prisonNumber == referralEntity.prisonNumber && it.auditAction == AuditAction.CREATE_REFERRAL }
 
     auditEntity.shouldNotBeNull()
     auditEntity.auditAction.shouldBeEqual(AuditAction.CREATE_REFERRAL)
-    auditEntity.prisonNumber.shouldBeEqual(PRISON_NUMBER_1)
+    auditEntity.prisonNumber.shouldBeEqual(referralEntity.prisonNumber)
   }
 
   private fun createInternalAuditRecord(

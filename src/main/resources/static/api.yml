@@ -1408,6 +1408,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /organisations/enabled:
+    get:
+      tags:
+        - reference data
+      summary: Get list of enabled organisations
+      operationId: getEnabledOrganisations
+      responses:
+        200:
+          description: List of enabled organisations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EnabledOrganisation'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
 
 components:
 
@@ -2320,4 +2339,12 @@ components:
         - description
         - referralCategoryCode
 
-
+    EnabledOrganisation:
+      type: object
+      properties:
+        code:
+          type: string
+          example: MDI
+        description:
+          type: string
+          example: Stocken
