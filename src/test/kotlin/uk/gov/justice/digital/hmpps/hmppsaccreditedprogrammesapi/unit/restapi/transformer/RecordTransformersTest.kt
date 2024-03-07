@@ -70,9 +70,10 @@ class RecordTransformersTest {
       .withSecondaryContactEmail("nobody-bwn2@digital.justice.gov.uk")
       .produce()
 
-    with(offering.toApi()) {
+    with(offering.toApi(true)) {
       id shouldBe offering.id
       organisationId shouldBe offering.organisationId
+      organisationEnabled shouldBe true
       contactEmail shouldBe offering.contactEmail
       secondaryContactEmail shouldBe offering.secondaryContactEmail
       referable shouldBe true

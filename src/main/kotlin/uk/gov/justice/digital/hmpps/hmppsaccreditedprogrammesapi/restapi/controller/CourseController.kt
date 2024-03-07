@@ -11,11 +11,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineM
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toCourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import java.util.UUID
 
 @Service
@@ -23,6 +23,7 @@ class CourseController
 @Autowired
 constructor(
   private val courseService: CourseService,
+  private val enabledOrganisationService: EnabledOrganisationService,
 ) : CoursesApiDelegate {
   override fun getAllCourses(): ResponseEntity<List<Course>> =
     ResponseEntity
@@ -68,13 +69,15 @@ constructor(
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /courses/$id")
 
-  override fun getAllOfferingsByCourseId(id: UUID): ResponseEntity<List<CourseOffering>> =
-    ResponseEntity
-      .ok(
-        courseService
-          .getAllOfferingsByCourseId(id)
-          .map(OfferingEntity::toApi),
-      )
+  override fun getAllOfferingsByCourseId(id: UUID): ResponseEntity<List<CourseOffering>> {
+    val offerings = courseService.getAllOfferingsByCourseId(id)
+    val mappedOfferings = offerings.map { offeringEntity ->
+      val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringEntity.organisationId) != null
+      offeringEntity.toApi(enabledOrg)
+    }
+    return ResponseEntity.ok(mappedOfferings)
+  }
+
   override fun getAllCourseNames(): ResponseEntity<List<String>> =
     ResponseEntity
       .ok(

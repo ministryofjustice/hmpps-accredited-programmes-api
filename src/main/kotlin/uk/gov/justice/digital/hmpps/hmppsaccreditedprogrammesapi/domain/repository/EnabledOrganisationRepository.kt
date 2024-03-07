@@ -6,4 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import java.util.UUID
 
 @Repository
-interface EnabledOrganisationRepository : JpaRepository<EnabledOrganisation, UUID>
+interface EnabledOrganisationRepository : JpaRepository<EnabledOrganisation, UUID> {
+  fun findEnabledOrganisationByCode(code: String): EnabledOrganisation?
+}

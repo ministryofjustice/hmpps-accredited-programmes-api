@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toOfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import java.util.UUID
 
 @Service
@@ -21,16 +22,21 @@ class OfferingController
 @Autowired
 constructor(
   private val courseService: CourseService,
+  private val enabledOrganisationService: EnabledOrganisationService,
 ) : OfferingsApiDelegate {
   override fun getCourseByOfferingId(id: UUID): ResponseEntity<Course> =
     courseService.getCourseByOfferingId(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /offerings/$id/course")
 
-  override fun getOfferingById(id: UUID): ResponseEntity<CourseOffering> =
-    courseService.getOfferingById(id)?.let {
-      ResponseEntity.ok(it.toApi())
+  override fun getOfferingById(id: UUID): ResponseEntity<CourseOffering> {
+    val offeringById = courseService.getOfferingById(id)
+    val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringById?.organisationId.orEmpty()) != null
+
+    return offeringById?.toApi(enabledOrg)?.let {
+      ResponseEntity.ok(it)
     } ?: throw NotFoundException("No Offering found at /offerings/$id")
+  }
 
   override fun updateOfferings(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.updateOfferings(offeringRecord.map(OfferingRecord::toDomain)))

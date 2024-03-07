@@ -7,4 +7,5 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 @Service
 class EnabledOrganisationService(val enabledOrganisationRepository: EnabledOrganisationRepository) {
   fun getEnabledOrganisations(): List<EnabledOrganisation> = enabledOrganisationRepository.findAll()
+  fun getEnabledOrganisation(organisationId: String) = enabledOrganisationRepository.findEnabledOrganisationByCode(organisationId)
 }
