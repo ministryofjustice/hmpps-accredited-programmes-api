@@ -79,7 +79,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       "SC++",
       "General offence",
     )
-    persistenceHelper.createEnabledOrganisation("BWN", "BMW org")
+    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createOffering(
