@@ -30,10 +30,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PersonEntityFactory
@@ -85,6 +87,9 @@ class ReferralServiceTest {
   @MockK(relaxed = true)
   private lateinit var referralReferenceDataService: ReferralReferenceDataService
 
+  @MockK(relaxed = true)
+  private lateinit var enabledOrganisationService: EnabledOrganisationService
+
   @InjectMockKs
   private lateinit var referralService: ReferralService
 
@@ -118,6 +123,8 @@ class ReferralServiceTest {
       .withOrganisationId(ORGANISATION_ID_MDI)
       .produce()
     every { offeringRepository.findById(any()) } returns Optional.of(offering)
+
+    every { enabledOrganisationService.getEnabledOrganisation(any()) } returns EnabledOrganisationEntityFactory().produce()
 
     val person = PersonEntityFactory()
       .produce()
@@ -177,7 +184,7 @@ class ReferralServiceTest {
       .withOrganisationId(prisonCode)
       .produce()
     every { offeringRepository.findById(any()) } returns Optional.of(offering)
-
+    every { enabledOrganisationService.getEnabledOrganisation(any()) } returns EnabledOrganisationEntityFactory().produce()
     val person = PersonEntityFactory()
       .produce()
     every { personRepository.findPersonEntityByPrisonNumber(any()) } returns person
