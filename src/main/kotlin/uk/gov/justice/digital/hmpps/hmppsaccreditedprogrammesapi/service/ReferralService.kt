@@ -57,6 +57,7 @@ constructor(
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralReferenceDataService: ReferralReferenceDataService,
+  private val enabledOrganisationService: EnabledOrganisationService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -72,6 +73,12 @@ constructor(
 
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found") }
+
+    val disabledOrganisation = enabledOrganisationService.getEnabledOrganisation(offering.organisationId) == null
+
+    if (disabledOrganisation) {
+      throw Exception("organisation not enabled for referrals")
+    }
 
     createOrUpdatePerson(prisonNumber)
 

@@ -79,6 +79,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       "SC++",
       "General offence",
     )
+    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
+    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
+
     persistenceHelper.createOffering(
       UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
       UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),

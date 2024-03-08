@@ -35,9 +35,10 @@ fun PrerequisiteEntity.toApi(): CoursePrerequisite = CoursePrerequisite(
   description = description,
 )
 
-fun OfferingEntity.toApi(): CourseOffering = CourseOffering(
+fun OfferingEntity.toApi(orgEnabled: Boolean): CourseOffering = CourseOffering(
   id = id!!,
   organisationId = organisationId,
+  organisationEnabled = orgEnabled,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
   referable = referable,

@@ -1541,6 +1541,9 @@ components:
           type: string
           example: "MDI"
           description: "The unique identifier associated with the location hosting the offering. For prisons, this is the PrisonId, which is usually three capital letters."
+        organisationEnabled:
+          type: boolean
+          description: "Describes if a referral can be created with an organisation"
         contactEmail:
           type: string
           format: email
