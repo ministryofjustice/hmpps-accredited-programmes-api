@@ -1,6 +1,7 @@
 ---
 generic-service:
   nameOverride: hmpps-accredited-programmes-api
+  serviceAccountName: hmpps-accredited-programmes-service-account
 
   replicaCount: 4
 

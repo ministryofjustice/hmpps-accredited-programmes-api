@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
@@ -31,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ExternalAuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.InternalAuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
@@ -89,6 +91,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var enabledOrganisationService: EnabledOrganisationService
+
+  @MockK(relaxed = true)
+  private lateinit var externalAuditService: ExternalAuditService
 
   @InjectMockKs
   private lateinit var referralService: ReferralService
@@ -165,6 +170,16 @@ class ReferralServiceTest {
         null,
       )
     }
+
+    verify {
+      externalAuditService.publishExternalAuditEvent(
+        match {
+          it.prisonNumber == PRISON_NUMBER_1 &&
+            it.referrer.username == REFERRER_USERNAME
+        },
+        AuditAction.CREATE_REFERRAL.name,
+      )
+    }
   }
 
   @Test
@@ -238,6 +253,16 @@ class ReferralServiceTest {
         null,
       )
     }
+
+    verify {
+      externalAuditService.publishExternalAuditEvent(
+        match {
+          it.prisonNumber == PRISON_NUMBER_1 &&
+            it.referrer.username == REFERRER_USERNAME
+        },
+        AuditAction.CREATE_REFERRAL.name,
+      )
+    }
   }
 
   @Test
@@ -297,6 +322,16 @@ class ReferralServiceTest {
             it.offering.id == offering.id
         },
         null,
+      )
+    }
+
+    verify {
+      externalAuditService.publishExternalAuditEvent(
+        match {
+          it.prisonNumber == PRISON_NUMBER_1 &&
+            it.referrer.username == "NONEXISTENT_USER"
+        },
+        AuditAction.CREATE_REFERRAL.name,
       )
     }
   }

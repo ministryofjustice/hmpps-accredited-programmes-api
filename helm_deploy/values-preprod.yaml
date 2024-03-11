@@ -15,6 +15,7 @@ generic-service:
     SERVICES_OASYS-API_BASE-URL: https://accredited-programmes-and-oasys-preprod.hmpps.service.justice.gov.uk
     SERVICES_ARNS-API_BASE-URL: https://assess-risks-and-needs-preprod.hmpps.service.justice.gov.uk/
     SENTRY_ENVIRONMENT: preprod
+    HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-preprod-hmpps_audit_queue"
 
   allowlist:
     groups:
