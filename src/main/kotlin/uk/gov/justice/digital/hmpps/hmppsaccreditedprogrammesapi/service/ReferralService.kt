@@ -74,7 +74,7 @@ constructor(
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found") }
 
-    if (enabledOrganisationService.getEnabledOrganisation(offering.organisationId) != null) {
+    if (enabledOrganisationService.getEnabledOrganisation(offering.organisationId) == null) {
       throw BusinessException("Organisation ${offering.organisationId} not enabled for referrals")
     }
 
