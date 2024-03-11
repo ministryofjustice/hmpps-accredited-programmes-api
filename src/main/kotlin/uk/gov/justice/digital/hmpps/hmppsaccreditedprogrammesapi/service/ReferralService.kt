@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -58,6 +59,7 @@ constructor(
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralReferenceDataService: ReferralReferenceDataService,
   private val enabledOrganisationService: EnabledOrganisationService,
+  private val externalAuditService: ExternalAuditService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -92,6 +94,7 @@ constructor(
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
     internalAuditService.createInternalAuditRecord(savedReferral, null)
+    externalAuditService.publishExternalAuditEvent(savedReferral, AuditAction.CREATE_REFERRAL.name)
     return savedReferral.id
   }
 
@@ -185,6 +188,7 @@ constructor(
     referral.status = referralStatusUpdate.status
     // audit the interaction
     internalAuditService.createInternalAuditRecord(referral, existingStatus)
+    externalAuditService.publishExternalAuditEvent(referral, AuditAction.UPDATE_REFERRAL.name)
   }
 
   private fun validateStatus(
