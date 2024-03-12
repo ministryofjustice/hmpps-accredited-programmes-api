@@ -24,6 +24,7 @@ generic-service:
     SERVICES_ARNS-API_BASE-URL: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk/
     SENTRY_ENVIRONMENT: dev
     HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-dev-hmpps_audit_queue"
+    LOGGING_LEVEL_UK_GOV_JUSTICE: DEBUG
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
