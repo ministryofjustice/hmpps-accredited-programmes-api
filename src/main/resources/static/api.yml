@@ -8,10 +8,37 @@ security:
   - bearerAuth: [ ]
 paths:
 
+  /people/{prisonNumber}/sentences:
+    get:
+      tags:
+        - Person
+      summary: Sentence details
+      operationId: getSentenceDetails
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: prison number
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/SentenceDetails'
+        404:
+          description: Person not found
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /prisoner-search:
     post:
       tags:
-        - Prisoner search
+        - Person
       summary: Search for a prisoner via prison search api by prisoner id and caseload.
       operationId: searchPrisoner
       requestBody:
@@ -1898,6 +1925,9 @@ components:
         surname:
           type: string
           description: surname of the person
+        sentenceType:
+          type: string
+          description: Sentence type description or 'Multiple sentences' if there are more than one
 
     ReferralStatusHistory:
       type: object
@@ -2358,3 +2388,35 @@ components:
         description:
           type: string
           example: Stocken
+
+    SentenceDetails:
+      type: object
+      properties:
+        sentences:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sentence'
+        keyDates:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyDate'
+
+    Sentence:
+      type: object
+      properties:
+        description:
+          type: string
+          example: CJA03 Standard Determinate Sentence
+        sentenceStartDate:
+          type: string
+          format: date
+
+    KeyDate:
+      type: object
+      properties:
+        type:
+          type: string
+          example: releaseDate
+        date:
+          type: string
+          format: date

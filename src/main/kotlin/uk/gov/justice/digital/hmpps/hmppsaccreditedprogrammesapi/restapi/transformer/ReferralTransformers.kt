@@ -56,4 +56,5 @@ fun ReferralViewEntity.toApi() = ReferralView(
   nonDtoReleaseDateType = nonDtoReleaseDateType,
   forename = forename,
   surname = surname,
+  sentenceType = sentenceType,
 )
