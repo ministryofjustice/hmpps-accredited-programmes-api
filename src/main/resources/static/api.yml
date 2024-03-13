@@ -98,6 +98,13 @@ paths:
         - Courses
       summary: Get all unique course names
       operationId: getAllCourseNames
+      parameters:
+        - name: includeWithdrawn
+          in: query
+          description: flag to include withdrawn
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: Return a JSON representation of all unique course names that are not withdrawn.

@@ -16,4 +16,13 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
   """,
   )
   fun findByOfferingId(offeringId: UUID): CourseEntity?
+
+  @Query(
+    """
+    SELECT distinct (c.name) FROM CourseEntity c
+    WHERE (:includeWithdrawn IS true OR c.withdrawn IS false)
+    order by c.name asc 
+  """,
+  )
+  fun getCourseNames(includeWithdrawn: Boolean?): List<String>
 }

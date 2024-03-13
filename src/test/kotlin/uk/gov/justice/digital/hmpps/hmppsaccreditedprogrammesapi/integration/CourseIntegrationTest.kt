@@ -8,6 +8,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
@@ -27,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.gen
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toCourseCsv
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toOfferingCsv
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toPrerequisiteCsv
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -34,6 +36,9 @@ import java.util.UUID
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class CourseIntegrationTest : IntegrationTestBase() {
+
+  @Autowired
+  lateinit var courseRepository: CourseRepository
 
   @BeforeEach
   fun setUp() {
@@ -45,6 +50,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     persistenceHelper.createCourse(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"), "CC", "Custom Course", "Sample description", "CC", "General offence")
     persistenceHelper.createCourse(UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"), "RC", "RAPID Course", "Sample description", "RC", "General offence")
+    persistenceHelper.createCourse(UUID.fromString("1811faa6-d568-4fc4-83ce-41111230242e"), "LEG", "Legacy Course", "Sample description", "LC", "General offence", true)
 
     persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
     persistenceHelper.createReferrerUser("TEST_REFERRER_USER_2")
@@ -78,10 +84,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @DirtiesContext
   @Test
   fun `Searching for all course names with JWT returns 200 with correct body`() {
-    val courseRecords = generateCourseRecords(3)
-    updateCourses(courseRecords.toCourseCsv())
-
-    val expectedCourseNames = courseRecords.map { it.name }.distinct()
+    val expectedCourseNames = courseRepository.getCourseNames(true)
 
     val responseBodySpec = webTestClient
       .get()
@@ -92,9 +95,24 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody()
 
-    expectedCourseNames.forEachIndexed { index, courseName ->
-      responseBodySpec.jsonPath("$[$index]").isEqualTo(courseName)
-    }
+    responseBodySpec.jsonPath("$").isEqualTo(expectedCourseNames)
+  }
+
+  @DirtiesContext
+  @Test
+  fun `Searching for all active course names with JWT returns 200 with correct body`() {
+    val expectedCourseNames = courseRepository.getCourseNames(false)
+
+    val responseBodySpec = webTestClient
+      .get()
+      .uri("/courses/course-names?includeWithdrawn=false")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+
+    responseBodySpec.jsonPath("$").isEqualTo(expectedCourseNames)
   }
 
   @Test

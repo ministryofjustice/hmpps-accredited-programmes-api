@@ -78,13 +78,9 @@ constructor(
     return ResponseEntity.ok(mappedOfferings)
   }
 
-  override fun getAllCourseNames(): ResponseEntity<List<String>> =
-    ResponseEntity
-      .ok(
-        courseService
-          .getAllCourses()
-          .map(CourseEntity::toApi)
-          .map(Course::name)
-          .distinct(),
-      )
+  override fun getAllCourseNames(includeWithdrawn: Boolean?): ResponseEntity<List<String>> = ResponseEntity
+    .ok(
+      courseService
+        .getCourseNames(includeWithdrawn),
+    )
 }
