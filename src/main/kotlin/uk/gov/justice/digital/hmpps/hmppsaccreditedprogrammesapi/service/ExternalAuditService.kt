@@ -26,9 +26,9 @@ class ExternalAuditService(private val auditService: HmppsAuditService?) {
     subjectType: String? = "PRISON_NUMBER",
     referralId: String? = "",
   ) {
-    log.info("Audit service injected : ${auditService != null} ")
+    log.debug("Audit service injected : ${auditService != null} ")
     auditService?.run {
-      log.info("Writing audit message for $prisonNumber ")
+      log.debug("Writing audit message for $prisonNumber ")
       scope.launch {
         publishEvent(
           what = auditAction,

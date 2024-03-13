@@ -6,33 +6,23 @@
 
     <springProperty scope="context" name="app" source="spring.application.name"/>
 
-
-    <springProfile name="dev || stdout">
-        <appender name="consoleAppender" class="ch.qos.logback.core.helpers.NOPAppender"/>
-        <appender name="logAppender" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <Pattern>${LOG_PATTERN}</Pattern>
-            </encoder>
-        </appender>
-    </springProfile>
-
-    <springProfile name="!(dev || stdout)">
-        <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <Pattern>${LOG_PATTERN}</Pattern>
-            </encoder>
-        </appender>
-    </springProfile>
+    <appender name="logAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
 
     <appender name="sentry" class="io.sentry.logback.SentryAppender"/>
 
-    <logger name="uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.Application" additivity="false"
-            level="DEBUG">
+    <logger name="uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi" additivity="false" level="INFO">
         <appender-ref ref="logAppender"/>
-        <appender-ref ref="consoleAppender"/>
     </logger>
 
-    <logger name="uk.gov.justice.digital.hmpps" additivity="false" level="DEBUG">
+    <logger name="uk.gov.justice.digital.hmpps" additivity="false" level="INFO">
+        <appender-ref ref="logAppender"/>
+    </logger>
+
+    <logger name="uk.gov.justice.hmpps.sqs.audit" additivity="false" level="DEBUG">
         <appender-ref ref="logAppender"/>
     </logger>
 
@@ -46,12 +36,10 @@
 
     <logger name="org.apache.catalina" additivity="false" level="INFO">
         <appender-ref ref="logAppender"/>
-        <appender-ref ref="consoleAppender"/>
     </logger>
 
     <logger name="org.springframework.boot" additivity="false" level="INFO">
         <appender-ref ref="logAppender"/>
-        <appender-ref ref="consoleAppender"/>
     </logger>
 
     <root level="INFO">
