@@ -24,12 +24,24 @@ constructor(
   private val offeringRepository: OfferingRepository,
 ) {
   fun getAllCourses(): List<CourseEntity> = courseRepository.findAll().filterNot { it.withdrawn }
+  fun getCourseNames(includeWithdrawn: Boolean? = true): List<String> {
+    return if (includeWithdrawn == null) {
+      courseRepository.getCourseNames(true)
+    } else {
+      courseRepository.getCourseNames(includeWithdrawn)
+    }
+  }
   fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
   fun getAllOfferings(): List<OfferingEntity> = offeringRepository.findAll().filterNot { it.withdrawn }
-  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> = offeringRepository.findAll().filter { it.organisationId == organisationId }
-  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> = offeringRepository.findAllByCourseId(courseId).filterNot { it.withdrawn }
-  fun getOfferingById(offeringId: UUID): OfferingEntity? = offeringRepository.findByIdOrNull(offeringId)?.takeIf { !it.withdrawn }
+  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> =
+    offeringRepository.findAll().filter { it.organisationId == organisationId }
+
+  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> =
+    offeringRepository.findAllByCourseId(courseId).filterNot { it.withdrawn }
+
+  fun getOfferingById(offeringId: UUID): OfferingEntity? =
+    offeringRepository.findByIdOrNull(offeringId)?.takeIf { !it.withdrawn }
 
   fun updateCourses(courseUpdates: List<CourseUpdate>) {
     val coursesByIdentifier = courseRepository.findAll().associateBy(CourseEntity::identifier)
@@ -178,7 +190,10 @@ constructor(
       }
     }.filterNotNull()
 
-  private fun unmatchedCourseErrors(offeringUpdates: List<OfferingUpdate>, coursesByIdentifier: Map<String, CourseEntity>) =
+  private fun unmatchedCourseErrors(
+    offeringUpdates: List<OfferingUpdate>,
+    coursesByIdentifier: Map<String, CourseEntity>,
+  ) =
     offeringUpdates
       .mapIndexed { index, record ->
         when (coursesByIdentifier.containsKey(record.identifier)) {
