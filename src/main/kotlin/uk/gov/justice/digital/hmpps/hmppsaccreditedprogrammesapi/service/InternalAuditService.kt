@@ -37,7 +37,7 @@ class InternalAuditService(private val auditRepository: AuditRepository) {
     ).id ?: throw Exception("Internal audit record creation failed for referralId: $referralId prisonNumber: $prisonNumber")
   }
 
-  fun createInternalAuditRecord(referralEntity: ReferralEntity, currentStatus: String? = null) {
+  fun createInternalAuditRecord(referralEntity: ReferralEntity, currentStatus: String? = null, auditAction: AuditAction = AuditAction.CREATE_REFERRAL) {
     createInternalAuditRecord(
       referralId = referralEntity.id,
       prisonNumber = referralEntity.prisonNumber,
@@ -47,7 +47,7 @@ class InternalAuditService(private val auditRepository: AuditRepository) {
       courseId = referralEntity.offering.course.id,
       courseName = referralEntity.offering.course.name,
       courseLocation = referralEntity.offering.organisationId,
-      auditAction = AuditAction.CREATE_REFERRAL,
+      auditAction = auditAction,
     )
   }
 }
