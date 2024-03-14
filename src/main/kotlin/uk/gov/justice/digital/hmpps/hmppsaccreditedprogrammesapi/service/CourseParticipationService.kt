@@ -24,12 +24,17 @@ constructor(
   fun getCourseParticipationById(historicCourseParticipationId: UUID): CourseParticipationEntity? =
     courseParticipationRepository.findById(historicCourseParticipationId).getOrNull()
 
-  fun updateCourseParticipationById(historicCourseParticipationId: UUID, update: CourseParticipationUpdate): CourseParticipationEntity =
+  fun updateCourseParticipationById(
+    historicCourseParticipationId: UUID,
+    update: CourseParticipationUpdate,
+  ): CourseParticipationEntity =
     courseParticipationRepository
       .getReferenceById(historicCourseParticipationId)
       .applyUpdate(update)
 
-  fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity> = courseParticipationRepository.findByPrisonNumber(prisonNumber)
+  fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity> =
+    courseParticipationRepository.findByPrisonNumber(prisonNumber)
+
   fun deleteCourseParticipationById(historicCourseParticipationId: UUID) {
     courseParticipationRepository.deleteById(historicCourseParticipationId)
   }

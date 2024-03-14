@@ -60,6 +60,7 @@ constructor(
   private val referralReferenceDataService: ReferralReferenceDataService,
   private val enabledOrganisationService: EnabledOrganisationService,
   private val externalAuditService: ExternalAuditService,
+  private val personService: PersonService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -113,6 +114,7 @@ constructor(
   }
 
   private fun createOrUpdatePerson(prisonNumber: String) {
+    val sentenceType = personService.getSentenceType(prisonNumber)
     prisonerSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
       var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
       if (personEntity == null) {
@@ -128,6 +130,7 @@ constructor(
           earliestReleaseDateAndType.second,
           it.indeterminateSentence,
           it.nonDtoReleaseDateType,
+          sentenceType,
         )
       } else {
         val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
@@ -140,6 +143,7 @@ constructor(
         personEntity.earliestReleaseDateType = earliestReleaseDateAndType.second
         personEntity.indeterminateSentence = it.indeterminateSentence
         personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
+        personEntity.sentenceType = sentenceType
       }
       personRepository.save(personEntity)
     }

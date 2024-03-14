@@ -12,6 +12,19 @@
         },
         "bodyFileName": "alerts.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/api/offenders/C6666CC/booking/latest/sentence-summary",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "sentence-info.json"
+      }
     }
   ]
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceAndOffenceDetails
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceInformation
 
 @Component
 class PrisonApiClient(
@@ -14,11 +14,11 @@ class PrisonApiClient(
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getSentencesAndOffencesByBookingId(bookingID: Int) = getRequest<List<SentenceAndOffenceDetails>> {
-    path = "/api/offender-sentences/booking/$bookingID/sentences-and-offences"
-  }
-
   fun getAlertsByPrisonNumber(prisonNumber: String) = getRequest<List<NomisAlert>> {
     path = "/api/offenders/$prisonNumber/alerts/v2"
+  }
+
+  fun getSentenceInformation(prisonNumber: String) = getRequest<SentenceInformation> {
+    path = "/api/offenders/$prisonNumber/booking/latest/sentence-summary"
   }
 }
