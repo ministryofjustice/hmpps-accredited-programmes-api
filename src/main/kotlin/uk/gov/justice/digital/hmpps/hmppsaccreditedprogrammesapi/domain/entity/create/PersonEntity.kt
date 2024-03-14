@@ -22,6 +22,7 @@ data class PersonEntity(
   var earliestReleaseDateType: String?,
   var indeterminateSentence: Boolean?,
   var nonDtoReleaseDateType: String?,
+  var sentenceType: String?,
   @Id
   @GeneratedValue
   @Column(name = "person_id")

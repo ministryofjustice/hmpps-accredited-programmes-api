@@ -20,6 +20,7 @@ class PersonEntityFactory : Factory<PersonEntity> {
   private var earliestReleaseDate: Yielded<LocalDate> = { LocalDate.now() }
   private var indeterminateSentence: Yielded<Boolean> = { false }
   private var nonDtoReleaseDateType: Yielded<String> = { randomAlphanumericString() }
+  private var sentenceType: Yielded<String> = { randomAlphanumericString() }
 
   override fun produce() = PersonEntity(
     id = id(),
@@ -33,5 +34,6 @@ class PersonEntityFactory : Factory<PersonEntity> {
     prisonNumber = prisonNumber(),
     indeterminateSentence = indeterminateSentence(),
     nonDtoReleaseDateType = nonDtoReleaseDateType(),
+    sentenceType = sentenceType(),
   )
 }
