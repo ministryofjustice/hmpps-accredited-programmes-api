@@ -38,6 +38,7 @@ class PersonService(val prisonApiClient: PrisonApiClient) {
       .filter { it.caseStatus == "ACTIVE" }
       .flatMap { it.sentences }
       .map { it.sentenceTypeDescription }
+      .distinct()
 
     return when {
       activeSentences.isEmpty() -> "No active sentences"
