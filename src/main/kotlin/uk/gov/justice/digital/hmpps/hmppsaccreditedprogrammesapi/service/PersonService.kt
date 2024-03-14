@@ -41,7 +41,7 @@ class PersonService(val prisonApiClient: PrisonApiClient) {
 
     return when {
       activeSentences.isEmpty() -> "No active sentences"
-      activeSentences.size == 1 -> activeSentences.first()
+      activeSentences.size == 1 -> activeSentences.first().toString()
       else -> "Multiple sentences"
     }
   }
