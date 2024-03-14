@@ -94,7 +94,7 @@ constructor(
     ) ?: throw Exception("Referral creation failed")
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
-    internalAuditService.createInternalAuditRecord(savedReferral, null)
+    internalAuditService.createInternalAuditRecord(savedReferral, null, AuditAction.CREATE_REFERRAL)
     externalAuditService.publishExternalAuditEvent(savedReferral, AuditAction.CREATE_REFERRAL.name)
     return savedReferral.id
   }
@@ -191,7 +191,7 @@ constructor(
     // update the status
     referral.status = referralStatusUpdate.status
     // audit the interaction
-    internalAuditService.createInternalAuditRecord(referral, existingStatus)
+    internalAuditService.createInternalAuditRecord(referral, existingStatus, AuditAction.UPDATE_REFERRAL)
     externalAuditService.publishExternalAuditEvent(referral, AuditAction.UPDATE_REFERRAL.name)
   }
 
