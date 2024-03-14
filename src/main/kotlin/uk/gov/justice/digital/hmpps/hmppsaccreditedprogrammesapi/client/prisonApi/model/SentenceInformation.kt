@@ -17,34 +17,34 @@ data class PrisonTerm(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class CourtSentence(
-  val caseSeq: Int,
-  val beginDate: LocalDate,
-  val caseStatus: String,
+  val caseSeq: Int?,
+  val beginDate: LocalDate?,
+  val caseStatus: String?,
   val sentences: List<Sentence>,
-  val issuingCourtDate: String,
+  val issuingCourtDate: String?,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Sentence(
-  val sentenceStatus: String,
-  val sentenceCategory: String,
-  val sentenceCalculationType: String,
-  val sentenceTypeDescription: String,
-  val sentenceStartDate: LocalDate,
-  val lineSeq: Int,
+  val sentenceStatus: String?,
+  val sentenceCategory: String?,
+  val sentenceCalculationType: String?,
+  val sentenceTypeDescription: String?,
+  val sentenceStartDate: LocalDate?,
+  val lineSeq: Int?,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class KeyDates(
-  val sentenceStartDate: LocalDate,
-  val effectiveSentenceEndDate: LocalDate,
-  val nonDtoReleaseDate: LocalDate,
-  val confirmedReleaseDate: LocalDate,
-  val releaseDate: LocalDate,
-  val sentenceExpiryDate: LocalDate,
-  val conditionalReleaseDate: LocalDate,
-  val licenceExpiryDate: LocalDate,
-  val homeDetentionCurfewEligibilityDate: LocalDate,
-  val earlyTermDate: LocalDate,
-  val lateTermDate: LocalDate,
+  val sentenceStartDate: LocalDate?,
+  val effectiveSentenceEndDate: LocalDate?,
+  val nonDtoReleaseDate: LocalDate?,
+  val confirmedReleaseDate: LocalDate?,
+  val releaseDate: LocalDate?,
+  val sentenceExpiryDate: LocalDate?,
+  val conditionalReleaseDate: LocalDate?,
+  val licenceExpiryDate: LocalDate?,
+  val homeDetentionCurfewEligibilityDate: LocalDate?,
+  val earlyTermDate: LocalDate?,
+  val lateTermDate: LocalDate?,
 )
