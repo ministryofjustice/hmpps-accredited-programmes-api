@@ -20,6 +20,7 @@ fun CourseEntity.toApi(): Course = Course(
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
   audience = audience,
+  audienceColour = audience_colour,
 )
 
 fun CourseEntity.toCourseRecord(): CourseRecord = CourseRecord(
@@ -28,6 +29,7 @@ fun CourseEntity.toCourseRecord(): CourseRecord = CourseRecord(
   alternateName = alternateName,
   identifier = identifier,
   audience = audience,
+  audienceColour = audience_colour,
 )
 
 fun PrerequisiteEntity.toApi(): CoursePrerequisite = CoursePrerequisite(
@@ -58,6 +60,7 @@ fun CourseRecord.toDomain(): CourseUpdate = CourseUpdate(
   identifier = identifier.trim(),
   description = description.trim(),
   audience = audience,
+  audienceColour = audienceColour?.let { it.trim().ifEmpty { null } },
   alternateName = alternateName?.trim(),
 )
 

@@ -41,6 +41,7 @@ data class CourseEntity(
   val offerings: MutableSet<OfferingEntity> = mutableSetOf(),
 
   var audience: String,
+  var audience_colour: String?,
   var withdrawn: Boolean = false,
 ) {
   fun addOffering(offering: OfferingEntity) {

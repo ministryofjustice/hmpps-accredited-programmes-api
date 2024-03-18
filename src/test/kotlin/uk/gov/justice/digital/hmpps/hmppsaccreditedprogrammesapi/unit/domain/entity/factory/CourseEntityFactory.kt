@@ -21,6 +21,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
   private var prerequisites: Yielded<MutableSet<PrerequisiteEntity>> = { mutableSetOf() }
   private var offerings: Yielded<MutableSet<OfferingEntity>> = { mutableSetOf() }
   private var audience: Yielded<String> = { randomUppercaseString() }
+  private var audienceColour: Yielded<String> = { randomUppercaseString() }
   private var withdrawn: Yielded<Boolean> = { false }
 
   fun withId(id: UUID?) = apply {
@@ -64,6 +65,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
     prerequisites = this.prerequisites(),
     offerings = this.offerings(),
     audience = this.audience(),
+    audience_colour = this.audienceColour(),
     withdrawn = this.withdrawn(),
   )
 }
@@ -73,6 +75,7 @@ class CourseUpdateFactory : Factory<CourseUpdate> {
   private var identifier: Yielded<String> = { randomUppercaseString() }
   private var description: Yielded<String> = { randomSentence() }
   private var audience: Yielded<String> = { randomUppercaseString() }
+  private var audienceColour: Yielded<String> = { randomUppercaseString() }
   private var alternateName: Yielded<String?> = { null }
   private var referable: Yielded<Boolean> = { true }
 
@@ -84,11 +87,16 @@ class CourseUpdateFactory : Factory<CourseUpdate> {
     this.audience = { audience }
   }
 
+  fun withAudienceColour(audienceColour: String) = apply {
+    this.audienceColour = { audienceColour }
+  }
+
   override fun produce() = CourseUpdate(
     name = this.name(),
     description = this.description(),
     identifier = this.identifier(),
     audience = this.audience(),
+    audienceColour = this.audienceColour(),
     alternateName = this.alternateName(),
   )
 }
