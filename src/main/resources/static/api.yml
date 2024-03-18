@@ -1493,6 +1493,9 @@ components:
         audience:
           type: string
           example: 'Gang offence'
+        audienceColour:
+          type: string
+          example: 'purple'
       required:
         - id
         - name
@@ -1513,6 +1516,9 @@ components:
           type: string
         audience:
           type: string
+        audienceColour:
+          type: string
+          example: 'purple'
         comments:
           type: string
       required:

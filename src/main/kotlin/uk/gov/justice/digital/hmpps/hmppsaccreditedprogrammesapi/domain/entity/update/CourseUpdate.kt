@@ -5,5 +5,6 @@ data class CourseUpdate(
   val description: String,
   val identifier: String,
   val audience: String,
+  val audienceColour: String?,
   val alternateName: String? = null,
 )
