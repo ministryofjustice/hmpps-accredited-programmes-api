@@ -121,7 +121,7 @@ constructor(
             true -> null
             false -> LineMessage(
               lineNumber = indexToCsvRowNumber(index),
-              level = LineMessage.Level.error,
+              level = LineMessage.Level.Error,
               message = "No match for course identifier '$identifier'",
             )
           }
@@ -183,7 +183,7 @@ constructor(
       when (record.contactEmail.isNullOrBlank()) {
         true -> LineMessage(
           lineNumber = indexToCsvRowNumber(index),
-          level = LineMessage.Level.warning,
+          level = LineMessage.Level.Warning,
           message = "Missing contactEmail for offering with identifier '${record.identifier}' at prisonId '${record.prisonId}'",
         )
 
@@ -201,7 +201,7 @@ constructor(
           true -> null
           false -> LineMessage(
             lineNumber = indexToCsvRowNumber(index),
-            level = LineMessage.Level.error,
+            level = LineMessage.Level.Error,
             message = "No course matches offering with identifier '${record.identifier}' and prisonId '${record.prisonId}'",
           )
         }
