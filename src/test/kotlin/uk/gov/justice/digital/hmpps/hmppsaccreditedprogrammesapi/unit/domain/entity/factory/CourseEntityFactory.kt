@@ -65,7 +65,7 @@ class CourseEntityFactory : Factory<CourseEntity> {
     prerequisites = this.prerequisites(),
     offerings = this.offerings(),
     audience = this.audience(),
-    audience_colour = this.audienceColour(),
+    audienceColour = this.audienceColour(),
     withdrawn = this.withdrawn(),
   )
 }

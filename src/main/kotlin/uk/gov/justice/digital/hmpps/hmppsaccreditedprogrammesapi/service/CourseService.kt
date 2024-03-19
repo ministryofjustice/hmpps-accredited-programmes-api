@@ -68,7 +68,7 @@ constructor(
           description = update.description,
           alternateName = update.alternateName,
           audience = update.audience,
-          audience_colour = update.audienceColour,
+          audienceColour = update.audienceColour,
         )
       }
     }
