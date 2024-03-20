@@ -132,7 +132,7 @@ class CourseServiceTest {
 
       val errorMessage = LineMessage(
         lineNumber = 3,
-        level = LineMessage.Level.error,
+        level = LineMessage.Level.Error,
         message = "No match for course identifier 'CX'",
       )
       courseService.updatePrerequisites(newPrerequisites).shouldContainExactly(errorMessage)
@@ -263,7 +263,7 @@ class CourseServiceTest {
 
       val errorMessage = LineMessage(
         lineNumber = 4,
-        level = LineMessage.Level.error,
+        level = LineMessage.Level.Error,
         message = "No course matches offering with identifier 'CX' and prisonId 'BWI'",
       )
       courseService.updateOfferings(offeringUpdates).shouldContainExactly(errorMessage)
@@ -282,7 +282,7 @@ class CourseServiceTest {
 
       val errorMessage = LineMessage(
         lineNumber = 2,
-        level = LineMessage.Level.warning,
+        level = LineMessage.Level.Warning,
         message = "Missing contactEmail for offering with identifier 'C1' at prisonId 'MDI'",
       )
       courseService.updateOfferings(offeringUpdates).shouldContainExactly(errorMessage)
