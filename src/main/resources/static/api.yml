@@ -2346,6 +2346,12 @@ components:
         draft:
           description: flag to show this is a draft status
           type: boolean
+        hold:
+          description: flag to show this is a hold status
+          type: boolean
+        release:
+          description: flag to show this is a release status
+          type: boolean
       required:
         - code
         - description

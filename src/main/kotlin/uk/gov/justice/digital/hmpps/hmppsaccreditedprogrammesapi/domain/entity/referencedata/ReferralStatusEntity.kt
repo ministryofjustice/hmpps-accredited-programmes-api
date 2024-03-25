@@ -22,6 +22,8 @@ data class ReferralStatusEntity(
   val active: Boolean,
   val draft: Boolean,
   val closed: Boolean,
+  val hold: Boolean,
+  val release: Boolean,
 )
 
 @Entity

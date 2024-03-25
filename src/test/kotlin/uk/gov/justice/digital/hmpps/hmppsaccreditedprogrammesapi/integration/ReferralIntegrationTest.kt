@@ -320,8 +320,30 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val statuses = getReferralTransitions(referralCreated.referralId)
     statuses.size shouldBeEqual 2
 
-    val withdrawnStatus = ReferralStatusRefData(code = REFERRAL_WITHDRAWN, description = REFERRAL_WITHDRAWN_DESCRIPTION, colour = REFERRAL_WITHDRAWN_COLOUR, hintText = REFERRAL_WITHDRAWN_HINT, hasNotes = true, hasConfirmation = false, closed = true, draft = false)
-    val onHoldStatus = ReferralStatusRefData(code = ON_HOLD_REFERRAL_SUBMITTED, description = ON_HOLD_REFERRAL_SUBMITTED_DESCRIPTION, colour = ON_HOLD_REFERRAL_SUBMITTED_COLOUR, hintText = ON_HOLD_REFERRAL_SUBMITTED_HINT, hasNotes = true, hasConfirmation = false, closed = false, draft = false)
+    val withdrawnStatus = ReferralStatusRefData(
+      code = REFERRAL_WITHDRAWN,
+      description = REFERRAL_WITHDRAWN_DESCRIPTION,
+      colour = REFERRAL_WITHDRAWN_COLOUR,
+      hintText = REFERRAL_WITHDRAWN_HINT,
+      hasNotes = true,
+      hasConfirmation = false,
+      closed = true,
+      draft = false,
+      hold = false,
+      release = false,
+    )
+    val onHoldStatus = ReferralStatusRefData(
+      code = ON_HOLD_REFERRAL_SUBMITTED,
+      description = ON_HOLD_REFERRAL_SUBMITTED_DESCRIPTION,
+      colour = ON_HOLD_REFERRAL_SUBMITTED_COLOUR,
+      hintText = ON_HOLD_REFERRAL_SUBMITTED_HINT,
+      hasNotes = true,
+      hasConfirmation = false,
+      closed = false,
+      draft = false,
+      hold = true,
+      release = false,
+    )
 
     statuses shouldContainAnyOf listOf(withdrawnStatus, onHoldStatus)
   }
