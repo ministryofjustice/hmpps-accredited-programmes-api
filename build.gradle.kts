@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.4"
   `jvm-test-suite`
   kotlin("plugin.spring") version "1.9.23"
   kotlin("plugin.jpa") version "1.9.23"
@@ -45,7 +45,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.7")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.8")
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
