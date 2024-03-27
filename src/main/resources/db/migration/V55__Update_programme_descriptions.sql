@@ -150,7 +150,7 @@ VALUES ('3ff72871-5708-4af0-a6f8-53d2e40e2b6a', 'Suitable for people with learni
 ------------------------------------------------------------------------------------------------------------------------
 -- course_id='12569f25-23b7-43f2-899b-561b98007d31'
 
-update COURSE set name='Living as New Me', description = 'Living as New Me (LNM) is a booster or maintenance programme for men who have completed New Me Strengths or Becoming New Me Plus and may need extra support. In a custody setting, it is for men convicted of any offence. In the community, it is for sexual offences only.' where course_id='12569f25-23b7-43f2-899b-561b98007d31';
+update COURSE set name='Living as New Me', audience='All offences', description = 'Living as New Me (LNM) is a booster or maintenance programme for men who have completed New Me Strengths or Becoming New Me Plus and may need extra support. In a custody setting, it is for men convicted of any offence. In the community, it is for sexual offences only.' where course_id='12569f25-23b7-43f2-899b-561b98007d31';
 
 update prerequisite set description='Medium or above risk' where course_id='12569f25-23b7-43f2-899b-561b98007d31' and name = 'Risk criteria'  and description='Medium';
 update prerequisite set description='Custody or community' where course_id='12569f25-23b7-43f2-899b-561b98007d31' and name = 'Setting'  and description='Custody';
@@ -231,3 +231,6 @@ VALUES ('bee96044-45fb-4ba4-93a4-19e5f71c8f15', 'Setting', 'Custody or community
        ('bee96044-45fb-4ba4-93a4-19e5f71c8f15', 'Risk criteria', 'All risk scores'),
        ('bee96044-45fb-4ba4-93a4-19e5f71c8f15', 'Suitable for people with learning disabilities or challenges (LDC)?', 'Yes'),
        ('bee96044-45fb-4ba4-93a4-19e5f71c8f15', 'Time to complete', 'Number of sessions is at the discretion of the practitioner and depends on the risk, need and responsivity profile of the individual. Has a 30-day Rehabilitation Activity Requirement (RAR) in the community.');
+
+
+
