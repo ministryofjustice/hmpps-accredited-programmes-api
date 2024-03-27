@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAnyOf
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -331,6 +332,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       draft = false,
       hold = false,
       release = false,
+      deselectAndKeepOpen = false,
     )
     val onHoldStatus = ReferralStatusRefData(
       code = ON_HOLD_REFERRAL_SUBMITTED,
@@ -343,9 +345,58 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       draft = false,
       hold = true,
       release = false,
+      deselectAndKeepOpen = false,
     )
 
     statuses shouldContainAnyOf listOf(withdrawnStatus, onHoldStatus)
+  }
+
+  @Test
+  fun `Get referral status transitions for on programme`() {
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = "ASSESSED_SUITABLE",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate4)
+
+    val referralStatusUpdate5 = ReferralStatusUpdate(
+      status = "ON_PROGRAMME",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate5)
+
+    val statuses = getReferralTransitions(referralCreated.referralId, true)
+
+    val statusDescriptions = statuses.map {
+      it.description
+    }
+
+    statusDescriptions shouldContainExactlyInAnyOrder listOf(
+      "Programme complete",
+      "Deselect and close referral",
+      "Deselect and keep referral open",
+    )
   }
 
   @Test
@@ -496,10 +547,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     }
   }
 
-  fun getReferralTransitions(referralId: UUID) =
+  fun getReferralTransitions(referralId: UUID, ptUser: Boolean = false) =
     webTestClient
       .get()
-      .uri("/referrals/$referralId/status-transitions")
+      .uri("/referrals/$referralId/status-transitions?ptUser=$ptUser")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

@@ -38,7 +38,6 @@ constructor(
   private val securityService: SecurityService,
   private val referenceDataService: ReferralReferenceDataService,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
-
 ) : ReferralsApiDelegate {
 
   override fun createReferral(referralCreate: ReferralCreate): ResponseEntity<ReferralCreated> =
@@ -159,10 +158,37 @@ constructor(
     )
   }
 
-  override fun getNextStatusTransitions(id: UUID, ptUser: Boolean): ResponseEntity<List<ReferralStatusRefData>> {
+  override fun getNextStatusTransitions(
+    id: UUID,
+    ptUser: Boolean,
+    deselectAndKeepOpen: Boolean,
+  ): ResponseEntity<List<ReferralStatusRefData>> {
     val referral = referralService.getReferralById(id)
+    var statuses = referenceDataService.getNextStatusTransitions(referral!!.status, ptUser)
+    // bespoke logic for deselect and keep open
+    if (statuses.any { it.code == "DESELECTED" } && !deselectAndKeepOpen) {
+      // rebuild the status list with a bespoke set of statuses
+      val newStatusList = mutableListOf<ReferralStatusRefData>()
+      newStatusList.addAll(statuses.filter { it.code == "PROGRAMME_COMPLETE" })
+      newStatusList.add(
+        statuses.first { it.code == "DESELECTED" }
+          .copy(description = "Deselect and close referral", deselectAndKeepOpen = false),
+      )
+      newStatusList.add(
+        statuses.first { it.code == "DESELECTED" }
+          .copy(description = "Deselect and keep referral open", deselectAndKeepOpen = true),
+      )
+      statuses = newStatusList
+    }
+    if (deselectAndKeepOpen) {
+      // rebuild the status list with a bespoke set of statuses
+      val newStatusList = mutableListOf<ReferralStatusRefData>()
+      newStatusList.addAll(statuses.filter { it.code != "DESELECTED" && it.code != "PROGRAMME_COMPLETE" })
+      statuses = newStatusList
+    }
+
     return ResponseEntity.ok(
-      referenceDataService.getNextStatusTransitions(referral!!.status, ptUser),
+      statuses,
     )
   }
 }

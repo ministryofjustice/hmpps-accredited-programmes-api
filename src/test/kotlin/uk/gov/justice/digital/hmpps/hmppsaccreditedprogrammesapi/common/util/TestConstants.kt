@@ -10,11 +10,11 @@ val COURSE_LOCATION: String = "West Midlands"
 val COURSE_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
 
 const val REFERRAL_STARTED = "REFERRAL_STARTED"
-const val REFERRAL_STARTED_DESCRIPTION = "Referral Started"
+const val REFERRAL_STARTED_DESCRIPTION = "Referral started"
 const val REFERRAL_STARTED_COLOUR = "light-blue"
 
 const val REFERRAL_SUBMITTED = "REFERRAL_SUBMITTED"
-const val REFERRAL_SUBMITTED_DESCRIPTION = "Referral Submitted"
+const val REFERRAL_SUBMITTED_DESCRIPTION = "Referral submitted"
 const val REFERRAL_SUBMITTED_COLOUR = "green"
 
 const val REFERRAL_WITHDRAWN = "WITHDRAWN"
