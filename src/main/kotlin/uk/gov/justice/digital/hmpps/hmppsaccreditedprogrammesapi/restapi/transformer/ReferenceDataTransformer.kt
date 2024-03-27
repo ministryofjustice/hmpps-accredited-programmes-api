@@ -16,4 +16,5 @@ fun ReferralStatusEntity.toModel() =
     hasConfirmation = hasConfirmation,
     hold = hold,
     release = release,
+    deselectAndKeepOpen = false,
   )

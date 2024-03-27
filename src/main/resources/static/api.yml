@@ -490,6 +490,13 @@ paths:
           schema:
             type: boolean
             default: false
+        - name: deselectAndKeepOpen
+          in: query
+          description: flag for bespoke deselection option
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         200:
           description: The list of statuses a referral can move on to
@@ -2351,6 +2358,9 @@ components:
           type: boolean
         release:
           description: flag to show this is a release status
+          type: boolean
+        deselectAndKeepOpen:
+          description: flag to show this a bespoke status of deslected and keep open
           type: boolean
       required:
         - code
