@@ -176,7 +176,11 @@ constructor(
       )
       newStatusList.add(
         statuses.first { it.code == "DESELECTED" }
-          .copy(description = "Deselect and keep referral open", deselectAndKeepOpen = true),
+          .copy(
+            description = "Deselect and keep referral open",
+            hintText = "This person cannot continue the programme now but may be able to in the future.",
+            deselectAndKeepOpen = true,
+          ),
       )
       statuses = newStatusList
     }
