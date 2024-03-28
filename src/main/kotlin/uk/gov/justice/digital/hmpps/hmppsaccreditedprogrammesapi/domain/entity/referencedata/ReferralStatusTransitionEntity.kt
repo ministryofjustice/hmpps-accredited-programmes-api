@@ -41,6 +41,7 @@ interface ReferralStatusTransitionRepository : JpaRepository<ReferralStatusTrans
       select st from ReferralStatusTransitionEntity st
       where st.fromStatus.code = :fromStatus
       and st.ptUser = true
+      order by st.toStatus.defaultOrder asc
     """,
   )
   fun getNextPTTransitions(fromStatus: String): List<ReferralStatusTransitionEntity>
@@ -51,6 +52,7 @@ interface ReferralStatusTransitionRepository : JpaRepository<ReferralStatusTrans
       select st from ReferralStatusTransitionEntity st
       where st.fromStatus.code = :fromStatus
       and st.pomUser = true
+      order by st.toStatus.defaultOrder asc
     """,
   )
   fun getNextPOMTransitions(fromStatus: String): List<ReferralStatusTransitionEntity>
