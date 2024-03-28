@@ -87,9 +87,9 @@ class ReferralReferenceDataService(
 
   fun getNextStatusTransitions(currentStatus: String, ptRole: Boolean = false): List<ReferralStatusRefData> {
     return if (ptRole) {
-      referralStatusTransitionRepository.getNextPTTransitions(currentStatus).map { it.toStatus.toModel() }
+      referralStatusTransitionRepository.getNextPTTransitions(currentStatus).map { it.toStatus.toModel(it.description, it.hintText) }
     } else {
-      referralStatusTransitionRepository.getNextPOMTransitions(currentStatus).map { it.toStatus.toModel() }
+      referralStatusTransitionRepository.getNextPOMTransitions(currentStatus).map { it.toStatus.toModel(it.description, it.hintText) }
     }
   }
 }

@@ -28,6 +28,8 @@ class ReferralStatusTransitionEntity(
   @ManyToOne
   @JoinColumn(name = "transitionToStatus")
   val toStatus: ReferralStatusEntity,
+  val description: String?,
+  val hintText: String?,
 )
 
 @Repository
