@@ -397,6 +397,17 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       "Deselect and close referral",
       "Deselect and keep referral open",
     )
+
+    // check that the follow on statuses are correct and that the alternative descriptions and hint text have been set
+    val deselectStatuses = getReferralTransitions(referralCreated.referralId, ptUser = true, deselectAndKeepOpen = true)
+    val assessedSuitable = deselectStatuses.first { it.code == "ASSESSED_SUITABLE" }
+    val assessedSuitableNotReady = deselectStatuses.first { it.code == "SUITABLE_NOT_READY" }
+
+    assessedSuitable.description shouldBe "Assessed as suitable and ready"
+    assessedSuitable.hintText shouldBe "This person has been deselected. However, they still meet the suitability criteria and can be considered to join a programme when it runs again."
+
+    assessedSuitableNotReady.description shouldBe "Assessed as suitable but not ready"
+    assessedSuitableNotReady.hintText shouldBe "This person meet the suitability criteria but is not ready to start the programme. The referral will be paused until they are ready."
   }
 
   @Test
@@ -547,10 +558,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     }
   }
 
-  fun getReferralTransitions(referralId: UUID, ptUser: Boolean = false) =
+  fun getReferralTransitions(referralId: UUID, ptUser: Boolean = false, deselectAndKeepOpen: Boolean = false) =
     webTestClient
       .get()
-      .uri("/referrals/$referralId/status-transitions?ptUser=$ptUser")
+      .uri("/referrals/$referralId/status-transitions?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

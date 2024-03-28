@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusEntity
 
-fun ReferralStatusEntity.toModel() =
+fun ReferralStatusEntity.toModel(altDescription: String?, altHintText: String?) =
   ReferralStatusRefData(
     code = code,
-    description = description,
+    description = altDescription ?: description,
     colour = colour,
-    hintText = hintText,
+    hintText = altHintText ?: hintText,
     confirmationText = confirmationText,
     closed = closed,
     draft = draft,
