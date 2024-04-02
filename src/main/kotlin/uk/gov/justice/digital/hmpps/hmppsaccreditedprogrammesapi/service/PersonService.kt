@@ -11,25 +11,44 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonAp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.KeyDates
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceInformation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.PrisonApiUnavailableException
 import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
+
+private const val PRISON_API = "PRISON_API"
 
 @Service
 class PersonService(val prisonApiClient: PrisonApiClient) {
 
   private fun getSentenceInformation(prisonNumber: String): SentenceInformation? {
-    val sentenceInformation = when (val response = prisonApiClient.getSentenceInformation(prisonNumber)) {
-      is ClientResult.Failure -> {
-        log.error("Failure to retrieve or parse data for $prisonNumber  ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
+    return when (val response = prisonApiClient.getSentenceInformation(prisonNumber)) {
       is ClientResult.Success -> {
         log.debug("Retrieved sentence data for $prisonNumber")
-        AuthorisableActionResult.Success(response.body)
+        AuthorisableActionResult.Success(response.body).entity
+      }
+      is ClientResult.Failure -> {
+        val exception = response.toException().cause
+        log.error("Failure to retrieve or parse data for prisonNumber: $prisonNumber reason: $exception")
+        when (response) {
+          is ClientResult.Failure.StatusCode -> {
+            if (response.status.is5xxServerError) {
+              log.error("Failure to retrieve or parse data from $PRISON_API for prisonNumber: $prisonNumber reason: $exception")
+              throw PrisonApiUnavailableException(
+                "Failure to retrieve data from $PRISON_API with prisonNumber: $prisonNumber statusCode: ${response.status.value()} from $PRISON_API",
+                response.toException(),
+              )
+            } else if (response.status.value() == 404) {
+              log.warn("No data found in $PRISON_API for prisonNumber: $prisonNumber reason: $exception ")
+              return null
+            } else {
+              log.error("Something went wrong whilst retrieving or parsing data from $PRISON_API for prisonNumber: $prisonNumber reason: $exception")
+              throw response.toException()
+            }
+          }
+          is ClientResult.Failure.Other -> throw response.toException()
+        }
       }
     }
-    return sentenceInformation.entity
   }
 
   fun getSentenceType(prisonNumber: String): String {

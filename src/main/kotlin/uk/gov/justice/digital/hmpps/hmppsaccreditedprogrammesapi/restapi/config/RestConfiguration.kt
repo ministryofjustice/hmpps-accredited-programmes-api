@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.PrisonApiUnavailableException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @RestControllerAdvice
 class RestConfiguration {
@@ -42,6 +44,26 @@ class RestConfiguration {
         ErrorResponse(
           status = BAD_REQUEST,
           userMessage = "Business rule violation: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(ServiceUnavailableException::class)
+  fun handleBusinessException(e: ServiceUnavailableException): ResponseEntity<ErrorResponse> {
+    log.error("Service unavailable ${e.message}", e)
+
+    val serviceName = when (e) {
+      is PrisonApiUnavailableException -> "Prison api is not available at the moment, please try after sometime"
+      else -> ""
+    }
+
+    return ResponseEntity
+      .status(INTERNAL_SERVER_ERROR)
+      .body(
+        ErrorResponse(
+          status = INTERNAL_SERVER_ERROR,
+          userMessage = "Service unavailable: $serviceName",
           developerMessage = e.message,
         ),
       )

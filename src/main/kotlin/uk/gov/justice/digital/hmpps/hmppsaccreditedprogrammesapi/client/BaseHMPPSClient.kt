@@ -103,10 +103,6 @@ sealed interface ClientResult<ResponseType> {
         jacksonObjectMapper().readValue(body, ResponseType::class.java)
     }
 
-    class CachedValueUnavailable<ResponseType>(val cacheKey: String) : Failure<ResponseType> {
-      override fun toException(): Throwable = RuntimeException("No Redis entry exists for $cacheKey")
-    }
-
     class Other<ResponseType>(val method: HttpMethod, val path: String, val exception: Exception) :
       Failure<ResponseType> {
       override fun toException(): Throwable = RuntimeException("Unable to complete $method request to $path", exception)
