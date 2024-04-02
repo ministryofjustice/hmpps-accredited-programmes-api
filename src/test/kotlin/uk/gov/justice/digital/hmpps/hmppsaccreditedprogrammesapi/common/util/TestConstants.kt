@@ -19,6 +19,7 @@ const val REFERRAL_SUBMITTED_COLOUR = "green"
 
 const val REFERRAL_WITHDRAWN = "WITHDRAWN"
 const val REFERRAL_WITHDRAWN_DESCRIPTION = "Withdrawn"
+const val REFERRAL_WITHDRAWN_ALT_DESCRIPTION = "Withdraw referral"
 const val REFERRAL_WITHDRAWN_COLOUR = "red"
 const val REFERRAL_WITHDRAWN_HINT = "The referral will be closed."
 
