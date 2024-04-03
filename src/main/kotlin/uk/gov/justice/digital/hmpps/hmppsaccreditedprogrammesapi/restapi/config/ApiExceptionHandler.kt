@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @RestControllerAdvice
-class RestConfiguration {
+class ApiExceptionHandler {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
     log.info("Not valid", e)
@@ -56,6 +57,21 @@ class RestConfiguration {
         ErrorResponse(
           status = NOT_FOUND,
           userMessage = "Not Found: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
+
+  @ExceptionHandler(ServiceUnavailableException::class)
+  fun handleServiceUnavailableException(e: ServiceUnavailableException): ResponseEntity<ErrorResponse> {
+    log.error("Service unavailable ${e.message}", e)
+
+    return ResponseEntity
+      .status(INTERNAL_SERVER_ERROR)
+      .body(
+        ErrorResponse(
+          status = INTERNAL_SERVER_ERROR,
+          userMessage = "Service unavailable: ${e.message}",
           developerMessage = e.message,
         ),
       )

@@ -8,17 +8,19 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPP
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
 
+private const val ARNS_API = "Arns API"
+
 @Component
 class ArnsApiClient(
   @Qualifier("arnsApiWebClient")
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getSummary(crn: String) = getRequest<ArnsSummary> {
+  fun getSummary(crn: String) = getRequest<ArnsSummary>(ARNS_API) {
     path = "/risks/crn/$crn/summary"
   }
 
-  fun getPredictorsAll(crn: String) = getRequest<List<ArnsScores>> {
+  fun getPredictorsAll(crn: String) = getRequest<List<ArnsScores>>(ARNS_API) {
     path = "/risks/crn/$crn/predictors/all"
   }
 }

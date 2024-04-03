@@ -9,16 +9,23 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 abstract class BaseHMPPSClient(
   private val webClient: WebClient,
   private val objectMapper: ObjectMapper,
 ) {
-  protected inline fun <reified ResponseType : Any> getRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
-    request(HttpMethod.GET, requestBuilderConfiguration)
+  protected inline fun <reified ResponseType : Any> getRequest(
+    serviceName: String,
+    noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+  ): ClientResult<ResponseType> =
+    request(HttpMethod.GET, requestBuilderConfiguration, serviceName)
 
-  protected inline fun <reified ResponseType : Any> postRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
-    request(HttpMethod.POST, requestBuilderConfiguration)
+  protected inline fun <reified ResponseType : Any> postRequest(
+    serviceName: String,
+    noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+  ): ClientResult<ResponseType> =
+    request(HttpMethod.POST, requestBuilderConfiguration, serviceName)
 
   protected inline fun <reified ResponseType : Any> putRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
     request(HttpMethod.PUT, requestBuilderConfiguration)
@@ -32,16 +39,18 @@ abstract class BaseHMPPSClient(
   protected inline fun <reified ResponseType : Any> request(
     method: HttpMethod,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+    serviceName: String? = "",
   ): ClientResult<ResponseType> {
     val typeReference = object : TypeReference<ResponseType>() {}
 
-    return doRequest(typeReference, method, requestBuilderConfiguration)
+    return doRequest(typeReference, method, requestBuilderConfiguration, serviceName)
   }
 
   fun <ResponseType : Any> doRequest(
     typeReference: TypeReference<ResponseType>,
     method: HttpMethod,
     requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+    serviceName: String?,
   ): ClientResult<ResponseType> {
     val requestBuilder = HMPPSRequestConfiguration()
     requestBuilderConfiguration(requestBuilder)
@@ -62,7 +71,9 @@ abstract class BaseHMPPSClient(
 
       return ClientResult.Success(result.statusCode, deserialized)
     } catch (exception: WebClientResponseException) {
-      if (!exception.statusCode.is2xxSuccessful) {
+      if (exception.statusCode.is5xxServerError) {
+        throw ServiceUnavailableException("$serviceName is temporarily unavailable. Please try again later.", exception)
+      } else if (!exception.statusCode.is2xxSuccessful) {
         return ClientResult.Failure.StatusCode(
           method,
           requestBuilder.path ?: "",

@@ -7,13 +7,15 @@ import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
 
+private const val PRISON_REGISTER_API = "PrisonRegister API"
+
 @Component
 class PrisonRegisterApiClient(
   @Qualifier("prisonRegisterApiWebClient")
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getPrisonDetailsByPrisonId(prisonId: String) = getRequest<PrisonDetails> {
+  fun getPrisonDetailsByPrisonId(prisonId: String) = getRequest<PrisonDetails>(PRISON_REGISTER_API) {
     path = "/prisons/id/$prisonId"
   }
 }
