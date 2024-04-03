@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @RestControllerAdvice
-class RestConfiguration {
+class ApiExceptionHandler {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
     log.info("Not valid", e)
@@ -36,7 +36,7 @@ class RestConfiguration {
   }
 
   @ExceptionHandler(BusinessException::class)
-  fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse> {
+  fun handleServiceUnavailableException(e: BusinessException): ResponseEntity<ErrorResponse> {
     log.info("Business rule violation", e)
     return ResponseEntity
       .status(BAD_REQUEST)
@@ -50,7 +50,7 @@ class RestConfiguration {
   }
 
   @ExceptionHandler(ServiceUnavailableException::class)
-  fun handleBusinessException(e: ServiceUnavailableException): ResponseEntity<ErrorResponse> {
+  fun handleServiceUnavailableException(e: ServiceUnavailableException): ResponseEntity<ErrorResponse> {
     log.error("Service unavailable ${e.message}", e)
 
     val serviceMessage = when (e) {
