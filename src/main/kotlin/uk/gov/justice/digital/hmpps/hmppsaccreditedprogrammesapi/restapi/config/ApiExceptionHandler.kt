@@ -54,7 +54,7 @@ class ApiExceptionHandler {
     log.error("Service unavailable ${e.message}", e)
 
     val serviceMessage = when (e) {
-      is PrisonApiUnavailableException -> "Prison api is not available at the moment, please try after sometime"
+      is PrisonApiUnavailableException -> "Prison API is temporarily unavailable. Please try again later."
       else -> ""
     }
 
