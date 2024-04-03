@@ -10,17 +10,19 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.PrisonerNumbers
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.PrisonerSearchResponse
 
+private const val PRISONER_SEARCH_API = "PrisonerSearch API"
+
 @Component
 class PrisonerSearchApiClient(
   @Qualifier("prisonerSearchApiWebClient")
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getPrisonersByPrisonNumbers(prisonNumbers: List<String>) = postRequest<List<Prisoner>> {
+  fun getPrisonersByPrisonNumbers(prisonNumbers: List<String>) = postRequest<List<Prisoner>>(PRISONER_SEARCH_API) {
     path = "/prisoner-search/prisoner-numbers"
     body = PrisonerNumbers(prisonNumbers)
   }
-  fun prisonerSearch(prisonerSearchRequest: PrisonerSearchRequest) = postRequest<List<PrisonerSearchResponse>> {
+  fun prisonerSearch(prisonerSearchRequest: PrisonerSearchRequest) = postRequest<List<PrisonerSearchResponse>>(PRISONER_SEARCH_API) {
     path = "/prisoner-search/match-prisoners"
     body = prisonerSearchRequest
   }

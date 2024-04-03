@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatusCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonerSearchApiService
 
 class PrisonerSearchApiServiceTest {
 
