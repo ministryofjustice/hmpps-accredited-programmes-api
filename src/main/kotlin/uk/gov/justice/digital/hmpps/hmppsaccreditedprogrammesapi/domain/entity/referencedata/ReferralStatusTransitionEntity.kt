@@ -30,6 +30,11 @@ class ReferralStatusTransitionEntity(
   val toStatus: ReferralStatusEntity,
   val description: String?,
   val hintText: String?,
+  val primaryHeading: String?,
+  val primaryDescription: String?,
+  val secondaryHeading: String?,
+  val secondaryDescription: String?,
+  val warningText: String?,
 )
 
 @Repository
@@ -56,4 +61,26 @@ interface ReferralStatusTransitionRepository : JpaRepository<ReferralStatusTrans
     """,
   )
   fun getNextPOMTransitions(fromStatus: String): List<ReferralStatusTransitionEntity>
+
+  @EntityGraph(attributePaths = ["fromStatus", "toStatus"])
+  @Query(
+    """
+      select st from ReferralStatusTransitionEntity st
+      where st.fromStatus.code = :fromStatus
+      and st.toStatus = :toStatus
+      and st.ptUser = true
+    """,
+  )
+  fun getPTTransition(fromStatus: String, toStatus: String): ReferralStatusTransitionEntity?
+
+  @EntityGraph(attributePaths = ["fromStatus", "toStatus"])
+  @Query(
+    """
+      select st from ReferralStatusTransitionEntity st
+      where st.fromStatus.code = :fromStatus
+      and st.toStatus = :toStatus
+      and st.pomUser = true
+    """,
+  )
+  fun getPOMTransition(fromStatus: String, toStatus: String): ReferralStatusTransitionEntity?
 }
