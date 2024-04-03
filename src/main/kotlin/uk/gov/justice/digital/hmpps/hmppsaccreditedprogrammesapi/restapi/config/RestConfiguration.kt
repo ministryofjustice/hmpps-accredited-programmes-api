@@ -53,7 +53,7 @@ class RestConfiguration {
   fun handleBusinessException(e: ServiceUnavailableException): ResponseEntity<ErrorResponse> {
     log.error("Service unavailable ${e.message}", e)
 
-    val serviceName = when (e) {
+    val serviceMessage = when (e) {
       is PrisonApiUnavailableException -> "Prison api is not available at the moment, please try after sometime"
       else -> ""
     }
@@ -63,7 +63,7 @@ class RestConfiguration {
       .body(
         ErrorResponse(
           status = INTERNAL_SERVER_ERROR,
-          userMessage = "Service unavailable: $serviceName",
+          userMessage = "Service unavailable: $serviceMessage",
           developerMessage = e.message,
         ),
       )
