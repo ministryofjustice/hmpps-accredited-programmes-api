@@ -513,6 +513,54 @@ paths:
         404:
           description: The referral does not exist
 
+  /referrals/{id}/confirmation-text/{chosenStatusCode}:
+    get:
+      tags:
+        - Referrals
+      summary: Endpoint to present the UI with the appropriate text for the status change chosen.
+      operationId: getConfirmationText
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: chosenStatusCode
+          in: path
+          description: The status code that was chosen
+          required: true
+          schema:
+            type: string
+        - name: ptUser
+          in: query
+          description: is the user a Programme Team user
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: deselectAndKeepOpen
+          in: query
+          description: flag for bespoke deselection option
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        200:
+          description: The screen fields for the confirmation page
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ConfirmationFields'
+        401:
+          description: The request was unauthorised
+        403:
+          description: Forbidden.  The client is not authorised to access this referral.
+        404:
+          description: The referral does not exist
+
   /referrals/{id}/status:
     put:
       summary: Change a referral's status
@@ -2322,6 +2370,30 @@ components:
       required:
         - bookingId
         - prisonerNumber
+
+    ConfirmationFields:
+      type: object
+      properties:
+        primaryHeading:
+          type: string
+          example: Move referral to awaiting assessment
+        primaryDescription:
+          type: string
+          example: Submitting this will change the status to awaiting assessment.
+        secondaryHeading:
+          type: string
+          example: Give a reason
+        secondaryDescription:
+          type: string
+          example: You must give a reason why this referral is being moved to suitable but not ready.
+        warningText:
+          type: string
+          example: Submitting this will pause the referral
+
+
+
+
+
 
     ReferralStatusRefData:
       type: object

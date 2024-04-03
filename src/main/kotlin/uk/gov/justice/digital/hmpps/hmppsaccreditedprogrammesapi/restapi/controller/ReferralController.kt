@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestParam
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
@@ -193,6 +194,45 @@ constructor(
 
     return ResponseEntity.ok(
       statuses,
+    )
+  }
+
+  override fun getConfirmationText(
+    id: UUID,
+    chosenStatusCode: String,
+    ptUser: Boolean,
+    deselectAndKeepOpen: Boolean,
+  ): ResponseEntity<ConfirmationFields> {
+    val referral = referralService.getReferralById(id) ?: throw NotFoundException("Referral with id '$id' not found")
+    val chosenStatus = referenceDataService.getReferralStatus(chosenStatusCode)
+    val defaultConfirmationFields = ConfirmationFields(
+      primaryHeading = "Move referral to ${chosenStatus.description.lowercase()}",
+      primaryDescription = "Submitting this will change the status to ${chosenStatus.description.lowercase()}.",
+      secondaryHeading = "Confirm status change",
+      secondaryDescription = chosenStatus.confirmationText,
+      warningText = if (chosenStatus.closed == true) {
+        "Submitting this will close the referral."
+      } else if (chosenStatus.hold == true) {
+        "Submitting this will pause the referral."
+      } else {
+        ""
+      },
+    )
+
+    // now see if there are any specific confirmation fields for this transition.
+    val statusTransition = referenceDataService.getStatusTransition(referral.status, chosenStatusCode)
+    if (statusTransition != null) {
+      defaultConfirmationFields.copy(
+        primaryHeading = statusTransition.primaryHeading ?: defaultConfirmationFields.primaryHeading,
+        primaryDescription = statusTransition.primaryDescription ?: defaultConfirmationFields.primaryDescription,
+        secondaryHeading = statusTransition.secondaryHeading ?: defaultConfirmationFields.secondaryHeading,
+        secondaryDescription = statusTransition.secondaryDescription ?: defaultConfirmationFields.secondaryDescription,
+        warningText = statusTransition.warningText ?: defaultConfirmationFields.warningText,
+      )
+    }
+
+    return ResponseEntity.ok(
+      defaultConfirmationFields,
     )
   }
 }
