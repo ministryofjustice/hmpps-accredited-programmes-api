@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.util.UriComponentsBuilder
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
@@ -352,6 +353,17 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Get referral confirmation text`() {
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id)
+
+    val confirmationFields = getConfirmationText(referralCreated.referralId, "ON_HOLD_REFERRAL_SUBMITTED")
+
+    confirmationFields.warningText shouldBe "Submitting this will put the referral on hold."
+  }
+
+  @Test
   fun `Get referral status transitions for on programme`() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
@@ -567,6 +579,17 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<List<ReferralStatusRefData>>()
+      .returnResult().responseBody!!
+
+  fun getConfirmationText(referralId: UUID, chosenStatusCode: String, ptUser: Boolean = false, deselectAndKeepOpen: Boolean = false) =
+    webTestClient
+      .get()
+      .uri("/referrals/$referralId/confirmation-text/$chosenStatusCode?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<ConfirmationFields>()
       .returnResult().responseBody!!
 
   @Test

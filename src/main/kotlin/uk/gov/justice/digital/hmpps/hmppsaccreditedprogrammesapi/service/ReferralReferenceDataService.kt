@@ -32,6 +32,7 @@ class ReferralReferenceDataService(
           colour = it.colour,
           closed = it.closed,
           draft = it.draft,
+          hold = it.hold,
         )
       }
 
@@ -47,6 +48,7 @@ class ReferralReferenceDataService(
         confirmationText = it.confirmationText,
         closed = it.closed,
         draft = it.draft,
+        hold = it.hold,
       )
     }
 
