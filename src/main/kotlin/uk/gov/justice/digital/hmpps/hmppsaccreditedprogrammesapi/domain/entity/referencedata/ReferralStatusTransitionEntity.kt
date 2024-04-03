@@ -67,7 +67,7 @@ interface ReferralStatusTransitionRepository : JpaRepository<ReferralStatusTrans
     """
       select st from ReferralStatusTransitionEntity st
       where st.fromStatus.code = :fromStatus
-      and st.toStatus = :toStatus
+      and st.toStatus.code = :toStatus
       and st.ptUser = true
     """,
   )
@@ -78,7 +78,7 @@ interface ReferralStatusTransitionRepository : JpaRepository<ReferralStatusTrans
     """
       select st from ReferralStatusTransitionEntity st
       where st.fromStatus.code = :fromStatus
-      and st.toStatus = :toStatus
+      and st.toStatus.code = :toStatus
       and st.pomUser = true
     """,
   )
