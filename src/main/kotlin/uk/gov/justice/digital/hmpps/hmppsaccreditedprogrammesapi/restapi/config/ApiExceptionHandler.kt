@@ -36,7 +36,7 @@ class ApiExceptionHandler {
   }
 
   @ExceptionHandler(BusinessException::class)
-  fun handleServiceUnavailableException(e: BusinessException): ResponseEntity<ErrorResponse> {
+  fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse> {
     log.info("Business rule violation", e)
     return ResponseEntity
       .status(BAD_REQUEST)
