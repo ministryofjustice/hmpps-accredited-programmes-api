@@ -205,7 +205,7 @@ constructor(
   ): ResponseEntity<ConfirmationFields> {
     val referral = referralService.getReferralById(id) ?: throw NotFoundException("Referral with id '$id' not found")
     val chosenStatus = referenceDataService.getReferralStatus(chosenStatusCode)
-    val defaultConfirmationFields = ConfirmationFields(
+    var defaultConfirmationFields = ConfirmationFields(
       primaryHeading = "Move referral to ${chosenStatus.description.lowercase()}",
       primaryDescription = "Submitting this will change the status to ${chosenStatus.description.lowercase()}.",
       secondaryHeading = "Confirm status change",
@@ -213,16 +213,17 @@ constructor(
       warningText = if (chosenStatus.closed == true) {
         "Submitting this will close the referral."
       } else if (chosenStatus.hold == true) {
-        "Submitting this will pause the referral."
+        "Submitting this will put the referral on hold."
       } else {
         ""
       },
+      hasConfirmation = chosenStatus.hasConfirmation,
     )
 
     // now see if there are any specific confirmation fields for this transition.
     val statusTransition = referenceDataService.getStatusTransition(referral.status, chosenStatusCode)
     if (statusTransition != null) {
-      defaultConfirmationFields.copy(
+      defaultConfirmationFields = defaultConfirmationFields.copy(
         primaryHeading = statusTransition.primaryHeading ?: defaultConfirmationFields.primaryHeading,
         primaryDescription = statusTransition.primaryDescription ?: defaultConfirmationFields.primaryDescription,
         secondaryHeading = statusTransition.secondaryHeading ?: defaultConfirmationFields.secondaryHeading,

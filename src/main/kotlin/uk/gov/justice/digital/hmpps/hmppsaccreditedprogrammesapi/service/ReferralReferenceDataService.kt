@@ -47,6 +47,7 @@ class ReferralReferenceDataService(
         confirmationText = it.confirmationText,
         closed = it.closed,
         draft = it.draft,
+        hold = it.hold,
       )
     }
 

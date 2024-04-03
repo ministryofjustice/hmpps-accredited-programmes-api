@@ -2389,6 +2389,9 @@ components:
         warningText:
           type: string
           example: Submitting this will pause the referral
+        hasConfirmation:
+          type: boolean
+          default: false
 
 
 
