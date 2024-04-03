@@ -17,8 +17,8 @@ generic-service:
     SERVICES_PRISON-API_BASE-URL: https://api.prison.service.justice.gov.uk
     SERVICES_PRISONER-SEARCH-API_BASE-URL: https://prisoner-search.prison.service.justice.gov.uk
     SERVICES_PRISON-REGISTER-API_BASE-URL: https://prison-register.hmpps.service.justice.gov.uk
-    SERVICES_OASYS-API_BASE-URL: https://accredited-programmes-and-oasys.hmpps.service.justice.gov.uk/
-    SERVICES_ARNS-API_BASE-URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk/
+    SERVICES_OASYS-API_BASE-URL: https://accredited-programmes-and-oasys.hmpps.service.justice.gov.uk
+    SERVICES_ARNS-API_BASE-URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk
     SENTRY_ENVIRONMENT: prod
     HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-prod-hmpps_audit_queue"
 
