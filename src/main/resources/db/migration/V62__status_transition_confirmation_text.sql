@@ -56,4 +56,4 @@ update referral_status_transitions set secondary_description = 'You must give a 
 update referral_status_transitions set primary_heading = 'Continue referral' where transition_from_status = 'SUITABLE_NOT_READY' and transition_to_status = 'ASSESSED_SUITABLE';
 update referral_status_transitions set primary_description = 'The referral will resume because the person is suitable and ready to continue.' where transition_from_status = 'SUITABLE_NOT_READY' and transition_to_status = 'ASSESSED_SUITABLE';
 update referral_status_transitions set secondary_heading = 'Give a reason' where transition_from_status = 'SUITABLE_NOT_READY' and transition_to_status = 'ASSESSED_SUITABLE';
-update referral_status_transitions set secondary_description = 'The referral will resume. You must give a reason why the person is now.' where transition_from_status = 'SUITABLE_NOT_READY' and transition_to_status = 'ASSESSED_SUITABLE';
+update referral_status_transitions set secondary_description = 'The referral will resume. You must give a reason why the person is now ready.' where transition_from_status = 'SUITABLE_NOT_READY' and transition_to_status = 'ASSESSED_SUITABLE';
