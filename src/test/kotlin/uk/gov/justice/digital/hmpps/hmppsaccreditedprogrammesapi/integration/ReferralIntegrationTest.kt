@@ -360,7 +360,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val confirmationFields = getConfirmationText(referralCreated.referralId, "ON_HOLD_REFERRAL_SUBMITTED")
 
-    confirmationFields.warningText shouldBe "Submitting this will put the referral on hold."
+    confirmationFields.warningText shouldBe "Submitting this will pause the referral."
   }
 
   @Test
