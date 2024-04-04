@@ -213,7 +213,9 @@ constructor(
       warningText = if (chosenStatus.closed == true) {
         "Submitting this will close the referral."
       } else if (chosenStatus.hold == true) {
-        "Submitting this will put the referral on hold."
+        "Submitting this will pause the referral."
+      } else if (chosenStatus.release == true) {
+        "This will resume the referral."
       } else {
         ""
       },

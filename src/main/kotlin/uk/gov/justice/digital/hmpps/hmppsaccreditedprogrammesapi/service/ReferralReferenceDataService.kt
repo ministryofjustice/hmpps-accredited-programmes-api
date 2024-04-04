@@ -33,6 +33,7 @@ class ReferralReferenceDataService(
           closed = it.closed,
           draft = it.draft,
           hold = it.hold,
+          release = it.release,
         )
       }
 
@@ -49,6 +50,7 @@ class ReferralReferenceDataService(
         closed = it.closed,
         draft = it.draft,
         hold = it.hold,
+        release = it.release,
       )
     }
 
