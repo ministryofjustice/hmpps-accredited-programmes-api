@@ -363,7 +363,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     confirmationFields.warningText shouldBe "Submitting this will pause the referral."
   }
 
-
   @Test
   fun `Get referral confirmation text assessment started to suitable not ready`() {
     val course = getAllCourses().first()
@@ -386,7 +385,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       ptUser = true,
     )
     updateReferralStatus(referralCreated.referralId, referralStatusUpdate3)
-
 
     val confirmationFields = getConfirmationText(
       referralId = referralCreated.referralId,
