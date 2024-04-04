@@ -210,20 +210,28 @@ constructor(
       primaryDescription = "Submitting this will change the status to ${chosenStatus.description.lowercase()}.",
       secondaryHeading = "Confirm status change",
       secondaryDescription = chosenStatus.confirmationText,
-      warningText = if (chosenStatus.closed == true) {
-        "Submitting this will close the referral."
-      } else if (chosenStatus.hold == true) {
-        "Submitting this will pause the referral."
-      } else if (chosenStatus.release == true) {
-        "This will resume the referral."
-      } else {
-        ""
+      warningText = when {
+        chosenStatus.closed == true -> {
+          "Submitting this will close the referral."
+        }
+
+        chosenStatus.hold == true -> {
+          "Submitting this will pause the referral."
+        }
+
+        chosenStatus.release == true -> {
+          "This will resume the referral."
+        }
+
+        else -> {
+          ""
+        }
       },
       hasConfirmation = chosenStatus.hasConfirmation,
     )
 
     // now see if there are any specific confirmation fields for this transition.
-    val statusTransition = referenceDataService.getStatusTransition(referral.status, chosenStatusCode)
+    val statusTransition = referenceDataService.getStatusTransition(referral.status, chosenStatusCode, ptUser)
     if (statusTransition != null) {
       defaultConfirmationFields = defaultConfirmationFields.copy(
         primaryHeading = statusTransition.primaryHeading ?: defaultConfirmationFields.primaryHeading,

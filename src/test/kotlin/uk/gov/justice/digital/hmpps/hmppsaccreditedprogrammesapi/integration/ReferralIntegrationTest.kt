@@ -367,6 +367,39 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Get referral confirmation text assessment started to suitable not ready`() {
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate3)
+
+    val confirmationFields = getConfirmationText(
+      referralId = referralCreated.referralId,
+      chosenStatusCode = "SUITABLE_NOT_READY",
+      ptUser = true,
+    )
+
+    confirmationFields.primaryHeading shouldBe "Pause referral: suitable but not ready"
+    confirmationFields.primaryDescription shouldBe "The referral will be paused until the person is ready to continue."
+  }
+
+  @Test
   fun `Get referral status transitions for on programme`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
@@ -585,7 +618,12 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectBody<List<ReferralStatusRefData>>()
       .returnResult().responseBody!!
 
-  fun getConfirmationText(referralId: UUID, chosenStatusCode: String, ptUser: Boolean = false, deselectAndKeepOpen: Boolean = false) =
+  fun getConfirmationText(
+    referralId: UUID,
+    chosenStatusCode: String,
+    ptUser: Boolean = false,
+    deselectAndKeepOpen: Boolean = false,
+  ) =
     webTestClient
       .get()
       .uri("/referrals/$referralId/confirmation-text/$chosenStatusCode?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen")
@@ -597,7 +635,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody!!
 
   @Test
-  fun `Retrieving a list of draft referral views for an organisation using regerralGroup should return 200 with correct body`() {
+  fun `Retrieving a list of draft referral views for an organisation using referral group should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
