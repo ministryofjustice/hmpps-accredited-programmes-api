@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.Authoris
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @Service
 @Transactional
@@ -21,14 +22,18 @@ constructor(
   }
 
   fun getPrisonById(prisonId: String): PrisonDetails? {
-    val prisonDetailsResult = when (val prison = prisonRegisterApiClient.getPrisonDetailsByPrisonId(prisonId)) {
-      is ClientResult.Success -> AuthorisableActionResult.Success(prison.body)
+    val prisonDetailsResult = when (val response = prisonRegisterApiClient.getPrisonDetailsByPrisonId(prisonId)) {
+      is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
       is ClientResult.Failure.StatusCode -> {
-        log.warn("Failure to retrieve data. Status code ${prison.status} reason ${prison.toException().message}")
+        log.warn("Failure to retrieve data. Status code ${response.status} reason ${response.toException().message}")
         AuthorisableActionResult.Success(null)
       }
+      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
+        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+        response.toException(),
+      )
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data ${prison.toException().message}")
+        log.warn("Failure to retrieve data ${response.toException().message}")
         AuthorisableActionResult.Success(null)
       }
     }
