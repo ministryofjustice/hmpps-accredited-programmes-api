@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.PrisonerSearchApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.PrisonerSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @Service
 @Transactional
@@ -29,9 +30,13 @@ constructor(
         log.warn("Failure to retrieve data. Status code ${response.status}")
         AuthorisableActionResult.Success(emptyList())
       }
+      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
+        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+        response.toException(),
+      )
 
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data")
+        log.warn("Failure to retrieve data for prisonerNumbers $prisonerNumbers Reason ${response.toException().message}")
         AuthorisableActionResult.Success(emptyList())
       }
     }
@@ -42,13 +47,14 @@ constructor(
   fun searchPrisoners(prisonerSearchRequest: PrisonerSearchRequest): List<PrisonerSearchResponse> {
     val prisoners = when (val response = prisonerSearchApiClient.prisonerSearch(prisonerSearchRequest)) {
       is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
-      is ClientResult.Failure.StatusCode -> {
-        log.warn("Failure to retrieve data. Status code ${response.status}")
-        AuthorisableActionResult.Success(emptyList())
-      }
+
+      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
+        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+        response.toException(),
+      )
 
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data")
+        log.warn("Failure to retrieve data for prisonNumbers ${prisonerSearchRequest.prisonIds} Reason ${response.toException().message} ")
         AuthorisableActionResult.Success(emptyList())
       }
     }

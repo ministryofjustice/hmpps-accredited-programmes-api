@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonAp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.KeyDates
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceInformation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
 
@@ -19,6 +20,11 @@ class PersonService(val prisonApiClient: PrisonApiClient) {
 
   private fun getSentenceInformation(prisonNumber: String): SentenceInformation? {
     val sentenceInformation = when (val response = prisonApiClient.getSentenceInformation(prisonNumber)) {
+      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
+        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+        response.toException(),
+      )
+
       is ClientResult.Failure -> {
         log.error("Failure to retrieve or parse data for $prisonNumber  ${response.toException().cause}")
         AuthorisableActionResult.Success(null)
