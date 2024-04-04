@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
@@ -15,6 +16,10 @@ abstract class BaseHMPPSClient(
   private val webClient: WebClient,
   private val objectMapper: ObjectMapper,
 ) {
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
+
   protected inline fun <reified ResponseType : Any> getRequest(
     serviceName: String,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
@@ -27,19 +32,28 @@ abstract class BaseHMPPSClient(
   ): ClientResult<ResponseType> =
     request(HttpMethod.POST, requestBuilderConfiguration, serviceName)
 
-  protected inline fun <reified ResponseType : Any> putRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
-    request(HttpMethod.PUT, requestBuilderConfiguration)
+  protected inline fun <reified ResponseType : Any> putRequest(
+    serviceName: String,
+    noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+  ): ClientResult<ResponseType> =
+    request(HttpMethod.PUT, requestBuilderConfiguration, serviceName)
 
-  protected inline fun <reified ResponseType : Any> deleteRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
-    request(HttpMethod.DELETE, requestBuilderConfiguration)
+  protected inline fun <reified ResponseType : Any> deleteRequest(
+    serviceName: String,
+    noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+  ): ClientResult<ResponseType> =
+    request(HttpMethod.DELETE, requestBuilderConfiguration, serviceName)
 
-  protected inline fun <reified ResponseType : Any> patchRequest(noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit): ClientResult<ResponseType> =
-    request(HttpMethod.PATCH, requestBuilderConfiguration)
+  protected inline fun <reified ResponseType : Any> patchRequest(
+    serviceName: String,
+    noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
+  ): ClientResult<ResponseType> =
+    request(HttpMethod.PATCH, requestBuilderConfiguration, serviceName)
 
   protected inline fun <reified ResponseType : Any> request(
     method: HttpMethod,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
-    serviceName: String? = "",
+    serviceName: String,
   ): ClientResult<ResponseType> {
     val typeReference = object : TypeReference<ResponseType>() {}
 
@@ -50,7 +64,7 @@ abstract class BaseHMPPSClient(
     typeReference: TypeReference<ResponseType>,
     method: HttpMethod,
     requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
-    serviceName: String?,
+    serviceName: String,
   ): ClientResult<ResponseType> {
     val requestBuilder = HMPPSRequestConfiguration()
     requestBuilderConfiguration(requestBuilder)
@@ -72,6 +86,7 @@ abstract class BaseHMPPSClient(
       return ClientResult.Success(result.statusCode, deserialized)
     } catch (exception: WebClientResponseException) {
       if (exception.statusCode.is5xxServerError) {
+        log.error("Request to $serviceName failed with status code ${exception.statusCode.value()} reason ${exception.message}.")
         throw ServiceUnavailableException("$serviceName is temporarily unavailable. Please try again later.", exception)
       } else if (!exception.statusCode.is2xxSuccessful) {
         return ClientResult.Failure.StatusCode(
@@ -81,10 +96,11 @@ abstract class BaseHMPPSClient(
           exception.responseBodyAsString,
         )
       } else {
+        log.error("Request to $serviceName failed with status code ${exception.statusCode.value()} reason ${exception.message}.")
         throw exception
       }
     } catch (exception: Exception) {
-      return ClientResult.Failure.Other(method, requestBuilder.path ?: "", exception)
+      return ClientResult.Failure.Other(method, requestBuilder.path ?: "", exception, serviceName)
     }
   }
 
@@ -114,13 +130,9 @@ sealed interface ClientResult<ResponseType> {
         jacksonObjectMapper().readValue(body, ResponseType::class.java)
     }
 
-    class CachedValueUnavailable<ResponseType>(val cacheKey: String) : Failure<ResponseType> {
-      override fun toException(): Throwable = RuntimeException("No Redis entry exists for $cacheKey")
-    }
-
-    class Other<ResponseType>(val method: HttpMethod, val path: String, val exception: Exception) :
+    class Other<ResponseType>(val method: HttpMethod, val path: String, val exception: Exception, val serviceName: String) :
       Failure<ResponseType> {
-      override fun toException(): Throwable = RuntimeException("Unable to complete $method request to $path", exception)
+      override fun toException(): Throwable = RuntimeException("Unable to complete request. Service $serviceName for $method request to $path", exception)
     }
   }
 }

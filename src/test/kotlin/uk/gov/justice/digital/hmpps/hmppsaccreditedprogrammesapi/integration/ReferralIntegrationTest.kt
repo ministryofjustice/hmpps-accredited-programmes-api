@@ -167,6 +167,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   @WithMockUser(username = "NONEXISTENT_USER")
   fun `Creating a referral with a nonexistent user should return 201 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id)
@@ -196,6 +197,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Updating a referral with a valid payload should return 204 with no body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id)
@@ -243,6 +245,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Updating a referral status should return 204 with no body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id)
@@ -398,6 +401,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get referral status transitions for on programme`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id)
