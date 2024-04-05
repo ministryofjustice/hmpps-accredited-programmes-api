@@ -242,6 +242,17 @@ constructor(
       )
     }
 
+    // if current status is ON_PROGRAMME and deselect and keep open option is checked then change the status transitions again to the bespoke ones:
+    if ((referral.status == "ON_PROGRAMME") && deselectAndKeepOpen && chosenStatusCode == "DESELECTED") {
+      defaultConfirmationFields = ConfirmationFields(
+        primaryHeading = "Deselection: keep referral open",
+        primaryDescription = "This person cannot complete the programme now. They may be able to join or restart in the future.",
+        secondaryHeading = "Choose the deselection status",
+        secondaryDescription = "The referral will be paused at this status, for example Deselected - assessed as suitable.",
+        warningText = "",
+      )
+    }
+
     return ResponseEntity.ok(
       defaultConfirmationFields,
     )
