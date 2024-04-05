@@ -20,7 +20,7 @@ class AuditEntityFactory : Factory<AuditEntity> {
   private var courseId: Yielded<UUID?> = { UUID.randomUUID() }
   private var courseName: Yielded<String> = { randomUppercaseString() }
   private var courseLocation: Yielded<String> = { randomUppercaseString() }
-  private var auditAction: Yielded<AuditAction> = { AuditAction.CREATE_REFERRAL }
+  private var auditAction: Yielded<String> = { AuditAction.CREATE_REFERRAL.name }
   private var auditUsername: Yielded<String> = { randomUppercaseString() }
   private var auditDateTime: Yielded<LocalDateTime> = { LocalDateTime.now() }
   fun withId(id: () -> UUID?) = apply { this.id = id }
@@ -36,7 +36,7 @@ class AuditEntityFactory : Factory<AuditEntity> {
   fun withCourseId(courseId: () -> UUID) = apply { this.courseId = courseId }
   fun withCourseLocation(courseLocation: () -> String) = apply { this.courseLocation = courseLocation }
   fun withCourseName(courseName: () -> String) = apply { this.courseName = courseName }
-  fun withAuditAction(auditAction: () -> AuditAction) = apply { this.auditAction = auditAction }
+  fun withAuditAction(auditAction: () -> String) = apply { this.auditAction = auditAction }
   fun withAuditUsername(auditUsername: () -> String) = apply { this.auditUsername = auditUsername }
   fun withAuditDateTime(auditDateTime: () -> LocalDateTime) = apply { this.auditDateTime = auditDateTime }
 

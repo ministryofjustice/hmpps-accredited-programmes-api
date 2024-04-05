@@ -51,13 +51,12 @@ constructor(
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
-  private val internalAuditService: InternalAuditService,
+  private val auditService: AuditService,
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralReferenceDataService: ReferralReferenceDataService,
   private val enabledOrganisationService: EnabledOrganisationService,
-  private val externalAuditService: ExternalAuditService,
   private val personService: PersonService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -92,8 +91,7 @@ constructor(
     ) ?: throw Exception("Referral creation failed")
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
-    internalAuditService.createInternalAuditRecord(savedReferral, null, AuditAction.CREATE_REFERRAL)
-    externalAuditService.publishExternalAuditEvent(savedReferral, AuditAction.CREATE_REFERRAL.name)
+    auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
     return savedReferral.id
   }
 
@@ -189,8 +187,7 @@ constructor(
     // update the status
     referral.status = referralStatusUpdate.status
     // audit the interaction
-    internalAuditService.createInternalAuditRecord(referral, existingStatus, AuditAction.UPDATE_REFERRAL)
-    externalAuditService.publishExternalAuditEvent(referral, AuditAction.UPDATE_REFERRAL.name)
+    auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
   }
 
   private fun validateStatus(

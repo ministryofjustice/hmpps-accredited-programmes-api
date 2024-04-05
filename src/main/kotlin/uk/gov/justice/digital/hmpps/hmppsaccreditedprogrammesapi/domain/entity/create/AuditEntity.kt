@@ -26,7 +26,7 @@ class AuditEntity(
   var courseId: UUID? = null,
   var courseName: String? = null,
   var courseLocation: String? = null,
-  var auditAction: AuditAction,
+  var auditAction: String,
   var auditUsername: String = SecurityContextHolder.getContext().authentication?.name ?: "UNKNOWN_USER",
   var auditDateTime: LocalDateTime = LocalDateTime.now(),
 )
@@ -35,4 +35,14 @@ enum class AuditAction {
   CREATE_REFERRAL,
   UPDATE_REFERRAL,
   SEARCH_FOR_PERSON,
+  OASYS_SEARCH_FOR_PERSON_OFFENCE_DETAIL,
+  OASYS_SEARCH_FOR_PERSON_RELATIONSHIP,
+  OASYS_SEARCH_FOR_PERSON_ROSH,
+  OASYS_SEARCH_FOR_PERSON_LIFESTYLE,
+  OASYS_SEARCH_FOR_PERSON_BEHAVIOUR,
+  OASYS_SEARCH_FOR_PERSON_HEALTH,
+  OASYS_SEARCH_FOR_PERSON_ATTITUDE,
+  OASYS_SEARCH_FOR_PERSON_PSYCHIATRIC,
+  OASYS_SEARCH_FOR_PERSON_LEARNING,
+  OASYS_SEARCH_FOR_PERSON_RISKS,
 }
