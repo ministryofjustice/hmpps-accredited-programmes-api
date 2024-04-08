@@ -227,7 +227,7 @@ constructor(
           ""
         }
       },
-      hasConfirmation = chosenStatus.hasConfirmation,
+      hasConfirmation = chosenStatus.hold != true && chosenStatus.hasConfirmation == true,
     )
 
     // now see if there are any specific confirmation fields for this transition.
