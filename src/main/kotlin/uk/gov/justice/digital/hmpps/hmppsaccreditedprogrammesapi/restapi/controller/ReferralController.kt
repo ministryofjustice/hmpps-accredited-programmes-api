@@ -212,6 +212,10 @@ constructor(
       secondaryHeading = "Confirm status change",
       secondaryDescription = chosenStatus.confirmationText,
       warningText = when {
+        currentStatus.code == "ON_PROGRAMME" && chosenStatus.code == "PROGRAMME_COMPLETE" -> {
+          ""
+        }
+
         chosenStatus.closed == true -> {
           "Submitting this will close the referral."
         }
@@ -222,10 +226,6 @@ constructor(
 
         chosenStatus.release == true -> {
           "This will resume the referral."
-        }
-
-        currentStatus.code == "ON_PROGRAMME" && chosenStatus.code == "PROGRAMME_COMPLETE" -> {
-          ""
         }
 
         else -> {
