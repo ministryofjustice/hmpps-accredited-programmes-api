@@ -224,6 +224,10 @@ constructor(
           "This will resume the referral."
         }
 
+        currentStatus.code == "ON_PROGRAMME" && chosenStatus.code == "PROGRAMME_COMPLETE" -> {
+          ""
+        }
+
         else -> {
           ""
         }
