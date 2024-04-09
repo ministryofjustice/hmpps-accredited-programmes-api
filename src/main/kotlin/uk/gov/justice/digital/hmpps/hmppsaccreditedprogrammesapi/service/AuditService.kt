@@ -14,6 +14,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.hmpps.sqs.audit.HmppsAuditService
 import java.time.Instant
 import java.util.UUID
+
+private const val ACCREDITED_PROGRAMME = "hmpps-accredited-programmes-api"
+
 @Service
 @Transactional
 class AuditService(
@@ -89,7 +92,7 @@ class AuditService(
           `when` = Instant.now(),
           subjectType = subjectType,
           correlationId = referralId,
-          service = "hmpps-accredited-programmes-api",
+          service = ACCREDITED_PROGRAMME,
         )
       }
     }
