@@ -54,7 +54,7 @@ class PrisonSearchIntegrationTest : IntegrationTestBase() {
     )
 
     val auditEntity = auditRepository.findAll()
-      .firstOrNull { it.prisonNumber == "C6666DD" && it.auditAction == AuditAction.SEARCH_FOR_PERSON.name }
+      .firstOrNull { it.prisonNumber == "C6666DD" && it.auditAction == AuditAction.NOMIS_SEARCH_FOR_PERSON.name }
 
     auditEntity shouldNotBe null
   }

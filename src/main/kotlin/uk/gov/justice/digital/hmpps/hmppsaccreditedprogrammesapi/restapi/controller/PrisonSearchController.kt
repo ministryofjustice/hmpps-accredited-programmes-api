@@ -20,7 +20,7 @@ constructor(
   override fun searchPrisoner(prisonerSearchRequest: PrisonerSearchRequest): ResponseEntity<List<PrisonerSearchResponse>> {
     auditService.audit(
       prisonNumber = prisonerSearchRequest.prisonerIdentifier,
-      auditAction = AuditAction.SEARCH_FOR_PERSON.name,
+      auditAction = AuditAction.NOMIS_SEARCH_FOR_PERSON.name,
     )
 
     return ResponseEntity.ok(
