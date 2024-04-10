@@ -51,13 +51,12 @@ constructor(
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
-  private val internalAuditService: InternalAuditService,
+  private val auditService: AuditService,
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralReferenceDataService: ReferralReferenceDataService,
   private val enabledOrganisationService: EnabledOrganisationService,
-  private val externalAuditService: ExternalAuditService,
   private val personService: PersonService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -67,13 +66,14 @@ constructor(
   ): UUID? {
     val username = SecurityContextHolder.getContext().authentication?.name
       ?: throw SecurityException("Authentication information not found")
+    log.info("STARTING - Request received to create a referral for prisonNumber $prisonNumber from $username")
 
     val referrerUser = referrerUserRepository.findById(username).orElseGet {
       referrerUserRepository.save(ReferrerUserEntity(username = username))
     }
 
     val offering = offeringRepository.findById(offeringId)
-      .orElseThrow { Exception("Offering not found") }
+      .orElseThrow { Exception("Offering not found for $offeringId") }
 
     if (enabledOrganisationService.getEnabledOrganisation(offering.organisationId) == null) {
       throw BusinessException("Organisation ${offering.organisationId} not enabled for referrals")
@@ -89,11 +89,11 @@ constructor(
         prisonNumber = prisonNumber,
         referrer = referrerUser,
       ),
-    ) ?: throw Exception("Referral creation failed")
+    ) ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
-    internalAuditService.createInternalAuditRecord(savedReferral, null, AuditAction.CREATE_REFERRAL)
-    externalAuditService.publishExternalAuditEvent(savedReferral, AuditAction.CREATE_REFERRAL.name)
+    auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
+    log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber from $username referralId: ${savedReferral.id}")
     return savedReferral.id
   }
 
@@ -106,8 +106,12 @@ constructor(
           organisationRepository.save(OrganisationEntity(code = it.prisonId, name = it.prisonName))
         } catch (e: Exception) {
           log.warn("Failed to save organisation details for prison $code", e)
+          throw BusinessException("Failed to save organisation details for prison $code", e)
         }
-      } ?: log.warn("Prison details could not be fetched for $code")
+      } ?: {
+        log.warn("Prison details could not be fetched for $code")
+        throw BusinessException("Prison details could not be fetched for $code")
+      }
     }
   }
 
@@ -189,8 +193,7 @@ constructor(
     // update the status
     referral.status = referralStatusUpdate.status
     // audit the interaction
-    internalAuditService.createInternalAuditRecord(referral, existingStatus, AuditAction.UPDATE_REFERRAL)
-    externalAuditService.publishExternalAuditEvent(referral, AuditAction.UPDATE_REFERRAL.name)
+    auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
   }
 
   private fun validateStatus(
@@ -199,16 +202,8 @@ constructor(
   ): Triple<ReferralStatusEntity, ReferralStatusCategoryEntity?, ReferralStatusReasonEntity?> {
     // validate that the status exists:
     val status = referralStatusRepository.getByCode(referralStatusUpdate.status.uppercase())
-    val category = if (referralStatusUpdate.category != null) {
-      referralStatusCategoryRepository.getByCode(referralStatusUpdate.category.uppercase())
-    } else {
-      null
-    }
-    val reason = if (referralStatusUpdate.reason != null) {
-      referralStatusReasonRepository.getByCode(referralStatusUpdate.reason.uppercase())
-    } else {
-      null
-    }
+    val category = referralStatusUpdate.category?.uppercase()?.let { referralStatusCategoryRepository.getByCode(it) }
+    val reason = referralStatusUpdate.reason?.uppercase()?.let { referralStatusReasonRepository.getByCode(it) }
 
     validateStatusTransition(referral.id!!, referral.status, referralStatusUpdate.status.uppercase(), referralStatusUpdate.ptUser!!)
 

@@ -27,7 +27,8 @@ class OasysApiServiceTest {
   private val oasysApiClient = mockk<OasysApiClient>()
   private val arnsApiClient = mockk<ArnsApiClient>()
   private val prisonApiClient = mockk<PrisonApiClient>()
-  val service = OasysService(oasysApiClient, arnsApiClient, prisonApiClient)
+  private val auditService = mockk<AuditService>()
+  val service = OasysService(oasysApiClient, arnsApiClient, prisonApiClient, auditService)
 
   @Test
   fun `should return assessmentId`() {

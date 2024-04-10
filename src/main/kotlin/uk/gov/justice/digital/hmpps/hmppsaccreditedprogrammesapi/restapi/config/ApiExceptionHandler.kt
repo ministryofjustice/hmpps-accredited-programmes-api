@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 class ApiExceptionHandler {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
-    log.info("Not valid", e)
+    log.warn("Not valid", e)
     return ResponseEntity
       .status(BAD_REQUEST)
       .body(
@@ -36,7 +36,7 @@ class ApiExceptionHandler {
 
   @ExceptionHandler(BusinessException::class)
   fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse> {
-    log.info("Business rule violation", e)
+    log.warn("Business rule violation", e)
     return ResponseEntity
       .status(BAD_REQUEST)
       .body(
@@ -50,7 +50,7 @@ class ApiExceptionHandler {
 
   @ExceptionHandler(NotFoundException::class)
   fun handleNotFoundException(e: NotFoundException): ResponseEntity<ErrorResponse> {
-    log.info("Not found", e)
+    log.warn("Not found", e)
     return ResponseEntity
       .status(NOT_FOUND)
       .body(
@@ -79,7 +79,7 @@ class ApiExceptionHandler {
 
   @ExceptionHandler(EntityNotFoundException::class)
   fun handleEntityNotFoundException(e: EntityNotFoundException): ResponseEntity<ErrorResponse> {
-    log.info("Entity not found", e)
+    log.error("Entity not found", e)
     return ResponseEntity
       .status(NOT_FOUND)
       .body(
@@ -93,7 +93,7 @@ class ApiExceptionHandler {
 
   @ExceptionHandler(IllegalArgumentException::class)
   fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
-    log.info("Conflict", e)
+    log.warn("Conflict", e)
     return ResponseEntity
       .status(CONFLICT)
       .body(
@@ -107,7 +107,7 @@ class ApiExceptionHandler {
 
   @ExceptionHandler(HttpMessageConversionException::class)
   fun handleHttpMessageConversionException(e: HttpMessageConversionException): ResponseEntity<ErrorResponse> {
-    log.info("Request not readable", e)
+    log.error("Request not readable", e)
     return ResponseEntity
       .status(BAD_REQUEST)
       .body(
@@ -121,7 +121,7 @@ class ApiExceptionHandler {
 
   @ExceptionHandler(MethodArgumentTypeMismatchException::class)
   fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-    log.info("Request not readable", e)
+    log.warn("Request not readable", e)
     return ResponseEntity
       .status(BAD_REQUEST)
       .body(
