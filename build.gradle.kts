@@ -20,7 +20,7 @@ dependencies {
   val springSecurityVersion = "6.2.3"
 
   runtimeOnly("org.postgresql:postgresql:42.7.3")
-
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:0.2.2")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")

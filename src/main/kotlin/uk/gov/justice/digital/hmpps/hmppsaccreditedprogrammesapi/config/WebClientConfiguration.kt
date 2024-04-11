@@ -16,10 +16,17 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
+import uk.gov.justice.hmpps.kotlin.auth.healthWebClient
 import java.time.Duration
 
 @Configuration
 class WebClientConfiguration(
+  @Value("\${services.prisoner-search-api.base-url}") val prisonerSearchApiBaseUrl: String,
+  @Value("\${services.prison-api.base-url}") val prisonsApiBaseUrl: String,
+  @Value("\${services.prison-register-api.base-url}") val prisonRegisterApiBaseUrl: String,
+  @Value("\${services.oasys-api.base-url}") val oasysApiBaseUrl: String,
+  @Value("\${services.arns-api.base-url}") val arnsApiBaseUrl: String,
+  @Value("\${hmpps.auth.url}") val hmppsAuthBaseUri: String,
   @Value("\${upstream-timeout-ms}") private val upstreamTimeoutMs: Long,
   @Value("\${max-response-in-memory-size-bytes}") private val maxResponseInMemorySizeBytes: Int,
 ) {
@@ -40,7 +47,6 @@ class WebClientConfiguration(
     clientRegistrations: ClientRegistrationRepository,
     authorizedClients: OAuth2AuthorizedClientRepository,
     authorizedClientManager: OAuth2AuthorizedClientManager,
-    @Value("\${services.prison-api.base-url}") prisonsApiBaseUrl: String,
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
@@ -70,7 +76,6 @@ class WebClientConfiguration(
     clientRegistrations: ClientRegistrationRepository,
     authorizedClients: OAuth2AuthorizedClientRepository,
     authorizedClientManager: OAuth2AuthorizedClientManager,
-    @Value("\${services.prisoner-search-api.base-url}") prisonerSearchApiBaseUrl: String,
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
@@ -100,7 +105,6 @@ class WebClientConfiguration(
     clientRegistrations: ClientRegistrationRepository,
     authorizedClients: OAuth2AuthorizedClientRepository,
     authorizedClientManager: OAuth2AuthorizedClientManager,
-    @Value("\${services.prison-register-api.base-url}") prisonRegisterApiBaseUrl: String,
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
@@ -130,7 +134,6 @@ class WebClientConfiguration(
     clientRegistrations: ClientRegistrationRepository,
     authorizedClients: OAuth2AuthorizedClientRepository,
     authorizedClientManager: OAuth2AuthorizedClientManager,
-    @Value("\${services.oasys-api.base-url}") oasysApiBaseUrl: String,
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
@@ -160,14 +163,13 @@ class WebClientConfiguration(
     clientRegistrations: ClientRegistrationRepository,
     authorizedClients: OAuth2AuthorizedClientRepository,
     authorizedClientManager: OAuth2AuthorizedClientManager,
-    @Value("\${services.arns-api.base-url}") arnsApiBaseUrl: String,
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
     oauth2Client.setDefaultClientRegistrationId("arns-api")
 
     return WebClient.builder()
-      .baseUrl("$arnsApiBaseUrl")
+      .baseUrl(arnsApiBaseUrl)
       .clientConnector(
         ReactorClientHttpConnector(
           HttpClient
@@ -184,4 +186,22 @@ class WebClientConfiguration(
       .filter(oauth2Client)
       .build()
   }
+
+  @Bean(name = ["prisonerSearchApiHealthWebClient"])
+  fun prisonerSearchHealthWebClient(builder: WebClient.Builder): WebClient = builder.healthWebClient(prisonerSearchApiBaseUrl)
+
+  @Bean(name = ["prisonsApiHealthWebClient"])
+  fun prisonsApiHealthWebClient(builder: WebClient.Builder): WebClient = builder.healthWebClient(prisonsApiBaseUrl)
+
+  @Bean(name = ["prisonRegisterApiHealthWebClient"])
+  fun prisonRegisterApiHealthWebClient(builder: WebClient.Builder): WebClient = builder.healthWebClient(prisonRegisterApiBaseUrl)
+
+  @Bean(name = ["oasysApiHealthWebClient"])
+  fun oasysApiHealthWebClient(builder: WebClient.Builder): WebClient = builder.healthWebClient(oasysApiBaseUrl)
+
+  @Bean(name = ["arnsApiHealthWebClient"])
+  fun arnsApiHealthWebClient(builder: WebClient.Builder): WebClient = builder.healthWebClient(arnsApiBaseUrl)
+
+  @Bean(name = ["authHealthWebClient"])
+  fun hmppsAuthHealthWebClient(builder: WebClient.Builder): WebClient = builder.healthWebClient(hmppsAuthBaseUri)
 }
