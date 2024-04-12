@@ -33,3 +33,10 @@ generic-service:
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
+
+elasticCacheAlertsClusterIds:
+  - "cp-d861363cf5bdb82d-001"
+  - "cp-d861363cf5bdb82d-002"
+
+rdsAlertsDatabases:
+  "dbe431ac1e7401f6e8": "Accredited Programmes API Database"
