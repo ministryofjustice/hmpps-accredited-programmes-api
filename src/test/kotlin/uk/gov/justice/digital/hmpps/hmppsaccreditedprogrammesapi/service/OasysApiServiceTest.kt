@@ -86,6 +86,9 @@ class OasysApiServiceTest {
       "Yes",
       "Free text",
       null,
+      "0-No problems",
+      "Not in a relationship",
+      "2-Significant problems",
     )
 
     every { oasysApiClient.getRelationships(any()) } returns ClientResult.Success(
