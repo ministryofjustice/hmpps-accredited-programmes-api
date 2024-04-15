@@ -93,7 +93,7 @@ fun OasysBehaviour.toModel(): Behaviour {
 
 fun OasysPsychiatric.toModel(): Psychiatric {
   return Psychiatric(
-    currPsychiatricProblems,
+    description = currPsychiatricProblems,
   )
 }
 
