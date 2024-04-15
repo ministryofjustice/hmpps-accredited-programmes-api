@@ -2158,6 +2158,9 @@ components:
         lifestyleIssues:
           type: string
           example: Commits robbery to fund drug addiction
+        easilyInfluenced:
+          type: string
+          example: 1-Some problems
 
     Psychiatric:
       type: object

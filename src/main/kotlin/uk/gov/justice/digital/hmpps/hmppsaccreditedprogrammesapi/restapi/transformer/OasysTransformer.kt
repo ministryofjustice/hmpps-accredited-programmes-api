@@ -70,12 +70,11 @@ fun OasysRoshFull.toModel(): RoshAnalysis {
   )
 }
 
-fun OasysLifestyle.toModel(): Lifestyle {
-  return Lifestyle(
-    regActivitiesEncourageOffending,
-    lifestyleIssuesDetails,
-  )
-}
+fun OasysLifestyle.toModel() = Lifestyle(
+  activitiesEncourageOffending = regActivitiesEncourageOffending,
+  lifestyleIssues = lifestyleIssuesDetails,
+  easilyInfluenced = easilyInfluenced,
+)
 
 fun OasysBehaviour.toModel(): Behaviour {
   return Behaviour(
