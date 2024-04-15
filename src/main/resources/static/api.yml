@@ -2209,6 +2209,9 @@ components:
         motivationToAddressBehaviour:
           type: string
           example: 0-No problems
+        hostileOrientation:
+          type: string
+          example: 0-No problems
 
     Health:
       type: object

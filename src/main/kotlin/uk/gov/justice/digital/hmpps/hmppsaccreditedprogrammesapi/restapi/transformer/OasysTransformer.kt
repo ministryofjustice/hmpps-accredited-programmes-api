@@ -107,8 +107,9 @@ fun OasysHealth.toModel(): Health {
 
 fun OasysAttitude.toModel(): Attitude {
   return Attitude(
-    proCriminalAttitudes,
-    motivationToAddressBehaviour,
+    proCriminalAttitudes = proCriminalAttitudes,
+    motivationToAddressBehaviour = motivationToAddressBehaviour,
+    hostileOrientation = hostileOrientation,
   )
 }
 
