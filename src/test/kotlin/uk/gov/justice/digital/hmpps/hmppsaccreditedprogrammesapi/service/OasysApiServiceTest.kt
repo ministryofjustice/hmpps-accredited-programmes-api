@@ -186,6 +186,7 @@ class OasysApiServiceTest {
     val attitude = OasysAttitude(
       "0-no problems",
       "1-some problems",
+      "0-no problems",
     )
 
     every { oasysApiClient.getAttitude(any()) } returns ClientResult.Success(
