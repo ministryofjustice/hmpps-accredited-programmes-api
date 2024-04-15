@@ -51,8 +51,8 @@ class AuditService(
 
   fun audit(prisonNumber: String, auditAction: String) {
     log.debug("AUDIT - Request received to perform $auditAction for prisonNumber $prisonNumber from ${getCurrentUser()}")
-    createInternalAuditRecord(prisonNumber = prisonNumber, auditAction = AuditAction.NOMIS_SEARCH_FOR_PERSON.name)
-    publishAuditEvent(auditAction = AuditAction.NOMIS_SEARCH_FOR_PERSON.name, prisonNumber = prisonNumber)
+    createInternalAuditRecord(prisonNumber = prisonNumber, auditAction = auditAction)
+    publishAuditEvent(prisonNumber = prisonNumber, auditAction = auditAction)
   }
 
   fun audit(referralEntity: ReferralEntity, currentStatus: String? = null, auditAction: String = AuditAction.CREATE_REFERRAL.name) {

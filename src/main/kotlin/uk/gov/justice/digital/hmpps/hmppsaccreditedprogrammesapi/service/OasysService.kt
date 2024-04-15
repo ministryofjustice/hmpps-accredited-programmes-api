@@ -46,7 +46,7 @@ class OasysService(
   val auditService: AuditService,
 ) {
   fun getOffenceDetail(prisonNumber: String): OffenceDetail? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_OFFENCE_DETAIL.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_OFFENCE_DETAIL.name)
 
     val oasysOffenceDetail = getAssessmentId(prisonNumber)
       ?.let { getOffenceDetail(it) }
@@ -56,7 +56,7 @@ class OasysService(
   }
 
   fun getRelationships(prisonNumber: String): Relationships? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_RELATIONSHIP.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_RELATIONSHIP.name)
 
     val oasysRelationships = getAssessmentId(prisonNumber)
       ?.let { getRelationships(it) }
@@ -66,7 +66,7 @@ class OasysService(
   }
 
   fun getRoshFull(prisonNumber: String): RoshAnalysis? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_ROSH.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_ROSH.name)
 
     val oasysRoshFull = getAssessmentId(prisonNumber)
       ?.let { getRoshFull(it) }
@@ -76,7 +76,7 @@ class OasysService(
   }
 
   fun getLifestyle(prisonNumber: String): Lifestyle? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_LIFESTYLE.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_LIFESTYLE.name)
 
     val oasysLifestyle = getAssessmentId(prisonNumber)
       ?.let { getLifestyle(it) }
@@ -86,7 +86,7 @@ class OasysService(
   }
 
   fun getBehaviour(prisonNumber: String): Behaviour? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_BEHAVIOUR.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_BEHAVIOUR.name)
 
     val oasysBehaviour = getAssessmentId(prisonNumber)
       ?.let { getBehaviour(it) }
@@ -96,7 +96,7 @@ class OasysService(
   }
 
   fun getHealth(prisonNumber: String): Health? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_HEALTH.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_HEALTH.name)
 
     val oasysHealth = getAssessmentId(prisonNumber)
       ?.let { getHealth(it) }
@@ -106,7 +106,7 @@ class OasysService(
   }
 
   fun getAttitude(prisonNumber: String): Attitude? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_ATTITUDE.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_ATTITUDE.name)
 
     val oasysAttitude = getAssessmentId(prisonNumber)
       ?.let { getAttitude(it) }
@@ -116,7 +116,7 @@ class OasysService(
   }
 
   fun getPsychiatric(prisonNumber: String): Psychiatric? {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_PSYCHIATRIC.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_PSYCHIATRIC.name)
 
     val oasysPsychiatric = getAssessmentId(prisonNumber)
       ?.let { getPsychiatric(it) }
@@ -126,7 +126,7 @@ class OasysService(
   }
 
   fun getLearningNeeds(prisonNumber: String): LearningNeeds {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_LEARNING.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_LEARNING.name)
     val assessmentId = getAssessmentId(prisonNumber)
       ?: throw NotFoundException("No learning needs information found for prison number $prisonNumber")
 
@@ -136,7 +136,7 @@ class OasysService(
   }
 
   fun getRisks(prisonNumber: String): Risks {
-    auditService.audit(prisonNumber, AuditAction.OASYS_SEARCH_FOR_PERSON_RISKS.name)
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_RISKS.name)
     val assessmentId = getAssessmentId(prisonNumber)
       ?: throw NotFoundException("No Risks information found for prison number $prisonNumber")
 
