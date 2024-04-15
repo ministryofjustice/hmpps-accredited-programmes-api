@@ -2178,6 +2178,18 @@ components:
         concreteAbstractThinking:
           type: string
           example: 0-No problems
+        sexualPreOccupation:
+          type: string
+          example: 0-No problems
+        offenceRelatedSexualInterests:
+          type: string
+          example: 0-No problems
+        aggressiveControllingBehaviour:
+          type: string
+          example: 0-No problems
+        impulsivity:
+          type: string
+          example: 0-No problems
 
     Attitude:
       type: object

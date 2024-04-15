@@ -145,6 +145,10 @@ class OasysApiServiceTest {
       "4",
       "5",
       "6",
+      "7",
+      "8",
+      "9",
+      "10",
     )
 
     every { oasysApiClient.getBehaviour(any()) } returns ClientResult.Success(

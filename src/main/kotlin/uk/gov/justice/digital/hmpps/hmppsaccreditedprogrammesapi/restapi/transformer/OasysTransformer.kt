@@ -79,12 +79,16 @@ fun OasysLifestyle.toModel(): Lifestyle {
 
 fun OasysBehaviour.toModel(): Behaviour {
   return Behaviour(
-    temperControl,
-    problemSolvingSkills,
-    awarenessOfConsequences,
-    achieveGoals,
-    understandsViewsOfOthers,
-    concreteAbstractThinking,
+    temperControl = temperControl,
+    problemSolvingSkills = problemSolvingSkills,
+    awarenessOfConsequences = awarenessOfConsequences,
+    achieveGoals = achieveGoals,
+    understandsViewsOfOthers = understandsViewsOfOthers,
+    concreteAbstractThinking = concreteAbstractThinking,
+    sexualPreOccupation = sexualPreOccupation,
+    offenceRelatedSexualInterests = offenceRelatedSexualInterests,
+    aggressiveControllingBehaviour = aggressiveControllingBehavour,
+    impulsivity = impulsivity,
   )
 }
 
