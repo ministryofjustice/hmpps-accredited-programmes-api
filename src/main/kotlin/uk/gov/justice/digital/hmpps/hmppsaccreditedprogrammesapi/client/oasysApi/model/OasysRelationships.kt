@@ -13,6 +13,9 @@ data class OasysRelationships(
   val relIssuesDetails: String?,
   @JsonAlias("SARA")
   val sara: Sara?,
+  val emotionalCongruence: String?,
+  val relCurrRelationshipStatus: String?,
+  val prevCloseRelationships: String?,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

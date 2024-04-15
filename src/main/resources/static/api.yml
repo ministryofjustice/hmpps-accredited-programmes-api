@@ -2114,6 +2114,15 @@ components:
         relIssuesDetails:
           type: string
           example: This person has a history of domestic violence
+        emotionalCongruence:
+          type: string
+          example: 0-No problems
+        relCurrRelationshipStatus:
+          type: string
+          example: Not in a relationship
+        prevCloseRelationships:
+          type: string
+          example: 2-Significant problems
 
     RoshAnalysis:
       type: object
