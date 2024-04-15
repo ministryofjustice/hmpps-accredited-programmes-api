@@ -127,6 +127,7 @@ class OasysApiServiceTest {
   fun `should return psychiatric details`() {
     val psychiatric = OasysPsychiatric(
       "0 - no problems",
+      null,
     )
 
     every { oasysApiClient.getPsychiatric(any()) } returns ClientResult.Success(
