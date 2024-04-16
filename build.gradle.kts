@@ -17,7 +17,7 @@ dependencies {
   val springdocVersion = "2.5.0"
   val sentryVersion = "7.8.0"
   val jsonWebtokenVersion = "0.12.5"
-  val springSecurityVersion = "6.2.3"
+  val springSecurityVersion = "6.2.4"
 
   runtimeOnly("org.postgresql:postgresql:42.7.3")
 
