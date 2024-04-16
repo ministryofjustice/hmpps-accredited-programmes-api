@@ -27,48 +27,42 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
 
-fun OasysOffenceDetail.toModel(): OffenceDetail {
-  return OffenceDetail(
-    offenceAnalysis,
-    whatOccurred?.contains(WhatOccurred.TARGETING.desc),
-    whatOccurred?.contains(WhatOccurred.RACIAL.desc),
-    whatOccurred?.contains(WhatOccurred.REVENGE.desc),
-    whatOccurred?.contains(WhatOccurred.DOMESTIC_VIOLENCE.desc),
-    whatOccurred?.contains(WhatOccurred.VICTIMISATION.desc),
-    whatOccurred?.contains(WhatOccurred.STRANGER.desc),
-    whatOccurred?.contains(WhatOccurred.STALKING.desc),
-    recognisesImpact == YES,
-    numberOfOthersInvolved,
-    othersInvolved,
-    peerGroupInfluences,
-    offenceMotivation,
-    acceptsResponsibility == YES,
-    patternOffending,
-  )
-}
+fun OasysOffenceDetail.toModel() = OffenceDetail(
+  offenceDetails = offenceAnalysis,
+  contactTargeting = whatOccurred?.contains(WhatOccurred.TARGETING.desc),
+  raciallyMotivated = whatOccurred?.contains(WhatOccurred.RACIAL.desc),
+  revenge = whatOccurred?.contains(WhatOccurred.REVENGE.desc),
+  domesticViolence = whatOccurred?.contains(WhatOccurred.DOMESTIC_VIOLENCE.desc),
+  repeatVictimisation = whatOccurred?.contains(WhatOccurred.VICTIMISATION.desc),
+  victimWasStranger = whatOccurred?.contains(WhatOccurred.STRANGER.desc),
+  stalking = whatOccurred?.contains(WhatOccurred.STALKING.desc),
+  recognisesImpact = recognisesImpact == YES,
+  numberOfOthersInvolved = numberOfOthersInvolved,
+  othersInvolvedDetail = othersInvolved,
+  peerGroupInfluences = peerGroupInfluences,
+  motivationAndTriggers = offenceMotivation,
+  acceptsResponsibility = acceptsResponsibility == YES,
+  acceptsResponsibilityDetail = patternOffending,
+)
 
-fun OasysRelationships.toModel(): Relationships {
-  return Relationships(
-    prevOrCurrentDomesticAbuse == YES,
-    victimOfPartner == YES,
-    victimOfFamily == YES,
-    perpAgainstFamily == YES,
-    perpAgainstPartner == YES,
-    relIssuesDetails,
-  )
-}
+fun OasysRelationships.toModel() = Relationships(
+  dvEvidence = prevOrCurrentDomesticAbuse == YES,
+  victimFormerPartner = victimOfPartner == YES,
+  victimFamilyMember = victimOfFamily == YES,
+  victimOfPartnerFamily = perpAgainstFamily == YES,
+  perpOfPartnerOrFamily = perpAgainstPartner == YES,
+  relIssuesDetails = relIssuesDetails,
+)
 
-fun OasysRoshFull.toModel(): RoshAnalysis {
-  return RoshAnalysis(
-    currentOffenceDetails,
-    currentWhereAndWhen,
-    currentHowDone,
-    currentWhoVictims,
-    currentAnyoneElsePresent,
-    currentWhyDone,
-    currentSources,
-  )
-}
+fun OasysRoshFull.toModel() = RoshAnalysis(
+  offenceDetails = currentOffenceDetails,
+  whereAndWhen = currentWhereAndWhen,
+  howDone = currentHowDone,
+  whoVictims = currentWhoVictims,
+  anyoneElsePresent = currentAnyoneElsePresent,
+  whyDone = currentWhyDone,
+  sources = currentSources,
+)
 
 fun OasysLifestyle.toModel() = Lifestyle(
   activitiesEncourageOffending = regActivitiesEncourageOffending,
@@ -91,35 +85,30 @@ fun OasysBehaviour.toModel(): Behaviour {
   )
 }
 
-fun OasysPsychiatric.toModel(): Psychiatric {
-  return Psychiatric(
-    description = currPsychiatricProblems,
-  )
-}
+fun OasysPsychiatric.toModel() = Psychiatric(
+  description = currPsychiatricProblems,
+  difficultiesCoping = difficultiesCoping,
+)
 
-fun OasysHealth.toModel(): Health {
-  return Health(
-    generalHealth == YES,
-    generalHeathSpecify,
-  )
-}
+fun OasysHealth.toModel() = Health(
+  anyHealthConditions = generalHealth == YES,
+  description = generalHeathSpecify,
+)
 
-fun OasysAttitude.toModel(): Attitude {
-  return Attitude(
-    proCriminalAttitudes = proCriminalAttitudes,
-    motivationToAddressBehaviour = motivationToAddressBehaviour,
-    hostileOrientation = hostileOrientation,
-  )
-}
+fun OasysAttitude.toModel() = Attitude(
+  proCriminalAttitudes = proCriminalAttitudes,
+  motivationToAddressBehaviour = motivationToAddressBehaviour,
+  hostileOrientation = hostileOrientation,
+)
 
 fun learningNeeds(oasysAccommodation: OasysAccommodation?, oasysLearning: OasysLearning?) = LearningNeeds(
-  oasysAccommodation?.noFixedAbodeOrTransient == YES,
-  oasysLearning?.workRelatedSkills,
-  oasysLearning?.problemsReadWriteNum,
-  oasysLearning?.learningDifficulties,
-  oasysLearning?.qualifications,
-  oasysLearning?.basicSkillsScore,
-  oasysLearning?.eTEIssuesDetails,
+  noFixedAbodeOrTransient = oasysAccommodation?.noFixedAbodeOrTransient == YES,
+  workRelatedSkills = oasysLearning?.workRelatedSkills,
+  problemsReadWriteNum = oasysLearning?.problemsReadWriteNum,
+  learningDifficulties = oasysLearning?.learningDifficulties,
+  qualifications = oasysLearning?.qualifications,
+  basicSkillsScore = oasysLearning?.basicSkillsScore,
+  basicSkillsScoreDescription = oasysLearning?.eTEIssuesDetails,
 )
 
 fun risks(
