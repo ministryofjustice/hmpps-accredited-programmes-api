@@ -124,6 +124,12 @@ services:
 hmpps:
   auth:
     url: http://localhost:9090/auth
+  sqs:
+    reactiveApi: true
+    queueAdminRole: ROLE_ACP_API_QUEUE_ADMIN
+    queues:
+      hmppsdomaineventsqueue:
+        asyncQueueClient: true
 
 log-client-credentials-jwt-info: false
 

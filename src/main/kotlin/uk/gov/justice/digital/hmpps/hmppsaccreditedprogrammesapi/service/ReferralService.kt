@@ -89,7 +89,8 @@ constructor(
         prisonNumber = prisonNumber,
         referrer = referrerUser,
       ),
-    ) ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
+    )
+      ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
@@ -115,6 +116,21 @@ constructor(
     }
   }
 
+  fun updatePerson(prisonNumber: String) {
+    log.debug("Attempting to update person with prison number: $prisonNumber")
+    val personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
+    if (personEntity != null) {
+      log.debug("Prisoner is of interest to ACP - about to update: $prisonNumber")
+      val sentenceType = personService.getSentenceType(prisonNumber)
+      prisonerSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
+        updatePerson(it, personEntity, sentenceType)
+      }
+      personRepository.save(personEntity)
+    } else {
+      log.debug("Prisoner is is not of interest to ACP")
+    }
+  }
+
   private fun createOrUpdatePerson(prisonNumber: String) {
     val sentenceType = personService.getSentenceType(prisonNumber)
     prisonerSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
@@ -135,20 +151,28 @@ constructor(
           sentenceType,
         )
       } else {
-        val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
-        personEntity.surname = it.lastName
-        personEntity.forename = it.firstName
-        personEntity.conditionalReleaseDate = it.conditionalReleaseDate
-        personEntity.paroleEligibilityDate = it.paroleEligibilityDate
-        personEntity.tariffExpiryDate = it.tariffDate
-        personEntity.earliestReleaseDate = earliestReleaseDateAndType.first
-        personEntity.earliestReleaseDateType = earliestReleaseDateAndType.second
-        personEntity.indeterminateSentence = it.indeterminateSentence
-        personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
-        personEntity.sentenceType = sentenceType
+        updatePerson(it, personEntity, sentenceType)
       }
       personRepository.save(personEntity)
     }
+  }
+
+  private fun updatePerson(
+    it: Prisoner,
+    personEntity: PersonEntity,
+    sentenceType: String,
+  ) {
+    val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
+    personEntity.surname = it.lastName
+    personEntity.forename = it.firstName
+    personEntity.conditionalReleaseDate = it.conditionalReleaseDate
+    personEntity.paroleEligibilityDate = it.paroleEligibilityDate
+    personEntity.tariffExpiryDate = it.tariffDate
+    personEntity.earliestReleaseDate = earliestReleaseDateAndType.first
+    personEntity.earliestReleaseDateType = earliestReleaseDateAndType.second
+    personEntity.indeterminateSentence = it.indeterminateSentence
+    personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
+    personEntity.sentenceType = sentenceType
   }
 
   private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> {
@@ -205,7 +229,12 @@ constructor(
     val category = referralStatusUpdate.category?.uppercase()?.let { referralStatusCategoryRepository.getByCode(it) }
     val reason = referralStatusUpdate.reason?.uppercase()?.let { referralStatusReasonRepository.getByCode(it) }
 
-    validateStatusTransition(referral.id!!, referral.status, referralStatusUpdate.status.uppercase(), referralStatusUpdate.ptUser!!)
+    validateStatusTransition(
+      referral.id!!,
+      referral.status,
+      referralStatusUpdate.status.uppercase(),
+      referralStatusUpdate.ptUser!!,
+    )
 
     return Triple(status, category, reason)
   }

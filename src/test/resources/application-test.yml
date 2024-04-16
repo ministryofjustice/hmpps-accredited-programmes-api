@@ -26,6 +26,20 @@ hmpps:
     client-id: integration-test-client-id
     client-secret: secret
 
+  sqs:
+    provider: localstack
+    queues:
+      hmppsdomaineventsqueue:
+        queueName: hmpps_domain_events_queue
+        dlqName: hmpps_domain_events_dlq
+        subscribeTopicId: hmppsdomaineventstopic
+        subscribeFilter: '{"eventType":[ "prisoner-offender-search.prisoner.updated"] }'
+        asyncQueueClient: true
+
+    topics:
+      hmppsdomaineventstopic:
+        arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
+
 services:
   prison-api:
     base-url: http://localhost:#WIREMOCK_PORT
