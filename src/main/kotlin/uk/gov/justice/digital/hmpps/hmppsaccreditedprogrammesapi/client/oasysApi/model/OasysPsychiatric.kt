@@ -5,4 +5,5 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OasysPsychiatric(
   val currPsychiatricProblems: String?,
+  val difficultiesCoping: String?,
 )

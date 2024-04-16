@@ -10,4 +10,8 @@ data class OasysBehaviour(
   val achieveGoals: String?,
   val understandsViewsOfOthers: String?,
   val concreteAbstractThinking: String?,
+  val sexualPreOccupation: String?,
+  val offenceRelatedSexualInterests: String?,
+  val aggressiveControllingBehavour: String?,
+  val impulsivity: String?,
 )
