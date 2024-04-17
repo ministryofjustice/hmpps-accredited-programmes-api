@@ -39,7 +39,7 @@ The running application expects to connect to a PostgresQL database and an
 hmpps-auth instance. Use the docker-compose.yml file to pull and start these:
 
 ```bash
-docker compose up hmpps-auth postgresql
+docker compose up hmpps-auth postgresql localstack
 ```
 
 Then, to run the server:
@@ -62,7 +62,7 @@ courses.
 
 ### Running/Debugging from IntelliJ
 
-To run from IntelliJ, first start `hmpps-auth` and the `postgresql` database in
+To run from IntelliJ, first start `hmpps-auth`, `localstack` and the `postgresql` database in
 Docker as above.
 
 You may need to manually install the Java 21 SDK to run the application. We've
@@ -78,6 +78,11 @@ if not visible), expand `hmpps-accredited-programmes-api`, `Tasks`,
 `application`, right-click on `bootRunLocal` and select either Run or Debug.
 
 ## Running the tests
+
+Running localstack is necessary for gradle and intellij tests
+```bash
+docker compose up localstack
+```
 
 To run linting and tests, do:
 
