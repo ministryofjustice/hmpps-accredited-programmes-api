@@ -117,17 +117,17 @@ constructor(
   }
 
   fun updatePerson(prisonNumber: String) {
-    log.debug("Attempting to update person with prison number: $prisonNumber")
+    log.info("Attempting to update person with prison number: $prisonNumber")
     val personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
     if (personEntity != null) {
-      log.debug("Prisoner is of interest to ACP - about to update: $prisonNumber")
+      log.info("Prisoner is of interest to ACP - about to update: $prisonNumber")
       val sentenceType = personService.getSentenceType(prisonNumber)
       prisonerSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
         updatePerson(it, personEntity, sentenceType)
       }
       personRepository.save(personEntity)
     } else {
-      log.debug("Prisoner is is not of interest to ACP")
+      log.info("Prisoner is is not of interest to ACP")
     }
   }
 
