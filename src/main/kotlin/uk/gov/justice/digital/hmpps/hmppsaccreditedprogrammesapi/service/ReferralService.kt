@@ -127,7 +127,7 @@ constructor(
       }
       personRepository.save(personEntity)
     } else {
-      log.info("Prisoner is is not of interest to ACP")
+      log.info("Prisoner is not of interest to ACP")
     }
   }
 
