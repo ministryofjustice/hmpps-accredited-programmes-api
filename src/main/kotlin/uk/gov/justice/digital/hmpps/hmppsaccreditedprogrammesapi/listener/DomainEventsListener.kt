@@ -23,13 +23,14 @@ class DomainEventsListener(
     val (message, attributes) = objectMapper.readValue<SQSMessage>(msg)
     val domainEventMessage = objectMapper.readValue<DomainEventsMessage>(message)
     if (domainEventMessage.eventType == "prisoner-offender-search.prisoner.updated") {
-      log.debug("Processing prisoner offender search update message")
+      log.info("Processing prisoner offender search update message")
       handleMessage(domainEventMessage)
     }
   }
 
   private fun handleMessage(message: DomainEventsMessage) {
     if (message.prisonerNumber != null) {
+      log.info("message contained prisoner number: ${message.prisonerNumber}")
       referralService.updatePerson(message.prisonerNumber)
     } else {
       log.error("Message did not contain prisoner number. " + message.additionalInformation)
