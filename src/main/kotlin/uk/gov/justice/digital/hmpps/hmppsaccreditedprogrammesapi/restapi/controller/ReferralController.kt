@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestParam
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ConfirmationFields
@@ -20,8 +21,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
@@ -39,6 +42,7 @@ constructor(
   private val securityService: SecurityService,
   private val referenceDataService: ReferralReferenceDataService,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
+  private val auditService: AuditService,
 ) : ReferralsApiDelegate {
 
   override fun createReferral(referralCreate: ReferralCreate): ResponseEntity<ReferralCreated> =
@@ -51,10 +55,12 @@ constructor(
       } ?: throw Exception("Unable to start referral")
     }
 
+  @Transactional
   override fun getReferralById(id: UUID, updatePerson: Boolean): ResponseEntity<Referral> =
     referralService
       .getReferralById(id, updatePerson)
       ?.let {
+        auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
         val status = referenceDataService.getReferralStatus(it.status)
         ResponseEntity.ok(it.toApi(status))
       }
@@ -65,11 +71,10 @@ constructor(
     return ResponseEntity.noContent().build()
   }
 
-  override fun updateReferralStatusById(id: UUID, referralStatusUpdate: ReferralStatusUpdate): ResponseEntity<Unit> =
-    with(referralStatusUpdate) {
-      referralService.updateReferralStatusById(id, referralStatusUpdate)
-      ResponseEntity.noContent().build()
-    }
+  override fun updateReferralStatusById(id: UUID, referralStatusUpdate: ReferralStatusUpdate): ResponseEntity<Unit> {
+    referralService.updateReferralStatusById(id, referralStatusUpdate)
+    return ResponseEntity.noContent().build()
+  }
 
   override fun submitReferralById(id: UUID): ResponseEntity<Unit> {
     referralService.getReferralById(id)?.let {
