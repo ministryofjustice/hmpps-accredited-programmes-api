@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -13,17 +14,25 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.TestPropertiesInitializer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.PersistenceHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.SQSMessage
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
+import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.nio.channels.FileChannel
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
@@ -75,6 +84,10 @@ object WiremockPortHolder {
 @Tag("integration")
 @ContextConfiguration(initializers = [TestPropertiesInitializer::class])
 abstract class IntegrationTestBase {
+
+  @SpyBean
+  lateinit var referralService: ReferralService
+
   @Autowired
   lateinit var webTestClient: WebTestClient
 
@@ -82,6 +95,9 @@ abstract class IntegrationTestBase {
   lateinit var jwtAuthHelper: JwtAuthHelper
 
   lateinit var wiremockServer: WireMockServer
+
+  @Autowired
+  protected lateinit var hmppsQueueService: HmppsQueueService
 
   @Autowired
   lateinit var persistenceHelper: PersistenceHelper
@@ -93,6 +109,13 @@ abstract class IntegrationTestBase {
     registerModule(JavaTimeModule())
   }
 
+  private val domainEventQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsdomaineventsqueue")
+      ?: throw MissingQueueException("HmppsQueue hmppsdomaineventsqueue not found")
+  }
+  private val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
+  private val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
+
   @BeforeEach
   fun beforeEach() {
     wiremockServer = WireMockServer(
@@ -102,6 +125,10 @@ abstract class IntegrationTestBase {
         .maxLoggedResponseSize(100_000),
     )
     wiremockServer.start()
+
+    domainEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.queueUrl).build()).get()
+    domainEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.dlqUrl).build())
+      .get()
   }
 
   @AfterEach
@@ -175,4 +202,16 @@ abstract class IntegrationTestBase {
       .expectStatus().isOk
       .expectBody<List<CourseOffering>>()
       .returnResult().responseBody!!
+
+  fun sendDomainEvent(
+    message: DomainEventsMessage,
+    queueUrl: String = domainEventQueue.queueUrl,
+    om: ObjectMapper = objectMapper,
+  ) = domainEventQueueClient.sendMessage(
+    SendMessageRequest.builder()
+      .queueUrl(queueUrl)
+      .messageBody(
+        om.writeValueAsString(SQSMessage(om.writeValueAsString(message))),
+      ).build(),
+  ).get()
 }

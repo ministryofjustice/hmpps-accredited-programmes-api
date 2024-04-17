@@ -22,7 +22,7 @@ class DomainEventsListener(
   fun listen(msg: String) {
     val (message, attributes) = objectMapper.readValue<SQSMessage>(msg)
     val domainEventMessage = objectMapper.readValue<DomainEventsMessage>(message)
-    if (attributes.eventType == "prisoner-offender-search.prisoner.updated") {
+    if (domainEventMessage.eventType == "prisoner-offender-search.prisoner.updated") {
       log.debug("Processing prisoner offender search update message")
       handleMessage(domainEventMessage)
     }
