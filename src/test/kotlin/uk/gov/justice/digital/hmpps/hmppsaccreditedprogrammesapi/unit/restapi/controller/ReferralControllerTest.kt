@@ -28,8 +28,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
@@ -46,6 +48,7 @@ class ReferralControllerTest
 constructor(
   val mockMvc: MockMvc,
   val jwtAuthHelper: JwtAuthHelper,
+  val auditService: AuditService,
 ) {
 
   @MockkBean
@@ -135,13 +138,14 @@ constructor(
 
   @Test
   fun `getReferralById with JWT returns 200 with correct body`() {
+    val offeringEntity = OfferingEntityFactory()
+      .withId(UUID.randomUUID())
+      .produce()
+    offeringEntity.course = CourseEntityFactory().produce()
+
     val referral = ReferralEntityFactory()
       .withId(UUID.randomUUID())
-      .withOffering(
-        OfferingEntityFactory()
-          .withId(UUID.randomUUID())
-          .produce(),
-      )
+      .withOffering(offeringEntity)
       .withReferrer(
         ReferrerUserEntityFactory()
           .withUsername(REFERRER_USERNAME)
