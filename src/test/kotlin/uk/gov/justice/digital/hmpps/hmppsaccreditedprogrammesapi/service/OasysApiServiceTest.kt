@@ -86,6 +86,9 @@ class OasysApiServiceTest {
       "Yes",
       "Free text",
       null,
+      "0-No problems",
+      "Not in a relationship",
+      "2-Significant problems",
     )
 
     every { oasysApiClient.getRelationships(any()) } returns ClientResult.Success(
@@ -124,6 +127,7 @@ class OasysApiServiceTest {
   fun `should return psychiatric details`() {
     val psychiatric = OasysPsychiatric(
       "0 - no problems",
+      null,
     )
 
     every { oasysApiClient.getPsychiatric(any()) } returns ClientResult.Success(
@@ -145,6 +149,10 @@ class OasysApiServiceTest {
       "4",
       "5",
       "6",
+      "7",
+      "8",
+      "9",
+      "10",
     )
 
     every { oasysApiClient.getBehaviour(any()) } returns ClientResult.Success(
@@ -179,6 +187,7 @@ class OasysApiServiceTest {
     val attitude = OasysAttitude(
       "0-no problems",
       "1-some problems",
+      "0-no problems",
     )
 
     every { oasysApiClient.getAttitude(any()) } returns ClientResult.Success(

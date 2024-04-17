@@ -6,4 +6,5 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 data class OasysAttitude(
   val proCriminalAttitudes: String?,
   val motivationToAddressBehaviour: String?,
+  val hostileOrientation: String?,
 )

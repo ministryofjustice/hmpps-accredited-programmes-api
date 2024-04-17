@@ -2114,6 +2114,15 @@ components:
         relIssuesDetails:
           type: string
           example: This person has a history of domestic violence
+        emotionalCongruence:
+          type: string
+          example: 0-No problems
+        relCurrRelationshipStatus:
+          type: string
+          example: Not in a relationship
+        prevCloseRelationships:
+          type: string
+          example: 2-Significant problems
 
     RoshAnalysis:
       type: object
@@ -2149,6 +2158,9 @@ components:
         lifestyleIssues:
           type: string
           example: Commits robbery to fund drug addiction
+        easilyInfluenced:
+          type: string
+          example: 1-Some problems
 
     Psychiatric:
       type: object
@@ -2156,6 +2168,8 @@ components:
         description:
           type: string
           example: 0-No problems
+        difficultiesCoping:
+          type: string
 
     Behaviour:
       type: object
@@ -2178,6 +2192,18 @@ components:
         concreteAbstractThinking:
           type: string
           example: 0-No problems
+        sexualPreOccupation:
+          type: string
+          example: 0-No problems
+        offenceRelatedSexualInterests:
+          type: string
+          example: 0-No problems
+        aggressiveControllingBehaviour:
+          type: string
+          example: 0-No problems
+        impulsivity:
+          type: string
+          example: 0-No problems
 
     Attitude:
       type: object
@@ -2186,6 +2212,9 @@ components:
           type: string
           example: 0-No problems
         motivationToAddressBehaviour:
+          type: string
+          example: 0-No problems
+        hostileOrientation:
           type: string
           example: 0-No problems
 
