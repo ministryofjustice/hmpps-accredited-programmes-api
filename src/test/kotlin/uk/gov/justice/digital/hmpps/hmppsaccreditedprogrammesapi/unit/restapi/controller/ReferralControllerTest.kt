@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
@@ -48,7 +49,6 @@ class ReferralControllerTest
 constructor(
   val mockMvc: MockMvc,
   val jwtAuthHelper: JwtAuthHelper,
-  val auditService: AuditService,
 ) {
 
   @MockkBean
@@ -56,6 +56,9 @@ constructor(
 
   @MockkBean
   private lateinit var securityService: SecurityService
+
+  @MockkBean
+  private lateinit var auditService: AuditService
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {
@@ -156,6 +159,7 @@ constructor(
       .produce()
 
     every { referralService.getReferralById(any()) } returns referral
+    every { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.VIEW_REFERRAL.name)) } returns Unit
 
     mockMvc.get("/referrals/${referral.id}?updatePerson=false") {
       accept = MediaType.APPLICATION_JSON
@@ -174,7 +178,8 @@ constructor(
       }
     }
 
-    verify { referralService.getReferralById(referral.id!!) }
+    verify { referralService.getReferralById(any()) }
+    verify { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.VIEW_REFERRAL.name)) }
   }
 
   @Test

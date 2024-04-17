@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestParam
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.ReferralsApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ConfirmationFields
@@ -54,6 +55,7 @@ constructor(
       } ?: throw Exception("Unable to start referral")
     }
 
+  @Transactional
   override fun getReferralById(id: UUID, updatePerson: Boolean): ResponseEntity<Referral> =
     referralService
       .getReferralById(id, updatePerson)
