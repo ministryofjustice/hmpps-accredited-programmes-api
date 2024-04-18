@@ -89,7 +89,8 @@ constructor(
         prisonNumber = prisonNumber,
         referrer = referrerUser,
       ),
-    ) ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
+    )
+      ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
@@ -183,15 +184,8 @@ constructor(
     }
   }
 
-  fun getReferralById(referralId: UUID, updatePersonDetails: Boolean = false): ReferralEntity? {
-    val referral = referralRepository.findById(referralId).getOrNull()
-
-    if (referral != null && updatePersonDetails) {
-      createOrUpdatePerson(referral.prisonNumber)
-      createOrganisationIfNotPresent(referral.offering.organisationId)
-    }
-    return referral
-  }
+  fun getReferralById(referralId: UUID, updatePersonDetails: Boolean = false) =
+    referralRepository.findById(referralId).getOrNull()
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
@@ -228,7 +222,12 @@ constructor(
     val category = referralStatusUpdate.category?.uppercase()?.let { referralStatusCategoryRepository.getByCode(it) }
     val reason = referralStatusUpdate.reason?.uppercase()?.let { referralStatusReasonRepository.getByCode(it) }
 
-    validateStatusTransition(referral.id!!, referral.status, referralStatusUpdate.status.uppercase(), referralStatusUpdate.ptUser!!)
+    validateStatusTransition(
+      referral.id!!,
+      referral.status,
+      referralStatusUpdate.status.uppercase(),
+      referralStatusUpdate.ptUser!!,
+    )
 
     return Triple(status, category, reason)
   }
