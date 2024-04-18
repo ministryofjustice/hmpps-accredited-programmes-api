@@ -20,12 +20,10 @@ class DomainEventsListener(
 
   @SqsListener("hmppsdomaineventsqueue", factory = "hmppsQueueContainerFactoryProxy")
   fun listen(msg: String) {
-    val (message, attributes) = objectMapper.readValue<SQSMessage>(msg)
+    val (message) = objectMapper.readValue<SQSMessage>(msg)
     val domainEventMessage = objectMapper.readValue<DomainEventsMessage>(message)
-    if (domainEventMessage.eventType == "prisoner-offender-search.prisoner.updated") {
-      log.info("Processing prisoner offender search update message")
-      handleMessage(domainEventMessage)
-    }
+    log.info("Processing prisoner offender search update message")
+    handleMessage(domainEventMessage)
   }
 
   private fun handleMessage(message: DomainEventsMessage) {
@@ -40,36 +38,11 @@ class DomainEventsListener(
 
 data class DomainEventsMessage(
   val eventType: String,
-  val personReference: PersonReference,
   val additionalInformation: Map<String, Any>? = mapOf(),
 ) {
   val prisonerNumber = additionalInformation?.get("nomsNumber") as String?
 }
 
-data class PersonReference(
-  val identifiers: List<Identifiers>,
-)
-
-data class Identifiers(
-  val type: String,
-  val value: String,
-)
-
 data class SQSMessage(
   @JsonProperty("Message") val message: String,
-  @JsonProperty("MessageAttributes") val attributes: MessageAttributes = MessageAttributes(),
 )
-
-data class MessageAttributes(
-  @JsonAnyGetter @JsonAnySetter
-  private val attributes: MutableMap<String, MessageAttribute> = mutableMapOf(),
-) : MutableMap<String, MessageAttribute> by attributes {
-
-  val eventType = attributes[EVENT_TYPE_KEY]?.value
-
-  companion object {
-    private const val EVENT_TYPE_KEY = "eventType"
-  }
-}
-
-data class MessageAttribute(@JsonProperty("Type") val type: String, @JsonProperty("Value") val value: String)
