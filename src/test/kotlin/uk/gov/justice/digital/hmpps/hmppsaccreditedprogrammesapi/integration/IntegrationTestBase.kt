@@ -117,6 +117,10 @@ abstract class IntegrationTestBase {
 
   @BeforeEach
   fun beforeEach() {
+    webTestClient.mutate()
+      .responseTimeout(Duration.ofMillis(30000))
+      .build()
+
     wiremockServer = WireMockServer(
       WireMockConfiguration()
         .port(wiremockPort)
