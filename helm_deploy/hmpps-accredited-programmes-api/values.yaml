@@ -50,6 +50,9 @@ generic-service:
       DB_NAME: "database_name"
       SPRING_DATASOURCE_USERNAME: "database_username"
       SPRING_DATASOURCE_PASSWORD: "database_password"
-
+    sqs-domain-events-secret:
+      HMPPS_SQS_QUEUES_HMPPSDOMAINEVENTSQUEUE_QUEUE_NAME: "sqs_queue_name"
+    sqs-domain-events-dl-secret:
+      HMPPS_SQS_QUEUES_HMPPSDOMAINEVENTSQUEUE_DLQ_NAME: "sqs_queue_name"
 generic-prometheus-alerts:
   targetApplication: hmpps-accredited-programmes-api
