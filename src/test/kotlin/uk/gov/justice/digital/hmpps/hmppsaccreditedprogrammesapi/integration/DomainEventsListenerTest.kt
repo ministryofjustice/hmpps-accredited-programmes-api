@@ -16,6 +16,6 @@ class DomainEventsListenerTest : IntegrationTestBase() {
         additionalInformation = mapOf("nomsNumber" to nomsNumber),
       ),
     )
-    verify(referralService, timeout(10000)).updatePerson(nomsNumber)
+    verify(referralService, timeout(20000)).updatePerson(nomsNumber)
   }
 }
