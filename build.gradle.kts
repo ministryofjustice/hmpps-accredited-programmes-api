@@ -57,7 +57,7 @@ java {
 }
 
 kotlin {
-  kotlinDaemonJvmArgs = listOf("-Xmx3072m")
+  kotlinDaemonJvmArgs = listOf("-Xmx4g")
   jvmToolchain(21)
 }
 
