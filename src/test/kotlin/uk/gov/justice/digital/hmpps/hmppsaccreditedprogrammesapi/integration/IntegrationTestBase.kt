@@ -20,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
-import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.TestPropertiesInitializer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
