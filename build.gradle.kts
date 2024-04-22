@@ -5,7 +5,7 @@ plugins {
   `jvm-test-suite`
   kotlin("plugin.spring") version "1.9.23"
   kotlin("plugin.jpa") version "1.9.23"
-  id("org.openapi.generator") version "7.4.0"
+  id("org.openapi.generator") version "7.5.0"
 }
 
 configurations {
