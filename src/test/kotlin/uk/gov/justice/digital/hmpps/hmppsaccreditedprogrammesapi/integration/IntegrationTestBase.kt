@@ -108,12 +108,12 @@ abstract class IntegrationTestBase {
     registerModule(JavaTimeModule())
   }
 
-  private val domainEventQueue by lazy {
+  protected val domainEventQueue by lazy {
     hmppsQueueService.findByQueueId("hmppsdomaineventsqueue")
       ?: throw MissingQueueException("HmppsQueue hmppsdomaineventsqueue not found")
   }
-  private val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
-  private val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
+  protected val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
+  protected val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
 
   @BeforeEach
   fun beforeEach() {

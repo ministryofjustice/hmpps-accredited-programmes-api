@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.5"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
   `jvm-test-suite`
   kotlin("plugin.spring") version "1.9.23"
   kotlin("plugin.jpa") version "1.9.23"
@@ -49,6 +49,7 @@ dependencies {
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
+  testImplementation("org.awaitility:awaitility-kotlin")
 }
 
 java {
@@ -56,7 +57,6 @@ java {
 }
 
 kotlin {
-  kotlinDaemonJvmArgs = listOf("-Xmx1024m")
   jvmToolchain(21)
 }
 
