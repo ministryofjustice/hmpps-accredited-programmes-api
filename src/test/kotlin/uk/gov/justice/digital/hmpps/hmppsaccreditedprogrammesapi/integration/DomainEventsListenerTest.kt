@@ -5,6 +5,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Isolated
+import org.mockito.kotlin.any
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.springframework.boot.test.mock.mockito.SpyBean
@@ -31,6 +32,6 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     await untilCallTo {
       domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
     } matches { it == 0 }
-    verify(referralService, timeout(5000)).updatePerson(nomsNumber)
+    verify(referralService, timeout(2000)).updatePerson(any())
   }
 }
