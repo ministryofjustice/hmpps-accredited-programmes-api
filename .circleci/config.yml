@@ -19,8 +19,8 @@ jobs:
       jdk_tag: "21.0"
       localstack_tag: "3"
     environment:
-      _JAVA_OPTIONS: "-Xmx5g"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=-Xmx5g "
+      _JAVA_OPTIONS: "-Xmx4g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=-Xmx4g "
     steps:
       - checkout
       - restore_cache:
@@ -32,7 +32,7 @@ jobs:
             PACT_PROVIDER_VERSION="$CIRCLE_SHA1" \
             PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
             PACT_PUBLISH_RESULTS="true" \
-            ./gradlew check --no-daemon
+            ./gradlew check --no-daemon --stacktrace
       - save_cache:
           paths:
             - ~/.gradle
