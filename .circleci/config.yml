@@ -20,7 +20,7 @@ jobs:
       localstack_tag: "3"
     environment:
       _JAVA_OPTIONS: "-Xmx3g"
-      GRADLE_OPTS: "-Xmx2048m -Dorg.gradle.daemon=false"
+      GRADLE_OPTS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -Dorg.gradle.daemon=false"
     steps:
       - checkout
       - hmpps/install_aws_cli
