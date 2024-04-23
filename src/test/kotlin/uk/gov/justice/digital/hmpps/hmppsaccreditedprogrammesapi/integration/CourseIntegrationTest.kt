@@ -80,7 +80,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectStatus().isUnauthorized
   }
 
-
   @Test
   fun `Searching for all course names with JWT returns 200 with correct body`() {
     val expectedCourseNames = courseRepository.getCourseNames(true)
@@ -96,7 +95,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     responseBodySpec.jsonPath("$").isEqualTo(expectedCourseNames)
   }
-
 
   @Test
   fun `Searching for all active course names with JWT returns 200 with correct body`() {
@@ -199,7 +197,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .jsonPath("$.contactEmail").isNotEmpty
   }
 
-
 //  @Test
   fun `Uploading valid course records in CSV format will process and persist them`() {
     val emptyCourseRecords = generateCourseRecords(0)
@@ -239,7 +236,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
     finalCourses shouldHaveSize updatedCourseRecords.size
   }
 
-
 //  @Test
   fun `Valid course records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
@@ -274,7 +270,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
     uploadedCourses shouldContainExactlyInAnyOrder reuploadedCourses
   }
 
-
 //  @Test
   fun `Uploading valid prerequisite records in CSV format will process and persist them`() {
     val courseRecordsToUpload = generateCourseRecords(3)
@@ -285,7 +280,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     getAllCourses().flatMap { it.coursePrerequisites } shouldHaveSize prerequisiteRecordsToUpload.size
   }
-
 
 //  @Test
   fun `Valid prerequisite records in CSV format maintain their internal consistency between uploads`() {
@@ -319,7 +313,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     coursesWithUpdatedPrerequisites shouldContainExactlyInAnyOrder uploadedCourses
   }
-
 
 //  @Test
   fun `Uploading valid offering records in CSV format will process and persist them`() {
@@ -360,7 +353,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     reuploadedOfferingsIds shouldContainExactly uploadedOfferingsIds
   }
-
 
 //  @Test
   fun `Valid offering records in CSV format maintain their internal consistency between uploads`() {
