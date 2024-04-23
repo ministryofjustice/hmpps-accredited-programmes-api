@@ -81,7 +81,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectStatus().isUnauthorized
   }
 
-  @DirtiesContext
+//  @DirtiesContext
   @Test
   fun `Searching for all course names with JWT returns 200 with correct body`() {
     val expectedCourseNames = courseRepository.getCourseNames(true)
@@ -98,7 +98,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     responseBodySpec.jsonPath("$").isEqualTo(expectedCourseNames)
   }
 
-  @DirtiesContext
+//  @DirtiesContext
   @Test
   fun `Searching for all active course names with JWT returns 200 with correct body`() {
     val expectedCourseNames = courseRepository.getCourseNames(false)
