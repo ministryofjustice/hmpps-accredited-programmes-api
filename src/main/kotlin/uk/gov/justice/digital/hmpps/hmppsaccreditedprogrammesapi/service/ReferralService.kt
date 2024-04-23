@@ -351,6 +351,7 @@ constructor(
   fun validateStatusTransition(referralId: UUID, currentStatus: String, newStatus: String, ptUser: Boolean) {
     val validTransitions = referralReferenceDataService.getNextStatusTransitions(currentStatus, ptUser)
     if (validTransitions.none { it.code == newStatus }) {
+      log.error("Cannot transition referral $referralId from $currentStatus to $newStatus")
       throw BusinessException("Cannot transition referral $referralId from $currentStatus to $newStatus")
     }
   }
