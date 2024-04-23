@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
+import org.springframework.boot.test.mock.mockito.MockReset
 import org.springframework.boot.test.mock.mockito.SpyBean
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
@@ -17,7 +17,7 @@ import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 @ActiveProfiles(profiles = ["test", "domain-events"])
 class DomainEventsListenerTest : IntegrationTestBase() {
 
-  @SpyBean
+  @SpyBean(reset = MockReset.BEFORE)
   lateinit var referralService: ReferralService
 
   @Test
