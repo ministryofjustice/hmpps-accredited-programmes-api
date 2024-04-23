@@ -4,16 +4,16 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.parallel.Isolated
 import org.mockito.kotlin.any
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.springframework.boot.test.mock.mockito.SpyBean
+import org.springframework.test.annotation.DirtiesContext
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 
-@Isolated
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 class DomainEventsListenerTest : IntegrationTestBase() {
 
   @SpyBean
