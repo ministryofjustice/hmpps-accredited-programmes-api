@@ -9,11 +9,12 @@ import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@ActiveProfiles(profiles = ["test", "domain-events"])
 class DomainEventsListenerTest : IntegrationTestBase() {
 
   @SpyBean
