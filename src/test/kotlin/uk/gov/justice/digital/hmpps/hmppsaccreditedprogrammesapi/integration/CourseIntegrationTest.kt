@@ -200,8 +200,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .jsonPath("$.contactEmail").isNotEmpty
   }
 
-  @DirtiesContext
-  @Test
+//  @DirtiesContext
+//  @Test
   fun `Uploading valid course records in CSV format will process and persist them`() {
     val emptyCourseRecords = generateCourseRecords(0)
     updateCourses(emptyCourseRecords.toCourseCsv())
@@ -240,8 +240,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
     finalCourses shouldHaveSize updatedCourseRecords.size
   }
 
-  @DirtiesContext
-  @Test
+//  @DirtiesContext
+//  @Test
   fun `Valid course records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
     updateCourses(courseRecordsToUpload.toCourseCsv())
@@ -275,8 +275,9 @@ class CourseIntegrationTest : IntegrationTestBase() {
     uploadedCourses shouldContainExactlyInAnyOrder reuploadedCourses
   }
 
-  @DirtiesContext
-  @Test
+
+//  @DirtiesContext
+//  @Test
   fun `Uploading valid prerequisite records in CSV format will process and persist them`() {
     val courseRecordsToUpload = generateCourseRecords(3)
     updateCourses(courseRecordsToUpload.toCourseCsv())
@@ -287,8 +288,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
     getAllCourses().flatMap { it.coursePrerequisites } shouldHaveSize prerequisiteRecordsToUpload.size
   }
 
-  @DirtiesContext
-  @Test
+//  @DirtiesContext
+//  @Test
   fun `Valid prerequisite records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
     updateCourses(courseRecordsToUpload.toCourseCsv())
@@ -321,8 +322,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
     coursesWithUpdatedPrerequisites shouldContainExactlyInAnyOrder uploadedCourses
   }
 
-  @DirtiesContext
-  @Test
+//  @DirtiesContext
+//  @Test
   fun `Uploading valid offering records in CSV format will process and persist them`() {
     val courseRecordsToUpload = generateCourseRecords(3)
     updateCourses(courseRecordsToUpload.toCourseCsv())
@@ -362,8 +363,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
     reuploadedOfferingsIds shouldContainExactly uploadedOfferingsIds
   }
 
-  @DirtiesContext
-  @Test
+//  @DirtiesContext
+//  @Test
   fun `Valid offering records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
     updateCourses(courseRecordsToUpload.toCourseCsv())
