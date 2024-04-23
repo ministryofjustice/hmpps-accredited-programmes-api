@@ -275,7 +275,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
     uploadedCourses shouldContainExactlyInAnyOrder reuploadedCourses
   }
 
-
 //  @DirtiesContext
 //  @Test
   fun `Uploading valid prerequisite records in CSV format will process and persist them`() {
