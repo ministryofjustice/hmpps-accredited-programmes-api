@@ -70,7 +70,7 @@ testing {
         all {
           testTask.configure {
             testLogging.showStandardStreams = true
-            maxParallelForks = 1
+            maxParallelForks = maxOf(1, Runtime.getRuntime().availableProcessors() - 1)
             environment["pact_do_not_track"] = "true"
             environment["pact.provider.tag"] = environment["PACT_PROVIDER_TAG"]
             environment["pact.provider.version"] = environment["PACT_PROVIDER_VERSION"]

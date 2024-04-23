@@ -21,7 +21,7 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = ["test", "domain-events"])
+@ActiveProfiles("test")
 @Order(1)
 class DomainEventsListenerTest {
 
