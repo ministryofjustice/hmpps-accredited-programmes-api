@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.5"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
   `jvm-test-suite`
   kotlin("plugin.spring") version "1.9.23"
   kotlin("plugin.jpa") version "1.9.23"
-  id("org.openapi.generator") version "7.4.0"
+  id("org.openapi.generator") version "7.5.0"
 }
 
 configurations {
@@ -36,7 +36,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:3.1.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:3.1.3")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
   testImplementation("com.h2database:h2")
@@ -45,7 +45,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.8")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.9")
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
