@@ -49,6 +49,7 @@ dependencies {
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
+  testImplementation("org.awaitility:awaitility-kotlin")
 }
 
 java {
@@ -56,7 +57,7 @@ java {
 }
 
 kotlin {
-  kotlinDaemonJvmArgs = listOf("-Xmx1024m")
+  kotlinDaemonJvmArgs = listOf("-Xmx3g")
   jvmToolchain(21)
 }
 
