@@ -2,12 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.matches
-import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,10 +19,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.SQSMes
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
-import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = ["test", "domain-events"])
+@Order(1)
 class DomainEventsListenerTest {
 
   @SpyBean
@@ -72,9 +69,6 @@ class DomainEventsListenerTest {
         additionalInformation = mapOf("nomsNumber" to nomsNumber),
       ),
     )
-    await untilCallTo {
-      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
-    } matches { it == 0 }
-    verify(referralService, timeout(2000)).updatePerson(any())
+    verify(referralService, timeout(2000)).updatePerson(nomsNumber)
   }
 }
