@@ -3,15 +3,20 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
-import org.junit.jupiter.api.parallel.Isolated
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
+import org.springframework.boot.test.mock.mockito.SpyBean
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 
-@Isolated
 class DomainEventsListenerTest : IntegrationTestBase() {
-//  @Test
+
+  @SpyBean
+  lateinit var referralService: ReferralService
+
+  @Test
   fun `update offender message`() {
     val eventType = "prisoner-offender-search.prisoner.updated"
     val nomsNumber = "N321321"
@@ -24,6 +29,6 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     await untilCallTo {
       domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
     } matches { it == 0 }
-    verify(referralService, timeout(20000)).updatePerson(nomsNumber)
+    verify(referralService, timeout(5000)).updatePerson(nomsNumber)
   }
 }

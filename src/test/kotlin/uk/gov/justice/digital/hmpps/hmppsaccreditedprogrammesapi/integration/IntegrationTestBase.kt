@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -22,6 +21,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.TestPropertiesInitializer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
@@ -29,7 +29,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.PersistenceHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.SQSMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.nio.channels.FileChannel
@@ -83,9 +82,6 @@ object WiremockPortHolder {
 @Tag("integration")
 @ContextConfiguration(initializers = [TestPropertiesInitializer::class])
 abstract class IntegrationTestBase {
-
-  @SpyBean
-  lateinit var referralService: ReferralService
 
   @Autowired
   lateinit var webTestClient: WebTestClient
@@ -209,7 +205,7 @@ abstract class IntegrationTestBase {
   fun sendDomainEvent(
     message: DomainEventsMessage,
     queueUrl: String = domainEventQueue.queueUrl,
-  ) = domainEventQueueClient.sendMessage(
+  ): SendMessageResponse = domainEventQueueClient.sendMessage(
     SendMessageRequest.builder()
       .queueUrl(queueUrl)
       .messageBody(
