@@ -80,7 +80,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectStatus().isUnauthorized
   }
 
-//  @DirtiesContext
+
   @Test
   fun `Searching for all course names with JWT returns 200 with correct body`() {
     val expectedCourseNames = courseRepository.getCourseNames(true)
@@ -97,7 +97,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     responseBodySpec.jsonPath("$").isEqualTo(expectedCourseNames)
   }
 
-//  @DirtiesContext
+
   @Test
   fun `Searching for all active course names with JWT returns 200 with correct body`() {
     val expectedCourseNames = courseRepository.getCourseNames(false)
@@ -199,7 +199,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .jsonPath("$.contactEmail").isNotEmpty
   }
 
-//  @DirtiesContext
+
 //  @Test
   fun `Uploading valid course records in CSV format will process and persist them`() {
     val emptyCourseRecords = generateCourseRecords(0)
@@ -239,7 +239,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     finalCourses shouldHaveSize updatedCourseRecords.size
   }
 
-//  @DirtiesContext
+
 //  @Test
   fun `Valid course records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
@@ -274,7 +274,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     uploadedCourses shouldContainExactlyInAnyOrder reuploadedCourses
   }
 
-//  @DirtiesContext
+
 //  @Test
   fun `Uploading valid prerequisite records in CSV format will process and persist them`() {
     val courseRecordsToUpload = generateCourseRecords(3)
@@ -286,7 +286,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     getAllCourses().flatMap { it.coursePrerequisites } shouldHaveSize prerequisiteRecordsToUpload.size
   }
 
-//  @DirtiesContext
+
 //  @Test
   fun `Valid prerequisite records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
@@ -320,7 +320,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     coursesWithUpdatedPrerequisites shouldContainExactlyInAnyOrder uploadedCourses
   }
 
-//  @DirtiesContext
+
 //  @Test
   fun `Uploading valid offering records in CSV format will process and persist them`() {
     val courseRecordsToUpload = generateCourseRecords(3)
@@ -361,7 +361,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     reuploadedOfferingsIds shouldContainExactly uploadedOfferingsIds
   }
 
-//  @DirtiesContext
+
 //  @Test
   fun `Valid offering records in CSV format maintain their internal consistency between uploads`() {
     val courseRecordsToUpload = generateCourseRecords(3)
