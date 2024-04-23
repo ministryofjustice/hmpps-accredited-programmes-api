@@ -92,9 +92,6 @@ abstract class IntegrationTestBase {
   lateinit var wiremockServer: WireMockServer
 
   @Autowired
-  protected lateinit var hmppsQueueService: HmppsQueueService
-
-  @Autowired
   lateinit var persistenceHelper: PersistenceHelper
 
   @Value("\${wiremock.port}")
@@ -103,13 +100,6 @@ abstract class IntegrationTestBase {
   val objectMapper = jacksonObjectMapper().apply {
     registerModule(JavaTimeModule())
   }
-
-  protected val domainEventQueue by lazy {
-    hmppsQueueService.findByQueueId("hmppsdomaineventsqueue")
-      ?: throw MissingQueueException("HmppsQueue hmppsdomaineventsqueue not found")
-  }
-  protected val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
-  protected val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
 
   @BeforeEach
   fun beforeEach() {
@@ -124,10 +114,6 @@ abstract class IntegrationTestBase {
         .maxLoggedResponseSize(100_000),
     )
     wiremockServer.start()
-
-    domainEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.queueUrl).build()).get()
-    domainEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.dlqUrl).build())
-      .get()
   }
 
   @AfterEach
@@ -201,15 +187,4 @@ abstract class IntegrationTestBase {
       .expectStatus().isOk
       .expectBody<List<CourseOffering>>()
       .returnResult().responseBody!!
-
-  fun sendDomainEvent(
-    message: DomainEventsMessage,
-    queueUrl: String = domainEventQueue.queueUrl,
-  ): SendMessageResponse = domainEventQueueClient.sendMessage(
-    SendMessageRequest.builder()
-      .queueUrl(queueUrl)
-      .messageBody(
-        objectMapper.writeValueAsString(SQSMessage(objectMapper.writeValueAsString(message))),
-      ).build(),
-  ).get()
 }
