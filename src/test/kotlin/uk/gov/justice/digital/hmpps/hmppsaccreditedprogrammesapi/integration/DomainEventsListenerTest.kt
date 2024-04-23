@@ -17,7 +17,7 @@ import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 @ActiveProfiles(profiles = ["test", "domain-events"])
 class DomainEventsListenerTest : IntegrationTestBase() {
 
-  @SpyBean(reset = MockReset.BEFORE)
+  @SpyBean
   lateinit var referralService: ReferralService
 
   @Test
