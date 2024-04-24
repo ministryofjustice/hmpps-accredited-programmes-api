@@ -45,6 +45,7 @@ class AuditService(
         courseName = courseName,
         courseLocation = courseLocation,
         auditAction = auditAction,
+        auditUsername = SecurityContextHolder.getContext().authentication?.name ?: "UNKNOWN_USER",
       ),
     ).id ?: { log.error("Failure to create internal audit record for $prisonNumber auditAction $auditAction") }
   }
@@ -82,7 +83,6 @@ class AuditService(
     subjectType: String? = "PRISON_NUMBER",
     referralId: String? = "",
   ) {
-    log.debug("Audit service injected : ${hmppsAuditService != null} ")
     hmppsAuditService?.run {
       log.debug("Writing audit message for $prisonNumber ")
       scope.launch {
