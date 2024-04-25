@@ -25,6 +25,19 @@
         },
         "bodyFileName": "sentence-info.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/api/offenders/C6666DD/booking/latest/sentence-summary",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "sentence-info.json"
+      }
     }
   ]
 }
