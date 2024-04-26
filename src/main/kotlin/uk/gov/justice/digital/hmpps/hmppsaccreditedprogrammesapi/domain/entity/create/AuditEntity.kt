@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.springframework.security.core.context.SecurityContextHolder
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -27,7 +26,7 @@ class AuditEntity(
   var courseName: String? = null,
   var courseLocation: String? = null,
   var auditAction: String,
-  var auditUsername: String = SecurityContextHolder.getContext().authentication?.name ?: "UNKNOWN_USER",
+  var auditUsername: String,
   var auditDateTime: LocalDateTime = LocalDateTime.now(),
 )
 
