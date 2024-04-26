@@ -19,11 +19,14 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.TestPropertiesInitializer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.PersistenceHelper
+import uk.gov.justice.hmpps.sqs.HmppsQueueService
+import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.nio.channels.FileChannel
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
@@ -87,6 +90,16 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var persistenceHelper: PersistenceHelper
 
+  @Autowired
+  lateinit var hmppsQueueService: HmppsQueueService
+
+  val domainEventQueue by lazy {
+    hmppsQueueService.findByQueueId("hmppsdomaineventsqueue")
+      ?: throw MissingQueueException("HmppsQueue hmppsdomaineventsqueue not found")
+  }
+  val domainEventQueueDlqClient by lazy { domainEventQueue.sqsDlqClient }
+  val domainEventQueueClient by lazy { domainEventQueue.sqsClient }
+
   @Value("\${wiremock.port}")
   var wiremockPort: Int = 0
 
@@ -96,6 +109,10 @@ abstract class IntegrationTestBase {
 
   @BeforeEach
   fun beforeEach() {
+    domainEventQueueClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.queueUrl).build()).get()
+    domainEventQueueDlqClient!!.purgeQueue(PurgeQueueRequest.builder().queueUrl(domainEventQueue.dlqUrl).build())
+      .get()
+
     webTestClient.mutate()
       .responseTimeout(Duration.ofMillis(30000))
       .build()
