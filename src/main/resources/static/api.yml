@@ -1541,6 +1541,9 @@ components:
         alternateName:
           type: string
           example: 'BNM+'
+        displayName:
+          type: string
+          example: 'Becoming New Me Plus: general violence offence (BNM+)'
         coursePrerequisites:
           type: array
           items:
