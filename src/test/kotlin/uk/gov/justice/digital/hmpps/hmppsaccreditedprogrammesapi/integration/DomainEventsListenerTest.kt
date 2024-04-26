@@ -108,6 +108,9 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     createReferral(offering.id, nomsNumber)
 
     val referralViewBefore = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    referralViewBefore shouldNotBe null
+    referralViewBefore?.forename?.shouldBeEqual("JOHN")
+    referralViewBefore?.surname?.shouldBeEqual("SMITH")
 
     val results = ResourceLoader.file<List<Prisoner>>("prison-search-results")
     val result = results[0]
@@ -129,21 +132,20 @@ class DomainEventsListenerTest : IntegrationTestBase() {
         additionalInformation = mapOf("nomsNumber" to nomsNumber),
       ),
     )
+    // wait until the message is processed
     await untilCallTo {
       domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
     } matches { it == 0 }
 
-    val referralViewAfter = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    await untilCallTo {
+      referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    } matches { it?.surname == "changed" }
 
-    referralViewBefore shouldNotBe null
-    referralViewBefore?.forename?.shouldBeEqual("JOHN")
-    referralViewBefore?.surname?.shouldBeEqual("SMITH")
+    val referralViewAfter = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
 
     referralViewAfter shouldNotBe null
     referralViewAfter?.forename?.shouldBeEqual("name")
     referralViewAfter?.surname?.shouldBeEqual("changed")
-
-//    verify(referralService, timeout(2000)).updatePerson(nomsNumber)
   }
 
   fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =
