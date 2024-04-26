@@ -69,7 +69,8 @@ testing {
       targets {
         all {
           testTask.configure {
-            testLogging.showStandardStreams = true
+            // Uncomment this next line if you need to debug tests in CI
+            // testLogging.showStandardStreams = true
             maxParallelForks = maxOf(1, Runtime.getRuntime().availableProcessors() - 1)
             environment["pact_do_not_track"] = "true"
             environment["pact.provider.tag"] = environment["PACT_PROVIDER_TAG"]
