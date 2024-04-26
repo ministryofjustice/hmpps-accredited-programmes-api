@@ -26,7 +26,7 @@ fun CourseEntity.toApi(): Course = Course(
 
 fun addAlternateName(alternateName: String?): String {
   return if (alternateName != null) {
-    "($alternateName)"
+    " ($alternateName)"
   } else {
     ""
   }
@@ -35,7 +35,7 @@ fun addAlternateName(alternateName: String?): String {
 fun addAudience(name: String, audience: String): String {
   val courseNamesWithAudience = listOf("Kaizen", "New Me Strengths", "Becoming New Me Plus")
   return if (name in courseNamesWithAudience) {
-    ": ${audience.lowercase()} "
+    ": ${audience.lowercase()}"
   } else {
     ""
   }
