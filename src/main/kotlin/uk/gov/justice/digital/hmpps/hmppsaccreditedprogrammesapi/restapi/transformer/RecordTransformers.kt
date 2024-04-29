@@ -21,8 +21,16 @@ fun CourseEntity.toApi(): Course = Course(
   coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
   audience = audience,
   audienceColour = audienceColour,
-  displayName = name + addAudience(name, audience),
+  displayName = name + addAudience(name, audience) + addAlternateName(alternateName),
 )
+
+fun addAlternateName(alternateName: String?): String {
+  return if (alternateName != null) {
+    " ($alternateName)"
+  } else {
+    ""
+  }
+}
 
 fun addAudience(name: String, audience: String): String {
   val courseNamesWithAudience = listOf("Kaizen", "New Me Strengths", "Becoming New Me Plus")
