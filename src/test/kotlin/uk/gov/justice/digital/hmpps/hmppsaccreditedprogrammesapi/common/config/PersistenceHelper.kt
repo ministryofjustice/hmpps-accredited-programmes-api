@@ -24,8 +24,8 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM enabled_organisation").executeUpdate()
   }
 
-  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false) {
-    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn)")
+  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue") {
+    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn, audience_colour) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn, :audienceColour)")
       .setParameter("id", courseId)
       .setParameter("identifier", identifier)
       .setParameter("name", name)
@@ -33,6 +33,7 @@ class PersistenceHelper {
       .setParameter("altName", altName)
       .setParameter("audience", audience)
       .setParameter("withdrawn", withdrawn)
+      .setParameter("audienceColour", audienceColour)
       .executeUpdate()
   }
 
