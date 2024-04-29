@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.SUBSELECT
@@ -33,6 +34,7 @@ data class CourseEntity(
   @ElementCollection(fetch = FetchType.EAGER)
   @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
+  @OrderBy("description DESC")
   val prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
