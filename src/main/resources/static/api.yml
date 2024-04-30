@@ -1992,6 +1992,9 @@ components:
         sentenceType:
           type: string
           description: Sentence type description or 'Multiple sentences' if there are more than one
+        listDisplayName:
+          type: string
+          description: The course display name when it is in a list.
 
     ReferralStatusHistory:
       type: object

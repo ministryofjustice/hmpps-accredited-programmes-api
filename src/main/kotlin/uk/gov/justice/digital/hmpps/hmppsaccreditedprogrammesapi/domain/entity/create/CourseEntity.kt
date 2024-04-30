@@ -45,6 +45,7 @@ data class CourseEntity(
   var audience: String,
   var audienceColour: String?,
   var withdrawn: Boolean = false,
+  val listDisplayName: String? = null,
 ) {
   fun addOffering(offering: OfferingEntity) {
     offering.course = this
