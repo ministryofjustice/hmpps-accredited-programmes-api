@@ -590,6 +590,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
           sentenceType = "CJA03 Standard Determinate Sentence",
+
         ),
       ).forEach { referralView ->
         actualSummary.id shouldBe referralView.id
@@ -603,6 +604,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         actualSummary.forename shouldBe referralView.forename
         actualSummary.surname shouldBe referralView.surname
         actualSummary.sentenceType shouldBe referralView.sentenceType
+        actualSummary.listDisplayName shouldBe referralView.courseName
       }
     }
   }
