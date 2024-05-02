@@ -1,0 +1,35 @@
+[
+  {
+    "prisonId": "MDI",
+    "prisonName": "Moorland HMP",
+    "active": true,
+    "male": true,
+    "female": true,
+    "contracted": true,
+    "types": [
+      {
+        "code": "HMP",
+        "description": "His Majesty’s Prison"
+      }
+    ],
+    "categories": [
+      "A"
+    ],
+    "addresses": [
+      {
+        "id": 10000,
+        "addressLine1": "Bawtry Road",
+        "addressLine2": "Hatfield Woodhouse",
+        "town": "Doncaster",
+        "county": "South Yorkshire",
+        "postcode": "DN7 6BW",
+        "country": "England"
+      }
+    ],
+    "operators": [
+      {
+        "name": "PSP, G4S"
+      }
+    ]
+  }
+]

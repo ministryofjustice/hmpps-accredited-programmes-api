@@ -1,0 +1,20 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/prisons/prisonsByIds",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "MDI"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-register-search-results.json"
+      }
+    }
+  ]
+}

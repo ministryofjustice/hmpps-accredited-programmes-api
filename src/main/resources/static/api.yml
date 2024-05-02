@@ -69,6 +69,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /prison-search:
+    post:
+      tags:
+        - Prison
+      summary: Search for prisons via prison register api by prison id.
+      operationId: getPrisons
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/PrisonSearchRequest'
+      responses:
+        201:
+          description: The prisoner search results.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrisonSearchResponse'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: The client is not authorized to perform this operation.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /courses:
     get:
       tags:
@@ -2406,6 +2440,57 @@ components:
         - bookingId
         - prisonerNumber
 
+    PrisonSearchRequest:
+      type: object
+      properties:
+        prisonIds:
+          type: array
+          description: List of Prisons
+          example:
+            - MDI
+          items:
+            type: string
+            description: List of Prison Ids
+            example: '["MDI"]'
+      required:
+        - prisonIds
+
+    PrisonSearchResponse:
+      type: object
+      properties:
+        prisonId:
+          type: string
+        prisonName:
+          type: string
+        active:
+          type: boolean
+        male:
+          type: boolean
+        female:
+          type: boolean
+        contracted:
+          type: boolean
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrisonType'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        operators:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrisonOperator'
+
+      required:
+        - bookingId
+        - prisonerNumber
+
     ConfirmationFields:
       type: object
       properties:
@@ -2427,11 +2512,6 @@ components:
         hasConfirmation:
           type: boolean
           default: false
-
-
-
-
-
 
     ReferralStatusRefData:
       type: object
@@ -2552,3 +2632,63 @@ components:
         date:
           type: string
           format: date
+
+    PrisonType:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "YOI"
+        description:
+          type: string
+          example: "His Majesty’s Youth Offender Institution"
+      required:
+        - code
+        - description
+
+    Category:
+      type: object
+      properties:
+        category:
+          type: string
+          example: "E"
+      required:
+        - category
+
+    PrisonOperator:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "PSP, G4S"
+      required:
+        - name
+
+    Address:
+      type: object
+      properties:
+        id:
+          type: long
+          example: 1
+        addressLine1:
+          type: string
+          example: "Higher Lane"
+        addressLine2:
+          type: string
+        town:
+          type: string
+          example: "Liverpool"
+        county:
+          type: string
+          example: "Merseyside"
+        postcode:
+          type: string
+          example: "L9 7LH"
+        country:
+          type: string
+          example: "England"
+      required:
+        - addressLine1
+        - town
+        - postcode
+        - country

@@ -3,46 +3,47 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.contro
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.PrisonerSearchApiDelegate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonerSearchRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonerSearchResponse
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.PrisonSearchApiDelegate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Address
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Category
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonOperator
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonSearchRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 
 @Service
 class PrisonSearchController
 @Autowired
 constructor(
-  private val prisonerSearchApiService: PrisonerSearchApiService,
-  private val auditService: AuditService,
-) : PrisonerSearchApiDelegate {
-  override fun searchPrisoner(prisonerSearchRequest: PrisonerSearchRequest): ResponseEntity<List<PrisonerSearchResponse>> {
-    auditService.audit(
-      prisonNumber = prisonerSearchRequest.prisonerIdentifier,
-      auditAction = AuditAction.NOMIS_SEARCH_FOR_PERSON.name,
-    )
+  private val prisonRegisterApiService: PrisonRegisterApiService,
+) : PrisonSearchApiDelegate {
 
+  override fun getPrisons(prisonSearchRequest: PrisonSearchRequest): ResponseEntity<List<PrisonSearchResponse>> {
     return ResponseEntity.ok(
-      prisonerSearchApiService.searchPrisoners(prisonerSearchRequest)
-        .map {
-          PrisonerSearchResponse(
-            bookingId = it.bookingId,
-            conditionalReleaseDate = it.conditionalReleaseDate,
-            prisonName = it.prisonName,
-            dateOfBirth = it.dateOfBirth,
-            ethnicity = it.ethnicity,
-            gender = it.gender,
-            homeDetentionCurfewEligibilityDate = it.homeDetentionCurfewEligibilityDate,
-            indeterminateSentence = it.indeterminateSentence,
-            firstName = it.firstName,
-            lastName = it.lastName,
-            paroleEligibilityDate = it.paroleEligibilityDate,
-            prisonerNumber = it.prisonerNumber,
-            religion = it.religion,
-            sentenceExpiryDate = it.sentenceExpiryDate,
-            sentenceStartDate = it.sentenceStartDate,
-            tariffDate = it.tariffDate,
+      prisonRegisterApiService.getPrisons(prisonSearchRequest.prisonIds)
+        .map { prison ->
+          PrisonSearchResponse(
+            prisonId = prison.prisonId,
+            prisonName = prison.prisonName,
+            active = prison.active,
+            male = prison.male,
+            female = prison.female,
+            contracted = prison.contracted,
+            types = prison.types.map { PrisonType(it.code, it.description) },
+            categories = prison.categories.map { Category(it) },
+            addresses = prison.addresses.map {
+              Address(
+                id = it.id,
+                addressLine1 = it.addressLine1,
+                addressLine2 = it.addressLine2,
+                county = it.county,
+                town = it.town,
+                postcode = it.postcode,
+                country = it.country,
+              )
+            },
+            operators = prison.operators.map { PrisonOperator(name = it.name) },
           )
         },
     )
