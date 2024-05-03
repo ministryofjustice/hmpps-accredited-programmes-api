@@ -13,7 +13,20 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "bodyFileName": "prison-register-search-results.json"
+        "bodyFileName": "prison-register-search-prisonByIds-results.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/prisons/id/MDI",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-register-search-prisonById-results.json"
       }
     }
   ]

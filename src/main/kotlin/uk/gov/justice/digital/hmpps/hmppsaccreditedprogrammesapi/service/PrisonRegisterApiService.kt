@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.Authoris
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @Service
@@ -22,8 +21,8 @@ constructor(
     private val log = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getPrisonById(prisonId: String): PrisonDetails? {
-    val prisonDetailsResult = when (val response = prisonRegisterApiClient.getPrisonDetailsByPrisonId(prisonId)) {
+  fun getPrisonById(prisonId: String): Prison? {
+    val prisonDetailsResult = when (val response = prisonRegisterApiClient.getPrison(prisonId)) {
       is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
       is ClientResult.Failure.StatusCode -> {
         log.warn("Failure to retrieve data. Status code ${response.status} reason ${response.toException().message}")

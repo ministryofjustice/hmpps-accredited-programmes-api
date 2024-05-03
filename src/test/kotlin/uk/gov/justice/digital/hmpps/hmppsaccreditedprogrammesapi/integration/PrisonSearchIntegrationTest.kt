@@ -23,7 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 class PrisonSearchIntegrationTest : IntegrationTestBase() {
 
   @Test
-  fun `search for a prisoner by prisonId`() {
+  fun `search for prisons by prisonIds`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val prisonerSearchRequest = PrisonSearchRequest(listOf("MDI"))
@@ -54,6 +54,37 @@ class PrisonSearchIntegrationTest : IntegrationTestBase() {
     )
   }
 
+  @Test
+  fun `search for a prison by prisonId`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val response = getPrison("MDI")
+
+    response.shouldNotBeNull()
+    response shouldBeEqual PrisonSearchResponse(
+      prisonId = "MDI",
+      prisonName = "Moorland (HMP & YOI)",
+      active = true,
+      male = true,
+      female = false,
+      contracted = false,
+      types = listOf(PrisonType(code = "HMP", description = "His Majesty’s Prison")),
+      categories = listOf(Category(category = "A")),
+      addresses = listOf(
+        Address(
+          addressLine1 = "Bawtry Road",
+          town = "Doncaster",
+          postcode = "DN7 6BW",
+          country = "England",
+          id = 77,
+          addressLine2 = "Hatfield Woodhouse",
+          county = "South Yorkshire",
+        ),
+      ),
+      operators = listOf(PrisonOperator(name = "PSP")),
+    )
+  }
+
   fun searchPrisons(prisonSearchRequest: PrisonSearchRequest) =
     webTestClient
       .post()
@@ -64,5 +95,16 @@ class PrisonSearchIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<List<PrisonSearchResponse>>()
+      .returnResult().responseBody!!
+
+  private fun getPrison(prisonNumber: String): PrisonSearchResponse =
+    webTestClient
+      .get()
+      .uri("/prison-search/$prisonNumber")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<PrisonSearchResponse>()
       .returnResult().responseBody!!
 }

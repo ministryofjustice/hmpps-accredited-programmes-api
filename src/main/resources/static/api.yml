@@ -103,6 +103,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+
+  /prison-search/{prisonId}:
+    get:
+      tags:
+        - Prison
+      summary: Details for a single prison
+      operationId: getPrisonById
+      parameters:
+        - name: prisonId
+          in: path
+          description: A prison identifier
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{3,6}$'
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/PrisonSearchResponse'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: The client is not authorized to perform this operation.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /courses:
     get:
       tags:
