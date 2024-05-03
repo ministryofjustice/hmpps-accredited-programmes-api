@@ -21,7 +21,7 @@ constructor(
     ResponseEntity
       .ok(
         courseService
-          .getAllOfferingsByOrganisationId(organisationId)
+          .getAllOfferingsByOrganisationId(organisationId).filter { !it.withdrawn }
           .map { it.course }
           .map { it.toApi() },
       )
