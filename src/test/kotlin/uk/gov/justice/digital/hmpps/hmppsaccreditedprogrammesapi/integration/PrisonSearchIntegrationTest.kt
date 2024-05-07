@@ -2,72 +2,109 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonerSearchRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonerSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Address
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Category
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonOperator
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonSearchRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
-import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class PrisonSearchIntegrationTest : IntegrationTestBase() {
 
-  @Autowired
-  lateinit var auditRepository: AuditRepository
-
   @Test
-  fun `search for a prisoner by prisonId`() {
+  fun `search for prisons by prisonIds`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
-    val prisonerSearchRequest = PrisonerSearchRequest("C6666DD", listOf("MDI"))
-    val response = searchPrisoners(prisonerSearchRequest)
+    val prisonerSearchRequest = PrisonSearchRequest(listOf("MDI"))
+    val response = searchPrisons(prisonerSearchRequest)
 
     response.shouldNotBeNull()
-    response.first() shouldBeEqual PrisonerSearchResponse(
-      bookingId = "1202335",
-      conditionalReleaseDate = null,
-      prisonName = "Nottingham (HMP)",
-      dateOfBirth = LocalDate.of(1975, 1, 1),
-      ethnicity = "White: Eng./Welsh/Scot./N.Irish/British",
-      gender = "Male",
-      homeDetentionCurfewEligibilityDate = null,
-      indeterminateSentence = false,
-      firstName = "MICKEY",
-      lastName = "SMITH",
-      paroleEligibilityDate = null,
-      prisonerNumber = "C6666DD",
-      religion = null,
-      sentenceExpiryDate = null,
-      sentenceStartDate = null,
-      tariffDate = null,
+    response.first() shouldBeEqual PrisonSearchResponse(
+      prisonId = "MDI",
+      prisonName = "Moorland HMP",
+      active = true,
+      male = true,
+      female = true,
+      contracted = true,
+      types = listOf(PrisonType(code = "HMP", description = "His Majesty’s Prison")),
+      categories = listOf(Category(category = "A")),
+      addresses = listOf(
+        Address(
+          addressLine1 = "Bawtry Road",
+          town = "Doncaster",
+          postcode = "DN7 6BW",
+          country = "England",
+          id = 10000,
+          addressLine2 = "Hatfield Woodhouse",
+          county = "South Yorkshire",
+        ),
+      ),
+      operators = listOf(PrisonOperator(name = "PSP, G4S")),
     )
-
-    val auditEntity = auditRepository.findAll()
-      .firstOrNull { it.prisonNumber == "C6666DD" && it.auditAction == AuditAction.NOMIS_SEARCH_FOR_PERSON.name }
-
-    auditEntity shouldNotBe null
   }
 
-  fun searchPrisoners(prisonerSearchRequest: PrisonerSearchRequest) =
+  @Test
+  fun `search for a prison by prisonId`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val response = getPrison("MDI")
+
+    response.shouldNotBeNull()
+    response shouldBeEqual PrisonSearchResponse(
+      prisonId = "MDI",
+      prisonName = "Moorland (HMP & YOI)",
+      active = true,
+      male = true,
+      female = false,
+      contracted = false,
+      types = listOf(PrisonType(code = "HMP", description = "His Majesty’s Prison")),
+      categories = listOf(Category(category = "A")),
+      addresses = listOf(
+        Address(
+          addressLine1 = "Bawtry Road",
+          town = "Doncaster",
+          postcode = "DN7 6BW",
+          country = "England",
+          id = 77,
+          addressLine2 = "Hatfield Woodhouse",
+          county = "South Yorkshire",
+        ),
+      ),
+      operators = listOf(PrisonOperator(name = "PSP")),
+    )
+  }
+
+  fun searchPrisons(prisonSearchRequest: PrisonSearchRequest) =
     webTestClient
       .post()
-      .uri("/prisoner-search")
+      .uri("/prison-search")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(prisonerSearchRequest)
+      .bodyValue(prisonSearchRequest)
       .exchange()
       .expectStatus().isOk
-      .expectBody<List<PrisonerSearchResponse>>()
+      .expectBody<List<PrisonSearchResponse>>()
+      .returnResult().responseBody!!
+
+  private fun getPrison(prisonNumber: String): PrisonSearchResponse =
+    webTestClient
+      .get()
+      .uri("/prison-search/$prisonNumber")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<PrisonSearchResponse>()
       .returnResult().responseBody!!
 }
