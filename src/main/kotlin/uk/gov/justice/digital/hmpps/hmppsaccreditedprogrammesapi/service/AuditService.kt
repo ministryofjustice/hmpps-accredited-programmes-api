@@ -51,6 +51,20 @@ class AuditService(
   }
 
   fun audit(prisonNumber: String, auditAction: String) {
+    log.debug("******************************************************************************************************************")
+    log.debug(" SecurityContextHolder.getContext().authentication?.name ${SecurityContextHolder.getContext().authentication?.name}")
+    log.debug("-----------------------------------------")
+    log.debug(" SecurityContextHolder.getContext().authentication?.authorities ${SecurityContextHolder.getContext().authentication.authorities}")
+    log.debug("-----------------------------------------")
+    log.debug(" SecurityContextHolder.getContext().authentication?.details ${SecurityContextHolder.getContext().authentication.details}")
+    log.debug("-----------------------------------------")
+    log.debug(" SecurityContextHolder.getContext().authentication?.principal ${SecurityContextHolder.getContext().authentication.principal}")
+    log.debug("-----------------------------------------")
+    log.debug(" SecurityContextHolder.getContext().authentication?.credentials ${SecurityContextHolder.getContext().authentication.credentials}")
+    log.debug("-----------------------------------------")
+    log.debug(" SecurityContextHolder.getContext().authentication?.isAuthenticated ${SecurityContextHolder.getContext().authentication.isAuthenticated}")
+    log.debug("******************************************************************************************************************")
+
     log.debug("AUDIT - Request received to perform $auditAction for prisonNumber $prisonNumber from ${getCurrentUser()}")
     createInternalAuditRecord(prisonNumber = prisonNumber, auditAction = auditAction)
     publishAuditEvent(prisonNumber = prisonNumber, auditAction = auditAction)

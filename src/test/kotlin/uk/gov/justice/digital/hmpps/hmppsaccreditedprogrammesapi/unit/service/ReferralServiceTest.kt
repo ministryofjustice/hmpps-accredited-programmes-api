@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonDetails
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
@@ -201,7 +201,18 @@ class ReferralServiceTest {
 
     every { organisationRepository.findOrganisationEntityByCode(prisonCode) } returns null
 
-    val prisonDetail = PrisonDetails(prisonCode, prisonName)
+    val prisonDetail = Prison(
+      prisonId = prisonCode,
+      prisonName = prisonName,
+      active = false,
+      male = false,
+      female = true,
+      contracted = true,
+      types = emptyList(),
+      categories = emptySet(),
+      addresses = emptyList(),
+      operators = emptyList(),
+    )
     every { prisonRegisterApiService.getPrisonById(prisonCode) } returns prisonDetail
 
     every { organisationRepository.save(any()) } returns OrganisationEntityFactory().produce()
