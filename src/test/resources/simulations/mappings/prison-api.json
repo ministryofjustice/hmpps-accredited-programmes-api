@@ -38,6 +38,32 @@
         },
         "bodyFileName": "sentence-info.json"
       }
+    },
+    {
+      "request": {
+        "url": "/api/users/me/caseloads?allCaseloads=false",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "caseloads_allCaseloads_false.json"
+      }
+    },
+    {
+      "request": {
+        "url": "/api/users/me/caseloads?allCaseloads=true",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "caseloads_allCaseloads_true.json"
+      }
     }
   ]
 }
