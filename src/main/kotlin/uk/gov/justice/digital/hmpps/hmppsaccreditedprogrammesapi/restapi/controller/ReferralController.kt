@@ -184,7 +184,7 @@ constructor(
         statuses.first { it.code == "DESELECTED" }
           .copy(
             description = "Deselect and keep referral open",
-            hintText = "This person cannot continue the programme now but may be able to in the future.",
+            hintText = "This person cannot continue the programme now but may be able to in future.",
             deselectAndKeepOpen = true,
           ),
       )
