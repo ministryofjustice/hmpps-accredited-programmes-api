@@ -129,8 +129,8 @@ fun risks(
   rsrScore = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore,
   rsrRisk = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.scoreLevel?.fixCase(),
 
-  ospcScore = oasysOffendingInfo?.ospCRisk,
-  ospiScore = oasysOffendingInfo?.ospIRisk,
+  ospcScore = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
+  ospiScore = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
 
   riskPrisonersCustody = oasysRoshSummary?.riskPrisonersCustody,
   riskStaffCustody = oasysRoshSummary?.riskStaffCustody,
