@@ -6,5 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 data class OasysOffendingInfo(
   val ospCRisk: String?,
   val ospIRisk: String?,
+  val ospIICRisk: String?,
+  val ospDCRisk: String?,
   val crn: String?,
 )

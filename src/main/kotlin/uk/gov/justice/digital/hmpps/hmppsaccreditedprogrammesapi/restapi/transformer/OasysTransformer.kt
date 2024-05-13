@@ -129,8 +129,8 @@ fun risks(
   rsrScore = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore,
   rsrRisk = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.scoreLevel?.fixCase(),
 
-  ospcScore = oasysOffendingInfo?.ospCRisk,
-  ospiScore = oasysOffendingInfo?.ospIRisk,
+  ospcScore = populateOSPCScore(oasysOffendingInfo),
+  ospiScore = populateOSPIScore(oasysOffendingInfo),
 
   riskPrisonersCustody = oasysRoshSummary?.riskPrisonersCustody,
   riskStaffCustody = oasysRoshSummary?.riskStaffCustody,
@@ -148,6 +148,20 @@ fun risks(
   overallRoshLevel = oasysArnsSummary?.overallRiskLevel?.fixCase(),
   alerts = activeAlerts?.map { Alert(it.alertTypeDescription) },
 )
+
+fun populateOSPIScore(oasysOffendingInfo: OasysOffendingInfo?): String? =
+  if (oasysOffendingInfo?.ospIICRisk != null) {
+    oasysOffendingInfo.ospIICRisk
+  } else {
+    oasysOffendingInfo?.ospIRisk
+  }
+
+fun populateOSPCScore(oasysOffendingInfo: OasysOffendingInfo?): String? =
+  if (oasysOffendingInfo?.ospDCRisk != null) {
+    oasysOffendingInfo.ospDCRisk
+  } else {
+    oasysOffendingInfo?.ospCRisk
+  }
 
 fun String.fixCase(): String = this.lowercase().replaceFirstChar(Char::titlecase)
 

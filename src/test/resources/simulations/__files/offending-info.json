@@ -28,6 +28,8 @@
   "likelihoodOfSeriousReoffendingNext2Years": "RSR score (DYNAMIC) is   1.46%   Low",
   "ospCRisk": "Medium",
   "ospIRisk": "Low",
+  "ospDCRisk": "High",
+  "ospIICRisk": "Medium",
   "ageAtFirstSanction": 28,
   "dateOfFirstSanction": null,
   "ageAtFirstConviction": null,
