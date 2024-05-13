@@ -22,6 +22,9 @@ private const val WITHDRAWN = "WITHDRAWN"
 private const val CATEGORY_ADMIN = "W_ADMIN"
 private const val REASON_DUPLICATE = "W_DUPLICATE"
 
+private const val DESELECTED = "DESELECTED"
+private const val PERSONAL = "D_PERSONAL"
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
@@ -96,6 +99,26 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     response.size.shouldBeGreaterThan(0)
     val category = response.firstOrNull { it.code == REASON_DUPLICATE }
     category!! shouldBeEqual reasonExpected
+  }
+
+  @Test
+  fun `get all deselection referral status reasons for a deselection closed`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val response = getReferralStatusReasonsDeselectedFlag(DESELECTED, PERSONAL, false)
+
+    response.shouldNotBeNull()
+    response.size.shouldBeEqual(4)
+  }
+
+  @Test
+  fun `get all deselection referral status reasons for a deselection open`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val response = getReferralStatusReasonsDeselectedFlag(DESELECTED, PERSONAL, true)
+
+    response.shouldNotBeNull()
+    response.size.shouldBeEqual(3)
   }
 
   @Test
@@ -174,6 +197,17 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/reference-data/referral-statuses/$statusCode/categories/$categoryCode/reasons")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<ReferralStatusReason>>()
+      .returnResult().responseBody!!
+
+  fun getReferralStatusReasonsDeselectedFlag(statusCode: String, categoryCode: String, deselectAndKeepOpen: Boolean) =
+    webTestClient
+      .get()
+      .uri("/reference-data/referral-statuses/$statusCode/categories/$categoryCode/reasons?deselectAndKeepOpen=$deselectAndKeepOpen")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
