@@ -1518,6 +1518,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: deselectAndKeepOpen
+          in: query
+          description: flag for bespoke deselection option
+          required: false
+          schema:
+            type: boolean
+            default: false
 
       responses:
         200:

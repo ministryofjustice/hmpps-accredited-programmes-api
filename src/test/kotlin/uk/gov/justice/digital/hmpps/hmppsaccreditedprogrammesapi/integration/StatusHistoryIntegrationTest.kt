@@ -56,7 +56,7 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
     val startedRefData = referralStatusRepository.findByCode(REFERRAL_STARTED) ?: throw NotFoundException("no status with code: $REFERRAL_STARTED found")
 
     val categoryRefData = referralStatusCategoryRepository.getAllByReferralStatusCodeAndActiveIsTrue(WITHDRAWN)[0]
-    val reasonRefData = referralStatusReasonRepository.getAllByReferralStatusCategoryCodeAndActiveIsTrue(categoryRefData.code)[0]
+    val reasonRefData = referralStatusReasonRepository.getAllByReferralStatusCategoryCodeAndActiveIsTrue(categoryRefData.code, false)[0]
 
     val startDateOfFirst = LocalDateTime.now().minusDays(3)
     val startDateOfSecond = LocalDateTime.now().minusDays(2)

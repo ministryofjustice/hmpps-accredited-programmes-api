@@ -72,8 +72,15 @@ class ReferralReferenceDataService(
       )
     }
 
-  fun getReferralStatusReasons(referralStatusCode: String, referralCategoryCode: String) =
-    referralStatusReasonRepository.getAllByReferralStatusCategoryCodeAndActiveIsTrue(referralCategoryCode).map {
+  fun getReferralStatusReasons(
+    referralStatusCode: String,
+    referralCategoryCode: String,
+    deselectAndKeepOpen: Boolean = false,
+  ) =
+    referralStatusReasonRepository.getAllByReferralStatusCategoryCodeAndActiveIsTrue(
+      referralCategoryCode,
+      deselectAndKeepOpen,
+    ).map {
       ReferralStatusReason(
         code = it.code,
         description = it.description,
@@ -92,13 +99,19 @@ class ReferralReferenceDataService(
 
   fun getNextStatusTransitions(currentStatus: String, ptRole: Boolean = false): List<ReferralStatusRefData> {
     return if (ptRole) {
-      referralStatusTransitionRepository.getNextPTTransitions(currentStatus).map { it.toStatus.toModel(it.description, it.hintText) }
+      referralStatusTransitionRepository.getNextPTTransitions(currentStatus)
+        .map { it.toStatus.toModel(it.description, it.hintText) }
     } else {
-      referralStatusTransitionRepository.getNextPOMTransitions(currentStatus).map { it.toStatus.toModel(it.description, it.hintText) }
+      referralStatusTransitionRepository.getNextPOMTransitions(currentStatus)
+        .map { it.toStatus.toModel(it.description, it.hintText) }
     }
   }
 
-  fun getStatusTransition(currentStatus: String, chosenStatus: String, ptRole: Boolean = false): ReferralStatusTransitionEntity? {
+  fun getStatusTransition(
+    currentStatus: String,
+    chosenStatus: String,
+    ptRole: Boolean = false,
+  ): ReferralStatusTransitionEntity? {
     return if (ptRole) {
       referralStatusTransitionRepository.getPTTransition(currentStatus, chosenStatus)
     } else {

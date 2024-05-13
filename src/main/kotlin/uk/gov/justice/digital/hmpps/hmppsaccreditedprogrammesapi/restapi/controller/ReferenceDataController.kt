@@ -39,10 +39,10 @@ constructor(
         .getReferralStatusCategory(code),
     )
 
-  override fun getReferralStatusReasons(referralStatusCode: String, categoryCode: String): ResponseEntity<List<ReferralStatusReason>> =
+  override fun getReferralStatusReasons(referralStatusCode: String, categoryCode: String, deselectAndKeepOpen: Boolean): ResponseEntity<List<ReferralStatusReason>> =
     ResponseEntity.ok(
       referenceDataService
-        .getReferralStatusReasons(referralStatusCode, categoryCode),
+        .getReferralStatusReasons(referralStatusCode, categoryCode, deselectAndKeepOpen),
     )
 
   override fun getReferralStatusReason(code: String): ResponseEntity<ReferralStatusReason> =

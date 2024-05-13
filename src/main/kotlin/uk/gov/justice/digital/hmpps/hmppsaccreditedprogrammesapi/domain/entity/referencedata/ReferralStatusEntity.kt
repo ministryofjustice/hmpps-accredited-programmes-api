@@ -4,6 +4,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import java.util.UUID
@@ -45,6 +46,7 @@ data class ReferralStatusReasonEntity(
   val description: String,
   val referralStatusCategoryCode: String,
   val active: Boolean,
+  val deselectOpen: Boolean,
 )
 
 @Repository
@@ -76,7 +78,21 @@ fun ReferralStatusCategoryRepository.getByCode(code: String) =
 
 @Repository
 interface ReferralStatusReasonRepository : JpaRepository<ReferralStatusReasonEntity, UUID> {
-  fun getAllByReferralStatusCategoryCodeAndActiveIsTrue(statusCode: String): List<ReferralStatusReasonEntity>
+
+  @Query(
+    value = """
+      SELECT e
+      FROM ReferralStatusReasonEntity e
+      WHERE e.referralStatusCategoryCode = :statusCode
+      AND e.active is TRUE
+      AND (:deselectOpen = FALSE OR e.deselectOpen = TRUE)
+    """,
+  )
+  fun getAllByReferralStatusCategoryCodeAndActiveIsTrue(
+    statusCode: String,
+    deselectOpen: Boolean,
+  ): List<ReferralStatusReasonEntity>
+
   fun findByCode(code: String): ReferralStatusReasonEntity?
 }
 
