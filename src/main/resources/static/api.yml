@@ -2440,7 +2440,16 @@ components:
       properties:
         description:
           type: string
-          example: Violence
+          example: risk to children
+        alertType:
+          type: string
+          example: Sexual Offence
+        dateCreated:
+          type: string
+          format: date
+          description: Date alert was created.
+
+
 
     PrisonerSearchRequest:
       type: object

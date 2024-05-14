@@ -146,7 +146,7 @@ fun risks(
   imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
 
   overallRoshLevel = oasysArnsSummary?.overallRiskLevel?.fixCase(),
-  alerts = activeAlerts?.map { Alert(it.alertTypeDescription) },
+  alerts = activeAlerts?.map { Alert(description = it.alertCodeDescription, alertType = it.alertTypeDescription, dateCreated = it.dateCreated) },
 )
 
 fun String.fixCase(): String = this.lowercase().replaceFirstChar(Char::titlecase)

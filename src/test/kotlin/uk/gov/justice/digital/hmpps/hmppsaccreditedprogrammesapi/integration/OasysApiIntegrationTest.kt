@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -118,7 +119,18 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       riskChildrenCommunity = LOW,
       imminentRiskOfViolenceTowardsPartner = HIGH,
       imminentRiskOfViolenceTowardsOthers = HIGH,
-      alerts = listOf(Alert(description = "Self Harm"), Alert(description = "Child Communication Measures")),
+      alerts = listOf(
+        Alert(
+          description = "ACCT Open (HMPS)",
+          alertType = "Self Harm",
+          dateCreated = LocalDate.of(2016, 1, 21),
+        ),
+        Alert(
+          description = "L1 Restriction No contact with any child",
+          alertType = "Child Communication Measures",
+          dateCreated = LocalDate.of(2014, 7, 23),
+        ),
+      ),
     )
   }
 
