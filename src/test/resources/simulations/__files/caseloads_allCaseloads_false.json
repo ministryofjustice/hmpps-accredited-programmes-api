@@ -1,0 +1,9 @@
+[
+  {
+    "caseLoadId": "MDI",
+    "description": "Moorland Closed (HMP & YOI)",
+    "type": "INST",
+    "caseloadFunction": "GENERAL",
+    "currentlyActive": false
+  }
+]
