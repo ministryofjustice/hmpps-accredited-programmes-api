@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class PersonSentencesIntegrationTest : IntegrationTestBase() {
+class PersonIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `get sentences by prison number should return 200 with matching entries`() {
