@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "1.9.23"
-  kotlin("plugin.jpa") version "1.9.23"
+  kotlin("plugin.spring") version "1.9.24"
+  kotlin("plugin.jpa") version "1.9.24"
   id("org.openapi.generator") version "7.5.0"
 }
 
@@ -13,9 +13,9 @@ configurations {
 }
 
 dependencies {
-  val kotestVersion = "5.8.1"
+  val kotestVersion = "5.9.0"
   val springdocVersion = "2.5.0"
-  val sentryVersion = "7.8.0"
+  val sentryVersion = "7.9.0"
   val jsonWebtokenVersion = "0.12.5"
   val springSecurityVersion = "6.2.4"
 
@@ -37,7 +37,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:$springdocVersion")
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:3.1.3")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
