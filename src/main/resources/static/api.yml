@@ -1594,7 +1594,7 @@ paths:
           description: Forbidden.  The client is not authorised to access.
 
 
-  /people/user/me/caseload:
+  /user/me/caseload:
     get:
       summary: Get list of caseloads for current user
       operationId: getCurrentUserCaseloads
@@ -1619,7 +1619,7 @@ paths:
         "403":
           description: Forbidden.  The client is not authorised to access.
       tags:
-        - Person
+        - User
 components:
   securitySchemes:
     bearerAuth:
