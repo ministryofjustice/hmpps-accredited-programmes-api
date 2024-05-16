@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/offences/code/GA04001",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "offence.json"
+      }
+    }
+  ]
+}

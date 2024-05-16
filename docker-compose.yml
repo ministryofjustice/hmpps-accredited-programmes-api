@@ -107,6 +107,23 @@ services:
     volumes:
       - ./wiremock:/home/wiremock
 
+  manage-offences-api:
+    container_name: manage-offences-api
+    depends_on:
+      - hmpps-auth
+    environment:
+      - SERVER_PORT=8080
+      - OAUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://hmpps-auth:8080/auth/.well-known/jwks.json
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+    image: quay.io/hmpps/hmpps-manage-offences-api:latest
+    networks:
+      - hmpps
+    ports:
+      - '9097:8080'
+
   hmpps-accredited-programmes-api:
     image: quay.io/hmpps/hmpps-accredited-programmes-api:latest
     container_name: hmpps-accredited-programmes-api
@@ -129,6 +146,7 @@ services:
       - SERVICES_PRISONER-SEARCH-API_BASE-URL=http://wiremock:8080
       - SERVICES_PRISON-REGISTER-API_BASE-URL=http://prison-register-api:8080
       - SERVICES_OASYS-API_BASE-URL=http://wiremock:8080
+      - SERVICES_MANAGE-OFFENCES-API_BASE-URL=http://wiremock:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/postgres
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin_password

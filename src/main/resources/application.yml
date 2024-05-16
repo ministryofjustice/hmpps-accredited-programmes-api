@@ -54,6 +54,11 @@ spring:
             client-id: hmpps-accredited-programmes-client-1
             client-secret: clientsecret
             authorization-grant-type: client_credentials
+          manage-offences-api:
+            provider: hmpps-auth
+            client-id: hmpps-accredited-programmes-client-1
+            client-secret: clientsecret
+            authorization-grant-type: client_credentials
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
@@ -119,6 +124,8 @@ services:
   oasys-api:
     base-url: http://localhost:9095
   arns-api:
+    base-url: http://localhost:9095
+  manage-offences-api:
     base-url: http://localhost:9095
 
 hmpps:

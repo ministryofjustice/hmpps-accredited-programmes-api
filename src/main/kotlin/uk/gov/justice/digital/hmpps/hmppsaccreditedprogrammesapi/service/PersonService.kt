@@ -16,7 +16,9 @@ import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
 
 @Service
-class PersonService(val prisonApiClient: PrisonApiClient) {
+class PersonService(
+  val prisonApiClient: PrisonApiClient,
+) {
 
   private fun getSentenceInformation(prisonNumber: String): SentenceInformation? {
     val sentenceInformation = when (val response = prisonApiClient.getSentenceInformation(prisonNumber)) {

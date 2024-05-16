@@ -45,24 +45,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
     oauth2Client.setDefaultClientRegistrationId("prison-api")
-
-    return WebClient.builder()
-      .baseUrl(prisonsApiBaseUrl)
-      .clientConnector(
-        ReactorClientHttpConnector(
-          HttpClient
-            .create()
-            .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
-        ),
-      )
-      .exchangeStrategies(
-        ExchangeStrategies.builder().codecs {
-          it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
-        }.build(),
-      )
-      .filter(oauth2Client)
-      .build()
+    return buildWebClient(prisonsApiBaseUrl, oauth2Client)
   }
 
   @Bean(name = ["prisonerSearchApiWebClient"])
@@ -75,24 +58,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
     oauth2Client.setDefaultClientRegistrationId("prisoner-search-api")
-
-    return WebClient.builder()
-      .baseUrl(prisonerSearchApiBaseUrl)
-      .clientConnector(
-        ReactorClientHttpConnector(
-          HttpClient
-            .create()
-            .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
-        ),
-      )
-      .exchangeStrategies(
-        ExchangeStrategies.builder().codecs {
-          it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
-        }.build(),
-      )
-      .filter(oauth2Client)
-      .build()
+    return buildWebClient(prisonerSearchApiBaseUrl, oauth2Client)
   }
 
   @Bean(name = ["prisonRegisterApiWebClient"])
@@ -105,24 +71,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
     oauth2Client.setDefaultClientRegistrationId("prison-register-api")
-
-    return WebClient.builder()
-      .baseUrl(prisonRegisterApiBaseUrl)
-      .clientConnector(
-        ReactorClientHttpConnector(
-          HttpClient
-            .create()
-            .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
-        ),
-      )
-      .exchangeStrategies(
-        ExchangeStrategies.builder().codecs {
-          it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
-        }.build(),
-      )
-      .filter(oauth2Client)
-      .build()
+    return buildWebClient(prisonRegisterApiBaseUrl, oauth2Client)
   }
 
   @Bean(name = ["oasysApiWebClient"])
@@ -135,24 +84,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
     oauth2Client.setDefaultClientRegistrationId("oasys-api")
-
-    return WebClient.builder()
-      .baseUrl("$oasysApiBaseUrl/assessments")
-      .clientConnector(
-        ReactorClientHttpConnector(
-          HttpClient
-            .create()
-            .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
-        ),
-      )
-      .exchangeStrategies(
-        ExchangeStrategies.builder().codecs {
-          it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
-        }.build(),
-      )
-      .filter(oauth2Client)
-      .build()
+    return buildWebClient("$oasysApiBaseUrl/assessments", oauth2Client)
   }
 
   @Bean(name = ["arnsApiWebClient"])
@@ -163,25 +95,39 @@ class WebClientConfiguration(
     @Value("\${services.arns-api.base-url}") arnsApiBaseUrl: String,
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-
     oauth2Client.setDefaultClientRegistrationId("arns-api")
 
-    return WebClient.builder()
-      .baseUrl("$arnsApiBaseUrl")
-      .clientConnector(
-        ReactorClientHttpConnector(
-          HttpClient
-            .create()
-            .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
-        ),
-      )
-      .exchangeStrategies(
-        ExchangeStrategies.builder().codecs {
-          it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
-        }.build(),
-      )
-      .filter(oauth2Client)
-      .build()
+    return buildWebClient(arnsApiBaseUrl, oauth2Client)
   }
+
+  @Bean(name = ["manageOffencesApiWebClient"])
+  fun manageOffencesApiWebClient(
+    clientRegistrations: ClientRegistrationRepository,
+    authorizedClients: OAuth2AuthorizedClientRepository,
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    @Value("\${services.manage-offences-api.base-url}") manageOffencesApiBaseUrl: String,
+  ): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+    oauth2Client.setDefaultClientRegistrationId("arns-api")
+
+    return buildWebClient(manageOffencesApiBaseUrl, oauth2Client)
+  }
+
+  fun buildWebClient(url: String, oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction): WebClient = WebClient.builder()
+    .baseUrl(url)
+    .clientConnector(
+      ReactorClientHttpConnector(
+        HttpClient
+          .create()
+          .responseTimeout(Duration.ofMillis(upstreamTimeoutMs))
+          .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Duration.ofMillis(upstreamTimeoutMs).toMillis().toInt()),
+      ),
+    )
+    .exchangeStrategies(
+      ExchangeStrategies.builder().codecs {
+        it.defaultCodecs().maxInMemorySize(maxResponseInMemorySizeBytes)
+      }.build(),
+    )
+    .filter(oauth2Client)
+    .build()
 }

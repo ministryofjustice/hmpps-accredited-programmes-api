@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.manageOffencesApi.model.LinkedScheduleDetails
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.manageOffencesApi.model.Offence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
@@ -58,4 +60,38 @@ fun ReferralViewEntity.toApi() = ReferralView(
   surname = surname,
   sentenceType = sentenceType,
   listDisplayName = listDisplayName,
+)
+
+fun Offence.toApi() = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Offence(
+  id = this.id,
+  code = this.code,
+  description = this.description,
+  offenceType = this.offenceType,
+  revisionId = this.revisionId,
+  startDate = this.startDate,
+  endDate = this.endDate,
+  homeOfficeStatsCode = this.homeOfficeStatsCode,
+  homeOfficeDescription = this.homeOfficeDescription,
+  changedDate = this.changedDate.toString(),
+  loadDate = this.loadDate.toString(),
+  schedules = this.schedules?.map {
+    uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LinkedScheduleDetails(
+      id = it.id,
+      act = it.act,
+      code = it.code,
+      url = it.url,
+      partNumber = it.partNumber,
+      paragraphNumber = it.paragraphNumber,
+      paragraphTitle = it.paragraphTitle,
+      lineReference = it.lineReference,
+      legislationText = it.legislationText,
+    )
+  },
+  isChild = this.isChild,
+  parentOffenceId = this.parentOffenceId,
+  childOffenceIds = this.childOffenceIds,
+  legislation = this.legislation,
+  maxPeriodIsLife = this.maxPeriodIsLife,
+  maxPeriodOfIndictmentYears = this.maxPeriodOfIndictmentYears,
+  custodialIndicator = this.custodialIndicator?.name,
 )

@@ -1,0 +1,25 @@
+[
+  {
+    "id": 2162212,
+    "code": "GA04001",
+    "description": "Act as an unlicensed gangmaster",
+    "offenceType": "CE",
+    "revisionId": 614825,
+    "startDate": "2015-03-15",
+    "endDate": null,
+    "homeOfficeStatsCode": "099/98",
+    "homeOfficeDescription": "Acting as a gangmaster in contravention of Section 6 (prohibition of unlicensed activities)",
+    "changedDate": "2023-05-15T16:25:40",
+    "loadDate": "2024-01-17T12:00:11.520845",
+    "schedules": null,
+    "isChild": false,
+    "parentOffenceId": null,
+    "childOffenceIds": [
+      2162605
+    ],
+    "legislation": "Contrary to section 12(1), (3) and (4) of the Gangmasters (Licensing) Act 2004.",
+    "maxPeriodIsLife": false,
+    "maxPeriodOfIndictmentYears": null,
+    "custodialIndicator": "Y"
+  }
+]
