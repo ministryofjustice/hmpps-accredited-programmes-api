@@ -217,9 +217,10 @@ paths:
         - Course Prerequisites
       summary: Upload a CSV format file containing a full set of prerequisites data for the current set of courses.
       operationId: updatePrerequisites
-      description: "Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
-      <p>Pre-existing prerequisite data will be removed before the new data is applied.
-      <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the PrerequisiteRecord schema. Column order is not important."
+      description: > 
+        Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
+        <p>Pre-existing prerequisite data will be removed before the new data is applied.
+        <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the PrerequisiteRecord schema. Column order is not important.
       requestBody:
         required: true
         content:
@@ -333,9 +334,10 @@ paths:
         - Course Offerings
       summary: Upload all offerings in CSV format.
       operationId: updateOfferings
-      description: "Accepts a CSV format file of data representing the desired state of all offerings data attached to the current set of courses.
-      <p>Pre-existing offering data will be removed before the new data is applied.
-      <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the OfferingRecord schema. Column order is not important."
+      description: >
+        Accepts a CSV format file of data representing the desired state of all offerings data attached to the current set of courses.
+        <p>Pre-existing offering data will be removed before the new data is applied.
+        <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the OfferingRecord schema. Column order is not important.
       requestBody:
         required: true
         content:
@@ -2744,9 +2746,6 @@ components:
     Address:
       type: object
       properties:
-        id:
-          type: long
-          example: 1
         addressLine1:
           type: string
           example: "Higher Lane"
