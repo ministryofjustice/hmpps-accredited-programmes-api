@@ -54,3 +54,5 @@ services:
     base-url: http://localhost:#WIREMOCK_PORT
   arns-api:
     base-url: http://localhost:#WIREMOCK_PORT
+  manage-offences-api:
+    base-url: http://localhost:#WIREMOCK_PORT

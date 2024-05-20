@@ -16,7 +16,9 @@ import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
 
 @Service
-class PersonService(val prisonApiClient: PrisonApiClient) {
+class PersonService(
+  val prisonApiClient: PrisonApiClient,
+) {
 
   private fun getSentenceInformation(prisonNumber: String): SentenceInformation? {
     val sentenceInformation = when (val response = prisonApiClient.getSentenceInformation(prisonNumber)) {
@@ -51,6 +53,16 @@ class PersonService(val prisonApiClient: PrisonApiClient) {
       activeSentences.size == 1 -> activeSentences.first().toString()
       else -> "Multiple sentences"
     }
+  }
+
+  fun getOffenceDetails(prisonNumber: String): List<Pair<String?, LocalDate?>> {
+    return getSentenceInformation(prisonNumber)?.latestPrisonTerm?.courtSentences
+      ?.filter { it.caseStatus == "ACTIVE" }
+      ?.flatMap { it.sentences }
+      ?.flatMap { it.offences.orEmpty() }
+      ?.map { Pair(it.offenceCode, it.offenceStartDate) }
+      ?.distinct()
+      .orEmpty()
   }
 
   fun getSentenceDetails(prisonNumber: String): SentenceDetails? {

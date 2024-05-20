@@ -1065,6 +1065,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /people/offences/{prisonNumber}:
+    get:
+      summary: Get details of an offence by prison number
+      description: Retrieves details of an offence by its unique code.
+      tags:
+        - Person
+      operationId: getOffences
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: The prison number of the person for whom the information should be retrieved.
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Offence'
+                type: array
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /oasys/{prisonNumber}/offence-details:
     get:
       tags:
@@ -2792,3 +2827,18 @@ components:
           type: boolean
           nullable: true
           description: Indicates whether the caseload is currently active or not.
+
+    Offence:
+      type: object
+      properties:
+        offence:
+          type: string
+          description: Description of the offence along with the code.
+        category:
+          type: string
+          nullable: true
+          description: Legislation.
+        offenceDate:
+          type: string
+          format: date
+          description: Offence start date.

@@ -8,9 +8,12 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Offence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.SentenceDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
+import java.time.LocalDate
+import java.time.Month
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -27,6 +30,22 @@ class PersonIntegrationTest : IntegrationTestBase() {
     sentenceDetails.sentences?.get(0)?.description shouldBe "CJA03 Standard Determinate Sentence"
   }
 
+  @Test
+  fun `get offences by offence code is successful`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val offenceCode = "GA04001"
+
+    val prisonNumber = "C6666DD"
+    val offences = getOffences(prisonNumber)
+    offences.isNotEmpty()
+
+    offences.first() shouldBe Offence(
+      offence = "Cause / permit fail to give treatment or cull sick or injured conventionally reared meat chickens - England - SX03174",
+      category = "Contrary to regulations 5(1)(ba), 7(1)(c) and 9 of, and paragraph 11(3) of Schedule 5A to, the Welfare of Farmed Animals (England) Regulations 2007.",
+      offenceDate = LocalDate.of(2012, Month.OCTOBER, 21),
+    )
+  }
+
   private fun getSentences(prisonNumber: String): SentenceDetails =
     webTestClient
       .get()
@@ -36,5 +55,16 @@ class PersonIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<SentenceDetails>()
+      .returnResult().responseBody!!
+
+  private fun getOffences(prisonNumber: String): List<Offence> =
+    webTestClient
+      .get()
+      .uri("/people/offences/$prisonNumber")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<Offence>>()
       .returnResult().responseBody!!
 }

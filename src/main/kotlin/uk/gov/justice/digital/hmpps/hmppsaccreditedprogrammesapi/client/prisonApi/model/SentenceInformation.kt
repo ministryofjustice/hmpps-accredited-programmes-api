@@ -32,6 +32,7 @@ data class Sentence(
   val sentenceTypeDescription: String?,
   val sentenceStartDate: LocalDate?,
   val lineSeq: Int?,
+  val offences: List<Offence>?,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -47,4 +48,10 @@ data class KeyDates(
   val homeDetentionCurfewEligibilityDate: LocalDate?,
   val earlyTermDate: LocalDate?,
   val lateTermDate: LocalDate?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Offence(
+  val offenceCode: String?,
+  val offenceStartDate: LocalDate?,
 )

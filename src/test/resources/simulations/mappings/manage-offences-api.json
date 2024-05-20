@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "url": "/offences/code/multiple?offenceCodes=SX03174&offenceCodes=SX03013&offenceCodes=SX03014",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "offence.json"
+      }
+    }
+  ]
+}

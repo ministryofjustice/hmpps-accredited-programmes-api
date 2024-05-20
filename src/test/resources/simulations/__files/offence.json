@@ -1,0 +1,23 @@
+[
+  {
+    "id": 2177579,
+    "code": "SX03174",
+    "description": "Cause / permit fail to give treatment or cull sick or injured conventionally reared meat chickens - England",
+    "offenceType": "CS",
+    "revisionId": 585341,
+    "startDate": "2010-12-24",
+    "endDate": null,
+    "homeOfficeStatsCode": "108/29",
+    "homeOfficeDescription": "Causing, permitting or failing to prevent unnecessary suffering - reclassified",
+    "changedDate": "2023-04-25T19:57:02",
+    "loadDate": "2024-01-17T11:57:11.968743",
+    "schedules": [],
+    "isChild": false,
+    "parentOffenceId": null,
+    "childOffenceIds": [],
+    "legislation": "Contrary to regulations 5(1)(ba), 7(1)(c) and 9 of, and paragraph 11(3) of Schedule 5A to, the Welfare of Farmed Animals (England) Regulations 2007.",
+    "maxPeriodIsLife": false,
+    "maxPeriodOfIndictmentYears": null,
+    "custodialIndicator": "Y"
+  }
+]
