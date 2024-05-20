@@ -35,29 +35,14 @@ class PersonIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val offenceCode = "GA04001"
 
-    val offences = getOffences(offenceCode)
+    val prisonNumber = "C6666DD"
+    val offences = getOffences(prisonNumber)
     offences.isNotEmpty()
 
     offences.first() shouldBe Offence(
-      id = 2162212,
-      code = "GA04001",
-      description = "Act as an unlicensed gangmaster",
-      offenceType = "CE",
-      revisionId = 614825,
-      startDate = LocalDate.of(2015, Month.MARCH, 15),
-      endDate = null,
-      homeOfficeStatsCode = "099/98",
-      homeOfficeDescription = "Acting as a gangmaster in contravention of Section 6 (prohibition of unlicensed activities)",
-      changedDate = "2023-05-15T16:25:40",
-      loadDate = "2024-01-17T12:00:11.520845",
-      schedules = null,
-      isChild = false,
-      parentOffenceId = null,
-      childOffenceIds = listOf(2162605),
-      legislation = "Contrary to section 12(1), (3) and (4) of the Gangmasters (Licensing) Act 2004.",
-      maxPeriodIsLife = false,
-      maxPeriodOfIndictmentYears = null,
-      custodialIndicator = "YES",
+      offence = "Cause / permit fail to give treatment or cull sick or injured conventionally reared meat chickens - England - SX03174",
+      category = "Contrary to regulations 5(1)(ba), 7(1)(c) and 9 of, and paragraph 11(3) of Schedule 5A to, the Welfare of Farmed Animals (England) Regulations 2007.",
+      offenceDate = LocalDate.of(2012, Month.OCTOBER, 21),
     )
   }
 
@@ -72,10 +57,10 @@ class PersonIntegrationTest : IntegrationTestBase() {
       .expectBody<SentenceDetails>()
       .returnResult().responseBody!!
 
-  private fun getOffences(offenceCode: String): List<Offence> =
+  private fun getOffences(prisonNumber: String): List<Offence> =
     webTestClient
       .get()
-      .uri("/people/offences/code/$offenceCode")
+      .uri("/people/offences/$prisonNumber")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

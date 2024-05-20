@@ -11,8 +11,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 
 @Service
 class ManageOffencesService(val manageOffencesApiClient: ManageOffencesApiClient) {
-  fun getOffences(offenceCode: String): List<Offence> {
-    val offences = when (val response = manageOffencesApiClient.getOffences(offenceCode)) {
+  fun getOffences(offenceCodes: List<String?>): List<Offence> {
+    val offences = when (val response = manageOffencesApiClient.getOffences(offenceCodes)) {
       is ClientResult.Failure.Other -> throw ServiceUnavailableException(
         "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
         response.toException(),

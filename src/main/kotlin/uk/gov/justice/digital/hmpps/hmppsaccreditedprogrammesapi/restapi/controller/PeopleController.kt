@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseP
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ManageOffencesService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation as CourseParticipationApi
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.manageOffencesApi.model.Offence as OffenceModel
 
 @Service
 class PeopleController
@@ -35,10 +34,18 @@ constructor(
         .getSentenceDetails(prisonNumber),
     )
 
-  override fun getOffences(offenceCode: String): ResponseEntity<List<Offence>> =
-    ResponseEntity.ok(
-      manageOffencesService
-        .getOffences(offenceCode)
-        .map(OffenceModel::toApi),
+  override fun getOffences(prisonNumber: String): ResponseEntity<List<Offence>> {
+    val offenceMap = personService.getOffenceDetails(prisonNumber).associateBy({ it.first }, { it.second })
+    val offences = manageOffencesService.getOffences(offenceMap.keys.toList())
+
+    return ResponseEntity.ok(
+      offences.map { offence ->
+        Offence(
+          offence = "${offence.description} - ${offence.code}",
+          category = offence.legislation,
+          offenceDate = offenceMap[offence.code],
+        )
+      },
     )
+  }
 }

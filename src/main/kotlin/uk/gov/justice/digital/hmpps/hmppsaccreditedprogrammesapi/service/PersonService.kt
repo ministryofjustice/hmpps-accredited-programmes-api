@@ -55,6 +55,16 @@ class PersonService(
     }
   }
 
+  fun getOffenceDetails(prisonNumber: String): List<Pair<String?, LocalDate?>> {
+    return getSentenceInformation(prisonNumber)?.latestPrisonTerm?.courtSentences
+      ?.filter { it.caseStatus == "ACTIVE" }
+      ?.flatMap { it.sentences }
+      ?.flatMap { it.offences.orEmpty() }
+      ?.map { Pair(it.offenceCode, it.offenceStartDate) }
+      ?.distinct()
+      .orEmpty()
+  }
+
   fun getSentenceDetails(prisonNumber: String): SentenceDetails? {
     val sentenceInformation = getSentenceInformation(prisonNumber)
       ?: throw NotFoundException("No sentence information found for person with id: $prisonNumber")

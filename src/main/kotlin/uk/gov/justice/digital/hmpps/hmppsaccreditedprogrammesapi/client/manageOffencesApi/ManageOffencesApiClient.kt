@@ -15,7 +15,7 @@ class ManageOffencesApiClient(
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getOffences(offenceCode: String) = getRequest<List<Offence>>(MANAGE_OFFENCES_API) {
-    path = "/offences/code/$offenceCode"
+  fun getOffences(offenceCodes: List<String?>) = getRequest<List<Offence>>(MANAGE_OFFENCES_API) {
+    path = "/offences/code/multiple?${offenceCodes.joinToString("&") { "offenceCodes=$it" }}"
   }
 }

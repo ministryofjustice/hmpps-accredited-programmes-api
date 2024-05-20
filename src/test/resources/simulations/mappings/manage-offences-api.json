@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/offences/code/GA04001",
+        "url": "/offences/code/multiple?offenceCodes=SX03174&offenceCodes=SX03013&offenceCodes=SX03014",
         "method": "GET"
       },
       "response": {
