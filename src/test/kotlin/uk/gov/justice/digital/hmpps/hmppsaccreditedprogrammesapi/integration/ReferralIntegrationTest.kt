@@ -885,7 +885,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     }
   }
 
-
   fun getSubjectAccessReport(prisonerId: String) =
     webTestClient
       .get()
