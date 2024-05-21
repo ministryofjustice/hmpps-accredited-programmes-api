@@ -15,7 +15,7 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
     HMPPS_AUTH_URL: https://sign-in-preprod.hmpps.service.justice.gov.uk/auth
-    SERVICES_PRISON-API_BASE-URL: https://api-preprod.prison.service.justice.gov.uk
+    SERVICES_PRISON-API_BASE-URL: https://prison-api-preprod.prison.service.justice.gov.uk
     SERVICES_PRISONER-SEARCH-API_BASE-URL: https://prisoner-search-preprod.prison.service.justice.gov.uk
     SERVICES_PRISON-REGISTER-API_BASE-URL: https://prison-register-preprod.hmpps.service.justice.gov.uk
     SERVICES_OASYS-API_BASE-URL: https://accredited-programmes-and-oasys-preprod.hmpps.service.justice.gov.uk
