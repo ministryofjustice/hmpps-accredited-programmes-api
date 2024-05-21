@@ -52,7 +52,6 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
     """,
-    nativeQuery = false,
   )
   fun getReferralsByOrganisationId(
     organisationId: String,
@@ -70,7 +69,6 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
     """,
-    nativeQuery = false,
   )
   fun getReferralsByUsername(
     username: String,

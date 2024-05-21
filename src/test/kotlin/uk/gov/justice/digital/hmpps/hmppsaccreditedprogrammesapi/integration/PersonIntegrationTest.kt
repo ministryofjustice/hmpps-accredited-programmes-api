@@ -33,7 +33,6 @@ class PersonIntegrationTest : IntegrationTestBase() {
   @Test
   fun `get offences by offence code is successful`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val offenceCode = "GA04001"
 
     val prisonNumber = "C6666DD"
     val offences = getOffences(prisonNumber)
