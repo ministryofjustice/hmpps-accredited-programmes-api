@@ -2315,6 +2315,10 @@ components:
           example: 0-No problems
         difficultiesCoping:
           type: string
+        currPsychologicalProblems:
+          type: string
+        selfHarmSuicidal:
+          type: string
 
     Behaviour:
       type: object

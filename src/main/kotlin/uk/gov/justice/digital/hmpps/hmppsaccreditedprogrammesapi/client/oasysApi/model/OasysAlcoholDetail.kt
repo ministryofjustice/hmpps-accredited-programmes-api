@@ -3,9 +3,9 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysAp
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class OasysPsychiatric(
-  val currPsychiatricProblems: String?,
-  val difficultiesCoping: String?,
-  val currPsychologicalProblems: String?,
-  val selfHarmSuicidal: String?,
+data class OasysAlcoholDetail(
+  val alcoholLinkedToHarm: String?,
+  val alcoholIssuesDetails: String?,
+  val frequencyAndLevel: String?,
+  val bingeDrinking: String?,
 )
