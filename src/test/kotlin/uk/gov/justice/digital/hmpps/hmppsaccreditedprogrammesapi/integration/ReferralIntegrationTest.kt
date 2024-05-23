@@ -873,7 +873,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     response.shouldNotBeNull()
 
     // Validating the response content
-    with(response.content.first()) {
+    with(response.referrals.first()) {
       courseName shouldBe course.name
       audience shouldBe course.audience
       courseOrganisation shouldBe offering.organisationId
