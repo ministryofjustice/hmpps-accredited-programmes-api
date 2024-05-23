@@ -863,7 +863,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     createReferral(offering.id, PRISON_NUMBER_1)
 
     // Fetching the referral entity
-    val referralEntities = referralRepository.getSarReferrals(PRISON_NUMBER_1, null, null)
+    val referralEntities = referralRepository.getSarReferrals(PRISON_NUMBER_1)
     referralEntities.shouldNotBeNull()
     referralEntities.shouldNotBeEmpty()
     val referralEntity = referralEntities.first()

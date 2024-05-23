@@ -17,8 +17,8 @@ class SubjectAccessRequestService(
 
   fun getPrisonContentFor(prisonerNumber: String, fromDate: LocalDateTime?, toDate: LocalDateTime?) =
     HmppsSubjectAccessRequestContent(
-      repository.getSarReferrals(prisonerNumber, fromDate, toDate).toSarReferral(),
-      courseParticipationRepository.getSarParticipations(prisonerNumber, fromDate, toDate)
+      repository.getSarReferrals(prisonerNumber).toSarReferral(),
+      courseParticipationRepository.getSarParticipations(prisonerNumber)
         .toSarParticipation(),
     )
 }
