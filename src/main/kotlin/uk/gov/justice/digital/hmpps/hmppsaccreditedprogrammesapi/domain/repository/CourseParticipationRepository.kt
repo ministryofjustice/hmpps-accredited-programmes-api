@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposit
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import java.time.LocalDateTime
@@ -19,5 +20,9 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
         AND (:toDate IS NULL OR (cp.lastModifiedDateTime IS NOT NULL AND cp.lastModifiedDateTime <= :toDate) OR (cp.lastModifiedDateTime IS NULL AND cp.createdDateTime <= :toDate))
         """,
   )
-  fun getSarParticipations(prisonerNumber: String, fromDate: LocalDateTime?, toDate: LocalDateTime?): List<CourseParticipationEntity>
+  fun getSarParticipations(
+    @Param("prisonerNumber") prisonerNumber: String,
+    @Param("fromDate") fromDate: LocalDateTime?,
+    @Param("toDate") toDate: LocalDateTime?,
+  ): List<CourseParticipationEntity>
 }

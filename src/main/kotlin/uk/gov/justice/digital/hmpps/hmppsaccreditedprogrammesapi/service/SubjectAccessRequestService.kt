@@ -31,12 +31,12 @@ data class HmppsSubjectAccessRequestContent(
 data class SarReferral(
   val prisonerNumber: String,
   val oasysConfirmed: Boolean,
-  val statusCode: String,
-  val hasReviewedProgrammeHistory: Boolean,
+  val statusCode: String?,
+  val hasReviewedProgrammeHistory: Boolean?,
   val additionalInformation: String?,
   val submittedOn: LocalDateTime?,
   val referrerUsername: String?,
-  val courseName: String,
+  val courseName: String?,
   val audience: String?,
   val courseOrganisation: String?,
 )
