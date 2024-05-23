@@ -34,7 +34,7 @@ jobs:
             PACT_PROVIDER_VERSION="$CIRCLE_SHA1" \
             PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
             PACT_PUBLISH_RESULTS="true" \
-            ./gradlew clean check org.gradle.jvmargs=-Xmx512M -XX:MaxMetaspaceSize=384M
+            ./gradlew clean check -Dorg.gradle.jvmargs=-Xmx512M -XX:MaxMetaspaceSize=384M
       - save_cache:
           paths:
             - ~/.gradle
