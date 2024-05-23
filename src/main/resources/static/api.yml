@@ -1388,7 +1388,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-
   /oasys/{prisonNumber}/risks-and-alerts:
     get:
       tags:
@@ -1420,6 +1419,40 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /oasys/{prisonNumber}/drugAndAlcoholDetail:
+    get:
+      summary: Get drug and alcohol assessment details
+      description: Retrieves the drug and alcohol assessment details for a given assessment ID.
+      tags:
+        - DrugAndAlcohol
+      operationId: getDrugAndAlcoholDetails
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DrugAlcoholDetail'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 
   /reference-data/referral-statuses:
     get:
@@ -2846,3 +2879,36 @@ components:
           type: string
           format: date
           description: Offence start date.
+
+    DrugAlcoholDetail:
+      type: object
+      properties:
+        drug:
+          $ref: '#/components/schemas/OasysDrugDetail'
+        alcohol:
+          $ref: '#/components/schemas/OasysAlcoholDetail'
+
+    OasysDrugDetail:
+      type: object
+      properties:
+        levelOfUseOfMainDrug:
+          type: string
+          nullable: true
+        drugsMajorActivity:
+          type: string
+          nullable: true
+    OasysAlcoholDetail:
+      type: object
+      properties:
+        alcoholLinkedToHarm:
+          type: string
+          nullable: true
+        alcoholIssuesDetails:
+          type: string
+          nullable: true
+        frequencyAndLevel:
+          type: string
+          nullable: true
+        bingeDrinking:
+          type: string
+          nullable: true

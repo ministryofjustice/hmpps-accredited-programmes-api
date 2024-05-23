@@ -13,6 +13,7 @@ import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Alert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
@@ -21,6 +22,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psych
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysDrugDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
 import java.math.BigDecimal
@@ -237,6 +240,38 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       "Some text about how clever or thick this person is",
     )
   }
+
+  @Test
+  fun `Get drug and alcohol data from Oasys`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+    val drugAlcoholDetail = getDrugAndAlcoholDetail(prisonNumber)
+
+    drugAlcoholDetail.shouldNotBeNull()
+    drugAlcoholDetail shouldBeEqual DrugAlcoholDetail(
+      drug = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysDrugDetail(
+        levelOfUseOfMainDrug = "1-Some problems",
+        drugsMajorActivity = "0-Very motivated",
+      ),
+      alcohol = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAlcoholDetail(
+        alcoholLinkedToHarm = "1-Some problems",
+        alcoholIssuesDetails = "Known to have some problems",
+        frequencyAndLevel = "frequent",
+        bingeDrinking = "1-Some problems",
+      ),
+    )
+  }
+
+  fun getDrugAndAlcoholDetail(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/drugAndAlcoholDetail")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<DrugAlcoholDetail>()
+      .returnResult().responseBody!!
 
   fun getRoshAnalysisByPrisonNumber(prisonNumber: String) =
     webTestClient

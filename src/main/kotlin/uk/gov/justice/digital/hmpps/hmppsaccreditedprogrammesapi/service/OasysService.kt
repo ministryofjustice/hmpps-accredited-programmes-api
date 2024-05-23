@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
@@ -176,6 +177,27 @@ class OasysService(
     } else {
       assessment.id
     }
+  }
+
+  fun getDrugAndAlcoholDetail(prisonNumber: String): DrugAlcoholDetail {
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_DRUG_ALCOHOL.name)
+    val assessmentId = getAssessmentId(prisonNumber)
+      ?: throw NotFoundException("No drug alcohol information found for prison number $prisonNumber")
+
+    val drugDetail = getDrugDetail(assessmentId)
+    val alcoholDetail = getAlcoholDetail(assessmentId)
+    return DrugAlcoholDetail(
+      drug = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysDrugDetail(
+        levelOfUseOfMainDrug = drugDetail?.LevelOfUseOfMainDrug,
+        drugsMajorActivity = drugDetail?.DrugsMajorActivity,
+      ),
+      alcohol = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAlcoholDetail(
+        alcoholLinkedToHarm = alcoholDetail?.alcoholLinkedToHarm,
+        alcoholIssuesDetails = alcoholDetail?.alcoholIssuesDetails,
+        frequencyAndLevel = alcoholDetail?.frequencyAndLevel,
+        bingeDrinking = alcoholDetail?.bingeDrinking,
+      ),
+    )
   }
 
   fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? {

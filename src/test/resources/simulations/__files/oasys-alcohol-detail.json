@@ -20,11 +20,11 @@
   "alcoholLinkedToReoffending": null,
   "alcoholViolentBehaviour": null,
   "alcoholProblemDescription": null,
-  "bingeDrinking": null,
+  "bingeDrinking": "1-Some problems",
   "alcoholTackleMotivation": null,
-  "alcoholIssuesDetails": null,
-  "alcoholLinkedToHarm": null,
-  "frequencyAndLevel": null,
+  "alcoholIssuesDetails": "Known to have some problems",
+  "alcoholLinkedToHarm": "1-Some problems",
+  "frequencyAndLevel": "frequent",
   "assessor": {
     "name": "Test Wark"
   },
