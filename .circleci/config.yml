@@ -18,6 +18,9 @@ jobs:
       name: hmpps/localstack
       jdk_tag: "21.0"
       localstack_tag: "3"
+    environment:
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx1024m "
     steps:
       - checkout
       - hmpps/install_aws_cli
@@ -34,7 +37,7 @@ jobs:
             PACT_PROVIDER_VERSION="$CIRCLE_SHA1" \
             PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
             PACT_PUBLISH_RESULTS="true" \
-            ./gradlew clean check -Dorg.gradle.jvmargs=-Xmx512M -XX:MaxMetaspaceSize=384M
+            ./gradlew clean check
       - save_cache:
           paths:
             - ~/.gradle
