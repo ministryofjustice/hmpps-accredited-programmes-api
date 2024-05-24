@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Subject
 import java.time.LocalDate
 
 @RestController
-@PreAuthorize("hasRole('ROLE_SAR_DATA_ACCESS')")
+@PreAuthorize("hasAnyRole('ROLE_SAR_DATA_ACCESS', 'ROLE_ACCREDITED_PROGRAMMES_API')")
 class SarsDataController(
   private val subjectAccessRequestService: SubjectAccessRequestService,
 ) {
