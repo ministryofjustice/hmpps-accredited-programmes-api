@@ -51,6 +51,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.UUID
@@ -68,6 +70,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var referralStatusHistoryRepository: ReferralStatusHistoryRepository
+
+  @Autowired
+  lateinit var referralRepository: ReferralRepository
 
   @BeforeEach
   fun setUp() {
@@ -844,4 +849,50 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     summaryPage2.pageNumber.shouldBe(2)
     summaryPage2.pageSize.shouldBe(10)
   }
+
+  @Test
+  fun `get subject access report for a referral`() {
+    // Mocking a JWT token for the request
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    // Fetching a course and its offering
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+
+    // Creating a referral for the given offering
+    createReferral(offering.id, PRISON_NUMBER_1)
+
+    // Fetching the referral entity
+    val referralEntities = referralRepository.getSarReferrals(PRISON_NUMBER_1, null, null)
+    referralEntities.shouldNotBeNull()
+    referralEntities.shouldNotBeEmpty()
+    val referralEntity = referralEntities.first()
+
+    // Fetching the subject access report
+    val response = getSubjectAccessReport(PRISON_NUMBER_1)
+    response.shouldNotBeNull()
+
+    // Validating the response content
+    with(response.referrals.first()) {
+      courseName shouldBe course.name
+      audience shouldBe course.audience
+      courseOrganisation shouldBe offering.organisationId
+      oasysConfirmed shouldBe referralEntity.oasysConfirmed
+      additionalInformation shouldBe referralEntity.additionalInformation
+      hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
+      statusCode shouldBe referralEntity.status
+      referrerUsername shouldBe referralEntity.referrer.username
+    }
+  }
+
+  fun getSubjectAccessReport(prisonerId: String) =
+    webTestClient
+      .get()
+      .uri("/subject-access-request?prisonerNumber=$prisonerId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<HmppsSubjectAccessRequestContent>()
+      .returnResult().responseBody!!
 }
