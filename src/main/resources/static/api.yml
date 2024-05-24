@@ -1423,9 +1423,9 @@ paths:
   /oasys/{prisonNumber}/drugAndAlcoholDetail:
     get:
       summary: Get drug and alcohol assessment details
-      description: Retrieves the drug and alcohol assessment details for a given assessment ID.
+      description: Retrieves the drug and alcohol assessment details for a given prison number
       tags:
-        - DrugAndAlcohol
+        - Oasys Integration
       operationId: getDrugAndAlcoholDetails
       parameters:
         - name: prisonNumber
