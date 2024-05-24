@@ -323,7 +323,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     // Mocking a JWT token for the request
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
-    val created = createCourseParticipation(
+    createCourseParticipation(
       CourseParticipationCreate(
         prisonNumber = PRISON_NUMBER_1,
       ),
