@@ -17,7 +17,7 @@ class SarsDataController(
 
   override fun subjectAccessRequestGet(prn: String?, fromDate: Instant?, toDate: Instant?): ResponseEntity<Any> {
     if (prn == null) {
-      return ResponseEntity("PRN is required", HttpStatus.BAD_REQUEST)
+      return ResponseEntity(null, null, 209)
     }
 
     val startDate = fromDate?.atZone(ZoneId.systemDefault())?.toLocalDate()?.atStartOfDay()
