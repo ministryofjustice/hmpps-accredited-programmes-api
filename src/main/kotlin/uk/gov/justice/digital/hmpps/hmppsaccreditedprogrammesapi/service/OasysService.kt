@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
@@ -19,8 +20,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysDrugDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
@@ -174,6 +177,27 @@ class OasysService(
     } else {
       assessment.id
     }
+  }
+
+  fun getDrugAndAlcoholDetail(prisonNumber: String): DrugAlcoholDetail {
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_DRUG_ALCOHOL.name)
+    val assessmentId = getAssessmentId(prisonNumber)
+      ?: throw NotFoundException("No drug alcohol information found for prison number $prisonNumber")
+
+    val drugDetail = getDrugDetail(assessmentId)
+    val alcoholDetail = getAlcoholDetail(assessmentId)
+    return DrugAlcoholDetail(
+      drug = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysDrugDetail(
+        levelOfUseOfMainDrug = drugDetail?.LevelOfUseOfMainDrug,
+        drugsMajorActivity = drugDetail?.DrugsMajorActivity,
+      ),
+      alcohol = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAlcoholDetail(
+        alcoholLinkedToHarm = alcoholDetail?.alcoholLinkedToHarm,
+        alcoholIssuesDetails = alcoholDetail?.alcoholIssuesDetails,
+        frequencyAndLevel = alcoholDetail?.frequencyAndLevel,
+        bingeDrinking = alcoholDetail?.bingeDrinking,
+      ),
+    )
   }
 
   fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? {
@@ -370,6 +394,12 @@ class OasysService(
     return roshSummary.entity
   }
 
+  fun getDrugDetail(assessmentId: Long): OasysDrugDetail? =
+    fetchDetail(assessmentId, oasysApiClient::getDrugDetail, "DrugDetail")
+
+  fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? =
+    fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
+
   private fun getArnsSummary(crn: String): ArnsSummary? {
     val arnsSummary = when (val response = arnsApiClient.getSummary(crn)) {
       is ClientResult.Failure -> {
@@ -401,6 +431,23 @@ class OasysService(
       ?.filter { it.assessmentStatus == "COMPLETE" }
       ?.sortedByDescending { it.completedDate }
       ?.firstOrNull()
+  }
+
+  private inline fun <T> fetchDetail(
+    assessmentId: Long,
+    fetchFunction: (Long) -> ClientResult<T>,
+    entityName: String,
+  ): T? {
+    val result = when (val response = fetchFunction(assessmentId)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve $entityName data for assessmentId $assessmentId reason ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+    return result.entity
   }
 
   companion object {

@@ -6,9 +6,11 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysDrugDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
@@ -53,6 +55,14 @@ class OasysApiClient(
 
   fun getLifestyle(assessmentPk: Long) = getRequest<OasysLifestyle>(OASYS_API) {
     path = "/$assessmentPk/section/section7"
+  }
+
+  fun getDrugDetail(assessmentPk: Long) = getRequest<OasysDrugDetail>(OASYS_API) {
+    path = "/$assessmentPk/section/section8"
+  }
+
+  fun getAlcoholDetail(assessmentPk: Long) = getRequest<OasysAlcoholDetail>(OASYS_API) {
+    path = "/$assessmentPk/section/section9"
   }
 
   fun getPsychiatric(assessmentPk: Long) = getRequest<OasysPsychiatric>(OASYS_API) {

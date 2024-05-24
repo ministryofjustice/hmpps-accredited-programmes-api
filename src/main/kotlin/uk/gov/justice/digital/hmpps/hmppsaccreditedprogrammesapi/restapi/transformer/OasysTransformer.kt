@@ -88,6 +88,8 @@ fun OasysBehaviour.toModel(): Behaviour {
 fun OasysPsychiatric.toModel() = Psychiatric(
   description = currPsychiatricProblems,
   difficultiesCoping = difficultiesCoping,
+  currPsychologicalProblems = currPsychologicalProblems,
+  selfHarmSuicidal = selfHarmSuicidal,
 )
 
 fun OasysHealth.toModel() = Health(
