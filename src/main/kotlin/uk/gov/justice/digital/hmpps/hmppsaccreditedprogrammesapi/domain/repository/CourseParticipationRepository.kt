@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Repository
@@ -16,13 +16,13 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
     """
         SELECT cp FROM CourseParticipationEntity cp
         WHERE cp.prisonNumber = :prisonerNumber
-        AND (:fromDate IS NULL OR (cp.lastModifiedDateTime IS NOT NULL AND cp.lastModifiedDateTime >= :fromDate) OR (cp.lastModifiedDateTime IS NULL AND cp.createdDateTime >= :fromDate))
-        AND (:toDate IS NULL OR (cp.lastModifiedDateTime IS NOT NULL AND cp.lastModifiedDateTime <= :toDate) OR (cp.lastModifiedDateTime IS NULL AND cp.createdDateTime <= :toDate))
+        AND ((cast(:fromDate as date) is null ) OR (cp.lastModifiedDateTime IS NOT NULL AND cp.lastModifiedDateTime >= :fromDate) OR (cp.lastModifiedDateTime IS NULL AND cp.createdDateTime >= :fromDate))
+        AND ((cast(:toDate as date) is null ) OR (cp.lastModifiedDateTime IS NOT NULL AND cp.lastModifiedDateTime <= :toDate) OR (cp.lastModifiedDateTime IS NULL AND cp.createdDateTime <= :toDate))
         """,
   )
   fun getSarParticipations(
     @Param("prisonerNumber") prisonerNumber: String,
-    @Param("fromDate") fromDate: OffsetDateTime?,
-    @Param("toDate") toDate: OffsetDateTime?,
+    @Param("fromDate") fromDate: LocalDateTime?,
+    @Param("toDate") toDate: LocalDateTime?,
   ): List<CourseParticipationEntity>
 }

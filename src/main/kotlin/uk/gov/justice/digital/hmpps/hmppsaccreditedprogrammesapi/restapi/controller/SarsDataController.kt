@@ -9,10 +9,6 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SubjectAccessRequestService
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 
 @RestController
 class SarsDataController(
@@ -22,31 +18,15 @@ class SarsDataController(
   @GetMapping("/subject-access-request")
   fun sarData(
     @RequestParam prisonerNumber: String?,
-    @RequestParam fromDate: String? = null,
-    @RequestParam toDate: String? = null,
+    @RequestParam fromDate: LocalDate? = null,
+    @RequestParam toDate: LocalDate? = null,
     authentication: JwtAuthenticationToken,
   ): ResponseEntity<HmppsSubjectAccessRequestContent> {
     if (prisonerNumber == null) {
       return ResponseEntity(null, null, 209)
     }
-
-    val offsetFromDate = fromDate?.let {
-      OffsetDateTime.of(
-        LocalDate.parse(fromDate, DateTimeFormatter.ISO_DATE),
-        LocalTime.MIDNIGHT,
-        ZoneOffset.UTC,
-      )
-    }
-    val offsetToDate = toDate?.let {
-      OffsetDateTime.of(
-        LocalDate.parse(toDate, DateTimeFormatter.ISO_DATE),
-        LocalTime.MIDNIGHT,
-        ZoneOffset.UTC,
-      )
-    }
-
     val sarsData =
-      subjectAccessRequestService.getPrisonContentFor(prisonerNumber, offsetFromDate, offsetToDate)
+      subjectAccessRequestService.getPrisonContentFor(prisonerNumber, fromDate?.atStartOfDay(), toDate?.atStartOfDay())
     if (sarsData.referrals.isEmpty() && sarsData.courseParticipation.isEmpty()) {
       return ResponseEntity(sarsData, HttpStatus.NO_CONTENT)
     }
