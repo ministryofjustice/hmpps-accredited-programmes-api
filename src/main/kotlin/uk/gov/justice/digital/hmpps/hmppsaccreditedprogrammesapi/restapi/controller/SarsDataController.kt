@@ -32,16 +32,16 @@ class SarsDataController(
 
     val offsetFromDate = fromDate?.let {
       OffsetDateTime.of(
-          LocalDate.parse(fromDate, DateTimeFormatter.ISO_DATE),
-          LocalTime.MIDNIGHT,
-          ZoneOffset.UTC,
+        LocalDate.parse(fromDate, DateTimeFormatter.ISO_DATE),
+        LocalTime.MIDNIGHT,
+        ZoneOffset.UTC,
       )
     }
     val offsetToDate = toDate?.let {
       OffsetDateTime.of(
-          LocalDate.parse(toDate, DateTimeFormatter.ISO_DATE),
-          LocalTime.MIDNIGHT,
-          ZoneOffset.UTC,
+        LocalDate.parse(toDate, DateTimeFormatter.ISO_DATE),
+        LocalTime.MIDNIGHT,
+        ZoneOffset.UTC,
       )
     }
 
