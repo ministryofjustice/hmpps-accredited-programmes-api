@@ -265,7 +265,7 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
   fun getDrugAndAlcoholDetail(prisonNumber: String) =
     webTestClient
       .get()
-      .uri("/oasys/$prisonNumber/drugAndAlcoholDetail")
+      .uri("/oasys/$prisonNumber/drug-and-alcohol-details")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

@@ -1461,7 +1461,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /oasys/{prisonNumber}/drugAndAlcoholDetail:
+  /oasys/{prisonNumber}/drug-and-alcohol-details:
     get:
       summary: Get drug and alcohol assessment details
       description: Retrieves the drug and alcohol assessment details for a given prison number
