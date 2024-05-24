@@ -17,8 +17,16 @@ class SubjectAccessRequestService(
 
   fun getPrisonContentFor(prisonerNumber: String, fromDate: LocalDateTime?, toDate: LocalDateTime?) =
     HmppsSubjectAccessRequestContent(
-      repository.getSarReferrals(prisonerNumber, fromDate, toDate).toSarReferral(),
-      courseParticipationRepository.getSarParticipations(prisonerNumber, fromDate, toDate)
+      repository.getSarReferrals(prisonerNumber).filter { referral ->
+        val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it) } ?: true
+        val beforeToDate = toDate?.let { referral.submittedOn?.isBefore(it) } ?: true
+        afterFromDate && beforeToDate
+      }.toSarReferral(),
+      courseParticipationRepository.getSarParticipations(prisonerNumber).filter { referral ->
+        val afterFromDate = fromDate?.let { referral.createdDateTime.isAfter(it) } ?: true
+        val beforeToDate = toDate?.let { referral.createdDateTime.isBefore(it) } ?: true
+        afterFromDate && beforeToDate
+      }
         .toSarParticipation(),
     )
 }
@@ -56,6 +64,7 @@ data class SarCourseParticipation(
   val updatedByUser: String?,
   val updatedDateTime: LocalDateTime?,
 )
+
 private fun List<CourseParticipationEntity>.toSarParticipation(): List<SarCourseParticipation> {
   return map {
     SarCourseParticipation(

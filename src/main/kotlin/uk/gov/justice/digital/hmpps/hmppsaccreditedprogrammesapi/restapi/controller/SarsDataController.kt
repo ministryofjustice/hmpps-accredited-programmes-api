@@ -26,7 +26,7 @@ class SarsDataController(
       return ResponseEntity(null, null, 209)
     }
     val sarsData =
-      subjectAccessRequestService.getPrisonContentFor(prisonerNumber, fromDate?.atStartOfDay(), toDate?.atStartOfDay())
+      subjectAccessRequestService.getPrisonContentFor(prisonerNumber, fromDate?.atStartOfDay(), toDate?.atStartOfDay()?.plusDays(1))
     if (sarsData.referrals.isEmpty() && sarsData.courseParticipation.isEmpty()) {
       return ResponseEntity(sarsData, HttpStatus.NO_CONTENT)
     }
