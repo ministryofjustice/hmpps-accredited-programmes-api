@@ -888,7 +888,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun getSubjectAccessReport(prisonerId: String) =
     webTestClient
       .get()
-      .uri("/subject-access-request?prisonerNumber=$prisonerId")
+      .uri("/subject-access-request?prn=$prisonerId")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
