@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 @Service
 @Transactional
@@ -15,10 +16,10 @@ class SubjectAccessRequestService(
   private val courseParticipationRepository: CourseParticipationRepository,
 ) {
 
-  fun getPrisonContentFor(prisonerNumber: String, fromDate: LocalDateTime?, toDate: LocalDateTime?) =
+  fun getPrisonContentFor(prisonerNumber: String, fromDate: OffsetDateTime?, toDate: OffsetDateTime?) =
     HmppsSubjectAccessRequestContent(
-      repository.getSarReferrals(prisonerNumber).toSarReferral(),
-      courseParticipationRepository.getSarParticipations(prisonerNumber)
+      repository.getSarReferrals(prisonerNumber, fromDate, toDate).toSarReferral(),
+      courseParticipationRepository.getSarParticipations(prisonerNumber, fromDate, toDate)
         .toSarParticipation(),
     )
 }
