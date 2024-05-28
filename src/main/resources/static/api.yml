@@ -582,8 +582,8 @@ paths:
           description: The referral does not exist
 
     delete:
-      summary: Delete a referral
-      description: Deletes a referral by its ID.
+      summary: Delete a draft referral
+      description: Deletes a draft referral by its ID.
       operationId: deleteReferralById
       tags:
         - Referrals

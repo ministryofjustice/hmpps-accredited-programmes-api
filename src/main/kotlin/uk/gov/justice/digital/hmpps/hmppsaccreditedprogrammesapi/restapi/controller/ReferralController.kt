@@ -67,27 +67,21 @@ constructor(
       }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 
+  @Transactional
   override fun deleteReferralById(id: UUID): ResponseEntity<Unit> {
-    println("********* Reached delete")
-
     val referral = referralService.getReferralById(id)
       ?: throw NotFoundException("No Referral found to delete /referrals/$id")
 
-    println("********* going to find status")
+    auditService.audit(referralEntity = referral, auditAction = AuditAction.DELETE_REFERRAL.name)
+
     val status = referenceDataService.getReferralStatus(referral.status)
 
-    println("********* Found status - $status")
-    println("********* Draft status - ${status.draft} ")
-    println("********* Draft condition - ${status.draft == true} ")
-
-    if (status.draft == true) {
-      println("********* Before delete - ${status.draft} ")
-      referralService.deleteReferral(id)
-      println("********* After delete - ${status.draft} ")
-      return ResponseEntity.noContent().build()
-    } else {
+    if (status.draft != true) {
       throw BusinessException("Only draft referrals can be deleted. Referral with $id has a status of ${status.code}")
     }
+
+    referralService.deleteReferral(id)
+    return ResponseEntity.noContent().build()
   }
 
   override fun updateReferralById(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> {
