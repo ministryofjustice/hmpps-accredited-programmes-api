@@ -43,7 +43,6 @@ class PersonService(
   fun getSentenceType(prisonNumber: String): String {
     val sentenceInformation = getSentenceInformation(prisonNumber) ?: return "No active sentences"
     val activeSentences = sentenceInformation.latestPrisonTerm.courtSentences
-      .filter { it.caseStatus == "ACTIVE" }
       .flatMap { it.sentences }
       .map { it.sentenceTypeDescription }
       .distinct()
@@ -57,7 +56,6 @@ class PersonService(
 
   fun getOffenceDetails(prisonNumber: String): List<Pair<String?, LocalDate?>> {
     return getSentenceInformation(prisonNumber)?.latestPrisonTerm?.courtSentences
-      ?.filter { it.caseStatus == "ACTIVE" }
       ?.flatMap { it.sentences }
       ?.flatMap { it.offences.orEmpty() }
       ?.map { Pair(it.offenceCode, it.offenceStartDate) }
@@ -70,7 +68,6 @@ class PersonService(
       ?: throw NotFoundException("No sentence information found for person with id: $prisonNumber")
 
     val sentences = sentenceInformation.latestPrisonTerm.courtSentences
-      .filter { it.caseStatus == "ACTIVE" }
       .flatMap { it.sentences }
       .map { Sentence(it.sentenceTypeDescription, it.sentenceStartDate) }
 

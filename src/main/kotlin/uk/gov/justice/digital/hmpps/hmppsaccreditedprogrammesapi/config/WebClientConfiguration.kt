@@ -84,7 +84,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
     oauth2Client.setDefaultClientRegistrationId("oasys-api")
-    return buildWebClient("$oasysApiBaseUrl/assessments", oauth2Client)
+    return buildWebClient("$oasysApiBaseUrl", oauth2Client)
   }
 
   @Bean(name = ["arnsApiWebClient"])
