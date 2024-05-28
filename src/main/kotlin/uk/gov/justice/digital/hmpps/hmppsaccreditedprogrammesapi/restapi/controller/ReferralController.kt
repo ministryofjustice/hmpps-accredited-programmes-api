@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
@@ -65,6 +66,29 @@ constructor(
         ResponseEntity.ok(it.toApi(status))
       }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
+
+  override fun deleteReferralById(id: UUID): ResponseEntity<Unit> {
+    println("********* Reached delete")
+
+    val referral = referralService.getReferralById(id)
+      ?: throw NotFoundException("No Referral found to delete /referrals/$id")
+
+    println("********* going to find status")
+    val status = referenceDataService.getReferralStatus(referral.status)
+
+    println("********* Found status - $status")
+    println("********* Draft status - ${status.draft} ")
+    println("********* Draft condition - ${status.draft == true} ")
+
+    if (status.draft == true) {
+      println("********* Before delete - ${status.draft} ")
+      referralService.deleteReferral(id)
+      println("********* After delete - ${status.draft} ")
+      return ResponseEntity.noContent().build()
+    } else {
+      throw BusinessException("Only draft referrals can be deleted. Referral with $id has a status of ${status.code}")
+    }
+  }
 
   override fun updateReferralById(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> {
     referralService.updateReferralById(id, referralUpdate.toDomain())

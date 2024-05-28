@@ -581,6 +581,30 @@ paths:
         404:
           description: The referral does not exist
 
+    delete:
+      summary: Delete a referral
+      description: Deletes a referral by its ID.
+      operationId: deleteReferralById
+      tags:
+        - Referrals
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: No Content - The referral was successfully deleted
+        401:
+          description: The request was unauthorised
+        403:
+          description: Not authorised to access this endpoint/these referrals
+        404:
+          description: No referrals for supplied organisationId (Not Found).
+
   /referrals/{id}/status-transitions:
     get:
       tags:
@@ -2085,6 +2109,9 @@ components:
               type: string
             submittedOn:
               type: string
+            deleted:
+              description: Is the status of the referral a deleted one.
+              type: boolean
           required:
             - id
             - offeringId

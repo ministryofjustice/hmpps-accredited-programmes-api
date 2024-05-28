@@ -153,6 +153,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
+      deleted = false,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -192,6 +193,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
+      deleted = false,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -228,6 +230,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
       submittedOn = null,
+      deleted = false,
     )
   }
 
@@ -273,6 +276,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       additionalInformation = null,
       submittedOn = null,
+      deleted = false,
     )
   }
 
@@ -895,4 +899,61 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody<HmppsSubjectAccessRequestContent>()
       .returnResult().responseBody!!
+
+  @Test
+  fun `Delete a nonexistent referral should return 404`() {
+    webTestClient
+      .delete()
+      .uri("/referrals/${UUID.randomUUID()}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange().expectStatus().isNotFound
+  }
+
+  @Test
+  fun `delete referral unsuccessful for non draft referrals`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id)
+
+    val referralStatusUpdate = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+    )
+
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate)
+
+    webTestClient
+      .delete()
+      .uri("/referrals/${referralCreated.referralId}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange().expectStatus().isBadRequest
+
+    val deletedReferral = getReferralById(referralCreated.referralId)
+    deletedReferral.deleted.shouldBe(false)
+  }
+
+  @Test
+  fun `delete draft referral successful`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val createdReferral = createReferral(offering.id, PRISON_NUMBER_1)
+
+    val referralHistories =
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(createdReferral.referralId)
+    referralHistories.shouldNotBeEmpty()
+    referralHistories.size shouldBe 1
+    referralHistories[0].status.code.shouldBeEqual("REFERRAL_STARTED")
+    referralHistories[0].status.draft.shouldBe(true)
+
+    webTestClient
+      .delete()
+      .uri("/referrals/${createdReferral.referralId}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange().expectStatus().isNoContent
+
+    val deletedReferral = getReferralById(createdReferral.referralId)
+    deletedReferral.deleted.shouldBe(true)
+  }
 }
