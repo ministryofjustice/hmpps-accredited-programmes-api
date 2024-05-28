@@ -117,6 +117,8 @@ abstract class IntegrationTestBase {
       .responseTimeout(Duration.ofMillis(30000))
       .build()
 
+    println("WIREMOCK PORT=$wiremockPort")
+
     wiremockServer = WireMockServer(
       WireMockConfiguration()
         .port(wiremockPort)

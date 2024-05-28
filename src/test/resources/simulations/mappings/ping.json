@@ -1,0 +1,43 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/health/ping",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "health-ping.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/health",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "healthy.json"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "urlPath": "/auth/oauth/token"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "token.json"
+      }
+    }
+  ]
+}

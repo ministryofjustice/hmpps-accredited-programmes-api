@@ -30,62 +30,62 @@ class OasysApiClient(
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
   fun getAssessments(prisonerNumber: String) = getRequest<OasysAssessmentTimeline>(OASYS_API) {
-    path = "/timeline/$prisonerNumber"
+    path = "/assessments/timeline/$prisonerNumber"
   }
 
   fun getOffendingInfo(assessmentPk: Long) = getRequest<OasysOffendingInfo>(OASYS_API) {
-    path = "/$assessmentPk/section/section1"
+    path = "/assessments/$assessmentPk/section/section1"
   }
 
   fun getOffenceDetail(assessmentPk: Long) = getRequest<OasysOffenceDetail>(OASYS_API) {
-    path = "/$assessmentPk/section/section2"
+    path = "/assessments/$assessmentPk/section/section2"
   }
 
   fun getAccommodation(assessmentPk: Long) = getRequest<OasysAccommodation>(OASYS_API) {
-    path = "/$assessmentPk/section/section3"
+    path = "/assessments/$assessmentPk/section/section3"
   }
 
   fun getLearning(assessmentPk: Long) = getRequest<OasysLearning>(OASYS_API) {
-    path = "/$assessmentPk/section/section4"
+    path = "/assessments/$assessmentPk/section/section4"
   }
 
   fun getRelationships(assessmentPk: Long) = getRequest<OasysRelationships>(OASYS_API) {
-    path = "/$assessmentPk/section/section6"
+    path = "/assessments/$assessmentPk/section/section6"
   }
 
   fun getLifestyle(assessmentPk: Long) = getRequest<OasysLifestyle>(OASYS_API) {
-    path = "/$assessmentPk/section/section7"
+    path = "/assessments/$assessmentPk/section/section7"
   }
 
   fun getDrugDetail(assessmentPk: Long) = getRequest<OasysDrugDetail>(OASYS_API) {
-    path = "/$assessmentPk/section/section8"
+    path = "/assessments/$assessmentPk/section/section8"
   }
 
   fun getAlcoholDetail(assessmentPk: Long) = getRequest<OasysAlcoholDetail>(OASYS_API) {
-    path = "/$assessmentPk/section/section9"
+    path = "/assessments/$assessmentPk/section/section9"
   }
 
   fun getPsychiatric(assessmentPk: Long) = getRequest<OasysPsychiatric>(OASYS_API) {
-    path = "/$assessmentPk/section/section10"
+    path = "/assessments/$assessmentPk/section/section10"
   }
 
   fun getBehaviour(assessmentPk: Long) = getRequest<OasysBehaviour>(OASYS_API) {
-    path = "/$assessmentPk/section/section11"
+    path = "/assessments/$assessmentPk/section/section11"
   }
 
   fun getAttitude(assessmentPk: Long) = getRequest<OasysAttitude>(OASYS_API) {
-    path = "/$assessmentPk/section/section12"
+    path = "/assessments/$assessmentPk/section/section12"
   }
 
   fun getHealth(assessmentPk: Long) = getRequest<OasysHealth>(OASYS_API) {
-    path = "/$assessmentPk/section/section13"
+    path = "/assessments/$assessmentPk/section/section13"
   }
 
   fun getRoshFull(assessmentPk: Long) = getRequest<OasysRoshFull>(OASYS_API) {
-    path = "/$assessmentPk/section/sectionroshfull"
+    path = "/assessments/$assessmentPk/section/sectionroshfull"
   }
 
   fun getRoshSummary(assessmentPk: Long) = getRequest<OasysRoshSummary>(OASYS_API) {
-    path = "/$assessmentPk/section/sectionroshsumm"
+    path = "/assessments/$assessmentPk/section/sectionroshsumm"
   }
 }

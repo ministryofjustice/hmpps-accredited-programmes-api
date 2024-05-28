@@ -1,0 +1,60 @@
+{
+  "status": "UP",
+  "components": {
+    "audit-health": {
+      "status": "UP",
+      "details": {
+        "queueName": "Digital-Prison-Services-dev-hmpps_audit_queue",
+        "messagesOnQueue": "0",
+        "messagesInFlight": "0"
+      }
+    },
+    "db": {
+      "status": "UP",
+      "details": {
+        "database": "PostgreSQL",
+        "validationQuery": "isValid()"
+      }
+    },
+    "diskSpace": {
+      "status": "UP",
+      "details": {
+        "total": 150311251968,
+        "free": 26188845056,
+        "threshold": 10485760,
+        "path": "/app/.",
+        "exists": true
+      }
+    },
+    "healthInfo": {
+      "status": "UP",
+      "details": {
+        "version": "2024-05-24.8920.b1fd77a"
+      }
+    },
+    "hmppsdomaineventsqueue-health": {
+      "status": "UP",
+      "details": {
+        "queueName": "accredited-programmes-team-development-hmpps_acp_domain_events_queue",
+        "messagesOnQueue": "0",
+        "messagesInFlight": "0",
+        "dlqStatus": "UP",
+        "dlqName": "accredited-programmes-team-development-hmpps_acp_domain_events_dlq",
+        "messagesOnDlq": "0"
+      }
+    },
+    "livenessState": {
+      "status": "UP"
+    },
+    "ping": {
+      "status": "UP"
+    },
+    "readinessState": {
+      "status": "UP"
+    }
+  },
+  "groups": [
+    "liveness",
+    "readiness"
+  ]
+}
