@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
@@ -65,6 +66,23 @@ constructor(
         ResponseEntity.ok(it.toApi(status))
       }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
+
+  @Transactional
+  override fun deleteReferralById(id: UUID): ResponseEntity<Unit> {
+    val referral = referralService.getReferralById(id)
+      ?: throw NotFoundException("No Referral found to delete /referrals/$id")
+
+    auditService.audit(referralEntity = referral, auditAction = AuditAction.DELETE_REFERRAL.name)
+
+    val status = referenceDataService.getReferralStatus(referral.status)
+
+    if (status.draft != true) {
+      throw BusinessException("Only draft referrals can be deleted. Referral with $id has a status of ${status.code}")
+    }
+
+    referralService.deleteReferral(id)
+    return ResponseEntity.noContent().build()
+  }
 
   override fun updateReferralById(id: UUID, referralUpdate: ReferralUpdate): ResponseEntity<Unit> {
     referralService.updateReferralById(id, referralUpdate.toDomain())

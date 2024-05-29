@@ -48,6 +48,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_HINT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
@@ -55,6 +56,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.time.LocalDateTime
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -278,9 +280,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Updating a referral status should insert a status history record`() {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralStatusUpdate1 = ReferralStatusUpdate(
       status = REFERRAL_SUBMITTED,
@@ -317,9 +317,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get referral status transitions`() {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralStatusUpdate1 = ReferralStatusUpdate(
       status = REFERRAL_SUBMITTED,
@@ -362,9 +360,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get referral confirmation text`() {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val confirmationFields = getConfirmationText(referralCreated.referralId, "ON_HOLD_REFERRAL_SUBMITTED")
 
@@ -373,9 +369,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get referral confirmation text assessment started to suitable not ready`() {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralStatusUpdate1 = ReferralStatusUpdate(
       status = REFERRAL_SUBMITTED,
@@ -407,9 +401,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Get referral status transitions for on programme`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralStatusUpdate1 = ReferralStatusUpdate(
       status = REFERRAL_SUBMITTED,
@@ -466,9 +458,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Submitting a referral with all fields set should return 204 with no body`() {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralUpdate = ReferralUpdate(
       additionalInformation = "Additional information",
@@ -499,6 +489,12 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isNotFound
+  }
+
+  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): ReferralCreated {
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    return createReferral(offering.id, prisonNumber)
   }
 
   fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =
@@ -692,7 +688,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
+    val referralCreated = createReferral(PRISON_NUMBER_1)
     val createdReferral = getReferralById(referralCreated.referralId)
 
     referralCreated.referralId.shouldNotBeNull()
@@ -895,4 +891,64 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody<HmppsSubjectAccessRequestContent>()
       .returnResult().responseBody!!
+
+  @Test
+  fun `Delete a nonexistent referral should return 404`() {
+    webTestClient
+      .delete()
+      .uri("/referrals/${UUID.randomUUID()}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange().expectStatus().isNotFound
+  }
+
+  @Test
+  fun `delete referral unsuccessful for non draft referrals`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+    )
+
+    updateReferralStatus(referralCreated.referralId, referralStatusUpdate)
+
+    webTestClient
+      .delete()
+      .uri("/referrals/${referralCreated.referralId}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange().expectStatus().isBadRequest
+  }
+
+  @Test
+  fun `delete draft referral successful`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val createdReferral = createReferral(offering.id, PRISON_NUMBER_1)
+
+    val referralHistories =
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(createdReferral.referralId)
+    referralHistories.shouldNotBeEmpty()
+    referralHistories.size shouldBe 1
+    referralHistories[0].status.code.shouldBeEqual("REFERRAL_STARTED")
+    referralHistories[0].status.draft.shouldBe(true)
+
+    webTestClient
+      .delete()
+      .uri("/referrals/${createdReferral.referralId}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange().expectStatus().isNoContent
+
+    val twoSecondsAgo = LocalDateTime.now().minusSeconds(2)
+    val auditEntity = auditRepository.findAll()
+      .filter {
+        it.prisonNumber == PRISON_NUMBER_1 &&
+          it.referralId == createdReferral.referralId &&
+          it.auditAction == AuditAction.DELETE_REFERRAL.name &&
+          it.auditDateTime.isAfter(twoSecondsAgo)
+      }
+
+    auditEntity shouldNotBe null
+  }
 }

@@ -355,4 +355,8 @@ constructor(
       throw BusinessException("Cannot transition referral $referralId from $currentStatus to $newStatus")
     }
   }
+
+  fun deleteReferral(referralId: UUID) {
+    referralRepository.deleteById(referralId)
+  }
 }
