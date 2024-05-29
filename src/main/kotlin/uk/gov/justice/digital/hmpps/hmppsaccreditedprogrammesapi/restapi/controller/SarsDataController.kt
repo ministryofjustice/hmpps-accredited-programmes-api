@@ -6,8 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.SubjectAccessRequestApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SubjectAccessRequestService
-import java.time.Instant
-import java.time.ZoneId
+import java.time.LocalDate
 
 @RestController
 @PreAuthorize("hasAnyRole('ROLE_SAR_DATA_ACCESS', 'ROLE_ACCREDITED_PROGRAMMES_API')")
@@ -15,17 +14,14 @@ class SarsDataController(
   private val subjectAccessRequestService: SubjectAccessRequestService,
 ) : SubjectAccessRequestApiDelegate {
 
-  override fun subjectAccessRequestGet(prn: String?, fromDate: Instant?, toDate: Instant?): ResponseEntity<Any> {
+  override fun subjectAccessRequestGet(prn: String?, fromDate: LocalDate?, toDate: LocalDate?): ResponseEntity<Any> {
     if (prn == null) {
       return ResponseEntity(null, null, 209)
     }
 
-    val startDate = fromDate?.atZone(ZoneId.systemDefault())?.toLocalDate()?.atStartOfDay()
-    val endDate = toDate?.atZone(ZoneId.systemDefault())?.toLocalDate()?.plusDays(1)?.atStartOfDay()
+    val sarsData = subjectAccessRequestService.getPrisonContentFor(prn, fromDate, toDate)
 
-    val sarsData = subjectAccessRequestService.getPrisonContentFor(prn, startDate, endDate)
-
-    return if (sarsData.referrals.isEmpty() && sarsData.courseParticipation.isEmpty()) {
+    return if (sarsData.content.referrals.isEmpty() && sarsData.content.courseParticipation.isEmpty()) {
       ResponseEntity(HttpStatus.NO_CONTENT)
     } else {
       ResponseEntity(sarsData, HttpStatus.OK)

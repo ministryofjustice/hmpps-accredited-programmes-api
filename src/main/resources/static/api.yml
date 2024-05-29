@@ -29,13 +29,13 @@ paths:
           description: from date
           schema:
             type: string
-            format: date-time
+            format: date
         - name: toDate
           in: query
           description: to date
           schema:
             type: string
-            format: date-time
+            format: date
       responses:
         '200':
           description: the sar content

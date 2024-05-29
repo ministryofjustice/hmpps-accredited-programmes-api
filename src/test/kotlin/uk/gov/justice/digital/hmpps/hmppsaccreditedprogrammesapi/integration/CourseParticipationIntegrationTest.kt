@@ -336,7 +336,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     response.shouldNotBeNull()
 
     // Validating the response content
-    with(response.courseParticipation.first()) {
+    with(response.content.courseParticipation.first()) {
       courseName shouldBe cp[0].courseName
     }
   }
