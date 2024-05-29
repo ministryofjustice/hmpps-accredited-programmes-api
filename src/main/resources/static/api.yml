@@ -2824,10 +2824,25 @@ components:
       properties:
         type:
           type: string
-          example: releaseDate
+          example: earliestReleaseDate
+        code:
+          type: string
+          example: ERD
+        description:
+          type: string
+          example: Earliest Release Date
+        earliestReleaseDate:
+          type: boolean
+          default: false
         date:
           type: string
           format: date
+        order:
+          type: integer
+          example: This is more like a weighting than an order - higher the number the more important the date.
+      required:
+        - type
+        - code
 
     PrisonType:
       type: object

@@ -81,6 +81,7 @@ springdoc:
       - name: API
         url: "api.yml"
 
+
 server:
   port: 8080
   servlet:
