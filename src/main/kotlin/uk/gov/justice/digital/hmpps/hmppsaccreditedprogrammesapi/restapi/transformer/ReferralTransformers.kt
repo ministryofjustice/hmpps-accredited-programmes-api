@@ -22,7 +22,6 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferr
   statusDescription = status.description,
   statusColour = status.colour,
   submittedOn = submittedOn?.toString(),
-  deleted = deleted,
 )
 
 fun ApiReferralUpdate.toDomain() = ReferralUpdate(

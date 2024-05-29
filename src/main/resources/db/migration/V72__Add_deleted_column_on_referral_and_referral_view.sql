@@ -25,7 +25,6 @@ SELECT r.referral_id,
        c.audience,
        r.submitted_on,
        p.sentence_type,
-       r.deleted,
     CASE
            WHEN c.list_display_name IS NOT NULL THEN c.list_display_name
            ELSE c.name
@@ -35,4 +34,5 @@ FROM referral r
          LEFT OUTER JOIN offering o ON o.offering_id = r.offering_id
          LEFT OUTER JOIN course c ON c.course_id = o.course_id
          LEFT OUTER JOIN organisation org ON org.code = o.organisation_id
-         LEFT OUTER JOIN referral_status rs ON rs.code = r.status;
+         LEFT OUTER JOIN referral_status rs ON rs.code = r.status
+WHERE r.deleted = false;

@@ -39,7 +39,6 @@ data class ReferralViewEntity(
   var submittedOn: LocalDateTime? = null,
   val sentenceType: String?,
   val listDisplayName: String?,
-  val deleted: Boolean?,
 )
 
 @Repository
@@ -52,7 +51,6 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
         AND (:status IS NULL OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
-        AND (r.deleted = FALSE)
     """,
   )
   fun getReferralsByOrganisationId(
@@ -70,7 +68,6 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
         AND (:status IS NULL OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
-        AND (r.deleted = FALSE)
     """,
   )
   fun getReferralsByUsername(

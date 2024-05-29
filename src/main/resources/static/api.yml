@@ -2109,9 +2109,6 @@ components:
               type: string
             submittedOn:
               type: string
-            deleted:
-              description: Is the status of the referral a deleted one.
-              type: boolean
           required:
             - id
             - offeringId

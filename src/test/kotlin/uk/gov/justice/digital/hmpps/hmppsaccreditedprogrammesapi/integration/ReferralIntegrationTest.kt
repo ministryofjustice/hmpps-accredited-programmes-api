@@ -155,7 +155,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
-      deleted = false,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -195,7 +194,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
-      deleted = false,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -232,7 +230,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
       submittedOn = null,
-      deleted = false,
     )
   }
 
@@ -278,7 +275,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       additionalInformation = null,
       submittedOn = null,
-      deleted = false,
     )
   }
 
@@ -921,9 +917,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .uri("/referrals/${referralCreated.referralId}")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .exchange().expectStatus().isBadRequest
-
-    val deletedReferral = getReferralById(referralCreated.referralId)
-    deletedReferral.deleted.shouldBe(false)
   }
 
   @Test
@@ -957,8 +950,5 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       }
 
     auditEntity shouldNotBe null
-
-    val deletedReferral = getReferralById(createdReferral.referralId)
-    deletedReferral.deleted.shouldBe(true)
   }
 }
