@@ -37,17 +37,18 @@ data class Sentence(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class KeyDates(
-  val sentenceStartDate: LocalDate?,
-  val effectiveSentenceEndDate: LocalDate?,
-  val nonDtoReleaseDate: LocalDate?,
-  val confirmedReleaseDate: LocalDate?,
-  val releaseDate: LocalDate?,
-  val sentenceExpiryDate: LocalDate?,
+  val actualParoleDate: LocalDate?,
+  val automaticReleaseDate: LocalDate?,
   val conditionalReleaseDate: LocalDate?,
-  val licenceExpiryDate: LocalDate?,
+  val earlyRemovalSchemeEligibilityDate: LocalDate?,
+  val homeDetentionCurfewActualDate: LocalDate?,
   val homeDetentionCurfewEligibilityDate: LocalDate?,
-  val earlyTermDate: LocalDate?,
-  val lateTermDate: LocalDate?,
+  val midTermDate: LocalDate?,
+  val nonParoleDate: LocalDate?,
+  val paroleEligibilityDate: LocalDate?,
+  val tariffEarlyRemovalSchemeEligibilityDate: LocalDate?,
+  val tariffDate: LocalDate?,
+  val dtoPostRecallReleaseDate: LocalDate?,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
