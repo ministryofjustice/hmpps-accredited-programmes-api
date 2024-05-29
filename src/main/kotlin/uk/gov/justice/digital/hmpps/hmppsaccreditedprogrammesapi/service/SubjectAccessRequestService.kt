@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
@@ -15,23 +16,29 @@ class SubjectAccessRequestService(
   private val courseParticipationRepository: CourseParticipationRepository,
 ) {
 
-  fun getPrisonContentFor(prisonerNumber: String, fromDate: LocalDateTime?, toDate: LocalDateTime?) =
+  fun getPrisonContentFor(prisonerNumber: String, fromDate: LocalDate?, toDate: LocalDate?) =
     HmppsSubjectAccessRequestContent(
-      repository.getSarReferrals(prisonerNumber).filter { referral ->
-        val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it) } ?: true
-        val beforeToDate = toDate?.let { referral.submittedOn?.isBefore(it) } ?: true
-        afterFromDate && beforeToDate
-      }.toSarReferral(),
-      courseParticipationRepository.getSarParticipations(prisonerNumber).filter { referral ->
-        val afterFromDate = fromDate?.let { referral.createdDateTime.isAfter(it) } ?: true
-        val beforeToDate = toDate?.let { referral.createdDateTime.isBefore(it) } ?: true
-        afterFromDate && beforeToDate
-      }
-        .toSarParticipation(),
+      Content(
+        repository.getSarReferrals(prisonerNumber).filter { referral ->
+          val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it.atStartOfDay()) } ?: true
+          val beforeToDate = toDate?.let { referral.submittedOn?.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
+          afterFromDate && beforeToDate
+        }.toSarReferral(),
+        courseParticipationRepository.getSarParticipations(prisonerNumber).filter { referral ->
+          val afterFromDate = fromDate?.let { referral.createdDateTime.isAfter(it.atStartOfDay()) } ?: true
+          val beforeToDate = toDate?.let { referral.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
+          afterFromDate && beforeToDate
+        }
+          .toSarParticipation(),
+      ),
     )
 }
 
 data class HmppsSubjectAccessRequestContent(
+  val content: Content,
+)
+
+data class Content(
   val referrals: List<SarReferral>,
   val courseParticipation: List<SarCourseParticipation>,
 )
