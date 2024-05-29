@@ -40,6 +40,7 @@ class SecurityConfiguration(
           "/v3/api-docs/**",
           "/api.yml",
           "/info",
+          "/swagger-ui.html",
         ).permitAll()
         .requestMatchers("/subject-access-request").hasAnyRole("SAR_DATA_ACCESS", "ACCREDITED_PROGRAMMES_API")
         .anyRequest().hasRole("ACCREDITED_PROGRAMMES_API")
