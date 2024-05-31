@@ -131,6 +131,15 @@ constructor(
     }
   }
 
+  fun updateAllPeople() {
+    log.info("Attempting to update all people in person cache.")
+    val people = personRepository.findAll()
+    people.forEach {
+      updatePerson(it.prisonNumber)
+    }
+    log.info("Updated all people in person cache.")
+  }
+
   private fun updatePerson(
     it: Prisoner,
     personEntity: PersonEntity,
@@ -176,12 +185,11 @@ constructor(
   }
 
   private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> {
-    return when {
-      prisoner.indeterminateSentence == true -> Pair(prisoner.tariffDate, "Tariff Date")
-      prisoner.paroleEligibilityDate != null -> Pair(prisoner.paroleEligibilityDate, "Parole Eligibility Date")
-      prisoner.conditionalReleaseDate != null -> Pair(prisoner.conditionalReleaseDate, "Conditional Release Date")
-      else -> Pair(null, null)
-    }
+    return personService.getSentenceDetails(prisoner.prisonerNumber)
+      ?.keyDates
+      ?.firstOrNull { it.earliestReleaseDate == true }
+      ?.let { Pair(it.date, it.description) }
+      ?: Pair(null, null)
   }
 
   fun getReferralById(referralId: UUID, updatePersonDetails: Boolean = false) =
