@@ -111,7 +111,7 @@ class PersonService(
 
   enum class KeyDateType(val mapping: String, val code: String, val description: String, val order: Int = 1) {
     ACTUAL_PAROLE_DATE("actualParoleDate", "APD", "Approved parole date", 10),
-    AUTOMATIC_RELEASE_DATE("automaticReleaseDate", "ARD", "Automatic release date", 20),
+    AUTOMATIC_RELEASE_DATE("automaticReleaseDate", "AED", "Automatic release date", 20),
     CONDITIONAL_RELEASE_DATE("conditionalReleaseDate", "CRD", "Conditional release date", 30),
     EARLY_REMOVAL_SCHEME_ELIGIBILITY_DATE(
       "earlyRemovalSchemeEligibilityDate",
@@ -141,7 +141,7 @@ class PersonService(
     ),
     TARIFF_DATE("tariffDate", "TED", "Tariff Expiry Date", 100),
     PAROLE_ELIGIBILITY_DATE("paroleEligibilityDate", "PED", "Parole eligibility date", 110),
-    POST_RECALL_RELEASE_DATE("dtoPostRecallReleaseDate", "PRRD", "Post recall release date", 120),
+    POST_RECALL_RELEASE_DATE("postRecallReleaseDate", "PRRD", "Post recall release date", 120),
     RELEASE_DATE("releaseDate", "RD", "Release date", 130),
     ;
 
