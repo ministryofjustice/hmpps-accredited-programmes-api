@@ -59,9 +59,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
-import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
@@ -981,8 +979,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     wiremockServer.stubFor(
       WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
         WireMock.containing(
-          nomsNumber
-        )
+          nomsNumber,
+        ),
       )
         .willReturn(
           WireMock.aResponse()
@@ -994,7 +992,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     updateAllPeople()
 
     await untilCallTo {
-     personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+      personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     } matches { it?.surname == "changed" }
 
     val referralViewAfter = personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
