@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAnyOf
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -9,6 +10,9 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,6 +33,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralView
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.ResourceLoader
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED_COLOUR
@@ -951,4 +957,57 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     auditEntity shouldNotBe null
   }
+
+  @Test
+  fun `update all people`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val nomsNumber = "C6666DD"
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    createReferral(offering.id, nomsNumber)
+
+    val referralViewBefore = personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    referralViewBefore shouldNotBe null
+    referralViewBefore?.forename?.shouldBeEqual("JOHN")
+    referralViewBefore?.surname?.shouldBeEqual("SMITH")
+
+    val results = ResourceLoader.file<List<Prisoner>>("prison-search-results")
+    val result = results[0]
+    result.lastName = "changed"
+    result.firstName = "name"
+    wiremockServer.stubFor(
+      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
+        WireMock.containing(
+          nomsNumber,
+        ),
+      )
+        .willReturn(
+          WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(listOf(result))),
+        ),
+    )
+
+    updateAllPeople()
+
+    await untilCallTo {
+      personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    } matches { it?.surname == "changed" }
+
+    val referralViewAfter = personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+
+    referralViewAfter shouldNotBe null
+    referralViewAfter?.forename?.shouldBeEqual("name")
+    referralViewAfter?.surname?.shouldBeEqual("changed")
+  }
+
+  fun updateAllPeople() =
+    webTestClient
+      .post()
+      .uri("/admin/person/updateAll")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
 }
