@@ -693,7 +693,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun `Retrieving a list of filtered referrals views for an organisation with unknown course filter should return 200 with empty body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
+    getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(PRISON_NUMBER_1)
     val createdReferral = getReferralById(referralCreated.referralId)
 

@@ -9,6 +9,7 @@ security:
 paths:
   /subject-access-request:
     get:
+      operationId: subjectAccessRequestGet
       summary: API call to retrieve SAR information about a person
       tags:
         - Subject Access Request
