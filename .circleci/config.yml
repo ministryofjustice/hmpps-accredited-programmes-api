@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@7
+  hmpps: ministryofjustice/hmpps@9
   node: circleci/node@4.5.2
 
 parameters:
@@ -35,6 +35,7 @@ jobs:
             PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
             PACT_PUBLISH_RESULTS="true" \
             ./gradlew clean check
+
       - save_cache:
           paths:
             - ~/.gradle
