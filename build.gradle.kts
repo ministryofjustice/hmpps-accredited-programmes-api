@@ -21,13 +21,12 @@ dependencies {
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.0")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
-
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("org.flywaydb:flyway-core")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
   implementation("com.google.guava:guava:33.2.1-jre")
 
