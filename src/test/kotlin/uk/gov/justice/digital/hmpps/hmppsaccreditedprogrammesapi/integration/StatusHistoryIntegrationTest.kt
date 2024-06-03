@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import io.kotest.matchers.equals.shouldBeEqual
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -87,20 +86,16 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `get referral statuses for a referral`() {
+  fun `get referral status history for a referral`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val response = getStatusHistories(referralUUID)
     response.shouldNotBeNull()
 
-    response.size shouldBeEqual 2
+    response.size shouldBeEqual 1
     val statusHistoryOne = response[0]
     statusHistoryOne.status?.shouldBeEqual(WITHDRAWN)
     statusHistoryOne.previousStatus?.shouldBeEqual(REFERRAL_STARTED)
-
-    val statusHistoryTwo = response[1]
-    statusHistoryTwo.status?.shouldBeEqual(REFERRAL_STARTED)
-    statusHistoryTwo.previousStatus?.shouldBeNull()
   }
 
   fun getStatusHistories(id: UUID?) =

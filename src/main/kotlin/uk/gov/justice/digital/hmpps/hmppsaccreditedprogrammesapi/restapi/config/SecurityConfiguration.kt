@@ -21,27 +21,29 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
-import java.util.*
+import java.util.Base64
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfiguration(
   private val objectMapper: ObjectMapper,
 ) {
+
   @Bean
-  fun securityFilterChain(http: HttpSecurity): SecurityFilterChain? = http
+  fun securityFilterChain(http: HttpSecurity): SecurityFilterChain = http
     .csrf { it.disable() }
     .authorizeHttpRequests {
       it
         .requestMatchers(
           "/health/**",
           "/swagger-ui/**",
-          "/v3/api-docs/swagger-config",
+          "/v3/api-docs/**",
           "/api.yml",
           "/info",
+          "/swagger-ui.html",
         ).permitAll()
-        .anyRequest()
-        .hasRole("ACCREDITED_PROGRAMMES_API")
+        .requestMatchers("/subject-access-request").hasAnyRole("SAR_DATA_ACCESS", "ACCREDITED_PROGRAMMES_API")
+        .anyRequest().hasRole("ACCREDITED_PROGRAMMES_API")
     }
     .anonymous { it.disable() }
     .oauth2ResourceServer { resourceServer ->
@@ -53,12 +55,11 @@ class SecurityConfiguration(
             characterEncoding = "UTF-8"
             writer.write(
               objectMapper.writeValueAsString(
-                object {
-                  val title = "Unauthenticated"
-                  val status = 401
-                  val detail =
-                    "A valid HMPPS Auth JWT must be supplied via bearer authentication to access this endpoint"
-                },
+                mapOf(
+                  "title" to "Unauthenticated",
+                  "status" to 401,
+                  "detail" to "A valid HMPPS Auth JWT must be supplied via bearer authentication to access this endpoint",
+                ),
               ),
             )
           }
@@ -109,34 +110,39 @@ class AuthorizedClientServiceConfiguration(
   private val clientRegistrationRepository: ClientRegistrationRepository,
   private val objectMapper: ObjectMapper,
 ) {
-  @Bean
-  fun inMemoryOAuth2AuthorizedClientService(): OAuth2AuthorizedClientService {
-    if (logClientCredentialsJwtInfo) return LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository, objectMapper)
 
-    return InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
-  }
+  @Bean
+  fun inMemoryOAuth2AuthorizedClientService(): OAuth2AuthorizedClientService =
+    if (logClientCredentialsJwtInfo) {
+      LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository, objectMapper)
+    } else {
+      InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
+    }
 }
 
-class LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository: ClientRegistrationRepository, private val objectMapper: ObjectMapper) : OAuth2AuthorizedClientService {
+class LoggingInMemoryOAuth2AuthorizedClientService(
+  clientRegistrationRepository: ClientRegistrationRepository,
+  private val objectMapper: ObjectMapper,
+) : OAuth2AuthorizedClientService {
+
   private val backingImplementation = InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
   private val log = LoggerFactory.getLogger(this::class.java)
 
   override fun <T : OAuth2AuthorizedClient?> loadAuthorizedClient(
     clientRegistrationId: String?,
     principalName: String?,
-  ): T = backingImplementation.loadAuthorizedClient<T>(clientRegistrationId, principalName)
+  ): T = backingImplementation.loadAuthorizedClient(clientRegistrationId, principalName)
 
   override fun saveAuthorizedClient(authorizedClient: OAuth2AuthorizedClient?, principal: Authentication?) {
-    val tokenValue = authorizedClient?.accessToken?.tokenValue
-
-    if (tokenValue != null) {
+    authorizedClient?.accessToken?.tokenValue?.let { tokenValue ->
       try {
         val tokenBodyBase64 = tokenValue.split(".")[1]
         val tokenBodyRaw = Base64.getDecoder().decode(tokenBodyBase64)
         val info = objectMapper.readValue(tokenBodyRaw, JwtLogInfo::class.java)
-        log.info("Retrieved a client_credentials JWT for service->service calls for client ${authorizedClient.clientRegistration.clientId} with authorities: ${info.authorities}, scopes: ${info.scope}, expiry: ${info.exp}")
+        log.info(
+          "Retrieved a client_credentials JWT for service->service calls for client ${authorizedClient.clientRegistration.clientId} with authorities: ${info.authorities}, scopes: ${info.scope}, expiry: ${info.exp}",
+        )
       } catch (exception: Exception) {
-        // Deliberately not logging exception message
         log.error("Unable to get token info to log, exception of type: ${exception::class.java.name}")
       }
     }
@@ -150,7 +156,8 @@ class LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository:
     val exp: Long,
   )
 
-  override fun removeAuthorizedClient(clientRegistrationId: String?, principalName: String?) = backingImplementation.removeAuthorizedClient(clientRegistrationId, principalName)
+  override fun removeAuthorizedClient(clientRegistrationId: String?, principalName: String?) =
+    backingImplementation.removeAuthorizedClient(clientRegistrationId, principalName)
 }
 
 class AuthAwareAuthenticationToken(
@@ -158,7 +165,6 @@ class AuthAwareAuthenticationToken(
   private val aPrincipal: String,
   authorities: Collection<GrantedAuthority>,
 ) : JwtAuthenticationToken(jwt, authorities) {
-  override fun getPrincipal(): String {
-    return aPrincipal
-  }
+
+  override fun getPrincipal(): String = aPrincipal
 }

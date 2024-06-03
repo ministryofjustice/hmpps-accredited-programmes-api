@@ -80,6 +80,32 @@
     },
     {
       "request": {
+        "url": "/assessments/2114584/section/section8",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "oasys-drug-detail.json"
+      }
+    },
+    {
+      "request": {
+        "url": "/assessments/2114584/section/section9",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "oasys-alcohol-detail.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/assessments/2114584/section/section10",
         "method": "GET"
       },

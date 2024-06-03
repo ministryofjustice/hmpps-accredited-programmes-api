@@ -88,6 +88,8 @@ fun OasysBehaviour.toModel(): Behaviour {
 fun OasysPsychiatric.toModel() = Psychiatric(
   description = currPsychiatricProblems,
   difficultiesCoping = difficultiesCoping,
+  currPsychologicalProblems = currPsychologicalProblems,
+  selfHarmSuicidal = selfHarmSuicidal,
 )
 
 fun OasysHealth.toModel() = Health(
@@ -146,7 +148,15 @@ fun risks(
   imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
 
   overallRoshLevel = oasysArnsSummary?.overallRiskLevel?.fixCase(),
-  alerts = activeAlerts?.map { Alert(description = it.alertCodeDescription, alertType = it.alertTypeDescription, dateCreated = it.dateCreated) },
+  alerts = activeAlerts?.map {
+    Alert(
+      description = it.alertCodeDescription,
+      alertType = it.alertTypeDescription,
+      dateCreated = it.dateCreated,
+    )
+  }?.distinctBy {
+    Triple(it.description, it.alertType, it.dateCreated)
+  },
 )
 
 fun String.fixCase(): String = this.lowercase().replaceFirstChar(Char::titlecase)

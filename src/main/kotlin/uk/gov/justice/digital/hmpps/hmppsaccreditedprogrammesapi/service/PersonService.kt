@@ -43,7 +43,6 @@ class PersonService(
   fun getSentenceType(prisonNumber: String): String {
     val sentenceInformation = getSentenceInformation(prisonNumber) ?: return "No active sentences"
     val activeSentences = sentenceInformation.latestPrisonTerm.courtSentences
-      .filter { it.caseStatus == "ACTIVE" }
       .flatMap { it.sentences }
       .map { it.sentenceTypeDescription }
       .distinct()
@@ -57,7 +56,6 @@ class PersonService(
 
   fun getOffenceDetails(prisonNumber: String): List<Pair<String?, LocalDate?>> {
     return getSentenceInformation(prisonNumber)?.latestPrisonTerm?.courtSentences
-      ?.filter { it.caseStatus == "ACTIVE" }
       ?.flatMap { it.sentences }
       ?.flatMap { it.offences.orEmpty() }
       ?.map { Pair(it.offenceCode, it.offenceStartDate) }
@@ -70,16 +68,90 @@ class PersonService(
       ?: throw NotFoundException("No sentence information found for person with id: $prisonNumber")
 
     val sentences = sentenceInformation.latestPrisonTerm.courtSentences
-      .filter { it.caseStatus == "ACTIVE" }
       .flatMap { it.sentences }
       .map { Sentence(it.sentenceTypeDescription, it.sentenceStartDate) }
+    val keyDates = buildKeyDates(sentenceInformation)
+    return SentenceDetails(sentences, keyDates)
+  }
 
+  private fun buildKeyDates(sentenceInformation: SentenceInformation): List<KeyDate> {
     val keyDates = ArrayList<KeyDate>()
     for (date in KeyDates::class.memberProperties) {
-      keyDates.add(KeyDate(date.name, date.get(sentenceInformation.latestPrisonTerm.keyDates) as LocalDate?))
+      val keyDateType = KeyDateType.fromMapping(date.name)
+      if (date.get(sentenceInformation.latestPrisonTerm.keyDates) != null && keyDateType != null) {
+        keyDates.add(
+          createKeyDate(
+            keyDateType,
+            date.get(sentenceInformation.latestPrisonTerm.keyDates) as LocalDate,
+          ),
+        )
+      }
     }
+    if (keyDates.isNotEmpty()) {
+      // now find the earliest of these dates:
+      val earliestReleaseDateCode =
+        keyDates.filter { it.date != null }.minBy { it.date!! }.code
+      val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
+      return remappedKeyDates
+    } else {
+      return keyDates
+    }
+  }
 
-    return SentenceDetails(sentences, keyDates)
+  fun createKeyDate(releaseDateType: KeyDateType, date: LocalDate?): KeyDate {
+    return KeyDate(
+      type = releaseDateType.mapping,
+      code = releaseDateType.code,
+      description = releaseDateType.description,
+      earliestReleaseDate = false,
+      date = date,
+      order = releaseDateType.order,
+    )
+  }
+
+  enum class KeyDateType(val mapping: String, val code: String, val description: String, val order: Int = 1) {
+    ACTUAL_PAROLE_DATE("actualParoleDate", "APD", "Approved parole date", 10),
+    AUTOMATIC_RELEASE_DATE("automaticReleaseDate", "ARD", "Automatic release date", 20),
+    CONDITIONAL_RELEASE_DATE("conditionalReleaseDate", "CRD", "Conditional release date", 30),
+    EARLY_REMOVAL_SCHEME_ELIGIBILITY_DATE(
+      "earlyRemovalSchemeEligibilityDate",
+      "ERSED",
+      "Early removal scheme eligibility date",
+      40,
+    ),
+    HOME_DETENTION_CURFEW_ACTUAL_DATE(
+      "homeDetentionCurfewActualDate",
+      "HDCAD",
+      "Home detention curfew approved date",
+      50,
+    ),
+    HOME_DETENTION_CURFEW_ELIGIBILITY_DATE(
+      "homeDetentionCurfewEligibilityDate",
+      "HDCED",
+      "Home detention curfew eligibility date",
+      60,
+    ),
+    MID_TERM_DATE("midTermDate", "MTD", "Mid term date", 70),
+    NON_PAROLE_DATE("nonParoleDate", "NPD", "Non-parole date", 80),
+    TARIFF_EARLY_REMOVAL_SCHEME_ELIGIBILITY_DATE(
+      "tariffEarlyRemovalSchemeEligibilityDate",
+      "TERSED",
+      "Tariff expired release scheme eligibility date",
+      90,
+    ),
+    TARIFF_DATE("tariffDate", "TED", "Tariff Expiry Date", 100),
+    PAROLE_ELIGIBILITY_DATE("paroleEligibilityDate", "PED", "Parole eligibility date", 110),
+    POST_RECALL_RELEASE_DATE("postRecallReleaseDate", "PRRD", "Post recall release date", 120),
+    RELEASE_DATE("releaseDate", "RD", "Release date", 130),
+    ;
+
+    companion object {
+      private val mappingToEnum: Map<String, KeyDateType> = entries.associateBy { it.mapping }
+
+      fun fromMapping(mapping: String): KeyDateType? {
+        return mappingToEnum[mapping]
+      }
+    }
   }
 
   companion object {

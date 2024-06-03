@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,16 +26,25 @@ class PersonIntegrationTest : IntegrationTestBase() {
   fun `get sentences by prison number should return 200 with matching entries`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = PRISONER_1.prisonerNumber
-
     val sentenceDetails = getSentences(prisonNumber)
-    sentenceDetails.sentences?.size shouldBe 5
-    sentenceDetails.sentences?.get(0)?.description shouldBe "CJA03 Standard Determinate Sentence"
+    sentenceDetails.keyDates?.forEach { println("keyDate: $it \n") }
+    sentenceDetails.sentences!!.size shouldBe 5
+    sentenceDetails.sentences!![0].description shouldBe "CJA03 Standard Determinate Sentence"
+    sentenceDetails.keyDates!!.size.shouldBeGreaterThan(0)
+    val keyDate = sentenceDetails.keyDates?.firstOrNull { it.earliestReleaseDate == true }
+    keyDate!!.code.shouldBeEqual("PRRD")
+  }
+
+  @Test
+  fun `get sentences by prison number with no keyDates should return 200 empty keydates`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val sentenceDetails = getSentences("A8610DY")
+    sentenceDetails.keyDates?.size shouldBe 0
   }
 
   @Test
   fun `get offences by offence code is successful`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val offenceCode = "GA04001"
 
     val prisonNumber = "C6666DD"
     val offences = getOffences(prisonNumber)

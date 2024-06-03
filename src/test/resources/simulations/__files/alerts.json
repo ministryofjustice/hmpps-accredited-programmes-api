@@ -35,6 +35,24 @@
     "expiredByLastName": "CNOMIS"
   },
   {
+    "alertId": 2,
+    "bookingId": 876623,
+    "offenderNo": "A9999BB",
+    "alertType": "H",
+    "alertTypeDescription": "Self Harm",
+    "alertCode": "HA",
+    "alertCodeDescription": "ACCT Open (HMPS)",
+    "dateCreated": "2016-01-21",
+    "dateExpires": "2016-01-29",
+    "modifiedDateTime": "2017-05-09T21:53:51.894412",
+    "expired": false,
+    "active": true,
+    "addedByFirstName": "DUDFSANAYE",
+    "addedByLastName": "EMERICIA",
+    "expiredByFirstName": "ADMIN&ONB",
+    "expiredByLastName": "CNOMIS"
+  },
+  {
     "alertId": 3,
     "bookingId": 876623,
     "offenderNo": "A9999BB",

@@ -7,6 +7,47 @@ servers:
 security:
   - bearerAuth: [ ]
 paths:
+  /subject-access-request:
+    get:
+      summary: API call to retrieve SAR information about a person
+      tags:
+        - Subject Access Request
+      description: |
+        Either NOMIS Prison Number (PRN) must be provided as part of the request.
+        * If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200.
+        * If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204
+        * If the product does not use the identifier type transmitted in the request, it should respond with HTTP code 209.
+      parameters:
+        - name: prn
+          in: query
+          description: prison number
+          required: false
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          description: from date
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          description: to date
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: the sar content
+          content:
+            application/json:
+              schema:
+                type: object
+        '204':
+          description: Request successfully processed - no content found
+        '209':
+          description: Subject Identifier is not recognised by this service
+
 
   /people/{prisonNumber}/sentences:
     get:
@@ -539,6 +580,30 @@ paths:
           description: Forbidden.  The client is not authorised to access this referral.
         404:
           description: The referral does not exist
+
+    delete:
+      summary: Delete a draft referral
+      description: Deletes a draft referral by its ID.
+      operationId: deleteReferralById
+      tags:
+        - Referrals
+      parameters:
+        - name: id
+          in: path
+          description: The id (UUID) of a referral
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: No Content - The referral was successfully deleted
+        401:
+          description: The request was unauthorised
+        403:
+          description: Not authorised to access this endpoint/these referrals
+        404:
+          description: No referrals for supplied organisationId (Not Found).
 
   /referrals/{id}/status-transitions:
     get:
@@ -1388,7 +1453,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-
   /oasys/{prisonNumber}/risks-and-alerts:
     get:
       tags:
@@ -1420,6 +1484,40 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /oasys/{prisonNumber}/drug-and-alcohol-details:
+    get:
+      summary: Get drug and alcohol assessment details
+      description: Retrieves the drug and alcohol assessment details for a given prison number
+      tags:
+        - Oasys Integration
+      operationId: getDrugAndAlcoholDetails
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DrugAlcoholDetail'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 
   /reference-data/referral-statuses:
     get:
@@ -2315,6 +2413,10 @@ components:
           example: 0-No problems
         difficultiesCoping:
           type: string
+        currPsychologicalProblems:
+          type: string
+        selfHarmSuicidal:
+          type: string
 
     Behaviour:
       type: object
@@ -2485,8 +2587,6 @@ components:
           type: string
           format: date
           description: Date alert was created.
-
-
 
     PrisonerSearchRequest:
       type: object
@@ -2715,6 +2815,12 @@ components:
           type: string
           example: Stocken
 
+    SAR:
+      type: object
+      properties:
+        content:
+          type: string
+
     SentenceDetails:
       type: object
       properties:
@@ -2742,10 +2848,25 @@ components:
       properties:
         type:
           type: string
-          example: releaseDate
+          example: earliestReleaseDate
+        code:
+          type: string
+          example: ERD
+        description:
+          type: string
+          example: Earliest Release Date
+        earliestReleaseDate:
+          type: boolean
+          default: false
         date:
           type: string
           format: date
+        order:
+          type: integer
+          example: This is more like a weighting than an order - higher the number the more important the date.
+      required:
+        - type
+        - code
 
     PrisonType:
       type: object
@@ -2842,3 +2963,36 @@ components:
           type: string
           format: date
           description: Offence start date.
+
+    DrugAlcoholDetail:
+      type: object
+      properties:
+        drug:
+          $ref: '#/components/schemas/OasysDrugDetail'
+        alcohol:
+          $ref: '#/components/schemas/OasysAlcoholDetail'
+
+    OasysDrugDetail:
+      type: object
+      properties:
+        levelOfUseOfMainDrug:
+          type: string
+          nullable: true
+        drugsMajorActivity:
+          type: string
+          nullable: true
+    OasysAlcoholDetail:
+      type: object
+      properties:
+        alcoholLinkedToHarm:
+          type: string
+          nullable: true
+        alcoholIssuesDetails:
+          type: string
+          nullable: true
+        frequencyAndLevel:
+          type: string
+          nullable: true
+        bingeDrinking:
+          type: string
+          nullable: true

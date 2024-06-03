@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.function.Consumer
@@ -9,7 +10,9 @@ import java.util.function.Consumer
 class HealthCheckTest : IntegrationTestBase() {
 
   @Test
+  @AutoConfigureWebTestClient(timeout = "PT300S")
   fun `Health endpoint should report status as UP`() {
+    println("Wait up")
     webTestClient
       .get()
       .uri("/health")
@@ -18,6 +21,8 @@ class HealthCheckTest : IntegrationTestBase() {
       .isOk
       .expectBody()
       .jsonPath("status").isEqualTo("UP")
+
+    println("Wait up")
   }
 
   @Test

@@ -71,121 +71,6 @@
         "issuingCourtDate": "2014-06-10"
       },
       {
-        "id": 1106775,
-        "caseSeq": 2,
-        "beginDate": "2014-06-23",
-        "court": {
-          "agencyId": "BRNSMC",
-          "description": "Barnsley Magistrates Court",
-          "longDescription": "Barnsley Magistrates Court",
-          "agencyType": "CRT",
-          "active": true,
-          "courtType": "MC"
-        },
-        "caseType": "Adult",
-        "caseStatus": "INACTIVE",
-        "sentences": [
-          {
-            "sentenceSequence": 2,
-            "sentenceStatus": "I",
-            "sentenceCategory": "2003",
-            "sentenceCalculationType": "ADIMP",
-            "sentenceTypeDescription": "CJA03 Standard Determinate Sentence",
-            "sentenceStartDate": "2014-07-13",
-            "sentenceEndDate": "2014-11-07",
-            "lineSeq": 2,
-            "offences": [
-              {
-                "offenderChargeId": 2630255,
-                "offenceStartDate": "2014-03-24",
-                "offenceStatute": "CJ88",
-                "offenceCode": "CJ88001",
-                "offenceDescription": "Common assault",
-                "indicators": [
-                  "111"
-                ]
-              }
-            ],
-            "terms": [
-              {
-                "termSequence": 1,
-                "sentenceTermCode": "IMP",
-                "startDate": "2014-08-15",
-                "weeks": 16,
-                "lifeSentence": false
-              }
-            ]
-          }
-        ],
-        "issuingCourt": {
-          "agencyId": "BRNSMC",
-          "description": "Barnsley Magistrates Court",
-          "longDescription": "Barnsley Magistrates Court",
-          "agencyType": "CRT",
-          "active": true,
-          "courtType": "MC"
-        },
-        "issuingCourtDate": "2014-06-23"
-      },
-      {
-        "id": 1212378,
-        "caseSeq": 3,
-        "beginDate": "2014-09-01",
-        "court": {
-          "agencyId": "BRNSMC",
-          "description": "Barnsley Magistrates Court",
-          "longDescription": "Barnsley Magistrates Court",
-          "agencyType": "CRT",
-          "active": true,
-          "courtType": "MC"
-        },
-        "caseType": "Adult",
-        "caseStatus": "INACTIVE",
-        "sentences": [
-          {
-            "sentenceSequence": 9,
-            "sentenceStatus": "I",
-            "sentenceCategory": "2003",
-            "sentenceCalculationType": "A/FINE",
-            "sentenceTypeDescription": "Imprisonment in Default of Fine",
-            "sentenceStartDate": "2014-10-25",
-            "sentenceEndDate": "2014-10-20",
-            "fineAmount": 567.6,
-            "lineSeq": 3,
-            "offences": [
-              {
-                "offenderChargeId": 2920553,
-                "offenceStatute": "TH68",
-                "offenceCode": "TH68010",
-                "offenceDescription": "Theft from a shop",
-                "indicators": [
-                  "D",
-                  "50"
-                ]
-              }
-            ],
-            "terms": [
-              {
-                "termSequence": 1,
-                "sentenceTermCode": "IMP",
-                "startDate": "2014-09-23",
-                "days": 7,
-                "lifeSentence": false
-              }
-            ]
-          }
-        ],
-        "issuingCourt": {
-          "agencyId": "BRNSMC",
-          "description": "Barnsley Magistrates Court",
-          "longDescription": "Barnsley Magistrates Court",
-          "agencyType": "CRT",
-          "active": true,
-          "courtType": "MC"
-        },
-        "issuingCourtDate": "2014-09-01"
-      },
-      {
         "caseInfoNumber": "T20157172",
         "id": 1225927,
         "caseSeq": 4,
@@ -418,11 +303,14 @@
       "licenceExpiryDate": "2022-01-01",
       "homeDetentionCurfewEligibilityDate": "2023-01-03",
       "earlyTermDate": "2022-01-04",
-      "lateTermDate": "2022-01-06"
-    },
-    "sentenceAdjustments": {
-      "additionalDaysAwarded": 7,
-      "remand": 21
+      "lateTermDate": "2022-01-06",
+      "nonDtoReleaseDate": "2024-01-05",
+      "automaticReleaseDate": "2024-01-05",
+      "postRecallReleaseDate": "2017-08-06"
     }
+  },
+  "sentenceAdjustments": {
+    "additionalDaysAwarded": 7,
+    "remand": 21
   }
 }

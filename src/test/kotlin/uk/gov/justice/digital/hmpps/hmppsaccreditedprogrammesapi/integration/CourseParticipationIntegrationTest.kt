@@ -8,6 +8,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
@@ -24,8 +25,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -34,6 +38,9 @@ import java.util.UUID
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class CourseParticipationIntegrationTest : IntegrationTestBase() {
+
+  @Autowired
+  lateinit var courseParticipationRepository: CourseParticipationRepository
 
   @BeforeEach
   fun setUp() {
@@ -311,6 +318,29 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNotFound
   }
 
+  @Test
+  fun `get subject access report for a referral`() {
+    // Mocking a JWT token for the request
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    createCourseParticipation(
+      CourseParticipationCreate(
+        prisonNumber = PRISON_NUMBER_1,
+      ),
+    )
+
+    val cp = courseParticipationRepository.findByPrisonNumber(PRISON_NUMBER_1)
+
+    // Fetching the subject access report
+    val response = getSubjectAccessReport(PRISON_NUMBER_1)
+    response.shouldNotBeNull()
+
+    // Validating the response content
+    with(response.content.courseParticipation.first()) {
+      courseName shouldBe cp[0].courseName
+    }
+  }
+
   private fun createCourseParticipation(courseParticipationToAdd: CourseParticipationCreate): CourseParticipation =
     webTestClient
       .post()
@@ -373,5 +403,16 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<List<CourseParticipation>>()
+      .returnResult().responseBody!!
+
+  fun getSubjectAccessReport(prisonerId: String) =
+    webTestClient
+      .get()
+      .uri("/subject-access-request?prn=$prisonerId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<HmppsSubjectAccessRequestContent>()
       .returnResult().responseBody!!
 }

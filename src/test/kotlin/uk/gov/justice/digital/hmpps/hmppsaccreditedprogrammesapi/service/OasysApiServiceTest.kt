@@ -9,9 +9,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.ArnsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysDrugDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
@@ -35,10 +37,10 @@ class OasysApiServiceTest {
     val assessment1 =
       Timeline(123123, "COMPLETE", "LAYER3", LocalDateTime.now())
     val assessment2 = Timeline(
-      999999,
-      "COMPLETE",
-      "LAYER3",
-      LocalDateTime.now().minusDays(1),
+      id = 999999,
+      status = "COMPLETE",
+      type = "LAYER3",
+      completedAt = LocalDateTime.now().minusDays(1),
     )
     val assessment3 = Timeline(111111, "STARTED", "LAYER3", null)
     val oasysAssessmentTimeline =
@@ -54,16 +56,16 @@ class OasysApiServiceTest {
   @Test
   fun `should return offence detail`() {
     val offenceDetail = OasysOffenceDetail(
-      "offence analysis",
-      listOf("Stalking"),
-      "Yes",
-      0,
-      "No",
-      "influences",
-      "motivation",
-      "Yes",
-      "fully",
-      "pattern",
+      offenceAnalysis = "offence analysis",
+      whatOccurred = listOf("Stalking"),
+      recognisesImpact = "Yes",
+      numberOfOthersInvolved = 0,
+      othersInvolved = "No",
+      peerGroupInfluences = "influences",
+      offenceMotivation = "motivation",
+      acceptsResponsibilityYesNo = "Yes",
+      acceptsResponsibility = "fully",
+      patternOffending = "pattern",
     )
 
     every { oasysApiClient.getOffenceDetail(any()) } returns ClientResult.Success(
@@ -79,16 +81,16 @@ class OasysApiServiceTest {
   @Test
   fun `should return relationships`() {
     val oasysRelationships = OasysRelationships(
-      "Yes",
-      "Yes",
-      "Yes",
-      "Yes",
-      "Yes",
-      "Free text",
-      null,
-      "0-No problems",
-      "Not in a relationship",
-      "2-Significant problems",
+      prevOrCurrentDomesticAbuse = "Yes",
+      victimOfPartner = "Yes",
+      victimOfFamily = "Yes",
+      perpAgainstFamily = "Yes",
+      perpAgainstPartner = "Yes",
+      relIssuesDetails = "Free text",
+      sara = null,
+      emotionalCongruence = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
+      prevCloseRelationships = "2-Significant problems",
     )
 
     every { oasysApiClient.getRelationships(any()) } returns ClientResult.Success(
@@ -104,13 +106,13 @@ class OasysApiServiceTest {
   @Test
   fun `should return Rosh Analysis`() {
     val oasysRoshFull = OasysRoshFull(
-      "Offence detail",
-      "where when",
-      "how done",
-      "who were victims",
-      "Any one else involved",
-      "motivation",
-      "source",
+      currentOffenceDetails = "Offence detail",
+      currentWhereAndWhen = "where when",
+      currentHowDone = "how done",
+      currentWhoVictims = "who were victims",
+      currentAnyoneElsePresent = "Any one else involved",
+      currentWhyDone = "motivation",
+      currentSources = "source",
     )
 
     every { oasysApiClient.getRoshFull(any()) } returns ClientResult.Success(
@@ -126,8 +128,10 @@ class OasysApiServiceTest {
   @Test
   fun `should return psychiatric details`() {
     val psychiatric = OasysPsychiatric(
-      "0 - no problems",
-      null,
+      currPsychiatricProblems = "0 - no problems",
+      difficultiesCoping = null,
+      currPsychologicalProblems = "0 - no problems",
+      selfHarmSuicidal = null,
     )
 
     every { oasysApiClient.getPsychiatric(any()) } returns ClientResult.Success(
@@ -143,16 +147,16 @@ class OasysApiServiceTest {
   @Test
   fun `should return behaviour details`() {
     val behaviour = OasysBehaviour(
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
+      temperControl = "1",
+      problemSolvingSkills = "2",
+      awarenessOfConsequences = "3",
+      achieveGoals = "4",
+      understandsViewsOfOthers = "5",
+      concreteAbstractThinking = "6",
+      sexualPreOccupation = "7",
+      offenceRelatedSexualInterests = "8",
+      aggressiveControllingBehavour = "9",
+      impulsivity = "10",
     )
 
     every { oasysApiClient.getBehaviour(any()) } returns ClientResult.Success(
@@ -168,8 +172,8 @@ class OasysApiServiceTest {
   @Test
   fun `should return health details`() {
     val health = OasysHealth(
-      "Yes",
-      "blind",
+      generalHealth = "Yes",
+      generalHeathSpecify = "blind",
     )
 
     every { oasysApiClient.getHealth(any()) } returns ClientResult.Success(
@@ -185,9 +189,9 @@ class OasysApiServiceTest {
   @Test
   fun `should return attitude details`() {
     val attitude = OasysAttitude(
-      "0-no problems",
-      "1-some problems",
-      "0-no problems",
+      proCriminalAttitudes = "0-no problems",
+      motivationToAddressBehaviour = "1-some problems",
+      hostileOrientation = "0-no problems",
     )
 
     every { oasysApiClient.getAttitude(any()) } returns ClientResult.Success(
@@ -203,12 +207,12 @@ class OasysApiServiceTest {
   @Test
   fun `should return learning needs details`() {
     val oasysLearning = OasysLearning(
-      "0",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
+      workRelatedSkills = "0",
+      problemsReadWriteNum = "1",
+      learningDifficulties = "2",
+      qualifications = "3",
+      basicSkillsScore = "4",
+      eTEIssuesDetails = "5",
     )
     val oasysAccommodation = OasysAccommodation(
       "Yes",
@@ -227,5 +231,41 @@ class OasysApiServiceTest {
     assertEquals(oasysLearning, learning)
     val accommodation = service.getAccommodation(123123)
     assertEquals(oasysAccommodation, accommodation)
+  }
+
+  @Test
+  fun `should return alcohol details`() {
+    val oasysAlcoholDetail = OasysAlcoholDetail(
+      alcoholLinkedToHarm = "Yes",
+      alcoholIssuesDetails = "Details about the problems",
+      frequencyAndLevel = "0 - no problems",
+      bingeDrinking = "1-Some problems",
+    )
+
+    every { oasysApiClient.getAlcoholDetail(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysAlcoholDetail,
+    )
+
+    val result = service.getAlcoholDetail(123123)
+
+    assertEquals(oasysAlcoholDetail, result)
+  }
+
+  @Test
+  fun `should return drug details`() {
+    val oasysDrugDetail = OasysDrugDetail(
+      LevelOfUseOfMainDrug = "1-Some problems",
+      DrugsMajorActivity = "1-Some problems",
+    )
+
+    every { oasysApiClient.getDrugDetail(any()) } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysDrugDetail,
+    )
+
+    val result = service.getDrugDetail(123123)
+
+    assertEquals(oasysDrugDetail, result)
   }
 }
