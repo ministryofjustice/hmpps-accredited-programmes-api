@@ -29,7 +29,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.flywaydb:flyway-core")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
-  implementation("com.google.guava:guava:33.2.0-jre")
+  implementation("com.google.guava:guava:33.2.1-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
@@ -46,7 +46,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.9")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.10")
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
