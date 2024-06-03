@@ -21,13 +21,9 @@ class TestPropertiesInitializer : ApplicationContextInitializer<ConfigurableAppl
       .filter { it.name.contains("application-test.yml") }
       .forEach { propertyFile ->
         propertyFile.source.forEach { (propertyName, propertyValue) ->
-          if (propertyName.startsWith("services.") && (propertyValue as? OriginTrackedValue)?.value is String) {
-            upstreamServiceUrlsToOverride[propertyName] = ((propertyValue as OriginTrackedValue).value as String).replace("#WIREMOCK_PORT", wiremockPort.toString())
-            return@forEach
-          }
-
-          if (propertyName == "hmpps.auth.url" && (propertyValue as? OriginTrackedValue)?.value is String) {
-            upstreamServiceUrlsToOverride[propertyName] = ((propertyValue as OriginTrackedValue).value as String).replace("#WIREMOCK_PORT", wiremockPort.toString())
+          val value = (propertyValue as? OriginTrackedValue)?.value as? String
+          if (value != null && (propertyName.startsWith("services.") || propertyName == "hmpps.auth.url")) {
+            upstreamServiceUrlsToOverride[propertyName] = value.replace("#WIREMOCK_PORT", wiremockPort.toString())
           }
         }
       }
