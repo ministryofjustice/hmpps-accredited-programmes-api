@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -28,6 +30,9 @@ class PersonIntegrationTest : IntegrationTestBase() {
     val sentenceDetails = getSentences(prisonNumber)
     sentenceDetails.sentences?.size shouldBe 5
     sentenceDetails.sentences?.get(0)?.description shouldBe "CJA03 Standard Determinate Sentence"
+    sentenceDetails.keyDates?.size?.shouldBeGreaterThan(0)
+    val keyDate = sentenceDetails.keyDates?.firstOrNull { it.earliestReleaseDate == true }
+    keyDate?.code?.shouldBeEqual("CRD")
   }
 
   @Test

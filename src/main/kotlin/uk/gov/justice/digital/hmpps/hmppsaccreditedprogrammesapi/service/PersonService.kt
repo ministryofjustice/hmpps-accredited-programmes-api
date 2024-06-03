@@ -87,8 +87,8 @@ class PersonService(
           ),
         )
       }
-      return keyDates
     }
+    return keyDates
 
     // now find the earliest of these dates:
     val earliestReleaseDateCode =
@@ -111,7 +111,7 @@ class PersonService(
 
   enum class KeyDateType(val mapping: String, val code: String, val description: String, val order: Int = 1) {
     ACTUAL_PAROLE_DATE("actualParoleDate", "APD", "Approved parole date", 10),
-    AUTOMATIC_RELEASE_DATE("automaticReleaseDate", "AED", "Automatic release date", 20),
+    AUTOMATIC_RELEASE_DATE("automaticReleaseDate", "ARD", "Automatic release date", 20),
     CONDITIONAL_RELEASE_DATE("conditionalReleaseDate", "CRD", "Conditional release date", 30),
     EARLY_REMOVAL_SCHEME_ELIGIBILITY_DATE(
       "earlyRemovalSchemeEligibilityDate",

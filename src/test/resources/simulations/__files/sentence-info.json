@@ -303,7 +303,10 @@
       "licenceExpiryDate": "2022-01-01",
       "homeDetentionCurfewEligibilityDate": "2023-01-03",
       "earlyTermDate": "2022-01-04",
-      "lateTermDate": "2022-01-06"
+      "lateTermDate": "2022-01-06",
+      "nonDtoReleaseDate": "2024-01-05",
+      "automaticReleaseDate": "2024-01-05"
+      }
     },
     "sentenceAdjustments": {
       "additionalDaysAwarded": 7,
