@@ -305,12 +305,13 @@
       "earlyTermDate": "2022-01-04",
       "lateTermDate": "2022-01-06",
       "nonDtoReleaseDate": "2024-01-05",
-      "automaticReleaseDate": "2024-01-05"
-      }
-    },
-    "sentenceAdjustments": {
-      "additionalDaysAwarded": 7,
-      "remand": 21
+      "automaticReleaseDate": "2024-01-05",
+      "postRecallReleaseDate": "2017-08-06"
     }
+  },
+  "sentenceAdjustments": {
+    "additionalDaysAwarded": 7,
+    "remand": 21
   }
+}
 }
