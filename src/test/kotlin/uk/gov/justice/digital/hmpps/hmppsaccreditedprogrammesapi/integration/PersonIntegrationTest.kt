@@ -36,6 +36,13 @@ class PersonIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `get sentences by prison number with no keyDates should return 200 empty keydates`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val sentenceDetails = getSentences("A8610DY")
+    sentenceDetails.keyDates?.size shouldBe 0
+  }
+
+  @Test
   fun `get offences by offence code is successful`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 

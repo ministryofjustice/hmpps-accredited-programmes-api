@@ -64,6 +64,19 @@
         },
         "bodyFileName": "caseloads_allCaseloads_true.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/api/offenders/A8610DY/booking/latest/sentence-summary",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "sentence-info2.json"
+      }
     }
   ]
 }

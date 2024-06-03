@@ -87,13 +87,15 @@ class PersonService(
         )
       }
     }
-
-    // now find the earliest of these dates:
-    val earliestReleaseDateCode =
-      keyDates.filter { it.date != null }.minBy { it.date!! }.code
-    val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
-
-    return remappedKeyDates
+    if (keyDates.isNotEmpty()) {
+      // now find the earliest of these dates:
+      val earliestReleaseDateCode =
+        keyDates.filter { it.date != null }.minBy { it.date!! }.code
+      val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
+      return remappedKeyDates
+    } else {
+      return keyDates
+    }
   }
 
   fun createKeyDate(releaseDateType: KeyDateType, date: LocalDate?): KeyDate {
