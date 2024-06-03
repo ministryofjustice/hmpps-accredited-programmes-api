@@ -34,6 +34,7 @@ jobs:
             PACT_PROVIDER_VERSION="$CIRCLE_SHA1" \
             PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
             PACT_PUBLISH_RESULTS="true" \
+            ./gradlew --stop  \    
             ./gradlew clean check
       - save_cache:
           paths:
