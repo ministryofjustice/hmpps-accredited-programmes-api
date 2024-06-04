@@ -27,7 +27,6 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("org.flywaydb:flyway-core")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
   implementation("com.google.guava:guava:33.2.1-jre")
 
@@ -39,6 +38,8 @@ dependencies {
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.0.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+  runtimeOnly("org.flywaydb:flyway-database-postgresql")
+  runtimeOnly("org.postgresql:postgresql:42.7.3")
 
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
