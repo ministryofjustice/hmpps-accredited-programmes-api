@@ -1002,6 +1002,25 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     referralViewAfter?.surname?.shouldBeEqual("changed")
   }
 
+  @Test
+  fun `deleted referrals does not appear when we searching for specific referral`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
+
+    deleteReferral(referralCreated.referralId)
+
+    webTestClient
+      .get()
+      .uri("/referrals/${referralCreated.referralId}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNotFound
+  }
+
   fun updateAllPeople() =
     webTestClient
       .post()
@@ -1010,4 +1029,13 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
+
+  fun deleteReferral(referralId: UUID) {
+    webTestClient
+      .delete()
+      .uri("/referrals/$referralId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange()
+      .expectStatus().isNoContent
+  }
 }

@@ -9,12 +9,14 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
 @Table(name = "referral")
 @SQLDelete(sql = "UPDATE referral SET deleted = true WHERE referral_id = ?")
+@SQLRestriction(value = "deleted = false")
 data class ReferralEntity(
   @Id
   @GeneratedValue
