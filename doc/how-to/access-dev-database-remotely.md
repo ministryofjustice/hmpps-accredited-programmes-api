@@ -2,6 +2,8 @@
 
 ## Prerequisites
 
+Install jq (brew install jq)
+
 - [Follow the Cloud Platform guidance to connect to the Kubernetes
   cluster](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/getting-started/kubectl-config.html#connecting-to-the-cloud-platform-39-s-kubernetes-cluster).
 
