@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -11,6 +12,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Offence
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PeopleSearchRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PeopleSearchResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.SentenceDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
@@ -56,6 +59,46 @@ class PersonIntegrationTest : IntegrationTestBase() {
       offenceDate = LocalDate.of(2012, Month.OCTOBER, 21),
     )
   }
+
+  @Test
+  fun `search for a person by prisonId`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val peopleSearchRequest = PeopleSearchRequest("C6666DD", listOf("MDI"))
+    val response = searchPrisoners(peopleSearchRequest)
+
+    response.shouldNotBeNull()
+    response.first() shouldBeEqual PeopleSearchResponse(
+      bookingId = "1202335",
+      conditionalReleaseDate = null,
+      prisonName = "Nottingham (HMP)",
+      dateOfBirth = LocalDate.of(1975, 1, 1),
+      ethnicity = "White: Eng./Welsh/Scot./N.Irish/British",
+      gender = "Male",
+      homeDetentionCurfewEligibilityDate = null,
+      indeterminateSentence = false,
+      firstName = "MICKEY",
+      lastName = "SMITH",
+      paroleEligibilityDate = null,
+      prisonerNumber = "C6666DD",
+      religion = null,
+      sentenceExpiryDate = null,
+      sentenceStartDate = null,
+      tariffDate = null,
+    )
+  }
+
+  fun searchPrisoners(peopleSearchRequest: PeopleSearchRequest) =
+    webTestClient
+      .post()
+      .uri("/prisoner-search")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(peopleSearchRequest)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<PeopleSearchResponse>>()
+      .returnResult().responseBody!!
 
   private fun getSentences(prisonNumber: String): SentenceDetails =
     webTestClient

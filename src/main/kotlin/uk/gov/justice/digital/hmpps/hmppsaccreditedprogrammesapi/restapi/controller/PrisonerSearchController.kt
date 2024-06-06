@@ -8,13 +8,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Priso
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonerSearchResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 
 @Service
 class PrisonerSearchController
 @Autowired
 constructor(
-  private val prisonerSearchApiService: PrisonerSearchApiService,
+  private val peopleSearchApiService: PeopleSearchApiService,
   private val auditService: AuditService,
 ) : PrisonerSearchApiDelegate {
   override fun searchPrisoner(prisonerSearchRequest: PrisonerSearchRequest): ResponseEntity<List<PrisonerSearchResponse>> {
@@ -24,7 +24,7 @@ constructor(
     )
 
     return ResponseEntity.ok(
-      prisonerSearchApiService.searchPrisoners(prisonerSearchRequest)
+      peopleSearchApiService.searchPrisoners(prisonerSearchRequest)
         .map {
           PrisonerSearchResponse(
             bookingId = it.bookingId,

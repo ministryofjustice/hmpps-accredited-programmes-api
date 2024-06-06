@@ -11,12 +11,12 @@ import org.springframework.http.HttpStatusCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonerSearchApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 
-class PrisonerSearchApiServiceTest {
+class PeopleSearchApiServiceTest {
 
   private val prisonerSearchApiClient = mockk<PrisonerSearchApiClient>()
-  val service = PrisonerSearchApiService(prisonerSearchApiClient)
+  val service = PeopleSearchApiService(prisonerSearchApiClient)
 
   @Test
   fun `should return list of prisoners`() {
