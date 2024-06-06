@@ -60,6 +60,7 @@ paths:
         - name: prisonNumber
           in: path
           description: prison number
+          example: "A1234AA"
           required: true
           schema:
             type: string
@@ -81,7 +82,8 @@ paths:
     post:
       tags:
         - Person
-      summary: Search for a prisoner via prison search api by prisoner id and caseload.
+      deprecated: true
+      summary: (Deprecated - use /people/search instead) Search for a prisoner via prison search api by prisoner id and caseload.
       operationId: searchPrisoner
       requestBody:
         required: true
@@ -98,6 +100,41 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PrisonerSearchResponse'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: The client is not authorized to perform this operation.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /people/search:
+    post:
+      tags:
+        - Person
+      deprecated: true
+      summary: Search for a prisoner via prison search api by prisoner id and caseload.
+      operationId: searchPeople
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/PeopleSearchRequest'
+      responses:
+        201:
+          description: The prisoner search results.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PeopleSearchResponse'
         400:
           description: Bad input
           content:
@@ -259,7 +296,7 @@ paths:
         - Course Prerequisites
       summary: Upload a CSV format file containing a full set of prerequisites data for the current set of courses.
       operationId: updatePrerequisites
-      description: > 
+      description: >
         Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
         <p>Pre-existing prerequisite data will be removed before the new data is applied.
         <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the PrerequisiteRecord schema. Column order is not important.
@@ -2608,7 +2645,6 @@ components:
       required:
         - prisonerIdentifier
 
-
     PrisonerSearchResponse:
       type: object
       properties:
@@ -2655,6 +2691,70 @@ components:
         - bookingId
         - prisonerNumber
 
+    PeopleSearchRequest:
+      type: object
+      properties:
+        prisonerIdentifier:
+          type: string
+          description: Prisoner identifier for this case we only accept prison number
+          example: A1234AA
+        prisonIds:
+          type: array
+          description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
+          example:
+            - MDI
+          items:
+            type: string
+            description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
+            example: '["MDI"]'
+      required:
+        - prisonerIdentifier
+
+    PeopleSearchResponse:
+      type: object
+      properties:
+        bookingId:
+          type: string
+        conditionalReleaseDate:
+          type: string
+          format: date
+        prisonName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        ethnicity:
+          type: string
+        gender:
+          type: string
+        homeDetentionCurfewEligibilityDate:
+          type: string
+          format: date
+        indeterminateSentence:
+          type: boolean
+        firstName:
+          type: string
+        lastName:
+          type: string
+        paroleEligibilityDate:
+          type: string
+          format: date
+        prisonerNumber:
+          type: string
+        religion:
+          type: string
+        sentenceExpiryDate:
+          type: string
+          format: date
+        sentenceStartDate:
+          type: string
+          format: date
+        tariffDate:
+          type: string
+          format: date
+      required:
+        - bookingId
+        - prisonerNumber
     PrisonSearchRequest:
       type: object
       properties:

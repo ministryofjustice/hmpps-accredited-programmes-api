@@ -46,7 +46,7 @@ constructor(
   private val referrerUserRepository: ReferrerUserRepository,
   private val offeringRepository: OfferingRepository,
   private val prisonRegisterApiService: PrisonRegisterApiService,
-  private val prisonerSearchApiService: PrisonerSearchApiService,
+  private val peopleSearchApiService: PeopleSearchApiService,
   private val personRepository: PersonRepository,
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
@@ -122,7 +122,7 @@ constructor(
     if (personEntity != null) {
       log.info("Prisoner is of interest to ACP - about to update: $prisonNumber")
       val sentenceType = personService.getSentenceType(prisonNumber)
-      prisonerSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
+      peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
         updatePerson(it, personEntity, sentenceType)
       }
       personRepository.save(personEntity)
@@ -160,7 +160,7 @@ constructor(
 
   private fun createOrUpdatePerson(prisonNumber: String) {
     val sentenceType = personService.getSentenceType(prisonNumber)
-    prisonerSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
+    peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
       var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
       if (personEntity == null) {
         val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
