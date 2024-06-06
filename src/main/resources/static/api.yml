@@ -117,7 +117,6 @@ paths:
     post:
       tags:
         - Person
-      deprecated: true
       summary: Search for a prisoner via prison search api by prisoner id and caseload.
       operationId: searchPeople
       requestBody:
