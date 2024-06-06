@@ -38,3 +38,5 @@ elasticCacheAlertsClusterIds:
 
 rdsAlertsDatabases:
   "db8ec03e49ab6abf06": "Accredited Programmes API Database"
+
+dataExtractorEnabled: true
