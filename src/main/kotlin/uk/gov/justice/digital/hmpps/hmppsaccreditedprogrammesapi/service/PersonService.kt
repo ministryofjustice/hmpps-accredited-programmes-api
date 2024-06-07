@@ -139,7 +139,7 @@ class PersonService(
       "Tariff expired release scheme eligibility date",
       90,
     ),
-    TARIFF_DATE("tariffDate", "TED", "Tariff Expiry Date", 100),
+    TARIFF_DATE("tariffDate", "TED", "Tariff end date", 100),
     PAROLE_ELIGIBILITY_DATE("paroleEligibilityDate", "PED", "Parole eligibility date", 110),
     POST_RECALL_RELEASE_DATE("postRecallReleaseDate", "PRRD", "Post recall release date", 120),
     RELEASE_DATE("releaseDate", "RD", "Release date", 130),

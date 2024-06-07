@@ -41,6 +41,6 @@ rdsAlertsDatabases:
 
 generic-data-analytics-extractor:
   serviceAccountName: hmpps-accredited-programmes-api-dev-to-ap-s3
-  databaseSecretName: database_name
+  databaseSecretName: "database_name"
   destinationS3SecretName: analytical-platform-reporting-s3-bucket
   enabled: false
