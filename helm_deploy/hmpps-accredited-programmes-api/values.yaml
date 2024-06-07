@@ -58,5 +58,6 @@ generic-service:
       HMPPS_SQS_QUEUES_HMPPSDOMAINEVENTSQUEUE_DLQ_NAME: "sqs_queue_name"
 generic-prometheus-alerts:
   targetApplication: hmpps-accredited-programmes-api
+dataExtractorEnabled: false
 
 

@@ -40,10 +40,3 @@ elasticCacheAlertsClusterIds:
 
 rdsAlertsDatabases:
   "db36754f4afedbe608": "Accredited Programmes API Database"
-
-
-generic-data-analytics-extractor:
-  serviceAccountName: hmpps-accredited-programmes-api-prod-to-ap-s3
-  databaseSecretName: database_name
-  destinationS3SecretName: analytical-platform-reporting-s3-bucket
-  enabled: false
