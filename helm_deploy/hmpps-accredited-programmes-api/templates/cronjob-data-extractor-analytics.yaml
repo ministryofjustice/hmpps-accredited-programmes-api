@@ -20,7 +20,7 @@ spec:
                   valueFrom:
                     secretKeyRef:
                       name: rds-instance-output
-                      key: rds_instance_address
+                      key: rds_instance_endpoint
                 - name: PGDATABASE
                   valueFrom:
                     secretKeyRef:
