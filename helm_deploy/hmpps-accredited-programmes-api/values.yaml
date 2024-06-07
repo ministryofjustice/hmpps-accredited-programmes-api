@@ -59,4 +59,3 @@ generic-service:
 generic-prometheus-alerts:
   targetApplication: hmpps-accredited-programmes-api
 
-dataExtractorEnabled: true
