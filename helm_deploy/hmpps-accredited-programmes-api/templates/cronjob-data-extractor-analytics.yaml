@@ -31,7 +31,7 @@ spec:
                   valueFrom:
                     secretKeyRef:
                       name: rds-postgresql-instance-output
-                      key: rds_instance_endpoint
+                      key: rds_instance_address
                 - name: PGDATABASE
                   valueFrom:
                     secretKeyRef:
