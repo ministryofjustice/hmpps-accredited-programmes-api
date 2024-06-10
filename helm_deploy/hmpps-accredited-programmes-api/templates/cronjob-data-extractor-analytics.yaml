@@ -30,22 +30,22 @@ spec:
                 - name: PGHOST
                   valueFrom:
                     secretKeyRef:
-                      name: rds-instance-output
+                      name: rds-postgresql-instance-output
                       key: rds_instance_endpoint
                 - name: PGDATABASE
                   valueFrom:
                     secretKeyRef:
-                      name: rds-instance-output
+                      name: rds-postgresql-instance-output
                       key: database_name
                 - name: PGUSER
                   valueFrom:
                     secretKeyRef:
-                      name: rds-instance-output
+                      name: rds-postgresql-instance-output
                       key: database_username
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: rds-instance-output
+                      name: rds-postgresql-instance-output
                       key: database_password
                 - name: S3_DESTINATION
                   valueFrom:
