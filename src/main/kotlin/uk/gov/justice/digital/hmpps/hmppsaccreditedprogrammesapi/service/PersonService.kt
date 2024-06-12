@@ -131,6 +131,7 @@ class PersonService(
       "Home detention curfew eligibility date",
       60,
     ),
+    LICENCE_END_DATE("licenceExpiryDate", "LED", "Licence end date", 65),
     MID_TERM_DATE("midTermDate", "MTD", "Mid term date", 70),
     NON_PAROLE_DATE("nonParoleDate", "NPD", "Non-parole date", 80),
     TARIFF_EARLY_REMOVAL_SCHEME_ELIGIBILITY_DATE(
@@ -143,6 +144,7 @@ class PersonService(
     PAROLE_ELIGIBILITY_DATE("paroleEligibilityDate", "PED", "Parole eligibility date", 110),
     POST_RECALL_RELEASE_DATE("postRecallReleaseDate", "PRRD", "Post recall release date", 120),
     RELEASE_DATE("releaseDate", "RD", "Release date", 130),
+    SENTENCE_END_DATE("sentenceExpiryDate", "SED", "Sentence end date", 140),
     ;
 
     companion object {
