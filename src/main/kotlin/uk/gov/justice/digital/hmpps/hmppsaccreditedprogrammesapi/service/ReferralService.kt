@@ -316,15 +316,15 @@ constructor(
     if (uppercaseStatuses == null || (uppercaseStatuses.isEmpty() && statusGroup != null)) {
       uppercaseStatuses = when (statusGroup) {
         "closed" -> {
-          referralStatusRepository.findAllByActiveIsTrueAndClosedIsTrue().map { it.code }
+          referralStatusRepository.findAllByActiveIsTrueAndClosedIsTrueOrderByDefaultOrder().map { it.code }
         }
 
         "draft" -> {
-          referralStatusRepository.findAllByActiveIsTrueAndDraftIsTrue().map { it.code }
+          referralStatusRepository.findAllByActiveIsTrueAndDraftIsTrueOrderByDefaultOrder().map { it.code }
         }
 
         "open" -> {
-          referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalse().map { it.code }
+          referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
         }
 
         else -> {

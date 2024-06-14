@@ -52,16 +52,16 @@ data class ReferralStatusReasonEntity(
 @Repository
 interface ReferralStatusRepository : JpaRepository<ReferralStatusEntity, UUID> {
   fun findByCode(code: String): ReferralStatusEntity?
-  fun findAllByActiveIsTrue(): List<ReferralStatusEntity>
+  fun findAllByActiveIsTrueOrderByDefaultOrder(): List<ReferralStatusEntity>
 
   // get draft statuses only
-  fun findAllByActiveIsTrueAndDraftIsTrue(): List<ReferralStatusEntity>
+  fun findAllByActiveIsTrueAndDraftIsTrueOrderByDefaultOrder(): List<ReferralStatusEntity>
 
   // get closed statuses only
-  fun findAllByActiveIsTrueAndClosedIsTrue(): List<ReferralStatusEntity>
+  fun findAllByActiveIsTrueAndClosedIsTrueOrderByDefaultOrder(): List<ReferralStatusEntity>
 
   // get open statuses only
-  fun findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalse(): List<ReferralStatusEntity>
+  fun findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder(): List<ReferralStatusEntity>
 }
 
 fun ReferralStatusRepository.getByCode(code: String) =
