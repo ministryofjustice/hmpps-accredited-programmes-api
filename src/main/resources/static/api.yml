@@ -2866,6 +2866,9 @@ components:
         deselectAndKeepOpen:
           description: flag to show this a bespoke status of deslected and keep open
           type: boolean
+        defaultOrder:
+          description: sort order for statuses
+          type: integer
       required:
         - code
         - description

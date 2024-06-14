@@ -20,7 +20,7 @@ class ReferralReferenceDataService(
   private val referralStatusTransitionRepository: ReferralStatusTransitionRepository,
 ) {
   fun getReferralStatuses() =
-    referralStatusRepository.findAllByActiveIsTrue()
+    referralStatusRepository.findAllByActiveIsTrueOrderByDefaultOrder()
       .map {
         ReferralStatusRefData(
           code = it.code,
