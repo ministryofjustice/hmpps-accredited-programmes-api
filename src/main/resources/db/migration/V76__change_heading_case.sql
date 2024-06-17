@@ -1,0 +1,1 @@
+update referral_status_transition set secondary_heading = "Not eligible" where secondary_heading = "Not Eligible"
