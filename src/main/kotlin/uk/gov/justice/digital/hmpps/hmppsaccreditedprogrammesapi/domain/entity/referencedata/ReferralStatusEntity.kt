@@ -26,6 +26,7 @@ data class ReferralStatusEntity(
   val hold: Boolean,
   val release: Boolean,
   val defaultOrder: Int,
+  val notesOptional: Boolean,
 )
 
 @Entity
