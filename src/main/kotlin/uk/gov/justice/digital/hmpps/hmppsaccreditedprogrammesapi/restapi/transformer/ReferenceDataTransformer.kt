@@ -17,4 +17,5 @@ fun ReferralStatusEntity.toModel(altDescription: String?, altHintText: String?) 
     hold = hold,
     release = release,
     deselectAndKeepOpen = false,
+    notesOptional = notesOptional,
   )

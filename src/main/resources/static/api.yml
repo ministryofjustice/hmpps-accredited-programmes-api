@@ -2869,6 +2869,9 @@ components:
         defaultOrder:
           description: sort order for statuses
           type: integer
+        notesOptional:
+          description: flag to show whether the notes are optional
+          type: boolean
       required:
         - code
         - description

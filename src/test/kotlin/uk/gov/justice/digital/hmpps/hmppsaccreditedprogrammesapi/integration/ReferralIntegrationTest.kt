@@ -346,6 +346,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       hold = false,
       release = false,
       deselectAndKeepOpen = false,
+      notesOptional = false,
     )
     val onHoldStatus = ReferralStatusRefData(
       code = ON_HOLD_REFERRAL_SUBMITTED,
@@ -359,6 +360,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       hold = true,
       release = false,
       deselectAndKeepOpen = false,
+      notesOptional = false,
     )
 
     statuses shouldContainAnyOf listOf(withdrawnStatus, onHoldStatus)
