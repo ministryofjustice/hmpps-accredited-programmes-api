@@ -5,7 +5,7 @@ plugins {
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.0.0"
   kotlin("plugin.jpa") version "2.0.0"
-  id("org.openapi.generator") version "7.6.0"
+  id("org.openapi.generator") version "7.7.0"
 }
 
 configurations {
@@ -15,7 +15,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "2.6.0"
-  val sentryVersion = "7.10.0"
+  val sentryVersion = "7.11.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.3.1"
 
