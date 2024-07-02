@@ -41,6 +41,7 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     closed = true,
     hold = false,
     release = false,
+    notesOptional = false,
   )
   val categoryExpected =
     ReferralStatusCategory(code = CATEGORY_ADMIN, description = "Administrative error", referralStatusCode = WITHDRAWN)
