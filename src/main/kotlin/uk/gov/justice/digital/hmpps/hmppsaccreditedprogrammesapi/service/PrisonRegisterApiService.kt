@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.Authoris
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonLite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @Service
@@ -43,6 +44,26 @@ constructor(
 
   fun getPrisons(prisonIds: List<String>): List<Prison> {
     val prisons = when (val response = prisonRegisterApiClient.getPrisons(prisonIds)) {
+      is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
+      is ClientResult.Failure.StatusCode -> {
+        log.warn("Failure to retrieve data. Status code ${response.status} reason ${response.toException().message}")
+        AuthorisableActionResult.Success(null)
+      }
+      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
+        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+        response.toException(),
+      )
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().message}")
+        AuthorisableActionResult.Success(null)
+      }
+    }
+
+    return prisons.entity.orEmpty()
+  }
+
+  fun getPrisons(): List<PrisonLite> {
+    val prisons = when (val response = prisonRegisterApiClient.getPrisons()) {
       is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
       is ClientResult.Failure.StatusCode -> {
         log.warn("Failure to retrieve data. Status code ${response.status} reason ${response.toException().message}")

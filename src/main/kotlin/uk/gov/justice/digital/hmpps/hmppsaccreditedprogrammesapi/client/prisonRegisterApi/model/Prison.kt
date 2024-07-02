@@ -6,14 +6,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 class Prison(
   val prisonId: String,
   val prisonName: String,
-  val active: Boolean,
+  val active: Boolean = false,
   val male: Boolean = false,
   val female: Boolean = false,
   val contracted: Boolean = false,
-  val types: List<PrisonType>,
-  val categories: Set<String>,
-  val addresses: List<Address>,
-  val operators: List<PrisonOperator>,
+  val types: List<PrisonType> = emptyList(),
+  val categories: Set<String> = emptySet(),
+  val addresses: List<Address> = emptyList(),
+  val operators: List<PrisonOperator> = emptyList(),
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

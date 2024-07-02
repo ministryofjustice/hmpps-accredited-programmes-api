@@ -28,6 +28,19 @@
         },
         "bodyFileName": "prison-register-search-prisonById-results.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/prisons/names",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-register-all-prisons-results.json"
+      }
     }
   ]
 }
