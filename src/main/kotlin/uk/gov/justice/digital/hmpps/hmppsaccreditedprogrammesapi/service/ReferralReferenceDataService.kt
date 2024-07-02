@@ -34,6 +34,7 @@ class ReferralReferenceDataService(
           draft = it.draft,
           hold = it.hold,
           release = it.release,
+          notesOptional = it.notesOptional
         )
       }
 
@@ -51,6 +52,7 @@ class ReferralReferenceDataService(
         draft = it.draft,
         hold = it.hold,
         release = it.release,
+        notesOptional = it.notesOptional,
       )
     }
 
