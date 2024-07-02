@@ -2826,6 +2826,9 @@ components:
         hasConfirmation:
           type: boolean
           default: false
+        notesOptional:
+          type: boolean
+          default: false
 
     ReferralStatusRefData:
       type: object

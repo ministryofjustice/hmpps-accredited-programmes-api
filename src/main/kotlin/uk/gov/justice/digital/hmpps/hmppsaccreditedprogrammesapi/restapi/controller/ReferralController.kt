@@ -256,6 +256,7 @@ constructor(
         }
       },
       hasConfirmation = currentStatus.hold != true && chosenStatus.hasConfirmation == true,
+      notesOptional = chosenStatus.notesOptional,
     )
 
     // now see if there are any specific confirmation fields for this transition.
