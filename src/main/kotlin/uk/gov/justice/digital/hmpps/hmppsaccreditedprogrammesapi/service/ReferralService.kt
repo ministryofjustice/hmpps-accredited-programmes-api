@@ -288,6 +288,10 @@ constructor(
 
   fun getReferralViewByOrganisationId(
     organisationId: String,
+    prisonNumber: String?,
+    surnameOnly: String?,
+    forename: String?,
+    surname: String?,
     pageable: Pageable,
     status: List<String>?,
     audience: String?,
@@ -299,6 +303,10 @@ constructor(
     val referralViewPage =
       referralViewRepository.getReferralsByOrganisationId(
         organisationId,
+        prisonNumber,
+        surnameOnly,
+        forename,
+        surname,
         pageable,
         uppercaseStatuses,
         audience,
@@ -324,7 +332,8 @@ constructor(
         }
 
         "open" -> {
-          referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
+          referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder()
+            .map { it.code }
         }
 
         else -> {
@@ -342,10 +351,18 @@ constructor(
     audience: String?,
     courseName: String?,
     statusGroup: String?,
+    prisonNumber: String?,
+    surnameOnly: String?,
+    forename: String?,
+    surname: String?,
   ): Page<ReferralViewEntity> {
     val uppercaseStatuses = getFilterStatuses(status, statusGroup)
     val referralViewPage =
       referralViewRepository.getReferralsByUsername(
+        prisonNumber,
+        surnameOnly,
+        forename,
+        surname,
         username,
         pageable,
         uppercaseStatuses,

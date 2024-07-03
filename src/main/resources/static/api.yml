@@ -846,6 +846,15 @@ paths:
           required: true
           schema:
             type: string
+        - name: nameOrId
+          in: query
+          description: 'The persons name: forename surname or surname or prison number. Name wll be a case insensitive like search. 
+                    For example entering John will return people with the forename or surname containing the name john like johnathan.
+                    If two names are given then the assumption is that they are forename and surname. And if there is a single term that matches 
+                    the regex for a prison number then only an exact prison number match will be carried out'
+          required: false
+          schema:
+            type: string
         - name: page
           in: query
           description: Page number of the requested page
@@ -935,6 +944,15 @@ paths:
           schema:
             type: integer
             default: 10
+        - name: nameOrId
+          in: query
+          description: 'The persons name: forename surname or surname or prison number. Name wll be a case insensitive like search. 
+                    For example entering John will return people with the forename or surname containing the name john like johnathan.
+                    If two names are given then the assumption is that they are forename and surname. And if there is a single term that matches 
+                    the regex for a prison number then only an exact prison number match will be carried out'
+          required: false
+          schema:
+            type: string
         - name: status
           in: query
           description: Filter by the status of the referral
