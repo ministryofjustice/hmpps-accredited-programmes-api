@@ -3131,9 +3131,9 @@ components:
     Organisation:
       type: object
       properties:
-        id:
+        code:
           type: string
           example: "MDI"
-        name:
+        prisonName:
           type: string
           example: "Moorland HMP"

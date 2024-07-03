@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonLite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonsByIdsRequest
 
 private const val PRISON_REGISTER_API = "PrisonRegister API"
@@ -26,7 +25,7 @@ class PrisonRegisterApiClient(
     body = PrisonsByIdsRequest(prisonIds)
   }
 
-  fun getPrisons() = getRequest<List<PrisonLite>>(PRISON_REGISTER_API) {
+  fun getPrisons() = getRequest<List<Prison>>(PRISON_REGISTER_API) {
     path = "/prisons/names"
   }
 }

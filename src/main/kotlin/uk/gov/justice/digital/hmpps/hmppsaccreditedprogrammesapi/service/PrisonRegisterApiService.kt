@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.Authoris
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.PrisonRegisterApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.PrisonLite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @Service
@@ -62,7 +61,7 @@ constructor(
     return prisons.entity.orEmpty()
   }
 
-  fun getPrisons(): List<PrisonLite> {
+  fun getPrisons(): List<Prison> {
     val prisons = when (val response = prisonRegisterApiClient.getPrisons()) {
       is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
       is ClientResult.Failure.StatusCode -> {

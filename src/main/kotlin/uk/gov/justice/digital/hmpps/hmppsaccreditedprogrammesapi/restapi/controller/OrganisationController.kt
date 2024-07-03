@@ -41,8 +41,8 @@ constructor(
       .ok(
         prisonRegisterApiService.getPrisons().map {
           Organisation(
-            id = it.prisonId,
-            name = it.prisonName,
+            code = it.prisonId,
+            prisonName = it.prisonName,
           )
         },
       )

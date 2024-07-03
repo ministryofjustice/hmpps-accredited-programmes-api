@@ -23,11 +23,11 @@ class PrisonRegisterIntegrationTest : IntegrationTestBase() {
     val prisons = getPrisons()
     prisons.isNotEmpty()
 
-    prisons[0].id shouldBe "AWI"
-    prisons[0].name shouldBe "Ashwell (HMP)"
+    prisons[0].code shouldBe "AWI"
+    prisons[0].prisonName shouldBe "Ashwell (HMP)"
 
-    prisons[1].id shouldBe "BXI"
-    prisons[1].name shouldBe "Brixton (HMP)"
+    prisons[1].code shouldBe "BXI"
+    prisons[1].prisonName shouldBe "Brixton (HMP)"
   }
 
   private fun getPrisons() =
