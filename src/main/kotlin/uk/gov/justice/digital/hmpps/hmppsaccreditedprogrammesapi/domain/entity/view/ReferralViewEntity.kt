@@ -51,10 +51,19 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
         AND (:status IS NULL OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
+         AND (:prisonNumber IS NULL OR r.prisonNumber = :prisonNumber)
+        AND (:surnameOnly IS NULL OR (LOWER(r.surname) LIKE LOWER(CONCAT('%', :surnameOnly, '%')) 
+                                  OR LOWER(r.forename) LIKE LOWER(CONCAT('%', :surnameOnly, '%'))))
+        AND (:forename IS NULL OR LOWER(r.forename) LIKE LOWER(CONCAT('%', :forename, '%')))
+        AND (:surname IS NULL OR LOWER(r.surname) LIKE LOWER(CONCAT('%', :surname, '%')))
     """,
   )
   fun getReferralsByOrganisationId(
     organisationId: String,
+    prisonNumber: String?,
+    surnameOnly: String?,
+    forename: String?,
+    surname: String?,
     pageable: Pageable,
     status: List<String>?,
     audience: String?,
@@ -68,9 +77,18 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
         AND (:status IS NULL OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
+        AND (:prisonNumber IS NULL OR r.prisonNumber = :prisonNumber)
+        AND (:surnameOnly IS NULL OR (LOWER(r.surname) LIKE LOWER(CONCAT('%', :surnameOnly, '%')) 
+                                  OR LOWER(r.forename) LIKE LOWER(CONCAT('%', :surnameOnly, '%'))))
+        AND (:forename IS NULL OR LOWER(r.forename) LIKE LOWER(CONCAT('%', :forename, '%')))
+        AND (:surname IS NULL OR LOWER(r.surname) LIKE LOWER(CONCAT('%', :surname, '%')))
     """,
   )
   fun getReferralsByUsername(
+    prisonNumber: String?,
+    surnameOnly: String?,
+    forename: String?,
+    surname: String?,
     username: String,
     pageable: Pageable,
     status: List<String>?,

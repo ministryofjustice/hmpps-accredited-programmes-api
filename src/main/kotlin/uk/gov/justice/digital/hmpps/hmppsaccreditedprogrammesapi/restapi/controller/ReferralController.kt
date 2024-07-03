@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -103,6 +104,7 @@ constructor(
 
   override fun getReferralViewsByOrganisationId(
     organisationId: String,
+    @RequestParam(value = "nameOrId", required = false) nameOrId: String?,
     @RequestParam(value = "page", defaultValue = "0") page: Int,
     @RequestParam(value = "size", defaultValue = "10") size: Int,
     @RequestParam(value = "status", required = false) status: List<String>?,
@@ -113,9 +115,15 @@ constructor(
     @RequestParam(value = "sortDirection", required = false) sortDirection: String?,
   ): ResponseEntity<PaginatedReferralView> {
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
+    val nameOrIdSearch = parseNameOrId(nameOrId)
+    log.info("Organisation case list parsed name params: {}", nameOrIdSearch)
     val apiReferralSummaryPage =
       referralService.getReferralViewByOrganisationId(
         organisationId,
+        nameOrIdSearch.prisonNumber,
+        nameOrIdSearch.surnameOnly,
+        nameOrIdSearch.forename,
+        nameOrIdSearch.surname,
         pageable,
         status,
         audience,
@@ -135,9 +143,38 @@ constructor(
     )
   }
 
+  private fun parseNameOrId(nameOrId: String?): NameOrIdSearch {
+    val terms = nameOrId?.split(" ") ?: return NameOrIdSearch()
+
+    return when {
+      terms.size == 1 -> {
+        val term = terms[0]
+        if (term.matches(Regex("[A-Za-z]\\d{4}[A-Za-z]{2}"))) {
+          NameOrIdSearch(prisonNumber = term)
+        } else {
+          NameOrIdSearch(surnameOnly = term)
+        }
+      }
+
+      terms.size > 1 -> {
+        NameOrIdSearch(forename = terms[0], surname = terms[1])
+      }
+
+      else -> NameOrIdSearch()
+    }
+  }
+
+  data class NameOrIdSearch(
+    val prisonNumber: String? = null,
+    val surnameOnly: String? = null,
+    val forename: String? = null,
+    val surname: String? = null,
+  )
+
   override fun getReferralViewsByCurrentUser(
     @RequestParam(value = "page", defaultValue = "0") page: Int,
     @RequestParam(value = "size", defaultValue = "10") size: Int,
+    @RequestParam(value = "nameOrId", required = false) nameOrId: String?,
     @RequestParam(value = "status", required = false) status: List<String>?,
     @RequestParam(value = "audience", required = false) audience: String?,
     @RequestParam(value = "courseName", required = false) courseName: String?,
@@ -150,8 +187,16 @@ constructor(
     val username: String =
       securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
 
+    val nameOrIdSearch = parseNameOrId(nameOrId)
+    log.info("Referal case list parsed name params: {}", nameOrIdSearch)
+
     val apiReferralSummaryPage =
-      referralService.getReferralViewByUsername(username, pageable, status, audience, courseName, statusGroup)
+      referralService.getReferralViewByUsername(
+        username, pageable, status, audience, courseName, statusGroup, nameOrIdSearch.prisonNumber,
+        nameOrIdSearch.surnameOnly,
+        nameOrIdSearch.forename,
+        nameOrIdSearch.surname,
+      )
 
     return ResponseEntity.ok(
       PaginatedReferralView(
@@ -285,5 +330,9 @@ constructor(
     return ResponseEntity.ok(
       defaultConfirmationFields,
     )
+  }
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
   }
 }
