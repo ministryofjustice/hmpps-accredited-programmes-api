@@ -143,7 +143,7 @@ class PersonService(
     TARIFF_DATE("tariffDate", "TED", "Tariff end date", 100),
     PAROLE_ELIGIBILITY_DATE("paroleEligibilityDate", "PED", "Parole eligibility date", 110),
     POST_RECALL_RELEASE_DATE("postRecallReleaseDate", "PRRD", "Post recall release date", 120),
-    RELEASE_DATE("releaseDate", "RD", "Release date", 130),
+    RELEASE_DATE("releaseDate", "RD", "Confirmed release date", 130),
     SENTENCE_END_DATE("sentenceExpiryDate", "SED", "Sentence end date", 140),
     ;
 
