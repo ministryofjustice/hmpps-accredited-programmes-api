@@ -14,10 +14,14 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_ID_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -38,6 +42,9 @@ constructor(
 
   @MockkBean
   private lateinit var enabledOrganisationService: EnabledOrganisationService
+
+  @MockkBean
+  private lateinit var prisonRegisterApiService: PrisonRegisterApiService
 
   @Nested
   inner class GetCoursesByOrganisationIdTests {
@@ -118,6 +125,30 @@ constructor(
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
         status { isUnauthorized() }
+      }
+    }
+  }
+
+  @Nested
+  inner class GetAllOrganisations {
+    @Test
+    fun `Should return list of all organisations`() {
+      val prison = Prison(
+        prisonId = PRISON_ID_1,
+        prisonName = PRISON_NAME_1,
+      )
+
+      every { prisonRegisterApiService.getPrisons() } returns listOf(prison)
+      mockMvc.get("/organisations") {
+        accept = MediaType.APPLICATION_JSON
+        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+      }.andExpect {
+        status { isOk() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          assertThat(prison.prisonId).isEqualTo(PRISON_ID_1)
+          assertThat(prison.prisonName).isEqualTo(PRISON_NAME_1)
+        }
       }
     }
   }

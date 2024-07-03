@@ -60,4 +60,24 @@ constructor(
 
     return prisons.entity.orEmpty()
   }
+
+  fun getPrisons(): List<Prison> {
+    val prisons = when (val response = prisonRegisterApiClient.getPrisons()) {
+      is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
+      is ClientResult.Failure.StatusCode -> {
+        log.warn("Failure to retrieve data. Status code ${response.status} reason ${response.toException().message}")
+        AuthorisableActionResult.Success(null)
+      }
+      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
+        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+        response.toException(),
+      )
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve data ${response.toException().message}")
+        AuthorisableActionResult.Success(null)
+      }
+    }
+
+    return prisons.entity.orEmpty()
+  }
 }

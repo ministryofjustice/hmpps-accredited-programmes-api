@@ -24,4 +24,8 @@ class PrisonRegisterApiClient(
     path = "/prisons/prisonsByIds"
     body = PrisonsByIdsRequest(prisonIds)
   }
+
+  fun getPrisons() = getRequest<List<Prison>>(PRISON_REGISTER_API) {
+    path = "/prisons/names"
+  }
 }
