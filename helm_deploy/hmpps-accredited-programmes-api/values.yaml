@@ -24,7 +24,7 @@ generic-service:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     SENTRY_SAMPLE-RATE: 1
     SENTRY_TRACES-SAMPLE-RATE: 0.2
-    SPRING_DATASOURCE_URL: "jdbc:postgresql://${DB_HOST}/${DB_NAME}"
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://${DB_HOST}/${DB_NAME}?sslmode=verify-full"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
