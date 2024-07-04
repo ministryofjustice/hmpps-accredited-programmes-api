@@ -22,6 +22,7 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM referrer_user").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audit_record").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM enabled_organisation").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM audience").executeUpdate()
   }
 
   fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue") {
@@ -91,6 +92,14 @@ class PersistenceHelper {
       .setParameter("createdDateTime", createdDateTime)
       .setParameter("lastModifiedByUsername", lastModifiedByUsername)
       .setParameter("lastModifiedDateTime", lastModifiedDateTime)
+      .executeUpdate()
+  }
+
+  fun createAudience(id: UUID = UUID.randomUUID(), name: String, colour: String) {
+    entityManager.createNativeQuery("INSERT INTO audience (audience_id, name, colour) VALUES (:id, :name, :colour)")
+      .setParameter("id", id)
+      .setParameter("name", name)
+      .setParameter("colour", colour)
       .executeUpdate()
   }
 }

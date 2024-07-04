@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.CoursesApiDelegate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
@@ -14,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toCourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AudienceService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import java.util.UUID
@@ -24,6 +26,7 @@ class CourseController
 constructor(
   private val courseService: CourseService,
   private val enabledOrganisationService: EnabledOrganisationService,
+  private val audienceService: AudienceService,
 ) : CoursesApiDelegate {
   override fun getAllCourses(): ResponseEntity<List<Course>> =
     ResponseEntity
@@ -82,5 +85,16 @@ constructor(
     .ok(
       courseService
         .getCourseNames(includeWithdrawn),
+    )
+
+  override fun getAudiences() = ResponseEntity
+    .ok(
+      audienceService
+        .getAllAudiences().map {
+          Audience(
+            name = it.name,
+            colour = it.colour,
+          )
+        },
     )
 }
