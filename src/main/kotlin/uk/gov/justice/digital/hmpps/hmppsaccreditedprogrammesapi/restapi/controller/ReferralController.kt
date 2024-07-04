@@ -144,7 +144,7 @@ constructor(
   }
 
   private fun parseNameOrId(nameOrId: String?): NameOrIdSearch {
-    val terms = nameOrId?.split(" ") ?: return NameOrIdSearch()
+    val terms = nameOrId?.uppercase()?.split(" ") ?: return NameOrIdSearch()
 
     return when {
       terms.size == 1 -> {
@@ -165,10 +165,10 @@ constructor(
   }
 
   data class NameOrIdSearch(
-    val prisonNumber: String? = null,
-    val surnameOnly: String? = null,
-    val forename: String? = null,
-    val surname: String? = null,
+    val prisonNumber: String = "",
+    val surnameOnly: String = "",
+    val forename: String = "",
+    val surname: String = "",
   )
 
   override fun getReferralViewsByCurrentUser(
