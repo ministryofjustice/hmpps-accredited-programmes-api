@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.CoursesApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
@@ -64,11 +65,11 @@ constructor(
         },
     )
 
-  override fun getCoursePrerequisites(id: UUID): ResponseEntity<List<PrerequisiteRecord>> =
+  override fun getCoursePrerequisites(id: UUID): ResponseEntity<List<CoursePrerequisite>> =
     ResponseEntity.ok(
       courseService
         .getCourseById(id)?.prerequisites?.map { prerequisite ->
-          PrerequisiteRecord(
+          CoursePrerequisite(
             name = prerequisite.name,
             description = prerequisite.description,
           )

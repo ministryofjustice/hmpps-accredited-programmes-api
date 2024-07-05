@@ -359,7 +359,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PrerequisiteRecord'
+                  $ref: '#/components/schemas/CoursePrerequisite'
 
   /courses/{id}:
     get:
@@ -1964,6 +1964,8 @@ components:
           type: string
       required:
         - name
+        - course
+        - identifier
 
     CourseOffering:
       type: object
