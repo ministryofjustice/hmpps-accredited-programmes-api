@@ -386,7 +386,7 @@ paths:
   /courses/audiences:
     get:
       tags:
-        - Audience
+        - Courses
       summary: Get all audiences
       description: Returns a list of audiences with their name and colour
       operationId: getAudiences
