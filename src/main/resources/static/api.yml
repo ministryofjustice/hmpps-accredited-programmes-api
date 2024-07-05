@@ -337,6 +337,30 @@ paths:
                 items:
                   $ref: '#/components/schemas/PrerequisiteRecord'
 
+  /courses/{id}/prerequisites:
+    get:
+      tags:
+        - Courses
+      summary: Get a list of prerequisites for a course.
+      operationId: getCoursePrerequisites
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description:
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrerequisiteRecord'
+
   /courses/{id}:
     get:
       tags:
@@ -1940,8 +1964,6 @@ components:
           type: string
       required:
         - name
-        - course
-        - identifier
 
     CourseOffering:
       type: object

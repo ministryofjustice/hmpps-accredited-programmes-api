@@ -64,6 +64,17 @@ constructor(
         },
     )
 
+  override fun getCoursePrerequisites(id: UUID): ResponseEntity<List<PrerequisiteRecord>> =
+    ResponseEntity.ok(
+      courseService
+        .getCourseById(id)?.prerequisites?.map { prerequisite ->
+          PrerequisiteRecord(
+            name = prerequisite.name,
+            description = prerequisite.description,
+          )
+        },
+    )
+
   override fun getCourseById(id: UUID): ResponseEntity<Course> =
     courseService.getCourseById(id)?.let {
       ResponseEntity.ok(it.toApi())
