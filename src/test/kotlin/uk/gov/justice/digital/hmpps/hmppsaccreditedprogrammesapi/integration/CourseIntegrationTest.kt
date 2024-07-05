@@ -115,6 +115,9 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "REFERRAL_SUBMITTED",
       LocalDateTime.parse("2023-11-13T19:11:00"),
     )
+
+    persistenceHelper.createAudience(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e1"), name = "Intimate partner violence offence", colour = "green")
+    persistenceHelper.createAudience(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e2"), name = "Sexual offence", colour = "orange")
   }
 
   @Test
@@ -242,5 +245,26 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .jsonPath("$.id").isEqualTo(COURSE_OFFERING_ID.toString())
       .jsonPath("$.organisationId").isNotEmpty
       .jsonPath("$.contactEmail").isNotEmpty
+  }
+
+  @Test
+  fun `Get all audiences returns 200 with correct body`() {
+    webTestClient
+      .get()
+      .uri("/courses/audiences")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .json(
+        """
+        [
+          { "name": "Intimate partner violence offence", "colour":"green" },
+          { "name": "Sexual offence", "colour":"orange" }
+        ]
+      """,
+      )
   }
 }

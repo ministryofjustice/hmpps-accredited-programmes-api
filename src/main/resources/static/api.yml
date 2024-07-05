@@ -407,6 +407,29 @@ paths:
                 items:
                   $ref: '#/components/schemas/CourseOffering'
 
+  /courses/audiences:
+    get:
+      tags:
+        - Courses
+      summary: Get all audiences
+      description: Returns a list of audiences with their name and colour
+      operationId: getAudiences
+      responses:
+        '200':
+          description: Successfully retrieved list of audience
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Audience'
+        '401':
+          description: You are not authorized to view the resource
+        '403':
+          description: Accessing the resource you were trying to reach is forbidden
+        '404':
+          description: The resource you were trying to reach is not found
+
   /organisations/{organisationId}/courses:
     get:
       tags:
@@ -3177,3 +3200,13 @@ components:
         prisonName:
           type: string
           example: "Moorland HMP"
+
+    Audience:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Sexual offence"
+        colour:
+          type: string
+          example: "orange"
