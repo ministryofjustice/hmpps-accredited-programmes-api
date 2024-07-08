@@ -326,14 +326,14 @@ class CourseServiceTest {
     fun `A withdrawn course should not be returned from getCourseById`() {
       val c1 = CourseEntityFactory().withIdentifier("C1").withWithdrawn(true).produce()
       every { courseRepository.findById(any()) } returns Optional.of(c1)
-      courseService.getCourseById(UUID.randomUUID()).shouldBeNull()
+      courseService.getNotWithdrawnCourseById(UUID.randomUUID()).shouldBeNull()
     }
 
     @Test
     fun `An active course should  be returned from getCourseById`() {
       val c1 = CourseEntityFactory().withIdentifier("C1").produce()
       every { courseRepository.findById(any()) } returns Optional.of(c1)
-      courseService.getCourseById(UUID.randomUUID()) shouldBe c1
+      courseService.getNotWithdrawnCourseById(UUID.randomUUID()) shouldBe c1
     }
 
     @Test

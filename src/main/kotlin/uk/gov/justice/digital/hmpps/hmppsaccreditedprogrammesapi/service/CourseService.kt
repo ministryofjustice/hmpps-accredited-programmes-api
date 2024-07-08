@@ -31,7 +31,9 @@ constructor(
       courseRepository.getCourseNames(includeWithdrawn)
     }
   }
-  fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
+  fun getNotWithdrawnCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
+  fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)
+  fun save(courseEntity: CourseEntity): CourseEntity = courseRepository.save(courseEntity)
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
   fun getAllOfferings(): List<OfferingEntity> = offeringRepository.findAll().filterNot { it.withdrawn }
   fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> =
