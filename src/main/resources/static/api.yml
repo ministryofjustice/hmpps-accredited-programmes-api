@@ -1950,6 +1950,9 @@ components:
         audienceColour:
           type: string
           example: 'purple'
+        withdrawn:
+          type: boolean
+          example: 'true'
       required:
         - id
         - name

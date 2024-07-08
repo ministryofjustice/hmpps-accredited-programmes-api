@@ -332,15 +332,16 @@ class CourseIntegrationTest : IntegrationTestBase() {
   fun `Update course is successful`() {
     val updatedCourseName = "Legacy Course 456"
     val courseIdToUpdate = "1811faa6-d568-4fc4-83ce-41111230242f"
-    val updatedCourse = updateCourse(UUID.fromString(courseIdToUpdate), updatedCourseName)
+    val updatedCourse = updateCourse(UUID.fromString(courseIdToUpdate), true, updatedCourseName)
 
     updatedCourse.id shouldBe UUID.fromString(courseIdToUpdate)
     updatedCourse.name shouldBe updatedCourseName
-    updatedCourse.alternateName shouldBe "LEGTEST"
+    updatedCourse.alternateName shouldBe "LC test"
     updatedCourse.description shouldBe "Sample description test"
+    updatedCourse.withdrawn shouldBe true
   }
 
-  fun updateCourse(courseId: UUID, courseName: String) =
+  fun updateCourse(courseId: UUID, withdrawn: Boolean, courseName: String) =
     webTestClient
       .put()
       .uri("/courses/$courseId")
@@ -350,6 +351,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .bodyValue(
         CourseUpdateRequest(
           name = courseName,
+          withdrawn = withdrawn,
         ),
       )
       .exchange()

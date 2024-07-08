@@ -134,6 +134,7 @@ constructor(
           audience = savedCourse.audience,
           audienceColour = savedCourse.audienceColour,
           coursePrerequisites = emptyList(),
+          withdrawn = savedCourse.withdrawn,
         ),
       )
     }
