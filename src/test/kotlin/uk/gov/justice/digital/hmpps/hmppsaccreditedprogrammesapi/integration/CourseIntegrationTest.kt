@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.ints.shouldBeGreaterThan
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -9,12 +11,15 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import java.time.LocalDateTime
 import java.util.UUID
+
+val COURSE_ID: UUID = UUID.fromString("790a2dfe-8df1-4504-bb9c-83e6e53a6537")
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -29,16 +34,28 @@ class CourseIntegrationTest : IntegrationTestBase() {
     persistenceHelper.clearAllTableContent()
 
     persistenceHelper.createCourse(
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      COURSE_ID,
       "SC",
       "Super Course",
       "Sample description",
       "SC++",
       "General offence",
     )
+
+    persistenceHelper.createPrerequisite(
+      COURSE_ID,
+      "pr name1",
+      "pr description1",
+    )
+
+    persistenceHelper.createPrerequisite(
+      COURSE_ID,
+      "pr name2",
+      "pr description2",
+    )
     persistenceHelper.createOffering(
       UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      COURSE_ID,
       "BWN",
       "nobody-bwn@digital.justice.gov.uk",
       "nobody2-bwn@digital.justice.gov.uk",
@@ -46,7 +63,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
     )
     persistenceHelper.createOffering(
       UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      COURSE_ID,
       "MDI",
       "nobody-mdi@digital.justice.gov.uk",
       "nobody2-mdi@digital.justice.gov.uk",
@@ -116,8 +133,16 @@ class CourseIntegrationTest : IntegrationTestBase() {
       LocalDateTime.parse("2023-11-13T19:11:00"),
     )
 
-    persistenceHelper.createAudience(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e1"), name = "Intimate partner violence offence", colour = "green")
-    persistenceHelper.createAudience(UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e2"), name = "Sexual offence", colour = "orange")
+    persistenceHelper.createAudience(
+      UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e1"),
+      name = "Intimate partner violence offence",
+      colour = "green",
+    )
+    persistenceHelper.createAudience(
+      UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e2"),
+      name = "Sexual offence",
+      colour = "orange",
+    )
   }
 
   @Test
@@ -266,5 +291,27 @@ class CourseIntegrationTest : IntegrationTestBase() {
         ]
       """,
       )
+  }
+
+  @Test
+  fun `Retrieve course prerequisites returns 200 with correct body`() {
+    val response = webTestClient
+      .get()
+      .uri("/courses/${COURSE_ID}/prerequisites")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<CoursePrerequisite>>()
+      .returnResult().responseBody!!
+
+    response.size shouldBeGreaterThan 0
+
+    val sortedResponse = response.sortedBy { it.name }
+
+    sortedResponse[0].name shouldBeEqual "pr name1"
+    sortedResponse[1].name shouldBeEqual "pr name2"
+    sortedResponse[0].description shouldBeEqual "pr description1"
+    sortedResponse[1].description shouldBeEqual "pr description2"
   }
 }

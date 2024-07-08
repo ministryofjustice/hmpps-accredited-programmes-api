@@ -355,7 +355,7 @@ paths:
         200:
           description:
           content:
-            'text/csv;charset=UTF-8':
+            'application/json':
               schema:
                 type: array
                 items:
