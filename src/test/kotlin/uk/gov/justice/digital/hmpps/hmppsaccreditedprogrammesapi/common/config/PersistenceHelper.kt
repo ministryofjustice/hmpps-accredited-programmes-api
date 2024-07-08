@@ -15,6 +15,7 @@ class PersistenceHelper {
   private lateinit var entityManager: EntityManager
 
   fun clearAllTableContent() {
+    entityManager.createNativeQuery("DELETE FROM prerequisite").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course_participation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
@@ -35,6 +36,14 @@ class PersistenceHelper {
       .setParameter("audience", audience)
       .setParameter("withdrawn", withdrawn)
       .setParameter("audienceColour", audienceColour)
+      .executeUpdate()
+  }
+
+  fun createPrerequisite(courseId: UUID, name: String, description: String) {
+    entityManager.createNativeQuery("INSERT INTO prerequisite (course_id, name, description) VALUES (:id, :name, :description)")
+      .setParameter("id", courseId)
+      .setParameter("name", name)
+      .setParameter("description", description)
       .executeUpdate()
   }
 
