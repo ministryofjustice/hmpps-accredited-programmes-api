@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -80,7 +81,7 @@ constructor(
     )
 
   override fun getCourseById(id: UUID): ResponseEntity<Course> =
-    courseService.getCourseById(id)?.let {
+    courseService.getNotWithdrawnCourseById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /courses/$id")
 
@@ -109,4 +110,32 @@ constructor(
           )
         },
     )
+
+  override fun updateCourse(id: UUID, courseUpdateRequest: CourseUpdateRequest): ResponseEntity<Course> {
+    val existingCourse = courseService.getCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
+
+    return run {
+      courseUpdateRequest.name?.let { existingCourse.name = it }
+      courseUpdateRequest.description?.let { existingCourse.description = it }
+      courseUpdateRequest.alternateName?.let { existingCourse.alternateName = it }
+      courseUpdateRequest.displayName?.let { existingCourse.listDisplayName = it }
+      courseUpdateRequest.audience?.let { existingCourse.audience = it }
+      courseUpdateRequest.audienceColour?.let { existingCourse.audienceColour = it }
+      courseUpdateRequest.withdrawn?.let { existingCourse.withdrawn = it }
+
+      val savedCourse = courseService.save(existingCourse)
+
+      ResponseEntity.ok(
+        Course(
+          id = savedCourse.id!!,
+          name = savedCourse.name,
+          description = savedCourse.description ?: "",
+          alternateName = savedCourse.alternateName,
+          audience = savedCourse.audience,
+          audienceColour = savedCourse.audienceColour,
+          coursePrerequisites = emptyList(),
+        ),
+      )
+    }
+  }
 }

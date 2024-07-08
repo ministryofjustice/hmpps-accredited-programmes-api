@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.shouldBe
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -12,7 +13,9 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
@@ -94,6 +97,16 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "LC",
       "General offence",
       true,
+    )
+
+    persistenceHelper.createCourse(
+      UUID.fromString("1811faa6-d568-4fc4-83ce-41111230242f"),
+      "LEGTEST",
+      "Legacy Course test",
+      "Sample description test",
+      "LC test",
+      "General offence test",
+      false,
     )
 
     persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
@@ -314,4 +327,33 @@ class CourseIntegrationTest : IntegrationTestBase() {
     sortedResponse[0].description shouldBeEqual "pr description1"
     sortedResponse[1].description shouldBeEqual "pr description2"
   }
+
+  @Test
+  fun `Update course is successful`() {
+    val updatedCourseName = "Legacy Course 456"
+    val courseIdToUpdate = "1811faa6-d568-4fc4-83ce-41111230242f"
+    val updatedCourse = updateCourse(UUID.fromString(courseIdToUpdate), updatedCourseName)
+
+    updatedCourse.id shouldBe UUID.fromString(courseIdToUpdate)
+    updatedCourse.name shouldBe updatedCourseName
+    updatedCourse.alternateName shouldBe "LEGTEST"
+    updatedCourse.description shouldBe "Sample description test"
+  }
+
+  fun updateCourse(courseId: UUID, courseName: String) =
+    webTestClient
+      .put()
+      .uri("/courses/$courseId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        CourseUpdateRequest(
+          name = courseName,
+        ),
+      )
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Course>()
+      .returnResult().responseBody!!
 }
