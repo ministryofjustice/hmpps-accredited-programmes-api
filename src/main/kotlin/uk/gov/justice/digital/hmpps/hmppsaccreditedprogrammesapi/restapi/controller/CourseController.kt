@@ -80,6 +80,11 @@ constructor(
         },
     )
 
+  override fun updateCoursePrerequisites(id: UUID, coursePrerequisites: List<CoursePrerequisite>): ResponseEntity<List<CoursePrerequisite>> {
+    val course = courseService.getNotWithdrawnCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
+    return ResponseEntity.ok(courseService.updateCoursePrerequisites(course, coursePrerequisites.toMutableSet()))
+  }
+
   override fun getCourseById(id: UUID): ResponseEntity<Course> =
     courseService.getNotWithdrawnCourseById(id)?.let {
       ResponseEntity.ok(it.toApi())
