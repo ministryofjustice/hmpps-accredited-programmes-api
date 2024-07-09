@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
@@ -13,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.u
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.util.UUID
 
 @Service
@@ -31,7 +33,10 @@ constructor(
       courseRepository.getCourseNames(includeWithdrawn)
     }
   }
-  fun getNotWithdrawnCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
+
+  fun getNotWithdrawnCourseById(courseId: UUID): CourseEntity? =
+    courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
+
   fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)
   fun save(courseEntity: CourseEntity): CourseEntity = courseRepository.save(courseEntity)
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
@@ -212,4 +217,20 @@ constructor(
   companion object {
     private fun indexToCsvRowNumber(index: Int) = index + 2
   }
+
+  fun updateCoursePrerequisites(
+    course: CourseEntity,
+    coursePrerequisites: Set<CoursePrerequisite>,
+  ): List<CoursePrerequisite>? {
+    val courseSaved = courseRepository.save(course.copy(prerequisites = coursePrerequisites.toEntity()))
+    return courseSaved.prerequisites.map { it.toApi() }
+  }
+}
+
+fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> {
+  return this.map { PrerequisiteEntity(it.name, it.description) }.toMutableSet()
+}
+
+fun CoursePrerequisite.toApi(): CoursePrerequisite {
+  return CoursePrerequisite(name, description)
 }

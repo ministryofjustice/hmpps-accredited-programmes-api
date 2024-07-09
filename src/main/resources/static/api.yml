@@ -360,6 +360,42 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CoursePrerequisite'
+    put:
+      tags:
+        - Courses
+      operationId: updateCoursePrerequisites
+      description: Replace all prerequisites for a course
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CoursePrerequisite'
+      responses:
+        200:
+          description: Successful update
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CoursePrerequisite'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /courses/{id}:
     get:

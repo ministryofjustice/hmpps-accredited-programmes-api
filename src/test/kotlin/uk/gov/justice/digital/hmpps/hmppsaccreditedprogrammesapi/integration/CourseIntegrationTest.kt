@@ -329,6 +329,39 @@ class CourseIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Update course prerequisites returns 200 with correct body`() {
+
+    val newPrerequisites = listOf(CoursePrerequisite("new pr name1", "new pr description1"))
+
+    webTestClient
+      .put()
+      .uri("/courses/${COURSE_ID}/prerequisites")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        newPrerequisites,
+      )
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<CoursePrerequisite>>()
+
+    val getResponse = webTestClient
+      .get()
+      .uri("/courses/${COURSE_ID}/prerequisites")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<CoursePrerequisite>>()
+      .returnResult().responseBody!!
+
+    getResponse.size shouldBeEqual 1
+
+    getResponse[0].name shouldBeEqual "new pr name1"
+    getResponse[0].description shouldBeEqual "new pr description1"
+  }
+
+  @Test
   fun `Update course is successful`() {
     val updatedCourseName = "Legacy Course 456"
     val courseIdToUpdate = "1811faa6-d568-4fc4-83ce-41111230242f"
