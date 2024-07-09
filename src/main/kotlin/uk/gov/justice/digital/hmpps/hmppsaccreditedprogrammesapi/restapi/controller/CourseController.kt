@@ -112,31 +112,21 @@ constructor(
     )
 
   override fun updateCourse(id: UUID, courseUpdateRequest: CourseUpdateRequest): ResponseEntity<Course> {
-    val existingCourse = courseService.getCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
+    val existingCourse = courseService.getCourseById(id)
+      ?: throw NotFoundException("No Course found at /courses/$id")
 
-    return run {
-      courseUpdateRequest.name?.let { existingCourse.name = it }
-      courseUpdateRequest.description?.let { existingCourse.description = it }
-      courseUpdateRequest.alternateName?.let { existingCourse.alternateName = it }
-      courseUpdateRequest.displayName?.let { existingCourse.listDisplayName = it }
-      courseUpdateRequest.audience?.let { existingCourse.audience = it }
-      courseUpdateRequest.audienceColour?.let { existingCourse.audienceColour = it }
-      courseUpdateRequest.withdrawn?.let { existingCourse.withdrawn = it }
+    val updatedCourse = existingCourse.copy(
+      name = courseUpdateRequest.name ?: existingCourse.name,
+      description = courseUpdateRequest.description ?: existingCourse.description,
+      alternateName = courseUpdateRequest.alternateName ?: existingCourse.alternateName,
+      listDisplayName = courseUpdateRequest.displayName ?: existingCourse.listDisplayName,
+      audience = courseUpdateRequest.audience ?: existingCourse.audience,
+      audienceColour = courseUpdateRequest.audienceColour ?: existingCourse.audienceColour,
+      withdrawn = courseUpdateRequest.withdrawn ?: existingCourse.withdrawn,
+    )
 
-      val savedCourse = courseService.save(existingCourse)
+    val savedCourse = courseService.save(updatedCourse)
 
-      ResponseEntity.ok(
-        Course(
-          id = savedCourse.id!!,
-          name = savedCourse.name,
-          description = savedCourse.description ?: "",
-          alternateName = savedCourse.alternateName,
-          audience = savedCourse.audience,
-          audienceColour = savedCourse.audienceColour,
-          coursePrerequisites = emptyList(),
-          withdrawn = savedCourse.withdrawn,
-        ),
-      )
-    }
+    return ResponseEntity.ok(savedCourse.toApi())
   }
 }
