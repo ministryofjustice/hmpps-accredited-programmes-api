@@ -231,6 +231,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Course'
+    post:
+      tags:
+        - Courses
+      summary: Create a course
+      operationId: createCourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreateRequest'
+      responses:
+        200:
+          description: Return a JSON representation of the created course
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Course'
+        '401':
+          description: You are not authorized to view the resource
+        '403':
+          description: Accessing the resource you were trying to reach is forbidden
 
   /courses/csv:
     put:
@@ -1964,6 +1986,9 @@ components:
         id:
           type: string
           format: uuid
+        identifier:
+          type: string
+          example: CC
         name:
           type: string
           example: Thinking skills programme
@@ -1991,6 +2016,7 @@ components:
           example: 'true'
       required:
         - id
+        - identifier
         - name
         - coursePrerequisites
         - audience
@@ -3311,3 +3337,33 @@ components:
         withdrawn:
           type: boolean
           example: true
+
+    CourseCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Thinking skills programme
+        identifier:
+          type: string
+          example: 'CC'
+        description:
+          type: string
+          example: Thinking Skills Programme (TSP) description
+        alternateName:
+          type: string
+          example: 'BNM+'
+        audienceId:
+          type: string
+          format: uuid
+          example: 'e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2'
+        withdrawn:
+          type: boolean
+          nullable: false
+          example: true
+      required:
+        - name
+        - identifier
+        - description
+        - audienceId
+        - withdrawn

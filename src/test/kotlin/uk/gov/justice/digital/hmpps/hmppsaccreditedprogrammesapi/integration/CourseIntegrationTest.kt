@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseCreateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
@@ -372,6 +374,58 @@ class CourseIntegrationTest : IntegrationTestBase() {
     updatedCourse.description shouldBe "Sample description test"
     updatedCourse.withdrawn shouldBe true
   }
+
+  @Test
+  fun `Create course is successful`() {
+    val courseName = "Legacy Course One"
+    val identifier = "LC1"
+    val description = "Test description for Legacy Course"
+    val audienceId = UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e1")
+    val withdrawn = false
+    val alternativeName = "LCO"
+
+    val createdCourse =
+      createCourse(courseName, identifier, description, audienceId, withdrawn, alternativeName)
+
+    createdCourse.id shouldNotBe null
+    createdCourse.name shouldBe courseName
+    createdCourse.identifier shouldBe identifier
+    createdCourse.description shouldBe description
+    createdCourse.audience shouldBe "Intimate partner violence offence"
+    createdCourse.withdrawn shouldBe withdrawn
+    createdCourse.alternateName shouldBe alternativeName
+    createdCourse.displayName shouldBe "Legacy Course One"
+    createdCourse.audienceColour shouldBe "green"
+  }
+
+  fun createCourse(
+    courseName: String,
+    identifier: String,
+    description: String,
+    audienceId: UUID,
+    withdrawn: Boolean,
+    alternativeName: String,
+  ) =
+    webTestClient
+      .post()
+      .uri("/courses")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        CourseCreateRequest(
+          name = courseName,
+          identifier = identifier,
+          description = description,
+          audienceId = audienceId,
+          withdrawn = withdrawn,
+          alternateName = alternativeName,
+        ),
+      )
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Course>()
+      .returnResult().responseBody!!
 
   fun updateCourse(courseId: UUID, withdrawn: Boolean, courseName: String) =
     webTestClient
