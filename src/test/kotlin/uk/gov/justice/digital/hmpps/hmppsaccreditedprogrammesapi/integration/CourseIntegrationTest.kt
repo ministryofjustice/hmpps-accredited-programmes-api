@@ -330,7 +330,6 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Update course prerequisites returns 200 with correct body`() {
-
     val newPrerequisites = listOf(CoursePrerequisite("new pr name1", "new pr description1"))
 
     webTestClient
