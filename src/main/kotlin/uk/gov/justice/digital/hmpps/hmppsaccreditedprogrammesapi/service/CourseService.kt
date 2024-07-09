@@ -38,6 +38,7 @@ constructor(
     courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
 
   fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)
+  fun getCourseByIdentifier(identifier: String): CourseEntity? = courseRepository.findByIdentifier(identifier)
   fun save(courseEntity: CourseEntity): CourseEntity = courseRepository.save(courseEntity)
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
   fun getAllOfferings(): List<OfferingEntity> = offeringRepository.findAll().filterNot { it.withdrawn }

@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
@@ -137,13 +138,22 @@ constructor(
   }
 
   override fun createCourse(courseCreateRequest: CourseCreateRequest): ResponseEntity<Course> {
+    val courseByIdentifier = courseService.getCourseByIdentifier(courseCreateRequest.identifier)
+
+    if (courseByIdentifier != null) {
+      throw BusinessException("Course with identifier ${courseCreateRequest.identifier} already exists")
+    }
+
+    val audience = audienceService.getAudienceById(courseCreateRequest.audienceId)
+      ?: throw BusinessException("Audience with id ${courseCreateRequest.audienceId} does not exist")
+
     val course = CourseEntity(
       name = courseCreateRequest.name,
       identifier = courseCreateRequest.identifier,
       description = courseCreateRequest.description,
       alternateName = courseCreateRequest.alternateName,
-      audience = courseCreateRequest.audience,
-      audienceColour = courseCreateRequest.audienceColour,
+      audience = audience.name,
+      audienceColour = audience.colour,
       withdrawn = courseCreateRequest.withdrawn,
     )
 

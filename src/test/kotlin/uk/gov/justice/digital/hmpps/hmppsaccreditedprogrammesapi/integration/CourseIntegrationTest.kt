@@ -380,33 +380,31 @@ class CourseIntegrationTest : IntegrationTestBase() {
     val courseName = "Legacy Course One"
     val identifier = "LC1"
     val description = "Test description for Legacy Course"
-    val audience = "Kaizen"
+    val audienceId = UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e1")
     val withdrawn = false
     val alternativeName = "LCO"
-    val audienceColour = "green"
 
     val createdCourse =
-      createCourse(courseName, identifier, description, audience, withdrawn, alternativeName, audienceColour)
+      createCourse(courseName, identifier, description, audienceId, withdrawn, alternativeName)
 
     createdCourse.id shouldNotBe null
     createdCourse.name shouldBe courseName
     createdCourse.identifier shouldBe identifier
     createdCourse.description shouldBe description
-    createdCourse.audience shouldBe audience
+    createdCourse.audience shouldBe "Intimate partner violence offence"
     createdCourse.withdrawn shouldBe withdrawn
     createdCourse.alternateName shouldBe alternativeName
     createdCourse.displayName shouldBe "Legacy Course One"
-    createdCourse.audienceColour shouldBe audienceColour
+    createdCourse.audienceColour shouldBe "green"
   }
 
   fun createCourse(
     courseName: String,
     identifier: String,
     description: String,
-    audience: String,
+    audienceId: UUID,
     withdrawn: Boolean,
     alternativeName: String,
-    audienceColour: String,
   ) =
     webTestClient
       .post()
@@ -419,10 +417,9 @@ class CourseIntegrationTest : IntegrationTestBase() {
           name = courseName,
           identifier = identifier,
           description = description,
-          audience = audience,
+          audienceId = audienceId,
           withdrawn = withdrawn,
           alternateName = alternativeName,
-          audienceColour = audienceColour,
         ),
       )
       .exchange()

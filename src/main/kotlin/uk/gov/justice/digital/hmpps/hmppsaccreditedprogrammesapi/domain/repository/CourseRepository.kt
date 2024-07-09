@@ -25,4 +25,6 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
   """,
   )
   fun getCourseNames(includeWithdrawn: Boolean?): List<String>
+
+  fun findByIdentifier(identifier: String): CourseEntity?
 }

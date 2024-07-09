@@ -3353,13 +3353,10 @@ components:
         alternateName:
           type: string
           example: 'BNM+'
-        audience:
+        audienceId:
           type: string
-          nullable: false
-          example: 'Gang offence'
-        audienceColour:
-          type: string
-          example: '#FF5733'
+          format: uuid
+          example: 'e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2'
         withdrawn:
           type: boolean
           nullable: false
@@ -3368,5 +3365,5 @@ components:
         - name
         - identifier
         - description
-        - audience
+        - audienceId
         - withdrawn
