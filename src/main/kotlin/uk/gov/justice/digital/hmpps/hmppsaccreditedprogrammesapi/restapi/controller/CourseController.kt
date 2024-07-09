@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.CoursesApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseCreateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
@@ -131,6 +132,22 @@ constructor(
     )
 
     val savedCourse = courseService.save(updatedCourse)
+
+    return ResponseEntity.ok(savedCourse.toApi())
+  }
+
+  override fun createCourse(courseCreateRequest: CourseCreateRequest): ResponseEntity<Course> {
+    val course = CourseEntity(
+      name = courseCreateRequest.name,
+      identifier = courseCreateRequest.identifier,
+      description = courseCreateRequest.description,
+      alternateName = courseCreateRequest.alternateName,
+      audience = courseCreateRequest.audience,
+      audienceColour = courseCreateRequest.audienceColour,
+      withdrawn = courseCreateRequest.withdrawn,
+    )
+
+    val savedCourse = courseService.save(course)
 
     return ResponseEntity.ok(savedCourse.toApi())
   }

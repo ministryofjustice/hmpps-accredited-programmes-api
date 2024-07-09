@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.u
 
 fun CourseEntity.toApi(): Course = Course(
   id = id!!,
+  identifier = identifier,
   name = name,
   description = description,
   alternateName = alternateName,
