@@ -26,7 +26,7 @@ constructor(
         courseService
           .getAllOfferingsByOrganisationId(organisationId).filter { !it.withdrawn }
           .map { it.course }
-          .map { it.toApi() },
+          .map { it!!.toApi() },
       )
 
   override fun getEnabledOrganisations(): ResponseEntity<List<EnabledOrganisation>> =

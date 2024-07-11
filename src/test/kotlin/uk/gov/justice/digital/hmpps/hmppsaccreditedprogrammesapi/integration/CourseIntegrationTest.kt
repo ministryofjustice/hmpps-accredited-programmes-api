@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseCreateRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
@@ -25,6 +26,10 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 val COURSE_ID: UUID = UUID.fromString("790a2dfe-8df1-4504-bb9c-83e6e53a6537")
+val NEW_COURSE_ID: UUID = UUID.fromString("790a2dfe-ddd1-4504-bb9c-83e6e53a6537")
+
+private const val OFFERING_ID = "7fffcc6a-11f8-4713-be35-cf5ff1aee517"
+private const val UNUSED_OFFERING_ID = "7fffbb9a-11f8-9743-be35-cf5881aee517"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -42,6 +47,15 @@ class CourseIntegrationTest : IntegrationTestBase() {
       COURSE_ID,
       "SC",
       "Super Course",
+      "Sample description",
+      "SC++",
+      "General offence",
+    )
+
+    persistenceHelper.createCourse(
+      NEW_COURSE_ID,
+      "NEWSC",
+      "A new Course",
       "Sample description",
       "SC++",
       "General offence",
@@ -67,9 +81,18 @@ class CourseIntegrationTest : IntegrationTestBase() {
       true,
     )
     persistenceHelper.createOffering(
-      UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
+      UUID.fromString(OFFERING_ID),
       COURSE_ID,
       "MDI",
+      "nobody-mdi@digital.justice.gov.uk",
+      "nobody2-mdi@digital.justice.gov.uk",
+      true,
+    )
+
+    persistenceHelper.createOffering(
+      UUID.fromString(UNUSED_OFFERING_ID),
+      NEW_COURSE_ID,
+      "SKN",
       "nobody-mdi@digital.justice.gov.uk",
       "nobody2-mdi@digital.justice.gov.uk",
       true,
@@ -116,7 +139,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
     persistenceHelper.createReferral(
       UUID.fromString("0c46ed09-170b-4c0f-aee8-a24eeaeeddaa"),
-      UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
+      UUID.fromString(OFFERING_ID),
       "B2345BB",
       "TEST_REFERRER_USER_1",
       "This referral will be updated",
@@ -444,4 +467,56 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody<Course>()
       .returnResult().responseBody!!
+
+  @Test
+  fun `Delete a course offering that is in use returns 400`() {
+    webTestClient
+      .delete()
+      .uri("/courses/$COURSE_ID/offerings/$OFFERING_ID")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().is4xxClientError
+      .expectBody()
+      .jsonPath("$.userMessage")
+      .isEqualTo("Business rule violation: Offering is in use and cannot be deleted. This offering should be withdrawn")
+  }
+
+  @Test
+  fun `Delete a course offering that is not in use returns 200`() {
+    webTestClient
+      .delete()
+      .uri("/courses/$NEW_COURSE_ID/offerings/$UNUSED_OFFERING_ID")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+  }
+
+  @Test
+  fun `Create offerings returns 200`() {
+    webTestClient
+      .put()
+      .uri("/courses/$NEW_COURSE_ID/offerings")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        listOf(
+          CourseOffering(
+            id = null,
+            organisationId = "AWI",
+            contactEmail = "awi1@whatton.com",
+            secondaryContactEmail = "awi2@whatton.com",
+            referable = true,
+            withdrawn = false,
+            organisationEnabled = true,
+          ),
+        ),
+      )
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<CourseOffering>>()
+      .returnResult().responseBody!!
+  }
 }

@@ -58,9 +58,18 @@ fun OfferingEntity.toApi(orgEnabled: Boolean): CourseOffering = CourseOffering(
   referable = referable,
 )
 
+fun OfferingEntity.toApi(): CourseOffering = CourseOffering(
+  id = id!!,
+  organisationId = organisationId,
+  organisationEnabled = referable,
+  contactEmail = contactEmail,
+  secondaryContactEmail = secondaryContactEmail,
+  referable = referable,
+)
+
 fun OfferingEntity.toOfferingRecord() = OfferingRecord(
   course = course.name,
-  identifier = course.identifier,
+  identifier = course!!.identifier,
   prisonId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
