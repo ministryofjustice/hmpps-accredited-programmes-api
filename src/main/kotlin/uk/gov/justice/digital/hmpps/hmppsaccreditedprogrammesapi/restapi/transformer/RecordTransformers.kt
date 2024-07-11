@@ -69,7 +69,7 @@ fun OfferingEntity.toApi(): CourseOffering = CourseOffering(
 
 fun OfferingEntity.toOfferingRecord() = OfferingRecord(
   course = course.name,
-  identifier = course!!.identifier,
+  identifier = course.identifier,
   prisonId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
