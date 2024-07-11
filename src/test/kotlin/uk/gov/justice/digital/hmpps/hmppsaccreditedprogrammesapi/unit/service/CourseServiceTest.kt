@@ -22,7 +22,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseUpdateFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.NewPrerequisiteFactory
@@ -39,12 +41,18 @@ class CourseServiceTest {
   @MockK(relaxed = true)
   private lateinit var offeringRepository: OfferingRepository
 
+  @MockK(relaxed = true)
+  private lateinit var prisonRegisterApiService: PrisonRegisterApiService
+
+  @MockK(relaxed = true)
+  private lateinit var referralRepository: ReferralRepository
+
   private lateinit var courseService: CourseService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    courseService = CourseService(courseRepository, offeringRepository)
+    courseService = CourseService(courseRepository, offeringRepository, prisonRegisterApiService, referralRepository)
   }
 
   @Nested

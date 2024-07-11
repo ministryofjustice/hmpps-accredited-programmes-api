@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
@@ -14,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.u
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.OfferingUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.util.UUID
 
@@ -24,6 +28,8 @@ class CourseService
 constructor(
   private val courseRepository: CourseRepository,
   private val offeringRepository: OfferingRepository,
+  private val prisonRegisterApiService: PrisonRegisterApiService,
+  private val referralRepository: ReferralRepository,
 ) {
   fun getAllCourses(): List<CourseEntity> = courseRepository.findAll().filterNot { it.withdrawn }
   fun getCourseNames(includeWithdrawn: Boolean? = true): List<String> {
@@ -141,6 +147,10 @@ constructor(
     courses.forEach { it.prerequisites.clear() }
   }
 
+  @Deprecated(
+    """Phasing out these CSV methods, leaving them in for now but adding this comment 
+    |so we don't get confused with the new endpoints""",
+  )
   fun updateOfferings(offeringUpdates: List<OfferingUpdate>): List<LineMessage> {
     val allCourses = courseRepository.findAll()
     val coursesByIdentifier = allCourses.associateBy(CourseEntity::identifier)
@@ -165,7 +175,7 @@ constructor(
         secondaryContactEmail = update?.secondaryContactEmail,
         referable = update?.referable ?: true,
       )
-
+      offeringToAdd.course = course
       course.addOffering(offeringToAdd)
     }
 
@@ -225,6 +235,45 @@ constructor(
   ): List<CoursePrerequisite>? {
     val courseSaved = courseRepository.save(course.copy(prerequisites = coursePrerequisites.toEntity()))
     return courseSaved.prerequisites.map { it.toApi() }
+  }
+
+  fun updateOfferings(course: CourseEntity, courseOffering: List<CourseOffering>): List<CourseOffering> {
+    val validPrisons = prisonRegisterApiService.getPrisons()
+
+    val offerings = listOf<OfferingEntity>()
+    courseOffering.forEach {
+      validPrisons.firstOrNull { prison -> prison.prisonId == it.organisationId }
+        ?: throw NotFoundException("No prison found with code ${it.organisationId}")
+      // validate that there isn't already an offering for this course/organisation
+      val existingOffering =
+        offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, it.organisationId)
+      existingOffering?.let {
+        throw BusinessException("Offering already exists for course ${course.name} and organisation ${it.organisationId}")
+      }
+      val offeringToAdd = OfferingEntity(
+        id = it.id,
+        organisationId = it.organisationId,
+        contactEmail = it.contactEmail,
+        secondaryContactEmail = it.secondaryContactEmail,
+        withdrawn = it.withdrawn ?: false,
+        referable = it.referable,
+      )
+
+      offeringToAdd.course = course
+      offerings + offeringToAdd
+    }
+    return offeringRepository.saveAll(offerings).map { it.toApi() }
+  }
+
+  fun deleteCourseOffering(id: UUID, offeringId: UUID) {
+    val existingOffering =
+      offeringRepository.findByCourseIdAndIdAndWithdrawnIsFalse(id, offeringId)
+        ?: throw BusinessException("Offering does not exist")
+    // check that the offering isn't being used
+    if (referralRepository.countAllByOfferingId(offeringId) > 0) {
+      throw BusinessException("Offering is in use and cannot be deleted. This offering should be withdrawn")
+    }
+    offeringRepository.delete(existingOffering)
   }
 }
 

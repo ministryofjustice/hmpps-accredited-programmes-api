@@ -138,7 +138,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
+    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
 
     val personEntity = personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER_1)
 
@@ -150,7 +150,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     getReferralById(referralCreated.referralId) shouldBeEqual Referral(
       id = referralCreated.referralId,
-      offeringId = offering.id,
+      offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_STARTED.lowercase(),
@@ -183,13 +183,13 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(offering.id!!)
 
     referralCreated.referralId.shouldNotBeNull()
 
     getReferralById(referralCreated.referralId) shouldBeEqual Referral(
       id = referralCreated.referralId,
-      offeringId = offering.id,
+      offeringId = offering.id!!,
       referrerUsername = "NONEXISTENT_USER",
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_STARTED.lowercase(),
@@ -213,7 +213,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+    val referralCreated = createReferral(offering.id!!)
 
     val referralUpdate = ReferralUpdate(
       additionalInformation = "Additional information",
@@ -225,7 +225,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     getReferralById(referralCreated.referralId) shouldBeEqual Referral(
       id = referralCreated.referralId,
-      offeringId = offering.id,
+      offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_STARTED.lowercase(),
@@ -271,7 +271,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     getReferralById(referralCreated.referralId) shouldBeEqual Referral(
       id = referralCreated.referralId,
-      offeringId = offering.id,
+      offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_SUBMITTED.lowercase(),
@@ -505,7 +505,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     return createReferral(offering.id, prisonNumber)
   }
 
-  fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =
+  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
     webTestClient
       .post()
       .uri("/referrals")
@@ -514,7 +514,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(
         ReferralCreate(
-          offeringId = offeringId,
+          offeringId = offeringId!!,
           prisonNumber = prisonNumber,
         ),
       )

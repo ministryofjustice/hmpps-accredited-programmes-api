@@ -499,6 +499,62 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CourseOffering'
+    put:
+      tags:
+        - Course Offerings
+      summary: Add or update course offerings
+      operationId: addUpdateCourseOfferings
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CourseOffering'
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseOffering'
+
+  /courses/{id}/offerings/{offeringId}:
+    delete:
+      tags:
+        - Course Offerings
+      summary: Delete a course offering, This can only be done if there are no referrals using this offering.
+      operationId: deleteCourseOffering
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: offeringId
+          in: path
+          description: An offering identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful operation
 
   /courses/audiences:
     get:
@@ -2116,8 +2172,10 @@ components:
         referable:
           type: boolean
           default: true
+        withdrawn:
+          type: boolean
+          default: false
       required:
-        - id
         - organisationId
         - contactEmail
         - referable

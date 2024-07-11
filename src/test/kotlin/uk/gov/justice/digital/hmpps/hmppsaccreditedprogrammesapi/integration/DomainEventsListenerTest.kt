@@ -105,7 +105,7 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     val nomsNumber = "C6666DD"
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    createReferral(offering.id, nomsNumber)
+    createReferral(offering.id!!, nomsNumber)
 
     val referralViewBefore = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     referralViewBefore shouldNotBe null

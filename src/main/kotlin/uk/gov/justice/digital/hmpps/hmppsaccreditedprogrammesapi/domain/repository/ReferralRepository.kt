@@ -21,4 +21,6 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
   fun getSarReferrals(
     @Param("prisonerNumber") prisonerNumber: String,
   ): List<ReferralEntity>
+
+  fun countAllByOfferingId(id: UUID): Long
 }
