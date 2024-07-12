@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/assessments/timeline/A9999BB",
+        "url": "/assessments/timeline/A9999BB",
         "method": "GET"
       },
       "response": {
@@ -11,6 +11,19 @@
           "Content-Type": "application/json"
         },
         "bodyFileName": "assessments.json"
+      }
+    },
+    {
+      "request": {
+        "url": "/assessments/timeline/A9999CC",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "assessment_dates.json"
       }
     },
     {

@@ -1769,6 +1769,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /oasys/{prisonNumber}/assessment_date:
+    get:
+      summary: Get latest layer 3 completed assessment date
+      description: Get latest layer 3 completed assessment date and if there are any open assessments
+      tags:
+        - Oasys Integration
+      operationId: getLatestCompletedAssessmentDate
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/OasysAssessmentDateInfo'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /reference-data/referral-statuses:
     get:
@@ -3350,6 +3382,17 @@ components:
         bingeDrinking:
           type: string
           nullable: true
+
+    OasysAssessmentDateInfo:
+      type: object
+      properties:
+        recentCompletedAssessmentDate:
+          type: string
+          format: date
+          nullable: true
+        hasOpenAssessment:
+          type: boolean
+          nullable: false
 
     Organisation:
       type: object

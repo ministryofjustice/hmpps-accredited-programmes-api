@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugA
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAssessmentDateInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
@@ -93,5 +94,12 @@ class OasysController(val oasysService: OasysService) : OasysApiDelegate {
       .ok(
         oasysService
           .getDrugAndAlcoholDetail(prisonNumber),
+      )
+
+  override fun getLatestCompletedAssessmentDate(prisonNumber: String): ResponseEntity<OasysAssessmentDateInfo> =
+    ResponseEntity
+      .ok(
+        oasysService
+          .getAssessmentDateInfo(prisonNumber),
       )
 }
