@@ -157,8 +157,10 @@ class OasysService(
   }
 
   fun getAssessmentId(prisonNumber: String): Long? {
+    val assessmentTimeline = getAssessments(prisonNumber)
+
     val assessment =
-      getLatestCompletedLayerThreeAssessment(prisonNumber)
+      getLatestCompletedLayerThreeAssessment(assessmentTimeline)
 
     return if (assessment == null) {
       log.warn("No completed assessment found for prison number $prisonNumber")
@@ -169,18 +171,21 @@ class OasysService(
   }
 
   fun getAssessmentDateInfo(prisonNumber: String): OasysAssessmentDateInfo {
-    val assessment =
-      getLatestCompletedLayerThreeAssessment(prisonNumber)
-    val hasOpenAssessment = getAssessments(prisonNumber).timeline.any { it.status == "OPEN" }
+    val assessmentTimeline = getAssessments(prisonNumber)
+    val latestCompletedAssessment =
+      getLatestCompletedLayerThreeAssessment(assessmentTimeline)
 
-    return OasysAssessmentDateInfo(assessment?.completedAt?.toLocalDate(), hasOpenAssessment)
+    val mostRecentOpenAssessment = latestCompletedAssessment?.let { latestAssessment ->
+      assessmentTimeline.timeline.filter { it.status == "OPEN" }.filter { it.id > latestAssessment.id }
+        .maxByOrNull { it.id }
+    }
+
+    return OasysAssessmentDateInfo(latestCompletedAssessment?.completedAt?.toLocalDate(), mostRecentOpenAssessment != null)
   }
 
-  private fun getLatestCompletedLayerThreeAssessment(prisonNumber: String): Timeline? {
-    val assessments = getAssessments(prisonNumber)
-
+  private fun getLatestCompletedLayerThreeAssessment(assessment: OasysAssessmentTimeline): Timeline? {
     // get the most recent completed assessment
-    return assessments
+    return assessment
       .timeline
       .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
       .sortedByDescending { it.completedAt }
