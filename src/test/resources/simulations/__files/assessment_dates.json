@@ -1,0 +1,35 @@
+{
+  "crn": "X739590",
+  "nomsId": "A8610DY",
+  "timeline": [
+    {
+      "id": 10082385,
+      "completedAt": "2023-12-19T16:57:25",
+      "type": "LAYER3",
+      "status": "COMPLETE"
+    },
+    {
+      "id": 4442,
+      "completedAt": "2024-01-22T14:52:18",
+      "type": "STANDALONE",
+      "status": "COMPLETE"
+    },
+    {
+      "id": 10142385,
+      "completedAt": "2024-02-20T16:01:27",
+      "type": "LAYER1",
+      "status": "COMPLETE"
+    },
+    {
+      "id": 10144385,
+      "completedAt": "2024-02-21T10:39:07",
+      "type": "LAYER1",
+      "status": "COMPLETE"
+    },
+    {
+      "id": 10176400,
+      "type": "LAYER3",
+      "status": "OPEN"
+    }
+  ]
+}

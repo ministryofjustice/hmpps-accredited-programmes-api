@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -17,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugA
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAssessmentDateInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
@@ -29,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.time.Month
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -262,6 +266,17 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
     )
   }
 
+  @Test
+  fun `Get latest assessement date info`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999CC"
+    val oasysAssessmentDateInfo = getLatestAssessmentDateByPrisonNumber(prisonNumber)
+
+    oasysAssessmentDateInfo shouldNotBe null
+    oasysAssessmentDateInfo.hasOpenAssessment shouldBe true
+    oasysAssessmentDateInfo.recentCompletedAssessmentDate shouldBe LocalDate.of(2023, Month.DECEMBER, 19)
+  }
+
   fun getDrugAndAlcoholDetail(prisonNumber: String) =
     webTestClient
       .get()
@@ -392,6 +407,17 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().is4xxClientError
       .expectBody<ErrorResponse>()
+      .returnResult().responseBody!!
+
+  fun getLatestAssessmentDateByPrisonNumber(prisonNumber: String) =
+    webTestClient
+      .get()
+      .uri("/oasys/$prisonNumber/assessment_date")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<OasysAssessmentDateInfo>()
       .returnResult().responseBody!!
 
   companion object {

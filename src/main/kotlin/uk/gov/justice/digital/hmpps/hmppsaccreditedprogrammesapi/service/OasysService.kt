@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugA
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAssessmentDateInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
@@ -21,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysDrugDetail
@@ -33,6 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -154,6 +157,42 @@ class OasysService(
   }
 
   fun getAssessmentId(prisonNumber: String): Long? {
+    val assessmentTimeline = getAssessments(prisonNumber)
+
+    val assessment =
+      getLatestCompletedLayerThreeAssessment(assessmentTimeline)
+
+    return if (assessment == null) {
+      log.warn("No completed assessment found for prison number $prisonNumber")
+      null
+    } else {
+      assessment.id
+    }
+  }
+
+  fun getAssessmentDateInfo(prisonNumber: String): OasysAssessmentDateInfo {
+    val assessmentTimeline = getAssessments(prisonNumber)
+    val latestCompletedAssessment =
+      getLatestCompletedLayerThreeAssessment(assessmentTimeline)
+
+    val mostRecentOpenAssessment = latestCompletedAssessment?.let { latestAssessment ->
+      assessmentTimeline.timeline.filter { it.status == "OPEN" }.filter { it.id > latestAssessment.id }
+        .maxByOrNull { it.id }
+    }
+
+    return OasysAssessmentDateInfo(latestCompletedAssessment?.completedAt?.toLocalDate(), mostRecentOpenAssessment != null)
+  }
+
+  private fun getLatestCompletedLayerThreeAssessment(assessment: OasysAssessmentTimeline): Timeline? {
+    // get the most recent completed assessment
+    return assessment
+      .timeline
+      .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
+      .sortedByDescending { it.completedAt }
+      .firstOrNull()
+  }
+
+  private fun getAssessments(prisonNumber: String): OasysAssessmentTimeline {
     val assessments = when (val result = oasysApiClient.getAssessments(prisonNumber)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve Assessment for $prisonNumber reason ${result.toException().cause}")
@@ -162,21 +201,7 @@ class OasysService(
 
       is ClientResult.Success -> AuthorisableActionResult.Success(result.body)
     }
-
-    // get the most recent completed assessment
-    val assessment =
-      assessments.entity
-        .timeline
-        .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
-        .sortedByDescending { it.completedAt }
-        .firstOrNull()
-
-    return if (assessment == null) {
-      log.warn("No completed assessment found for prison number $prisonNumber")
-      null
-    } else {
-      assessment.id
-    }
+    return assessments.entity
   }
 
   fun getDrugAndAlcoholDetail(prisonNumber: String): DrugAlcoholDetail {
