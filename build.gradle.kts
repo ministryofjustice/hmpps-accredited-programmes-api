@@ -18,6 +18,7 @@ dependencies {
   val sentryVersion = "7.12.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.3.1"
+  val openAPIVersion = "1.8.0"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.2")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
@@ -35,6 +36,9 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:$springdocVersion")
+
+  implementation("org.springdoc:springdoc-openapi-ui:$openAPIVersion")
+  implementation("org.springdoc:springdoc-openapi-kotlin:$openAPIVersion")
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.0.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
