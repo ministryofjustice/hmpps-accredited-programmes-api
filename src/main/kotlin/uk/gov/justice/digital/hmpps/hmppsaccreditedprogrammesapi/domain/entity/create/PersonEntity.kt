@@ -27,4 +27,5 @@ data class PersonEntity(
   @GeneratedValue
   @Column(name = "person_id")
   var id: UUID = UUID.randomUUID(),
+  var location: String?,
 )

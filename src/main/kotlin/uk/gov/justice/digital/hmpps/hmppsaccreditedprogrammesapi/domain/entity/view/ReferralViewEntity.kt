@@ -39,6 +39,7 @@ data class ReferralViewEntity(
   var submittedOn: LocalDateTime? = null,
   val sentenceType: String?,
   val listDisplayName: String?,
+  val location: String?,
 )
 
 @Repository

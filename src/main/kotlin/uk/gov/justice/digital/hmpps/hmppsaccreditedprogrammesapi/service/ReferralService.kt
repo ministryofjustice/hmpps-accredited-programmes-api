@@ -156,6 +156,7 @@ constructor(
     personEntity.indeterminateSentence = it.indeterminateSentence
     personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
     personEntity.sentenceType = sentenceType
+    personEntity.location = it.prisonName
   }
 
   private fun createOrUpdatePerson(prisonNumber: String) {
@@ -165,17 +166,18 @@ constructor(
       if (personEntity == null) {
         val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
         personEntity = PersonEntity(
-          it.lastName,
-          it.firstName,
-          prisonNumber,
-          it.conditionalReleaseDate,
-          it.paroleEligibilityDate,
-          it.tariffDate,
-          earliestReleaseDateAndType.first,
-          earliestReleaseDateAndType.second,
-          it.indeterminateSentence,
-          it.nonDtoReleaseDateType,
-          sentenceType,
+          surname = it.lastName,
+          forename = it.firstName,
+          prisonNumber = prisonNumber,
+          conditionalReleaseDate = it.conditionalReleaseDate,
+          paroleEligibilityDate = it.paroleEligibilityDate,
+          tariffExpiryDate = it.tariffDate,
+          earliestReleaseDate = earliestReleaseDateAndType.first,
+          earliestReleaseDateType = earliestReleaseDateAndType.second,
+          indeterminateSentence = it.indeterminateSentence,
+          nonDtoReleaseDateType = it.nonDtoReleaseDateType,
+          sentenceType = sentenceType,
+          location = it.prisonName,
         )
       } else {
         updatePerson(it, personEntity, sentenceType)
