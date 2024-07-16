@@ -2546,6 +2546,9 @@ components:
         listDisplayName:
           type: string
           description: The course display name when it is in a list.
+        location:
+          type: string
+          description: location of person
 
     ReferralStatusHistory:
       type: object

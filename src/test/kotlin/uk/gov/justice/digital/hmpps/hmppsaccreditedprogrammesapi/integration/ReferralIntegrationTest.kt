@@ -145,6 +145,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     personEntity.shouldNotBeNull()
     personEntity.surname.shouldBeEqual(PRISONER_1.lastName)
     personEntity.forename.shouldBeEqual(PRISONER_1.firstName)
+    personEntity.location.shouldNotBeNull()
 
     referralCreated.referralId.shouldNotBeNull()
 
