@@ -51,6 +51,7 @@ val PRISONER_1 = Prisoner(
   tariffDate = TARIFF_EXPIRY_DATE,
   paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
   indeterminateSentence = INDETERMINATE_SENTENCE,
+  prisonName = "HMP Leeds",
 )
 
 const val PRISON_LOCATION = "Buckinghamshire"
