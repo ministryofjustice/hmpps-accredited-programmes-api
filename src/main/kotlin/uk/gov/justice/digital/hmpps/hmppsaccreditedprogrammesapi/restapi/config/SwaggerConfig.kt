@@ -13,10 +13,12 @@ class SwaggerConfig {
       return OpenApiCustomizer { openApi ->
         openApi.info
           .title("Statistics API")
-          .description("""
+          .description(
+            """
             This API provides API endpoints that return statistical data about accredited programmes. 
             Note that these endpoints are created manually rather than via open api.yaml.
-          """.trimIndent())
+            """.trimIndent(),
+          )
           .version("1.0.0")
       }
     }

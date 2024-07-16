@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -47,13 +48,13 @@ class StatisticsController(
     }
     return ReportContent(
       reportType = reportType.name,
-      content = objectMapper.readTree(content),
+      content = objectMapper.readValue(content, Content::class.java),
       parameters = parameters,
     )
   }
 }
 
-data class ReportContent(val reportType: String, val parameters: Parameters, val content: Any)
+data class ReportContent(val reportType: String, val parameters: Parameters, val content: Content)
 
 data class Parameters(
   val startDate: LocalDate,
@@ -67,3 +68,23 @@ enum class ReportType {
 }
 
 data class ReportTypes(val types: List<String>)
+
+@Schema(
+  example = "\"content\": {\n" +
+    "        \"count\": 6\n" +
+    "    }",
+  required = true,
+  description = "The result of the statistics query",
+)
+data class Content(
+  @Schema(description = "count will be present for simple queries where there is only a count returned.")
+  val count: Int?,
+  @Schema(description = "A list of counts will be returned when the query has more than one count returned")
+  val courseCounts: List<CourseCount>?,
+)
+
+data class CourseCount(
+  val name: String,
+  val audience: String,
+  val count: Int?,
+)
