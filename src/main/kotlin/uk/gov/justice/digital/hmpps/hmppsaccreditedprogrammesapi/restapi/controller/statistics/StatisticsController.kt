@@ -70,10 +70,6 @@ enum class ReportType {
 data class ReportTypes(val types: List<String>)
 
 @Schema(
-  example = "\"content\": {\n" +
-    "        \"count\": 6\n" +
-    "    }",
-  required = true,
   description = "The result of the statistics query",
 )
 data class Content(
