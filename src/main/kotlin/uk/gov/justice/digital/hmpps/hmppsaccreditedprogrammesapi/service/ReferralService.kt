@@ -116,11 +116,11 @@ constructor(
     }
   }
 
-  fun updatePerson(prisonNumber: String) {
+  fun updatePerson(prisonNumber: String, fromUpdateEndpoint: Boolean = false) {
     log.info("Attempting to update person with prison number: $prisonNumber")
     val personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
     if (personEntity != null) {
-      log.info("Prisoner is of interest to ACP - about to update: $prisonNumber")
+      log.info("Prisoner is of interest to ACP - about to update: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
       val sentenceType = personService.getSentenceType(prisonNumber)
       peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
         updatePerson(it, personEntity, sentenceType)
@@ -135,7 +135,7 @@ constructor(
     log.info("Attempting to update all people in person cache.")
     val people = personRepository.findAll()
     people.forEach {
-      updatePerson(it.prisonNumber)
+      updatePerson(it.prisonNumber, true)
     }
     log.info("Updated all people in person cache.")
   }
