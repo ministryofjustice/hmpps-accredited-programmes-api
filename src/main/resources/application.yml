@@ -80,7 +80,14 @@ springdoc:
     urls:
       - name: API
         url: "api.yml"
-
+      - name: Courses
+        url: "courses_api.yml"
+      - name: Oasys
+        url: "oasys_api.yml"
+      - name: RefereceData
+        url: "refdata_api.yml"
+      - name: Referrals
+        url: "referrals_api.yml"
 
 server:
   port: 8080
