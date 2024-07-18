@@ -1,0 +1,495 @@
+openapi: 3.0.1
+info:
+  title: Accredited Programmes API
+  version: 1.0.0
+servers:
+  - url: /courses
+security:
+  - bearerAuth: [ ]
+paths:
+  /:
+    get:
+      tags:
+        - Courses
+      summary: List all courses
+      operationId: getAllCourses
+      responses:
+        200:
+          description: Return a JSON representation of all courses that are not withdrawn.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/Course'
+    post:
+      tags:
+        - Courses
+      summary: Create a course
+      operationId: createCourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreateRequest'
+      responses:
+        200:
+          description: Return a JSON representation of the created course
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/Course'
+        '401':
+          description: You are not authorized to view the resource
+        '403':
+          description: Accessing the resource you were trying to reach is forbidden
+
+  /csv:
+    put:
+      tags:
+        - Courses
+      summary: Upload a CSV format file containing a full set of Courses data.
+      operationId: updateCourses
+      requestBody:
+        required: true
+        content:
+          'text/csv;charset=UTF-8':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CourseRecord'
+      responses:
+        204:
+          description: Successful update
+        400:
+          description: Bad input
+    get:
+      tags:
+        - Courses
+      summary: List all courses
+      operationId: getCoursesCsv
+      responses:
+        200:
+          description: Return a CSV format representation of all courses that are not withdrawn. The data is compatible with the PUT /courses endpoint and may be round-tripped.
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseRecord'
+
+  /course-names:
+    get:
+      tags:
+        - Courses
+      summary: Get all unique course names
+      operationId: getAllCourseNames
+      parameters:
+        - name: includeWithdrawn
+          in: query
+          description: flag to include withdrawn
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: Return a JSON representation of all unique course names that are not withdrawn.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /prerequisites/csv:
+    put:
+      tags:
+        - Course Prerequisites
+      summary: Upload a CSV format file containing a full set of prerequisites data for the current set of courses.
+      operationId: updatePrerequisites
+      description: >
+        Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
+        <p>Pre-existing prerequisite data will be removed before the new data is applied.
+        <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the PrerequisiteRecord schema. Column order is not important.
+      requestBody:
+        required: true
+        content:
+          'text/csv;charset=UTF-8':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PrerequisiteRecord'
+      responses:
+        200:
+          description: Successful update
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/LineMessage'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Course Prerequisites
+      summary: Download a CSV format representation of the current set of prerequisites.
+      operationId: getPrerequisitesCsv
+      responses:
+        200:
+          description: The CSV formatted data is compatible with the PUT operation and may be round-tripped.
+          content:
+            'text/csv;charset=UTF-8':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrerequisiteRecord'
+
+  /{id}/prerequisites:
+    get:
+      tags:
+        - Courses
+      summary: Get a list of prerequisites for a course.
+      operationId: getCoursePrerequisites
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description:
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/CoursePrerequisite'
+    put:
+      tags:
+        - Courses
+      operationId: updateCoursePrerequisites
+      description: Replace all prerequisites for a course
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              type: array
+              items:
+                $ref: '_shared.yml#/components/schemas/CoursePrerequisite'
+      responses:
+        200:
+          description: Successful update
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/CoursePrerequisite'
+        400:
+          description: Bad input
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{id}:
+    get:
+      tags:
+        - Courses
+      summary: Details for a single course
+      operationId: getCourseById
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/Course'
+    put:
+      tags:
+        - Courses
+      summary: Update a course
+      description: Updates the details of a specific course
+      operationId: updateCourse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: A course identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseUpdateRequest'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: '_shared.yml#/components/schemas/Course'
+        '400':
+          description: Bad input
+        '401':
+          description: You are not authorized to view the resource
+        '403':
+          description: Accessing the resource you were trying to reach is forbidden
+        '404':
+          description: The resource you were trying to reach is not found
+
+  /{id}/offerings:
+    get:
+      tags:
+        - Course Offerings
+      summary: List all offerings for a course
+      operationId: getAllOfferingsByCourseId
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/CourseOffering'
+    put:
+      tags:
+        - Course Offerings
+      summary: Add or update course offerings
+      operationId: addUpdateCourseOfferings
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              type: array
+              items:
+                $ref: '_shared.yml#/components/schemas/CourseOffering'
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/CourseOffering'
+
+  /{id}/offerings/{offeringId}:
+    delete:
+      tags:
+        - Course Offerings
+      summary: Delete a course offering, This can only be done if there are no referrals using this offering.
+      operationId: deleteCourseOffering
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: offeringId
+          in: path
+          description: An offering identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: successful operation
+
+  /audiences:
+    get:
+      tags:
+        - Courses
+      summary: Get all audiences
+      description: Returns a list of audiences with their name and colour
+      operationId: getAudiences
+      responses:
+        '200':
+          description: Successfully retrieved list of audience
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Audience'
+        '401':
+          description: You are not authorized to view the resource
+        '403':
+          description: Accessing the resource you were trying to reach is forbidden
+        '404':
+          description: The resource you were trying to reach is not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CourseCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Thinking skills programme
+        identifier:
+          type: string
+          example: 'CC'
+        description:
+          type: string
+          example: Thinking Skills Programme (TSP) description
+        alternateName:
+          type: string
+          example: 'BNM+'
+        audienceId:
+          type: string
+          format: uuid
+          example: 'e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2'
+        withdrawn:
+          type: boolean
+          nullable: false
+          example: true
+      required:
+        - name
+        - identifier
+        - description
+        - audienceId
+        - withdrawn
+
+    CourseRecord:
+      title: 'CourseRecord'
+      type: object
+      properties:
+        name:
+          type: string
+        alternateName:
+          type: string
+        identifier:
+          type: string
+        description:
+          type: string
+        audience:
+          type: string
+        audienceColour:
+          type: string
+          example: 'purple'
+        comments:
+          type: string
+      required:
+        - name
+        - identifier
+        - description
+        - audience
+
+    PrerequisiteRecord:
+      type: object
+      title: 'PrerequisiteRecord'
+      properties:
+        name:
+          type: string
+          example: "age"
+          description: "The name of this Course Prerequisite."
+        description:
+          type: string
+          example: "18+"
+          description: "The value of this Course Prerequisite."
+        course:
+          type: string
+          example: "Kaizen"
+          description: "The name of the Course to which this Prerequisite applies. The name must match a course name exactly for this Prerequisite to be added to the Course."
+        identifier:
+          type: string
+          example: "BNM-IPVO"
+        comments:
+          type: string
+      required:
+        - name
+        - course
+        - identifier
+
+    CourseUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Thinking skills programme
+        description:
+          type: string
+          example: Thinking Skills Programme (TSP) description
+        alternateName:
+          type: string
+          example: 'BNM+'
+        displayName:
+          type: string
+          example: 'Becoming New Me Plus: general violence offence (BNM+)'
+        audience:
+          type: string
+          example: 'Gang offence'
+        audienceColour:
+          type: string
+          example: '#FF5733'
+        withdrawn:
+          type: boolean
+          example: true
+
+    Audience:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Sexual offence"
+        colour:
+          type: string
+          example: "orange"

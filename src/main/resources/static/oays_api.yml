@@ -1,0 +1,752 @@
+openapi: 3.0.1
+info:
+  title: Accredited Programmes API
+  version: 1.0.0
+servers:
+  - url: /oasys
+security:
+  - bearerAuth: [ ]
+paths:
+  /{prisonNumber}/offence-details:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Offence details as held by Oasys
+      operationId: getOffenceDetails
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/OffenceDetail'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/relationships:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Relationships details as held by Oasys
+      operationId: getRelationships
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Relationships'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/rosh-analysis:
+    get:
+      tags:
+        - Oasys Integration
+      summary: ROSH analysis details as held by Oasys
+      operationId: getRoshAnalysis
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/RoshAnalysis'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/lifestyle:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Lifestyle details as held by Oasys
+      operationId: getLifestyle
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Lifestyle'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/psychiatric:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Psychiatric details as held by Oasys
+      operationId: getPsychiatric
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Psychiatric'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/behaviour:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Behaviour details as held by Oasys
+      operationId: getBehaviour
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Behaviour'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/attitude:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Attitude details as held by Oasys
+      operationId: getAttitude
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Attitude'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/health:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Health details as held by Oasys
+      operationId: getHealth
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Health'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/learning-needs:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Learning needs details as held by Oasys
+      operationId: getLearningNeeds
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/LearningNeeds'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/risks-and-alerts:
+    get:
+      tags:
+        - Oasys Integration
+      summary: Risks details as held by Oasys
+      operationId: getRisks
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Risks'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/drug-and-alcohol-details:
+    get:
+      summary: Get drug and alcohol assessment details
+      description: Retrieves the drug and alcohol assessment details for a given prison number
+      tags:
+        - Oasys Integration
+      operationId: getDrugAndAlcoholDetails
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DrugAlcoholDetail'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /{prisonNumber}/assessment_date:
+    get:
+      summary: Get latest layer 3 completed assessment date
+      description: Get latest layer 3 completed assessment date and if there are any open assessments
+      tags:
+        - Oasys Integration
+      operationId: getLatestCompletedAssessmentDate
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/OasysAssessmentDateInfo'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          description: Invalid prison number
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    OffenceDetail:
+      type: object
+      properties:
+        offenceDetails:
+          type: string
+          example: Armed robbery
+        contactTargeting:
+          type: boolean
+          default: false
+        raciallyMotivated:
+          type: boolean
+          default: false
+        revenge:
+          type: boolean
+          default: false
+        domesticViolence:
+          type: boolean
+          default: false
+        repeatVictimisation:
+          type: boolean
+          default: false
+        victimWasStranger:
+          type: boolean
+          default: false
+        stalking:
+          type: boolean
+          default: false
+        recognisesImpact:
+          type: boolean
+          default: false
+        numberOfOthersInvolved:
+          type: integer
+          default: 0
+        othersInvolvedDetail:
+          type: string
+          example: There were two others involved who absconded at the scene
+        peerGroupInfluences:
+          type: string
+          example: This person is easily lead
+        motivationAndTriggers:
+          type: string
+          example: Drug misuse fuels this persons motivation
+        acceptsResponsibility:
+          type: boolean
+          default: false
+        acceptsResponsibilityDetail:
+          type: string
+          example: This person fully accepts their actions
+        patternOffending:
+          type: string
+          example: This person has a long history of robbery
+
+    Relationships:
+      type: object
+      properties:
+        dvEvidence:
+          type: boolean
+          default: false
+        victimFormerPartner:
+          type: boolean
+          default: false
+        victimFamilyMember:
+          type: boolean
+          default: false
+        victimOfPartnerFamily:
+          type: boolean
+          default: false
+        perpOfPartnerOrFamily:
+          type: boolean
+          default: false
+        relIssuesDetails:
+          type: string
+          example: This person has a history of domestic violence
+        emotionalCongruence:
+          type: string
+          example: 0-No problems
+        relCurrRelationshipStatus:
+          type: string
+          example: Not in a relationship
+        prevCloseRelationships:
+          type: string
+          example: 2-Significant problems
+
+    RoshAnalysis:
+      type: object
+      properties:
+        offenceDetails:
+          type: string
+          example: Tax evasion
+        whereAndWhen:
+          type: string
+          example: at home
+        howDone:
+          type: string
+          example: false accounting
+        whoVictims:
+          type: string
+          example: hmrc
+        anyoneElsePresent:
+          type: string
+          example: company secretary
+        whyDone:
+          type: string
+          example: Greed
+        sources:
+          type: string
+          example: crown court
+
+    Lifestyle:
+      type: object
+      properties:
+        activitiesEncourageOffending:
+          type: string
+          example: Drug addiction
+        lifestyleIssues:
+          type: string
+          example: Commits robbery to fund drug addiction
+        easilyInfluenced:
+          type: string
+          example: 1-Some problems
+
+    Psychiatric:
+      type: object
+      properties:
+        description:
+          type: string
+          example: 0-No problems
+        difficultiesCoping:
+          type: string
+        currPsychologicalProblems:
+          type: string
+        selfHarmSuicidal:
+          type: string
+
+    Behaviour:
+      type: object
+      properties:
+        temperControl:
+          type: string
+          example: 0-No problems
+        problemSolvingSkills:
+          type: string
+          example: 0-No problems
+        awarenessOfConsequences:
+          type: string
+          example: 0-No problems
+        achieveGoals:
+          type: string
+          example: 0-No problems
+        understandsViewsOfOthers:
+          type: string
+          example: 0-No problems
+        concreteAbstractThinking:
+          type: string
+          example: 0-No problems
+        sexualPreOccupation:
+          type: string
+          example: 0-No problems
+        offenceRelatedSexualInterests:
+          type: string
+          example: 0-No problems
+        aggressiveControllingBehaviour:
+          type: string
+          example: 0-No problems
+        impulsivity:
+          type: string
+          example: 0-No problems
+
+    Attitude:
+      type: object
+      properties:
+        proCriminalAttitudes:
+          type: string
+          example: 0-No problems
+        motivationToAddressBehaviour:
+          type: string
+          example: 0-No problems
+        hostileOrientation:
+          type: string
+          example: 0-No problems
+
+    Health:
+      type: object
+      properties:
+        anyHealthConditions:
+          type: boolean
+          default: false
+        description:
+          type: string
+          example: Blind in one eye
+
+    LearningNeeds:
+      type: object
+      properties:
+        noFixedAbodeOrTransient:
+          type: boolean
+          default: false
+        workRelatedSkills:
+          type: string
+          example: 0-No problems
+        problemsReadWriteNum:
+          type: string
+          example: 0-No problems
+        learningDifficulties:
+          type: string
+          example: 0-No problems
+        qualifications:
+          type: string
+          example: 0-Any qualifications
+        basicSkillsScore:
+          type: string
+          example: 6
+        basicSkillsScoreDescription:
+          type: string
+          example: free text about this persons learning needs
+
+    Risks:
+      type: object
+      properties:
+        ogrsYear1:
+          type: number
+          example: 45
+        ogrsYear2:
+          type: number
+          example: 65
+        ogrsRisk:
+          type: string
+          example: High
+        ovpYear1:
+          type: number
+          example: 23
+        ovpYear2:
+          type: number
+          example: 32
+        ovpRisk:
+          type: string
+          example: Medium
+        rsrScore:
+          type: number
+          example: 3.45
+        rsrRisk:
+          type: string
+          example: Medium
+        ospcScore:
+          type: string
+          example: Low
+        ospiScore:
+          type: string
+          example: High
+        overallRoshLevel:
+          type: string
+          example: Low
+        riskPrisonersCustody:
+          type: string
+          example: Medium
+        riskStaffCustody:
+          type: string
+          example: Medium
+        riskKnownAdultCustody:
+          type: string
+          example: Medium
+        riskPublicCustody:
+          type: string
+          example: Medium
+        riskChildrenCustody:
+          type: string
+          example: Medium
+        riskStaffCommunity:
+          type: string
+          example: Medium
+        riskKnownAdultCommunity:
+          type: string
+          example: Medium
+        riskPublicCommunity:
+          type: string
+          example: Medium
+        riskChildrenCommunity:
+          type: string
+          example: Medium
+        imminentRiskOfViolenceTowardsPartner:
+          type: string
+          example: Low
+        imminentRiskOfViolenceTowardsOthers:
+          type: string
+          example: Low
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alert'
+
+    Alert:
+      type: object
+      properties:
+        description:
+          type: string
+          example: risk to children
+        alertType:
+          type: string
+          example: Sexual Offence
+        dateCreated:
+          type: string
+          format: date
+          description: Date alert was created.
+
+    DrugAlcoholDetail:
+      type: object
+      properties:
+        drug:
+          $ref: '#/components/schemas/OasysDrugDetail'
+        alcohol:
+          $ref: '#/components/schemas/OasysAlcoholDetail'
+
+    OasysDrugDetail:
+      type: object
+      properties:
+        levelOfUseOfMainDrug:
+          type: string
+          nullable: true
+        drugsMajorActivity:
+          type: string
+          nullable: true
+
+    OasysAlcoholDetail:
+      type: object
+      properties:
+        alcoholLinkedToHarm:
+          type: string
+          nullable: true
+        alcoholIssuesDetails:
+          type: string
+          nullable: true
+        frequencyAndLevel:
+          type: string
+          nullable: true
+        bingeDrinking:
+          type: string
+          nullable: true
+
+    OasysAssessmentDateInfo:
+      type: object
+      properties:
+        recentCompletedAssessmentDate:
+          type: string
+          format: date
+          nullable: true
+        hasOpenAssessment:
+          type: boolean
+          nullable: false

@@ -1,0 +1,197 @@
+openapi: 3.0.1
+info:
+  title: Accredited Programmes API
+  version: 1.0.0
+servers:
+  - url: /reference-data
+security:
+  - bearerAuth: [ ]
+paths:
+  /referral-statuses:
+    get:
+      tags:
+        - reference data
+      summary: The referral status reference data
+      operationId: getReferralStatuses
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/ReferralStatusRefData'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+
+  /referral-statuses/{code}:
+    get:
+      tags:
+        - reference data
+      summary: referral status reference data
+      operationId: getReferralStatus
+      parameters:
+        - name: code
+          in: path
+          description: referral status code
+          example: "WITHDRAWN"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ReferralStatusRefData'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+        404:
+          description: Reference data not found
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /referral-statuses/{referralStatusCode}/categories:
+    get:
+      tags:
+        - reference data
+      summary: The referral status categories reference data for a referral status code
+      operationId: getReferralStatusCategories
+      parameters:
+        - name: referralStatusCode
+          in: path
+          description: referral status code
+          example: "WITHDRAWN"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/ReferralStatusCategory'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+
+  /referral-statuses/categories/{code}:
+    get:
+      tags:
+        - reference data
+      summary: get a single referral status category
+      operationId: getReferralStatusCategory
+      parameters:
+        - name: code
+          in: path
+          description: category code
+          example: "ADMIN"
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ReferralStatusCategory'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+        404:
+          description: Reference data not found
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
+
+  /referral-statuses/{referralStatusCode}/categories/{categoryCode}/reasons:
+    get:
+      tags:
+        - reference data
+      summary: The referral status reasons reference data for a referral status code
+      operationId: getReferralStatusReasons
+      parameters:
+        - name: referralStatusCode
+          in: path
+          description: referral status code
+          example: "WITHDRAWN"
+          required: true
+          schema:
+            type: string
+        - name: categoryCode
+          in: path
+          description: referral category code
+          example: "ADMIN"
+          required: true
+          schema:
+            type: string
+        - name: deselectAndKeepOpen
+          in: query
+          description: flag for bespoke deselection option
+          required: false
+          schema:
+            type: boolean
+            default: false
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '_shared.yml#/components/schemas/ReferralStatusReason'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+
+  /referral-statuses/categories/reasons/{code}:
+    get:
+      tags:
+        - reference data
+      summary: get a single referral status reason
+      operationId: getReferralStatusReason
+      parameters:
+        - name: code
+          in: path
+          description: reason code
+          example: "DUPLICATE"
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ReferralStatusReason'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access.
+        404:
+          description: Reference data not found
+          content:
+            'application/json':
+              schema:
+                $ref: '_shared.yml#/components/schemas/ErrorResponse'
