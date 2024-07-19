@@ -19,7 +19,7 @@ interface StatisticsRepository : JpaRepository<ReferralEntity, UUID> {
       join offering o on r.offering_id = o.offering_id
       where r.submitted_on >= :startDate 
         and r.submitted_on <= :endDate
-        and ( :locationCode is null OR o.organisation_id = :locationCode )
+        and ( :locationCodes is null OR o.organisation_id in :locationCodes )
         and r.deleted = false;
           """,
     nativeQuery = true,
@@ -27,7 +27,7 @@ interface StatisticsRepository : JpaRepository<ReferralEntity, UUID> {
   fun referralCount(
     startDate: LocalDate,
     endDate: LocalDate,
-    locationCode: String?,
+    locationCodes: List<String>?,
   ): String
 
   @Query(
@@ -49,7 +49,7 @@ FROM (
     JOIN course c ON o.course_id = c.course_id
     WHERE r.submitted_on >= :startDate 
       AND r.submitted_on <= :endDate
-      AND (:locationCode IS NULL OR o.organisation_id = :locationCode)
+      and ( :locationCodes is null OR o.organisation_id in :locationCodes )
       AND r.deleted = FALSE
     GROUP BY c.name, c.audience
 ) AS subquery;
@@ -59,6 +59,6 @@ FROM (
   fun referralCountByCourse(
     startDate: LocalDate,
     endDate: LocalDate,
-    locationCode: String?,
+    locationCodes: List<String>?,
   ): String
 }
