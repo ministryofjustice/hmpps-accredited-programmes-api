@@ -70,13 +70,13 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/SentenceDetails'
+                $ref: '_schemas.yml#/components/schemas/SentenceDetails'
         404:
           description: Person not found
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /prisoner-search:
     post:
@@ -90,7 +90,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/PrisonerSearchRequest'
+              $ref: '_schemas.yml#/components/schemas/PrisonerSearchRequest'
       responses:
         201:
           description: The prisoner search results.
@@ -99,19 +99,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PrisonerSearchResponse'
+                  $ref: '_schemas.yml#/components/schemas/PrisonerSearchResponse'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         401:
           description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /people/search:
     post:
@@ -124,7 +124,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/PeopleSearchRequest'
+              $ref: '_schemas.yml#/components/schemas/PeopleSearchRequest'
       responses:
         201:
           description: The prisoner search results.
@@ -133,19 +133,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PeopleSearchResponse'
+                  $ref: '_schemas.yml#/components/schemas/PeopleSearchResponse'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         401:
           description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /prison-search:
     post:
@@ -158,7 +158,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/PrisonSearchRequest'
+              $ref: '_schemas.yml#/components/schemas/PrisonSearchRequest'
       responses:
         201:
           description: The prisoner search results.
@@ -167,19 +167,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PrisonSearchResponse'
+                  $ref: '_schemas.yml#/components/schemas/PrisonSearchResponse'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         401:
           description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
 
   /prison-search/{prisonId}:
@@ -202,19 +202,19 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/PrisonSearchResponse'
+                $ref: '_schemas.yml#/components/schemas/PrisonSearchResponse'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         401:
           description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /courses:
     get:
@@ -230,7 +230,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Course'
+                  $ref: '_schemas.yml#/components/schemas/Course'
     post:
       tags:
         - Courses
@@ -241,14 +241,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CourseCreateRequest'
+              $ref: '_schemas.yml#/components/schemas/CourseCreateRequest'
       responses:
         200:
           description: Return a JSON representation of the created course
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Course'
+                $ref: '_schemas.yml#/components/schemas/Course'
         '401':
           description: You are not authorized to view the resource
         '403':
@@ -267,7 +267,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/CourseRecord'
+                $ref: '_schemas.yml#/components/schemas/CourseRecord'
       responses:
         204:
           description: Successful update
@@ -286,7 +286,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CourseRecord'
+                  $ref: '_schemas.yml#/components/schemas/CourseRecord'
 
   /courses/course-names:
     get:
@@ -328,7 +328,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/PrerequisiteRecord'
+                $ref: '_schemas.yml#/components/schemas/PrerequisiteRecord'
       responses:
         200:
           description: Successful update
@@ -337,13 +337,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LineMessage'
+                  $ref: '_schemas.yml#/components/schemas/LineMessage'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
     get:
       tags:
         - Course Prerequisites
@@ -357,7 +357,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PrerequisiteRecord'
+                  $ref: '_schemas.yml#/components/schemas/PrerequisiteRecord'
 
   /courses/{id}/prerequisites:
     get:
@@ -381,7 +381,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CoursePrerequisite'
+                  $ref: '_schemas.yml#/components/schemas/CoursePrerequisite'
     put:
       tags:
         - Courses
@@ -402,7 +402,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/CoursePrerequisite'
+                $ref: '_schemas.yml#/components/schemas/CoursePrerequisite'
       responses:
         200:
           description: Successful update
@@ -411,13 +411,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CoursePrerequisite'
+                  $ref: '_schemas.yml#/components/schemas/CoursePrerequisite'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /courses/{id}:
     get:
@@ -439,7 +439,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Course'
+                $ref: '_schemas.yml#/components/schemas/Course'
     put:
       tags:
         - Courses
@@ -459,14 +459,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CourseUpdateRequest'
+              $ref: '_schemas.yml#/components/schemas/CourseUpdateRequest'
       responses:
         '200':
           description: Successful update
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Course'
+                $ref: '_schemas.yml#/components/schemas/Course'
         '400':
           description: Bad input
         '401':
@@ -498,7 +498,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CourseOffering'
+                  $ref: '_schemas.yml#/components/schemas/CourseOffering'
     put:
       tags:
         - Course Offerings
@@ -519,7 +519,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/CourseOffering'
+                $ref: '_schemas.yml#/components/schemas/CourseOffering'
 
       responses:
         200:
@@ -529,7 +529,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CourseOffering'
+                  $ref: '_schemas.yml#/components/schemas/CourseOffering'
 
   /courses/{id}/offerings/{offeringId}:
     delete:
@@ -571,7 +571,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Audience'
+                  $ref: '_schemas.yml#/components/schemas/Audience'
         '401':
           description: You are not authorized to view the resource
         '403':
@@ -600,7 +600,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Course'
+                  $ref: '_schemas.yml#/components/schemas/Course'
 
   /offerings/csv:
     put:
@@ -619,7 +619,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/OfferingRecord'
+                $ref: '_schemas.yml#/components/schemas/OfferingRecord'
       responses:
         204:
           description: Successful update
@@ -628,13 +628,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LineMessage'
+                  $ref: '_schemas.yml#/components/schemas/LineMessage'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
     get:
       tags:
         - Course Offerings
@@ -648,7 +648,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/OfferingRecord'
+                  $ref: '_schemas.yml#/components/schemas/OfferingRecord'
 
   /offerings/{id}:
     get:
@@ -670,7 +670,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/CourseOffering'
+                $ref: '_schemas.yml#/components/schemas/CourseOffering'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -680,7 +680,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /referrals:
     post:
@@ -693,20 +693,20 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/ReferralCreate'
+              $ref: '_schemas.yml#/components/schemas/ReferralCreate'
       responses:
         201:
           description: Started referral
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ReferralCreated'
+                $ref: '_schemas.yml#/components/schemas/ReferralCreated'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         401:
           description: Unauthorised. The request was unauthorised.
 
@@ -744,7 +744,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Referral'
+                  $ref: '_schemas.yml#/components/schemas/Referral'
         401:
           description: The request was unauthorised
         403:
@@ -777,7 +777,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Referral'
+                $ref: '_schemas.yml#/components/schemas/Referral'
         401:
           description: The request was unauthorised
         403:
@@ -803,7 +803,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: "#/components/schemas/ReferralUpdate"
+              $ref: "_schemas.yml#/components/schemas/ReferralUpdate"
       responses:
         204:
           description: The referral was updated
@@ -874,7 +874,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReferralStatusRefData'
+                  $ref: '_schemas.yml#/components/schemas/ReferralStatusRefData'
         401:
           description: The request was unauthorised
         403:
@@ -922,7 +922,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ConfirmationFields'
+                $ref: '_schemas.yml#/components/schemas/ConfirmationFields'
         401:
           description: The request was unauthorised
         403:
@@ -949,7 +949,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/ReferralStatusUpdate'
+              $ref: '_schemas.yml#/components/schemas/ReferralStatusUpdate'
       responses:
         204:
           description: The referral now has the requested status.
@@ -1015,19 +1015,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReferralStatusHistory'
+                  $ref: '_schemas.yml#/components/schemas/ReferralStatusHistory'
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         401:
           description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /referrals/view/organisation/{organisationId}/dashboard:
     get:
@@ -1111,7 +1111,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/PaginatedReferralView'
+                $ref: '_schemas.yml#/components/schemas/PaginatedReferralView'
         401:
           description: The request was unauthorised
         403:
@@ -1195,7 +1195,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/PaginatedReferralView'
+                $ref: '_schemas.yml#/components/schemas/PaginatedReferralView'
         401:
           description: The request was unauthorised
         403:
@@ -1223,7 +1223,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Course'
+                $ref: '_schemas.yml#/components/schemas/Course'
         401:
           description: The request was unauthorised
         403:
@@ -1242,26 +1242,26 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/CourseParticipationCreate'
+              $ref: '_schemas.yml#/components/schemas/CourseParticipationCreate'
       responses:
         201:
           description: The course participation information has been added.
           content:
             'application/json':
               schema:
-                $ref: "#/components/schemas/CourseParticipation"
+                $ref: "_schemas.yml#/components/schemas/CourseParticipation"
         400:
           description: Bad input
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         401:
           description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /course-participations/{id}:
     get:
@@ -1283,13 +1283,13 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: "#/components/schemas/CourseParticipation"
+                $ref: "_schemas.yml#/components/schemas/CourseParticipation"
         401:
           description: The client is not authorised to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
     put:
       tags:
         - Course Participations
@@ -1307,7 +1307,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: "#/components/schemas/CourseParticipationUpdate"
+              $ref: "_schemas.yml#/components/schemas/CourseParticipationUpdate"
         required: true
       responses:
         200:
@@ -1315,19 +1315,19 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: "#/components/schemas/CourseParticipation"
+                $ref: "_schemas.yml#/components/schemas/CourseParticipation"
         401:
           description: The client is not authorized to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
         404:
           description: There is no information for the id, so it cannot be updated.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
     delete:
       tags:
         - Course Participations
@@ -1349,7 +1349,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /people/{prisonNumber}/course-participations:
     get:
@@ -1373,13 +1373,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CourseParticipation"
+                  $ref: "_schemas.yml#/components/schemas/CourseParticipation"
         401:
           description: The client is not authorised to perform this operation.
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /people/offences/{prisonNumber}:
     get:
@@ -1403,7 +1403,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/Offence'
+                  $ref: '_schemas.yml#/components/schemas/Offence'
                 type: array
         401:
           description: Unauthorised. The request was unauthorised.
@@ -1414,7 +1414,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/offence-details:
     get:
@@ -1436,7 +1436,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/OffenceDetail'
+                $ref: '_schemas.yml#/components/schemas/OffenceDetail'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1446,7 +1446,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/relationships:
     get:
@@ -1468,7 +1468,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Relationships'
+                $ref: '_schemas.yml#/components/schemas/Relationships'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1478,7 +1478,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/rosh-analysis:
     get:
@@ -1500,7 +1500,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/RoshAnalysis'
+                $ref: '_schemas.yml#/components/schemas/RoshAnalysis'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1510,7 +1510,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/lifestyle:
     get:
@@ -1532,7 +1532,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Lifestyle'
+                $ref: '_schemas.yml#/components/schemas/Lifestyle'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1542,7 +1542,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/psychiatric:
     get:
@@ -1564,7 +1564,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Psychiatric'
+                $ref: '_schemas.yml#/components/schemas/Psychiatric'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1574,7 +1574,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/behaviour:
     get:
@@ -1596,7 +1596,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Behaviour'
+                $ref: '_schemas.yml#/components/schemas/Behaviour'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1606,7 +1606,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/attitude:
     get:
@@ -1628,7 +1628,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Attitude'
+                $ref: '_schemas.yml#/components/schemas/Attitude'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1638,7 +1638,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/health:
     get:
@@ -1660,7 +1660,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Health'
+                $ref: '_schemas.yml#/components/schemas/Health'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1670,7 +1670,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/learning-needs:
     get:
@@ -1692,7 +1692,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/LearningNeeds'
+                $ref: '_schemas.yml#/components/schemas/LearningNeeds'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1702,7 +1702,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/risks-and-alerts:
     get:
@@ -1724,7 +1724,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Risks'
+                $ref: '_schemas.yml#/components/schemas/Risks'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1734,7 +1734,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/drug-and-alcohol-details:
     get:
@@ -1757,7 +1757,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/DrugAlcoholDetail'
+                $ref: '_schemas.yml#/components/schemas/DrugAlcoholDetail'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1767,7 +1767,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /oasys/{prisonNumber}/assessment_date:
     get:
@@ -1790,7 +1790,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/OasysAssessmentDateInfo'
+                $ref: '_schemas.yml#/components/schemas/OasysAssessmentDateInfo'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1800,7 +1800,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /reference-data/referral-statuses:
     get:
@@ -1816,7 +1816,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ReferralStatusRefData"
+                  $ref: "_schemas.yml#/components/schemas/ReferralStatusRefData"
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1842,7 +1842,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ReferralStatusRefData'
+                $ref: '_schemas.yml#/components/schemas/ReferralStatusRefData'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1852,7 +1852,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /reference-data/referral-statuses/{referralStatusCode}/categories:
     get:
@@ -1876,7 +1876,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ReferralStatusCategory"
+                  $ref: "_schemas.yml#/components/schemas/ReferralStatusCategory"
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1903,7 +1903,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ReferralStatusCategory'
+                $ref: '_schemas.yml#/components/schemas/ReferralStatusCategory'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1913,7 +1913,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /reference-data/referral-statuses/{referralStatusCode}/categories/{categoryCode}/reasons:
     get:
@@ -1952,7 +1952,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ReferralStatusReason"
+                  $ref: "_schemas.yml#/components/schemas/ReferralStatusReason"
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1979,7 +1979,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ReferralStatusReason'
+                $ref: '_schemas.yml#/components/schemas/ReferralStatusReason'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -1989,7 +1989,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
 
   /organisations/enabled:
     get:
@@ -2005,7 +2005,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EnabledOrganisation'
+                  $ref: '_schemas.yml#/components/schemas/EnabledOrganisation'
         401:
           description: Unauthorised. The request was unauthorised.
         403:
@@ -2026,7 +2026,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Organisation'
+                  $ref: '_schemas.yml#/components/schemas/Organisation'
         '401':
           description: You are not authorized to view the resource
         '403':
@@ -2051,7 +2051,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/CaseLoad'
+                  $ref: '_schemas.yml#/components/schemas/CaseLoad'
                 type: array
           description: Retrieves the caseloads associated with the authenticated user.
         "401":
@@ -2060,1414 +2060,3 @@ paths:
           description: Forbidden.  The client is not authorised to access.
       tags:
         - User
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
-  schemas:
-    Course:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        identifier:
-          type: string
-          example: CC
-        name:
-          type: string
-          example: Thinking skills programme
-        description:
-          type: string
-          example: Thinking Skills Programme (TSP) description
-        alternateName:
-          type: string
-          example: 'BNM+'
-        displayName:
-          type: string
-          example: 'Becoming New Me Plus: general violence offence (BNM+)'
-        coursePrerequisites:
-          type: array
-          items:
-            $ref: '#/components/schemas/CoursePrerequisite'
-        audience:
-          type: string
-          example: 'Gang offence'
-        audienceColour:
-          type: string
-          example: 'purple'
-        withdrawn:
-          type: boolean
-          example: 'true'
-      required:
-        - id
-        - identifier
-        - name
-        - coursePrerequisites
-        - audience
-
-    CourseRecord:
-      title: 'CourseRecord'
-      type: object
-      properties:
-        name:
-          type: string
-        alternateName:
-          type: string
-        identifier:
-          type: string
-        description:
-          type: string
-        audience:
-          type: string
-        audienceColour:
-          type: string
-          example: 'purple'
-        comments:
-          type: string
-      required:
-        - name
-        - identifier
-        - description
-        - audience
-
-    CoursePrerequisite:
-      type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-      example:
-        - name: gender
-          description: female
-        - name: risk score
-          description: 'ORGS: 50+'
-        - name: offence type
-          description: some offence here
-      required:
-        - name
-        - description
-
-    PrerequisiteRecord:
-      type: object
-      title: 'PrerequisiteRecord'
-      properties:
-        name:
-          type: string
-          example: "age"
-          description: "The name of this Course Prerequisite."
-        description:
-          type: string
-          example: "18+"
-          description: "The value of this Course Prerequisite."
-        course:
-          type: string
-          example: "Kaizen"
-          description: "The name of the Course to which this Prerequisite applies. The name must match a course name exactly for this Prerequisite to be added to the Course."
-        identifier:
-          type: string
-          example: "BNM-IPVO"
-        comments:
-          type: string
-      required:
-        - name
-        - course
-        - identifier
-
-    CourseOffering:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        organisationId:
-          type: string
-          example: "MDI"
-          description: "The unique identifier associated with the location hosting the offering. For prisons, this is the PrisonId, which is usually three capital letters."
-        organisationEnabled:
-          type: boolean
-          description: "Describes if a referral can be created with an organisation"
-        contactEmail:
-          type: string
-          format: email
-          example: "ap-admin@digital.justice.gov.uk"
-          description: "The email address of a contact for this offering"
-        secondaryContactEmail:
-          type: string
-          format: email
-          example: "ap-admin-2@digital.justice.gov.uk"
-          description: "An optional secondary email address of a contact for this offering."
-        referable:
-          type: boolean
-          default: true
-        withdrawn:
-          type: boolean
-          default: false
-      required:
-        - organisationId
-        - contactEmail
-        - referable
-
-    OfferingRecord:
-      type: object
-      title: 'OfferingRecord'
-      properties:
-        course:
-          type: string
-          example: "Kaizen"
-          description: "The name of the Course to which this Offering applies. This value is only present to help with comprehension. It is not used to match offerings with courses."
-        identifier:
-          type: string
-          description: "The unique identifier of the Course variant to which this Offering applies. The offering is added to the course having this identifier."
-          example: "BNM-IPVO"
-        organisation:
-          type: string
-        "contact email":
-          type: string
-          format: email
-          example: "ap-admin@digital.justice.gov.uk"
-          description: "The email address of the contact for this offering."
-        "secondary contact email":
-          type: string
-          format: email
-          example: "ap-admin2@digital.justice.gov.uk"
-          description: "An optional secondary email address of a contact for this offering."
-        prisonId:
-          type: string
-          example: "MDI"
-          description: "The prison id for the prison associated with this Offering. This is usually three capital letters."
-        referable:
-          type: boolean
-          default: true
-      required:
-        - course
-        - prisonId
-        - identifier
-        - referable
-
-    LineMessage:
-      description: "warnings and errors for a line in an uploaded CSV file."
-      type: object
-      properties:
-        lineNumber:
-          type: integer
-          example: 20
-          description: "The number of the line in the CSV file that was rejected. The header line is lineNumber 1, the first line of CSV data is lineNumber 2."
-        level:
-          type: string
-          enum:
-            - Warning
-            - Error
-          description: "One of 'Error' or 'Warning'.  If a line has an Error then the data was not added. If it is a Warning then the line was added but there was a problem that should be corrected."
-        message:
-          type: string
-          example: "No match for course 'Kaizen', prisonId 'BWI'"
-          description: "Useful information about the Error or Warning."
-
-    ErrorResponse:
-      type: object
-      properties:
-        status:
-          type: integer
-          example: 404
-        errorCode:
-          type: integer
-        userMessage:
-          type: string
-          example: "Not found"
-        developerMessage:
-          type: string
-        moreInfo:
-          type: string
-      required:
-        - status
-
-    CourseParticipationUpdate:
-      type: object
-      properties:
-        courseName:
-          description: "The name of the course taken by the participant."
-          type: string
-        setting:
-          $ref: '#/components/schemas/CourseParticipationSetting'
-        outcome:
-          $ref: '#/components/schemas/CourseParticipationOutcome'
-        detail:
-          type: string
-        source:
-          type: string
-
-    CourseParticipationCreate:
-      allOf:
-        - $ref: "#/components/schemas/CourseParticipationUpdate"
-        - type: object
-          properties:
-            prisonNumber:
-              description: The prison number of the course participant.
-              example: "A1234AA"
-              type: string
-          required:
-            - prisonNumber
-
-    CourseParticipation:
-      allOf:
-        - $ref: "#/components/schemas/CourseParticipationCreate"
-        - type: object
-          properties:
-            id:
-              description: A unique identifier for this record of participation in a course.
-              type: string
-              format: uuid
-            addedBy:
-              description: The identity of the person who added this CourseParticipation
-              type: string
-            createdAt:
-              description: The date and time at which this CourseParticipation was created. ISO 8601 date-time format.
-              type: string
-          required:
-            - id
-            - addedBy
-            - createdAt
-
-    CourseParticipationSettingType:
-      description: Either Custody or Community.
-      type: string
-      enum:
-        - custody
-        - community
-
-    CourseParticipationSetting:
-      description: Information about where the course was held.
-      type: object
-      properties:
-        location:
-          type: string
-        type:
-          $ref: '#/components/schemas/CourseParticipationSettingType'
-      required:
-        - type
-
-    CourseParticipationOutcome:
-      description: The outcome of participating in a course.
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - incomplete
-            - complete
-        yearStarted:
-          type: integer
-        yearCompleted:
-          type: integer
-      required:
-        - status
-
-    ReferralCreate:
-      type: object
-      properties:
-        offeringId:
-          description: The id (UUID) of an active offering
-          type: string
-          format: uuid
-        prisonNumber:
-          description: The prison number of the person who is being referred.
-          example: "A1234AA"
-          type: string
-      required:
-        - offeringId
-        - prisonNumber
-
-    ReferralUpdate:
-      type: object
-      properties:
-        additionalInformation:
-          type: string
-        oasysConfirmed:
-          type: boolean
-          default: false
-        hasReviewedProgrammeHistory:
-          type: boolean
-          default: false
-      required:
-        - oasysConfirmed
-        - hasReviewedProgrammeHistory
-
-    Referral:
-      allOf:
-        - $ref: "#/components/schemas/ReferralCreate"
-        - $ref: "#/components/schemas/ReferralUpdate"
-        - type: object
-          properties:
-            id:
-              description: The unique id (UUID) of this referral.
-              type: string
-              format: uuid
-            status:
-              description: The status code of the referral.
-              type: string
-            closed:
-              description: Is the status of the referral a closed one.
-              type: boolean
-            statusDescription:
-              description: The status description.
-              type: string
-            statusColour:
-              description: The colour to display status description.
-              type: string
-            referrerUsername:
-              type: string
-            submittedOn:
-              type: string
-          required:
-            - id
-            - offeringId
-            - prisonNumber
-            - referrerUsername
-            - oasysConfirmed
-            - status
-
-    ReferralCreated:
-      type: object
-      properties:
-        referralId:
-          description: The unique id (UUID) of the new referral.
-          type: string
-          format: uuid
-      required:
-        - referralId
-
-    ReferralStatusUpdate:
-      type: object
-      properties:
-        status:
-          type: string
-        category:
-          type: string
-        reason:
-          type: string
-        notes:
-          type: string
-        ptUser:
-          type: boolean
-          description: is the user a pt user
-          default: false
-      required:
-        - status
-
-    PaginatedReferralView:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReferralView'
-        totalPages:
-          type: integer
-        totalElements:
-          type: integer
-        pageSize:
-          type: integer
-        pageNumber:
-          type: integer
-        pageIsEmpty:
-          type: boolean
-
-    ReferralView:
-      type: object
-      properties:
-        id:
-          description: The unique id (UUID) of the new referral.
-          type: string
-          format: uuid
-        referrerUsername:
-          description: The unique HMPPS username of the user who created this referral.
-          type: string
-        courseName:
-          type: string
-        audience:
-          type: string
-          example: 'Gang offence'
-        status:
-          type: string
-        statusDescription:
-          description: The status description.
-          type: string
-        statusColour:
-          description: The colour to display status description.
-          type: string
-        submittedOn:
-          type: string
-          format: date-time
-          description: Date referral was submitted.
-        prisonNumber:
-          type: string
-        organisationName:
-          type: string
-          description: Name of the organisation
-        organisationId:
-          type: string
-          description: ID of the organisation
-        conditionalReleaseDate:
-          type: string
-          format: date
-          description: Conditional release date.
-        paroleEligibilityDate:
-          type: string
-          format: date
-          description: Parole eligibility date.
-        tariffExpiryDate:
-          type: string
-          format: date
-          description: Tariff expiry date.
-        earliestReleaseDate:
-          type: string
-          format: date
-          description: Earliest release date, if applicable, to this individual. Derived from Sentence information.
-        earliestReleaseDateType:
-          type: string
-          description: Earliest release date type used
-        nonDtoReleaseDateType:
-          type: string
-          description: Release date type
-        forename:
-          type: string
-          description: forename of the person
-        surname:
-          type: string
-          description: surname of the person
-        sentenceType:
-          type: string
-          description: Sentence type description or 'Multiple sentences' if there are more than one
-        listDisplayName:
-          type: string
-          description: The course display name when it is in a list.
-        location:
-          type: string
-          description: location of person
-
-    ReferralStatusHistory:
-      type: object
-      properties:
-        id:
-          description: The id (UUID) of the status history record.
-          type: string
-          format: uuid
-        referralId:
-          description: The unique id (UUID) of the referral.
-          type: string
-          format: uuid
-        status:
-          description: The status of the referral.
-          type: string
-        statusDescription:
-          description: The status description.
-          type: string
-        statusColour:
-          description: The colour to display status description.
-          type: string
-        previousStatus:
-          description: The previous status of the referral.
-          type: string
-        previousStatusDescription:
-          description: The previous status description.
-          type: string
-        previousStatusColour:
-          description: The previous colour to display status description.
-          type: string
-        notes:
-          description: The notes associated with the status change.
-          type: string
-        statusStartDate:
-          type: string
-          format: date-time
-          description: Date referral was changed to this status.
-        username:
-          type: string
-          description: Username of the person who changed to this status
-
-    Person:
-      type: object
-      properties:
-        prisonNumber:
-          description: The prison number of the person who is being referred.
-          example: "A1234AA"
-          type: string
-      required:
-        - prisonNumber
-
-
-    OffenceDetail:
-      type: object
-      properties:
-        offenceDetails:
-          type: string
-          example: Armed robbery
-        contactTargeting:
-          type: boolean
-          default: false
-        raciallyMotivated:
-          type: boolean
-          default: false
-        revenge:
-          type: boolean
-          default: false
-        domesticViolence:
-          type: boolean
-          default: false
-        repeatVictimisation:
-          type: boolean
-          default: false
-        victimWasStranger:
-          type: boolean
-          default: false
-        stalking:
-          type: boolean
-          default: false
-        recognisesImpact:
-          type: boolean
-          default: false
-        numberOfOthersInvolved:
-          type: integer
-          default: 0
-        othersInvolvedDetail:
-          type: string
-          example: There were two others involved who absconded at the scene
-        peerGroupInfluences:
-          type: string
-          example: This person is easily lead
-        motivationAndTriggers:
-          type: string
-          example: Drug misuse fuels this persons motivation
-        acceptsResponsibility:
-          type: boolean
-          default: false
-        acceptsResponsibilityDetail:
-          type: string
-          example: This person fully accepts their actions
-        patternOffending:
-          type: string
-          example: This person has a long history of robbery
-
-    Relationships:
-      type: object
-      properties:
-        dvEvidence:
-          type: boolean
-          default: false
-        victimFormerPartner:
-          type: boolean
-          default: false
-        victimFamilyMember:
-          type: boolean
-          default: false
-        victimOfPartnerFamily:
-          type: boolean
-          default: false
-        perpOfPartnerOrFamily:
-          type: boolean
-          default: false
-        relIssuesDetails:
-          type: string
-          example: This person has a history of domestic violence
-        emotionalCongruence:
-          type: string
-          example: 0-No problems
-        relCurrRelationshipStatus:
-          type: string
-          example: Not in a relationship
-        prevCloseRelationships:
-          type: string
-          example: 2-Significant problems
-
-    RoshAnalysis:
-      type: object
-      properties:
-        offenceDetails:
-          type: string
-          example: Tax evasion
-        whereAndWhen:
-          type: string
-          example: at home
-        howDone:
-          type: string
-          example: false accounting
-        whoVictims:
-          type: string
-          example: hmrc
-        anyoneElsePresent:
-          type: string
-          example: company secretary
-        whyDone:
-          type: string
-          example: Greed
-        sources:
-          type: string
-          example: crown court
-
-    Lifestyle:
-      type: object
-      properties:
-        activitiesEncourageOffending:
-          type: string
-          example: Drug addiction
-        lifestyleIssues:
-          type: string
-          example: Commits robbery to fund drug addiction
-        easilyInfluenced:
-          type: string
-          example: 1-Some problems
-
-    Psychiatric:
-      type: object
-      properties:
-        description:
-          type: string
-          example: 0-No problems
-        difficultiesCoping:
-          type: string
-        currPsychologicalProblems:
-          type: string
-        selfHarmSuicidal:
-          type: string
-
-    Behaviour:
-      type: object
-      properties:
-        temperControl:
-          type: string
-          example: 0-No problems
-        problemSolvingSkills:
-          type: string
-          example: 0-No problems
-        awarenessOfConsequences:
-          type: string
-          example: 0-No problems
-        achieveGoals:
-          type: string
-          example: 0-No problems
-        understandsViewsOfOthers:
-          type: string
-          example: 0-No problems
-        concreteAbstractThinking:
-          type: string
-          example: 0-No problems
-        sexualPreOccupation:
-          type: string
-          example: 0-No problems
-        offenceRelatedSexualInterests:
-          type: string
-          example: 0-No problems
-        aggressiveControllingBehaviour:
-          type: string
-          example: 0-No problems
-        impulsivity:
-          type: string
-          example: 0-No problems
-
-    Attitude:
-      type: object
-      properties:
-        proCriminalAttitudes:
-          type: string
-          example: 0-No problems
-        motivationToAddressBehaviour:
-          type: string
-          example: 0-No problems
-        hostileOrientation:
-          type: string
-          example: 0-No problems
-
-    Health:
-      type: object
-      properties:
-        anyHealthConditions:
-          type: boolean
-          default: false
-        description:
-          type: string
-          example: Blind in one eye
-
-    LearningNeeds:
-      type: object
-      properties:
-        noFixedAbodeOrTransient:
-          type: boolean
-          default: false
-        workRelatedSkills:
-          type: string
-          example: 0-No problems
-        problemsReadWriteNum:
-          type: string
-          example: 0-No problems
-        learningDifficulties:
-          type: string
-          example: 0-No problems
-        qualifications:
-          type: string
-          example: 0-Any qualifications
-        basicSkillsScore:
-          type: string
-          example: 6
-        basicSkillsScoreDescription:
-          type: string
-          example: free text about this persons learning needs
-
-    Risks:
-      type: object
-      properties:
-        ogrsYear1:
-          type: number
-          example: 45
-        ogrsYear2:
-          type: number
-          example: 65
-        ogrsRisk:
-          type: string
-          example: High
-        ovpYear1:
-          type: number
-          example: 23
-        ovpYear2:
-          type: number
-          example: 32
-        ovpRisk:
-          type: string
-          example: Medium
-        rsrScore:
-          type: number
-          example: 3.45
-        rsrRisk:
-          type: string
-          example: Medium
-        ospcScore:
-          type: string
-          example: Low
-        ospiScore:
-          type: string
-          example: High
-        overallRoshLevel:
-          type: string
-          example: Low
-        riskPrisonersCustody:
-          type: string
-          example: Medium
-        riskStaffCustody:
-          type: string
-          example: Medium
-        riskKnownAdultCustody:
-          type: string
-          example: Medium
-        riskPublicCustody:
-          type: string
-          example: Medium
-        riskChildrenCustody:
-          type: string
-          example: Medium
-        riskStaffCommunity:
-          type: string
-          example: Medium
-        riskKnownAdultCommunity:
-          type: string
-          example: Medium
-        riskPublicCommunity:
-          type: string
-          example: Medium
-        riskChildrenCommunity:
-          type: string
-          example: Medium
-        imminentRiskOfViolenceTowardsPartner:
-          type: string
-          example: Low
-        imminentRiskOfViolenceTowardsOthers:
-          type: string
-          example: Low
-        alerts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Alert'
-
-    Alert:
-      type: object
-      properties:
-        description:
-          type: string
-          example: risk to children
-        alertType:
-          type: string
-          example: Sexual Offence
-        dateCreated:
-          type: string
-          format: date
-          description: Date alert was created.
-
-    PrisonerSearchRequest:
-      type: object
-      properties:
-        prisonerIdentifier:
-          type: string
-          description: Prisoner identifier for this case we only accept prison number
-          example: A1234AA
-        prisonIds:
-          type: array
-          description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-          example:
-            - MDI
-          items:
-            type: string
-            description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-            example: '["MDI"]'
-      required:
-        - prisonerIdentifier
-
-    PrisonerSearchResponse:
-      type: object
-      properties:
-        bookingId:
-          type: string
-        conditionalReleaseDate:
-          type: string
-          format: date
-        prisonName:
-          type: string
-        dateOfBirth:
-          type: string
-          format: date
-        ethnicity:
-          type: string
-        gender:
-          type: string
-        homeDetentionCurfewEligibilityDate:
-          type: string
-          format: date
-        indeterminateSentence:
-          type: boolean
-        firstName:
-          type: string
-        lastName:
-          type: string
-        paroleEligibilityDate:
-          type: string
-          format: date
-        prisonerNumber:
-          type: string
-        religion:
-          type: string
-        sentenceExpiryDate:
-          type: string
-          format: date
-        sentenceStartDate:
-          type: string
-          format: date
-        tariffDate:
-          type: string
-          format: date
-      required:
-        - bookingId
-        - prisonerNumber
-
-    PeopleSearchRequest:
-      type: object
-      properties:
-        prisonerIdentifier:
-          type: string
-          description: Prisoner identifier for this case we only accept prison number
-          example: A1234AA
-        prisonIds:
-          type: array
-          description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-          example:
-            - MDI
-          items:
-            type: string
-            description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-            example: '["MDI"]'
-      required:
-        - prisonerIdentifier
-
-    PeopleSearchResponse:
-      type: object
-      properties:
-        bookingId:
-          type: string
-        conditionalReleaseDate:
-          type: string
-          format: date
-        prisonName:
-          type: string
-        dateOfBirth:
-          type: string
-          format: date
-        ethnicity:
-          type: string
-        gender:
-          type: string
-        homeDetentionCurfewEligibilityDate:
-          type: string
-          format: date
-        indeterminateSentence:
-          type: boolean
-        firstName:
-          type: string
-        lastName:
-          type: string
-        paroleEligibilityDate:
-          type: string
-          format: date
-        prisonerNumber:
-          type: string
-        religion:
-          type: string
-        sentenceExpiryDate:
-          type: string
-          format: date
-        sentenceStartDate:
-          type: string
-          format: date
-        tariffDate:
-          type: string
-          format: date
-      required:
-        - bookingId
-        - prisonerNumber
-    PrisonSearchRequest:
-      type: object
-      properties:
-        prisonIds:
-          type: array
-          description: List of Prisons
-          example:
-            - MDI
-          items:
-            type: string
-            description: List of Prison Ids
-            example: '["MDI"]'
-      required:
-        - prisonIds
-
-    PrisonSearchResponse:
-      type: object
-      properties:
-        prisonId:
-          type: string
-        prisonName:
-          type: string
-        active:
-          type: boolean
-        male:
-          type: boolean
-        female:
-          type: boolean
-        contracted:
-          type: boolean
-        types:
-          type: array
-          items:
-            $ref: '#/components/schemas/PrisonType'
-        categories:
-          type: array
-          items:
-            $ref: '#/components/schemas/Category'
-        addresses:
-          type: array
-          items:
-            $ref: '#/components/schemas/Address'
-        operators:
-          type: array
-          items:
-            $ref: '#/components/schemas/PrisonOperator'
-
-      required:
-        - bookingId
-        - prisonerNumber
-
-    ConfirmationFields:
-      type: object
-      properties:
-        primaryHeading:
-          type: string
-          example: Move referral to awaiting assessment
-        primaryDescription:
-          type: string
-          example: Submitting this will change the status to awaiting assessment.
-        secondaryHeading:
-          type: string
-          example: Give a reason
-        secondaryDescription:
-          type: string
-          example: You must give a reason why this referral is being moved to suitable but not ready.
-        warningText:
-          type: string
-          example: Submitting this will pause the referral
-        hasConfirmation:
-          type: boolean
-          default: false
-        notesOptional:
-          type: boolean
-          default: false
-
-    ReferralStatusRefData:
-      type: object
-      properties:
-        code:
-          type: string
-          example: WITHDRAWN
-        description:
-          type: string
-          example: Withdrawn
-        hintText:
-          type: string
-          example: The application has been withdrawn
-        confirmationText:
-          type: string
-          example: I confirm that this person is eligible.
-        hasNotes:
-          description: flag to show this status has notes text box
-          type: boolean
-        hasConfirmation:
-          description: flag to show this status has confirmation box
-          type: boolean
-        colour:
-          type: string
-          example: light-grey
-        closed:
-          description: flag to show this is a closed status
-          type: boolean
-        draft:
-          description: flag to show this is a draft status
-          type: boolean
-        hold:
-          description: flag to show this is a hold status
-          type: boolean
-        release:
-          description: flag to show this is a release status
-          type: boolean
-        deselectAndKeepOpen:
-          description: flag to show this a bespoke status of deslected and keep open
-          type: boolean
-        defaultOrder:
-          description: sort order for statuses
-          type: integer
-        notesOptional:
-          description: flag to show whether the notes are optional
-          type: boolean
-      required:
-        - code
-        - description
-        - colour
-
-    ReferralStatusCategory:
-      type: object
-      properties:
-        code:
-          type: string
-          example: ADMIN
-        description:
-          type: string
-          example: Administrative error
-        referralStatusCode:
-          type: string
-          example: WITHDRAWN
-      required:
-        - code
-        - description
-        - referralStatusCode
-
-    ReferralStatusReason:
-      type: object
-      properties:
-        code:
-          type: string
-          example: DUPLICATE
-        description:
-          type: string
-          example: Duplicate referral
-        referralCategoryCode:
-          type: string
-          example: ADMIN
-      required:
-        - code
-        - description
-        - referralCategoryCode
-
-    EnabledOrganisation:
-      type: object
-      properties:
-        code:
-          type: string
-          example: MDI
-        description:
-          type: string
-          example: Stocken
-
-    SAR:
-      type: object
-      properties:
-        content:
-          type: string
-
-    SentenceDetails:
-      type: object
-      properties:
-        sentences:
-          type: array
-          items:
-            $ref: '#/components/schemas/Sentence'
-        keyDates:
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyDate'
-
-    Sentence:
-      type: object
-      properties:
-        description:
-          type: string
-          example: CJA03 Standard Determinate Sentence
-        sentenceStartDate:
-          type: string
-          format: date
-
-    KeyDate:
-      type: object
-      properties:
-        type:
-          type: string
-          example: earliestReleaseDate
-        code:
-          type: string
-          example: ERD
-        description:
-          type: string
-          example: Earliest Release Date
-        earliestReleaseDate:
-          type: boolean
-          default: false
-        date:
-          type: string
-          format: date
-        order:
-          type: integer
-          example: This is more like a weighting than an order - higher the number the more important the date.
-      required:
-        - type
-        - code
-
-    PrisonType:
-      type: object
-      properties:
-        code:
-          type: string
-          example: "YOI"
-        description:
-          type: string
-          example: "His Majesty’s Youth Offender Institution"
-      required:
-        - code
-        - description
-
-    Category:
-      type: object
-      properties:
-        category:
-          type: string
-          example: "E"
-      required:
-        - category
-
-    PrisonOperator:
-      type: object
-      properties:
-        name:
-          type: string
-          example: "PSP, G4S"
-      required:
-        - name
-
-    Address:
-      type: object
-      properties:
-        addressLine1:
-          type: string
-          example: "Higher Lane"
-        addressLine2:
-          type: string
-        town:
-          type: string
-          example: "Liverpool"
-        county:
-          type: string
-          example: "Merseyside"
-        postcode:
-          type: string
-          example: "L9 7LH"
-        country:
-          type: string
-          example: "England"
-      required:
-        - addressLine1
-        - town
-        - postcode
-        - country
-
-    CaseLoad:
-      type: object
-      properties:
-        caseLoadId:
-          type: string
-          nullable: true
-          description: The unique identifier of the caseload.
-        description:
-          type: string
-          nullable: true
-          description: The description of the caseload.
-        type:
-          type: string
-          nullable: true
-          description: The type of the caseload.
-        caseloadFunction:
-          type: string
-          nullable: true
-          description: The function of the caseload.
-        currentlyActive:
-          type: boolean
-          nullable: true
-          description: Indicates whether the caseload is currently active or not.
-
-    Offence:
-      type: object
-      properties:
-        offence:
-          type: string
-          description: Description of the offence along with the code.
-        category:
-          type: string
-          nullable: true
-          description: Legislation.
-        offenceDate:
-          type: string
-          format: date
-          description: Offence start date.
-
-    DrugAlcoholDetail:
-      type: object
-      properties:
-        drug:
-          $ref: '#/components/schemas/OasysDrugDetail'
-        alcohol:
-          $ref: '#/components/schemas/OasysAlcoholDetail'
-
-    OasysDrugDetail:
-      type: object
-      properties:
-        levelOfUseOfMainDrug:
-          type: string
-          nullable: true
-        drugsMajorActivity:
-          type: string
-          nullable: true
-    OasysAlcoholDetail:
-      type: object
-      properties:
-        alcoholLinkedToHarm:
-          type: string
-          nullable: true
-        alcoholIssuesDetails:
-          type: string
-          nullable: true
-        frequencyAndLevel:
-          type: string
-          nullable: true
-        bingeDrinking:
-          type: string
-          nullable: true
-
-    OasysAssessmentDateInfo:
-      type: object
-      properties:
-        recentCompletedAssessmentDate:
-          type: string
-          format: date
-          nullable: true
-        hasOpenAssessment:
-          type: boolean
-          nullable: false
-
-    Organisation:
-      type: object
-      properties:
-        code:
-          type: string
-          example: "MDI"
-        prisonName:
-          type: string
-          example: "Moorland HMP"
-
-    Audience:
-      type: object
-      properties:
-        name:
-          type: string
-          example: "Sexual offence"
-        colour:
-          type: string
-          example: "orange"
-
-    CourseUpdateRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Thinking skills programme
-        description:
-          type: string
-          example: Thinking Skills Programme (TSP) description
-        alternateName:
-          type: string
-          example: 'BNM+'
-        displayName:
-          type: string
-          example: 'Becoming New Me Plus: general violence offence (BNM+)'
-        audience:
-          type: string
-          example: 'Gang offence'
-        audienceColour:
-          type: string
-          example: '#FF5733'
-        withdrawn:
-          type: boolean
-          example: true
-
-    CourseCreateRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Thinking skills programme
-        identifier:
-          type: string
-          example: 'CC'
-        description:
-          type: string
-          example: Thinking Skills Programme (TSP) description
-        alternateName:
-          type: string
-          example: 'BNM+'
-        audienceId:
-          type: string
-          format: uuid
-          example: 'e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2'
-        withdrawn:
-          type: boolean
-          nullable: false
-          example: true
-      required:
-        - name
-        - identifier
-        - description
-        - audienceId
-        - withdrawn
