@@ -106,6 +106,7 @@ workflows:
             branches:
               only:
                 - main
+                - APG-203-2
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -115,6 +116,7 @@ workflows:
             branches:
               only:
                 - main
+                - APG-203-2
           requires:
             - validate
             - build_docker

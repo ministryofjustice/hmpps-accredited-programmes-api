@@ -29,7 +29,7 @@ class StatisticsController(
     @PathVariable reportType: ReportType,
     @RequestParam startDate: LocalDate,
     @RequestParam endDate: LocalDate? = LocalDate.now(),
-    @RequestParam locationCodes: List<String>?,
+    @RequestParam locationCodes: List<String>? = null,
   ): ReportContent {
     val parameters = Parameters(startDate, endDate, locationCodes)
     val content = when (reportType) {
