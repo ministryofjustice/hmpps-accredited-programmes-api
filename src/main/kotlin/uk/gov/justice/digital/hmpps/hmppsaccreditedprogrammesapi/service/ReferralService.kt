@@ -322,28 +322,27 @@ constructor(
     status: List<String>?,
     statusGroup: String?,
   ): List<String>? {
-    var uppercaseStatuses = status?.map { it.uppercase() }
-    if (statusGroup != null) {
-      uppercaseStatuses = when (statusGroup) {
-        "closed" -> {
-          referralStatusRepository.findAllByActiveIsTrueAndClosedIsTrueOrderByDefaultOrder().map { it.code }
-        }
+    // Convert existing status to uppercase, or initialize as an empty list if status is null
+    val uppercaseStatuses = status?.map { it.uppercase() }?.toMutableList() ?: mutableListOf()
 
-        "draft" -> {
-          referralStatusRepository.findAllByActiveIsTrueAndDraftIsTrueOrderByDefaultOrder().map { it.code }
-        }
-
-        "open" -> {
-          referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder()
-            .map { it.code }
-        }
-
-        else -> {
-          null
-        }
+    // Retrieve the statuses for the specified group
+    val groupStatuses = statusGroup?.let { group ->
+      when (group) {
+        "closed" -> referralStatusRepository.findAllByActiveIsTrueAndClosedIsTrueOrderByDefaultOrder().map { it.code }
+        "draft" -> referralStatusRepository.findAllByActiveIsTrueAndDraftIsTrueOrderByDefaultOrder().map { it.code }
+        "open" -> referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
+        else -> emptyList()
       }
+    } ?: emptyList()
+
+    // If both status and statusGroup are provided, filter statuses by the group statuses
+    val filteredStatuses = if (status != null && statusGroup != null) {
+      uppercaseStatuses.intersect(groupStatuses.toSet()).toList()
+    } else {
+      uppercaseStatuses.apply { addAll(groupStatuses) }
     }
-    return uppercaseStatuses
+
+    return filteredStatuses.takeIf { it.isNotEmpty() }
   }
 
   fun getReferralViewByUsername(
