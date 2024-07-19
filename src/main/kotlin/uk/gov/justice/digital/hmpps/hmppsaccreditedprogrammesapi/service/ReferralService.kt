@@ -322,6 +322,8 @@ constructor(
     status: List<String>?,
     statusGroup: String?,
   ): List<String>? {
+    log.info("Status list: $status")
+    log.info("Status group: $statusGroup")
     // Convert existing status to uppercase, or initialize as an empty list if status is null
     val uppercaseStatuses = status?.map { it.uppercase() }?.toMutableList() ?: mutableListOf()
 
@@ -335,12 +337,19 @@ constructor(
       }
     } ?: emptyList()
 
+    log.info("Group statuses list: $status")
+
     // If both status and statusGroup are provided, filter statuses by the group statuses
     val filteredStatuses = if (status != null && statusGroup != null) {
-      uppercaseStatuses.intersect(groupStatuses.toSet()).toList()
+      val intersection = uppercaseStatuses.intersect(groupStatuses.toSet()).toList()
+      intersection.ifEmpty {
+        listOf("INVALID_STATUS")
+      }
     } else {
       uppercaseStatuses.apply { addAll(groupStatuses) }
     }
+
+    log.info("Filtered statuses are: $filteredStatuses")
 
     return filteredStatuses.takeIf { it.isNotEmpty() }
   }
