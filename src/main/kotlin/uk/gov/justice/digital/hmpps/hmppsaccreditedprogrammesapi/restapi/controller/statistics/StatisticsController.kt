@@ -29,23 +29,23 @@ class StatisticsController(
     @PathVariable reportType: ReportType,
     @RequestParam startDate: LocalDate,
     @RequestParam endDate: LocalDate? = LocalDate.now(),
-    @RequestParam locationCode: String?,
+    @RequestParam locationCodes: List<String>?,
   ): ReportContent {
-    val parameters = Parameters(startDate, endDate, locationCode)
-
+    val parameters = Parameters(startDate, endDate, locationCodes)
     val content = when (reportType) {
       ReportType.REFERRAL_COUNT_BY_COURSE -> statisticsRepository.referralCountByCourse(
         startDate,
         endDate!!,
-        locationCode,
+        locationCodes,
       )
 
       ReportType.REFERRAL_COUNT -> statisticsRepository.referralCount(
         startDate,
         endDate!!,
-        locationCode,
+        locationCodes,
       )
     }
+
     return ReportContent(
       reportType = reportType.name,
       content = objectMapper.readValue(content, Content::class.java),
@@ -59,7 +59,7 @@ data class ReportContent(val reportType: String, val parameters: Parameters, val
 data class Parameters(
   val startDate: LocalDate,
   val endDate: LocalDate?,
-  val locationCode: String?,
+  val locationCodes: List<String>?,
 )
 
 enum class ReportType {
