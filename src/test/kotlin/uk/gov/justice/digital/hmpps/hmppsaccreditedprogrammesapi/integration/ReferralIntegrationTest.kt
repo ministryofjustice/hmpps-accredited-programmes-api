@@ -693,6 +693,52 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Retrieving a list of draft referral views for an organisation using referral group and status should return 200 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
+    val createdReferral = getReferralById(referralCreated.referralId)
+
+    referralCreated.referralId.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
+
+    var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = "draft", statusFilter = listOf("WITHDRAWN"))
+    summary.content.shouldBeEmpty()
+
+    summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = "draft", statusFilter = listOf("REFERRAL_STARTED"))
+    summary.content.shouldNotBeEmpty()
+
+    summary.content?.forEach { actualSummary ->
+      listOf(
+        ReferralView(
+          id = createdReferral.id,
+          courseName = course.name,
+          audience = course.audience,
+          status = createdReferral.status.lowercase(),
+          statusDescription = createdReferral.statusDescription,
+          statusColour = createdReferral.statusColour,
+          prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = REFERRER_USERNAME,
+          forename = PRISONER_1.firstName,
+          surname = PRISONER_1.lastName,
+        ),
+      ).forEach { referralView ->
+        actualSummary.id shouldBe referralView.id
+        actualSummary.courseName shouldBe referralView.courseName
+        actualSummary.audience shouldBe referralView.audience
+        actualSummary.status shouldBe referralView.status
+        actualSummary.statusDescription shouldBe referralView.statusDescription
+        actualSummary.statusColour shouldBe referralView.statusColour
+        actualSummary.prisonNumber shouldBe referralView.prisonNumber
+        actualSummary.referrerUsername shouldBe referralView.referrerUsername
+        actualSummary.forename shouldBe referralView.forename
+        actualSummary.surname shouldBe referralView.surname
+      }
+    }
+  }
+
+  @Test
   fun `Retrieving a referral views for an organisation prisonerId return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
