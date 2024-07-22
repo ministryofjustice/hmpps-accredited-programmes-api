@@ -1,0 +1,9 @@
+components:
+  responses:
+    404Response:
+      description: Person not found
+      content:
+        'application/json':
+          schema:
+            $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+
