@@ -1,9 +1,38 @@
 components:
   responses:
-    404Response:
-      description: Person not found
+    400Response:
+      description: Bad input
       content:
         'application/json':
           schema:
             $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+
+    401Response:
+      description: The client is not authorized to perform this operation.
+      content:
+        'application/json':
+          schema:
+            $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+
+    404Response:
+      description: Not found
+      content:
+        'application/json':
+          schema:
+            $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+
+    404InvalidPrisonNumberResponse:
+      description: Invalid prison number
+      content:
+        'application/json':
+          schema:
+            $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+
+    404RefDataNotFoundResponse:
+      description: Reference data not found
+      content:
+        'application/json':
+          schema:
+            $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+
 

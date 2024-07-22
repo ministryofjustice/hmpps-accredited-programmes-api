@@ -72,11 +72,7 @@ paths:
               schema:
                 $ref: '_schemas.yml#/components/schemas/SentenceDetails'
         404:
-          description: Person not found
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404Response'
 
   /prisoner-search:
     post:
@@ -101,17 +97,9 @@ paths:
                 items:
                   $ref: '_schemas.yml#/components/schemas/PrisonerSearchResponse'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /people/search:
     post:
@@ -135,17 +123,9 @@ paths:
                 items:
                   $ref: '_schemas.yml#/components/schemas/PeopleSearchResponse'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /prison-search:
     post:
@@ -169,17 +149,9 @@ paths:
                 items:
                   $ref: '_schemas.yml#/components/schemas/PrisonSearchResponse'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
 
   /prison-search/{prisonId}:
@@ -204,17 +176,9 @@ paths:
               schema:
                 $ref: '_schemas.yml#/components/schemas/PrisonSearchResponse'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /courses:
     get:
@@ -249,10 +213,10 @@ paths:
             'application/json':
               schema:
                 $ref: '_schemas.yml#/components/schemas/Course'
-        '401':
-          description: You are not authorized to view the resource
-        '403':
-          description: Accessing the resource you were trying to reach is forbidden
+        400:
+          $ref: '_shared.yml#/components/responses/400Response'
+        401:
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /courses/csv:
     put:
@@ -413,11 +377,7 @@ paths:
                 items:
                   $ref: '_schemas.yml#/components/schemas/CoursePrerequisite'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
 
   /courses/{id}:
     get:
@@ -630,11 +590,8 @@ paths:
                 items:
                   $ref: '_schemas.yml#/components/schemas/LineMessage'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
+
     get:
       tags:
         - Course Offerings
@@ -672,15 +629,11 @@ paths:
               schema:
                 $ref: '_schemas.yml#/components/schemas/CourseOffering'
         401:
-          description: Unauthorised. The request was unauthorised.
+          $ref: '_shared.yml#/components/responses/401Response'
         403:
           description: Forbidden.  The client is not authorised to access this offering.
-        404:
-          description: Invalid course offering id
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+        400:
+          $ref: '_shared.yml#/components/responses/400Response'
 
   /referrals:
     post:
@@ -702,13 +655,9 @@ paths:
               schema:
                 $ref: '_schemas.yml#/components/schemas/ReferralCreated'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
         401:
-          description: Unauthorised. The request was unauthorised.
+          $ref: '_shared.yml#/components/responses/401Response'
 
     get:
       summary: Retrieve some referrals
@@ -1017,17 +966,9 @@ paths:
                 items:
                   $ref: '_schemas.yml#/components/schemas/ReferralStatusHistory'
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /referrals/view/organisation/{organisationId}/dashboard:
     get:
@@ -1251,17 +1192,9 @@ paths:
               schema:
                 $ref: "_schemas.yml#/components/schemas/CourseParticipation"
         400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/400Response'
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /course-participations/{id}:
     get:
@@ -1284,12 +1217,9 @@ paths:
             'application/json':
               schema:
                 $ref: "_schemas.yml#/components/schemas/CourseParticipation"
-        401:
-          description: The client is not authorised to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+        400:
+          $ref: '_shared.yml#/components/responses/400Response'
+
     put:
       tags:
         - Course Participations
@@ -1317,11 +1247,7 @@ paths:
               schema:
                 $ref: "_schemas.yml#/components/schemas/CourseParticipation"
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
         404:
           description: There is no information for the id, so it cannot be updated.
           content:
@@ -1345,11 +1271,7 @@ paths:
         204:
           description: The information about a person's participation in a course has been deleted.
         401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /people/{prisonNumber}/course-participations:
     get:
@@ -1375,11 +1297,7 @@ paths:
                 items:
                   $ref: "_schemas.yml#/components/schemas/CourseParticipation"
         401:
-          description: The client is not authorised to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/401Response'
 
   /people/offences/{prisonNumber}:
     get:
@@ -1406,15 +1324,11 @@ paths:
                   $ref: '_schemas.yml#/components/schemas/Offence'
                 type: array
         401:
-          description: Unauthorised. The request was unauthorised.
+          $ref: '_shared.yml#/components/responses/401Response'
         403:
           description: Forbidden.  The client is not authorised to access person.
-        404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+        400:
+          $ref: '_shared.yml#/components/responses/400Response'
 
   /oasys/{prisonNumber}/offence-details:
     get:
@@ -1442,11 +1356,8 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404Response'
+
 
   /oasys/{prisonNumber}/relationships:
     get:
@@ -1474,11 +1385,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404Response'
 
   /oasys/{prisonNumber}/rosh-analysis:
     get:
@@ -1506,11 +1413,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404Response'
 
   /oasys/{prisonNumber}/lifestyle:
     get:
@@ -1538,11 +1441,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/psychiatric:
     get:
@@ -1570,11 +1469,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/behaviour:
     get:
@@ -1602,11 +1497,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/attitude:
     get:
@@ -1634,11 +1525,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/health:
     get:
@@ -1666,11 +1553,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/learning-needs:
     get:
@@ -1698,11 +1581,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/risks-and-alerts:
     get:
@@ -1730,11 +1609,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/drug-and-alcohol-details:
     get:
@@ -1763,11 +1638,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /oasys/{prisonNumber}/assessment_date:
     get:
@@ -1796,11 +1667,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access person.
         404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
 
   /reference-data/referral-statuses:
     get:
@@ -1848,11 +1715,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access.
         404:
-          description: Reference data not found
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404RefDataNotFoundResponse'
 
   /reference-data/referral-statuses/{referralStatusCode}/categories:
     get:
@@ -1909,11 +1772,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access.
         404:
-          description: Reference data not found
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404RefDataNotFoundResponse'
 
   /reference-data/referral-statuses/{referralStatusCode}/categories/{categoryCode}/reasons:
     get:
@@ -1985,11 +1844,7 @@ paths:
         403:
           description: Forbidden.  The client is not authorised to access.
         404:
-          description: Reference data not found
-          content:
-            'application/json':
-              schema:
-                $ref: '_schemas.yml#/components/schemas/ErrorResponse'
+          $ref: '_shared.yml#/components/responses/404RefDataNotFoundResponse'
 
   /organisations/enabled:
     get:
