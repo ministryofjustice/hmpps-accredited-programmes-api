@@ -18,7 +18,7 @@ interface StatisticsRepository : JpaRepository<ReferralEntity, UUID> {
         from referral r
       join offering o on r.offering_id = o.offering_id
       where r.submitted_on >= :startDate 
-        and r.submitted_on <= :endDate
+        and r.submitted_on < :endDate
         and ( :locationCodes is null OR o.organisation_id in :locationCodes )
         and r.deleted = false;
           """,
@@ -49,7 +49,7 @@ FROM (
     JOIN offering o ON r.offering_id = o.offering_id
     JOIN course c ON o.course_id = c.course_id
     WHERE r.submitted_on >= :startDate 
-      AND r.submitted_on <= :endDate
+      AND r.submitted_on < :endDate
       and ( :locationCodes is null OR o.organisation_id in :locationCodes )
       AND r.deleted = FALSE
     GROUP BY c.name, c.audience
@@ -84,7 +84,7 @@ FROM (
          WHERE r.deleted = FALSE
            AND rsh.status = :statusCode
            AND rsh.status_start_date >= :startDate
-           AND rsh.status_start_date <= :endDate
+           AND rsh.status_start_date < :endDate
            AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
          GROUP BY c.name, c.audience
      ) AS subquery;
