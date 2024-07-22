@@ -44,6 +44,12 @@ class StatisticsController(
         endDate!!,
         locationCodes,
       )
+
+      ReportType.PROGRAMME_COMPLETIONS -> statisticsRepository.programmeCompletions(
+        startDate,
+        endDate!!,
+        locationCodes,
+      )
     }
 
     return ReportContent(
@@ -65,6 +71,7 @@ data class Parameters(
 enum class ReportType {
   REFERRAL_COUNT_BY_COURSE,
   REFERRAL_COUNT,
+  PROGRAMME_COMPLETIONS,
 }
 
 data class ReportTypes(val types: List<String>)

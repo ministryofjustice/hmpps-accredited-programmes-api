@@ -61,4 +61,38 @@ FROM (
     endDate: LocalDate,
     locationCodes: List<String>?,
   ): String
+
+  @Query(
+    """
+       SELECT json_build_object(
+               'count', sum(count),
+               'courseCounts', json_agg(json_build_object(
+                'name', name,
+                'audience', audience,
+                'count', count))
+       ) AS result
+        FROM (
+         SELECT
+             c.name as name,
+             c.audience as audience,
+             COUNT(*) AS count
+         FROM referral r
+                  JOIN offering o ON r.offering_id = o.offering_id
+                  JOIN course c ON o.course_id = c.course_id
+                  JOIN referral_status_history rsh ON rsh.referral_id = r.referral_id
+         WHERE r.deleted = FALSE
+           AND rsh.status = 'PROGRAMME_COMPLETE'
+           AND rsh.status_start_date >= :startDate
+           AND rsh.status_start_date <= :endDate
+           AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
+         GROUP BY c.name, c.audience
+     ) AS subquery;
+          """,
+    nativeQuery = true,
+  )
+  fun programmeCompletions(
+    startDate: LocalDate,
+    endDate: LocalDate,
+    locationCodes: List<String>?,
+  ): String
 }
