@@ -33,6 +33,7 @@ interface StatisticsRepository : JpaRepository<ReferralEntity, UUID> {
   @Query(
     """
         SELECT json_build_object(
+        'count', sum(count),
         'courseCounts', json_agg(json_build_object(
                 'name', name,
                 'audience', audience,
@@ -65,11 +66,11 @@ FROM (
   @Query(
     """
        SELECT json_build_object(
-               'count', sum(count),
-               'courseCounts', json_agg(json_build_object(
-                'name', name,
-                'audience', audience,
-                'count', count))
+              'count', sum(count),
+              'courseCounts', json_agg(json_build_object(
+              'name', name,
+              'audience', audience,
+              'count', count))
        ) AS result
         FROM (
          SELECT
@@ -81,7 +82,7 @@ FROM (
                   JOIN course c ON o.course_id = c.course_id
                   JOIN referral_status_history rsh ON rsh.referral_id = r.referral_id
          WHERE r.deleted = FALSE
-           AND rsh.status = 'PROGRAMME_COMPLETE'
+           AND rsh.status = :statusCode
            AND rsh.status_start_date >= :startDate
            AND rsh.status_start_date <= :endDate
            AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
@@ -90,9 +91,10 @@ FROM (
           """,
     nativeQuery = true,
   )
-  fun programmeCompletions(
+  fun finalStatusCodeCounts(
     startDate: LocalDate,
     endDate: LocalDate,
     locationCodes: List<String>?,
+    statusCode: String,
   ): String
 }
