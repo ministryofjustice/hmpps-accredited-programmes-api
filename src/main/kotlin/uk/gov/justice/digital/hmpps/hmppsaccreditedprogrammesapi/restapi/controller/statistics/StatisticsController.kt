@@ -45,10 +45,39 @@ class StatisticsController(
         locationCodes,
       )
 
-      ReportType.PROGRAMME_COMPLETIONS -> statisticsRepository.programmeCompletions(
+      ReportType.PROGRAMME_COMPLETE_COUNT -> statisticsRepository.finalStatusCodeCounts(
         startDate,
         endDate!!,
         locationCodes,
+        "PROGRAMME_COMPLETE",
+      )
+
+      ReportType.WITHDRAWN_COUNT -> statisticsRepository.finalStatusCodeCounts(
+        startDate,
+        endDate!!,
+        locationCodes,
+        "WITHDRAWN",
+      )
+
+      ReportType.NOT_ELIGIBLE_COUNT -> statisticsRepository.finalStatusCodeCounts(
+        startDate,
+        endDate!!,
+        locationCodes,
+        "NOT_ELIGIBLE",
+      )
+
+      ReportType.NOT_SUITABLE_COUNT -> statisticsRepository.finalStatusCodeCounts(
+        startDate,
+        endDate!!,
+        locationCodes,
+        "NOT_SUITABLE",
+      )
+
+      ReportType.DESELECTED_COUNT -> statisticsRepository.finalStatusCodeCounts(
+        startDate,
+        endDate!!,
+        locationCodes,
+        "DESELECTED",
       )
     }
 
@@ -71,7 +100,11 @@ data class Parameters(
 enum class ReportType {
   REFERRAL_COUNT_BY_COURSE,
   REFERRAL_COUNT,
-  PROGRAMME_COMPLETIONS,
+  PROGRAMME_COMPLETE_COUNT,
+  WITHDRAWN_COUNT,
+  NOT_ELIGIBLE_COUNT,
+  NOT_SUITABLE_COUNT,
+  DESELECTED_COUNT,
 }
 
 data class ReportTypes(val types: List<String>)
