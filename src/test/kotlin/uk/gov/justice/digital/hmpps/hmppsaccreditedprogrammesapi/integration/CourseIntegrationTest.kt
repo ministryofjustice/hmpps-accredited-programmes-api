@@ -324,8 +324,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .json(
         """
         [
-          { "name": "Intimate partner violence offence", "colour":"green" },
-          { "name": "Sexual offence", "colour":"orange" }
+          { "id":"28e47d30-30bf-4dab-a8eb-9fda3f6400e1", "name": "Intimate partner violence offence", "colour":"green" },
+          { "id":"28e47d30-30bf-4dab-a8eb-9fda3f6400e2", "name": "Sexual offence", "colour":"orange" }
         ]
       """,
       )
