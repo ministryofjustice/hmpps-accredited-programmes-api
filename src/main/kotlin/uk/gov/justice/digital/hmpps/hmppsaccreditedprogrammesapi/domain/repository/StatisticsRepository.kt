@@ -97,4 +97,59 @@ FROM (
     locationCodes: List<String>?,
     statusCode: String,
   ): String
+
+  @Query(
+    """
+        WITH aggregated_courses AS (
+    SELECT
+        c.name AS name,
+        c.audience AS audience,
+        r.status AS status,
+        COUNT(*) AS count,
+        COUNT(r.referral_id) AS referral_count
+    FROM
+        referral r
+            JOIN offering o ON r.offering_id = o.offering_id
+            JOIN course c ON o.course_id = c.course_id
+    WHERE
+        r.status IN :statusCodes
+      AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
+      AND r.deleted = FALSE
+    GROUP BY
+        c.name, c.audience, r.status
+),
+     aggregated_statuses AS (
+         SELECT
+             status,
+             json_agg(json_build_object(
+                     'name', name,
+                     'audience', audience,
+                     'count', count
+                      )) AS courseCounts,
+             SUM(count) AS total_count,
+             SUM(referral_count) AS referral_count
+         FROM
+             aggregated_courses
+         GROUP BY
+             status
+     )
+SELECT
+    json_build_object(
+            'totalCount', SUM(referral_count),
+            'statusContent', json_agg(json_build_object(
+            'status', status,
+            'countAtStatus', referral_count,
+            'courseCounts', courseCounts
+             ))
+    ) AS result
+FROM
+    aggregated_statuses;
+
+          """,
+    nativeQuery = true,
+  )
+  fun currentCountsByStatus(
+    statusCodes: List<String>,
+    locationCodes: List<String>?,
+  ): String
 }

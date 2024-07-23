@@ -80,12 +80,27 @@ class StatisticsController(
         "DESELECTED",
       )
     }
-
     return ReportContent(
       reportType = reportType.name,
       content = objectMapper.readValue(content, Content::class.java),
       parameters = parameters,
     )
+  }
+
+  /**
+   * Returns the counts of referrals at various statuses for location codes.
+   * Note that this endpoint will just return the number of referrals that have the
+   * supplied status.
+   *
+   */
+  @GetMapping("/current/status_counts")
+  fun getCurrentStatusCounts(
+    @RequestParam statuses: List<String> = listOf(),
+    @RequestParam locationCodes: List<String>? = listOf(),
+  ): CurrentCount {
+    val content = statisticsRepository.currentCountsByStatus(statuses, locationCodes)
+
+    return objectMapper.readValue(content, CurrentCount::class.java)
   }
 }
 
@@ -97,9 +112,17 @@ data class Parameters(
   val locationCodes: List<String>?,
 )
 
+/**
+ * For each report Type the input params are start/end date (the date the referral was
+ * submitted) and a list of 0 to many location codes.
+ * If the end date is left blank it will default to the current date. And if location codes is
+ * empty then it defaults to all locations (ie national)
+ */
 enum class ReportType {
-  REFERRAL_COUNT_BY_COURSE,
-  REFERRAL_COUNT,
+  REFERRAL_COUNT_BY_COURSE, // Number of referrals broken down by course/audience
+  REFERRAL_COUNT, // Number of referrals
+
+  // Number of referrals at Various closed statuses broken down by course/audience
   PROGRAMME_COMPLETE_COUNT,
   WITHDRAWN_COUNT,
   NOT_ELIGIBLE_COUNT,
@@ -124,3 +147,7 @@ data class CourseCount(
   val audience: String,
   val count: Int?,
 )
+
+data class CurrentCount(val totalCount: Int?, val statusContent: List<StatusContent>?)
+
+data class StatusContent(val status: String, val countAtStatus: Int, val courseCounts: List<CourseCount>?)
