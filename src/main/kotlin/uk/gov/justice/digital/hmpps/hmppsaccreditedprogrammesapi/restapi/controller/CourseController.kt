@@ -126,6 +126,7 @@ constructor(
       audienceService
         .getAllAudiences().map {
           Audience(
+            id = it.id,
             name = it.name,
             colour = it.colour,
           )
