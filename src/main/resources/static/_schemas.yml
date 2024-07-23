@@ -1409,3 +1409,94 @@ components:
         - description
         - audienceId
         - withdrawn
+
+    PNIInfo:
+      type: object
+      properties:
+        Needs:
+          type: object
+          properties:
+            Sex:
+              $ref: '#/components/schemas/SexScores'
+            Cognitive:
+              $ref: '#/components/schemas/CognitiveScores'
+            Relationships:
+              $ref: '#/components/schemas/RelationshipScores'
+            SelfManagement:
+              $ref: '#/components/schemas/SelfManagementScores'
+        RiskScores:
+          $ref: '#/components/schemas/RiskScores'
+
+    SexScores:
+      type: object
+      properties:
+        sexualPreOccupation:
+          type: integer
+          nullable: true
+        offenceRelatedSexualInterests:
+          type: integer
+          nullable: true
+        emotionalCongruence:
+          type: integer
+          nullable: true
+    CognitiveScores:
+      type: object
+      properties:
+        proCriminalAttitudes:
+          type: integer
+          nullable: true
+        hostileOrientation:
+          type: integer
+          nullable: true
+    RelationshipScores:
+      type: object
+      properties:
+        curRelCloseFamily:
+          type: integer
+          nullable: true
+        prevExpCloseRel:
+          type: integer
+          nullable: true
+        easilyInfluenced:
+          type: integer
+          nullable: true
+        aggressiveControllingBehavour:
+          type: integer
+          nullable: true
+    SelfManagementScores:
+      type: object
+      properties:
+        impulsivity:
+          type: integer
+          nullable: true
+        temperControl:
+          type: integer
+          nullable: true
+        problemSolvingSkills:
+          type: integer
+          nullable: true
+        difficultiesCoping:
+          type: integer
+          nullable: true
+
+    RiskScores:
+      type: object
+      properties:
+        ogrs3:
+          type: integer
+          nullable: true
+        ovp:
+          type: integer
+          nullable: true
+        ospDc:
+          type: integer
+          nullable: true
+        ospIic:
+          type: integer
+          nullable: true
+        rsr:
+          type: integer
+          nullable: true
+        sara:
+          type: integer
+          nullable: true

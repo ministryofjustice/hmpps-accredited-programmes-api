@@ -1915,3 +1915,32 @@ paths:
           description: Forbidden.  The client is not authorised to access.
       tags:
         - User
+
+  /pni/{prisonNumber}:
+    get:
+      summary: Get needs and risk data for prisoner
+      description: Get needs (sex, cognitive, relationships & Self Management) and risk data for given prisoner
+      tags:
+        - PNI
+      operationId: getPNIByPrisonNumber
+      parameters:
+        - name: prisonNumber
+          in: path
+          description: Prison nomis identifier
+          example: "A1234AA"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '_schemas.yml#/components/schemas/PNIInfo'
+        401:
+          description: Unauthorised. The request was unauthorised.
+        403:
+          description: Forbidden.  The client is not authorised to access person.
+        404:
+          $ref: '_shared.yml#/components/responses/404InvalidPrisonNumberResponse'
