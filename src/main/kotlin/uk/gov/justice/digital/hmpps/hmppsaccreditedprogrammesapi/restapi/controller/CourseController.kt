@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Audienc
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import java.util.UUID
+import kotlin.random.Random
 
 @Service
 class CourseController
@@ -32,18 +33,18 @@ constructor(
   private val enabledOrganisationService: EnabledOrganisationService,
   private val audienceService: AudienceService,
 ) : CoursesApiDelegate {
-  override fun getAllCourses(): ResponseEntity<List<Course>> =
+  override fun getAllCourses(withdrawn: Boolean?): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
         courseService
-          .getAllCourses()
+          .getAllCourses(withdrawn ?: false)
           .map(CourseEntity::toApi),
       )
 
   override fun getCoursesCsv(): ResponseEntity<List<CourseRecord>> =
     ResponseEntity.ok(
       courseService
-        .getAllCourses()
+        .getAllCourses(false)
         .map(CourseEntity::toCourseRecord),
     )
 
@@ -52,13 +53,21 @@ constructor(
     return ResponseEntity.noContent().build()
   }
 
+  @Deprecated(
+    """Phasing out these CSV methods, leaving them in for now but adding this comment 
+    |so we don't get confused with the new endpoints""",
+  )
   override fun updatePrerequisites(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
     ResponseEntity.ok(courseService.updatePrerequisites(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
 
+  @Deprecated(
+    """Phasing out these CSV methods, leaving them in for now but adding this comment 
+    |so we don't get confused with the new endpoints""",
+  )
   override fun getPrerequisitesCsv(): ResponseEntity<List<PrerequisiteRecord>> =
     ResponseEntity.ok(
       courseService
-        .getAllCourses()
+        .getAllCourses(false)
         .flatMap { course ->
           course.prerequisites.map { prerequisite ->
             PrerequisiteRecord(
@@ -82,8 +91,12 @@ constructor(
         },
     )
 
-  override fun updateCoursePrerequisites(id: UUID, coursePrerequisites: List<CoursePrerequisite>): ResponseEntity<List<CoursePrerequisite>> {
-    val course = courseService.getNotWithdrawnCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
+  override fun updateCoursePrerequisites(
+    id: UUID,
+    coursePrerequisites: List<CoursePrerequisite>,
+  ): ResponseEntity<List<CoursePrerequisite>> {
+    val course =
+      courseService.getNotWithdrawnCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
     return ResponseEntity.ok(courseService.updateCoursePrerequisites(course, coursePrerequisites.toMutableSet()))
   }
 
@@ -153,7 +166,9 @@ constructor(
   }
 
   override fun createCourse(courseCreateRequest: CourseCreateRequest): ResponseEntity<Course> {
-    val courseByIdentifier = courseService.getCourseByIdentifier(courseCreateRequest.identifier)
+    // temporary code to generate a unique identifier:
+    val identifier = courseCreateRequest.identifier ?: generateRandom10AlphaString()
+    val courseByIdentifier = courseService.getCourseByIdentifier(identifier)
 
     if (courseByIdentifier != null) {
       throw BusinessException("Course with identifier ${courseCreateRequest.identifier} already exists")
@@ -164,7 +179,7 @@ constructor(
 
     val course = CourseEntity(
       name = courseCreateRequest.name,
-      identifier = courseCreateRequest.identifier,
+      identifier = identifier,
       description = courseCreateRequest.description,
       alternateName = courseCreateRequest.alternateName,
       audience = audience.name,
@@ -175,5 +190,14 @@ constructor(
     val savedCourse = courseService.save(course)
 
     return ResponseEntity.ok(savedCourse.toApi())
+  }
+
+  fun generateRandom10AlphaString(): String {
+    val chars = ('A'..'Z')
+    val charsList = chars.toList()
+    return (1..10)
+      .map { Random.nextInt(0, charsList.size) }
+      .map(charsList::get)
+      .joinToString("")
   }
 }

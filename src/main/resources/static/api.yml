@@ -222,6 +222,13 @@ paths:
         - Courses
       summary: List all courses
       operationId: getAllCourses
+      parameters:
+        - name: withdrawn
+          in: query
+          description: flag to return withdrawn
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: Return a JSON representation of all courses that are not withdrawn.
@@ -2076,7 +2083,8 @@ components:
           format: uuid
         identifier:
           type: string
-          example: CC
+          example: 'BNM-VO'
+          description: This is an internal identifier for the course (to be removed)
         name:
           type: string
           example: Thinking skills programme
@@ -2104,7 +2112,6 @@ components:
           example: 'true'
       required:
         - id
-        - identifier
         - name
         - coursePrerequisites
         - audience
@@ -3454,7 +3461,8 @@ components:
           example: Thinking skills programme
         identifier:
           type: string
-          example: 'CC'
+          example: 'BNM-VO'
+          description: This is an internal identifier for the course (to be removed)
         description:
           type: string
           example: Thinking Skills Programme (TSP) description
@@ -3471,7 +3479,6 @@ components:
           example: true
       required:
         - name
-        - identifier
         - description
         - audienceId
         - withdrawn
