@@ -14,11 +14,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
 
 class PNIController(
-  private val pniService: PniService
+  private val pniService: PniService,
 ) {
 
   @Operation(
-    tags = ["PNI",],
+    tags = ["PNI"],
     summary = "Get needs and risk data for prisoner",
     operationId = "getPNIByPrisonNumber",
     description = """Get needs (sex, cognitive, relationships & Self Management) and risk data for given prisoner""",
@@ -26,13 +26,13 @@ class PNIController(
       ApiResponse(responseCode = "200", description = "successful operation", content = [Content(schema = Schema(implementation = PNIInfo::class))]),
       ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised."),
       ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access person."),
-      ApiResponse(responseCode = "404", description = "Invalid prison number", content = [Content(schema = Schema(implementation = ErrorResponse::class))])
-    ]
+      ApiResponse(responseCode = "404", description = "Invalid prison number", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    ],
   )
   @RequestMapping(
     method = [RequestMethod.GET],
     value = ["/pni/{prisonNumber}"],
-    produces = ["application/json"]
+    produces = ["application/json"],
   )
   fun getPNIByPrisonNumber(@Parameter(description = "Prison nomis identifier", required = true) @PathVariable("prisonNumber") prisonNumber: kotlin.String): ResponseEntity<PNIInfo> {
     return ResponseEntity.ok(pniService.getPniInfo(prisonNumber))

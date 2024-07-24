@@ -14,5 +14,5 @@ data class PNIInfo(
   @get:JsonProperty("Needs") val needsScores: NeedsScores? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("RiskScores") val riskScores: RiskScores? = null
+  @get:JsonProperty("RiskScores") val riskScores: RiskScores? = null,
 )
