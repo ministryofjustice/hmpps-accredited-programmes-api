@@ -57,7 +57,7 @@ constructor(
         CourseEntityFactory().withName("Course3").produce(),
       )
 
-      every { courseService.getAllCourses() } returns courses
+      every { courseService.getAllCourses(false) } returns courses
 
       mockMvc.get("/courses") {
         accept = MediaType.APPLICATION_JSON
@@ -95,7 +95,7 @@ constructor(
         CourseEntityFactory().withName("Course2").produce(),
         CourseEntityFactory().withName("Course3").produce(),
       )
-      every { courseService.getAllCourses() } returns courses
+      every { courseService.getAllCourses(false) } returns courses
 
       val uniqueCourseNames = courses.map { it.name }.distinct()
       every { courseService.getCourseNames(null) } returns uniqueCourseNames

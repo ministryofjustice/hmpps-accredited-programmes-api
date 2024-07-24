@@ -350,7 +350,7 @@ class CourseServiceTest {
       val c2 = CourseEntityFactory().withIdentifier("C2").produce()
       val courses = listOf(c1, c2)
       every { courseRepository.findAll() } returns courses
-      courseService.getAllCourses().shouldContainExactly(c2)
+      courseService.getAllCourses(false).shouldContainExactly(c2)
     }
   }
 

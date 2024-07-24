@@ -31,7 +31,13 @@ constructor(
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val referralRepository: ReferralRepository,
 ) {
-  fun getAllCourses(): List<CourseEntity> = courseRepository.findAll().filterNot { it.withdrawn }
+  fun getAllCourses(withdrawn: Boolean): List<CourseEntity> {
+    return if (withdrawn) {
+      courseRepository.findAll().filter { it.withdrawn }
+    } else {
+      courseRepository.findAll().filterNot { it.withdrawn }
+    }
+  }
   fun getCourseNames(includeWithdrawn: Boolean? = true): List<String> {
     return if (includeWithdrawn == null) {
       courseRepository.getCourseNames(true)
@@ -57,6 +63,10 @@ constructor(
   fun getOfferingById(offeringId: UUID): OfferingEntity? =
     offeringRepository.findByIdOrNull(offeringId)?.takeIf { !it.withdrawn }
 
+  @Deprecated(
+    """Phasing out these CSV methods, leaving them in for now but adding this comment 
+    |so we don't get confused with the new endpoints""",
+  )
   fun updateCourses(courseUpdates: List<CourseUpdate>) {
     val coursesByIdentifier = courseRepository.findAll().associateBy(CourseEntity::identifier)
     val courseDataByIdentifier = courseUpdates.associateBy(CourseUpdate::identifier)
