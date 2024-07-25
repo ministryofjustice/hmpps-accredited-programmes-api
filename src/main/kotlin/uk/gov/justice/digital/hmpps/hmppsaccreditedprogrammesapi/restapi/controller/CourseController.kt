@@ -193,6 +193,11 @@ constructor(
     return ResponseEntity.status(HttpStatus.CREATED).body(savedCourse.toApi())
   }
 
+  override fun deleteCourse(id: UUID): ResponseEntity<Unit> {
+    courseService.delete(id)
+    return ResponseEntity.ok(null)
+  }
+
   fun generateRandom10AlphaString(): String {
     val chars = ('A'..'Z')
     val charsList = chars.toList()
