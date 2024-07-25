@@ -12,16 +12,12 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 data class NeedsScores(
 
-  @Schema(example = "null", description = "")
   @get:JsonProperty("Sex") val sexScores: SexScores? = null,
 
-  @Schema(example = "null", description = "")
   @get:JsonProperty("Cognitive") val cognitiveScores: CognitiveScores? = null,
 
-  @Schema(example = "null", description = "")
   @get:JsonProperty("Relationships") val relationshipScores: RelationshipScores? = null,
 
-  @Schema(example = "SelfManagementScores(impulsivity=null, temperControl=null, problemSolvingSkills=null, difficultiesCoping=null)", description = "")
   @get:JsonProperty("SelfManagement") val selfManagementScores: SelfManagementScores? = null,
 )
 

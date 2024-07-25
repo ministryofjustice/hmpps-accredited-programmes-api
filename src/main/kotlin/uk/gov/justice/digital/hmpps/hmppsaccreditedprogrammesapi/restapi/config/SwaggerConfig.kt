@@ -12,42 +12,20 @@ class SwaggerConfig {
     fun apiStatisticsOpenApiCustomizer(): OpenApiCustomizer {
       return OpenApiCustomizer { openApi ->
         openApi.info
-          .title("Statistics API")
+          .title("APIs (Not generated via openApi)")
           .description(
             """
-            This API provides API endpoints that return statistical data about accredited programmes. 
             Note that these endpoints are created manually rather than via open api.yaml.
             """.trimIndent(),
           )
           .version("1.0.0")
       }
     }
-    return GroupedOpenApi.builder()
-      .group("API-Statistics")
-      .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics")
-      .addOpenApiCustomizer(apiStatisticsOpenApiCustomizer())
-      .build()
-  }
 
-  @Bean
-  fun pniApi(): GroupedOpenApi {
-    fun apiPniOpenApiCustomizer(): OpenApiCustomizer {
-      return OpenApiCustomizer { openApi ->
-        openApi.info
-          .title("PNI-API")
-          .description(
-            """
-            This API provides endpoints that returns PNI (Programme Needs Identifier) information for a person 
-            Note that these endpoints are created manually rather than via open api.yaml.
-            """.trimIndent(),
-          )
-          .version("1.0.0")
-      }
-    }
     return GroupedOpenApi.builder()
-      .group("API-PNI")
-      .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni")
-      .addOpenApiCustomizer(apiPniOpenApiCustomizer())
+      .group("API (outside of openApi)")
+      .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni")
+      .addOpenApiCustomizer(apiStatisticsOpenApiCustomizer())
       .build()
   }
 }
