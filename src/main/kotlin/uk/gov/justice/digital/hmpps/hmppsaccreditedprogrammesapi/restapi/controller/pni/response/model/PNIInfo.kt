@@ -13,10 +13,10 @@ data class PNIInfo(
   @Schema(
     example = "" +
       "{ " +
-        "sexScores=SexScores(sexualPreOccupation=null, offenceRelatedSexualInterests=null, emotionalCongruence=0), " +
-        "cognitiveScores=CognitiveScores(proCriminalAttitudes=1, hostileOrientation=null), " +
-        "relationshipScores=RelationshipScores(curRelCloseFamily=null, prevExpCloseRel=2, easilyInfluenced=null, aggressiveControllingBehaviour=null), " +
-        "selfManagementScores=SelfManagementScores(impulsivity=null, temperControl=null, problemSolvingSkills=null, difficultiesCoping=null)" +
+      "sexScores=SexScores(sexualPreOccupation=null, offenceRelatedSexualInterests=null, emotionalCongruence=0), " +
+      "cognitiveScores=CognitiveScores(proCriminalAttitudes=1, hostileOrientation=null), " +
+      "relationshipScores=RelationshipScores(curRelCloseFamily=null, prevExpCloseRel=2, easilyInfluenced=null, aggressiveControllingBehaviour=null), " +
+      "selfManagementScores=SelfManagementScores(impulsivity=null, temperControl=null, problemSolvingSkills=null, difficultiesCoping=null)" +
       "}",
     description = "",
   )
