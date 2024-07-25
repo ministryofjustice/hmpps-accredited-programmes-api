@@ -35,6 +35,11 @@ class PactContractTest : IntegrationTestBase() {
   @State("A participation can be created")
   fun `ensure a participation can be created`() {}
 
+  @State("A course can be created")
+  fun `ensure a course can be created`() {
+    persistenceHelper.createAudience(UUID.fromString("e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2"), "All offences", "light-blue")
+  }
+
   @State("Course d3abc217-75ee-46e9-a010-368f30282367 exists")
   fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 exists`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
@@ -235,6 +240,13 @@ class PactContractTest : IntegrationTestBase() {
     persistenceHelper.createReferral(UUID.fromString("0c46ed09-170b-4c0f-aee8-a24eeaeeddaa"), UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), "B2345BB", "TEST_REFERRER_USER_1", "This referral will be updated", false, false, "REFERRAL_STARTED", null)
     persistenceHelper.createReferral(UUID.fromString("fae2ed00-057e-4179-9e55-f6a4f4874cf0"), UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), "C3456CC", "TEST_REFERRER_USER_2", "more information", true, true, "REFERRAL_SUBMITTED", LocalDateTime.parse("2023-11-12T19:11:00"))
     persistenceHelper.createReferral(UUID.fromString("153383a4-b250-46a8-9950-43eb358c2805"), UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), "D3456DD", "TEST_REFERRER_USER_2", "more information", true, true, "REFERRAL_SUBMITTED", LocalDateTime.parse("2023-11-13T19:11:00"))
+  }
+
+  @State("Audiences e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2, e9f9a8d8-2f7d-4a88-8f39-5d3b9071e75b, and 7e2db7fc-18c5-4bda-bb0d-ec39bfa20414 and no others exist")
+  fun `ensure audiences e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2, e9f9a8d8-2f7d-4a88-8f39-5d3b9071e75b, and 7e2db7fc-18c5-4bda-bb0d-ec39bfa20414 and no others exist`() {
+    persistenceHelper.createAudience(UUID.fromString("e4d1a44a-9c3b-4a7c-b79c-4d8a76488eb2"), "All offences", "light-blue")
+    persistenceHelper.createAudience(UUID.fromString("e9f9a8d8-2f7d-4a88-8f39-5d3b9071e75b"), "Extremism offence", "turquoise")
+    persistenceHelper.createAudience(UUID.fromString("7e2db7fc-18c5-4bda-bb0d-ec39bfa20414"), "Gang-related offence", "purple")
   }
 
   @TestTemplate
