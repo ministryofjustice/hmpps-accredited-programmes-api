@@ -12,6 +12,7 @@ data class ArnsScores(
   val violencePredictorScore: OvpScore? = null,
   val generalPredictorScore: Score? = null,
   val riskOfSeriousRecidivismScore: RsrScore? = null,
+  val sexualPredictorScore: SexualPredictorScore? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -32,4 +33,12 @@ class OvpScore(
 class RsrScore(
   val scoreLevel: String? = null,
   val percentageScore: BigDecimal? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class SexualPredictorScore(
+  val ospIndecentPercentageScore: BigDecimal? = null,
+  val ospContactPercentageScore: BigDecimal? = null,
+  val ospIndirectImagePercentageScore: BigDecimal? = null,
+  val ospDirectContactPercentageScore: BigDecimal? = null,
 )

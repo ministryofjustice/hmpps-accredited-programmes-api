@@ -425,7 +425,7 @@ class OasysService(
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? =
     fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
 
-  private fun getArnsSummary(crn: String): ArnsSummary? {
+  fun getArnsSummary(crn: String): ArnsSummary? {
     val arnsSummary = when (val response = arnsApiClient.getSummary(crn)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve ArnsSummary for crn $crn reason ${response.toException().cause}")
@@ -440,7 +440,7 @@ class OasysService(
     return arnsSummary.entity
   }
 
-  private fun getArnsPredictorSummary(crn: String): ArnsScores? {
+  fun getArnsPredictorSummary(crn: String): ArnsScores? {
     val arnsPredictors = when (val response = arnsApiClient.getPredictorsAll(crn)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve data ${response.toException().cause}")
