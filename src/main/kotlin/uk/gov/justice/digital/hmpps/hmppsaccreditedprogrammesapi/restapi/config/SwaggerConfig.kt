@@ -28,4 +28,26 @@ class SwaggerConfig {
       .addOpenApiCustomizer(apiStatisticsOpenApiCustomizer())
       .build()
   }
+
+  @Bean
+  fun pniApi(): GroupedOpenApi {
+    fun apiPniOpenApiCustomizer(): OpenApiCustomizer {
+      return OpenApiCustomizer { openApi ->
+        openApi.info
+          .title("PNI-API")
+          .description(
+            """
+            This API provides endpoints that returns PNI (Programme Needs Identifier) information for a person 
+            Note that these endpoints are created manually rather than via open api.yaml.
+            """.trimIndent(),
+          )
+          .version("1.0.0")
+      }
+    }
+    return GroupedOpenApi.builder()
+      .group("API-PNI")
+      .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni")
+      .addOpenApiCustomizer(apiPniOpenApiCustomizer())
+      .build()
+  }
 }

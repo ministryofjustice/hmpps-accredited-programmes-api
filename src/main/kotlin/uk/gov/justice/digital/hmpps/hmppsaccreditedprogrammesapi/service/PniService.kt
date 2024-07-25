@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
@@ -7,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.CognitiveScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.NeedsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.PNIInfo
@@ -14,11 +16,21 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.RiskScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.SelfManagementScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.SexScores
+import java.math.BigDecimal
+import java.math.RoundingMode
+import kotlin.math.round
 
+@Service
 class PniService(
   private val oasysService: OasysService,
+  private val auditService: AuditService,
 ) {
-  fun getPniInfo(prisonNumber: String): PNIInfo? {
+  fun getPniInfo(prisonNumber: String): PNIInfo {
+    auditService.audit(
+      prisonNumber = prisonNumber,
+      auditAction = AuditAction.PNI.name,
+    )
+
     val assessmentId = oasysService.getAssessmentId(prisonNumber)
       ?: throw NotFoundException("No assessment id found for $prisonNumber")
 
@@ -47,13 +59,13 @@ class PniService(
     oasysArnsPredictor: ArnsScores?,
     relationships: OasysRelationships?,
   ) = RiskScores(
-    ogrs3 = oasysArnsPredictor?.groupReconvictionScore?.oneYear,
-    ovp = oasysArnsPredictor?.violencePredictorScore?.oneYear,
-    ospDc = oasysArnsPredictor?.sexualPredictorScore?.ospDirectContactPercentageScore
-      ?: oasysArnsPredictor?.sexualPredictorScore?.ospContactPercentageScore,
-    ospIic = oasysArnsPredictor?.sexualPredictorScore?.ospIndirectImagePercentageScore
-      ?: oasysArnsPredictor?.sexualPredictorScore?.ospIndecentPercentageScore,
-    rsr = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore,
+    ogrs3 = oasysArnsPredictor?.groupReconvictionScore?.oneYear?.round(),
+    ovp = oasysArnsPredictor?.violencePredictorScore?.oneYear?.round(),
+    ospIic = oasysArnsPredictor?.sexualPredictorScore?.ospIndirectImagePercentageScore?.round()
+      ?: oasysArnsPredictor?.sexualPredictorScore?.ospIndecentPercentageScore?.round(),
+    ospDc = oasysArnsPredictor?.sexualPredictorScore?.ospDirectContactPercentageScore?.round()
+      ?: oasysArnsPredictor?.sexualPredictorScore?.ospContactPercentageScore?.round(),
+    rsr = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
     sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
   )
 }
@@ -91,3 +103,7 @@ private fun buildNeedsScores(
 )
 
 private fun String?.getScore() = this?.trim()?.split("-")?.firstOrNull()?.toIntOrNull()
+
+private fun BigDecimal.round(): BigDecimal {
+  return this.setScale(2, RoundingMode.HALF_UP)
+}

@@ -21,7 +21,7 @@ data class NeedsScores(
   @Schema(example = "null", description = "")
   @get:JsonProperty("Relationships") val relationshipScores: RelationshipScores? = null,
 
-  @Schema(example = "null", description = "")
+  @Schema(example = "SelfManagementScores(impulsivity=null, temperControl=null, problemSolvingSkills=null, difficultiesCoping=null)", description = "")
   @get:JsonProperty("SelfManagement") val selfManagementScores: SelfManagementScores? = null,
 )
 
@@ -46,7 +46,7 @@ data class CognitiveScores(
   @get:JsonProperty("hostileOrientation") val hostileOrientation: kotlin.Int? = null,
 )
 
-class SelfManagementScores(
+data class SelfManagementScores(
   @Schema(example = "2", description = "")
   @get:JsonProperty("impulsivity") val impulsivity: kotlin.Int? = null,
 
