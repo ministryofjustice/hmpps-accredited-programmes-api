@@ -152,4 +152,53 @@ FROM
     statusCodes: List<String>,
     locationCodes: List<String>?,
   ): String
+
+  @Query(
+    """
+       SELECT json_build_object(
+                'performance', json_agg(
+                json_build_object(
+                   'status', status,
+                   'averageDuration', 
+                   to_char((avg_duration_at_this_status / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"'),
+                   'averageDurationUnderOneHour', 
+                   to_char((avg_duration_excluding_long / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"'),
+                   'minDuration',
+                   to_char((min_duration / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"'),
+                   'maxDuration',
+                   to_char((max_duration / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"')
+                )
+                )
+       ) AS result
+FROM (
+         SELECT
+             rsh.status AS status,
+             AVG(rsh.duration_at_this_status) AS avg_duration_at_this_status,
+             AVG(CASE
+                     WHEN rsh.duration_at_this_status <= 3600000
+                         THEN rsh.duration_at_this_status
+                 END) AS avg_duration_excluding_long,
+             MIN(rsh.duration_at_this_status) AS min_duration,
+             MAX(rsh.duration_at_this_status) AS max_duration
+         FROM referral r
+                  JOIN offering o ON r.offering_id = o.offering_id
+                  JOIN course c ON o.course_id = c.course_id
+                  JOIN referral_status_history rsh ON rsh.referral_id = r.referral_id
+         WHERE r.deleted = FALSE
+           AND rsh.status IN :statusCodes
+           AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
+           AND rsh.status_end_date >= :startDate
+           AND rsh.status_end_date < :endDate
+           AND rsh.duration_at_this_status IS NOT NULL
+         GROUP BY rsh.status
+     ) AS subquery;
+          """,
+    nativeQuery = true,
+  )
+  fun averageTime(
+    startDate: LocalDate,
+    endDate: LocalDate,
+    statusCodes: List<String>,
+    locationCodes: List<String>?,
+  ): String
 }
