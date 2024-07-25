@@ -456,7 +456,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
         ),
       )
       .exchange()
-      .expectStatus().isOk
+      .expectStatus().isCreated()
       .expectBody<Course>()
       .returnResult().responseBody!!
 

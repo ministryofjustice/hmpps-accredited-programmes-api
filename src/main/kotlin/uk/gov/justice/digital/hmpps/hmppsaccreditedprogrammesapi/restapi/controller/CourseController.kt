@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.CoursesApiDelegate
@@ -189,7 +190,7 @@ constructor(
 
     val savedCourse = courseService.save(course)
 
-    return ResponseEntity.ok(savedCourse.toApi())
+    return ResponseEntity.status(HttpStatus.CREATED).body(savedCourse.toApi())
   }
 
   override fun deleteCourse(id: UUID): ResponseEntity<Unit> {
