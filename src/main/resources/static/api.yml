@@ -483,6 +483,32 @@ paths:
         '404':
           description: The resource you were trying to reach is not found
 
+    delete:
+      tags:
+        - Courses
+      summary: delete a course
+      description: Deletes a course from the database. Note you can only delete a course if it's not being used.
+      operationId: deleteCourse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: A course identifier
+      responses:
+        '200':
+          description: Successful delete
+        '400':
+          description: Bad input
+        '401':
+          description: You are not authorized to view the resource
+        '403':
+          description: Accessing the resource you were trying to reach is forbidden
+        '404':
+          description: The course did not exist
+
   /courses/{id}/offerings:
     get:
       tags:

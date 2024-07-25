@@ -27,6 +27,7 @@ import java.util.UUID
 
 val COURSE_ID: UUID = UUID.fromString("790a2dfe-8df1-4504-bb9c-83e6e53a6537")
 val NEW_COURSE_ID: UUID = UUID.fromString("790a2dfe-ddd1-4504-bb9c-83e6e53a6537")
+val UNUSED_COURSE_ID: UUID = UUID.fromString("891a2dfe-ddd1-4801-ab9b-94e6f53a6537")
 
 private const val OFFERING_ID = "7fffcc6a-11f8-4713-be35-cf5ff1aee517"
 private const val UNUSED_OFFERING_ID = "7fffbb9a-11f8-9743-be35-cf5881aee517"
@@ -58,6 +59,15 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "A new Course",
       "Sample description",
       "SC++",
+      "General offence",
+    )
+
+    persistenceHelper.createCourse(
+      UNUSED_COURSE_ID,
+      "UNUSEDC",
+      "An unused Course",
+      "Unused course for testing",
+      "UN1",
       "General offence",
     )
 
@@ -480,6 +490,31 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .expectBody()
       .jsonPath("$.userMessage")
       .isEqualTo("Business rule violation: Offering is in use and cannot be deleted. This offering should be withdrawn")
+  }
+
+  @Test
+  fun `Delete a course that is in use returns 400`() {
+    webTestClient
+      .delete()
+      .uri("/courses/$COURSE_ID")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().is4xxClientError
+      .expectBody()
+      .jsonPath("$.userMessage")
+      .isEqualTo("Business rule violation: Cannot delete course as offerings exist that use this course.")
+  }
+
+  @Test
+  fun `Delete a course that is not in use returns a 200`() {
+    webTestClient
+      .delete()
+      .uri("/courses/$UNUSED_COURSE_ID")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
   }
 
   @Test

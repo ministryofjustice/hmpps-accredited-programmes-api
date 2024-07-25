@@ -38,6 +38,7 @@ constructor(
       courseRepository.findAll().filterNot { it.withdrawn }
     }
   }
+
   fun getCourseNames(includeWithdrawn: Boolean? = true): List<String> {
     return if (includeWithdrawn == null) {
       courseRepository.getCourseNames(true)
@@ -52,6 +53,15 @@ constructor(
   fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)
   fun getCourseByIdentifier(identifier: String): CourseEntity? = courseRepository.findByIdentifier(identifier)
   fun save(courseEntity: CourseEntity): CourseEntity = courseRepository.save(courseEntity)
+
+  fun delete(courseId: UUID) {
+    val courseEntity = courseRepository.findById(courseId) ?: throw BusinessException("Course does not exist")
+    if (offeringRepository.findAllByCourseId(courseId).isNotEmpty()) {
+      throw BusinessException("Cannot delete course as offerings exist that use this course.")
+    }
+    courseRepository.delete(courseEntity.get())
+  }
+
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
   fun getAllOfferings(): List<OfferingEntity> = offeringRepository.findAll().filterNot { it.withdrawn }
   fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> =
