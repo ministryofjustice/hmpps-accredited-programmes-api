@@ -106,7 +106,6 @@ workflows:
             branches:
               only:
                 - main
-                - APG-216
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -116,87 +115,86 @@ workflows:
             branches:
               only:
                 - main
-                - APG-216
           requires:
             - validate
             - build_docker
             - helm_lint
           helm_timeout: 5m
-#      - end_to_end_test:
-#          context: hmpps-common-vars
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          requires:
-#            - deploy_dev
-#      - tag_pact_version:
-#          name: "tag_pact_version_dev"
-#          tag: "deployed:dev"
-#          requires: [ deploy_dev ]
-#          context: [ hmpps-common-vars ]
-#
-#      - request-preprod-approval:
-#          type: approval
-#          requires:
-#            - deploy_dev
-#      - hmpps/deploy_env:
-#          name: deploy_preprod
-#          env: "preprod"
-#          context:
-#            - hmpps-common-vars
-#            - hmpps-accredited-programmes-api-preprod
-#          requires:
-#            - request-preprod-approval
-#      - tag_pact_version:
-#          name: "tag_pact_version_preprod"
-#          tag: "deployed:preprod"
-#          requires: [ deploy_preprod ]
-#          context: [ hmpps-common-vars ]
-#
-#      - request-prod-approval:
-#          type: approval
-#          requires:
-#            - deploy_preprod
-#      - hmpps/deploy_env:
-#          name: deploy_prod
-#          env: "prod"
-#          slack_notification: true
-#          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
-#          context:
-#            - hmpps-common-vars
-#            - hmpps-accredited-programmes-api-prod
-#          requires:
-#            - request-prod-approval
-#      - tag_pact_version:
-#          name: "tag_pact_version_prod"
-#          tag: "deployed:prod"
-#          requires: [ deploy_prod ]
-#          context: [ hmpps-common-vars ]
-#
-#  security:
-#    triggers:
-#      - schedule:
-#          cron: "10 5 * * 1-5"
-#          filters:
-#            branches:
-#              only:
-#                - main
-#    jobs:
-#      - hmpps/gradle_owasp_dependency_check:
-#          jdk_tag: "21.0"
-#          slack_channel: << pipeline.parameters.alerts-slack-channel >>
-#          context:
-#            - hmpps-common-vars
-#      - hmpps/trivy_latest_scan:
-#          slack_channel: << pipeline.parameters.alerts-slack-channel >>
-#          context:
-#            - hmpps-common-vars
-#      - hmpps/veracode_pipeline_scan:
-#          slack_channel: << pipeline.parameters.alerts-slack-channel >>
-#          context:
-#            - veracode-credentials
-#            - hmpps-common-vars
+      - end_to_end_test:
+          context: hmpps-common-vars
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - deploy_dev
+      - tag_pact_version:
+          name: "tag_pact_version_dev"
+          tag: "deployed:dev"
+          requires: [ deploy_dev ]
+          context: [ hmpps-common-vars ]
+
+      - request-preprod-approval:
+          type: approval
+          requires:
+            - deploy_dev
+      - hmpps/deploy_env:
+          name: deploy_preprod
+          env: "preprod"
+          context:
+            - hmpps-common-vars
+            - hmpps-accredited-programmes-api-preprod
+          requires:
+            - request-preprod-approval
+      - tag_pact_version:
+          name: "tag_pact_version_preprod"
+          tag: "deployed:preprod"
+          requires: [ deploy_preprod ]
+          context: [ hmpps-common-vars ]
+
+      - request-prod-approval:
+          type: approval
+          requires:
+            - deploy_preprod
+      - hmpps/deploy_env:
+          name: deploy_prod
+          env: "prod"
+          slack_notification: true
+          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
+          context:
+            - hmpps-common-vars
+            - hmpps-accredited-programmes-api-prod
+          requires:
+            - request-prod-approval
+      - tag_pact_version:
+          name: "tag_pact_version_prod"
+          tag: "deployed:prod"
+          requires: [ deploy_prod ]
+          context: [ hmpps-common-vars ]
+
+  security:
+    triggers:
+      - schedule:
+          cron: "10 5 * * 1-5"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - hmpps/gradle_owasp_dependency_check:
+          jdk_tag: "21.0"
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
+          context:
+            - hmpps-common-vars
+      - hmpps/trivy_latest_scan:
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
+          context:
+            - hmpps-common-vars
+      - hmpps/veracode_pipeline_scan:
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
+          context:
+            - veracode-credentials
+            - hmpps-common-vars
   security-weekly:
     triggers:
       - schedule:
