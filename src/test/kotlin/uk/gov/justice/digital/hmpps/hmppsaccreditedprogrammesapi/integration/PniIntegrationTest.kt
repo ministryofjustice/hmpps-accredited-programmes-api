@@ -53,8 +53,8 @@ class PniIntegrationTest : IntegrationTestBase() {
         ),
       ),
       riskScores = RiskScores(
-        ogrs3 = "8.00".toBigDecimal(),
-        ovp = "8.00".toBigDecimal(),
+        ogrs3 = "15.00".toBigDecimal(),
+        ovp = "15.00".toBigDecimal(),
         ospDc = 1.07.toBigDecimal(),
         ospIic = 0.11.toBigDecimal(),
         rsr = 1.46.toBigDecimal(),

@@ -59,8 +59,8 @@ class PniService(
     oasysArnsPredictor: ArnsScores?,
     relationships: OasysRelationships?,
   ) = RiskScores(
-    ogrs3 = oasysArnsPredictor?.groupReconvictionScore?.oneYear?.round(),
-    ovp = oasysArnsPredictor?.violencePredictorScore?.oneYear?.round(),
+    ogrs3 = oasysArnsPredictor?.groupReconvictionScore?.twoYears?.round(),
+    ovp = oasysArnsPredictor?.violencePredictorScore?.twoYears?.round(),
     ospIic = oasysArnsPredictor?.sexualPredictorScore?.ospIndirectImagePercentageScore?.round()
       ?: oasysArnsPredictor?.sexualPredictorScore?.ospIndecentPercentageScore?.round(),
     ospDc = oasysArnsPredictor?.sexualPredictorScore?.ospDirectContactPercentageScore?.round()
