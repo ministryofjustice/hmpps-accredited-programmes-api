@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
 import java.time.LocalDate
 
@@ -93,7 +94,7 @@ class StatisticsController(
    * supplied status.
    *
    */
-  @GetMapping("/current/status_counts")
+  @GetMapping("/current/status-counts")
   fun getCurrentStatusCounts(
     @RequestParam statuses: List<String> = listOf(),
     @RequestParam locationCodes: List<String>? = listOf(),
@@ -101,6 +102,20 @@ class StatisticsController(
     val content = statisticsRepository.currentCountsByStatus(statuses, locationCodes)
 
     return objectMapper.readValue(content, CurrentCount::class.java)
+  }
+
+  @GetMapping("/performance/status-duration")
+  fun getAverageTimeSpentAtStatus(
+    @RequestParam startDate: LocalDate,
+    @RequestParam endDate: LocalDate? = LocalDate.now().plusDays(1),
+    @RequestParam statuses: List<String> = listOf(),
+    @RequestParam locationCodes: List<String>? = listOf(),
+  ): Performance {
+    if (statuses.isEmpty()) {
+      throw BusinessException("This end point requires at least one status")
+    }
+    val content = statisticsRepository.averageTime(startDate, endDate!!, statuses, locationCodes)
+    return objectMapper.readValue(content, Performance::class.java)
   }
 }
 
@@ -149,5 +164,15 @@ data class CourseCount(
 )
 
 data class CurrentCount(val totalCount: Int?, val statusContent: List<StatusContent>?)
+
+data class Performance(val performance: List<PerformanceStatistic>?)
+
+data class PerformanceStatistic(
+  val status: String,
+  val averageDuration: String,
+  val averageDurationUnderOneHour: String,
+  val minDuration: String,
+  val maxDuration: String,
+)
 
 data class StatusContent(val status: String, val countAtStatus: Int, val courseCounts: List<CourseCount>?)
