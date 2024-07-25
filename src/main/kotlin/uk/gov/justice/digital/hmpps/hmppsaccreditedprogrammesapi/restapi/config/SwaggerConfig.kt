@@ -12,19 +12,19 @@ class SwaggerConfig {
     fun apiStatisticsOpenApiCustomizer(): OpenApiCustomizer {
       return OpenApiCustomizer { openApi ->
         openApi.info
-          .title("Statistics API")
+          .title("APIs (Not generated via openApi)")
           .description(
             """
-            This API provides API endpoints that return statistical data about accredited programmes. 
             Note that these endpoints are created manually rather than via open api.yaml.
             """.trimIndent(),
           )
           .version("1.0.0")
       }
     }
+
     return GroupedOpenApi.builder()
-      .group("API-Statistics")
-      .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics")
+      .group("API (outside of openApi)")
+      .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni")
       .addOpenApiCustomizer(apiStatisticsOpenApiCustomizer())
       .build()
   }
