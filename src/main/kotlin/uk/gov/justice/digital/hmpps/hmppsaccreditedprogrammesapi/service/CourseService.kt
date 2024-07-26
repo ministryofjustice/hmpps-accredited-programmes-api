@@ -289,7 +289,7 @@ constructor(
     if (referralRepository.countAllByOfferingId(offeringId) > 0) {
       throw BusinessException("Offering is in use and cannot be deleted. This offering should be withdrawn")
     }
-    offeringRepository.delete(existingOffering)
+    offeringRepository.delete(existingOffering.id!!)
   }
 }
 

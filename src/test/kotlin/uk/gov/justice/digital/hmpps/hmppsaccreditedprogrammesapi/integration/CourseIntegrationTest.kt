@@ -22,7 +22,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import java.time.LocalDateTime
+import java.util.Optional
 import java.util.UUID
 
 val COURSE_ID: UUID = UUID.fromString("790a2dfe-8df1-4504-bb9c-83e6e53a6537")
@@ -39,6 +41,9 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var courseRepository: CourseRepository
+
+  @Autowired
+  lateinit var offeringRepository: OfferingRepository
 
   @BeforeEach
   fun setUp() {
@@ -515,6 +520,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
+    courseRepository.findById(UNUSED_COURSE_ID) shouldBe Optional.empty()
   }
 
   @Test
@@ -526,6 +532,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
+
+    offeringRepository.findById(UUID.fromString(UNUSED_OFFERING_ID)) shouldBe Optional.empty()
   }
 
   @Test
