@@ -170,7 +170,6 @@ data class Performance(val performance: List<PerformanceStatistic>?)
 data class PerformanceStatistic(
   val status: String,
   val averageDuration: String?,
-  val averageDurationUnderOneHour: String?,
   val minDuration: String?,
   val maxDuration: String?,
 )
