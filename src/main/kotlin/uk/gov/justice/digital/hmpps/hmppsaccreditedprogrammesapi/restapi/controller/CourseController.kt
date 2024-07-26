@@ -115,13 +115,22 @@ constructor(
     return ResponseEntity.ok(mappedOfferings)
   }
 
-  override fun addUpdateCourseOfferings(
+  override fun addCourseOffering(
     id: UUID,
-    courseOffering: List<CourseOffering>,
-  ): ResponseEntity<List<CourseOffering>> {
+    courseOffering: CourseOffering,
+  ): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
-    return ResponseEntity.ok(courseService.updateOfferings(course, courseOffering))
+    return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createOrUpdateOffering(course, courseOffering))
+  }
+
+  override fun updateCourseOffering(
+    id: UUID,
+    courseOffering: CourseOffering,
+  ): ResponseEntity<CourseOffering> {
+    val course = courseService.getCourseById(id)
+      ?: throw NotFoundException("No Course found at /courses/$id")
+    return ResponseEntity.ok(courseService.createOrUpdateOffering(course, courseOffering))
   }
 
   override fun deleteCourseOffering(id: UUID, offeringId: UUID): ResponseEntity<Unit> {
