@@ -155,25 +155,36 @@ FROM
 
   @Query(
     """
-SELECT json_build_object(
-               'performance', json_agg(
-                json_build_object(
+    SELECT json_build_object(
+                             'performance', json_agg(
+                        json_build_object(
                         'status', status,
                         'averageDuration',
-                        to_char(justify_interval((avg_duration_at_this_status / 1000) * interval '1 second'), 'DD "days" HH24 "hours" MI "minutes" SS "seconds"'),
+                        avg_days || ' days ' || avg_hours || ' hours ' || avg_minutes || ' minutes ' || avg_seconds || ' seconds',
                         'minDuration',
-                        to_char(justify_interval((min_duration / 1000) * interval '1 second'), 'DD "days" HH24 "hours" MI "minutes" SS "seconds"'),
+                        min_days || ' days ' || min_hours || ' hours ' || min_minutes || ' minutes ' || min_seconds || ' seconds',
                         'maxDuration',
-                        to_char(justify_interval((max_duration / 1000) * interval '1 second'), 'DD "days" HH24 "hours" MI "minutes" SS "seconds"')
+                        max_days || ' days ' || max_hours || ' hours ' || max_minutes || ' minutes ' || max_seconds || ' seconds'
                 )
-                              )
+            )
        ) AS result
 FROM (
          SELECT
-             rsh.status AS status,
-             AVG(rsh.duration_at_this_status) AS avg_duration_at_this_status,
-             MIN(rsh.duration_at_this_status) AS min_duration,
-             MAX(rsh.duration_at_this_status) AS max_duration
+            rsh.status AS status,
+             FLOOR(AVG(rsh.duration_at_this_status) / 86400000) AS avg_days,
+             FLOOR((AVG(rsh.duration_at_this_status) % 86400000) / 3600000) AS avg_hours,
+             FLOOR((AVG(rsh.duration_at_this_status) % 3600000) / 60000) AS avg_minutes,
+             FLOOR((AVG(rsh.duration_at_this_status) % 60000) / 1000) AS avg_seconds,
+
+             FLOOR(MIN(rsh.duration_at_this_status) / 86400000) AS min_days,
+             FLOOR((MIN(rsh.duration_at_this_status) % 86400000) / 3600000) AS min_hours,
+             FLOOR((MIN(rsh.duration_at_this_status) % 3600000) / 60000) AS min_minutes,
+             FLOOR((MIN(rsh.duration_at_this_status) % 60000) / 1000) AS min_seconds,
+
+             FLOOR(MAX(rsh.duration_at_this_status) / 86400000) AS max_days,
+             FLOOR((MAX(rsh.duration_at_this_status) % 86400000) / 3600000) AS max_hours,
+             FLOOR((MAX(rsh.duration_at_this_status) % 3600000) / 60000) AS max_minutes,
+             FLOOR((MAX(rsh.duration_at_this_status) % 60000) / 1000) AS max_seconds
          FROM referral r
                   JOIN offering o ON r.offering_id = o.offering_id
                   JOIN course c ON o.course_id = c.course_id
