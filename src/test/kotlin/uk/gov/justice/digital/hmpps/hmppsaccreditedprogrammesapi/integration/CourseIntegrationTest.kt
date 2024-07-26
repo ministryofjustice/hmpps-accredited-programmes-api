@@ -531,27 +531,25 @@ class CourseIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Create offerings returns 200`() {
     webTestClient
-      .put()
+      .post()
       .uri("/courses/$NEW_COURSE_ID/offerings")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(
-        listOf(
-          CourseOffering(
-            id = null,
-            organisationId = "AWI",
-            contactEmail = "awi1@whatton.com",
-            secondaryContactEmail = "awi2@whatton.com",
-            referable = true,
-            withdrawn = false,
-            organisationEnabled = true,
-          ),
+        CourseOffering(
+          id = null,
+          organisationId = "AWI",
+          contactEmail = "awi1@whatton.com",
+          secondaryContactEmail = "awi2@whatton.com",
+          referable = true,
+          withdrawn = false,
+          organisationEnabled = true,
         ),
       )
       .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseOffering>>()
+      .expectStatus().isCreated
+      .expectBody<CourseOffering>()
       .returnResult().responseBody!!
   }
 }

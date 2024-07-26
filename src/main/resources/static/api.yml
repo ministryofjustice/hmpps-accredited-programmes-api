@@ -535,8 +535,8 @@ paths:
     put:
       tags:
         - Course Offerings
-      summary: Add or update course offerings
-      operationId: addUpdateCourseOfferings
+      summary: update a course offering
+      operationId: updateCourseOffering
       parameters:
         - name: id
           in: path
@@ -550,19 +550,40 @@ paths:
         content:
           'application/json':
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/CourseOffering'
-
+              $ref: '#/components/schemas/CourseOffering'
       responses:
         200:
           description: successful operation
           content:
             'application/json':
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CourseOffering'
+                $ref: '#/components/schemas/CourseOffering'
+    post:
+      tags:
+        - Course Offerings
+      summary: Add a course offering
+      operationId: addCourseOffering
+      parameters:
+        - name: id
+          in: path
+          description: A course identifier
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/CourseOffering'
+      responses:
+        200:
+          description: successful operation
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/CourseOffering'
 
   /courses/{id}/offerings/{offeringId}:
     delete:
