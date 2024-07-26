@@ -155,29 +155,23 @@ FROM
 
   @Query(
     """
-       SELECT json_build_object(
-                'performance', json_agg(
+SELECT json_build_object(
+               'performance', json_agg(
                 json_build_object(
-                   'status', status,
-                   'averageDuration', 
-                   to_char((avg_duration_at_this_status / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"'),
-                   'averageDurationUnderOneHour', 
-                   to_char((avg_duration_excluding_long / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"'),
-                   'minDuration',
-                   to_char((min_duration / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"'),
-                   'maxDuration',
-                   to_char((max_duration / 1000) * interval '1 second', 'HH24 "hours" MI "minutes" SS "seconds"')
+                        'status', status,
+                        'averageDuration',
+                        to_char(justify_interval((avg_duration_at_this_status / 1000) * interval '1 second'), 'DD "days" HH24 "hours" MI "minutes" SS "seconds"'),
+                        'minDuration',
+                        to_char(justify_interval((min_duration / 1000) * interval '1 second'), 'DD "days" HH24 "hours" MI "minutes" SS "seconds"'),
+                        'maxDuration',
+                        to_char(justify_interval((max_duration / 1000) * interval '1 second'), 'DD "days" HH24 "hours" MI "minutes" SS "seconds"')
                 )
-                )
+                              )
        ) AS result
 FROM (
          SELECT
              rsh.status AS status,
              AVG(rsh.duration_at_this_status) AS avg_duration_at_this_status,
-             AVG(CASE
-                     WHEN rsh.duration_at_this_status <= 3600000
-                         THEN rsh.duration_at_this_status
-                 END) AS avg_duration_excluding_long,
              MIN(rsh.duration_at_this_status) AS min_duration,
              MAX(rsh.duration_at_this_status) AS max_duration
          FROM referral r
