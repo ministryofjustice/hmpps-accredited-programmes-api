@@ -12,6 +12,7 @@ interface OfferingRepository : JpaRepository<OfferingEntity, UUID> {
   fun findAllByCourseId(courseId: UUID): List<OfferingEntity>
   fun findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(courseId: UUID, organisationId: String): OfferingEntity?
   fun findByCourseIdAndIdAndWithdrawnIsFalse(courseId: UUID, offeringId: UUID): OfferingEntity?
+
   @Modifying
   @Query("delete from OfferingEntity o where o.id = :offeringId")
   fun delete(offeringId: UUID)
