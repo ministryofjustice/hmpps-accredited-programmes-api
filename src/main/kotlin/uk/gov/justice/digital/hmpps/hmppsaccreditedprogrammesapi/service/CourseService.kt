@@ -257,32 +257,28 @@ constructor(
     return courseSaved.prerequisites.map { it.toApi() }
   }
 
-  fun updateOfferings(course: CourseEntity, courseOffering: List<CourseOffering>): List<CourseOffering> {
+  fun createOrUpdateOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
     val validPrisons = prisonRegisterApiService.getPrisons()
 
-    val offerings = listOf<OfferingEntity>()
-    courseOffering.forEach {
-      validPrisons.firstOrNull { prison -> prison.prisonId == it.organisationId }
-        ?: throw NotFoundException("No prison found with code ${it.organisationId}")
-      // validate that there isn't already an offering for this course/organisation
-      val existingOffering =
-        offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, it.organisationId)
-      existingOffering?.let {
-        throw BusinessException("Offering already exists for course ${course.name} and organisation ${it.organisationId}")
-      }
-      val offeringToAdd = OfferingEntity(
-        id = it.id,
-        organisationId = it.organisationId,
-        contactEmail = it.contactEmail,
-        secondaryContactEmail = it.secondaryContactEmail,
-        withdrawn = it.withdrawn ?: false,
-        referable = it.referable,
-      )
-
-      offeringToAdd.course = course
-      offerings + offeringToAdd
+    validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
+      ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
+    // validate that there isn't already an offering for this course/organisation
+    val existingOffering =
+      offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
+    existingOffering?.let {
+      throw BusinessException("Offering already exists for course ${course.name} and organisation ${it.organisationId}")
     }
-    return offeringRepository.saveAll(offerings).map { it.toApi() }
+    val offering = OfferingEntity(
+      id = courseOffering.id,
+      organisationId = courseOffering.organisationId,
+      contactEmail = courseOffering.contactEmail,
+      secondaryContactEmail = courseOffering.secondaryContactEmail,
+      withdrawn = courseOffering.withdrawn ?: false,
+      referable = courseOffering.referable,
+    )
+    offering.course = course
+
+    return offeringRepository.save(offering).toApi()
   }
 
   fun deleteCourseOffering(id: UUID, offeringId: UUID) {
@@ -293,7 +289,7 @@ constructor(
     if (referralRepository.countAllByOfferingId(offeringId) > 0) {
       throw BusinessException("Offering is in use and cannot be deleted. This offering should be withdrawn")
     }
-    offeringRepository.delete(existingOffering)
+    offeringRepository.delete(existingOffering.id!!)
   }
 }
 
