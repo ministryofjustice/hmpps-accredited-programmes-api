@@ -13,7 +13,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import java.time.LocalDate
 
 @RestController
-@Tag(name = "Statistics")
+@Tag(
+  name = "Statistics",
+  description = """A series of endpoints for generating accredited programme statistics.
+    | For more information see here: 
+    | https://dsdmoj.atlassian.net/wiki/spaces/IC/pages/5036638227/Performance+endpoints""",
+)
 @RequestMapping("statistics")
 class StatisticsController(
   private val statisticsRepository: StatisticsRepository,
