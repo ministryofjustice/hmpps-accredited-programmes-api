@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration
 class SwaggerConfig {
   @Bean
   fun api(): GroupedOpenApi {
-    fun apiStatisticsOpenApiCustomizer(): OpenApiCustomizer {
+    fun openApiCustomizer(): OpenApiCustomizer {
       return OpenApiCustomizer { openApi ->
         openApi.info
           .title("APIs (Not generated via openApi)")
@@ -25,7 +25,7 @@ class SwaggerConfig {
     return GroupedOpenApi.builder()
       .group("API (outside of openApi)")
       .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni")
-      .addOpenApiCustomizer(apiStatisticsOpenApiCustomizer())
+      .addOpenApiCustomizer(openApiCustomizer())
       .build()
   }
 }

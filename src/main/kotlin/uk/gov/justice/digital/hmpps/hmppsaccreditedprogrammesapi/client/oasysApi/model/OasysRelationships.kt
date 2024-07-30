@@ -14,7 +14,7 @@ data class OasysRelationships(
   @JsonAlias("SARA")
   val sara: Sara?,
   val emotionalCongruence: String?,
-  val relCurrRelationshipStatus: String?,
+  val relCloseFamily: String?,
   val prevCloseRelationships: String?,
 )
 
