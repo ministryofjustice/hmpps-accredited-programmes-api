@@ -15,9 +15,11 @@ import java.time.LocalDate
 @RestController
 @Tag(
   name = "Statistics",
-  description = """A series of endpoints for generating accredited programme statistics.
-    | For more information see here: 
-    | https://dsdmoj.atlassian.net/wiki/spaces/IC/pages/5036638227/Performance+endpoints""",
+  description = """
+    A series of endpoints for generating accredited programme statistics.
+    For more information see here:
+    [Performance endpoints](https://dsdmoj.atlassian.net/wiki/spaces/IC/pages/5036638227/Performance+endpoints)
+  """
 )
 @RequestMapping("statistics")
 class StatisticsController(
