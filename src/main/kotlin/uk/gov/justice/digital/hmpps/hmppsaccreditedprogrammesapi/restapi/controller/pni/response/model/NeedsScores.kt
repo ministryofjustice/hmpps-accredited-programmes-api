@@ -12,13 +12,13 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 data class NeedsScores(
 
-  @get:JsonProperty("Sex") val sexScores: SexScores? = null,
+  @get:JsonProperty("Sex") val sexScores: SexScores,
 
-  @get:JsonProperty("Cognitive") val cognitiveScores: CognitiveScores? = null,
+  @get:JsonProperty("Cognitive") val cognitiveScores: CognitiveScores,
 
-  @get:JsonProperty("Relationships") val relationshipScores: RelationshipScores? = null,
+  @get:JsonProperty("Relationships") val relationshipScores: RelationshipScores,
 
-  @get:JsonProperty("SelfManagement") val selfManagementScores: SelfManagementScores? = null,
+  @get:JsonProperty("SelfManagement") val selfManagementScores: SelfManagementScores,
 )
 
 data class SexScores(
@@ -31,7 +31,26 @@ data class SexScores(
 
   @Schema(example = "1", description = "")
   @get:JsonProperty("emotionalCongruence") val emotionalCongruence: kotlin.Int? = null,
-)
+) {
+  fun hasNullValues() = listOf(
+    sexualPreOccupation,
+    offenceRelatedSexualInterests,
+    emotionalCongruence,
+  ).any { it == null }
+
+  fun totalScore(): Int {
+    return (sexualPreOccupation ?: 0) +
+      (offenceRelatedSexualInterests ?: 0) +
+      (emotionalCongruence ?: 0)
+  }
+
+  fun overallSexDomainScore(totalScore: Int) = when {
+    totalScore in 0..1 -> 0
+    totalScore in 2..3 -> 1
+    totalScore in 4..6 || (offenceRelatedSexualInterests == 2) -> 2
+    else -> 0
+  }
+}
 
 data class CognitiveScores(
 

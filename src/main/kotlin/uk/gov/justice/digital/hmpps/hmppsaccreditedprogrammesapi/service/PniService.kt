@@ -23,6 +23,7 @@ import java.math.RoundingMode
 class PniService(
   private val oasysService: OasysService,
   private val auditService: AuditService,
+  private val pniNeedsEngine: PniNeedsEngine,
 ) {
   fun getPniInfo(prisonNumber: String): PNIInfo {
     auditService.audit(
@@ -48,10 +49,14 @@ class PniService(
     val oasysOffendingInfo = oasysService.getOffendingInfo(assessmentId)
     val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { oasysService.getArnsPredictorSummary(it) }
 
-    return PNIInfo(
+    val pniInfo = PNIInfo(
       needsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
       riskScores = buildRiskScores(oasysArnsPredictor, relationships),
     )
+
+    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(pniInfo, prisonNumber)
+
+    return pniInfo
   }
 
   private fun buildRiskScores(

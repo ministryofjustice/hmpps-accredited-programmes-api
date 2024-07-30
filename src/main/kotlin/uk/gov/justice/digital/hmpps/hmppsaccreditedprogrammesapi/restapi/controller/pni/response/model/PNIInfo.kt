@@ -20,8 +20,8 @@ data class PNIInfo(
       "}",
     description = "",
   )
-  @get:JsonProperty("Needs") val needsScores: NeedsScores? = null,
+  @get:JsonProperty("Needs") val needsScores: NeedsScores,
 
   @Schema(example = "{ogrs3=8, ovp=8, ospDc=1.07, ospIic=0.11, rsr=1.46, sara=High}", description = "")
-  @get:JsonProperty("RiskScores") val riskScores: RiskScores? = null,
+  @get:JsonProperty("RiskScores") val riskScores: RiskScores,
 )
