@@ -40,7 +40,7 @@ class PniIntegrationTest : IntegrationTestBase() {
           hostileOrientation = null,
         ),
         relationshipScores = RelationshipScores(
-          curRelCloseFamily = null,
+          curRelCloseFamily = 0,
           prevExpCloseRel = 2,
           easilyInfluenced = null,
           aggressiveControllingBehaviour = null,

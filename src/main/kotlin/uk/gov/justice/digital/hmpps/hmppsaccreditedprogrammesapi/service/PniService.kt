@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.SexScores
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.math.round
 
 @Service
 class PniService(
@@ -88,7 +87,7 @@ private fun buildNeedsScores(
     hostileOrientation = attitude?.hostileOrientation.getScore(),
   ),
   relationshipScores = RelationshipScores(
-    curRelCloseFamily = relationships?.relCurrRelationshipStatus.getScore(),
+    curRelCloseFamily = relationships?.relCloseFamily.getScore(),
     prevExpCloseRel = relationships?.prevCloseRelationships.getScore(),
     easilyInfluenced = lifestyle?.easilyInfluenced.getScore(),
     aggressiveControllingBehaviour = behavior?.aggressiveControllingBehavour.getScore(),

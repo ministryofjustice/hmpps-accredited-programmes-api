@@ -89,7 +89,7 @@ class OasysApiServiceTest {
       relIssuesDetails = "Free text",
       sara = null,
       emotionalCongruence = "0-No problems",
-      relCurrRelationshipStatus = "Not in a relationship",
+      relCloseFamily = "0-No problems",
       prevCloseRelationships = "2-Significant problems",
     )
 
