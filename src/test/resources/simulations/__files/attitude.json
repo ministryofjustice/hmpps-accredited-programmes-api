@@ -25,7 +25,7 @@
   "attitudesTowardsStaff": null,
   "attitudesTowardsCommunitySociety": null,
   "attIssuesDetails": null,
-  "hostileOrientation": 2,
+  "hostileOrientation": "1-Some problems",
   "assessor": {
     "name": "Test Wark"
   },

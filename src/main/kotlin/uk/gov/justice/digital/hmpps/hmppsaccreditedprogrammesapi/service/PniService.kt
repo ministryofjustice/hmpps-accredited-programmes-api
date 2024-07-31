@@ -105,7 +105,7 @@ private fun buildNeedsScores(
 
 )
 
-private fun String?.getScore() = this?.trim()?.split("-")?.firstOrNull()?.toIntOrNull()
+private fun String?.getScore() = this?.trim()?.split("-")?.firstOrNull()?.trim()?.toIntOrNull()
 
 private fun BigDecimal.round(): BigDecimal {
   return this.setScale(2, RoundingMode.HALF_UP)

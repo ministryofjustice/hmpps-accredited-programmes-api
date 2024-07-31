@@ -24,12 +24,12 @@ class PniIntegrationTest : IntegrationTestBase() {
     val pniInfo = getPniInfoByPrisonNumber(prisonNumber)
 
     pniInfo shouldBe NeedsScore(
-      overallNeedsScore = 5,
+      overallNeedsScore = 6,
       domainScore = DomainScore(
         sexDomainScore = 2,
-        thinkingDomainScore = 2,
+        thinkingDomainScore = 1,
         relationshipDomainScore = 1,
-        selfManagementDomainScore = 0,
+        selfManagementDomainScore = 2,
       ),
     )
   }
