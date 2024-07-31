@@ -65,16 +65,7 @@ data class CognitiveScores(
       (hostileOrientation ?: 0)
   }
 
-  fun hasNullValues() = listOf(
-    proCriminalAttitudes,
-    hostileOrientation,
-  ).any { it == null }
-
   fun overallCognitiveDomainScore(prisonNumber: String): Int {
-//    if (hasNullValues()) {
-//      throw BusinessException("PNI information cannot be computed for $prisonNumber as ThinkingSkillsDomain contains null values")
-//    }
-
     val totalScore = totalScore()
 
     return when {
@@ -105,18 +96,7 @@ data class SelfManagementScores(
       (difficultiesCoping ?: 0)
   }
 
-  fun hasNullValues() = listOf(
-    impulsivity,
-    temperControl,
-    problemSolvingSkills,
-    difficultiesCoping,
-  ).any { it == null }
-
   fun overallSelfManagementScore(prisonNumber: String): Int {
-//    if (hasNullValues()) {
-//      throw BusinessException("PNI information cannot be computed for $prisonNumber as SelfManagementDomain contains null values")
-//    }
-
     val totalScore = totalScore()
 
     return when {
@@ -150,18 +130,7 @@ data class RelationshipScores(
       (aggressiveControllingBehaviour ?: 0)
   }
 
-  private fun hasNullValues() = listOf(
-    curRelCloseFamily,
-    prevExpCloseRel,
-    easilyInfluenced,
-    aggressiveControllingBehaviour,
-  ).any { it == null }
-
   fun overallRelationshipScore(prisonNumber: String): Int {
-//    if (hasNullValues()) {
-//      throw BusinessException("PNI information cannot be computed for $prisonNumber as RelationshipScore contains null values")
-//    }
-
     val totalScore = totalScore()
 
     return when {
