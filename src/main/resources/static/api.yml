@@ -386,9 +386,7 @@ paths:
           content:
             'application/json':
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CoursePrerequisite'
+                $ref: '#/components/schemas/CoursePrerequisites'
     put:
       tags:
         - Courses
@@ -407,18 +405,14 @@ paths:
         content:
           'application/json':
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/CoursePrerequisite'
+              $ref: '#/components/schemas/CoursePrerequisites'
       responses:
         200:
           description: Successful update
           content:
             'application/json':
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CoursePrerequisite'
+                $ref: '#/components/schemas/CoursePrerequisites'
         400:
           description: Bad input
           content:
@@ -2187,6 +2181,14 @@ components:
         - identifier
         - description
         - audience
+
+    CoursePrerequisites:
+      type: object
+      properties:
+        prerequisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoursePrerequisite'
 
     CoursePrerequisite:
       type: object
