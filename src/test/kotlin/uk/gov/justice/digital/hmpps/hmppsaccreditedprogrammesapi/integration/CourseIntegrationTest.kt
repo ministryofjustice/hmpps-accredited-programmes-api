@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseCreateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisites
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
@@ -355,12 +356,12 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody<List<CoursePrerequisite>>()
+      .expectBody<CoursePrerequisites>()
       .returnResult().responseBody!!
 
-    response.size shouldBeGreaterThan 0
+    response.prerequisites!!.size shouldBeGreaterThan 0
 
-    val sortedResponse = response.sortedBy { it.name }
+    val sortedResponse = response.prerequisites!!.sortedBy { it.name }
 
     sortedResponse[0].name shouldBeEqual "pr name1"
     sortedResponse[1].name shouldBeEqual "pr name2"
@@ -378,11 +379,11 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(
-        newPrerequisites,
+        CoursePrerequisites(newPrerequisites),
       )
       .exchange()
       .expectStatus().isOk
-      .expectBody<List<CoursePrerequisite>>()
+      .expectBody<CoursePrerequisites>()
 
     val getResponse = webTestClient
       .get()
@@ -391,13 +392,13 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody<List<CoursePrerequisite>>()
+      .expectBody<CoursePrerequisites>()
       .returnResult().responseBody!!
 
-    getResponse.size shouldBeEqual 1
+    getResponse.prerequisites!!.size shouldBeEqual 1
 
-    getResponse[0].name shouldBeEqual "new pr name1"
-    getResponse[0].description shouldBeEqual "new pr description1"
+    getResponse.prerequisites!![0].name shouldBeEqual "new pr name1"
+    getResponse.prerequisites!![0].description shouldBeEqual "new pr description1"
   }
 
   @Test
