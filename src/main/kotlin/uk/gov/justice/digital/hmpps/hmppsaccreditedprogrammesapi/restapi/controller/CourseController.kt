@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseCreateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisites
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
@@ -81,24 +82,33 @@ constructor(
         },
     )
 
-  override fun getCoursePrerequisites(id: UUID): ResponseEntity<List<CoursePrerequisite>> =
+  override fun getCoursePrerequisites(id: UUID): ResponseEntity<CoursePrerequisites> =
     ResponseEntity.ok(
-      courseService
-        .getCourseById(id)?.prerequisites?.map { prerequisite ->
-          CoursePrerequisite(
-            name = prerequisite.name,
-            description = prerequisite.description,
-          )
-        },
+      CoursePrerequisites(
+        courseService
+          .getCourseById(id)?.prerequisites?.map { prerequisite ->
+            CoursePrerequisite(
+              name = prerequisite.name,
+              description = prerequisite.description,
+            )
+          },
+      ),
     )
 
   override fun updateCoursePrerequisites(
     id: UUID,
-    coursePrerequisites: List<CoursePrerequisite>,
-  ): ResponseEntity<List<CoursePrerequisite>> {
+    coursePrerequisites: CoursePrerequisites,
+  ): ResponseEntity<CoursePrerequisites> {
     val course =
       courseService.getNotWithdrawnCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
-    return ResponseEntity.ok(courseService.updateCoursePrerequisites(course, coursePrerequisites.toMutableSet()))
+    return ResponseEntity.ok(
+      CoursePrerequisites(
+        courseService.updateCoursePrerequisites(
+          course,
+          coursePrerequisites.prerequisites!!.toMutableSet(),
+        ),
+      ),
+    )
   }
 
   override fun getCourseById(id: UUID): ResponseEntity<Course> =
