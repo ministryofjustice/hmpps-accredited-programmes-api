@@ -28,4 +28,5 @@ data class PersonEntity(
   @Column(name = "person_id")
   var id: UUID = UUID.randomUUID(),
   var location: String?,
+  var gender: String?,
 )
