@@ -22,6 +22,7 @@ class PersonEntityFactory : Factory<PersonEntity> {
   private var nonDtoReleaseDateType: Yielded<String> = { randomAlphanumericString() }
   private var sentenceType: Yielded<String> = { randomAlphanumericString() }
   private var location: Yielded<String> = { randomAlphanumericString() }
+  private var gender: Yielded<String> = { "Male" }
 
   override fun produce() = PersonEntity(
     id = id(),
@@ -37,5 +38,6 @@ class PersonEntityFactory : Factory<PersonEntity> {
     nonDtoReleaseDateType = nonDtoReleaseDateType(),
     sentenceType = sentenceType(),
     location = location(),
+    gender = gender(),
   )
 }
