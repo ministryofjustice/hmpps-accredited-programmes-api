@@ -52,6 +52,7 @@ val PRISONER_1 = Prisoner(
   paroleEligibilityDate = PAROLE_ELIGIBILITY_DATE,
   indeterminateSentence = INDETERMINATE_SENTENCE,
   prisonName = "HMP Leeds",
+  gender = "Male",
 )
 
 const val PRISON_LOCATION = "Buckinghamshire"

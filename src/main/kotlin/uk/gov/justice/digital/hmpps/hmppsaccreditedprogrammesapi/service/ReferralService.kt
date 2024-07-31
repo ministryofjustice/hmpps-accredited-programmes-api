@@ -157,6 +157,7 @@ constructor(
     personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
     personEntity.sentenceType = sentenceType
     personEntity.location = if (it.prisonName == "Outside") "Released" else it.prisonName
+    personEntity.gender = it.gender
   }
 
   private fun createOrUpdatePerson(prisonNumber: String) {
@@ -178,6 +179,7 @@ constructor(
           nonDtoReleaseDateType = it.nonDtoReleaseDateType,
           sentenceType = sentenceType,
           location = it.prisonName,
+          gender = it.gender,
         )
       } else {
         updatePerson(it, personEntity, sentenceType)
