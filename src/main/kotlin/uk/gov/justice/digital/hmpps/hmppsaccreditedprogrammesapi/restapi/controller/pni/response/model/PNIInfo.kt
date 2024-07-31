@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  *
- * @param needsScores
+ * @param individualNeedsScores
  * @param riskScores
  */
 data class PNIInfo(
@@ -20,7 +20,7 @@ data class PNIInfo(
       "}",
     description = "",
   )
-  @get:JsonProperty("Needs") val needsScores: NeedsScores,
+  @get:JsonProperty("Needs") val individualNeedsScores: IndividualNeedsScores,
 
   @Schema(example = "{ogrs3=8, ovp=8, ospDc=1.07, ospIic=0.11, rsr=1.46, sara=High}", description = "")
   @get:JsonProperty("RiskScores") val riskScores: RiskScores,

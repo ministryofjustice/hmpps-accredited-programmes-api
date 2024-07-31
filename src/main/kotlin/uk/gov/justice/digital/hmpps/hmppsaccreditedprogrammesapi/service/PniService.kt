@@ -10,7 +10,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.CognitiveScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.NeedsScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.IndividualNeedsScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.NeedsScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.PNIInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.RelationshipScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.RiskScores
@@ -25,7 +26,7 @@ class PniService(
   private val auditService: AuditService,
   private val pniNeedsEngine: PniNeedsEngine,
 ) {
-  fun getPniInfo(prisonNumber: String): PNIInfo {
+  fun getPniInfo(prisonNumber: String): NeedsScore {
     auditService.audit(
       prisonNumber = prisonNumber,
       auditAction = AuditAction.PNI.name,
@@ -50,13 +51,11 @@ class PniService(
     val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { oasysService.getArnsPredictorSummary(it) }
 
     val pniInfo = PNIInfo(
-      needsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
+      individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
       riskScores = buildRiskScores(oasysArnsPredictor, relationships),
     )
 
-    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(pniInfo, prisonNumber)
-
-    return pniInfo
+    return pniNeedsEngine.getOverallNeedsScore(pniInfo, prisonNumber)
   }
 
   private fun buildRiskScores(
@@ -80,7 +79,7 @@ private fun buildNeedsScores(
   attitude: OasysAttitude?,
   lifestyle: OasysLifestyle?,
   psychiatric: OasysPsychiatric?,
-) = NeedsScores(
+) = IndividualNeedsScores(
   sexScores = SexScores(
     sexualPreOccupation = behavior?.sexualPreOccupation.getScore(),
     offenceRelatedSexualInterests = behavior?.offenceRelatedSexualInterests.getScore(),
