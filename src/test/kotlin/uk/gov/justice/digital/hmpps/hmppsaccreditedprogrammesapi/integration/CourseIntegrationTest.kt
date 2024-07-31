@@ -379,7 +379,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(
-        newPrerequisites,
+        CoursePrerequisites(newPrerequisites),
       )
       .exchange()
       .expectStatus().isOk
