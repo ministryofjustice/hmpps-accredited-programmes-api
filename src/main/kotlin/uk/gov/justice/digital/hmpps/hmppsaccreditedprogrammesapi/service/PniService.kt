@@ -9,14 +9,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.CognitiveScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.IndividualNeedsScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.NeedsScore
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.PNIInfo
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.RelationshipScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.RiskScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.SelfManagementScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.SexScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualCognitiveScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualNeedsAndRiskScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualNeedsScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualRelationshipScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSelfManagementScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSexScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.PniScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RiskScores
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -26,7 +26,7 @@ class PniService(
   private val auditService: AuditService,
   private val pniNeedsEngine: PniNeedsEngine,
 ) {
-  fun getPniInfo(prisonNumber: String): NeedsScore {
+  fun getPniScore(prisonNumber: String): PniScore {
     auditService.audit(
       prisonNumber = prisonNumber,
       auditAction = AuditAction.PNI.name,
@@ -50,12 +50,15 @@ class PniService(
     val oasysOffendingInfo = oasysService.getOffendingInfo(assessmentId)
     val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { oasysService.getArnsPredictorSummary(it) }
 
-    val pniInfo = PNIInfo(
+    val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
       riskScores = buildRiskScores(oasysArnsPredictor, relationships),
     )
 
-    return pniNeedsEngine.getOverallNeedsScore(pniInfo, prisonNumber)
+    return PniScore(
+      needsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber),
+      riskScores = individualNeedsAndRiskScores.riskScores,
+    )
   }
 
   private fun buildRiskScores(
@@ -80,23 +83,23 @@ private fun buildNeedsScores(
   lifestyle: OasysLifestyle?,
   psychiatric: OasysPsychiatric?,
 ) = IndividualNeedsScores(
-  sexScores = SexScores(
+  individualSexScores = IndividualSexScores(
     sexualPreOccupation = behavior?.sexualPreOccupation.getScore(),
     offenceRelatedSexualInterests = behavior?.offenceRelatedSexualInterests.getScore(),
     emotionalCongruence = relationships?.emotionalCongruence.getScore(),
   ),
 
-  cognitiveScores = CognitiveScores(
+  individualCognitiveScores = IndividualCognitiveScores(
     proCriminalAttitudes = attitude?.proCriminalAttitudes.getScore(),
     hostileOrientation = attitude?.hostileOrientation.getScore(),
   ),
-  relationshipScores = RelationshipScores(
+  individualRelationshipScores = IndividualRelationshipScores(
     curRelCloseFamily = relationships?.relCloseFamily.getScore(),
     prevExpCloseRel = relationships?.prevCloseRelationships.getScore(),
     easilyInfluenced = lifestyle?.easilyInfluenced.getScore(),
     aggressiveControllingBehaviour = behavior?.aggressiveControllingBehavour.getScore(),
   ),
-  selfManagementScores = SelfManagementScores(
+  individualSelfManagementScores = IndividualSelfManagementScores(
     impulsivity = behavior?.impulsivity.getScore(),
     temperControl = behavior?.temperControl.getScore(),
     problemSolvingSkills = behavior?.problemSolvingSkills.getScore(),

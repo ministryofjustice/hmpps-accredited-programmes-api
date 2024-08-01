@@ -1,27 +1,27 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  *
- * @param sexScores
- * @param cognitiveScores
- * @param relationshipScores
- * @param selfManagementScores
+ * @param individualSexScores
+ * @param individualCognitiveScores
+ * @param individualRelationshipScores
+ * @param individualSelfManagementScores
  */
 data class IndividualNeedsScores(
 
-  @get:JsonProperty("Sex") val sexScores: SexScores,
+  @get:JsonProperty("IndividualSexScores") val individualSexScores: IndividualSexScores,
 
-  @get:JsonProperty("Cognitive") val cognitiveScores: CognitiveScores,
+  @get:JsonProperty("IndividualCognitiveScores") val individualCognitiveScores: IndividualCognitiveScores,
 
-  @get:JsonProperty("Relationships") val relationshipScores: RelationshipScores,
+  @get:JsonProperty("IndividualRelationshipScores") val individualRelationshipScores: IndividualRelationshipScores,
 
-  @get:JsonProperty("SelfManagement") val selfManagementScores: SelfManagementScores,
+  @get:JsonProperty("IndividualSelfManagementScores") val individualSelfManagementScores: IndividualSelfManagementScores,
 )
 
-data class SexScores(
+data class IndividualSexScores(
 
   @Schema(example = "1", description = "")
   @get:JsonProperty("sexualPreOccupation") val sexualPreOccupation: kotlin.Int? = null,
@@ -52,7 +52,7 @@ data class SexScores(
   }
 }
 
-data class CognitiveScores(
+data class IndividualCognitiveScores(
 
   @Schema(example = "2", description = "")
   @get:JsonProperty("proCriminalAttitudes") val proCriminalAttitudes: kotlin.Int? = null,
@@ -65,7 +65,7 @@ data class CognitiveScores(
       (hostileOrientation ?: 0)
   }
 
-  fun overallCognitiveDomainScore(prisonNumber: String): Int {
+  fun overallCognitiveDomainScore(): Int {
     val totalScore = totalScore()
 
     return when {
@@ -76,7 +76,7 @@ data class CognitiveScores(
   }
 }
 
-data class SelfManagementScores(
+data class IndividualSelfManagementScores(
   @Schema(example = "2", description = "")
   @get:JsonProperty("impulsivity") val impulsivity: kotlin.Int? = null,
 
@@ -96,19 +96,16 @@ data class SelfManagementScores(
       (difficultiesCoping ?: 0)
   }
 
-  fun overallSelfManagementScore(prisonNumber: String): Int {
-    val totalScore = totalScore()
-
-    return when {
-      totalScore in 0..1 -> 0
-      totalScore in 2..4 -> 1
-      totalScore in 5..8 -> 2
+  fun overallSelfManagementScore() =
+    when (totalScore()) {
+      in 0..1 -> 0
+      in 2..4 -> 1
+      in 5..8 -> 2
       else -> 0
     }
-  }
 }
 
-data class RelationshipScores(
+data class IndividualRelationshipScores(
 
   @Schema(example = "1", description = "")
   @get:JsonProperty("curRelCloseFamily") val curRelCloseFamily: kotlin.Int? = null,
@@ -130,14 +127,10 @@ data class RelationshipScores(
       (aggressiveControllingBehaviour ?: 0)
   }
 
-  fun overallRelationshipScore(prisonNumber: String): Int {
-    val totalScore = totalScore()
-
-    return when {
-      totalScore in 0..1 -> 0
-      totalScore in 2..4 -> 1
-      totalScore in 5..8 -> 2
-      else -> 0
-    }
+  fun overallRelationshipScore() = when (totalScore()) {
+    in 0..1 -> 0
+    in 2..4 -> 1
+    in 5..8 -> 2
+    else -> 0
   }
 }
