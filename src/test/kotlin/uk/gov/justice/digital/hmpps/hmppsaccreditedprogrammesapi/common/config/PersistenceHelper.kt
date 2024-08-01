@@ -15,6 +15,7 @@ class PersistenceHelper {
   private lateinit var entityManager: EntityManager
 
   fun clearAllTableContent() {
+    entityManager.createNativeQuery("DELETE FROM referral_status_history").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM prerequisite").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course_participation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()

@@ -12,14 +12,19 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusHistory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -44,12 +49,44 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
   lateinit var referralStatusCategoryRepository: ReferralStatusCategoryRepository
 
   @Autowired
+  lateinit var referrerUserRepository: ReferrerUserRepository
+
+  @Autowired
   lateinit var referralStatusReasonRepository: ReferralStatusReasonRepository
 
-  private val referralUUID = UUID.randomUUID()
+  lateinit var referralId: UUID
 
   @BeforeEach
   fun setUp() {
+    persistenceHelper.clearAllTableContent()
+
+    persistenceHelper.createCourse(
+      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      "SC",
+      "Super Course",
+      "Sample description",
+      "SC++",
+      "General offence",
+    )
+    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
+    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
+
+    persistenceHelper.createOffering(
+      UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
+      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      "MDI",
+      "nobody-mdi@digital.justice.gov.uk",
+      "nobody2-mdi@digital.justice.gov.uk",
+      true,
+    )
+    persistenceHelper.createOffering(
+      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
+      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      "BWN",
+      "nobody-bwn@digital.justice.gov.uk",
+      "nobody2-bwn@digital.justice.gov.uk",
+      true,
+    )
     // Create some test data.
     val withdrawnRefData = referralStatusRepository.findByCode(WITHDRAWN) ?: throw NotFoundException("no status with code: $WITHDRAWN found")
     val startedRefData = referralStatusRepository.findByCode(REFERRAL_STARTED) ?: throw NotFoundException("no status with code: $REFERRAL_STARTED found")
@@ -61,14 +98,21 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
     val startDateOfSecond = LocalDateTime.now().minusDays(2)
     val duration = ChronoUnit.MILLIS.between(startDateOfSecond, startDateOfFirst)
 
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
+    referralId = referralCreated.referralId
+
+    referrerUserRepository.save(ReferrerUserEntity("UNKNOWN_USER"))
+
     val first = ReferralStatusHistoryEntity(
-      referralId = referralUUID,
+      referralId = referralId,
       status = startedRefData,
       statusStartDate = startDateOfFirst,
       statusEndDate = startDateOfSecond,
     )
     val second = ReferralStatusHistoryEntity(
-      referralId = referralUUID,
+      referralId = referralId,
       status = withdrawnRefData,
       category = categoryRefData,
       reason = reasonRefData,
@@ -89,7 +133,7 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
   fun `get referral status history for a referral`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
-    val response = getStatusHistories(referralUUID)
+    val response = getStatusHistories(referralId)
     response.shouldNotBeNull()
 
     response.size shouldBeEqual 1
@@ -107,5 +151,29 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<List<ReferralStatusHistory>>()
+      .returnResult().responseBody!!
+
+  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): ReferralCreated {
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    return createReferral(offering.id, prisonNumber)
+  }
+
+  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
+    webTestClient
+      .post()
+      .uri("/referrals")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        ReferralCreate(
+          offeringId = offeringId!!,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectBody<ReferralCreated>()
       .returnResult().responseBody!!
 }

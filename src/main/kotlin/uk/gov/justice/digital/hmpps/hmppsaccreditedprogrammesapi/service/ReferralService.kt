@@ -220,7 +220,7 @@ constructor(
       newNotes = referralStatusUpdate.notes,
     )
     // update the status
-    referral.status = referralStatusUpdate.status
+    referral.status = referralStatusUpdate.status.uppercase()
     // audit the interaction
     auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
   }
