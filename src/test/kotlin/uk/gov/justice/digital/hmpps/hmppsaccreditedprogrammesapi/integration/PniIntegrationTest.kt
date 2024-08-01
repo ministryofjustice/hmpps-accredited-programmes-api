@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.SelfManagementDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.ThinkingDomainScore
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
@@ -34,6 +33,9 @@ class PniIntegrationTest : IntegrationTestBase() {
     val pniScore = getPniInfoByPrisonNumber(prisonNumber)
 
     pniScore shouldBe PniScore(
+      prisonNumber = prisonNumber,
+      crn = "X739590",
+      assessmentId = 2114584,
       needsScore = NeedsScore(
         overallNeedsScore = 6,
         domainScore = DomainScore(

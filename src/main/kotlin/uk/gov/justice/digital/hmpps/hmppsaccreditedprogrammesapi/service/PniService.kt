@@ -56,6 +56,9 @@ class PniService(
     )
 
     return PniScore(
+      prisonNumber = prisonNumber,
+      crn = oasysOffendingInfo?.crn,
+      assessmentId = assessmentId,
       needsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber),
       riskScores = individualNeedsAndRiskScores.riskScores,
     )

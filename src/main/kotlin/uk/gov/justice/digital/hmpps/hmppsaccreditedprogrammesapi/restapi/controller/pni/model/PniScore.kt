@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(
   example = "{\n" +
+    "  \"prisonNumber\": \"A1234BC\",\n" +
+    "  \"crn\": \"X739590\",\n" +
+    "  \"assessmentId\": 2114584,\n" +
     "  \"needsScore\": {\n" +
     "    \"overallNeedsScore\": 6,\n" +
     "    \"domainScore\": {\n" +
@@ -12,7 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema
     "        \"overAllSexDomainScore\": 2,\n" +
     "        \"individualSexScores\": {\n" +
     "          \"sexualPreOccupation\": 2,\n" +
-    "          \"offenceRelatedSexualInterests\": 1,\n" +
+    "          \"offenceRelatedSexualInterests\": 2,\n" +
     "          \"emotionalCongruence\": 0\n" +
     "        }\n" +
     "      },\n" +
@@ -20,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
     "        \"overallThinkingDomainScore\": 1,\n" +
     "        \"individualThinkingScores\": {\n" +
     "          \"proCriminalAttitudes\": 1,\n" +
-    "          \"hostileOrientation\": null\n" +
+    "          \"hostileOrientation\": 1\n" +
     "        }\n" +
     "      },\n" +
     "      \"relationshipDomainScore\": {\n" +
@@ -28,16 +31,16 @@ import io.swagger.v3.oas.annotations.media.Schema
     "        \"individualRelationshipScores\": {\n" +
     "          \"curRelCloseFamily\": 0,\n" +
     "          \"prevExpCloseRel\": 2,\n" +
-    "          \"easilyInfluenced\": null,\n" +
-    "          \"aggressiveControllingBehaviour\": null\n" +
+    "          \"easilyInfluenced\": 1,\n" +
+    "          \"aggressiveControllingBehaviour\": 1\n" +
     "        }\n" +
     "      },\n" +
     "      \"selfManagementDomainScore\": {\n" +
     "        \"overallSelfManagementDomainScore\": 2,\n" +
     "        \"individualSelfManagementScores\": {\n" +
-    "          \"impulsivity\": null,\n" +
-    "          \"temperControl\": null,\n" +
-    "          \"problemSolvingSkills\": null,\n" +
+    "          \"impulsivity\": 1,\n" +
+    "          \"temperControl\": 4,\n" +
+    "          \"problemSolvingSkills\": 2,\n" +
     "          \"difficultiesCoping\": null\n" +
     "        }\n" +
     "      }\n" +
@@ -55,6 +58,9 @@ import io.swagger.v3.oas.annotations.media.Schema
   description = "",
 )
 data class PniScore(
+  @get:JsonProperty("prisonNumber") val prisonNumber: String,
+  @get:JsonProperty("crn") val crn: String?,
+  @get:JsonProperty("assessmentId") val assessmentId: Long,
   @get:JsonProperty("NeedsScore") val needsScore: NeedsScore,
   @get:JsonProperty("RiskScores") val riskScores: RiskScores,
 )
