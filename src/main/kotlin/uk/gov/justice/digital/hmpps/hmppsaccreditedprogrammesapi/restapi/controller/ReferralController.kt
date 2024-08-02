@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Refer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusHistory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
@@ -224,44 +223,6 @@ constructor(
       .getReferralById(id, updatePerson)
     return ResponseEntity.ok(
       referralStatusHistoryService.getReferralStatusHistories(id),
-    )
-  }
-
-  override fun getNextStatusTransitions(
-    id: UUID,
-    ptUser: Boolean,
-    deselectAndKeepOpen: Boolean,
-  ): ResponseEntity<List<ReferralStatusRefData>> {
-    val referral = referralService.getReferralById(id)
-    var statuses = referenceDataService.getNextStatusTransitions(referral!!.status, ptUser)
-    // bespoke logic for deselect and keep open
-    if (statuses.any { it.code == "DESELECTED" } && !deselectAndKeepOpen) {
-      // rebuild the status list with a bespoke set of statuses
-      val newStatusList = mutableListOf<ReferralStatusRefData>()
-      newStatusList.addAll(statuses.filter { it.code == "PROGRAMME_COMPLETE" })
-      newStatusList.add(
-        statuses.first { it.code == "DESELECTED" }
-          .copy(description = "Deselect and close referral", deselectAndKeepOpen = false),
-      )
-      newStatusList.add(
-        statuses.first { it.code == "DESELECTED" }
-          .copy(
-            description = "Deselect and keep referral open",
-            hintText = "This person cannot continue the programme now but may be able to in future.",
-            deselectAndKeepOpen = true,
-          ),
-      )
-      statuses = newStatusList
-    }
-    if (deselectAndKeepOpen) {
-      // rebuild the status list with a bespoke set of statuses
-      val newStatusList = mutableListOf<ReferralStatusRefData>()
-      newStatusList.addAll(statuses.filter { it.code != "DESELECTED" && it.code != "PROGRAMME_COMPLETE" })
-      statuses = newStatusList
-    }
-
-    return ResponseEntity.ok(
-      statuses,
     )
   }
 

@@ -44,7 +44,7 @@ private const val MY_REFERRALS_ENDPOINT = "/referrals/me/dashboard"
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class ReferralControllerTest
+class ReferralsControllerTest
 @Autowired
 constructor(
   val mockMvc: MockMvc,
