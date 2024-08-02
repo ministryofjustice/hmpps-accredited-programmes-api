@@ -88,7 +88,7 @@ class PniIntegrationTest : IntegrationTestBase() {
   fun getPniInfoByPrisonNumber(prisonNumber: String) =
     webTestClient
       .get()
-      .uri("/pni/$prisonNumber")
+      .uri("/PNI/$prisonNumber")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
