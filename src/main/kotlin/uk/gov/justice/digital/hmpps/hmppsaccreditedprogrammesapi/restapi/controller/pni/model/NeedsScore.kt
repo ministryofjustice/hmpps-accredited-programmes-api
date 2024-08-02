@@ -13,6 +13,7 @@ data class NeedsScore(
     description = "",
   )
   @get:JsonProperty("overallNeedsScore") val overallNeedsScore: Int,
+  @get:JsonProperty("classification") val classification: String,
   @get:JsonProperty("DomainScore") val domainScore: DomainScore,
 )
 

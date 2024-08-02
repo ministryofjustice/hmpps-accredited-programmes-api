@@ -21,9 +21,10 @@ class PniNeedsEngine {
     val thinkingDomainScore = individualNeedsAndRiskScores.individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore()
     val relationshipDomainScore = individualNeedsAndRiskScores.individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
     val selfManagementDomainScore = individualNeedsAndRiskScores.individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
-
+    val overallNeedsScore = listOf(sexDomainScore, thinkingDomainScore, relationshipDomainScore, selfManagementDomainScore).sum()
     return NeedsScore(
-      overallNeedsScore = listOf(sexDomainScore, thinkingDomainScore, relationshipDomainScore, selfManagementDomainScore).sum(),
+      overallNeedsScore = overallNeedsScore,
+      classification = getClassification(overallNeedsScore),
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(
           overAllSexDomainScore = sexDomainScore,
@@ -63,5 +64,14 @@ class PniNeedsEngine {
     }
 
     return individualNeedsAndRiskScores.individualNeedsScores.individualSexScores.overallSexDomainScore(totalSexScore)
+  }
+
+  private fun getClassification(overallNeedsScore: Int): String {
+    return when (overallNeedsScore) {
+      in 0..2 -> "LOW NEED"
+      in 3..5 -> "MEDIUM NEED"
+      in 6..8 -> "HIGH NEED"
+      else -> throw BusinessException("Unable to compute classification. Overall needs score is $overallNeedsScore")
+    }
   }
 }

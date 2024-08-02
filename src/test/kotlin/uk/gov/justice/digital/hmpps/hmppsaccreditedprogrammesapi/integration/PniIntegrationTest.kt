@@ -38,6 +38,7 @@ class PniIntegrationTest : IntegrationTestBase() {
       assessmentId = 2114584,
       needsScore = NeedsScore(
         overallNeedsScore = 6,
+        classification = "HIGH NEED",
         domainScore = DomainScore(
           sexDomainScore = SexDomainScore(
             overAllSexDomainScore = 2,
