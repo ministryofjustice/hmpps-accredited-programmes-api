@@ -37,8 +37,8 @@ class ReferralsController(
   @GetMapping("/{id}/status-transitions", produces = ["application/json"])
   fun getNextStatusTransitions(
     @PathVariable id: UUID,
-    @RequestParam ptUser: Boolean,
-    @RequestParam deselectAndKeepOpen: Boolean = false,
+    @RequestParam(defaultValue = "false") ptUser: Boolean = false,
+    @RequestParam(defaultValue = "false") deselectAndKeepOpen: Boolean = false,
   ): ResponseEntity<List<ReferralStatusRefData>> {
     val referral = referralService.getReferralById(id)
     var statuses = referenceDataService.getNextStatusTransitions(referral!!.status, ptUser)

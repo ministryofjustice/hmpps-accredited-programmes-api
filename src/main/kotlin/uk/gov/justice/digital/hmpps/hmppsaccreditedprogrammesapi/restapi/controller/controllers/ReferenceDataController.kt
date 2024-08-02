@@ -50,7 +50,7 @@ class ReferenceDataController(
   fun getReferralStatusReasons(
     @PathVariable referralStatusCode: String,
     @PathVariable categoryCode: String,
-    @RequestParam deselectAndKeepOpen: Boolean = false,
+    @RequestParam(defaultValue = "false") deselectAndKeepOpen: Boolean = false,
   ): List<ReferralStatusReason> =
     referenceDataService
       .getReferralStatusReasons(referralStatusCode, categoryCode, deselectAndKeepOpen)
