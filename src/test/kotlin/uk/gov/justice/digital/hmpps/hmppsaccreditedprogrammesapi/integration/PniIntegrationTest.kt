@@ -9,14 +9,18 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.CognitiveScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.NeedsScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.PNIInfo
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.RelationshipScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.RiskScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.SelfManagementScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.response.model.SexScores
-
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.DomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualCognitiveScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualRelationshipScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSelfManagementScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSexScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.NeedsScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.PniScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RelationshipDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RiskScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.SelfManagementDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.SexDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.ThinkingDomainScore
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
@@ -26,30 +30,48 @@ class PniIntegrationTest : IntegrationTestBase() {
   fun `Get pni info for prisoner successful`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
-    val pniInfo = getPniInfoByPrisonNumber(prisonNumber)
+    val pniScore = getPniInfoByPrisonNumber(prisonNumber)
 
-    pniInfo shouldBe PNIInfo(
-      needsScores = NeedsScores(
-        sexScores = SexScores(
-          sexualPreOccupation = null,
-          offenceRelatedSexualInterests = null,
-          emotionalCongruence = 0,
-        ),
-        cognitiveScores = CognitiveScores(
-          proCriminalAttitudes = 1,
-          hostileOrientation = null,
-        ),
-        relationshipScores = RelationshipScores(
-          curRelCloseFamily = 0,
-          prevExpCloseRel = 2,
-          easilyInfluenced = null,
-          aggressiveControllingBehaviour = null,
-        ),
-        selfManagementScores = SelfManagementScores(
-          impulsivity = null,
-          temperControl = null,
-          problemSolvingSkills = null,
-          difficultiesCoping = null,
+    pniScore shouldBe PniScore(
+      prisonNumber = prisonNumber,
+      crn = "X739590",
+      assessmentId = 2114584,
+      needsScore = NeedsScore(
+        overallNeedsScore = 6,
+        domainScore = DomainScore(
+          sexDomainScore = SexDomainScore(
+            overAllSexDomainScore = 2,
+            individualSexScores = IndividualSexScores(
+              sexualPreOccupation = 2,
+              offenceRelatedSexualInterests = 2,
+              emotionalCongruence = 0,
+            ),
+          ),
+          thinkingDomainScore = ThinkingDomainScore(
+            overallThinkingDomainScore = 1,
+            individualThinkingScores = IndividualCognitiveScores(
+              proCriminalAttitudes = 1,
+              hostileOrientation = 1,
+            ),
+          ),
+          relationshipDomainScore = RelationshipDomainScore(
+            overallRelationshipDomainScore = 1,
+            individualRelationshipScores = IndividualRelationshipScores(
+              curRelCloseFamily = 0,
+              prevExpCloseRel = 2,
+              easilyInfluenced = 1,
+              aggressiveControllingBehaviour = 1,
+            ),
+          ),
+          selfManagementDomainScore = SelfManagementDomainScore(
+            overallSelfManagementDomainScore = 2,
+            individualSelfManagementScores = IndividualSelfManagementScores(
+              impulsivity = 1,
+              temperControl = 4,
+              problemSolvingSkills = 2,
+              difficultiesCoping = null,
+            ),
+          ),
         ),
       ),
       riskScores = RiskScores(
@@ -66,11 +88,11 @@ class PniIntegrationTest : IntegrationTestBase() {
   fun getPniInfoByPrisonNumber(prisonNumber: String) =
     webTestClient
       .get()
-      .uri("/pni/$prisonNumber")
+      .uri("/PNI/$prisonNumber")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody<PNIInfo>()
+      .expectBody<PniScore>()
       .returnResult().responseBody!!
 }

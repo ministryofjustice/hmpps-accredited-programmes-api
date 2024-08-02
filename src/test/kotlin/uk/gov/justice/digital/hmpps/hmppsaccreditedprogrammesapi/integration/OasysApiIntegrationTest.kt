@@ -151,6 +151,7 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
     lifestyle shouldBeEqual Lifestyle(
       "drug taking",
       "regularly takes drugs and struggles to support this without resorting to crime",
+      "1 - some problems",
     )
   }
 
@@ -162,12 +163,16 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
 
     lifestyle.shouldNotBeNull()
     lifestyle shouldBeEqual Behaviour(
-      "4 - massive problems",
-      "2 - slight problems",
-      "0 - no problems",
-      "3 - big problems",
-      "1 - some problems",
-      "1 - some problems",
+      temperControl = "4 - massive problems",
+      problemSolvingSkills = "2 - slight problems",
+      awarenessOfConsequences = "0 - no problems",
+      achieveGoals = "3 - big problems",
+      understandsViewsOfOthers = "1 - some problems",
+      concreteAbstractThinking = "1 - some problems",
+      sexualPreOccupation = "2 - slight problems",
+      offenceRelatedSexualInterests = "2 - slight problems",
+      aggressiveControllingBehaviour = "1 - some problems",
+      impulsivity = "1 - some problems",
     )
   }
 
@@ -222,8 +227,9 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
 
     attitude.shouldNotBeNull()
     attitude shouldBeEqual Attitude(
-      "1-Some problems",
-      "0-Very motivated",
+      proCriminalAttitudes = "1-Some problems",
+      motivationToAddressBehaviour = "0-Very motivated",
+      hostileOrientation = "1-Some problems",
     )
   }
 
