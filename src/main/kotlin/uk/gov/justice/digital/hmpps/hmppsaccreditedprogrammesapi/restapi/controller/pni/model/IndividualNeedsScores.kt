@@ -45,9 +45,9 @@ data class IndividualSexScores(
   }
 
   fun overallSexDomainScore(totalScore: Int) = when {
+    totalScore in 4..6 || (offenceRelatedSexualInterests == 2) -> 2
     totalScore in 0..1 -> 0
     totalScore in 2..3 -> 1
-    totalScore in 4..6 || (offenceRelatedSexualInterests == 2) -> 2
     else -> 0
   }
 }
@@ -60,7 +60,7 @@ data class IndividualCognitiveScores(
   @Schema(example = "2", description = "")
   @get:JsonProperty("hostileOrientation") val hostileOrientation: kotlin.Int? = null,
 ) {
-  private fun totalScore(): Int {
+  fun totalScore(): Int {
     return (proCriminalAttitudes ?: 0) +
       (hostileOrientation ?: 0)
   }
@@ -69,8 +69,8 @@ data class IndividualCognitiveScores(
     val totalScore = totalScore()
 
     return when {
-      totalScore in 1..2 -> 1
       totalScore in 3..4 || (proCriminalAttitudes == 2) -> 2
+      totalScore in 1..2 -> 1
       else -> 0
     }
   }
@@ -89,7 +89,7 @@ data class IndividualSelfManagementScores(
   @Schema(example = "", description = "")
   @get:JsonProperty("difficultiesCoping") val difficultiesCoping: kotlin.Int? = null,
 ) {
-  private fun totalScore(): Int {
+  fun totalScore(): Int {
     return (impulsivity ?: 0) +
       (temperControl ?: 0) +
       (problemSolvingSkills ?: 0) +
