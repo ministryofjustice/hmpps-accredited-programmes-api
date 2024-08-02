@@ -24,7 +24,11 @@ class SwaggerConfig {
 
     return GroupedOpenApi.builder()
       .group("API (outside of openApi)")
-      .packagesToScan("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni")
+      .packagesToScan(
+        "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.statistics",
+        "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni",
+        "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.controllers",
+      )
       .addOpenApiCustomizer(openApiCustomizer())
       .build()
   }
