@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.controllers
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -31,11 +32,13 @@ class ReferralsController(
   private val auditService: AuditService,
 ) {
 
+  private val log = LoggerFactory.getLogger(this::class.java)
+
   @GetMapping("/{id}/status-transitions", produces = ["application/json"])
   fun getNextStatusTransitions(
     @PathVariable id: UUID,
     @RequestParam ptUser: Boolean,
-    @RequestParam deselectAndKeepOpen: Boolean,
+    @RequestParam deselectAndKeepOpen: Boolean = false,
   ): ResponseEntity<List<ReferralStatusRefData>> {
     val referral = referralService.getReferralById(id)
     var statuses = referenceDataService.getNextStatusTransitions(referral!!.status, ptUser)
