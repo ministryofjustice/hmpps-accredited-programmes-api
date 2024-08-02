@@ -15,10 +15,6 @@ ALTER TABLE referral_status_history
         FOREIGN KEY (previous_status) REFERENCES referral_status(code);
 
 ALTER TABLE referral_status_history
-    ADD CONSTRAINT rs_username_fk
-        FOREIGN KEY (username) REFERENCES referrer_user(referrer_username);
-
-ALTER TABLE referral_status_history
     ADD CONSTRAINT rs_category_fk
         FOREIGN KEY (category) REFERENCES referral_status_category(code);
 
