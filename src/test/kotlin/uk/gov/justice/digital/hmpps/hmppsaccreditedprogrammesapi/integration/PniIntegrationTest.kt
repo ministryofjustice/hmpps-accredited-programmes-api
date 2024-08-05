@@ -12,15 +12,17 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.DomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualCognitiveScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualRelationshipScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualRiskScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSelfManagementScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSexScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.NeedsScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.PniScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RelationshipDomainScore
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RiskScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RiskScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.SelfManagementDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.ThinkingDomainScore
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
@@ -38,7 +40,7 @@ class PniIntegrationTest : IntegrationTestBase() {
       assessmentId = 2114584,
       needsScore = NeedsScore(
         overallNeedsScore = 6,
-        classification = "HIGH NEED",
+        classification = "HIGH_NEED",
         domainScore = DomainScore(
           sexDomainScore = SexDomainScore(
             overAllSexDomainScore = 2,
@@ -75,13 +77,17 @@ class PniIntegrationTest : IntegrationTestBase() {
           ),
         ),
       ),
-      riskScores = RiskScores(
-        ogrs3 = "15.00".toBigDecimal(),
-        ovp = "15.00".toBigDecimal(),
-        ospDc = 1.07.toBigDecimal(),
-        ospIic = 0.11.toBigDecimal(),
-        rsr = 1.46.toBigDecimal(),
-        sara = "High",
+
+      riskScore = RiskScore(
+        classification = "HIGH_SARA",
+        individualRiskScores = IndividualRiskScores(
+          ogrs3 = "15.00".toBigDecimal(),
+          ovp = "15.00".toBigDecimal(),
+          ospDc = 1.07.toBigDecimal(),
+          ospIic = 0.11.toBigDecimal(),
+          rsr = 1.46.toBigDecimal(),
+          sara = "High",
+        ),
       ),
     )
   }

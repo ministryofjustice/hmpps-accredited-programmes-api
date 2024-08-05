@@ -13,10 +13,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualNeedsAndRiskScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualNeedsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualRelationshipScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualRiskScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSelfManagementScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualSexScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.NeedsScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.PniScore
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RiskScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RiskScore
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -25,6 +27,7 @@ class PniService(
   private val oasysService: OasysService,
   private val auditService: AuditService,
   private val pniNeedsEngine: PniNeedsEngine,
+  private val pniRiskEngine: PniRiskEngine,
 ) {
   fun getPniScore(prisonNumber: String): PniScore {
     auditService.audit(
@@ -52,22 +55,42 @@ class PniService(
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
-      riskScores = buildRiskScores(oasysArnsPredictor, relationships),
+      individualRiskScores = buildRiskScores(oasysArnsPredictor, relationships),
     )
+
+    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber)
+
+    val overallRiskScore =
+      pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber)
+
+    val combinedPathway = getCombinedPathway(individualNeedsAndRiskScores, overallNeedsScore, overallRiskScore)
 
     return PniScore(
       prisonNumber = prisonNumber,
       crn = oasysOffendingInfo?.crn,
       assessmentId = assessmentId,
-      needsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber),
-      riskScores = individualNeedsAndRiskScores.riskScores,
+      needsScore = overallNeedsScore,
+      riskScore = overallRiskScore,
     )
+  }
+
+  private fun getCombinedPathway(
+    individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
+    overallNeedsScore: NeedsScore,
+    overallRiskScore: RiskScore,
+  ): String {
+    if (pniRiskEngine.isHighIntensityBasedOnRiskScores(individualNeedsAndRiskScores.individualRiskScores)) {
+      return "High Intensity BC"
+    } else {
+      // logic for compined pathway flow
+      return ""
+    }
   }
 
   private fun buildRiskScores(
     oasysArnsPredictor: ArnsScores?,
     relationships: OasysRelationships?,
-  ) = RiskScores(
+  ) = IndividualRiskScores(
     ogrs3 = oasysArnsPredictor?.groupReconvictionScore?.twoYears?.round(),
     ovp = oasysArnsPredictor?.violencePredictorScore?.twoYears?.round(),
     ospIic = oasysArnsPredictor?.sexualPredictorScore?.ospIndirectImagePercentageScore?.round()
