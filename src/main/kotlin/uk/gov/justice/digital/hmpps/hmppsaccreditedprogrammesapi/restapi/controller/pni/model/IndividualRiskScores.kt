@@ -13,7 +13,7 @@ import java.math.BigDecimal
  * @param rsr
  * @param sara
  */
-data class RiskScores(
+data class IndividualRiskScores(
 
   @Schema(example = "1", description = "")
   @get:JsonProperty("ogrs3") val ogrs3: BigDecimal? = null,

@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 /**
  *
  * @param individualNeedsScores
- * @param riskScores
+ * @param individualRiskScores
  */
 data class IndividualNeedsAndRiskScores(
 
@@ -23,5 +23,5 @@ data class IndividualNeedsAndRiskScores(
   @get:JsonProperty("Needs") val individualNeedsScores: IndividualNeedsScores,
 
   @Schema(example = "{ogrs3=8, ovp=8, ospDc=1.07, ospIic=0.11, rsr=1.46, sara=High}", description = "")
-  @get:JsonProperty("RiskScores") val riskScores: RiskScores,
+  @get:JsonProperty("RiskScores") val individualRiskScores: IndividualRiskScores,
 )

@@ -51,8 +51,8 @@ class PniNeedsEngine {
 
     val totalSexScore = if (hasNullValues) {
       if ((
-        individualNeedsAndRiskScores.riskScores.ospDc?.let { it > BigDecimal.ZERO } == true ||
-          individualNeedsAndRiskScores.riskScores.ospIic?.let { it > BigDecimal.ZERO } == true
+        individualNeedsAndRiskScores.individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true ||
+          individualNeedsAndRiskScores.individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true
         )
       ) {
         throw BusinessException("PNI information cannot be computed for $prisonNumber as ospDC and OspII scores are present but sexScore contains null")
@@ -68,10 +68,16 @@ class PniNeedsEngine {
 
   private fun getClassification(overallNeedsScore: Int): String {
     return when (overallNeedsScore) {
-      in 0..2 -> "LOW NEED"
-      in 3..5 -> "MEDIUM NEED"
-      in 6..8 -> "HIGH NEED"
+      in 0..2 -> NeedsClassification.LOW_NEED.name
+      in 3..5 -> NeedsClassification.MEDIUM_NEED.name
+      in 6..8 -> NeedsClassification.HIGH_NEED.name
       else -> throw BusinessException("Unable to compute classification. Overall needs score is $overallNeedsScore")
     }
+  }
+
+  enum class NeedsClassification() {
+    LOW_NEED,
+    MEDIUM_NEED,
+    HIGH_NEED,
   }
 }
