@@ -20,10 +20,6 @@ class PniRiskEngine {
     (isHighOgrs3(individualRiskScores) && (isHighOvp(individualRiskScores) || isHighSara(individualRiskScores)))
 
   fun getRiskClassification(individualRiskScores: IndividualRiskScores) = when {
-    isHighOgrs3(individualRiskScores) -> RiskClassification.HIGH_OGRS
-    isHighOvp(individualRiskScores) -> RiskClassification.HIGH_OVP
-    isHighSara(individualRiskScores) -> RiskClassification.HIGH_SARA
-    isMediumSara(individualRiskScores) -> RiskClassification.MEDIUM_SARA
     isHighRisk(individualRiskScores) -> RiskClassification.HIGH_RISK
     isMediumRisk(individualRiskScores) -> RiskClassification.MEDIUM_RISK
     else -> RiskClassification.LOW_RISK
@@ -63,7 +59,7 @@ class PniRiskEngine {
   private fun isOspIicHigh(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.ospIic?.let { it >= BigDecimal("35.00") } == true
 
-  private fun isHighSara(individualRiskScores: IndividualRiskScores) =
+  fun isHighSara(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.sara?.equals("High", ignoreCase = true) == true
 
   private fun isRsrHigh(individualRiskScores: IndividualRiskScores) =
@@ -82,7 +78,7 @@ class PniRiskEngine {
   private fun isOspIicMedium(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.ospIic?.let { it in BigDecimal("30.00")..BigDecimal("35.00") } == true
 
-  private fun isMediumSara(individualRiskScores: IndividualRiskScores) =
+  fun isMediumSara(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.sara?.equals("Medium", ignoreCase = true) == true
 
   private fun isRsrMedium(individualRiskScores: IndividualRiskScores) =
@@ -94,8 +90,4 @@ enum class RiskClassification {
   HIGH_RISK,
   MEDIUM_RISK,
   LOW_RISK,
-  HIGH_OGRS,
-  HIGH_OVP,
-  HIGH_SARA,
-  MEDIUM_SARA,
 }
