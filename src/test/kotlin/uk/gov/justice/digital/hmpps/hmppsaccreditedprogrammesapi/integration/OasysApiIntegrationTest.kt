@@ -12,23 +12,21 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Alert
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugAlcoholDetail
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAssessmentDateInfo
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Risks
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysDrugDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Alert
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Attitude
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Behaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DrugAlcoholDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Health
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.LearningNeeds
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Lifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OasysAssessmentDateInfo
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Psychiatric
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Risks
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -259,11 +257,11 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
 
     drugAlcoholDetail.shouldNotBeNull()
     drugAlcoholDetail shouldBeEqual DrugAlcoholDetail(
-      drug = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysDrugDetail(
+      drug = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OasysDrugDetail(
         levelOfUseOfMainDrug = "1-Some problems",
         drugsMajorActivity = "0-Very motivated",
       ),
-      alcohol = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAlcoholDetail(
+      alcohol = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OasysAlcoholDetail(
         alcoholLinkedToHarm = "1-Some problems",
         alcoholIssuesDetails = "Known to have some problems",
         frequencyAndLevel = "frequent",

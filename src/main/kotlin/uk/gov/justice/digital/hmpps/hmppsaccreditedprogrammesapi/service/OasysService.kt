@@ -2,18 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Attitude
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Behaviour
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.DrugAlcoholDetail
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Health
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LearningNeeds
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Lifestyle
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAssessmentDateInfo
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OffenceDetail
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Psychiatric
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Relationships
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Risks
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.ArnsApiClient
@@ -40,6 +28,18 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonAp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Attitude
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Behaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DrugAlcoholDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Health
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.LearningNeeds
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Lifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OasysAssessmentDateInfo
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OffenceDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Psychiatric
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Relationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Risks
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.learningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
@@ -212,11 +212,11 @@ class OasysService(
     val drugDetail = getDrugDetail(assessmentId)
     val alcoholDetail = getAlcoholDetail(assessmentId)
     return DrugAlcoholDetail(
-      drug = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysDrugDetail(
+      drug = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OasysDrugDetail(
         levelOfUseOfMainDrug = drugDetail?.LevelOfUseOfMainDrug,
         drugsMajorActivity = drugDetail?.DrugsMajorActivity,
       ),
-      alcohol = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OasysAlcoholDetail(
+      alcohol = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OasysAlcoholDetail(
         alcoholLinkedToHarm = alcoholDetail?.alcoholLinkedToHarm,
         alcoholIssuesDetails = alcoholDetail?.alcoholIssuesDetails,
         frequencyAndLevel = alcoholDetail?.frequencyAndLevel,
