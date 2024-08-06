@@ -20,7 +20,7 @@ class Prison(
 data class PrisonType(val code: String, val description: String)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Address(val addressLine1: String, val addressLine2: String?, val town: String, val county: String?, val postcode: String, val country: String)
+data class Address(val addressLine1: String?, val addressLine2: String?, val town: String?, val county: String?, val postcode: String, val country: String)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PrisonOperator(val name: String)

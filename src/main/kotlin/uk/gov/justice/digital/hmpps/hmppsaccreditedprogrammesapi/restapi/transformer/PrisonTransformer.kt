@@ -23,10 +23,10 @@ fun Prison.toPrisonSearchResponse() = PrisonSearchResponse(
   categories = this.categories.map { Category(it) },
   addresses = this.addresses.map {
     Address(
-      addressLine1 = it.addressLine1,
+      addressLine1 = it.addressLine1.orEmpty(),
       addressLine2 = it.addressLine2,
       county = it.county,
-      town = it.town,
+      town = it.town.orEmpty(),
       postcode = it.postcode,
       country = it.country,
     )
