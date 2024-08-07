@@ -1,7 +1,7 @@
 
 CREATE TABLE IF NOT EXISTS pni_rule
 (
-    rule_id UUID NOT NULL PRIMARY KEY
+    rule_id UUID NOT NULL PRIMARY KEY,
     overall_need TEXT NOT NULL,
     overall_risk TEXT NOT NULL,
     combined_pathway TEXT NOT NULL,
