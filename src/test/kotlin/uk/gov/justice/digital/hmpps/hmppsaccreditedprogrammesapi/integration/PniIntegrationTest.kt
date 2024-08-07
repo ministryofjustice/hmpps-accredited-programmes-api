@@ -38,6 +38,7 @@ class PniIntegrationTest : IntegrationTestBase() {
       prisonNumber = prisonNumber,
       crn = "X739590",
       assessmentId = 2114584,
+      programmePathway = "HIGH_INTENSITY_BC",
       needsScore = NeedsScore(
         overallNeedsScore = 6,
         classification = "HIGH_NEED",
@@ -79,7 +80,7 @@ class PniIntegrationTest : IntegrationTestBase() {
       ),
 
       riskScore = RiskScore(
-        classification = "HIGH_SARA",
+        classification = "HIGH_RISK",
         individualRiskScores = IndividualRiskScores(
           ogrs3 = "15.00".toBigDecimal(),
           ovp = "15.00".toBigDecimal(),

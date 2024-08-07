@@ -12,62 +12,6 @@ class PniRiskEngineTest {
   private val riskEngine = PniRiskEngine()
 
   @Test
-  fun `getOverallRiskScore should return HIGH_OGRS when ogrs3 is high`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = BigDecimal("76.00"),
-      ovp = null,
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = null,
-    )
-    val riskScore = riskEngine.getOverallRiskScore(riskScores, "A12345")
-    assertEquals(RiskClassification.HIGH_OGRS.name, riskScore.classification)
-  }
-
-  @Test
-  fun `getOverallRiskScore should return HIGH_OVP when ovp is high`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = null,
-      ovp = BigDecimal("61.00"),
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = null,
-    )
-    val riskScore = riskEngine.getOverallRiskScore(riskScores, "A12345")
-    assertEquals(RiskClassification.HIGH_OVP.name, riskScore.classification)
-  }
-
-  @Test
-  fun `getOverallRiskScore should return HIGH_SARA when sara is high`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = null,
-      ovp = null,
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = "High",
-    )
-    val riskScore = riskEngine.getOverallRiskScore(riskScores, "A12345")
-    assertEquals(RiskClassification.HIGH_SARA.name, riskScore.classification)
-  }
-
-  @Test
-  fun `getOverallRiskScore should return MEDIUM_SARA when sara is medium`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = null,
-      ovp = null,
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = "Medium",
-    )
-    val riskScore = riskEngine.getOverallRiskScore(riskScores, "A12345")
-    assertEquals(RiskClassification.MEDIUM_SARA.name, riskScore.classification)
-  }
-
-  @Test
   fun `isHighIntensityBasedOnRiskScores should return true for high OGRS3 and high OVP`() {
     val riskScores = IndividualRiskScores(
       ogrs3 = BigDecimal("76.00"),
@@ -299,58 +243,6 @@ class PniRiskEngineTest {
       sara = "Low",
     )
     assertFalse(riskEngine.isMediumRisk(riskScores))
-  }
-
-  @Test
-  fun `getRiskClassification should return HIGH_OGRS if ogrs3 is high`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = BigDecimal("76.00"),
-      ovp = null,
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = null,
-    )
-    assertEquals(RiskClassification.HIGH_OGRS.name, riskEngine.getRiskClassification(riskScores))
-  }
-
-  @Test
-  fun `getRiskClassification should return HIGH_OVP if ovp is high`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = null,
-      ovp = BigDecimal("61.00"),
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = null,
-    )
-    assertEquals(RiskClassification.HIGH_OVP.name, riskEngine.getRiskClassification(riskScores))
-  }
-
-  @Test
-  fun `getRiskClassification should return HIGH_SARA if sara is high`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = null,
-      ovp = null,
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = "High",
-    )
-    assertEquals(RiskClassification.HIGH_SARA.name, riskEngine.getRiskClassification(riskScores))
-  }
-
-  @Test
-  fun `getRiskClassification should return MEDIUM_SARA if sara is medium`() {
-    val riskScores = IndividualRiskScores(
-      ogrs3 = null,
-      ovp = null,
-      ospDc = null,
-      ospIic = null,
-      rsr = null,
-      sara = "Medium",
-    )
-    assertEquals(RiskClassification.MEDIUM_SARA.name, riskEngine.getRiskClassification(riskScores))
   }
 
   @Test
