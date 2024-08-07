@@ -2,9 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.KeyDate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Sentence
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.SentenceDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
@@ -12,6 +9,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonAp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceInformation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.KeyDate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sentence
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SentenceDetails
 import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
 

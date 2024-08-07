@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Address
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Category
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonOperator
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonSearchResponse
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrisonType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Address
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Category
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PrisonOperator
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PrisonSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PrisonType
 
 fun Prison.toPrisonSearchResponse() = PrisonSearchResponse(
   prisonId = this.prisonId,

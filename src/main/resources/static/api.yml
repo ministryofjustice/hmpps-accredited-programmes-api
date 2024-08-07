@@ -49,173 +49,6 @@ paths:
         '209':
           description: Subject Identifier is not recognised by this service
 
-
-  /people/{prisonNumber}/sentences:
-    get:
-      tags:
-        - Person
-      summary: Sentence details
-      operationId: getSentenceDetails
-      parameters:
-        - name: prisonNumber
-          in: path
-          description: prison number
-          example: "A1234AA"
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/SentenceDetails'
-        404:
-          description: Person not found
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /prisoner-search:
-    post:
-      tags:
-        - Person
-      deprecated: true
-      summary: (Deprecated - use /people/search instead) Search for a prisoner via prison search api by prisoner id and caseload.
-      operationId: searchPrisoner
-      requestBody:
-        required: true
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/PrisonerSearchRequest'
-      responses:
-        201:
-          description: The prisoner search results.
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PrisonerSearchResponse'
-        400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /people/search:
-    post:
-      tags:
-        - Person
-      summary: Search for a prisoner via prison search api by prisoner id and caseload.
-      operationId: searchPeople
-      requestBody:
-        required: true
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/PeopleSearchRequest'
-      responses:
-        201:
-          description: The prisoner search results.
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PeopleSearchResponse'
-        400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /prison-search:
-    post:
-      tags:
-        - Prison
-      summary: Search for prisons via prison register api by prison id.
-      operationId: getPrisons
-      requestBody:
-        required: true
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/PrisonSearchRequest'
-      responses:
-        201:
-          description: The prisoner search results.
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PrisonSearchResponse'
-        400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-
-  /prison-search/{prisonId}:
-    get:
-      tags:
-        - Prison
-      summary: Details for a single prison
-      operationId: getPrisonById
-      parameters:
-        - name: prisonId
-          in: path
-          description: A prison identifier
-          required: true
-          schema:
-            type: string
-            pattern: '^[A-Z]{3,6}$'
-      responses:
-        200:
-          description: successful operation
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/PrisonSearchResponse'
-        400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
   /courses:
     get:
       tags:
@@ -317,54 +150,6 @@ paths:
                 type: array
                 items:
                   type: string
-
-  /courses/prerequisites/csv:
-    put:
-      tags:
-        - Course Prerequisites
-      summary: Upload a CSV format file containing a full set of prerequisites data for the current set of courses.
-      operationId: updatePrerequisites
-      description: >
-        Accepts a CSV format file of data representing the desired state of all prerequisite data attached to the current set of courses.
-        <p>Pre-existing prerequisite data will be removed before the new data is applied.
-        <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the PrerequisiteRecord schema. Column order is not important.
-      requestBody:
-        required: true
-        content:
-          'text/csv;charset=UTF-8':
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/PrerequisiteRecord'
-      responses:
-        200:
-          description: Successful update
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LineMessage'
-        400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    get:
-      tags:
-        - Course Prerequisites
-      summary: Download a CSV format representation of the current set of prerequisites.
-      operationId: getPrerequisitesCsv
-      responses:
-        200:
-          description: The CSV formatted data is compatible with the PUT operation and may be round-tripped.
-          content:
-            'text/csv;charset=UTF-8':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PrerequisiteRecord'
 
   /courses/{id}/prerequisites:
     get:
@@ -650,54 +435,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/Course'
 
-  /offerings/csv:
-    put:
-      tags:
-        - Course Offerings
-      summary: Upload all offerings in CSV format.
-      operationId: updateOfferings
-      description: >
-        Accepts a CSV format file of data representing the desired state of all offerings data attached to the current set of courses.
-        <p>Pre-existing offering data will be removed before the new data is applied.
-        <p>The first row of CSV data is treated as a header row.  The column headings in the header row must much the names of the fields in the OfferingRecord schema. Column order is not important.
-      requestBody:
-        required: true
-        content:
-          'text/csv;charset=UTF-8':
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/OfferingRecord'
-      responses:
-        204:
-          description: Successful update
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LineMessage'
-        400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    get:
-      tags:
-        - Course Offerings
-      summary: Download all Offerings in CSV format
-      operationId: getOfferingsCsv
-      responses:
-        200:
-          description: successful operation
-          content:
-            'text/csv;charset=UTF-8':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OfferingRecord'
-
   /offerings/{id}:
     get:
       tags:
@@ -757,191 +494,6 @@ paths:
           description: Forbidden.  The client is not authorised to access this offering.
         404:
           description: No offering has the supplied id (Not Found).
-
-  /course-participations:
-    post:
-      tags:
-        - Course Participations
-      summary: Record information about a person's prior participation in a course.
-      operationId: createCourseParticipation
-      requestBody:
-        required: true
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/CourseParticipationCreate'
-      responses:
-        201:
-          description: The course participation information has been added.
-          content:
-            'application/json':
-              schema:
-                $ref: "#/components/schemas/CourseParticipation"
-        400:
-          description: Bad input
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /course-participations/{id}:
-    get:
-      tags:
-        - Course Participations
-      summary: Return information about a person's participation in a course. Selected by a unique identifier.
-      operationId: getCourseParticipationById
-      parameters:
-        - name: id
-          in: path
-          description: The unique identifier assigned to this record when it was created.
-          schema:
-            type: string
-            format: uuid
-          required: true
-      responses:
-        200:
-          description: The selected course participation record.
-          content:
-            'application/json':
-              schema:
-                $ref: "#/components/schemas/CourseParticipation"
-        401:
-          description: The client is not authorised to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    put:
-      tags:
-        - Course Participations
-      summary: Update the information about a person's participation in a course.
-      operationId: updateCourseParticipationById
-      parameters:
-        - name: id
-          in: path
-          description: The unique identifier assigned to this record when it was created.
-          schema:
-            type: string
-            format: uuid
-          required: true
-      requestBody:
-        content:
-          'application/json':
-            schema:
-              $ref: "#/components/schemas/CourseParticipationUpdate"
-        required: true
-      responses:
-        200:
-          description: The information about a person's participation in a course has been updated.
-          content:
-            'application/json':
-              schema:
-                $ref: "#/components/schemas/CourseParticipation"
-        401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        404:
-          description: There is no information for the id, so it cannot be updated.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    delete:
-      tags:
-        - Course Participations
-      summary: Delete information about a person's participation in a course.
-      operationId: deleteCourseParticipationById
-      parameters:
-        - name: id
-          in: path
-          description: The unique identifier assigned to this record when it was created.
-          schema:
-            type: string
-            format: uuid
-          required: true
-      responses:
-        204:
-          description: The information about a person's participation in a course has been deleted.
-        401:
-          description: The client is not authorized to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /people/{prisonNumber}/course-participations:
-    get:
-      tags:
-        - Course Participations
-      summary: Retrieve course participation information for a person identified by their prison number.
-      operationId: getCourseParticipationsByPrisonNumber
-      parameters:
-        - name: prisonNumber
-          in: path
-          description: The prison number of the person for whom the information should be retrieved.
-          example: "A1234AA"
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: All historic course participation information for the person.  Empty if none found.
-          content:
-            'application/json':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CourseParticipation"
-        401:
-          description: The client is not authorised to perform this operation.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /people/offences/{prisonNumber}:
-    get:
-      summary: Get details of an offence by prison number
-      description: Retrieves details of an offence by its unique code.
-      tags:
-        - Person
-      operationId: getOffences
-      parameters:
-        - name: prisonNumber
-          in: path
-          description: The prison number of the person for whom the information should be retrieved.
-          example: "A1234AA"
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Offence'
-                type: array
-        401:
-          description: Unauthorised. The request was unauthorised.
-        403:
-          description: Forbidden.  The client is not authorised to access person.
-        404:
-          description: Invalid prison number
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
 
   /organisations/enabled:
     get:
@@ -1327,196 +879,6 @@ components:
       required:
         - status
 
-    Person:
-      type: object
-      properties:
-        prisonNumber:
-          description: The prison number of the person who is being referred.
-          example: "A1234AA"
-          type: string
-      required:
-        - prisonNumber
-
-    PrisonerSearchRequest:
-      type: object
-      properties:
-        prisonerIdentifier:
-          type: string
-          description: Prisoner identifier for this case we only accept prison number
-          example: A1234AA
-        prisonIds:
-          type: array
-          description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-          example:
-            - MDI
-          items:
-            type: string
-            description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-            example: '["MDI"]'
-      required:
-        - prisonerIdentifier
-
-    PrisonerSearchResponse:
-      type: object
-      properties:
-        bookingId:
-          type: string
-        conditionalReleaseDate:
-          type: string
-          format: date
-        prisonName:
-          type: string
-        dateOfBirth:
-          type: string
-          format: date
-        ethnicity:
-          type: string
-        gender:
-          type: string
-        homeDetentionCurfewEligibilityDate:
-          type: string
-          format: date
-        indeterminateSentence:
-          type: boolean
-        firstName:
-          type: string
-        lastName:
-          type: string
-        paroleEligibilityDate:
-          type: string
-          format: date
-        prisonerNumber:
-          type: string
-        religion:
-          type: string
-        sentenceExpiryDate:
-          type: string
-          format: date
-        sentenceStartDate:
-          type: string
-          format: date
-        tariffDate:
-          type: string
-          format: date
-      required:
-        - bookingId
-        - prisonerNumber
-
-    PeopleSearchRequest:
-      type: object
-      properties:
-        prisonerIdentifier:
-          type: string
-          description: Prisoner identifier for this case we only accept prison number
-          example: A1234AA
-        prisonIds:
-          type: array
-          description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-          example:
-            - MDI
-          items:
-            type: string
-            description: List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-            example: '["MDI"]'
-      required:
-        - prisonerIdentifier
-
-    PeopleSearchResponse:
-      type: object
-      properties:
-        bookingId:
-          type: string
-        conditionalReleaseDate:
-          type: string
-          format: date
-        prisonName:
-          type: string
-        dateOfBirth:
-          type: string
-          format: date
-        ethnicity:
-          type: string
-        gender:
-          type: string
-        homeDetentionCurfewEligibilityDate:
-          type: string
-          format: date
-        indeterminateSentence:
-          type: boolean
-        firstName:
-          type: string
-        lastName:
-          type: string
-        paroleEligibilityDate:
-          type: string
-          format: date
-        prisonerNumber:
-          type: string
-        religion:
-          type: string
-        sentenceExpiryDate:
-          type: string
-          format: date
-        sentenceStartDate:
-          type: string
-          format: date
-        tariffDate:
-          type: string
-          format: date
-      required:
-        - bookingId
-        - prisonerNumber
-    PrisonSearchRequest:
-      type: object
-      properties:
-        prisonIds:
-          type: array
-          description: List of Prisons
-          example:
-            - MDI
-          items:
-            type: string
-            description: List of Prison Ids
-            example: '["MDI"]'
-      required:
-        - prisonIds
-
-    PrisonSearchResponse:
-      type: object
-      properties:
-        prisonId:
-          type: string
-        prisonName:
-          type: string
-        active:
-          type: boolean
-        male:
-          type: boolean
-        female:
-          type: boolean
-        contracted:
-          type: boolean
-        types:
-          type: array
-          items:
-            $ref: '#/components/schemas/PrisonType'
-        categories:
-          type: array
-          items:
-            $ref: '#/components/schemas/Category'
-        addresses:
-          type: array
-          items:
-            $ref: '#/components/schemas/Address'
-        operators:
-          type: array
-          items:
-            $ref: '#/components/schemas/PrisonOperator'
-
-      required:
-        - bookingId
-        - prisonerNumber
-
     EnabledOrganisation:
       type: object
       properties:
@@ -1526,53 +888,6 @@ components:
         description:
           type: string
           example: Stocken
-
-    SentenceDetails:
-      type: object
-      properties:
-        sentences:
-          type: array
-          items:
-            $ref: '#/components/schemas/Sentence'
-        keyDates:
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyDate'
-
-    Sentence:
-      type: object
-      properties:
-        description:
-          type: string
-          example: CJA03 Standard Determinate Sentence
-        sentenceStartDate:
-          type: string
-          format: date
-
-    KeyDate:
-      type: object
-      properties:
-        type:
-          type: string
-          example: earliestReleaseDate
-        code:
-          type: string
-          example: ERD
-        description:
-          type: string
-          example: Earliest Release Date
-        earliestReleaseDate:
-          type: boolean
-          default: false
-        date:
-          type: string
-          format: date
-        order:
-          type: integer
-          example: This is more like a weighting than an order - higher the number the more important the date.
-      required:
-        - type
-        - code
 
     PrisonType:
       type: object
@@ -1655,21 +970,6 @@ components:
           nullable: true
           description: Indicates whether the caseload is currently active or not.
 
-    Offence:
-      type: object
-      properties:
-        offence:
-          type: string
-          description: Description of the offence along with the code.
-        category:
-          type: string
-          nullable: true
-          description: Legislation.
-        offenceDate:
-          type: string
-          format: date
-          description: Offence start date.
-
     Organisation:
       type: object
       properties:
@@ -1748,3 +1048,55 @@ components:
         - description
         - audienceId
         - withdrawn
+
+    PrisonSearchRequest:
+      type: object
+      properties:
+        prisonIds:
+          type: array
+          description: List of Prisons
+          example:
+            - MDI
+          items:
+            type: string
+            description: List of Prison Ids
+            example: '["MDI"]'
+      required:
+        - prisonIds
+
+    PrisonSearchResponse:
+      type: object
+      properties:
+        prisonId:
+          type: string
+        prisonName:
+          type: string
+        active:
+          type: boolean
+        male:
+          type: boolean
+        female:
+          type: boolean
+        contracted:
+          type: boolean
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrisonType'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        operators:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrisonOperator'
+
+      required:
+        - bookingId
+        - prisonerNumber
+

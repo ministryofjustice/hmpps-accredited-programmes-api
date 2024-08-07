@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import java.time.Year
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome as ApiCourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationOutcome as ApiCourseParticipationOutcome
 
 class CourseParticipationTransformersTest {
 
   @Test
   fun `toDomain should transform valid ApiCourseParticipationOutcome correctly`() {
     val outcome = ApiCourseParticipationOutcome(
-      status = ApiCourseParticipationOutcome.Status.complete,
+      status = ApiCourseParticipationOutcome.Status.COMPLETE,
       yearStarted = 1995,
       yearCompleted = 2000,
     ).toDomain()
@@ -27,7 +27,7 @@ class CourseParticipationTransformersTest {
   @Test
   fun `toDomain should throw ValidationException for invalid yearStarted`() {
     val apiOutcome = ApiCourseParticipationOutcome(
-      status = ApiCourseParticipationOutcome.Status.complete,
+      status = ApiCourseParticipationOutcome.Status.COMPLETE,
       yearStarted = 1985,
       yearCompleted = 2000,
     )
@@ -40,7 +40,7 @@ class CourseParticipationTransformersTest {
   @Test
   fun `toDomain should throw ValidationException for invalid yearCompleted`() {
     val apiOutcome = ApiCourseParticipationOutcome(
-      status = ApiCourseParticipationOutcome.Status.complete,
+      status = ApiCourseParticipationOutcome.Status.COMPLETE,
       yearStarted = 1995,
       yearCompleted = 1985,
     )

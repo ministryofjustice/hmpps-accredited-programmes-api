@@ -6,13 +6,8 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.OfferingsApiDelegate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.OfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toOfferingRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import java.util.UUID
@@ -37,14 +32,4 @@ constructor(
       ResponseEntity.ok(it)
     } ?: throw NotFoundException("No Offering found at /offerings/$id")
   }
-
-  override fun updateOfferings(offeringRecord: List<OfferingRecord>): ResponseEntity<List<LineMessage>> =
-    ResponseEntity.ok(courseService.updateOfferings(offeringRecord.map(OfferingRecord::toDomain)))
-
-  override fun getOfferingsCsv(): ResponseEntity<List<OfferingRecord>> =
-    ResponseEntity.ok(
-      courseService
-        .getAllOfferings()
-        .map(OfferingEntity::toOfferingRecord),
-    )
 }

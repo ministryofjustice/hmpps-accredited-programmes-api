@@ -11,12 +11,12 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Offence
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PeopleSearchRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PeopleSearchResponse
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.SentenceDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISONER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Offence
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PeopleSearchRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PeopleSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SentenceDetails
 import java.time.LocalDate
 import java.time.Month
 
