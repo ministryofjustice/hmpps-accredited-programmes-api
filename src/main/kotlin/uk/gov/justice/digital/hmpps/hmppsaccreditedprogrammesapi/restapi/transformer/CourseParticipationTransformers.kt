@@ -9,12 +9,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseParticipationUpdate
 import java.time.Year
 import java.time.format.DateTimeFormatter
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation as ApiCourseParticipation
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationCreate as ApiCourseParticipationCreate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome as ApiCourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSetting as ApiCourseParticipationSetting
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType as ApiCourseParticipationSettingType
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation as ApiCourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationCreate as ApiCourseParticipationCreate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationOutcome as ApiCourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationSetting as ApiCourseParticipationSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationSettingType as ApiCourseParticipationSettingType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
 
 val referralProgramStartYear = Year.of(1990)
 
@@ -37,8 +37,8 @@ fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
 )
 
 fun ApiCourseParticipationSettingType.toDomain() = when (this) {
-  ApiCourseParticipationSettingType.community -> CourseSetting.COMMUNITY
-  ApiCourseParticipationSettingType.custody -> CourseSetting.CUSTODY
+  ApiCourseParticipationSettingType.COMMUNITY -> CourseSetting.COMMUNITY
+  ApiCourseParticipationSettingType.CUSTODY -> CourseSetting.CUSTODY
 }
 
 fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
@@ -61,8 +61,8 @@ fun Year.isValidYear(fieldName: String) = run {
 }
 
 fun ApiCourseParticipationOutcome.Status.toDomain() = when (this) {
-  ApiCourseParticipationOutcome.Status.complete -> CourseStatus.COMPLETE
-  ApiCourseParticipationOutcome.Status.incomplete -> CourseStatus.INCOMPLETE
+  ApiCourseParticipationOutcome.Status.COMPLETE -> CourseStatus.COMPLETE
+  ApiCourseParticipationOutcome.Status.INCOMPLETE -> CourseStatus.INCOMPLETE
 }
 
 fun CourseParticipationSetting.toApi() = ApiCourseParticipationSetting(
@@ -71,13 +71,13 @@ fun CourseParticipationSetting.toApi() = ApiCourseParticipationSetting(
 )
 
 fun CourseSetting.toApi() = when (this) {
-  CourseSetting.CUSTODY -> ApiCourseParticipationSettingType.custody
-  CourseSetting.COMMUNITY -> ApiCourseParticipationSettingType.community
+  CourseSetting.CUSTODY -> ApiCourseParticipationSettingType.CUSTODY
+  CourseSetting.COMMUNITY -> ApiCourseParticipationSettingType.COMMUNITY
 }
 
 fun CourseStatus.toApi() = when (this) {
-  CourseStatus.INCOMPLETE -> ApiCourseParticipationOutcome.Status.incomplete
-  CourseStatus.COMPLETE -> ApiCourseParticipationOutcome.Status.complete
+  CourseStatus.INCOMPLETE -> ApiCourseParticipationOutcome.Status.INCOMPLETE
+  CourseStatus.COMPLETE -> ApiCourseParticipationOutcome.Status.COMPLETE
 }
 
 fun CourseParticipationEntity.toApi() = ApiCourseParticipation(
