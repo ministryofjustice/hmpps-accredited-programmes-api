@@ -40,6 +40,8 @@ class PniService(
   private val log = LoggerFactory.getLogger(this::class.java)
 
   fun getPniScore(prisonNumber: String): PniScore {
+    log.info("Request received to process PNI for prisonNumber $prisonNumber")
+
     auditService.audit(
       prisonNumber = prisonNumber,
       auditAction = AuditAction.PNI.name,
@@ -70,8 +72,12 @@ class PniService(
 
     val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber)
 
+    log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
+
     val overallRiskScore =
       pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber)
+
+    log.info("Overall risk classification for prisonNumber $prisonNumber is ${overallNeedsScore.classification} ")
 
     val programmePathway = getProgramPathway(overallNeedsScore, overallRiskScore, prisonNumber)
 
