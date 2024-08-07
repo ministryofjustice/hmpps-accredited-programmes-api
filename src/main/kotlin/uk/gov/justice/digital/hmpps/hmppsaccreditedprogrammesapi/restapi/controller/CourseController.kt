@@ -13,8 +13,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisites
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.LineMessage
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.PrerequisiteRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
@@ -54,33 +52,6 @@ constructor(
     courseService.updateCourses(courseRecord.map(CourseRecord::toDomain))
     return ResponseEntity.noContent().build()
   }
-
-  @Deprecated(
-    """Phasing out these CSV methods, leaving them in for now but adding this comment 
-    |so we don't get confused with the new endpoints""",
-  )
-  override fun updatePrerequisites(prerequisiteRecord: List<PrerequisiteRecord>): ResponseEntity<List<LineMessage>> =
-    ResponseEntity.ok(courseService.updatePrerequisites(prerequisiteRecord.map(PrerequisiteRecord::toDomain)))
-
-  @Deprecated(
-    """Phasing out these CSV methods, leaving them in for now but adding this comment 
-    |so we don't get confused with the new endpoints""",
-  )
-  override fun getPrerequisitesCsv(): ResponseEntity<List<PrerequisiteRecord>> =
-    ResponseEntity.ok(
-      courseService
-        .getAllCourses(false)
-        .flatMap { course ->
-          course.prerequisites.map { prerequisite ->
-            PrerequisiteRecord(
-              name = prerequisite.name,
-              description = prerequisite.description,
-              course = course.name,
-              identifier = course.identifier,
-            )
-          }
-        },
-    )
 
   override fun getCoursePrerequisites(id: UUID): ResponseEntity<CoursePrerequisites> =
     ResponseEntity.ok(

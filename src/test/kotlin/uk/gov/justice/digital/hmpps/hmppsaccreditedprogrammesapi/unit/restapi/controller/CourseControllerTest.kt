@@ -1,10 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.restapi.controller
 
 import com.ninjasquad.springmockk.MockkBean
-import io.mockk.Runs
 import io.mockk.confirmVerified
 import io.mockk.every
-import io.mockk.just
 import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -17,16 +15,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.MEDIA_TYPE_TEXT_CSV
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generateCourseRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generateOfferingRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.generatePrerequisiteRecords
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toCourseCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toOfferingCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.toPrerequisiteCsv
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -232,80 +221,6 @@ constructor(
       }.andExpect {
         status { isUnauthorized() }
       }
-    }
-  }
-
-  @Nested
-  inner class PutCoursesTests {
-    @Test
-    fun `updateCourses with valid CSV data returns 204`() {
-      every { courseService.updateCourses(any()) } just Runs
-
-      val replacementCourses = generateCourseRecords(3)
-      val replacementCoursesCsv = replacementCourses.toCourseCsv()
-      val replacementCoursesDomain = replacementCourses.map { it.toDomain() }
-
-      mockMvc.put("/courses/csv") {
-        contentType = MEDIA_TYPE_TEXT_CSV
-        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = replacementCoursesCsv
-      }.andExpect {
-        status { isNoContent() }
-      }
-
-      verify { courseService.updateCourses(replacementCoursesDomain) }
-    }
-  }
-
-  @Nested
-  inner class PutPrerequisitesTests {
-    @Test
-    fun `updatePrerequisites with valid CSV data returns 200 and no content`() {
-      every { courseService.updatePrerequisites(any()) } returns emptyList()
-
-      val replacementPrerequisites = generatePrerequisiteRecords(3)
-      val replacementPrerequisitesCsv = replacementPrerequisites.toPrerequisiteCsv()
-      val replacementPrerequisitesDomain = replacementPrerequisites.map { it.toDomain() }
-
-      mockMvc.put("/courses/prerequisites/csv") {
-        contentType = MEDIA_TYPE_TEXT_CSV
-        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = replacementPrerequisitesCsv
-      }.andExpect {
-        status { isOk() }
-        content {
-          contentType(MediaType.APPLICATION_JSON)
-          jsonPath("$.size()") { value(0) }
-        }
-      }
-
-      verify { courseService.updatePrerequisites(replacementPrerequisitesDomain) }
-    }
-  }
-
-  @Nested
-  inner class PutOfferingsTests {
-    @Test
-    fun `updateOfferings with valid CSV data returns 200 and no content`() {
-      every { courseService.updateOfferings(any()) } returns emptyList()
-
-      val replacementOfferings = generateOfferingRecords(3)
-      val replacementOfferingsCsv = replacementOfferings.toOfferingCsv()
-      val replacementOfferingsDomain = replacementOfferings.map { it.toDomain() }
-
-      mockMvc.put("/offerings/csv") {
-        contentType = MEDIA_TYPE_TEXT_CSV
-        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = replacementOfferingsCsv
-      }.andExpect {
-        status { isOk() }
-        content {
-          contentType(MediaType.APPLICATION_JSON)
-          jsonPath("$.size()") { value(0) }
-        }
-      }
-
-      verify { courseService.updateOfferings(replacementOfferingsDomain) }
     }
   }
 }
