@@ -9,6 +9,8 @@ data class PniScore(
   @get:JsonProperty("crn") val crn: String?,
   @Schema(example = "2512235167", required = true)
   @get:JsonProperty("assessmentId") val assessmentId: Long,
+  @Schema(example = "HIGH_INTENSITY_BC", required = true)
+  @get:JsonProperty("programmePathway") val programmePathway: String,
   @Schema(
     example = "{\n" +
       "  \"prisonNumber\": \"A1234BC\",\n" +

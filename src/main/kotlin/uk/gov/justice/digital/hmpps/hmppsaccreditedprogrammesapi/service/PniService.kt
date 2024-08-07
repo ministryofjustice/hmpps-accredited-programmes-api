@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
@@ -7,8 +8,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniRuleRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualCognitiveScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualNeedsAndRiskScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualNeedsScores
@@ -22,13 +25,20 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import java.math.BigDecimal
 import java.math.RoundingMode
 
+private const val HIGH_INTENSITY_BC = "HIGH_INTENSITY_BC"
+
+private const val MEDIUM_INTENSITY_BC = "MEDIUM_INTENSITY_BC"
+
 @Service
 class PniService(
   private val oasysService: OasysService,
   private val auditService: AuditService,
   private val pniNeedsEngine: PniNeedsEngine,
   private val pniRiskEngine: PniRiskEngine,
+  private val pniRuleRepository: PniRuleRepository,
 ) {
+  private val log = LoggerFactory.getLogger(this::class.java)
+
   fun getPniScore(prisonNumber: String): PniScore {
     auditService.audit(
       prisonNumber = prisonNumber,
@@ -63,27 +73,41 @@ class PniService(
     val overallRiskScore =
       pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber)
 
-    val combinedPathway = getCombinedPathway(individualNeedsAndRiskScores, overallNeedsScore, overallRiskScore)
+    val programmePathway = getProgramPathway(overallNeedsScore, overallRiskScore, prisonNumber)
 
     return PniScore(
       prisonNumber = prisonNumber,
       crn = oasysOffendingInfo?.crn,
       assessmentId = assessmentId,
+      programmePathway = programmePathway,
       needsScore = overallNeedsScore,
       riskScore = overallRiskScore,
     )
   }
 
-  private fun getCombinedPathway(
-    individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
+  private fun getProgramPathway(
     overallNeedsScore: NeedsScore,
     overallRiskScore: RiskScore,
+    prisonNumber: String,
   ): String {
-    if (pniRiskEngine.isHighIntensityBasedOnRiskScores(individualNeedsAndRiskScores.individualRiskScores)) {
-      return "High Intensity BC"
-    } else {
-      // logic for compined pathway flow
-      return ""
+    val programmePathway = getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
+      ?: return pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
+        overallNeedsScore.classification,
+        overallRiskScore.classification,
+      )?.combinedPathway
+        ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
+
+    log.info("Programme pathway for $prisonNumber: ${overallNeedsScore.classification} + ${overallRiskScore.classification}  -> $programmePathway")
+
+    return programmePathway
+  }
+
+  private fun getPathwayAfterApplyingExceptionRules(needsClassification: String, individualRiskScores: IndividualRiskScores): String? {
+    return when {
+      pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> HIGH_INTENSITY_BC
+      needsClassification == PniNeedsEngine.NeedsClassification.LOW_NEED.name &&
+        (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MEDIUM_INTENSITY_BC
+      else -> null
     }
   }
 
