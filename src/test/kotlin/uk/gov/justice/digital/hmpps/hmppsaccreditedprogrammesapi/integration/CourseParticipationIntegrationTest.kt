@@ -18,17 +18,17 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.test.web.reactive.server.returnResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipation
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationCreate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSetting
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationSettingType
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationCreate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationOutcome
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationSetting
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationSettingType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -63,11 +63,11 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
         source = "Source of information",
         detail = "Course detail",
         setting = CourseParticipationSetting(
-          type = CourseParticipationSettingType.custody,
+          type = CourseParticipationSettingType.CUSTODY,
           location = "location",
         ),
         outcome = CourseParticipationOutcome(
-          status = CourseParticipationOutcome.Status.complete,
+          status = CourseParticipationOutcome.Status.COMPLETE,
           yearStarted = 2021,
           yearCompleted = 2022,
         ),
@@ -141,11 +141,11 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       source = "Source of information",
       detail = "Course detail",
       setting = CourseParticipationSetting(
-        type = CourseParticipationSettingType.custody,
+        type = CourseParticipationSettingType.CUSTODY,
         location = "location",
       ),
       outcome = CourseParticipationOutcome(
-        status = CourseParticipationOutcome.Status.complete,
+        status = CourseParticipationOutcome.Status.COMPLETE,
         yearStarted = 1985,
         yearCompleted = 2022,
       ),
@@ -179,12 +179,12 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
       CourseParticipationUpdate(
         courseName = "Course name",
         setting = CourseParticipationSetting(
-          type = CourseParticipationSettingType.custody,
+          type = CourseParticipationSettingType.CUSTODY,
         ),
         source = "Source of information",
         detail = "Course participation detail",
         outcome = CourseParticipationOutcome(
-          status = CourseParticipationOutcome.Status.incomplete,
+          status = CourseParticipationOutcome.Status.INCOMPLETE,
           yearStarted = 2020,
         ),
       ),
@@ -224,12 +224,12 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     val updateAttempt = CourseParticipationUpdate(
       courseName = "Non-existent Course",
       setting = CourseParticipationSetting(
-        type = CourseParticipationSettingType.custody,
+        type = CourseParticipationSettingType.CUSTODY,
       ),
       source = "Non-existent Source",
       detail = "Non-existent Course Detail",
       outcome = CourseParticipationOutcome(
-        status = CourseParticipationOutcome.Status.incomplete,
+        status = CourseParticipationOutcome.Status.INCOMPLETE,
         yearStarted = 2021,
       ),
     )

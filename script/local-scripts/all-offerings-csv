@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-# Upload Offering data in CSV format to the PUT /courses/offerings endpoint.
-# The data is accepted on stdin
-DIR="$(dirname "$(realpath "$0")")"
-TOKEN=$("$DIR"/get-token)
-curl -v --header "Authorization: Bearer $TOKEN" --header "Accept: text/csv" http://localhost:8080/offerings/csv

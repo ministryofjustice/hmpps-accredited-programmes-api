@@ -5,8 +5,7 @@ Every script takes one argument, `-ns <env>` ,that defines the namespace that it
 'dev', 'preprod' or 'prod'
 
 ## The scripts and their function:
-- `get-token` Acquires a token from the hmpps-auth service for the named environment. Printed to stdout.
-- `upload-csv` Uploads CSV format files 'Course.csv', 'Offering.csv' and 'CoursePrerequiste.csv' to the named 
+- `get-token` Acquires a token from the hmpps-auth service for the named environment. Printed to stdout. 
    environment.  The script should be invoked from the directory containing the files
 - `get-courses` Invoke the `GET /courses` end-point and output the response to stdout
 - `start-db-portforward-pod` Starts a pod in the named environment that forwards the Postgresql port for the API 

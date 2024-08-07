@@ -11,14 +11,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.Cours
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CoursePrerequisites
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseRecord
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toCourseRecord
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AudienceService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
@@ -40,18 +37,6 @@ constructor(
           .getAllCourses(withdrawn ?: false)
           .map(CourseEntity::toApi),
       )
-
-  override fun getCoursesCsv(): ResponseEntity<List<CourseRecord>> =
-    ResponseEntity.ok(
-      courseService
-        .getAllCourses(false)
-        .map(CourseEntity::toCourseRecord),
-    )
-
-  override fun updateCourses(courseRecord: List<CourseRecord>): ResponseEntity<Unit> {
-    courseService.updateCourses(courseRecord.map(CourseRecord::toDomain))
-    return ResponseEntity.noContent().build()
-  }
 
   override fun getCoursePrerequisites(id: UUID): ResponseEntity<CoursePrerequisites> =
     ResponseEntity.ok(
