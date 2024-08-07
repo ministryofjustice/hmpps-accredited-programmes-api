@@ -1,3 +1,5 @@
+# THIS FUNCTIONALITY HAS NOW BEEN REMOVED
+
 # Replace all API data
 
 There are two scenarios in which replacing API data may be useful or necessary.
