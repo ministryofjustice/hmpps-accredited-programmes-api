@@ -97,11 +97,11 @@ class PniService(
     prisonNumber: String,
   ): String {
     val programmePathway = getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
-      ?: return pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
+      ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
         overallNeedsScore.classification,
         overallRiskScore.classification,
       )?.combinedPathway
-        ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
+      ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
 
     log.info("Programme pathway for $prisonNumber: ${overallNeedsScore.classification} + ${overallRiskScore.classification}  -> $programmePathway")
 
