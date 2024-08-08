@@ -23,13 +23,13 @@ data class IndividualNeedsScores(
 
 data class IndividualSexScores(
 
-  @Schema(example = "1", description = "")
+  @Schema(name = "sexualPreOccupation", example = "1", description = "")
   @get:JsonProperty("sexualPreOccupation") val sexualPreOccupation: kotlin.Int? = null,
 
-  @Schema(example = "1", description = "")
+  @Schema(name = "offenceRelatedSexualInterests", example = "1", description = "")
   @get:JsonProperty("offenceRelatedSexualInterests") val offenceRelatedSexualInterests: kotlin.Int? = null,
 
-  @Schema(example = "1", description = "")
+  @Schema(name = "emotionalCongruence", example = "1", description = "")
   @get:JsonProperty("emotionalCongruence") val emotionalCongruence: kotlin.Int? = null,
 ) {
   fun hasNullValues() = listOf(

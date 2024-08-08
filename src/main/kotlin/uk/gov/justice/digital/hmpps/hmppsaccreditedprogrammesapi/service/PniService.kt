@@ -77,7 +77,7 @@ class PniService(
     val overallRiskScore =
       pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber)
 
-    log.info("Overall risk classification for prisonNumber $prisonNumber is ${overallNeedsScore.classification} ")
+    log.info("Overall risk score classification for prisonNumber $prisonNumber is ${overallNeedsScore.classification} ")
 
     val programmePathway = getProgramPathway(overallNeedsScore, overallRiskScore, prisonNumber)
 

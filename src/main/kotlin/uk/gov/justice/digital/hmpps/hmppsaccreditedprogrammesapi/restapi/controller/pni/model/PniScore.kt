@@ -2,16 +2,19 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.contro
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+
 data class PniScore(
-  @Schema(example = "A1234BC", required = true)
+  @Schema(name = "prisonNumber", example = "A1234BC", required = true)
   @get:JsonProperty("prisonNumber") val prisonNumber: String,
-  @Schema(example = "D602550", required = true)
+  @Schema(name = "crn", example = "D602550", required = true)
   @get:JsonProperty("crn") val crn: String?,
-  @Schema(example = "2512235167", required = true)
+  @Schema(name = "assessmentId", example = "2512235167", required = true)
   @get:JsonProperty("assessmentId") val assessmentId: Long,
-  @Schema(example = "HIGH_INTENSITY_BC", required = true)
+  @Schema(name = "programmePathway", example = "HIGH_INTENSITY_BC", required = true)
   @get:JsonProperty("programmePathway") val programmePathway: String,
   @Schema(
+    name = "NeedsScore",
+    required = true,
     example = "{\n" +
       "  \"prisonNumber\": \"A1234BC\",\n" +
       "  \"crn\": \"X739590\",\n" +
@@ -58,6 +61,8 @@ data class PniScore(
   )
   @get:JsonProperty("NeedsScore") val needsScore: NeedsScore,
   @Schema(
+    name = "RiskScore",
+    required = true,
     example = "  \"riskScores\": {\n" +
       "    \"ogrs3\": 15.0,\n" +
       "    \"ovp\": 15.0,\n" +

@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 
 data class NeedsScore(
-  @Schema(example = "5", required = true)
+  @Schema(name = "overallNeedsScore", example = "5", required = true)
   @get:JsonProperty("overallNeedsScore") val overallNeedsScore: Int,
-  @Schema(example = "High Intensity BC", required = true)
+  @Schema(name = "classification", example = "High Intensity BC", required = true)
   @get:JsonProperty("classification") val classification: String,
-  @Schema(example = "5", required = true)
+  @Schema(name = "DomainScore", example = "5", required = true)
   @get:JsonProperty("DomainScore") val domainScore: DomainScore,
 )
 
 data class DomainScore(
-  @Schema(example = "1", required = true)
+  @Schema(name = "SexDomainScore", example = "null", required = true)
   @get:JsonProperty("SexDomainScore") val sexDomainScore: SexDomainScore,
   @Schema(example = "2", required = true)
   @get:JsonProperty("ThinkingDomainScore") val thinkingDomainScore: ThinkingDomainScore,
@@ -24,8 +24,9 @@ data class DomainScore(
 )
 
 data class SexDomainScore(
-  @Schema(example = "2", required = true)
+  @Schema(name = "overallSexDomainScore", example = "2", required = true)
   @get:JsonProperty("overallSexDomainScore") val overAllSexDomainScore: Int,
+  @Schema(name = "IndividualSexScores", example = "null", required = true)
   @get:JsonProperty("individualSexScores") val individualSexScores: IndividualSexScores,
 )
 
