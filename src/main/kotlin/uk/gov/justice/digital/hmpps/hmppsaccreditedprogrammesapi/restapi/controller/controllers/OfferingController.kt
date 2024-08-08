@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.E
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import java.util.UUID
 
 @RestController
 @Tag(
@@ -50,7 +51,7 @@ class OfferingController(
     value = ["/offerings/{id}/course"],
     produces = ["application/json"],
   )
-  fun getCourseByOfferingId(@Parameter(description = "The id (UUID) of an offering.", required = true) @PathVariable("id") id: java.util.UUID): ResponseEntity<Course> =
+  fun getCourseByOfferingId(@Parameter(description = "The id (UUID) of an offering.", required = true) @PathVariable("id") id: UUID): ResponseEntity<Course> =
     courseService.getCourseByOfferingId(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /offerings/$id/course")
@@ -73,7 +74,7 @@ class OfferingController(
     value = ["/offerings/{id}"],
     produces = ["application/json"],
   )
-  fun getOfferingById(@Parameter(description = "A course offering identifier", required = true) @PathVariable("id") id: java.util.UUID): ResponseEntity<CourseOffering> {
+  fun getOfferingById(@Parameter(description = "A course offering identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CourseOffering> {
     val offeringById = courseService.getOfferingById(id)
     val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringById?.organisationId.orEmpty()) != null
 

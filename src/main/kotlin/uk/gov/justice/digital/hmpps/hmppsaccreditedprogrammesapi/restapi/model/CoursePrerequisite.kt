@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CoursePrerequisite(
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("name", required = true) val name: kotlin.String,
+  @get:JsonProperty("name", required = true) val name: String,
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("description", required = true) val description: kotlin.String,
+  @get:JsonProperty("description", required = true) val description: String,
 )

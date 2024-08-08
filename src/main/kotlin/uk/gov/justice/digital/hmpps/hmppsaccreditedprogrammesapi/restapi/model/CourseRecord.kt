@@ -16,23 +16,23 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CourseRecord(
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("name", required = true) val name: kotlin.String,
+  @get:JsonProperty("name", required = true) val name: String,
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("identifier", required = true) val identifier: kotlin.String,
+  @get:JsonProperty("identifier", required = true) val identifier: String,
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("description", required = true) val description: kotlin.String,
+  @get:JsonProperty("description", required = true) val description: String,
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("audience", required = true) val audience: kotlin.String,
+  @get:JsonProperty("audience", required = true) val audience: String,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("alternateName") val alternateName: kotlin.String? = null,
+  @get:JsonProperty("alternateName") val alternateName: String? = null,
 
   @Schema(example = "purple", description = "")
-  @get:JsonProperty("audienceColour") val audienceColour: kotlin.String? = null,
+  @get:JsonProperty("audienceColour") val audienceColour: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("comments") val comments: kotlin.String? = null,
+  @get:JsonProperty("comments") val comments: String? = null,
 )

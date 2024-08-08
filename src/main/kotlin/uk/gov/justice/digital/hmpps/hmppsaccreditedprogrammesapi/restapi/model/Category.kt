@@ -10,5 +10,5 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Category(
 
   @Schema(example = "E", required = true, description = "")
-  @get:JsonProperty("category", required = true) val category: kotlin.String,
+  @get:JsonProperty("category", required = true) val category: String,
 )

@@ -12,10 +12,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Alert(
 
   @Schema(example = "risk to children", description = "")
-  @get:JsonProperty("description") val description: kotlin.String? = null,
+  @get:JsonProperty("description") val description: String? = null,
 
   @Schema(example = "Sexual Offence", description = "")
-  @get:JsonProperty("alertType") val alertType: kotlin.String? = null,
+  @get:JsonProperty("alertType") val alertType: String? = null,
 
   @Schema(example = "null", description = "Date alert was created.")
   @get:JsonProperty("dateCreated") val dateCreated: java.time.LocalDate? = null,

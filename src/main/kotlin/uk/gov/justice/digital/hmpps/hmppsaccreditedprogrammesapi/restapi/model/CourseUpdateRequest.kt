@@ -16,23 +16,23 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CourseUpdateRequest(
 
   @Schema(example = "Thinking skills programme", description = "")
-  @get:JsonProperty("name") val name: kotlin.String? = null,
+  @get:JsonProperty("name") val name: String? = null,
 
   @Schema(example = "Thinking Skills Programme (TSP) description", description = "")
-  @get:JsonProperty("description") val description: kotlin.String? = null,
+  @get:JsonProperty("description") val description: String? = null,
 
   @Schema(example = "BNM+", description = "")
-  @get:JsonProperty("alternateName") val alternateName: kotlin.String? = null,
+  @get:JsonProperty("alternateName") val alternateName: String? = null,
 
   @Schema(example = "Becoming New Me Plus: general violence offence (BNM+)", description = "")
-  @get:JsonProperty("displayName") val displayName: kotlin.String? = null,
+  @get:JsonProperty("displayName") val displayName: String? = null,
 
   @Schema(example = "Gang offence", description = "")
-  @get:JsonProperty("audience") val audience: kotlin.String? = null,
+  @get:JsonProperty("audience") val audience: String? = null,
 
   @Schema(example = "#FF5733", description = "")
-  @get:JsonProperty("audienceColour") val audienceColour: kotlin.String? = null,
+  @get:JsonProperty("audienceColour") val audienceColour: String? = null,
 
   @Schema(example = "true", description = "")
-  @get:JsonProperty("withdrawn") val withdrawn: kotlin.Boolean? = null,
+  @get:JsonProperty("withdrawn") val withdrawn: Boolean? = null,
 )

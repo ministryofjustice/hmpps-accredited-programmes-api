@@ -15,20 +15,20 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Address(
 
   @Schema(example = "Higher Lane", required = true, description = "")
-  @get:JsonProperty("addressLine1", required = true) val addressLine1: kotlin.String,
+  @get:JsonProperty("addressLine1", required = true) val addressLine1: String,
 
   @Schema(example = "Liverpool", required = true, description = "")
-  @get:JsonProperty("town", required = true) val town: kotlin.String,
+  @get:JsonProperty("town", required = true) val town: String,
 
   @Schema(example = "L9 7LH", required = true, description = "")
-  @get:JsonProperty("postcode", required = true) val postcode: kotlin.String,
+  @get:JsonProperty("postcode", required = true) val postcode: String,
 
   @Schema(example = "England", required = true, description = "")
-  @get:JsonProperty("country", required = true) val country: kotlin.String,
+  @get:JsonProperty("country", required = true) val country: String,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("addressLine2") val addressLine2: kotlin.String? = null,
+  @get:JsonProperty("addressLine2") val addressLine2: String? = null,
 
   @Schema(example = "Merseyside", description = "")
-  @get:JsonProperty("county") val county: kotlin.String? = null,
+  @get:JsonProperty("county") val county: String? = null,
 )

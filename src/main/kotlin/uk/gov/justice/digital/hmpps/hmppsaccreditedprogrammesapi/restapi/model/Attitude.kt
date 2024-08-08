@@ -12,11 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Attitude(
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("proCriminalAttitudes") val proCriminalAttitudes: kotlin.String? = null,
+  @get:JsonProperty("proCriminalAttitudes") val proCriminalAttitudes: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("motivationToAddressBehaviour") val motivationToAddressBehaviour: kotlin.String? = null,
+  @get:JsonProperty("motivationToAddressBehaviour") val motivationToAddressBehaviour: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("hostileOrientation") val hostileOrientation: kotlin.String? = null,
+  @get:JsonProperty("hostileOrientation") val hostileOrientation: String? = null,
 )

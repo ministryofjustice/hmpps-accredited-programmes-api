@@ -25,50 +25,50 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class OffenceDetail(
 
   @Schema(example = "Armed robbery", description = "")
-  @get:JsonProperty("offenceDetails") val offenceDetails: kotlin.String? = null,
+  @get:JsonProperty("offenceDetails") val offenceDetails: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("contactTargeting") val contactTargeting: kotlin.Boolean? = false,
+  @get:JsonProperty("contactTargeting") val contactTargeting: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("raciallyMotivated") val raciallyMotivated: kotlin.Boolean? = false,
+  @get:JsonProperty("raciallyMotivated") val raciallyMotivated: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("revenge") val revenge: kotlin.Boolean? = false,
+  @get:JsonProperty("revenge") val revenge: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("domesticViolence") val domesticViolence: kotlin.Boolean? = false,
+  @get:JsonProperty("domesticViolence") val domesticViolence: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("repeatVictimisation") val repeatVictimisation: kotlin.Boolean? = false,
+  @get:JsonProperty("repeatVictimisation") val repeatVictimisation: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("victimWasStranger") val victimWasStranger: kotlin.Boolean? = false,
+  @get:JsonProperty("victimWasStranger") val victimWasStranger: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("stalking") val stalking: kotlin.Boolean? = false,
+  @get:JsonProperty("stalking") val stalking: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("recognisesImpact") val recognisesImpact: kotlin.Boolean? = false,
+  @get:JsonProperty("recognisesImpact") val recognisesImpact: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("numberOfOthersInvolved") val numberOfOthersInvolved: kotlin.Int? = 0,
+  @get:JsonProperty("numberOfOthersInvolved") val numberOfOthersInvolved: Int? = 0,
 
   @Schema(example = "There were two others involved who absconded at the scene", description = "")
-  @get:JsonProperty("othersInvolvedDetail") val othersInvolvedDetail: kotlin.String? = null,
+  @get:JsonProperty("othersInvolvedDetail") val othersInvolvedDetail: String? = null,
 
   @Schema(example = "This person is easily lead", description = "")
-  @get:JsonProperty("peerGroupInfluences") val peerGroupInfluences: kotlin.String? = null,
+  @get:JsonProperty("peerGroupInfluences") val peerGroupInfluences: String? = null,
 
   @Schema(example = "Drug misuse fuels this persons motivation", description = "")
-  @get:JsonProperty("motivationAndTriggers") val motivationAndTriggers: kotlin.String? = null,
+  @get:JsonProperty("motivationAndTriggers") val motivationAndTriggers: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("acceptsResponsibility") val acceptsResponsibility: kotlin.Boolean? = false,
+  @get:JsonProperty("acceptsResponsibility") val acceptsResponsibility: Boolean? = false,
 
   @Schema(example = "This person fully accepts their actions", description = "")
-  @get:JsonProperty("acceptsResponsibilityDetail") val acceptsResponsibilityDetail: kotlin.String? = null,
+  @get:JsonProperty("acceptsResponsibilityDetail") val acceptsResponsibilityDetail: String? = null,
 
   @Schema(example = "This person has a long history of robbery", description = "")
-  @get:JsonProperty("patternOffending") val patternOffending: kotlin.String? = null,
+  @get:JsonProperty("patternOffending") val patternOffending: String? = null,
 )

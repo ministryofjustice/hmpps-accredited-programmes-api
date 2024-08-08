@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import java.util.UUID
 
 /**
  *
@@ -18,19 +19,19 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CourseParticipation(
 
   @Schema(example = "A1234AA", required = true, description = "The prison number of the course participant.")
-  @get:JsonProperty("prisonNumber", required = true) val prisonNumber: kotlin.String,
+  @get:JsonProperty("prisonNumber", required = true) val prisonNumber: String,
 
   @Schema(example = "null", required = true, description = "A unique identifier for this record of participation in a course.")
-  @get:JsonProperty("id", required = true) val id: java.util.UUID,
+  @get:JsonProperty("id", required = true) val id: UUID,
 
   @Schema(example = "null", required = true, description = "The identity of the person who added this CourseParticipation")
-  @get:JsonProperty("addedBy", required = true) val addedBy: kotlin.String,
+  @get:JsonProperty("addedBy", required = true) val addedBy: String,
 
   @Schema(example = "null", required = true, description = "The date and time at which this CourseParticipation was created. ISO 8601 date-time format.")
-  @get:JsonProperty("createdAt", required = true) val createdAt: kotlin.String,
+  @get:JsonProperty("createdAt", required = true) val createdAt: String,
 
   @Schema(example = "null", description = "The name of the course taken by the participant.")
-  @get:JsonProperty("courseName") val courseName: kotlin.String? = null,
+  @get:JsonProperty("courseName") val courseName: String? = null,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("setting") val setting: CourseParticipationSetting? = null,
@@ -39,8 +40,8 @@ data class CourseParticipation(
   @get:JsonProperty("outcome") val outcome: CourseParticipationOutcome? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("detail") val detail: kotlin.String? = null,
+  @get:JsonProperty("detail") val detail: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("source") val source: kotlin.String? = null,
+  @get:JsonProperty("source") val source: String? = null,
 )

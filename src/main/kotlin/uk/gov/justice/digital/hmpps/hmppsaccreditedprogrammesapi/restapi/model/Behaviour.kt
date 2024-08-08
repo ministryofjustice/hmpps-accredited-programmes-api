@@ -19,32 +19,32 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Behaviour(
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("temperControl") val temperControl: kotlin.String? = null,
+  @get:JsonProperty("temperControl") val temperControl: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("problemSolvingSkills") val problemSolvingSkills: kotlin.String? = null,
+  @get:JsonProperty("problemSolvingSkills") val problemSolvingSkills: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("awarenessOfConsequences") val awarenessOfConsequences: kotlin.String? = null,
+  @get:JsonProperty("awarenessOfConsequences") val awarenessOfConsequences: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("achieveGoals") val achieveGoals: kotlin.String? = null,
+  @get:JsonProperty("achieveGoals") val achieveGoals: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("understandsViewsOfOthers") val understandsViewsOfOthers: kotlin.String? = null,
+  @get:JsonProperty("understandsViewsOfOthers") val understandsViewsOfOthers: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("concreteAbstractThinking") val concreteAbstractThinking: kotlin.String? = null,
+  @get:JsonProperty("concreteAbstractThinking") val concreteAbstractThinking: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("sexualPreOccupation") val sexualPreOccupation: kotlin.String? = null,
+  @get:JsonProperty("sexualPreOccupation") val sexualPreOccupation: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("offenceRelatedSexualInterests") val offenceRelatedSexualInterests: kotlin.String? = null,
+  @get:JsonProperty("offenceRelatedSexualInterests") val offenceRelatedSexualInterests: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("aggressiveControllingBehaviour") val aggressiveControllingBehaviour: kotlin.String? = null,
+  @get:JsonProperty("aggressiveControllingBehaviour") val aggressiveControllingBehaviour: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("impulsivity") val impulsivity: kotlin.String? = null,
+  @get:JsonProperty("impulsivity") val impulsivity: String? = null,
 )

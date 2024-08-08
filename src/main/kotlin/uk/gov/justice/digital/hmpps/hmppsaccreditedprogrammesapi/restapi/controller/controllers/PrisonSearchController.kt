@@ -43,7 +43,7 @@ class PrisonSearchController(private val prisonRegisterApiService: PrisonRegiste
     value = ["/prison-search/{prisonId}"],
     produces = ["application/json"],
   )
-  fun getPrisonById(@Parameter(description = "A prison identifier", required = true) @PathVariable("prisonId") prisonId: kotlin.String): ResponseEntity<PrisonSearchResponse> {
+  fun getPrisonById(@Parameter(description = "A prison identifier", required = true) @PathVariable("prisonId") prisonId: String): ResponseEntity<PrisonSearchResponse> {
     return prisonRegisterApiService.getPrisonById(prisonId)?.let {
       ResponseEntity.ok(it.toPrisonSearchResponse())
     } ?: throw NotFoundException("No Prison found for $prisonId")

@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Organisation(
 
   @Schema(example = "MDI", description = "")
-  @get:JsonProperty("code") val code: kotlin.String? = null,
+  @get:JsonProperty("code") val code: String? = null,
 
   @Schema(example = "Moorland HMP", description = "")
-  @get:JsonProperty("prisonName") val prisonName: kotlin.String? = null,
+  @get:JsonProperty("prisonName") val prisonName: String? = null,
 )

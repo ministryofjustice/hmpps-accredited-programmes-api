@@ -14,5 +14,5 @@ data class OasysAssessmentDateInfo(
   @get:JsonProperty("recentCompletedAssessmentDate") val recentCompletedAssessmentDate: java.time.LocalDate? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("hasOpenAssessment") val hasOpenAssessment: kotlin.Boolean? = null,
+  @get:JsonProperty("hasOpenAssessment") val hasOpenAssessment: Boolean? = null,
 )

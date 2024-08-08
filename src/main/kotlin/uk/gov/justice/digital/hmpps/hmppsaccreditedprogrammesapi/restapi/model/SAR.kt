@@ -10,5 +10,5 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class SAR(
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("content") val content: kotlin.String? = null,
+  @get:JsonProperty("content") val content: String? = null,
 )

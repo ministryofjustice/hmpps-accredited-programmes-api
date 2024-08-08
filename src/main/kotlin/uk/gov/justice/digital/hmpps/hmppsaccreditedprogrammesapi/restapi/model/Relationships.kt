@@ -18,29 +18,29 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Relationships(
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("dvEvidence") val dvEvidence: kotlin.Boolean? = false,
+  @get:JsonProperty("dvEvidence") val dvEvidence: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("victimFormerPartner") val victimFormerPartner: kotlin.Boolean? = false,
+  @get:JsonProperty("victimFormerPartner") val victimFormerPartner: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("victimFamilyMember") val victimFamilyMember: kotlin.Boolean? = false,
+  @get:JsonProperty("victimFamilyMember") val victimFamilyMember: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("victimOfPartnerFamily") val victimOfPartnerFamily: kotlin.Boolean? = false,
+  @get:JsonProperty("victimOfPartnerFamily") val victimOfPartnerFamily: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("perpOfPartnerOrFamily") val perpOfPartnerOrFamily: kotlin.Boolean? = false,
+  @get:JsonProperty("perpOfPartnerOrFamily") val perpOfPartnerOrFamily: Boolean? = false,
 
   @Schema(example = "This person has a history of domestic violence", description = "")
-  @get:JsonProperty("relIssuesDetails") val relIssuesDetails: kotlin.String? = null,
+  @get:JsonProperty("relIssuesDetails") val relIssuesDetails: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("emotionalCongruence") val emotionalCongruence: kotlin.String? = null,
+  @get:JsonProperty("emotionalCongruence") val emotionalCongruence: String? = null,
 
   @Schema(example = "Not in a relationship", description = "")
-  @get:JsonProperty("relCurrRelationshipStatus") val relCurrRelationshipStatus: kotlin.String? = null,
+  @get:JsonProperty("relCurrRelationshipStatus") val relCurrRelationshipStatus: String? = null,
 
   @Schema(example = "2-Significant problems", description = "")
-  @get:JsonProperty("prevCloseRelationships") val prevCloseRelationships: kotlin.String? = null,
+  @get:JsonProperty("prevCloseRelationships") val prevCloseRelationships: String? = null,
 )

@@ -12,11 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Lifestyle(
 
   @Schema(example = "Drug addiction", description = "")
-  @get:JsonProperty("activitiesEncourageOffending") val activitiesEncourageOffending: kotlin.String? = null,
+  @get:JsonProperty("activitiesEncourageOffending") val activitiesEncourageOffending: String? = null,
 
   @Schema(example = "Commits robbery to fund drug addiction", description = "")
-  @get:JsonProperty("lifestyleIssues") val lifestyleIssues: kotlin.String? = null,
+  @get:JsonProperty("lifestyleIssues") val lifestyleIssues: String? = null,
 
   @Schema(example = "1-Some problems", description = "")
-  @get:JsonProperty("easilyInfluenced") val easilyInfluenced: kotlin.String? = null,
+  @get:JsonProperty("easilyInfluenced") val easilyInfluenced: String? = null,
 )

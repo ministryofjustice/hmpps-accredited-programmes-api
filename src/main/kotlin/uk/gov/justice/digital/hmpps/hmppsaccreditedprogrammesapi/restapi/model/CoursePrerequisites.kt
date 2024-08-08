@@ -10,5 +10,5 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CoursePrerequisites(
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("prerequisites") val prerequisites: kotlin.collections.List<CoursePrerequisite>? = null,
+  @get:JsonProperty("prerequisites") val prerequisites: List<CoursePrerequisite>? = null,
 )

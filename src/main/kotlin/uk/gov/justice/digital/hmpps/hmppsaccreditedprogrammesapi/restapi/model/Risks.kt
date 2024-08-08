@@ -38,7 +38,7 @@ data class Risks(
   @get:JsonProperty("ogrsYear2") val ogrsYear2: java.math.BigDecimal? = null,
 
   @Schema(example = "High", description = "")
-  @get:JsonProperty("ogrsRisk") val ogrsRisk: kotlin.String? = null,
+  @get:JsonProperty("ogrsRisk") val ogrsRisk: String? = null,
 
   @Schema(example = "23", description = "")
   @get:JsonProperty("ovpYear1") val ovpYear1: java.math.BigDecimal? = null,
@@ -47,56 +47,56 @@ data class Risks(
   @get:JsonProperty("ovpYear2") val ovpYear2: java.math.BigDecimal? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("ovpRisk") val ovpRisk: kotlin.String? = null,
+  @get:JsonProperty("ovpRisk") val ovpRisk: String? = null,
 
   @Schema(example = "3.45", description = "")
   @get:JsonProperty("rsrScore") val rsrScore: java.math.BigDecimal? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("rsrRisk") val rsrRisk: kotlin.String? = null,
+  @get:JsonProperty("rsrRisk") val rsrRisk: String? = null,
 
   @Schema(example = "Low", description = "")
-  @get:JsonProperty("ospcScore") val ospcScore: kotlin.String? = null,
+  @get:JsonProperty("ospcScore") val ospcScore: String? = null,
 
   @Schema(example = "High", description = "")
-  @get:JsonProperty("ospiScore") val ospiScore: kotlin.String? = null,
+  @get:JsonProperty("ospiScore") val ospiScore: String? = null,
 
   @Schema(example = "Low", description = "")
-  @get:JsonProperty("overallRoshLevel") val overallRoshLevel: kotlin.String? = null,
+  @get:JsonProperty("overallRoshLevel") val overallRoshLevel: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskPrisonersCustody") val riskPrisonersCustody: kotlin.String? = null,
+  @get:JsonProperty("riskPrisonersCustody") val riskPrisonersCustody: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskStaffCustody") val riskStaffCustody: kotlin.String? = null,
+  @get:JsonProperty("riskStaffCustody") val riskStaffCustody: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskKnownAdultCustody") val riskKnownAdultCustody: kotlin.String? = null,
+  @get:JsonProperty("riskKnownAdultCustody") val riskKnownAdultCustody: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskPublicCustody") val riskPublicCustody: kotlin.String? = null,
+  @get:JsonProperty("riskPublicCustody") val riskPublicCustody: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskChildrenCustody") val riskChildrenCustody: kotlin.String? = null,
+  @get:JsonProperty("riskChildrenCustody") val riskChildrenCustody: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskStaffCommunity") val riskStaffCommunity: kotlin.String? = null,
+  @get:JsonProperty("riskStaffCommunity") val riskStaffCommunity: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskKnownAdultCommunity") val riskKnownAdultCommunity: kotlin.String? = null,
+  @get:JsonProperty("riskKnownAdultCommunity") val riskKnownAdultCommunity: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskPublicCommunity") val riskPublicCommunity: kotlin.String? = null,
+  @get:JsonProperty("riskPublicCommunity") val riskPublicCommunity: String? = null,
 
   @Schema(example = "Medium", description = "")
-  @get:JsonProperty("riskChildrenCommunity") val riskChildrenCommunity: kotlin.String? = null,
+  @get:JsonProperty("riskChildrenCommunity") val riskChildrenCommunity: String? = null,
 
   @Schema(example = "Low", description = "")
-  @get:JsonProperty("imminentRiskOfViolenceTowardsPartner") val imminentRiskOfViolenceTowardsPartner: kotlin.String? = null,
+  @get:JsonProperty("imminentRiskOfViolenceTowardsPartner") val imminentRiskOfViolenceTowardsPartner: String? = null,
 
   @Schema(example = "Low", description = "")
-  @get:JsonProperty("imminentRiskOfViolenceTowardsOthers") val imminentRiskOfViolenceTowardsOthers: kotlin.String? = null,
+  @get:JsonProperty("imminentRiskOfViolenceTowardsOthers") val imminentRiskOfViolenceTowardsOthers: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("alerts") val alerts: kotlin.collections.List<Alert>? = null,
+  @get:JsonProperty("alerts") val alerts: List<Alert>? = null,
 )

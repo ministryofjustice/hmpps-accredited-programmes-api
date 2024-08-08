@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class PrisonType(
 
   @Schema(example = "YOI", required = true, description = "")
-  @get:JsonProperty("code", required = true) val code: kotlin.String,
+  @get:JsonProperty("code", required = true) val code: String,
 
   @Schema(example = "His Majesty’s Youth Offender Institution", required = true, description = "")
-  @get:JsonProperty("description", required = true) val description: kotlin.String,
+  @get:JsonProperty("description", required = true) val description: String,
 )

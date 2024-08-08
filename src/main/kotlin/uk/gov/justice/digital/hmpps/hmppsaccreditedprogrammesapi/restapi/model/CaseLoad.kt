@@ -14,17 +14,17 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CaseLoad(
 
   @Schema(example = "null", description = "The unique identifier of the caseload.")
-  @get:JsonProperty("caseLoadId") val caseLoadId: kotlin.String? = null,
+  @get:JsonProperty("caseLoadId") val caseLoadId: String? = null,
 
   @Schema(example = "null", description = "The description of the caseload.")
-  @get:JsonProperty("description") val description: kotlin.String? = null,
+  @get:JsonProperty("description") val description: String? = null,
 
   @Schema(example = "null", description = "The type of the caseload.")
-  @get:JsonProperty("type") val type: kotlin.String? = null,
+  @get:JsonProperty("type") val type: String? = null,
 
   @Schema(example = "null", description = "The function of the caseload.")
-  @get:JsonProperty("caseloadFunction") val caseloadFunction: kotlin.String? = null,
+  @get:JsonProperty("caseloadFunction") val caseloadFunction: String? = null,
 
   @Schema(example = "null", description = "Indicates whether the caseload is currently active or not.")
-  @get:JsonProperty("currentlyActive") val currentlyActive: kotlin.Boolean? = null,
+  @get:JsonProperty("currentlyActive") val currentlyActive: Boolean? = null,
 )
