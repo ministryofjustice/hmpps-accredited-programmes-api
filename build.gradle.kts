@@ -5,7 +5,6 @@ plugins {
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.0.10"
   kotlin("plugin.jpa") version "2.0.10"
-  id("org.openapi.generator") version "7.7.0"
 }
 
 configurations {
@@ -18,7 +17,6 @@ dependencies {
   val sentryVersion = "7.13.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.3.1"
-  val openAPIVersion = "1.8.0"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.3")
   runtimeOnly("org.postgresql:postgresql:42.7.3")
@@ -34,8 +32,7 @@ dependencies {
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:$springdocVersion")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.2.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
@@ -94,8 +91,6 @@ tasks {
 
     kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/kotlin"))
     kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/resources"))
-
-    dependsOn("openApiGenerate")
   }
 
   register("bootRunLocal") {
@@ -108,29 +103,6 @@ tasks {
     }
     finalizedBy("bootRun")
   }
-
-  runKtlintCheckOverMainSourceSet {
-    dependsOn("openApiGenerate")
-  }
-}
-
-openApiGenerate {
-  generatorName.set("kotlin-spring")
-  inputSpec.set("$rootDir/src/main/resources/static/api.yml")
-  outputDir.set(layout.buildDirectory.dir("generated").map { it.asFile.path })
-  apiPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api")
-  modelPackage.set("uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.api.model")
-  configOptions.apply {
-    put("useSpringBoot3", "true")
-    put("basePackage", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi")
-    put("delegatePattern", "true")
-    put("gradleBuildFile", "false")
-    put("exceptionHandler", "false")
-    put("useBeanValidation", "false")
-    put("dateLibrary", "custom")
-  }
-  typeMappings.put("DateTime", "Instant")
-  importMappings.put("Instant", "java.time.Instant")
 }
 
 ktlint {
