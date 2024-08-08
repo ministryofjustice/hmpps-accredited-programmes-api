@@ -7,47 +7,17 @@ servers:
 security:
   - bearerAuth: [ ]
 paths:
-  /subject-access-request:
+  /dummy:
     get:
-      operationId: subjectAccessRequestGet
-      summary: API call to retrieve SAR information about a person
-      tags:
-        - Subject Access Request
-      description: |
-        Either NOMIS Prison Number (PRN) must be provided as part of the request.
-        * If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200.
-        * If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204
-        * If the product does not use the identifier type transmitted in the request, it should respond with HTTP code 209.
-      parameters:
-        - name: prn
-          in: query
-          description: prison number
-          required: false
-          schema:
-            type: string
-        - name: fromDate
-          in: query
-          description: from date
-          schema:
-            type: string
-            format: date
-        - name: toDate
-          in: query
-          description: to date
-          schema:
-            type: string
-            format: date
+      operationId: dummy
+      summary: DummyAPI
       responses:
         '200':
-          description: the sar content
+          description: dummyresponse
           content:
             application/json:
               schema:
                 type: object
-        '204':
-          description: Request successfully processed - no content found
-        '209':
-          description: Subject Identifier is not recognised by this service
 
 
 components:
