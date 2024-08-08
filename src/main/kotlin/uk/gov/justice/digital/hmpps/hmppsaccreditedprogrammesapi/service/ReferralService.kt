@@ -9,11 +9,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryEntity
@@ -28,11 +26,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.v
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -46,8 +42,6 @@ constructor(
   private val referrerUserRepository: ReferrerUserRepository,
   private val offeringRepository: OfferingRepository,
   private val prisonRegisterApiService: PrisonRegisterApiService,
-  private val peopleSearchApiService: PeopleSearchApiService,
-  private val personRepository: PersonRepository,
   private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
@@ -79,7 +73,7 @@ constructor(
       throw BusinessException("Organisation ${offering.organisationId} not enabled for referrals")
     }
 
-    createOrUpdatePerson(prisonNumber)
+    personService.createOrUpdatePerson(prisonNumber)
 
     createOrganisationIfNotPresent(offering.organisationId)
 
@@ -114,86 +108,6 @@ constructor(
         throw BusinessException("Prison details could not be fetched for $code")
       }
     }
-  }
-
-  fun updatePerson(prisonNumber: String, fromUpdateEndpoint: Boolean = false) {
-    log.info("Attempting to update person with prison number: $prisonNumber")
-    val personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
-    if (personEntity != null) {
-      log.info("Prisoner is of interest to ACP - about to update: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
-      val sentenceType = personService.getSentenceType(prisonNumber)
-      peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
-        updatePerson(it, personEntity, sentenceType)
-      }
-      personRepository.save(personEntity)
-    } else {
-      log.info("Prisoner is not of interest to ACP: $prisonNumber")
-    }
-  }
-
-  fun updateAllPeople() {
-    log.info("Attempting to update all people in person cache.")
-    val people = personRepository.findAll()
-    people.forEach {
-      updatePerson(it.prisonNumber, true)
-    }
-    log.info("Updated all people in person cache.")
-  }
-
-  private fun updatePerson(
-    it: Prisoner,
-    personEntity: PersonEntity,
-    sentenceType: String,
-  ) {
-    val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
-    personEntity.surname = it.lastName
-    personEntity.forename = it.firstName
-    personEntity.conditionalReleaseDate = it.conditionalReleaseDate
-    personEntity.paroleEligibilityDate = it.paroleEligibilityDate
-    personEntity.tariffExpiryDate = it.tariffDate
-    personEntity.earliestReleaseDate = earliestReleaseDateAndType.first
-    personEntity.earliestReleaseDateType = earliestReleaseDateAndType.second
-    personEntity.indeterminateSentence = it.indeterminateSentence
-    personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
-    personEntity.sentenceType = sentenceType
-    personEntity.location = if (it.prisonName == "Outside") "Released" else it.prisonName
-    personEntity.gender = it.gender
-  }
-
-  private fun createOrUpdatePerson(prisonNumber: String) {
-    val sentenceType = personService.getSentenceType(prisonNumber)
-    peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
-      var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
-      if (personEntity == null) {
-        val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
-        personEntity = PersonEntity(
-          surname = it.lastName,
-          forename = it.firstName,
-          prisonNumber = prisonNumber,
-          conditionalReleaseDate = it.conditionalReleaseDate,
-          paroleEligibilityDate = it.paroleEligibilityDate,
-          tariffExpiryDate = it.tariffDate,
-          earliestReleaseDate = earliestReleaseDateAndType.first,
-          earliestReleaseDateType = earliestReleaseDateAndType.second,
-          indeterminateSentence = it.indeterminateSentence,
-          nonDtoReleaseDateType = it.nonDtoReleaseDateType,
-          sentenceType = sentenceType,
-          location = it.prisonName,
-          gender = it.gender,
-        )
-      } else {
-        updatePerson(it, personEntity, sentenceType)
-      }
-      personRepository.save(personEntity)
-    }
-  }
-
-  private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> {
-    return personService.getSentenceDetails(prisoner.prisonerNumber)
-      ?.keyDates
-      ?.firstOrNull { it.earliestReleaseDate == true }
-      ?.let { Pair(it.date, it.description) }
-      ?: Pair(null, null)
   }
 
   fun getReferralById(referralId: UUID) =

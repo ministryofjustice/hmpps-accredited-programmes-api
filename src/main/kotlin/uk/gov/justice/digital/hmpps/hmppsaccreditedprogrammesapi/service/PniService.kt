@@ -111,7 +111,7 @@ class PniService(
   private fun getPathwayAfterApplyingExceptionRules(needsClassification: String, individualRiskScores: IndividualRiskScores): String? {
     return when {
       pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> HIGH_INTENSITY_BC
-      needsClassification == PniNeedsEngine.NeedsClassification.LOW_NEED.name &&
+      needsClassification == NeedsClassification.LOW_NEED.name &&
         (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MEDIUM_INTENSITY_BC
       else -> null
     }

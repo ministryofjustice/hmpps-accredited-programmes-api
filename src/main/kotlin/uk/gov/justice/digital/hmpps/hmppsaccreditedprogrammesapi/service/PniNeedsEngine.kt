@@ -16,68 +16,70 @@ private const val ZERO = 0
 @Service
 class PniNeedsEngine {
 
-  fun getOverallNeedsScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String): NeedsScore {
+  fun getOverallNeedsScore(
+    individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
+    prisonNumber: String,
+  ): NeedsScore {
     val sexDomainScore = getSexDomainScore(individualNeedsAndRiskScores, prisonNumber)
-    val thinkingDomainScore = individualNeedsAndRiskScores.individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore()
-    val relationshipDomainScore = individualNeedsAndRiskScores.individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
-    val selfManagementDomainScore = individualNeedsAndRiskScores.individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
-    val overallNeedsScore = listOf(sexDomainScore, thinkingDomainScore, relationshipDomainScore, selfManagementDomainScore).sum()
+    val individualNeedsScores = individualNeedsAndRiskScores.individualNeedsScores
+    val thinkingDomainScore = individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore()
+    val relationshipDomainScore = individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
+    val selfManagementDomainScore = individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
+    val overallNeedsScore =
+      listOf(sexDomainScore, thinkingDomainScore, relationshipDomainScore, selfManagementDomainScore).sum()
     return NeedsScore(
       overallNeedsScore = overallNeedsScore,
       classification = getClassification(overallNeedsScore),
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(
           overAllSexDomainScore = sexDomainScore,
-          individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores,
+          individualSexScores = individualNeedsScores.individualSexScores,
         ),
         thinkingDomainScore = ThinkingDomainScore(
           overallThinkingDomainScore = thinkingDomainScore,
-          individualThinkingScores = individualNeedsAndRiskScores.individualNeedsScores.individualCognitiveScores,
+          individualThinkingScores = individualNeedsScores.individualCognitiveScores,
         ),
         relationshipDomainScore = RelationshipDomainScore(
           overallRelationshipDomainScore = relationshipDomainScore,
-          individualRelationshipScores = individualNeedsAndRiskScores.individualNeedsScores.individualRelationshipScores,
+          individualRelationshipScores = individualNeedsScores.individualRelationshipScores,
         ),
         selfManagementDomainScore = SelfManagementDomainScore(
           overallSelfManagementDomainScore = selfManagementDomainScore,
-          individualSelfManagementScores = individualNeedsAndRiskScores.individualNeedsScores.individualSelfManagementScores,
+          individualSelfManagementScores = individualNeedsScores.individualSelfManagementScores,
         ),
       ),
     )
   }
 
   fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String): Int {
-    val hasNullValues = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores.hasNullValues()
+    val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
+    val hasNullValues = individualSexScores.hasNullValues()
 
-    val totalSexScore = if (hasNullValues) {
-      if ((
-        individualNeedsAndRiskScores.individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true ||
-          individualNeedsAndRiskScores.individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true
-        )
-      ) {
-        throw BusinessException("PNI information cannot be computed for $prisonNumber as ospDC and OspII scores are present but sexScore contains null")
-      } else {
-        ZERO
-      }
-    } else {
-      individualNeedsAndRiskScores.individualNeedsScores.individualSexScores.totalScore()
+    if (!hasNullValues) {
+      return individualSexScores.overallSexDomainScore(individualSexScores.totalScore())
     }
 
-    return individualNeedsAndRiskScores.individualNeedsScores.individualSexScores.overallSexDomainScore(totalSexScore)
-  }
+    val individualRiskScores = individualNeedsAndRiskScores.individualRiskScores
 
-  private fun getClassification(overallNeedsScore: Int): String {
-    return when (overallNeedsScore) {
-      in 0..2 -> NeedsClassification.LOW_NEED.name
-      in 3..5 -> NeedsClassification.MEDIUM_NEED.name
-      in 6..8 -> NeedsClassification.HIGH_NEED.name
-      else -> throw BusinessException("Unable to compute classification. Overall needs score is $overallNeedsScore")
+    if ((individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true || individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true)) {
+      throw BusinessException("PNI information cannot be computed for $prisonNumber as ospDC or OspII scores are present but SexDomainScore is null")
     }
-  }
 
-  enum class NeedsClassification() {
-    LOW_NEED,
-    MEDIUM_NEED,
-    HIGH_NEED,
+    return ZERO
   }
+}
+
+private fun getClassification(overallNeedsScore: Int): String {
+  return when (overallNeedsScore) {
+    in 0..2 -> NeedsClassification.LOW_NEED.name
+    in 3..5 -> NeedsClassification.MEDIUM_NEED.name
+    in 6..8 -> NeedsClassification.HIGH_NEED.name
+    else -> throw BusinessException("Unable to compute classification. Overall needs score is $overallNeedsScore")
+  }
+}
+
+enum class NeedsClassification {
+  LOW_NEED,
+  MEDIUM_NEED,
+  HIGH_NEED,
 }

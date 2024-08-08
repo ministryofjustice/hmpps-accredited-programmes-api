@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 
 @RestController
 @RequestMapping("admin")
@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
   """,
 )
 class AdminController(
-  private val referralService: ReferralService,
+  private val personService: PersonService,
 ) {
   @Operation(
     tags = ["Admin"],
@@ -25,6 +25,6 @@ class AdminController(
   )
   @PostMapping("/person/updateAll")
   fun updatePersonCache() {
-    referralService.updateAllPeople()
+    personService.updateAllPeople()
   }
 }
