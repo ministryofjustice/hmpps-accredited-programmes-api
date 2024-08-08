@@ -39,7 +39,7 @@ class PNIController(
     value = ["/PNI/{prisonNumber}"],
     produces = ["application/json"],
   )
-  fun getPNIByPrisonNumber(@Parameter(description = "Prison nomis identifier", required = true) @PathVariable("prisonNumber") prisonNumber: kotlin.String): ResponseEntity<PniScore> {
+  fun getPNIByPrisonNumber(@Parameter(description = "Prison nomis identifier", required = true) @PathVariable("prisonNumber") prisonNumber: String): ResponseEntity<PniScore> {
     return ResponseEntity.ok(pniService.getPniScore(prisonNumber))
   }
 }

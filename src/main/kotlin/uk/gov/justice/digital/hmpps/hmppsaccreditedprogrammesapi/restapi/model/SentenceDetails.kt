@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class SentenceDetails(
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("sentences") val sentences: kotlin.collections.List<Sentence>? = null,
+  @get:JsonProperty("sentences") val sentences: List<Sentence>? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("keyDates") val keyDates: kotlin.collections.List<KeyDate>? = null,
+  @get:JsonProperty("keyDates") val keyDates: List<KeyDate>? = null,
 )

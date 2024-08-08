@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AudienceService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import java.util.UUID
 import kotlin.random.Random
 
 @RestController
@@ -64,7 +65,7 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun addCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
+  fun addCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
     return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createOrUpdateOffering(course, courseOffering))
@@ -133,7 +134,7 @@ class CourseController(
     method = [RequestMethod.DELETE],
     value = ["/courses/{id}"],
   )
-  fun deleteCourse(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID): ResponseEntity<Unit> {
+  fun deleteCourse(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<Unit> {
     courseService.delete(id)
     return ResponseEntity.ok(null)
   }
@@ -152,7 +153,7 @@ class CourseController(
     method = [RequestMethod.DELETE],
     value = ["/courses/{id}/offerings/{offeringId}"],
   )
-  fun deleteCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID, @Parameter(description = "An offering identifier", required = true) @PathVariable("offeringId") offeringId: java.util.UUID): ResponseEntity<Unit> {
+  fun deleteCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "An offering identifier", required = true) @PathVariable("offeringId") offeringId: UUID): ResponseEntity<Unit> {
     courseService.deleteCourseOffering(id, offeringId)
     return ResponseEntity.ok(null)
   }
@@ -172,7 +173,7 @@ class CourseController(
     value = ["/courses/course-names"],
     produces = ["application/json"],
   )
-  fun getAllCourseNames(@Parameter(description = "flag to include withdrawn") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: kotlin.Boolean?): ResponseEntity<List<String>> = ResponseEntity
+  fun getAllCourseNames(@Parameter(description = "flag to include withdrawn") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: Boolean?): ResponseEntity<List<String>> = ResponseEntity
     .ok(
       courseService
         .getCourseNames(includeWithdrawn),
@@ -193,7 +194,7 @@ class CourseController(
     value = ["/courses"],
     produces = ["application/json"],
   )
-  fun getAllCourses(@Parameter(description = "flag to return withdrawn") @RequestParam(value = "withdrawn", required = false) withdrawn: kotlin.Boolean?): ResponseEntity<List<Course>> =
+  fun getAllCourses(@Parameter(description = "flag to return withdrawn") @RequestParam(value = "withdrawn", required = false) withdrawn: Boolean?): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
         courseService
@@ -216,7 +217,7 @@ class CourseController(
     value = ["/courses/{id}/offerings"],
     produces = ["application/json"],
   )
-  fun getAllOfferingsByCourseId(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID): ResponseEntity<List<CourseOffering>> {
+  fun getAllOfferingsByCourseId(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<List<CourseOffering>> {
     val offerings = courseService.getAllOfferingsByCourseId(id)
     val mappedOfferings = offerings.map { offeringEntity ->
       val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringEntity.organisationId) != null
@@ -270,7 +271,7 @@ class CourseController(
     value = ["/courses/{id}"],
     produces = ["application/json"],
   )
-  fun getCourseById(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID): ResponseEntity<Course> =
+  fun getCourseById(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<Course> =
     courseService.getNotWithdrawnCourseById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /courses/$id")
@@ -290,7 +291,7 @@ class CourseController(
     value = ["/courses/{id}/prerequisites"],
     produces = ["application/json"],
   )
-  fun getCoursePrerequisites(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID): ResponseEntity<CoursePrerequisites> =
+  fun getCoursePrerequisites(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CoursePrerequisites> =
     ResponseEntity.ok(
       CoursePrerequisites(
         courseService
@@ -323,7 +324,7 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun updateCourse(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID, @Parameter(description = "", required = true) @RequestBody courseUpdateRequest: CourseUpdateRequest): ResponseEntity<Course> {
+  fun updateCourse(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseUpdateRequest: CourseUpdateRequest): ResponseEntity<Course> {
     val existingCourse = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
 
@@ -358,7 +359,7 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun updateCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
+  fun updateCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
     return ResponseEntity.ok(courseService.createOrUpdateOffering(course, courseOffering))
@@ -381,7 +382,7 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun updateCoursePrerequisites(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: java.util.UUID, @Parameter(description = "", required = true) @RequestBody coursePrerequisites: CoursePrerequisites): ResponseEntity<CoursePrerequisites> {
+  fun updateCoursePrerequisites(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody coursePrerequisites: CoursePrerequisites): ResponseEntity<CoursePrerequisites> {
     val course =
       courseService.getNotWithdrawnCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
     return ResponseEntity.ok(

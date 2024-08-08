@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.E
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
+import java.util.UUID
 
 @RestController
 @Transactional
@@ -61,7 +62,7 @@ class CourseParticipationController(private val courseParticipationService: Cour
       description = "",
       required = true,
     ) @RequestBody courseParticipationCreate: CourseParticipationCreate,
-  ): ResponseEntity<uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation> =
+  ): ResponseEntity<CourseParticipation> =
     courseParticipationService.createCourseParticipation(courseParticipationCreate.toDomain())?.let {
       ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
     } ?: throw Exception("Unable to add to course participation")
@@ -93,7 +94,7 @@ class CourseParticipationController(private val courseParticipationService: Cour
     @Parameter(
       description = "The unique identifier assigned to this record when it was created.",
       required = true,
-    ) @PathVariable("id") id: java.util.UUID,
+    ) @PathVariable("id") id: UUID,
   ): ResponseEntity<Unit> {
     courseParticipationService.getCourseParticipationById(id)?.let {
       courseParticipationService.deleteCourseParticipationById(id)
@@ -129,8 +130,8 @@ class CourseParticipationController(private val courseParticipationService: Cour
     @Parameter(
       description = "The unique identifier assigned to this record when it was created.",
       required = true,
-    ) @PathVariable("id") id: java.util.UUID,
-  ): ResponseEntity<uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation> =
+    ) @PathVariable("id") id: UUID,
+  ): ResponseEntity<CourseParticipation> =
     courseParticipationService.getCourseParticipationById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No course participation found for id $id")
@@ -169,12 +170,12 @@ class CourseParticipationController(private val courseParticipationService: Cour
     @Parameter(
       description = "The unique identifier assigned to this record when it was created.",
       required = true,
-    ) @PathVariable("id") id: java.util.UUID,
+    ) @PathVariable("id") id: UUID,
     @Parameter(
       description = "",
       required = true,
     ) @RequestBody courseParticipationUpdate: CourseParticipationUpdate,
-  ): ResponseEntity<uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation> =
+  ): ResponseEntity<CourseParticipation> =
     courseParticipationService.updateCourseParticipationById(id, courseParticipationUpdate.toDomain()).let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No course participation found for id $id")

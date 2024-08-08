@@ -35,7 +35,7 @@ class UserController(private val userService: UserService) {
     value = ["/user/me/caseload"],
     produces = ["application/json"],
   )
-  fun getCurrentUserCaseloads(@Parameter(description = "Flag to indicate whether to retrieve all caseloads or not. Set to false by default", schema = Schema(defaultValue = "false")) @RequestParam(value = "allCaseloads", required = false, defaultValue = "false") allCaseloads: kotlin.Boolean): ResponseEntity<List<CaseLoad>> = ResponseEntity.ok(
+  fun getCurrentUserCaseloads(@Parameter(description = "Flag to indicate whether to retrieve all caseloads or not. Set to false by default", schema = Schema(defaultValue = "false")) @RequestParam(value = "allCaseloads", required = false, defaultValue = "false") allCaseloads: Boolean): ResponseEntity<List<CaseLoad>> = ResponseEntity.ok(
     userService
       .getCurrentUsersCaseloads(allCaseloads)
       .map {

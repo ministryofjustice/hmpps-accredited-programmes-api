@@ -209,7 +209,7 @@ class ReferralsController(
     @Parameter(
       description = "The status code that was chosen",
       required = true,
-    ) @PathVariable("chosenStatusCode") chosenStatusCode: kotlin.String,
+    ) @PathVariable("chosenStatusCode") chosenStatusCode: String,
     @Parameter(
       description = "is the user a Programme Team user",
       schema = Schema(defaultValue = "false"),

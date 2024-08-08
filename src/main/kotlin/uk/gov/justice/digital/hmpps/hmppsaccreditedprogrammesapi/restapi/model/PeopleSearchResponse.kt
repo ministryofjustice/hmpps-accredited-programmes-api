@@ -25,43 +25,43 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class PeopleSearchResponse(
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("bookingId", required = true) val bookingId: kotlin.String,
+  @get:JsonProperty("bookingId", required = true) val bookingId: String,
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("prisonerNumber", required = true) val prisonerNumber: kotlin.String,
+  @get:JsonProperty("prisonerNumber", required = true) val prisonerNumber: String,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("conditionalReleaseDate") val conditionalReleaseDate: java.time.LocalDate? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("prisonName") val prisonName: kotlin.String? = null,
+  @get:JsonProperty("prisonName") val prisonName: String? = null,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("dateOfBirth") val dateOfBirth: java.time.LocalDate? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("ethnicity") val ethnicity: kotlin.String? = null,
+  @get:JsonProperty("ethnicity") val ethnicity: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("gender") val gender: kotlin.String? = null,
+  @get:JsonProperty("gender") val gender: String? = null,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("homeDetentionCurfewEligibilityDate") val homeDetentionCurfewEligibilityDate: java.time.LocalDate? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("indeterminateSentence") val indeterminateSentence: kotlin.Boolean? = null,
+  @get:JsonProperty("indeterminateSentence") val indeterminateSentence: Boolean? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("firstName") val firstName: kotlin.String? = null,
+  @get:JsonProperty("firstName") val firstName: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("lastName") val lastName: kotlin.String? = null,
+  @get:JsonProperty("lastName") val lastName: String? = null,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("paroleEligibilityDate") val paroleEligibilityDate: java.time.LocalDate? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("religion") val religion: kotlin.String? = null,
+  @get:JsonProperty("religion") val religion: String? = null,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("sentenceExpiryDate") val sentenceExpiryDate: java.time.LocalDate? = null,

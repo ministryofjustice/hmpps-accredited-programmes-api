@@ -10,5 +10,5 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class PrisonSearchRequest(
 
   @Schema(example = "[\"MDI\"]", required = true, description = "List of Prisons")
-  @get:JsonProperty("prisonIds", required = true) val prisonIds: kotlin.collections.List<kotlin.String>,
+  @get:JsonProperty("prisonIds", required = true) val prisonIds: List<String>,
 )

@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Sentence(
 
   @Schema(example = "CJA03 Standard Determinate Sentence", description = "")
-  @get:JsonProperty("description") val description: kotlin.String? = null,
+  @get:JsonProperty("description") val description: String? = null,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("sentenceStartDate") val sentenceStartDate: java.time.LocalDate? = null,

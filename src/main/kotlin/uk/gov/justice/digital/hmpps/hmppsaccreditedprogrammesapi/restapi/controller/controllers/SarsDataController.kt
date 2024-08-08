@@ -46,7 +46,7 @@ class SarsDataController(private val subjectAccessRequestService: SubjectAccessR
     @Parameter(description = "prison number") @RequestParam(
       value = "prn",
       required = false,
-    ) prn: kotlin.String?,
+    ) prn: String?,
     @Parameter(description = "from date") @RequestParam(
       value = "fromDate",
       required = false,

@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationSettingType as ApiCourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationUpdate as ApiCourseParticipationUpdate
 
-val referralProgramStartYear = Year.of(1990)
+val referralProgramStartYear: Year = Year.of(1990)
 
 fun ApiCourseParticipationCreate.toDomain() =
   CourseParticipationEntity(

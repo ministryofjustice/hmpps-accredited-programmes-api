@@ -10,5 +10,5 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class PrisonOperator(
 
   @Schema(example = "PSP, G4S", required = true, description = "")
-  @get:JsonProperty("name", required = true) val name: kotlin.String,
+  @get:JsonProperty("name", required = true) val name: String,
 )

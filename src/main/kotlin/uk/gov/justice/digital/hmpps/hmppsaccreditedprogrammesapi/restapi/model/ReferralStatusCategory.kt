@@ -12,11 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class ReferralStatusCategory(
 
   @Schema(example = "ADMIN", required = true, description = "")
-  @get:JsonProperty("code", required = true) val code: kotlin.String,
+  @get:JsonProperty("code", required = true) val code: String,
 
   @Schema(example = "Administrative error", required = true, description = "")
-  @get:JsonProperty("description", required = true) val description: kotlin.String,
+  @get:JsonProperty("description", required = true) val description: String,
 
   @Schema(example = "WITHDRAWN", required = true, description = "")
-  @get:JsonProperty("referralStatusCode", required = true) val referralStatusCode: kotlin.String,
+  @get:JsonProperty("referralStatusCode", required = true) val referralStatusCode: String,
 )

@@ -15,20 +15,20 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class KeyDate(
 
   @Schema(example = "earliestReleaseDate", required = true, description = "")
-  @get:JsonProperty("type", required = true) val type: kotlin.String,
+  @get:JsonProperty("type", required = true) val type: String,
 
   @Schema(example = "ERD", required = true, description = "")
-  @get:JsonProperty("code", required = true) val code: kotlin.String,
+  @get:JsonProperty("code", required = true) val code: String,
 
   @Schema(example = "Earliest Release Date", description = "")
-  @get:JsonProperty("description") val description: kotlin.String? = null,
+  @get:JsonProperty("description") val description: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("earliestReleaseDate") val earliestReleaseDate: kotlin.Boolean? = false,
+  @get:JsonProperty("earliestReleaseDate") val earliestReleaseDate: Boolean? = false,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("date") val date: java.time.LocalDate? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("order") val order: kotlin.Int? = null,
+  @get:JsonProperty("order") val order: Int? = null,
 )

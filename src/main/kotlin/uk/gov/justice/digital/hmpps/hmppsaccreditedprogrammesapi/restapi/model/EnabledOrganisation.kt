@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class EnabledOrganisation(
 
   @Schema(example = "MDI", description = "")
-  @get:JsonProperty("code") val code: kotlin.String? = null,
+  @get:JsonProperty("code") val code: String? = null,
 
   @Schema(example = "Stocken", description = "")
-  @get:JsonProperty("description") val description: kotlin.String? = null,
+  @get:JsonProperty("description") val description: String? = null,
 )

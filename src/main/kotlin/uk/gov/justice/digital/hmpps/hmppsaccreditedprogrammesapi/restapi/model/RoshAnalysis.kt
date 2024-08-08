@@ -16,23 +16,23 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class RoshAnalysis(
 
   @Schema(example = "Tax evasion", description = "")
-  @get:JsonProperty("offenceDetails") val offenceDetails: kotlin.String? = null,
+  @get:JsonProperty("offenceDetails") val offenceDetails: String? = null,
 
   @Schema(example = "at home", description = "")
-  @get:JsonProperty("whereAndWhen") val whereAndWhen: kotlin.String? = null,
+  @get:JsonProperty("whereAndWhen") val whereAndWhen: String? = null,
 
   @Schema(example = "false accounting", description = "")
-  @get:JsonProperty("howDone") val howDone: kotlin.String? = null,
+  @get:JsonProperty("howDone") val howDone: String? = null,
 
   @Schema(example = "hmrc", description = "")
-  @get:JsonProperty("whoVictims") val whoVictims: kotlin.String? = null,
+  @get:JsonProperty("whoVictims") val whoVictims: String? = null,
 
   @Schema(example = "company secretary", description = "")
-  @get:JsonProperty("anyoneElsePresent") val anyoneElsePresent: kotlin.String? = null,
+  @get:JsonProperty("anyoneElsePresent") val anyoneElsePresent: String? = null,
 
   @Schema(example = "Greed", description = "")
-  @get:JsonProperty("whyDone") val whyDone: kotlin.String? = null,
+  @get:JsonProperty("whyDone") val whyDone: String? = null,
 
   @Schema(example = "crown court", description = "")
-  @get:JsonProperty("sources") val sources: kotlin.String? = null,
+  @get:JsonProperty("sources") val sources: String? = null,
 )

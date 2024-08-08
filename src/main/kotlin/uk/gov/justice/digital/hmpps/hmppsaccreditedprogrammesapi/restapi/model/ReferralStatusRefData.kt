@@ -23,44 +23,44 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class ReferralStatusRefData(
 
   @Schema(example = "WITHDRAWN", required = true, description = "")
-  @get:JsonProperty("code", required = true) val code: kotlin.String,
+  @get:JsonProperty("code", required = true) val code: String,
 
   @Schema(example = "Withdrawn", required = true, description = "")
-  @get:JsonProperty("description", required = true) val description: kotlin.String,
+  @get:JsonProperty("description", required = true) val description: String,
 
   @Schema(example = "light-grey", required = true, description = "")
-  @get:JsonProperty("colour", required = true) val colour: kotlin.String,
+  @get:JsonProperty("colour", required = true) val colour: String,
 
   @Schema(example = "The application has been withdrawn", description = "")
-  @get:JsonProperty("hintText") val hintText: kotlin.String? = null,
+  @get:JsonProperty("hintText") val hintText: String? = null,
 
   @Schema(example = "I confirm that this person is eligible.", description = "")
-  @get:JsonProperty("confirmationText") val confirmationText: kotlin.String? = null,
+  @get:JsonProperty("confirmationText") val confirmationText: String? = null,
 
   @Schema(example = "null", description = "flag to show this status has notes text box")
-  @get:JsonProperty("hasNotes") val hasNotes: kotlin.Boolean? = null,
+  @get:JsonProperty("hasNotes") val hasNotes: Boolean? = null,
 
   @Schema(example = "null", description = "flag to show this status has confirmation box")
-  @get:JsonProperty("hasConfirmation") val hasConfirmation: kotlin.Boolean? = null,
+  @get:JsonProperty("hasConfirmation") val hasConfirmation: Boolean? = null,
 
   @Schema(example = "null", description = "flag to show this is a closed status")
-  @get:JsonProperty("closed") val closed: kotlin.Boolean? = null,
+  @get:JsonProperty("closed") val closed: Boolean? = null,
 
   @Schema(example = "null", description = "flag to show this is a draft status")
-  @get:JsonProperty("draft") val draft: kotlin.Boolean? = null,
+  @get:JsonProperty("draft") val draft: Boolean? = null,
 
   @Schema(example = "null", description = "flag to show this is a hold status")
-  @get:JsonProperty("hold") val hold: kotlin.Boolean? = null,
+  @get:JsonProperty("hold") val hold: Boolean? = null,
 
   @Schema(example = "null", description = "flag to show this is a release status")
-  @get:JsonProperty("release") val release: kotlin.Boolean? = null,
+  @get:JsonProperty("release") val release: Boolean? = null,
 
   @Schema(example = "null", description = "flag to show this a bespoke status of deslected and keep open")
-  @get:JsonProperty("deselectAndKeepOpen") val deselectAndKeepOpen: kotlin.Boolean? = null,
+  @get:JsonProperty("deselectAndKeepOpen") val deselectAndKeepOpen: Boolean? = null,
 
   @Schema(example = "null", description = "sort order for statuses")
-  @get:JsonProperty("defaultOrder") val defaultOrder: kotlin.Int? = null,
+  @get:JsonProperty("defaultOrder") val defaultOrder: Int? = null,
 
   @Schema(example = "null", description = "flag to show whether the notes are optional")
-  @get:JsonProperty("notesOptional") val notesOptional: kotlin.Boolean? = null,
+  @get:JsonProperty("notesOptional") val notesOptional: Boolean? = null,
 )

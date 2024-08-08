@@ -24,13 +24,13 @@ data class IndividualNeedsScores(
 data class IndividualSexScores(
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("sexualPreOccupation") val sexualPreOccupation: kotlin.Int? = null,
+  @get:JsonProperty("sexualPreOccupation") val sexualPreOccupation: Int? = null,
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("offenceRelatedSexualInterests") val offenceRelatedSexualInterests: kotlin.Int? = null,
+  @get:JsonProperty("offenceRelatedSexualInterests") val offenceRelatedSexualInterests: Int? = null,
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("emotionalCongruence") val emotionalCongruence: kotlin.Int? = null,
+  @get:JsonProperty("emotionalCongruence") val emotionalCongruence: Int? = null,
 ) {
   fun hasNullValues() = listOf(
     sexualPreOccupation,
@@ -55,10 +55,10 @@ data class IndividualSexScores(
 data class IndividualCognitiveScores(
 
   @Schema(example = "2", description = "")
-  @get:JsonProperty("proCriminalAttitudes") val proCriminalAttitudes: kotlin.Int? = null,
+  @get:JsonProperty("proCriminalAttitudes") val proCriminalAttitudes: Int? = null,
 
   @Schema(example = "2", description = "")
-  @get:JsonProperty("hostileOrientation") val hostileOrientation: kotlin.Int? = null,
+  @get:JsonProperty("hostileOrientation") val hostileOrientation: Int? = null,
 ) {
   fun totalScore(): Int {
     return (proCriminalAttitudes ?: 0) +
@@ -78,16 +78,16 @@ data class IndividualCognitiveScores(
 
 data class IndividualSelfManagementScores(
   @Schema(example = "2", description = "")
-  @get:JsonProperty("impulsivity") val impulsivity: kotlin.Int? = null,
+  @get:JsonProperty("impulsivity") val impulsivity: Int? = null,
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("temperControl") val temperControl: kotlin.Int? = null,
+  @get:JsonProperty("temperControl") val temperControl: Int? = null,
 
   @Schema(example = "0", description = "")
-  @get:JsonProperty("problemSolvingSkills") val problemSolvingSkills: kotlin.Int? = null,
+  @get:JsonProperty("problemSolvingSkills") val problemSolvingSkills: Int? = null,
 
   @Schema(example = "", description = "")
-  @get:JsonProperty("difficultiesCoping") val difficultiesCoping: kotlin.Int? = null,
+  @get:JsonProperty("difficultiesCoping") val difficultiesCoping: Int? = null,
 ) {
   fun totalScore(): Int {
     return (impulsivity ?: 0) +
@@ -108,16 +108,16 @@ data class IndividualSelfManagementScores(
 data class IndividualRelationshipScores(
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("curRelCloseFamily") val curRelCloseFamily: kotlin.Int? = null,
+  @get:JsonProperty("curRelCloseFamily") val curRelCloseFamily: Int? = null,
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("prevExpCloseRel") val prevExpCloseRel: kotlin.Int? = null,
+  @get:JsonProperty("prevExpCloseRel") val prevExpCloseRel: Int? = null,
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("easilyInfluenced") val easilyInfluenced: kotlin.Int? = null,
+  @get:JsonProperty("easilyInfluenced") val easilyInfluenced: Int? = null,
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("aggressiveControllingBehaviour") val aggressiveControllingBehaviour: kotlin.Int? = null,
+  @get:JsonProperty("aggressiveControllingBehaviour") val aggressiveControllingBehaviour: Int? = null,
 ) {
 
   fun totalScore(): Int {

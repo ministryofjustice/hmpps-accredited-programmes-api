@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class OasysDrugDetail(
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("levelOfUseOfMainDrug") val levelOfUseOfMainDrug: kotlin.String? = null,
+  @get:JsonProperty("levelOfUseOfMainDrug") val levelOfUseOfMainDrug: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("drugsMajorActivity") val drugsMajorActivity: kotlin.String? = null,
+  @get:JsonProperty("drugsMajorActivity") val drugsMajorActivity: String? = null,
 )

@@ -15,17 +15,17 @@ data class CourseParticipationOutcome(
   @get:JsonProperty("status", required = true) val status: CourseParticipationOutcome.Status,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("yearStarted") val yearStarted: kotlin.Int? = null,
+  @get:JsonProperty("yearStarted") val yearStarted: Int? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("yearCompleted") val yearCompleted: kotlin.Int? = null,
+  @get:JsonProperty("yearCompleted") val yearCompleted: Int? = null,
 ) {
 
   /**
    *
    * Values: incomplete,complete
    */
-  enum class Status(val value: kotlin.String) {
+  enum class Status(val value: String) {
 
     @JsonProperty("incomplete")
     INCOMPLETE("incomplete"),

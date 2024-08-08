@@ -49,7 +49,7 @@ class OrganisationController(
     value = ["/organisations/{organisationId}/courses"],
     produces = ["application/json"],
   )
-  fun getAllCoursesByOrganisationId(@Parameter(description = "A organisation identifier", required = true) @PathVariable("organisationId") organisationId: kotlin.String): ResponseEntity<List<Course>> =
+  fun getAllCoursesByOrganisationId(@Parameter(description = "A organisation identifier", required = true) @PathVariable("organisationId") organisationId: String): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
         courseService

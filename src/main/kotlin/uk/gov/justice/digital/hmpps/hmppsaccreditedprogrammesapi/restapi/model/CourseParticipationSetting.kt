@@ -14,5 +14,5 @@ data class CourseParticipationSetting(
   @get:JsonProperty("type", required = true) val type: CourseParticipationSettingType,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("location") val location: kotlin.String? = null,
+  @get:JsonProperty("location") val location: String? = null,
 )

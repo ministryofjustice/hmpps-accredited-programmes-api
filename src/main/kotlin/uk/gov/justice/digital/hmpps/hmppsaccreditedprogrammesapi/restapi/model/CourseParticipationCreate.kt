@@ -15,10 +15,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CourseParticipationCreate(
 
   @Schema(example = "A1234AA", required = true, description = "The prison number of the course participant.")
-  @get:JsonProperty("prisonNumber", required = true) val prisonNumber: kotlin.String,
+  @get:JsonProperty("prisonNumber", required = true) val prisonNumber: String,
 
   @Schema(example = "null", description = "The name of the course taken by the participant.")
-  @get:JsonProperty("courseName") val courseName: kotlin.String? = null,
+  @get:JsonProperty("courseName") val courseName: String? = null,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("setting") val setting: CourseParticipationSetting? = null,
@@ -27,8 +27,8 @@ data class CourseParticipationCreate(
   @get:JsonProperty("outcome") val outcome: CourseParticipationOutcome? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("detail") val detail: kotlin.String? = null,
+  @get:JsonProperty("detail") val detail: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("source") val source: kotlin.String? = null,
+  @get:JsonProperty("source") val source: String? = null,
 )

@@ -13,14 +13,14 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class OasysAlcoholDetail(
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("alcoholLinkedToHarm") val alcoholLinkedToHarm: kotlin.String? = null,
+  @get:JsonProperty("alcoholLinkedToHarm") val alcoholLinkedToHarm: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("alcoholIssuesDetails") val alcoholIssuesDetails: kotlin.String? = null,
+  @get:JsonProperty("alcoholIssuesDetails") val alcoholIssuesDetails: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("frequencyAndLevel") val frequencyAndLevel: kotlin.String? = null,
+  @get:JsonProperty("frequencyAndLevel") val frequencyAndLevel: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("bingeDrinking") val bingeDrinking: kotlin.String? = null,
+  @get:JsonProperty("bingeDrinking") val bingeDrinking: String? = null,
 )

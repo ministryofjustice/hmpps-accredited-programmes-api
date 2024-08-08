@@ -14,17 +14,17 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class PrerequisiteRecord(
 
   @Schema(example = "age", required = true, description = "The name of this Course Prerequisite.")
-  @get:JsonProperty("name", required = true) val name: kotlin.String,
+  @get:JsonProperty("name", required = true) val name: String,
 
   @Schema(example = "Kaizen", required = true, description = "The name of the Course to which this Prerequisite applies. The name must match a course name exactly for this Prerequisite to be added to the Course.")
-  @get:JsonProperty("course", required = true) val course: kotlin.String,
+  @get:JsonProperty("course", required = true) val course: String,
 
   @Schema(example = "BNM-IPVO", required = true, description = "")
-  @get:JsonProperty("identifier", required = true) val identifier: kotlin.String,
+  @get:JsonProperty("identifier", required = true) val identifier: String,
 
   @Schema(example = "18+", description = "The value of this Course Prerequisite.")
-  @get:JsonProperty("description") val description: kotlin.String? = null,
+  @get:JsonProperty("description") val description: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("comments") val comments: kotlin.String? = null,
+  @get:JsonProperty("comments") val comments: String? = null,
 )

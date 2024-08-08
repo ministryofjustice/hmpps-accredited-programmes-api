@@ -12,10 +12,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Offence(
 
   @Schema(example = "null", description = "Description of the offence along with the code.")
-  @get:JsonProperty("offence") val offence: kotlin.String? = null,
+  @get:JsonProperty("offence") val offence: String? = null,
 
   @Schema(example = "null", description = "Legislation.")
-  @get:JsonProperty("category") val category: kotlin.String? = null,
+  @get:JsonProperty("category") val category: String? = null,
 
   @Schema(example = "null", description = "Offence start date.")
   @get:JsonProperty("offenceDate") val offenceDate: java.time.LocalDate? = null,

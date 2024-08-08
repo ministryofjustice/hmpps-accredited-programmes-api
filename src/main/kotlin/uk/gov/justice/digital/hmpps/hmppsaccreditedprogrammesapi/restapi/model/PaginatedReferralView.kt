@@ -15,20 +15,20 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class PaginatedReferralView(
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("content") val content: kotlin.collections.List<ReferralView>? = null,
+  @get:JsonProperty("content") val content: List<ReferralView>? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("totalPages") val totalPages: kotlin.Int? = null,
+  @get:JsonProperty("totalPages") val totalPages: Int? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("totalElements") val totalElements: kotlin.Int? = null,
+  @get:JsonProperty("totalElements") val totalElements: Int? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("pageSize") val pageSize: kotlin.Int? = null,
+  @get:JsonProperty("pageSize") val pageSize: Int? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("pageNumber") val pageNumber: kotlin.Int? = null,
+  @get:JsonProperty("pageNumber") val pageNumber: Int? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("pageIsEmpty") val pageIsEmpty: kotlin.Boolean? = null,
+  @get:JsonProperty("pageIsEmpty") val pageIsEmpty: Boolean? = null,
 )

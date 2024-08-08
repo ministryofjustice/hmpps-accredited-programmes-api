@@ -12,11 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class ReferralUpdate(
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("oasysConfirmed", required = true) val oasysConfirmed: kotlin.Boolean = false,
+  @get:JsonProperty("oasysConfirmed", required = true) val oasysConfirmed: Boolean = false,
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("hasReviewedProgrammeHistory", required = true) val hasReviewedProgrammeHistory: kotlin.Boolean = false,
+  @get:JsonProperty("hasReviewedProgrammeHistory", required = true) val hasReviewedProgrammeHistory: Boolean = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("additionalInformation") val additionalInformation: kotlin.String? = null,
+  @get:JsonProperty("additionalInformation") val additionalInformation: String? = null,
 )

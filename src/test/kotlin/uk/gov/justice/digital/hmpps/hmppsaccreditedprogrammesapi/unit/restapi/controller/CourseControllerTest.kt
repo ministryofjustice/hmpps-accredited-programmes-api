@@ -168,8 +168,8 @@ constructor(
           contentType(MediaType.APPLICATION_JSON)
           jsonPath("$.status") { value(400) }
           jsonPath("$.errorCode") { isEmpty() }
-          jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: $badId") }
-          jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: $badId") }
+          jsonPath("$.userMessage") { prefix("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'UUID'; Invalid UUID string: $badId") }
+          jsonPath("$.developerMessage") { prefix("Failed to convert value of type 'java.lang.String' to required type 'UUID'; Invalid UUID string: $badId") }
           jsonPath("$.moreInfo") { isEmpty() }
         }
       }

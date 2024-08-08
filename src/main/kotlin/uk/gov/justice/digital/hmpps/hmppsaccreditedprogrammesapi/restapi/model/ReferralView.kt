@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import java.util.UUID
 
 /**
  *
@@ -31,37 +32,37 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class ReferralView(
 
   @Schema(example = "null", description = "The unique id (UUID) of the new referral.")
-  @get:JsonProperty("id") val id: java.util.UUID? = null,
+  @get:JsonProperty("id") val id: UUID? = null,
 
   @Schema(example = "null", description = "The unique HMPPS username of the user who created this referral.")
-  @get:JsonProperty("referrerUsername") val referrerUsername: kotlin.String? = null,
+  @get:JsonProperty("referrerUsername") val referrerUsername: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("courseName") val courseName: kotlin.String? = null,
+  @get:JsonProperty("courseName") val courseName: String? = null,
 
   @Schema(example = "Gang offence", description = "")
-  @get:JsonProperty("audience") val audience: kotlin.String? = null,
+  @get:JsonProperty("audience") val audience: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("status") val status: kotlin.String? = null,
+  @get:JsonProperty("status") val status: String? = null,
 
   @Schema(example = "null", description = "The status description.")
-  @get:JsonProperty("statusDescription") val statusDescription: kotlin.String? = null,
+  @get:JsonProperty("statusDescription") val statusDescription: String? = null,
 
   @Schema(example = "null", description = "The colour to display status description.")
-  @get:JsonProperty("statusColour") val statusColour: kotlin.String? = null,
+  @get:JsonProperty("statusColour") val statusColour: String? = null,
 
   @Schema(example = "null", description = "Date referral was submitted.")
   @get:JsonProperty("submittedOn") val submittedOn: java.time.Instant? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("prisonNumber") val prisonNumber: kotlin.String? = null,
+  @get:JsonProperty("prisonNumber") val prisonNumber: String? = null,
 
   @Schema(example = "null", description = "Name of the organisation")
-  @get:JsonProperty("organisationName") val organisationName: kotlin.String? = null,
+  @get:JsonProperty("organisationName") val organisationName: String? = null,
 
   @Schema(example = "null", description = "ID of the organisation")
-  @get:JsonProperty("organisationId") val organisationId: kotlin.String? = null,
+  @get:JsonProperty("organisationId") val organisationId: String? = null,
 
   @Schema(example = "null", description = "Conditional release date.")
   @get:JsonProperty("conditionalReleaseDate") val conditionalReleaseDate: java.time.LocalDate? = null,
@@ -76,23 +77,23 @@ data class ReferralView(
   @get:JsonProperty("earliestReleaseDate") val earliestReleaseDate: java.time.LocalDate? = null,
 
   @Schema(example = "null", description = "Earliest release date type used")
-  @get:JsonProperty("earliestReleaseDateType") val earliestReleaseDateType: kotlin.String? = null,
+  @get:JsonProperty("earliestReleaseDateType") val earliestReleaseDateType: String? = null,
 
   @Schema(example = "null", description = "Release date type")
-  @get:JsonProperty("nonDtoReleaseDateType") val nonDtoReleaseDateType: kotlin.String? = null,
+  @get:JsonProperty("nonDtoReleaseDateType") val nonDtoReleaseDateType: String? = null,
 
   @Schema(example = "null", description = "forename of the person")
-  @get:JsonProperty("forename") val forename: kotlin.String? = null,
+  @get:JsonProperty("forename") val forename: String? = null,
 
   @Schema(example = "null", description = "surname of the person")
-  @get:JsonProperty("surname") val surname: kotlin.String? = null,
+  @get:JsonProperty("surname") val surname: String? = null,
 
   @Schema(example = "null", description = "Sentence type description or 'Multiple sentences' if there are more than one")
-  @get:JsonProperty("sentenceType") val sentenceType: kotlin.String? = null,
+  @get:JsonProperty("sentenceType") val sentenceType: String? = null,
 
   @Schema(example = "null", description = "The course display name when it is in a list.")
-  @get:JsonProperty("listDisplayName") val listDisplayName: kotlin.String? = null,
+  @get:JsonProperty("listDisplayName") val listDisplayName: String? = null,
 
   @Schema(example = "null", description = "location of person")
-  @get:JsonProperty("location") val location: kotlin.String? = null,
+  @get:JsonProperty("location") val location: String? = null,
 )

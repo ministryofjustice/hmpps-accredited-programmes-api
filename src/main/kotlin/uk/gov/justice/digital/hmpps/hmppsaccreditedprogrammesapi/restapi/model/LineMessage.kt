@@ -12,20 +12,20 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class LineMessage(
 
   @Schema(example = "20", description = "The number of the line in the CSV file that was rejected. The header line is lineNumber 1, the first line of CSV data is lineNumber 2.")
-  @get:JsonProperty("lineNumber") val lineNumber: kotlin.Int? = null,
+  @get:JsonProperty("lineNumber") val lineNumber: Int? = null,
 
   @Schema(example = "null", description = "One of 'Error' or 'Warning'.  If a line has an Error then the data was not added. If it is a Warning then the line was added but there was a problem that should be corrected.")
   @get:JsonProperty("level") val level: LineMessage.Level? = null,
 
   @Schema(example = "No match for course 'Kaizen', prisonId 'BWI'", description = "Useful information about the Error or Warning.")
-  @get:JsonProperty("message") val message: kotlin.String? = null,
+  @get:JsonProperty("message") val message: String? = null,
 ) {
 
   /**
    * One of 'Error' or 'Warning'.  If a line has an Error then the data was not added. If it is a Warning then the line was added but there was a problem that should be corrected.
    * Values: Warning,Error
    */
-  enum class Level(val value: kotlin.String) {
+  enum class Level(val value: String) {
 
     @JsonProperty("Warning")
     Warning("Warning"),
