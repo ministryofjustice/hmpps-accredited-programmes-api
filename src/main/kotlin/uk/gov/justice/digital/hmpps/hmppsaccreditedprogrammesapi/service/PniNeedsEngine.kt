@@ -14,7 +14,9 @@ import java.math.BigDecimal
 private const val ZERO = 0
 
 @Service
-class PniNeedsEngine {
+class PniNeedsEngine(
+  private val personService: PersonService,
+) {
 
   fun getOverallNeedsScore(
     individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
@@ -52,17 +54,24 @@ class PniNeedsEngine {
   }
 
   fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String): Int {
-    val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
-    val hasNullValues = individualSexScores.hasNullValues()
+    personService.createOrUpdatePerson(prisonNumber)
+    val gender = personService.getPerson(prisonNumber)?.gender.orEmpty()
 
-    if (!hasNullValues) {
+    val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
+
+    if (individualSexScores.isAllValuesPresent()) {
       return individualSexScores.overallSexDomainScore(individualSexScores.totalScore())
     }
 
     val individualRiskScores = individualNeedsAndRiskScores.individualRiskScores
+    if (gender.equals("Male", ignoreCase = true) &&
+      (individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true || individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true)
+    ) {
+      throw BusinessException("PNI information cannot be computed for $gender prisoner $prisonNumber as ospDC or OspII scores are present but SexDomainScore is null")
+    }
 
-    if ((individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true || individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true)) {
-      throw BusinessException("PNI information cannot be computed for $prisonNumber as ospDC or OspII scores are present but SexDomainScore is null")
+    if (gender.equals("Female", ignoreCase = true) && individualSexScores.hasSomeDataPresent()) {
+      throw BusinessException("PNI information cannot be computed for $gender prisoner $prisonNumber some SexDomainScore is present but not all")
     }
 
     return ZERO

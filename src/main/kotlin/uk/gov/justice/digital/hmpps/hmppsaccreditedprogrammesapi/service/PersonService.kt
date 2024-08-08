@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonAp
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.KeyDates
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceInformation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
@@ -26,7 +25,7 @@ class PersonService(
   private val personRepository: PersonRepository,
 ) {
 
-  fun createOrUpdatePerson(prisonNumber: String): PersonEntity? {
+  fun createOrUpdatePerson(prisonNumber: String) {
     val sentenceType = getSentenceType(prisonNumber)
     peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
       var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
@@ -50,10 +49,11 @@ class PersonService(
       } else {
         updatePerson(it, personEntity, sentenceType)
       }
-      return personRepository.save(personEntity)
+      personRepository.save(personEntity)
     }
-    throw BusinessException("Could not find information about prisoner $prisonNumber")
   }
+
+  fun getPerson(prisonNumber: String) = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
 
   private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> {
     return getSentenceDetails(prisoner.prisonerNumber)

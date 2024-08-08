@@ -9,13 +9,13 @@ import java.util.stream.Stream
 class IndividualSexScoresTest {
   companion object {
     @JvmStatic
-    fun scoresForNullCheck(): Stream<Arguments> {
+    fun hasSomeDataPresent(): Stream<Arguments> {
       return Stream.of(
         Arguments.of(IndividualSexScores(null, 1, 1), true),
         Arguments.of(IndividualSexScores(1, null, 1), true),
         Arguments.of(IndividualSexScores(1, 1, null), true),
-        Arguments.of(IndividualSexScores(1, 1, 1), false),
-        Arguments.of(IndividualSexScores(null, null, null), true),
+        Arguments.of(IndividualSexScores(1, 1, 1), true),
+        Arguments.of(IndividualSexScores(null, null, null), false),
       )
     }
 
@@ -43,9 +43,9 @@ class IndividualSexScoresTest {
   }
 
   @ParameterizedTest
-  @MethodSource("scoresForNullCheck")
-  fun `hasNullValues method`(scores: IndividualSexScores, expected: Boolean) {
-    assertEquals(expected, scores.hasNullValues())
+  @MethodSource("hasSomeDataPresent")
+  fun `hasSomeDataPresent method`(scores: IndividualSexScores, expected: Boolean) {
+    assertEquals(expected, scores.hasSomeDataPresent())
   }
 
   @ParameterizedTest

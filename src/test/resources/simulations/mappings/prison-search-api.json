@@ -21,22 +21,6 @@
         "urlPattern": "/prisoner-search/prisoner-numbers",
         "method": "POST",
         "bodyPatterns" : [ {
-          "contains" : "A1234AA"
-        } ]
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "bodyFileName": "prison-search-results-A1234AA.json"
-      }
-    },
-    {
-      "request": {
-        "urlPattern": "/prisoner-search/prisoner-numbers",
-        "method": "POST",
-        "bodyPatterns" : [ {
           "contains" : "C6666DD"
         } ]
       },
