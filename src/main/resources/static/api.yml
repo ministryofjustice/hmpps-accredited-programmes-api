@@ -49,32 +49,7 @@ paths:
         '209':
           description: Subject Identifier is not recognised by this service
 
-  /user/me/caseload:
-    get:
-      summary: Get list of caseloads for current user
-      operationId: getCurrentUserCaseloads
-      parameters:
-        - name: allCaseloads
-          in: query
-          description: Flag to indicate whether to retrieve all caseloads or not. Set to false by default
-          schema:
-            type: boolean
-            default: false
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/CaseLoad'
-                type: array
-          description: Retrieves the caseloads associated with the authenticated user.
-        "401":
-          description: Unauthorised. The request was unauthorised.
-        "403":
-          description: Forbidden.  The client is not authorised to access.
-      tags:
-        - User
+
 components:
   securitySchemes:
     bearerAuth:
@@ -82,48 +57,8 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
-  schemas:
 
-    ErrorResponse:
-      type: object
-      properties:
-        status:
-          type: integer
-          example: 404
-        errorCode:
-          type: integer
-        userMessage:
-          type: string
-          example: "Not found"
-        developerMessage:
-          type: string
-        moreInfo:
-          type: string
-      required:
-        - status
 
-    CaseLoad:
-      type: object
-      properties:
-        caseLoadId:
-          type: string
-          nullable: true
-          description: The unique identifier of the caseload.
-        description:
-          type: string
-          nullable: true
-          description: The description of the caseload.
-        type:
-          type: string
-          nullable: true
-          description: The type of the caseload.
-        caseloadFunction:
-          type: string
-          nullable: true
-          description: The function of the caseload.
-        currentlyActive:
-          type: boolean
-          nullable: true
-          description: Indicates whether the caseload is currently active or not.
+
 
 
