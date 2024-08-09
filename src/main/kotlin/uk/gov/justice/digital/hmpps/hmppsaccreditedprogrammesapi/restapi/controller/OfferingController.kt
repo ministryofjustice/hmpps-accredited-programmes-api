@@ -40,9 +40,9 @@ class OfferingController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "200", description = "Information about the Course that owns the offering.", content = [Content(schema = Schema(implementation = Course::class))]),
-      ApiResponse(responseCode = "401", description = "The request was unauthorised"),
-      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access this offering."),
-      ApiResponse(responseCode = "404", description = "No offering has the supplied id (Not Found)."),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access this offering.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "No offering has the supplied id (Not Found).", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
@@ -63,8 +63,8 @@ class OfferingController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "200", description = "successful operation", content = [Content(schema = Schema(implementation = CourseOffering::class))]),
-      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised."),
-      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access this offering."),
+      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access this offering.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
       ApiResponse(responseCode = "404", description = "Invalid course offering id", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],

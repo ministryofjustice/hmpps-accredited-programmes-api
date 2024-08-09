@@ -118,7 +118,7 @@ class ReferralsController(
         description = "Bad input",
         content = [Content(schema = Schema(implementation = ErrorResponse::class))],
       ),
-      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised."),
+      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -145,9 +145,9 @@ class ReferralsController(
     description = """Deletes a draft referral by its ID.""",
     responses = [
       ApiResponse(responseCode = "204", description = "No Content - The referral was successfully deleted"),
-      ApiResponse(responseCode = "401", description = "The request was unauthorised"),
-      ApiResponse(responseCode = "403", description = "Not authorised to access this endpoint/these referrals"),
-      ApiResponse(responseCode = "404", description = "No referrals for supplied organisationId (Not Found)."),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Not authorised to access this endpoint/these referrals", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "No referrals for supplied organisationId (Not Found).", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -191,8 +191,10 @@ class ReferralsController(
       ApiResponse(
         responseCode = "403",
         description = "Forbidden.  The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+
       ),
-      ApiResponse(responseCode = "404", description = "The referral does not exist"),
+      ApiResponse(responseCode = "404", description = "The referral does not exist", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -303,8 +305,9 @@ class ReferralsController(
       ApiResponse(
         responseCode = "403",
         description = "Forbidden.  The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
       ),
-      ApiResponse(responseCode = "404", description = "The referral does not exist"),
+      ApiResponse(responseCode = "404", description = "The referral does not exist", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -339,9 +342,9 @@ class ReferralsController(
         description = "Paginated summary of referrals for an organisation",
         content = [Content(schema = Schema(implementation = PaginatedReferralView::class))],
       ),
-      ApiResponse(responseCode = "401", description = "The request was unauthorised"),
-      ApiResponse(responseCode = "403", description = "Not authorised to access this endpoint/these referrals"),
-      ApiResponse(responseCode = "404", description = "No referrals for supplied organisationId (Not Found)."),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Not authorised to access this endpoint/these referrals", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "No referrals for supplied organisationId (Not Found).", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -463,9 +466,9 @@ class ReferralsController(
         description = "Paginated summary of referrals for an organisation",
         content = [Content(schema = Schema(implementation = PaginatedReferralView::class))],
       ),
-      ApiResponse(responseCode = "401", description = "The request was unauthorised"),
-      ApiResponse(responseCode = "403", description = "Not authorised to access this endpoint/these referrals"),
-      ApiResponse(responseCode = "404", description = "No referrals for supplied organisationId (Not Found)."),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Not authorised to access this endpoint/these referrals", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "No referrals for supplied organisationId (Not Found).", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -594,12 +597,13 @@ class ReferralsController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "204", description = "Submitted a completed referral."),
-      ApiResponse(responseCode = "401", description = "The request was unauthorised."),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
       ApiResponse(
         responseCode = "403",
         description = "Forbidden. The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
       ),
-      ApiResponse(responseCode = "404", description = "The referral does not exist."),
+      ApiResponse(responseCode = "404", description = "The referral does not exist.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -626,12 +630,13 @@ class ReferralsController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "204", description = "The referral was updated"),
-      ApiResponse(responseCode = "401", description = "The request was unauthorised"),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
       ApiResponse(
         responseCode = "403",
         description = "Forbidden.  The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
       ),
-      ApiResponse(responseCode = "404", description = "The referral does not exist"),
+      ApiResponse(responseCode = "404", description = "The referral does not exist", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -658,13 +663,14 @@ class ReferralsController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "204", description = "The referral now has the requested status."),
-      ApiResponse(responseCode = "401", description = "The request was unauthorised."),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
       ApiResponse(
         responseCode = "403",
         description = "Forbidden.  The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
       ),
-      ApiResponse(responseCode = "404", description = "The referral does not exist."),
-      ApiResponse(responseCode = "409", description = "The referral may not change its status to the supplied value."),
+      ApiResponse(responseCode = "404", description = "The referral does not exist.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "409", description = "The referral may not change its status to the supplied value.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )

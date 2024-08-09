@@ -96,8 +96,8 @@ class PeopleController(
         description = "Successful operation",
         content = [Content(array = ArraySchema(schema = Schema(implementation = Offence::class)))],
       ),
-      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised."),
-      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access person."),
+      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access person.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
       ApiResponse(
         responseCode = "404",
         description = "Invalid prison number",

@@ -56,6 +56,7 @@ class CourseController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "200", description = "successful operation", content = [Content(schema = Schema(implementation = CourseOffering::class))]),
+      ApiResponse(responseCode = "404", description = "No Course found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
@@ -78,8 +79,8 @@ class CourseController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "200", description = "Return a JSON representation of the created course", content = [Content(schema = Schema(implementation = Course::class))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource"),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden"),
+      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
@@ -123,10 +124,10 @@ class CourseController(
     description = """Deletes a course from the database. Note you can only delete a course if it's not being used.""",
     responses = [
       ApiResponse(responseCode = "200", description = "Successful delete"),
-      ApiResponse(responseCode = "400", description = "Bad input"),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource"),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden"),
-      ApiResponse(responseCode = "404", description = "The course did not exist"),
+      ApiResponse(responseCode = "400", description = "Bad input", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "The course did not exist", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
@@ -233,9 +234,9 @@ class CourseController(
     description = """Returns a list of audiences with their name and colour""",
     responses = [
       ApiResponse(responseCode = "200", description = "Successfully retrieved list of audience", content = [Content(array = ArraySchema(schema = Schema(implementation = Audience::class)))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource"),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden"),
-      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found"),
+      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
@@ -311,10 +312,10 @@ class CourseController(
     description = """Updates the details of a specific course""",
     responses = [
       ApiResponse(responseCode = "200", description = "Successful update", content = [Content(schema = Schema(implementation = Course::class))]),
-      ApiResponse(responseCode = "400", description = "Bad input"),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource"),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden"),
-      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found"),
+      ApiResponse(responseCode = "400", description = "Bad input", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )

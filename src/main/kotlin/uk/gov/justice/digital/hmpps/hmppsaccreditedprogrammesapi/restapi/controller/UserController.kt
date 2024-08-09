@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CaseLoad
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.UserService
 
 @Controller
@@ -25,8 +26,8 @@ class UserController(private val userService: UserService) {
     description = """""",
     responses = [
       ApiResponse(responseCode = "200", description = "Retrieves the caseloads associated with the authenticated user.", content = [Content(array = ArraySchema(schema = Schema(implementation = CaseLoad::class)))]),
-      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised."),
-      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access."),
+      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
