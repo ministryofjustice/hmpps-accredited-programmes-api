@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualNeedsAndRiskScores
@@ -39,7 +40,10 @@ class PNIController(
     value = ["/PNI/{prisonNumber}"],
     produces = ["application/json"],
   )
-  fun getPNIByPrisonNumber(@Parameter(description = "Prison nomis identifier", required = true) @PathVariable("prisonNumber") prisonNumber: String): ResponseEntity<PniScore> {
-    return ResponseEntity.ok(pniService.getPniScore(prisonNumber))
+  fun getPNIByPrisonNumber(
+    @Parameter(description = "Prison nomis identifier", required = true) @PathVariable("prisonNumber") prisonNumber: String,
+    @Parameter(description = "Gender of the prisoner", required = false) @RequestParam("gender", required = false) gender: String?,
+  ): ResponseEntity<PniScore> {
+    return ResponseEntity.ok(pniService.getPniScore(prisonNumber, gender))
   }
 }

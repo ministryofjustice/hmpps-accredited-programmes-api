@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DomainScore
@@ -17,12 +18,13 @@ private const val ZERO = 0
 class PniNeedsEngine(
   private val personService: PersonService,
 ) {
-
+  private val log = LoggerFactory.getLogger(this::class.java)
   fun getOverallNeedsScore(
     individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
     prisonNumber: String,
+    gender: String?,
   ): NeedsScore {
-    val sexDomainScore = getSexDomainScore(individualNeedsAndRiskScores, prisonNumber)
+    val sexDomainScore = getSexDomainScore(individualNeedsAndRiskScores, prisonNumber, gender)
     val individualNeedsScores = individualNeedsAndRiskScores.individualNeedsScores
     val thinkingDomainScore = individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore()
     val relationshipDomainScore = individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
@@ -53,9 +55,8 @@ class PniNeedsEngine(
     )
   }
 
-  fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String): Int {
-    personService.createOrUpdatePerson(prisonNumber)
-    val gender = personService.getPerson(prisonNumber)?.gender.orEmpty()
+  fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, prisonerGender: String?): Int {
+    val gender = getGenderOfPrisoner(prisonNumber, prisonerGender)
 
     val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
 
@@ -75,6 +76,16 @@ class PniNeedsEngine(
     }
 
     return ZERO
+  }
+
+  private fun getGenderOfPrisoner(prisonNumber: String, prisonerGender: String?): String {
+    return prisonerGender
+      ?: personService.getPerson(prisonNumber)?.gender
+      ?: run {
+        log.info("Prisoner $prisonNumber is not available in our db, fetching from external service.")
+        personService.createOrUpdatePerson(prisonNumber)
+        personService.getPerson(prisonNumber)?.gender
+      } ?: throw BusinessException("Gender information missing for prisonNumber $prisonNumber. PNI could not be determined")
   }
 }
 
