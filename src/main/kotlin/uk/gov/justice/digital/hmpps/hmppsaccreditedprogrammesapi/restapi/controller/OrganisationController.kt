@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.EnabledOrganisation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Organisation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
@@ -65,8 +66,8 @@ class OrganisationController(
     description = """""",
     responses = [
       ApiResponse(responseCode = "200", description = "List of enabled organisations", content = [Content(array = ArraySchema(schema = Schema(implementation = EnabledOrganisation::class)))]),
-      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised."),
-      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access."),
+      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
@@ -94,9 +95,9 @@ class OrganisationController(
     description = """Returns a list of organisations with their ID and name""",
     responses = [
       ApiResponse(responseCode = "200", description = "Successfully retrieved list", content = [Content(array = ArraySchema(schema = Schema(implementation = Organisation::class)))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource"),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden"),
-      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found"),
+      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
