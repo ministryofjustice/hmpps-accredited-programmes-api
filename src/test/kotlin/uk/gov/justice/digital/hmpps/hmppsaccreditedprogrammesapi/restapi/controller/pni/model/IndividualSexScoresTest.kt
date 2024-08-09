@@ -4,18 +4,19 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualSexScores
 import java.util.stream.Stream
 
 class IndividualSexScoresTest {
   companion object {
     @JvmStatic
-    fun scoresForNullCheck(): Stream<Arguments> {
+    fun hasSomeDataPresent(): Stream<Arguments> {
       return Stream.of(
         Arguments.of(IndividualSexScores(null, 1, 1), true),
         Arguments.of(IndividualSexScores(1, null, 1), true),
         Arguments.of(IndividualSexScores(1, 1, null), true),
-        Arguments.of(IndividualSexScores(1, 1, 1), false),
-        Arguments.of(IndividualSexScores(null, null, null), true),
+        Arguments.of(IndividualSexScores(1, 1, 1), true),
+        Arguments.of(IndividualSexScores(null, null, null), false),
       )
     }
 
@@ -43,9 +44,9 @@ class IndividualSexScoresTest {
   }
 
   @ParameterizedTest
-  @MethodSource("scoresForNullCheck")
-  fun `hasNullValues method`(scores: IndividualSexScores, expected: Boolean) {
-    assertEquals(expected, scores.hasNullValues())
+  @MethodSource("hasSomeDataPresent")
+  fun `hasSomeDataPresent method`(scores: IndividualSexScores, expected: Boolean) {
+    assertEquals(expected, scores.hasSomeDataPresent())
   }
 
   @ParameterizedTest

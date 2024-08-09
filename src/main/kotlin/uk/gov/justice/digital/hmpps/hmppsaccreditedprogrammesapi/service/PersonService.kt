@@ -7,8 +7,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientRe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.KeyDates
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceInformation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.KeyDate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SentenceDetails
@@ -18,9 +21,69 @@ import kotlin.reflect.full.memberProperties
 @Service
 class PersonService(
   val prisonApiClient: PrisonApiClient,
+  private val peopleSearchApiService: PeopleSearchApiService,
+  private val personRepository: PersonRepository,
 ) {
 
-  private fun getSentenceInformation(prisonNumber: String): SentenceInformation? {
+  fun createOrUpdatePerson(prisonNumber: String) {
+    val sentenceType = getSentenceType(prisonNumber)
+    peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
+      var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
+      if (personEntity == null) {
+        val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
+        personEntity = PersonEntity(
+          surname = it.lastName,
+          forename = it.firstName,
+          prisonNumber = prisonNumber,
+          conditionalReleaseDate = it.conditionalReleaseDate,
+          paroleEligibilityDate = it.paroleEligibilityDate,
+          tariffExpiryDate = it.tariffDate,
+          earliestReleaseDate = earliestReleaseDateAndType.first,
+          earliestReleaseDateType = earliestReleaseDateAndType.second,
+          indeterminateSentence = it.indeterminateSentence,
+          nonDtoReleaseDateType = it.nonDtoReleaseDateType,
+          sentenceType = sentenceType,
+          location = it.prisonName,
+          gender = it.gender,
+        )
+      } else {
+        updatePerson(it, personEntity, sentenceType)
+      }
+      personRepository.save(personEntity)
+    }
+  }
+
+  fun getPerson(prisonNumber: String) = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
+
+  private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> {
+    return getSentenceDetails(prisoner.prisonerNumber)
+      ?.keyDates
+      ?.firstOrNull { it.earliestReleaseDate == true }
+      ?.let { Pair(it.date, it.description) }
+      ?: Pair(null, null)
+  }
+
+  private fun updatePerson(
+    it: Prisoner,
+    personEntity: PersonEntity,
+    sentenceType: String,
+  ) {
+    val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
+    personEntity.surname = it.lastName
+    personEntity.forename = it.firstName
+    personEntity.conditionalReleaseDate = it.conditionalReleaseDate
+    personEntity.paroleEligibilityDate = it.paroleEligibilityDate
+    personEntity.tariffExpiryDate = it.tariffDate
+    personEntity.earliestReleaseDate = earliestReleaseDateAndType.first
+    personEntity.earliestReleaseDateType = earliestReleaseDateAndType.second
+    personEntity.indeterminateSentence = it.indeterminateSentence
+    personEntity.nonDtoReleaseDateType = it.nonDtoReleaseDateType
+    personEntity.sentenceType = sentenceType
+    personEntity.location = if (it.prisonName == "Outside") "Released" else it.prisonName
+    personEntity.gender = it.gender
+  }
+
+  fun getSentenceInformation(prisonNumber: String): SentenceInformation? {
     val sentenceInformation = when (val response = prisonApiClient.getSentenceInformation(prisonNumber)) {
       is ClientResult.Failure.Other -> throw ServiceUnavailableException(
         "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
@@ -72,6 +135,30 @@ class PersonService(
       .map { Sentence(it.sentenceTypeDescription, it.sentenceStartDate) }
     val keyDates = buildKeyDates(sentenceInformation)
     return SentenceDetails(sentences, keyDates)
+  }
+
+  fun updatePerson(prisonNumber: String, fromUpdateEndpoint: Boolean = false) {
+    log.info("Attempting to update person with prison number: $prisonNumber")
+    val personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
+    if (personEntity != null) {
+      log.info("Prisoner is of interest to ACP - about to update: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
+      val sentenceType = getSentenceType(prisonNumber)
+      peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
+        updatePerson(it, personEntity, sentenceType)
+      }
+      personRepository.save(personEntity)
+    } else {
+      log.info("Prisoner is not of interest to ACP: $prisonNumber")
+    }
+  }
+
+  fun updateAllPeople() {
+    log.info("Attempting to update all people in person cache.")
+    val people = personRepository.findAll()
+    people.forEach {
+      updatePerson(it.prisonNumber, true)
+    }
+    log.info("Updated all people in person cache.")
   }
 
   private fun buildKeyDates(sentenceInformation: SentenceInformation): List<KeyDate> {

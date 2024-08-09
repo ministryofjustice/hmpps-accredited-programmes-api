@@ -6,11 +6,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.awspring.cloud.sqs.annotation.SqsListener
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 
 @Service
 class DomainEventsListener(
-  private val referralService: ReferralService,
+  private val personService: PersonService,
   private val objectMapper: ObjectMapper,
 ) {
 
@@ -27,7 +27,7 @@ class DomainEventsListener(
   private fun handleMessage(message: DomainEventsMessage) {
     if (message.prisonerNumber != null) {
       log.info("message contained prisoner number: ${message.prisonerNumber}")
-      referralService.updatePerson(message.prisonerNumber)
+      personService.updatePerson(message.prisonerNumber)
     } else {
       log.error("Message did not contain prisoner number. " + message.additionalInformation)
     }

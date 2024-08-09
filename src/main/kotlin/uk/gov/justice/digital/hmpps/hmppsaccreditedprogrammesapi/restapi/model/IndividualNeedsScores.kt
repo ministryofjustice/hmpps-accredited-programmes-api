@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
@@ -32,11 +32,17 @@ data class IndividualSexScores(
   @Schema(example = "1", description = "")
   @get:JsonProperty("emotionalCongruence") val emotionalCongruence: Int? = null,
 ) {
-  fun hasNullValues() = listOf(
+  fun hasSomeDataPresent() = listOf(
     sexualPreOccupation,
     offenceRelatedSexualInterests,
     emotionalCongruence,
-  ).any { it == null }
+  ).any { it != null }
+
+  fun isAllValuesPresent() = listOf(
+    sexualPreOccupation,
+    offenceRelatedSexualInterests,
+    emotionalCongruence,
+  ).all { it != null }
 
   fun totalScore(): Int {
     return (sexualPreOccupation ?: 0) +
