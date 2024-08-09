@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.controllers
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
