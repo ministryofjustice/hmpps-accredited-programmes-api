@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.IndividualRiskScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.pni.model.RiskScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualRiskScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RiskScore
 import java.math.BigDecimal
 
 @Service
