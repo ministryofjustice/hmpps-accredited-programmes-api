@@ -95,6 +95,7 @@ class PniService(
       assessmentId = assessmentId,
       programmePathway = programmePathway,
       needsScore = overallNeedsScore,
+      validationErrors = overallNeedsScore.validate(),
       riskScore = overallRiskScore,
     )
 
@@ -116,8 +117,7 @@ class PniService(
       riskClassification = pniScore.riskScore.classification,
       overallNeedsScore = pniScore.needsScore.overallNeedsScore,
       programmePathway = pniScore.programmePathway,
-      pniValid = true,
-      // TODO this will need joining up with the validation work
+      pniValid = pniScore.validationErrors.isEmpty(),
       pniResultJson = objectMapper.writeValueAsString(pniScore),
       pniAssessmentDate = LocalDateTime.now(),
     )

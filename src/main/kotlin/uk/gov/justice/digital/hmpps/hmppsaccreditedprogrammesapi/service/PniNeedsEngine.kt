@@ -31,6 +31,7 @@ class PniNeedsEngine(
     val selfManagementDomainScore = individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
     val overallNeedsScore =
       listOf(sexDomainScore, thinkingDomainScore, relationshipDomainScore, selfManagementDomainScore).sum()
+
     return NeedsScore(
       overallNeedsScore = overallNeedsScore,
       classification = getClassification(overallNeedsScore),

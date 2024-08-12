@@ -87,7 +87,7 @@ class PniIntegrationTest :
         ),
       ),
     ),
-
+    validationErrors = listOf("difficultiesCoping in SelfManagementScores is null"),
     riskScore = RiskScore(
       classification = "HIGH_RISK",
       individualRiskScores = IndividualRiskScores(
@@ -114,6 +114,7 @@ class PniIntegrationTest :
     results[0].programmePathway shouldBe pniScore(prisonNumber).programmePathway
     results[0].riskClassification shouldBe pniScore(prisonNumber).riskScore.classification
     results[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore(prisonNumber))
+    results[0].pniValid shouldBe false
   }
 
   fun getPniInfoByPrisonNumber(prisonNumber: String) =
