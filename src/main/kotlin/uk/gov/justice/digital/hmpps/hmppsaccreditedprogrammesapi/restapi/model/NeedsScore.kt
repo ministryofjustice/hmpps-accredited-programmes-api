@@ -10,7 +10,14 @@ data class NeedsScore(
   @get:JsonProperty("classification") val classification: String,
   @Schema(example = "5", required = true)
   @get:JsonProperty("DomainScore") val domainScore: DomainScore,
-)
+) {
+  fun validate() =
+    listOf(
+      domainScore.thinkingDomainScore.isAllValuesPresent(),
+      domainScore.relationshipDomainScore.isAllValuesPresent(),
+      domainScore.selfManagementDomainScore.isAllValuesPresent(),
+    ).flatten()
+}
 
 data class DomainScore(
   @Schema(example = "1", required = true)
@@ -32,14 +39,54 @@ data class SexDomainScore(
 data class ThinkingDomainScore(
   @get:JsonProperty("overallThinkingDomainScore") val overallThinkingDomainScore: Int,
   @get:JsonProperty("individualThinkingScores") val individualThinkingScores: IndividualCognitiveScores,
-)
+) {
+  fun isAllValuesPresent() =
+    mutableListOf<String>().apply {
+      if (individualThinkingScores.proCriminalAttitudes == null) {
+        add("proCriminalAttitudes in ThinkingDomainScore is null")
+      }
+      if (individualThinkingScores.hostileOrientation == null) {
+        add("hostileOrientation in ThinkingDomainScore is null")
+      }
+    }
+}
 
 data class RelationshipDomainScore(
   @get:JsonProperty("overallRelationshipDomainScore") val overallRelationshipDomainScore: Int,
   @get:JsonProperty("individualRelationshipScores") val individualRelationshipScores: IndividualRelationshipScores,
-)
+) {
+  fun isAllValuesPresent() = mutableListOf<String>().apply {
+    if (individualRelationshipScores.curRelCloseFamily == null) {
+      add("curRelCloseFamily in RelationshipScores is null")
+    }
+    if (individualRelationshipScores.prevExpCloseRel == null) {
+      add("hostileOrientation in RelationshipScores is null")
+    }
+    if (individualRelationshipScores.easilyInfluenced == null) {
+      add("easilyInfluenced in RelationshipScores is null")
+    }
+    if (individualRelationshipScores.aggressiveControllingBehaviour == null) {
+      add("aggressiveControllingBehaviour in RelationshipScores is null")
+    }
+  }
+}
 
 data class SelfManagementDomainScore(
   @get:JsonProperty("overallSelfManagementDomainScore") val overallSelfManagementDomainScore: Int,
   @get:JsonProperty("individualSelfManagementScores") val individualSelfManagementScores: IndividualSelfManagementScores,
-)
+) {
+  fun isAllValuesPresent() = mutableListOf<String>().apply {
+    if (individualSelfManagementScores.impulsivity == null) {
+      add("impulsivity in SelfManagementScores is null")
+    }
+    if (individualSelfManagementScores.temperControl == null) {
+      add("temperControl in SelfManagementScores is null")
+    }
+    if (individualSelfManagementScores.problemSolvingSkills == null) {
+      add("problemSolvingSkills in SelfManagementScores is null")
+    }
+    if (individualSelfManagementScores.difficultiesCoping == null) {
+      add("difficultiesCoping in SelfManagementScores is null")
+    }
+  }
+}

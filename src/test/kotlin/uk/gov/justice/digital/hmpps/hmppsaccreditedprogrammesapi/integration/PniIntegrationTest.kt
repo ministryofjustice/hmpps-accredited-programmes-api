@@ -78,7 +78,7 @@ class PniIntegrationTest : IntegrationTestBase() {
           ),
         ),
       ),
-
+      validationErrors = listOf("difficultiesCoping in SelfManagementScores is null"),
       riskScore = RiskScore(
         classification = "HIGH_RISK",
         individualRiskScores = IndividualRiskScores(

@@ -87,6 +87,7 @@ class PniService(
       assessmentId = assessmentId,
       programmePathway = programmePathway,
       needsScore = overallNeedsScore,
+      validationErrors = overallNeedsScore.validate(),
       riskScore = overallRiskScore,
     )
   }
