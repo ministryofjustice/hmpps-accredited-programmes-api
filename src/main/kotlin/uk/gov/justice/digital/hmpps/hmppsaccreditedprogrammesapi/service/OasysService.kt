@@ -43,6 +43,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.learningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
+import java.time.LocalDateTime
 
 @Service
 class OasysService(
@@ -52,7 +53,10 @@ class OasysService(
   val auditService: AuditService,
 ) {
   fun getOffenceDetail(prisonNumber: String): OffenceDetail? {
-    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_OFFENCE_DETAIL.name)
+    auditService.audit(
+      prisonNumber = prisonNumber,
+      auditAction = AuditAction.OASYS_SEARCH_FOR_PERSON_OFFENCE_DETAIL.name,
+    )
 
     val oasysOffenceDetail = getAssessmentId(prisonNumber)
       ?.let { getOffenceDetail(it) }
@@ -153,10 +157,21 @@ class OasysService(
     val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { getArnsPredictorSummary(it) }
     val activeAlerts = getActiveAlerts(prisonNumber)
 
-    return risks(oasysOffendingInfo, oasysRelationships, oasysRoshSummary, oasysArnsSummary, oasysArnsPredictor, activeAlerts)
+    return risks(
+      oasysOffendingInfo,
+      oasysRelationships,
+      oasysRoshSummary,
+      oasysArnsSummary,
+      oasysArnsPredictor,
+      activeAlerts,
+    )
   }
 
   fun getAssessmentId(prisonNumber: String): Long? {
+    return getAssessmentIdDate(prisonNumber)?.first
+  }
+
+  fun getAssessmentIdDate(prisonNumber: String): Pair<Long, LocalDateTime?>? {
     val assessmentTimeline = getAssessments(prisonNumber)
 
     val assessment =
@@ -166,7 +181,7 @@ class OasysService(
       log.warn("No completed assessment found for prison number $prisonNumber")
       null
     } else {
-      assessment.id
+      Pair(assessment.id, assessment.completedAt)
     }
   }
 
@@ -180,7 +195,10 @@ class OasysService(
         .maxByOrNull { it.id }
     }
 
-    return OasysAssessmentDateInfo(latestCompletedAssessment?.completedAt?.toLocalDate(), mostRecentOpenAssessment != null)
+    return OasysAssessmentDateInfo(
+      latestCompletedAssessment?.completedAt?.toLocalDate(),
+      mostRecentOpenAssessment != null,
+    )
   }
 
   private fun getLatestCompletedLayerThreeAssessment(assessment: OasysAssessmentTimeline): Timeline? {
@@ -468,6 +486,7 @@ class OasysService(
         log.warn("Failure to retrieve $entityName data for assessmentId $assessmentId reason ${response.toException().cause}")
         AuthorisableActionResult.Success(null)
       }
+
       is ClientResult.Success -> {
         AuthorisableActionResult.Success(response.body)
       }

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
@@ -11,6 +12,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PNIResultEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniRuleRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualCognitiveScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualNeedsAndRiskScores
@@ -24,6 +27,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.P
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RiskScore
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDateTime
+import java.util.UUID
 
 private const val HIGH_INTENSITY_BC = "HIGH_INTENSITY_BC"
 
@@ -36,10 +41,12 @@ class PniService(
   private val pniNeedsEngine: PniNeedsEngine,
   private val pniRiskEngine: PniRiskEngine,
   private val pniRuleRepository: PniRuleRepository,
+  private val pniResultEntityRepository: PNIResultEntityRepository,
+  private val objectMapper: ObjectMapper,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  fun getPniScore(prisonNumber: String, gender: String?): PniScore {
+  fun getPniScore(prisonNumber: String, gender: String?, savePni: Boolean = false, referralId: UUID? = null): PniScore {
     log.info("Request received to process PNI for prisonNumber $prisonNumber")
 
     auditService.audit(
@@ -47,8 +54,9 @@ class PniService(
       auditAction = AuditAction.PNI.name,
     )
 
-    val assessmentId = oasysService.getAssessmentId(prisonNumber)
+    val assessmentIdDate = oasysService.getAssessmentIdDate(prisonNumber)
       ?: throw NotFoundException("No assessment id found for $prisonNumber")
+    val assessmentId = assessmentIdDate.first
 
     // section 6
     val relationships = oasysService.getRelationships(assessmentId)
@@ -81,13 +89,37 @@ class PniService(
 
     val programmePathway = getProgramPathway(overallNeedsScore, overallRiskScore, prisonNumber)
 
-    return PniScore(
+    val pniScore = PniScore(
       prisonNumber = prisonNumber,
       crn = oasysOffendingInfo?.crn,
       assessmentId = assessmentId,
       programmePathway = programmePathway,
       needsScore = overallNeedsScore,
       riskScore = overallRiskScore,
+    )
+
+    if (savePni) {
+      pniResultEntityRepository.save(buildEntity(pniScore, assessmentIdDate, referralId))
+    }
+
+    return pniScore
+  }
+
+  private fun buildEntity(pniScore: PniScore, assessmentIdDate: Pair<Long, LocalDateTime?>, referralId: UUID?): PniResultEntity {
+    return PniResultEntity(
+      crn = pniScore.crn,
+      prisonNumber = pniScore.prisonNumber,
+      referralId = referralId,
+      oasysAssessmentId = assessmentIdDate.first,
+      oasysAssessmentCompletedDate = assessmentIdDate.second,
+      needsClassification = pniScore.needsScore.classification,
+      riskClassification = pniScore.riskScore.classification,
+      overallNeedsScore = pniScore.needsScore.overallNeedsScore,
+      programmePathway = pniScore.programmePathway,
+      pniValid = true,
+      // TODO this will need joining up with the validation work
+      pniResultJson = objectMapper.writeValueAsString(pniScore),
+      pniAssessmentDate = LocalDateTime.now(),
     )
   }
 

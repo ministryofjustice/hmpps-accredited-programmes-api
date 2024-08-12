@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.E
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualNeedsAndRiskScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PniScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
+import java.util.UUID
 
 @RestController
 @Tag(name = "PNI")
@@ -43,7 +44,16 @@ class PNIController(
   fun getPNIByPrisonNumber(
     @Parameter(description = "Prison nomis identifier", required = true) @PathVariable("prisonNumber") prisonNumber: String,
     @Parameter(description = "Gender of the prisoner", required = false) @RequestParam("gender", required = false) gender: String?,
+    @Parameter(description = "save pni result to DB", required = false) @RequestParam("savePNI", required = false) savePNI: Boolean = false,
+    @Parameter(description = "referral id", required = false) @RequestParam("referralId", required = false) referralId: UUID?,
   ): ResponseEntity<PniScore> {
-    return ResponseEntity.ok(pniService.getPniScore(prisonNumber, gender))
+    return ResponseEntity.ok(
+      pniService.getPniScore(
+        prisonNumber = prisonNumber,
+        gender = gender,
+        savePni = savePNI,
+        referralId = referralId,
+      ),
+    )
   }
 }
