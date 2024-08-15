@@ -52,4 +52,10 @@ data class ReferralStatusHistory(
 
   @Schema(example = "null", description = "Username of the person who changed to this status")
   @get:JsonProperty("username") val username: String? = null,
+
+  @Schema(example = "null", description = "The description of the category - if appropriate.")
+  @get:JsonProperty("categoryDescription") val categoryDescription: String? = null,
+
+  @Schema(example = "null", description = "The description of the reason - if appropriate.")
+  @get:JsonProperty("reasonDescription") val reasonDescription: String? = null,
 )
