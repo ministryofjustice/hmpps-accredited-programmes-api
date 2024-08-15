@@ -8,6 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,6 +27,11 @@ data class ReferralStatusHistoryEntity(
   @Column(name = "statusHistoryId")
   @GeneratedValue(strategy = GenerationType.AUTO)
   val id: UUID? = null,
+
+  @Version
+  @Column(name = "version", nullable = false)
+  val version: Long = 0,
+
   val referralId: UUID,
   val statusStartDate: LocalDateTime = LocalDateTime.now(),
   val username: String = SecurityContextHolder.getContext().authentication?.name ?: "UNKNOWN_USER",

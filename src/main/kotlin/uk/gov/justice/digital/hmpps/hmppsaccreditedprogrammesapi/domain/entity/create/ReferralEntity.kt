@@ -8,6 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
@@ -22,6 +23,10 @@ data class ReferralEntity(
   @GeneratedValue
   @Column(name = "referral_id")
   var id: UUID? = null,
+
+  @Version
+  @Column(name = "version", nullable = false)
+  val version: Long = 0,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "offering_id", referencedColumnName = "offering_id")
