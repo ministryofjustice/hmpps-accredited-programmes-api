@@ -710,10 +710,18 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     referralCreated.referralId.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
-    var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = "draft", statusFilter = listOf("WITHDRAWN"))
+    var summary = getReferralViewsByOrganisationId(
+      ORGANISATION_ID_MDI,
+      statusGroupFilter = "draft",
+      statusFilter = listOf("WITHDRAWN"),
+    )
     summary.content.shouldBeEmpty()
 
-    summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = "draft", statusFilter = listOf("REFERRAL_STARTED"))
+    summary = getReferralViewsByOrganisationId(
+      ORGANISATION_ID_MDI,
+      statusGroupFilter = "draft",
+      statusFilter = listOf("REFERRAL_STARTED"),
+    )
     summary.content.shouldNotBeEmpty()
 
     summary.content?.forEach { actualSummary ->

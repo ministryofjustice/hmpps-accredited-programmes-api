@@ -130,9 +130,15 @@ sealed interface ClientResult<ResponseType> {
         jacksonObjectMapper().readValue(body, ResponseType::class.java)
     }
 
-    class Other<ResponseType>(val method: HttpMethod, val path: String, val exception: Exception, val serviceName: String) :
+    class Other<ResponseType>(
+      val method: HttpMethod,
+      val path: String,
+      val exception: Exception,
+      val serviceName: String,
+    ) :
       Failure<ResponseType> {
-      override fun toException(): Throwable = RuntimeException("Unable to complete request. Service $serviceName for $method request to $path", exception)
+      override fun toException(): Throwable =
+        RuntimeException("Unable to complete request. Service $serviceName for $method request to $path", exception)
     }
   }
 }

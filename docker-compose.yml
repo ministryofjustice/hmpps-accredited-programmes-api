@@ -147,6 +147,7 @@ services:
       - SERVICES_PRISON-REGISTER-API_BASE-URL=http://prison-register-api:8080
       - SERVICES_OASYS-API_BASE-URL=http://wiremock:8080
       - SERVICES_MANAGE-OFFENCES-API_BASE-URL=http://wiremock:8080
+      - SERVICES_CASE-NOTES-API_BASE-URL=http://wiremock:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/postgres
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin_password

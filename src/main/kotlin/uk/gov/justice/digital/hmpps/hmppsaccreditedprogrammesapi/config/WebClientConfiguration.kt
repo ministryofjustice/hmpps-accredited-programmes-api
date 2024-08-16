@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.config
 
 import io.netty.channel.ChannelOption
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,6 +24,10 @@ class WebClientConfiguration(
   @Value("\${upstream-timeout-ms}") private val upstreamTimeoutMs: Long,
   @Value("\${max-response-in-memory-size-bytes}") private val maxResponseInMemorySizeBytes: Int,
 ) {
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
 
   @Bean
   fun authorizedClientManager(clients: ClientRegistrationRepository): OAuth2AuthorizedClientManager {
@@ -84,7 +89,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
 
     oauth2Client.setDefaultClientRegistrationId("oasys-api")
-    return buildWebClient("$oasysApiBaseUrl", oauth2Client)
+    return buildWebClient(oasysApiBaseUrl, oauth2Client)
   }
 
   @Bean(name = ["manageOffencesApiWebClient"])
@@ -98,6 +103,19 @@ class WebClientConfiguration(
     oauth2Client.setDefaultClientRegistrationId("manage-offences-api")
 
     return buildWebClient(manageOffencesApiBaseUrl, oauth2Client)
+  }
+
+  @Bean(name = ["caseNotesApiWebClient"])
+  fun caseNotesApiWebClient(
+    clientRegistrations: ClientRegistrationRepository,
+    authorizedClients: OAuth2AuthorizedClientRepository,
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    @Value("\${services.case-notes-api.base-url}") caseNotesApiBaseUrl: String,
+  ): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+    oauth2Client.setDefaultClientRegistrationId("case-notes-api")
+
+    return buildWebClient(caseNotesApiBaseUrl, oauth2Client)
   }
 
   fun buildWebClient(url: String, oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction): WebClient = WebClient.builder()

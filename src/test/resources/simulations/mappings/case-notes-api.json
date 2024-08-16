@@ -1,0 +1,20 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "url": "/case-notes/C6666CC",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "ACP"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "case-notes-created-response-C6666CC.json"
+      }
+    }
+  ]
+}

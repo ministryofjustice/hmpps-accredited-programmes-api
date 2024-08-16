@@ -54,9 +54,16 @@ spring:
             client-id: hmpps-accredited-programmes-client-1
             client-secret: clientsecret
             authorization-grant-type: client_credentials
+          case-notes-api:
+            provider: hmpps-auth
+            client-id: hmpps-accredited-programmes-client-1
+            client-secret: clientsecret
+            authorization-grant-type: client_credentials
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
+          hmpps-auth-notes:
+            token-uri: ${hmpps.auth.url}/oauth/token?username=ACP_USER_TEST
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -111,9 +118,14 @@ services:
   prison-register-api:
     base-url: http://localhost:9096
   oasys-api:
-    base-url: http://localhost:9095
+    base-url: http://localhost:9097
   manage-offences-api:
-    base-url: http://localhost:9095
+    base-url: http://localhost:9098
+  case-notes-api:
+    base-url: http://localhost:9099
+
+feature-switch:
+  case-notes-enabled: true
 
 hmpps:
   auth:

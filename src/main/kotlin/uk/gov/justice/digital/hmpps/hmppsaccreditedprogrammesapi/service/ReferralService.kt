@@ -53,6 +53,7 @@ constructor(
   private val enabledOrganisationService: EnabledOrganisationService,
   private val personService: PersonService,
   private val pniService: PniService,
+  private val caseNotesApiService: CaseNotesApiService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -134,6 +135,7 @@ constructor(
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
+    log.info("Request received for update of status for $referralId and $referralStatusUpdate")
     val referral = referralRepository.getReferenceById(referralId)
     val statuses = validateStatus(referral, referralStatusUpdate)
     val existingStatus = referral.status
@@ -159,6 +161,10 @@ constructor(
     }
     // update the status
     referral.status = referralStatusUpdate.status.uppercase()
+
+    // write case notes
+    caseNotesApiService.buildAndCreateCaseNote(referral, referralStatusUpdate)
+
     // audit the interaction
     auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
   }
@@ -232,6 +238,8 @@ constructor(
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
+        savePNI(referral.prisonNumber, referral)
+        caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
       }
 
       "REFERRAL_SUBMITTED" -> {
@@ -252,8 +260,6 @@ constructor(
       previousStatusCode = existingStatus,
       newStatus = referralStatusRepository.getByCode(referral.status),
     )
-
-    savePNI(referral.prisonNumber, referral)
   }
 
   fun getReferralViewByOrganisationId(

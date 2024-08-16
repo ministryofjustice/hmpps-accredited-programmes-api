@@ -1,0 +1,29 @@
+{
+  "caseNoteId": "12311312",
+  "offenderIdentifier": "C6666CC",
+  "type": "KA",
+  "typeDescription": "Key Worker",
+  "subType": "KS",
+  "subTypeDescription": "Key Worker Session",
+  "source": "INST",
+  "creationDateTime": "2024-09-03T11:13:34.170Z",
+  "occurrenceDateTime": "2024-09-03T11:13:34.170Z",
+  "authorName": "John Smith",
+  "authorUserId": "12345 or USERNAME_12345",
+  "text": "This is some text",
+  "locationId": "MDI",
+  "eventId": -23,
+  "sensitive": true,
+  "amendments": [
+    {
+      "caseNoteAmendmentId": 123232,
+      "creationDateTime": "2024-09-03T11:13:34.170Z",
+      "authorUserName": "USER1",
+      "authorName": "Mickey Mouse",
+      "authorUserId": "12345",
+      "additionalNoteText": "Some Additional Text"
+    }
+  ],
+  "systemGenerated": true,
+  "legacyId": 0
+}
