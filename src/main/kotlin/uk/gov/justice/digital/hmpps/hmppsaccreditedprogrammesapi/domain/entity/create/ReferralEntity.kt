@@ -8,20 +8,23 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import org.hibernate.annotations.SQLDelete
+import jakarta.persistence.Version
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
 @Table(name = "referral")
-@SQLDelete(sql = "UPDATE referral SET deleted = true WHERE referral_id = ?")
 @SQLRestriction(value = "deleted = false")
 data class ReferralEntity(
   @Id
   @GeneratedValue
   @Column(name = "referral_id")
   var id: UUID? = null,
+
+  @Version
+  @Column(name = "version", nullable = false)
+  val version: Long = 0,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "offering_id", referencedColumnName = "offering_id")

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 import java.time.LocalDate
 import java.util.UUID
 
@@ -27,6 +28,11 @@ data class PersonEntity(
   @GeneratedValue
   @Column(name = "person_id")
   var id: UUID = UUID.randomUUID(),
+
+  @Version
+  @Column(name = "version", nullable = false)
+  val version: Long = 0,
+
   var location: String?,
   var gender: String?,
 )

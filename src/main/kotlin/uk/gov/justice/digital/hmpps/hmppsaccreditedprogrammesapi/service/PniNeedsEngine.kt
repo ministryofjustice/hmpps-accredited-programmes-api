@@ -69,7 +69,7 @@ class PniNeedsEngine(
     if (gender.equals("Male", ignoreCase = true) &&
       (individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true || individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true)
     ) {
-      throw BusinessException("PNI information cannot be computed for $gender prisoner $prisonNumber as ospDC or OspII scores are present but SexDomainScore is null")
+      throw BusinessException("PNI information cannot be computed for $gender prisoner $prisonNumber as ospDC or OspII scores are present but some values of SexDomainScore are null")
     }
 
     if (gender.equals("Female", ignoreCase = true) && individualSexScores.hasSomeDataPresent()) {

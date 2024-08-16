@@ -91,6 +91,7 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       victimOfPartnerFamily = true,
       perpOfPartnerOrFamily = true,
       relIssuesDetails = "Free text",
+      relCloseFamily = "0-No problems",
     )
   }
 

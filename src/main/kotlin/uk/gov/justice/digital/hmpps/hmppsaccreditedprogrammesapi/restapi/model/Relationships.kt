@@ -36,11 +36,14 @@ data class Relationships(
   @get:JsonProperty("relIssuesDetails") val relIssuesDetails: String? = null,
 
   @Schema(example = "0-No problems", description = "")
-  @get:JsonProperty("emotionalCongruence") val emotionalCongruence: String? = null,
+  @get:JsonProperty("relCloseFamily") val relCloseFamily: String? = null,
 
   @Schema(example = "Not in a relationship", description = "")
   @get:JsonProperty("relCurrRelationshipStatus") val relCurrRelationshipStatus: String? = null,
 
   @Schema(example = "2-Significant problems", description = "")
   @get:JsonProperty("prevCloseRelationships") val prevCloseRelationships: String? = null,
+
+  @Schema(example = "0-No problems", description = "")
+  @get:JsonProperty("emotionalCongruence") val emotionalCongruence: String? = null,
 )

@@ -39,6 +39,8 @@ class ReferralStatusHistoryService(
           notes = it.notes,
           statusStartDate = it.statusStartDate.toInstant(ZoneOffset.UTC),
           username = it.username,
+          categoryDescription = it.category?.description,
+          reasonDescription = it.reason?.description,
         )
       }
 
