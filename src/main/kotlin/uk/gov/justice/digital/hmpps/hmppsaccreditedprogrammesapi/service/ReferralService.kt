@@ -124,19 +124,56 @@ constructor(
     val referral = referralRepository.getReferenceById(referralId)
     val statuses = validateStatus(referral, referralStatusUpdate)
     val existingStatus = referral.status
-    // create the referral history
-    referralStatusHistoryService.updateReferralHistory(
-      referralId = referralId,
-      previousStatusCode = existingStatus,
-      newStatus = statuses.first,
-      newCategory = statuses.second,
-      newReason = statuses.third,
-      newNotes = referralStatusUpdate.notes,
-    )
+
+    if (specialDeselectedCase(referralId, statuses, existingStatus, referralStatusUpdate)) {
+      val updatedReferral = referralRepository.getReferenceById(referralId)
+      // create the referral history
+      referralStatusHistoryService.updateReferralHistory(
+        referralId = referralId,
+        previousStatusCode = updatedReferral.status,
+        newStatus = statuses.first,
+      )
+    } else {
+      // create the referral history
+      referralStatusHistoryService.updateReferralHistory(
+        referralId = referralId,
+        previousStatusCode = existingStatus,
+        newStatus = statuses.first,
+        newCategory = statuses.second,
+        newReason = statuses.third,
+        newNotes = referralStatusUpdate.notes,
+      )
+    }
     // update the status
     referral.status = referralStatusUpdate.status.uppercase()
     // audit the interaction
     auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
+  }
+
+  /**
+   *  This is a special case where the current status is ON_PROGRAMME and they are moving to a
+   *  status that is not closed we need to insert a deselected status here.
+   *  This is unfortunate as it breaks the configuration of the status transitions [sad face]
+   */
+  private fun specialDeselectedCase(
+    referralId: UUID,
+    status: Triple<ReferralStatusEntity, ReferralStatusCategoryEntity?, ReferralStatusReasonEntity?>,
+    existingStatus: String,
+    referralStatusUpdate: ReferralStatusUpdate,
+  ): Boolean {
+    if (existingStatus == "ON_PROGRAMME" && !status.first.closed) {
+      val newStatus = referralStatusRepository.getByCode("DESELECTED")
+      referralStatusHistoryService.updateReferralHistory(
+        referralId = referralId,
+        previousStatusCode = existingStatus,
+        newStatus = newStatus,
+        newCategory = status.second,
+        newReason = status.third,
+        newNotes = referralStatusUpdate.notes,
+      )
+      return true
+    }
+    return false
   }
 
   private fun validateStatus(
