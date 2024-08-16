@@ -8,6 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 import java.util.UUID
 
 @Entity
@@ -17,6 +18,10 @@ data class OfferingEntity(
   @GeneratedValue
   @Column(name = "offering_id")
   val id: UUID? = null,
+
+  @Version
+  @Column(name = "version", nullable = false)
+  val version: Long = 0,
 
   val organisationId: String,
   var contactEmail: String,
