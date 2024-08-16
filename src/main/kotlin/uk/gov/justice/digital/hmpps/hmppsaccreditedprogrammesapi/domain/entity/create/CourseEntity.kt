@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode.SUBSELECT
 import org.hibernate.annotations.Immutable
@@ -25,6 +26,10 @@ data class CourseEntity(
   @GeneratedValue
   @Column(name = "course_id")
   val id: UUID? = null,
+
+  @Version
+  @Column(name = "version", nullable = false)
+  val version: Long = 0,
 
   var name: String,
   var identifier: String,
