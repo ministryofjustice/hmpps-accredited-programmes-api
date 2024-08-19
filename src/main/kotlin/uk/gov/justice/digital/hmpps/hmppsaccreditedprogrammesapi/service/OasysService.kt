@@ -4,10 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.ArnsApiClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
@@ -23,7 +21,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.getHighestPriorityScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -48,7 +48,6 @@ import java.time.LocalDateTime
 @Service
 class OasysService(
   val oasysApiClient: OasysApiClient,
-  val arnsApiClient: ArnsApiClient,
   val prisonApiClient: PrisonApiClient,
   val auditService: AuditService,
 ) {
@@ -153,15 +152,15 @@ class OasysService(
     val oasysOffendingInfo = getOffendingInfo(assessmentId)
     val oasysRelationships = getRelationships(assessmentId)
     val oasysRoshSummary = getRoshSummary(assessmentId)
-    val oasysArnsSummary = oasysOffendingInfo?.crn?.let { getArnsSummary(it) }
-    val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { getArnsPredictorSummary(it) }
+    val oasysArnsSummary = oasysRoshSummary?.getHighestPriorityScore()
+    val oasysArnsPredictor = getRiskPredictors(assessmentId)
     val activeAlerts = getActiveAlerts(prisonNumber)
 
     return risks(
       oasysOffendingInfo,
       oasysRelationships,
       oasysRoshSummary,
-      oasysArnsSummary,
+      RiskSummary(oasysArnsSummary?.type),
       oasysArnsPredictor,
       activeAlerts,
     )
@@ -243,171 +242,6 @@ class OasysService(
     )
   }
 
-  fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? {
-    val offenceDetail = when (val response = oasysApiClient.getOffenceDetail(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve OffenceDetail for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return offenceDetail.entity
-  }
-
-  fun getRoshFull(assessmentId: Long): OasysRoshFull? {
-    val roshFull = when (val response = oasysApiClient.getRoshFull(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve RoshFull data for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return roshFull.entity
-  }
-
-  fun getRelationships(assessmentId: Long): OasysRelationships? {
-    val relationships = when (val response = oasysApiClient.getRelationships(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Relationships data for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return relationships.entity
-  }
-
-  fun getLifestyle(assessmentId: Long): OasysLifestyle? {
-    val lifestyle = when (val response = oasysApiClient.getLifestyle(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Lifestyle for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return lifestyle.entity
-  }
-
-  fun getPsychiatric(assessmentId: Long): OasysPsychiatric? {
-    val psychiatric = when (val response = oasysApiClient.getPsychiatric(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Psychiatric for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return psychiatric.entity
-  }
-
-  fun getBehaviour(assessmentId: Long): OasysBehaviour? {
-    val behaviour = when (val response = oasysApiClient.getBehaviour(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Behaviour for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return behaviour.entity
-  }
-
-  fun getHealth(assessmentId: Long): OasysHealth? {
-    val health = when (val response = oasysApiClient.getHealth(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Health for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return health.entity
-  }
-
-  fun getAttitude(assessmentId: Long): OasysAttitude? {
-    val attitude = when (val response = oasysApiClient.getAttitude(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Attitude for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return attitude.entity
-  }
-
-  fun getLearning(assessmentId: Long): OasysLearning? {
-    val learning = when (val response = oasysApiClient.getLearning(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Learning for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return learning.entity
-  }
-
-  fun getAccommodation(assessmentId: Long): OasysAccommodation? {
-    val accommodation = when (val response = oasysApiClient.getAccommodation(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve Accommodation for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return accommodation.entity
-  }
-
-  fun getOffendingInfo(assessmentId: Long): OasysOffendingInfo? {
-    val offendingInfo = when (val response = oasysApiClient.getOffendingInfo(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve OffendingInfo for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return offendingInfo.entity
-  }
-
   fun getActiveAlerts(prisonNumber: String): List<NomisAlert>? {
     val nomisAlerts = when (val response = prisonApiClient.getAlertsByPrisonNumber(prisonNumber)) {
       is ClientResult.Failure -> {
@@ -422,59 +256,48 @@ class OasysService(
     return nomisAlerts.entity?.filter { it.active && !it.expired }?.sortedByDescending { it.dateCreated }
   }
 
-  fun getRoshSummary(assessmentId: Long): OasysRoshSummary? {
-    val roshSummary = when (val response = oasysApiClient.getRoshSummary(assessmentId)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve RoshSummary data for assessmentId $assessmentId reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
+  fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? =
+    fetchDetail(assessmentId, oasysApiClient::getOffenceDetail, "Offence detail")
 
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
+  fun getRoshFull(assessmentId: Long): OasysRoshFull? =
+    fetchDetail(assessmentId, oasysApiClient::getRoshFull, "RoshFull")
 
-    return roshSummary.entity
-  }
+  fun getRelationships(assessmentId: Long): OasysRelationships? =
+    fetchDetail(assessmentId, oasysApiClient::getRelationships, "Relationships")
+
+  fun getLifestyle(assessmentId: Long): OasysLifestyle? =
+    fetchDetail(assessmentId, oasysApiClient::getLifestyle, "Lifestyle")
+  fun getPsychiatric(assessmentId: Long): OasysPsychiatric? =
+    fetchDetail(assessmentId, oasysApiClient::getPsychiatric, "Psychiatric")
+
+  fun getBehaviour(assessmentId: Long): OasysBehaviour? =
+    fetchDetail(assessmentId, oasysApiClient::getBehaviour, "Behaviour")
+
+  fun getHealth(assessmentId: Long): OasysHealth? =
+    fetchDetail(assessmentId, oasysApiClient::getHealth, "Health")
+
+  fun getAttitude(assessmentId: Long): OasysAttitude? =
+    fetchDetail(assessmentId, oasysApiClient::getAttitude, "Attitude")
+
+  fun getLearning(assessmentId: Long): OasysLearning? =
+    fetchDetail(assessmentId, oasysApiClient::getLearning, "Learning")
+
+  fun getAccommodation(assessmentId: Long): OasysAccommodation? =
+    fetchDetail(assessmentId, oasysApiClient::getAccommodation, "Accomodation")
+
+  fun getOffendingInfo(assessmentId: Long): OasysOffendingInfo? =
+    fetchDetail(assessmentId, oasysApiClient::getOffendingInfo, "OffendingInfo")
+  fun getRoshSummary(assessmentId: Long): OasysRoshSummary? =
+    fetchDetail(assessmentId, oasysApiClient::getRoshSummary, "RoshSummary")
+
+  fun getRiskPredictors(assessmentId: Long): ArnsScores? =
+    fetchDetail(assessmentId, oasysApiClient::getRiskPredictors, "RiskPredictors")
 
   fun getDrugDetail(assessmentId: Long): OasysDrugDetail? =
     fetchDetail(assessmentId, oasysApiClient::getDrugDetail, "DrugDetail")
 
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? =
     fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
-
-  fun getArnsSummary(crn: String): ArnsSummary? {
-    val arnsSummary = when (val response = arnsApiClient.getSummary(crn)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve ArnsSummary for crn $crn reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return arnsSummary.entity
-  }
-
-  fun getArnsPredictorSummary(crn: String): ArnsScores? {
-    val arnsPredictors = when (val response = arnsApiClient.getPredictorsAll(crn)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return arnsPredictors.entity
-      ?.filter { it.assessmentStatus == "COMPLETE" }
-      ?.sortedByDescending { it.completedDate }
-      ?.firstOrNull()
-  }
 
   private inline fun <T> fetchDetail(
     assessmentId: Long,

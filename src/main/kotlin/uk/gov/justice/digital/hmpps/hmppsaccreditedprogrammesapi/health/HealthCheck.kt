@@ -18,6 +18,3 @@ class PrisonRegisterApiHealthCheck(@Qualifier("prisonRegisterApiWebClient") webC
 
 @Component
 class OasysApiWebClientHealthCheck(@Qualifier("oasysApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
-
-@Component
-class ArnsApiWebClientHealthCheck(@Qualifier("arnsApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)

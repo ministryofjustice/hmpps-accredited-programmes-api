@@ -87,19 +87,6 @@ class WebClientConfiguration(
     return buildWebClient("$oasysApiBaseUrl", oauth2Client)
   }
 
-  @Bean(name = ["arnsApiWebClient"])
-  fun arnsApiWebClient(
-    clientRegistrations: ClientRegistrationRepository,
-    authorizedClients: OAuth2AuthorizedClientRepository,
-    authorizedClientManager: OAuth2AuthorizedClientManager,
-    @Value("\${services.arns-api.base-url}") arnsApiBaseUrl: String,
-  ): WebClient {
-    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-    oauth2Client.setDefaultClientRegistrationId("arns-api")
-
-    return buildWebClient(arnsApiBaseUrl, oauth2Client)
-  }
-
   @Bean(name = ["manageOffencesApiWebClient"])
   fun manageOffencesApiWebClient(
     clientRegistrations: ClientRegistrationRepository,

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.ArnsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
@@ -27,10 +26,9 @@ import java.time.LocalDateTime
 class OasysApiServiceTest {
 
   private val oasysApiClient = mockk<OasysApiClient>()
-  private val arnsApiClient = mockk<ArnsApiClient>()
   private val prisonApiClient = mockk<PrisonApiClient>()
   private val auditService = mockk<AuditService>()
-  val service = OasysService(oasysApiClient, arnsApiClient, prisonApiClient, auditService)
+  val service = OasysService(oasysApiClient, prisonApiClient, auditService)
 
   @Test
   fun `should return assessmentId`() {
