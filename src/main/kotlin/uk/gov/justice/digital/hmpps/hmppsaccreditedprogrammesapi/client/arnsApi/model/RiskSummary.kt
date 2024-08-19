@@ -3,6 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class ArnsSummary(
+data class RiskSummary(
   val overallRiskLevel: String?,
 )

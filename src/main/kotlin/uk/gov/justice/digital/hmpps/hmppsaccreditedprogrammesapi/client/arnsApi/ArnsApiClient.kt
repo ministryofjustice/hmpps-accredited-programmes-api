@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
 
 private const val ARNS_API = "Arns API"
 
@@ -15,10 +14,6 @@ class ArnsApiClient(
   @Qualifier("arnsApiWebClient")
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
-
-  fun getSummary(crn: String) = getRequest<ArnsSummary>(ARNS_API) {
-    path = "/risks/crn/$crn/summary"
-  }
 
   fun getPredictorsAll(crn: String) = getRequest<List<ArnsScores>>(ARNS_API) {
     path = "/risks/crn/$crn/predictors/all"

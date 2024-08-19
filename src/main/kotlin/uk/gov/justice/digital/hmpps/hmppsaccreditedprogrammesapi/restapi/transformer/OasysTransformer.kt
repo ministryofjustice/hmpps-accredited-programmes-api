@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
@@ -118,7 +118,7 @@ fun risks(
   oasysOffendingInfo: OasysOffendingInfo?,
   oasysRelationships: OasysRelationships?,
   oasysRoshSummary: OasysRoshSummary?,
-  oasysArnsSummary: ArnsSummary?,
+  oasysArnsSummary: RiskSummary?,
   oasysArnsPredictor: ArnsScores?,
   activeAlerts: List<NomisAlert>?,
 ) = Risks(
@@ -135,15 +135,15 @@ fun risks(
   ospcScore = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
   ospiScore = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
 
-  riskPrisonersCustody = oasysRoshSummary?.riskPrisonersCustody,
-  riskStaffCustody = oasysRoshSummary?.riskStaffCustody,
-  riskStaffCommunity = oasysRoshSummary?.riskStaffCommunity,
-  riskKnownAdultCustody = oasysRoshSummary?.riskKnownAdultCustody,
-  riskKnownAdultCommunity = oasysRoshSummary?.riskKnownAdultCommunity,
-  riskPublicCustody = oasysRoshSummary?.riskPublicCustody,
-  riskPublicCommunity = oasysRoshSummary?.riskPublicCommunity,
-  riskChildrenCustody = oasysRoshSummary?.riskChildrenCustody,
-  riskChildrenCommunity = oasysRoshSummary?.riskChildrenCommunity,
+  riskPrisonersCustody = oasysRoshSummary?.riskPrisonersCustody?.type,
+  riskStaffCustody = oasysRoshSummary?.riskStaffCustody?.type,
+  riskStaffCommunity = oasysRoshSummary?.riskStaffCommunity?.type,
+  riskKnownAdultCustody = oasysRoshSummary?.riskKnownAdultCustody?.type,
+  riskKnownAdultCommunity = oasysRoshSummary?.riskKnownAdultCommunity?.type,
+  riskPublicCustody = oasysRoshSummary?.riskPublicCustody?.type,
+  riskPublicCommunity = oasysRoshSummary?.riskPublicCommunity?.type,
+  riskChildrenCustody = oasysRoshSummary?.riskChildrenCustody?.type,
+  riskChildrenCommunity = oasysRoshSummary?.riskChildrenCommunity?.type,
 
   imminentRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
   imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,

@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.Authoris
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.ArnsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.getHighestPriorityScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -153,7 +154,7 @@ class OasysService(
     val oasysOffendingInfo = getOffendingInfo(assessmentId)
     val oasysRelationships = getRelationships(assessmentId)
     val oasysRoshSummary = getRoshSummary(assessmentId)
-    val oasysArnsSummary = oasysOffendingInfo?.crn?.let { getArnsSummary(it) }
+    val oasysArnsSummary = oasysRoshSummary?.getHighestPriorityScore()
     val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { getArnsPredictorSummary(it) }
     val activeAlerts = getActiveAlerts(prisonNumber)
 
@@ -161,7 +162,7 @@ class OasysService(
       oasysOffendingInfo,
       oasysRelationships,
       oasysRoshSummary,
-      oasysArnsSummary,
+      RiskSummary(oasysArnsSummary?.type),
       oasysArnsPredictor,
       activeAlerts,
     )
@@ -442,21 +443,6 @@ class OasysService(
 
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? =
     fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
-
-  fun getArnsSummary(crn: String): ArnsSummary? {
-    val arnsSummary = when (val response = arnsApiClient.getSummary(crn)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve ArnsSummary for crn $crn reason ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return arnsSummary.entity
-  }
 
   fun getArnsPredictorSummary(crn: String): ArnsScores? {
     val arnsPredictors = when (val response = arnsApiClient.getPredictorsAll(crn)) {
