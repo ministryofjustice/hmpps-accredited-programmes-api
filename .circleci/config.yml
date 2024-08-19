@@ -106,7 +106,6 @@ workflows:
             branches:
               only:
                 - main
-                - ARNS_refactor
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -116,7 +115,6 @@ workflows:
             branches:
               only:
                 - main
-                - ARNS_refactor
           requires:
             - validate
             - build_docker
