@@ -4,8 +4,6 @@ server:
 logging:
   level:
     uk.gov: DEBUG
-    com.github.tomakehurst.wiremock: trace
-
 
 management.endpoint:
   health.cache.time-to-live: 0
