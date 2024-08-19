@@ -220,33 +220,6 @@
         },
         "bodyFileName": "risk-predictors.json"
       }
-    },
-    {
-      "request": {
-        "urlPattern": "/risks/crn/X739590/predictors/all",
-        "method": "GET"
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "bodyFileName": "arns-predictors.json"
-      }
-    }
-  ,
-    {
-      "request": {
-        "urlPattern": "/risks/crn/X739590/summary",
-        "method": "GET"
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "bodyFileName": "arns-summary.json"
-      }
     }
   ]
 }
