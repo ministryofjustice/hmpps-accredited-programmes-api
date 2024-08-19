@@ -128,7 +128,7 @@ fun risks(
 
   ovpYear1 = oasysArnsPredictor?.violencePredictorScore?.oneYear,
   ovpYear2 = oasysArnsPredictor?.violencePredictorScore?.twoYears,
-  ovpRisk = oasysArnsPredictor?.violencePredictorScore?.ovpRisk?.fixCase(),
+  ovpRisk = oasysArnsPredictor?.violencePredictorScore?.scoreLevel?.fixCase(),
   rsrScore = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore,
   rsrRisk = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.scoreLevel?.fixCase(),
 

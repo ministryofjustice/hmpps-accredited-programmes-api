@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.ArnsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
@@ -49,7 +48,6 @@ import java.time.LocalDateTime
 @Service
 class OasysService(
   val oasysApiClient: OasysApiClient,
-  val arnsApiClient: ArnsApiClient,
   val prisonApiClient: PrisonApiClient,
   val auditService: AuditService,
 ) {
@@ -155,7 +153,7 @@ class OasysService(
     val oasysRelationships = getRelationships(assessmentId)
     val oasysRoshSummary = getRoshSummary(assessmentId)
     val oasysArnsSummary = oasysRoshSummary?.getHighestPriorityScore()
-    val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { getArnsPredictorSummary(it) }
+    val oasysArnsPredictor = getRiskPredictors(assessmentId)
     val activeAlerts = getActiveAlerts(prisonNumber)
 
     return risks(
@@ -438,29 +436,14 @@ class OasysService(
     return roshSummary.entity
   }
 
+  fun getRiskPredictors(assessmentId: Long): ArnsScores? =
+    fetchDetail(assessmentId, oasysApiClient::getRiskPredictors, "RiskPredictors")
+
   fun getDrugDetail(assessmentId: Long): OasysDrugDetail? =
     fetchDetail(assessmentId, oasysApiClient::getDrugDetail, "DrugDetail")
 
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? =
     fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
-
-  fun getArnsPredictorSummary(crn: String): ArnsScores? {
-    val arnsPredictors = when (val response = arnsApiClient.getPredictorsAll(crn)) {
-      is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data ${response.toException().cause}")
-        AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        AuthorisableActionResult.Success(response.body)
-      }
-    }
-
-    return arnsPredictors.entity
-      ?.filter { it.assessmentStatus == "COMPLETE" }
-      ?.sortedByDescending { it.completedDate }
-      ?.firstOrNull()
-  }
 
   private inline fun <T> fetchDetail(
     assessmentId: Long,

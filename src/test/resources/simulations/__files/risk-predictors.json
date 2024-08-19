@@ -1,0 +1,27 @@
+{
+  "groupReconvictionScore": {
+    "oneYear": 8,
+    "twoYears": 15,
+    "scoreLevel": "LOW"
+  },
+  "violencePredictorScore": {
+    "oneYear": 8,
+    "twoYears": 15,
+    "scoreLevel": "MEDIUM"
+  },
+  "generalPredictorScore": {
+    "oneYear": 8,
+    "twoYears": 15,
+    "scoreLevel": "LOW"
+  },
+  "riskOfSeriousRecidivismScore": {
+    "scoreLevel": "LOW",
+    "percentageScore": 1.46
+  },
+  "sexualPredictorScore": {
+    "ospIndecentPercentageScore": 0.11,
+    "ospContactPercentageScore": 1.07,
+    "ospIndecentPercentageScoreLevel": "LOW",
+    "ospContactPercentageScoreLevel": "MEDIUM"
+  }
+}

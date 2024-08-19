@@ -71,7 +71,7 @@ class PniService(
 
     // risks
     val oasysOffendingInfo = oasysService.getOffendingInfo(assessmentId)
-    val oasysArnsPredictor = oasysOffendingInfo?.crn?.let { oasysService.getArnsPredictorSummary(it) }
+    val oasysArnsPredictor = oasysService.getRiskPredictors(assessmentId)
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),

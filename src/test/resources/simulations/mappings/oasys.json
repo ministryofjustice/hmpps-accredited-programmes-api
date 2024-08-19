@@ -210,6 +210,19 @@
     },
     {
       "request": {
+        "urlPattern": "/assessments/2114584/risk-predictors",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "risk-predictors.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/risks/crn/X739590/predictors/all",
         "method": "GET"
       },
