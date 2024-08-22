@@ -4,8 +4,6 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -39,8 +37,3 @@ data class PniResultEntity(
   @Column
   val pniResultJson: String?,
 )
-
-@Repository
-interface PNIResultEntityRepository : JpaRepository<PniResultEntity, UUID> {
-  fun findAllByPrisonNumber(prisonNumber: String): List<PniResultEntity>
-}

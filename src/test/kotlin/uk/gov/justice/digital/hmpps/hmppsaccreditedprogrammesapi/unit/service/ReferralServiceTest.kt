@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditSe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
@@ -93,6 +94,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var personService: PersonService
+
+  @MockK(relaxed = true)
+  private lateinit var pniService: PniService
 
   @InjectMockKs
   private lateinit var referralService: ReferralService
@@ -173,6 +177,10 @@ class ReferralServiceTest {
         },
       )
     }
+
+    verify {
+      pniService.savePni(PRISON_NUMBER_1, null, true, createdReferralId)
+    }
   }
 
   @Test
@@ -252,6 +260,10 @@ class ReferralServiceTest {
           it.prisonNumber == PRISON_NUMBER_1
         },
       )
+    }
+
+    verify {
+      pniService.savePni(PRISON_NUMBER_1, null, true, createdReferralId)
     }
   }
 

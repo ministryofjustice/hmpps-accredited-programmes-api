@@ -34,6 +34,22 @@
     },
     {
       "request": {
+        "urlPattern": "/prisoner-search/prisoner-numbers",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "A9999BB"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results_A9999BB.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/prisoner-search/match-prisoners",
         "method": "POST",
         "bodyPatterns" : [ {
