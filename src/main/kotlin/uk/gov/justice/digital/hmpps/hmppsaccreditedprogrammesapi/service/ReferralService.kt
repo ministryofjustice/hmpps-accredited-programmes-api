@@ -89,10 +89,22 @@ constructor(
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
-    pniService.savePni(prisonNumber = prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
+
+    savePNI(prisonNumber, savedReferral)
 
     log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber from $username referralId: ${savedReferral.id}")
     return savedReferral.id
+  }
+
+  private fun savePNI(
+    prisonNumber: String,
+    savedReferral: ReferralEntity,
+  ) {
+    try {
+      pniService.savePni(prisonNumber = prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
+    } catch (ex: Exception) {
+      log.warn("PNI could not be stored ${ex.message} for prisonNumber $prisonNumber")
+    }
   }
 
   private fun createOrganisationIfNotPresent(code: String) {
