@@ -1,0 +1,1417 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 13,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "4916a1f5-41e2-40c3-9e29-014b5f419586",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppMetrics\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name == 'PageVisitTime'\n| summarize SumMax = sum(Max), Count = count() by extract_json('$.PageName', tostring(Properties))\n| extend Average = round((SumMax / Count) / 1000)\n| project AverageTimeSeconds = Average, Page = replace_string(Column1, 'HMPPS Accredited Programmes -', '')\n| order by AverageTimeSeconds desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "AverageTimeSeconds": "314px",
+                    "Page": "598px"
+                  },
+                  "Query": "AppMetrics\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name == 'PageVisitTime'\n| where extract_json('$.PageUrl', tostring(Properties)) contains '/refer/'\n| where Max < 600000//Remove any timings greater than 10 minutes\n| summarize SumMax = sum(Max), Count = count() by extract_json('$.PageName', tostring(Properties))\n| extend Average =  round((SumMax / Count) / 1000)\n| where Column1 !contains  'Error'\n| project AverageTimeSeconds = Average, Page = replace_string(Column1, 'HMPPS Accredited Programmes -', '')\n| order by AverageTimeSeconds desc \n"
+                }
+              },
+              "partHeader": {
+                "title": "Time spent on Referrals",
+                "subtitle": "Average time spent on each page"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 6,
+              "colSpan": 13,
+              "rowSpan": 9
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "Query": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| where Name endswith '/new' or Name endswith  '/submit'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Day = startofday(TimeGenerated)\n| extend Action = iff(Name endswith \"/submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Day\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n\n",
+                  "SpecificChart": "UnstackedColumn"
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 6,
+              "colSpan": 13,
+              "rowSpan": 9
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "caseload",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "Query": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| where Name endswith '/new' \n| extend caseload = tostring(parse_json(Properties).activeCaseLoadDescription)\n| extend Day = startofday(TimeGenerated)\n| summarize Count=count() by caseload, Day\n| render columnchart\n\n",
+                  "SpecificChart": "StackedColumn"
+                }
+              },
+              "partHeader": {
+                "title": "Number of referrals created by users caseload",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 16,
+              "colSpan": 13,
+              "rowSpan": 9
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "Query": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| where Name endswith '/new' \n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Day = startofday(TimeGenerated)\n| extend Action = \n    iff(Properties has 'ROLE_ACP_PROGRAMME_TEAM', \n       \"Created by PT\",\n        \"Created by Referrer\")\n| summarize Count=count() by Action, Day\n",
+                  "SpecificChart": "UnstackedColumn"
+                }
+              },
+              "partHeader": {
+                "title": "Number of referrals crerated  by role",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 16,
+              "colSpan": 13,
+              "rowSpan": 9
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [],
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Number_Unique_Users",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "Query": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name !in ('GET /metrics', 'GET /ping', 'GET /health')\n| where Name !has ('GET /sign-in')\n| where Name !has ('GET /sign-out')\n| where Name !has ('GET /assets')\n| where Url has ('/refer/')\n| extend Day = startofday(TimeGenerated)\n| extend userName = tostring(parse_json(Properties).username)\n| where isnotempty(userName)\n| where Success == True\n| summarize Number_Unique_Users = dcount(userName) by Day\n| render columnchart\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Number of users",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 25,
+              "colSpan": 13,
+              "rowSpan": 9
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [],
+                    "xAxis": {
+                      "name": "Action",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "Query": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| where Name endswith '/new' or Name endswith  '/submit'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Day = startofday(TimeGenerated)\n| extend Action = iff(Name endswith \"/submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action\n\n",
+                  "SpecificChart": "Pie"
+                }
+              },
+              "partHeader": {
+                "title": "Number of referrals created vs submitted",
+                "subtitle": "The difference it the number of draft referrals"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 1,
+              "y": 35,
+              "colSpan": 6,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<H1>The cards below are experimental are not be ready to use yet</H1>. ",
+                  "title": "Experimental Area",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 1,
+              "y": 38,
+              "colSpan": 13,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "ControlType": "AnalyticsGrid",
+                  "IsQueryContainTimeRange": true,
+                  "Query": "let searchQuery = \n    AppMetrics\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Properties has 'confirm personal details'\n    | project searchTime = todatetime(TimeGenerated), SessionId\n    | order by searchTime asc;\nlet completedQuery = \n    AppMetrics\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Properties has 'Referral complete'\n    | project submittedTime = todatetime(TimeGenerated), SessionId\n    | order by submittedTime asc;\ncompletedQuery\n| join kind=innerunique searchQuery on SessionId\n| where submittedTime > searchTime\n| extend TimeTakenraw = submittedTime - searchTime\n| extend TimeTaken = floor(TimeTakenraw, 1s) // Round down milliseconds to zero\n| project searchTime, submittedTime, TimeTaken\n| order by submittedTime asc\n\n",
+                  "SpecificChart": "UnstackedColumn"
+                }
+              },
+              "partHeader": {
+                "title": "Time taken to submit referral",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 15,
+              "y": 38,
+              "colSpan": 8,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "ControlType": "AnalyticsGrid",
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "AverageTimeTakenMinutes",
+                        "type": "real"
+                      }
+                    ]
+                  },
+                  "IsQueryContainTimeRange": true,
+                  "Query": "let searchQuery = \n    AppRequests\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Name has 'POST /refer/referrals/new'\n    | where Name endswith '/new'    \n    | where isnotempty(SessionId)\n    | project searchTime = todatetime(TimeGenerated), SessionId\n    | order by searchTime asc;\nlet completedQuery = \n    AppRequests\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Name has 'POST /refer/referrals/new'\n    | where Name endswith '/submit' \n    | where isnotempty(SessionId)   \n    | project submittedTime = todatetime(TimeGenerated), SessionId\n    | order by submittedTime asc;\nlet timeTakenData = completedQuery\n    | join kind=innerunique searchQuery on SessionId\n    | where submittedTime > searchTime\n    | extend TimeTakenraw = submittedTime - searchTime\n    | extend TimeTaken = floor(TimeTakenraw, 1s); // Round down milliseconds to zero\ntimeTakenData\n| summarize \n    avgTimeTaken = avg(TimeTaken)\n\n",
+                  "SpecificChart": "UnstackedColumn"
+                }
+              },
+              "partHeader": {
+                "title": "Average Time taken to submit referral per day in minutes",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 24,
+              "y": 38,
+              "colSpan": 6,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "ControlType": "AnalyticsGrid",
+                  "IsQueryContainTimeRange": true,
+                  "Query": "let searchQuery = \n    AppRequests\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Name has 'POST /refer/referrals/new'\n    | where Name endswith '/new'    \n    | where isnotempty(SessionId)\n    | project searchTime = todatetime(TimeGenerated), SessionId\n    | order by searchTime asc;\nlet completedQuery = \n    AppRequests\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Name has 'POST /refer/referrals/new'\n    | where Name endswith '/submit' \n    | where isnotempty(SessionId)   \n    | project submittedTime = todatetime(TimeGenerated), SessionId\n    | order by submittedTime asc;\nlet timeTakenData = completedQuery\n    | join kind=innerunique searchQuery on SessionId\n    | where submittedTime > searchTime\n    | extend TimeTakenraw = submittedTime - searchTime\n    | extend TimeTaken = floor(TimeTakenraw, 1s); // Round down milliseconds to zero\n// Calculate the first (Q1), median, third (Q3) quartiles, and the mean\ntimeTakenData\n| summarize \n    avgTimeTaken = avg(TimeTaken),\n    percentiles(TimeTaken, 25, 50, 75)\n| project \n\tStatName = pack_array('Mean (average)', 'Median value', 'Inter Quartile Range', 'Q1', 'Q3'),\n\t StatValue = pack_array(\n    Mean_time_taken = floor(avgTimeTaken, 1s),\n    Median_time_taken = percentile_TimeTaken_50,\n    InterQuartileRange = percentile_TimeTaken_75 - percentile_TimeTaken_25,\n    Q1 = percentile_TimeTaken_25,\n    Q3 = percentile_TimeTaken_75)\n| mv-expand StatName, StatValue\n| project StatName, StatValue\n\n",
+                  "SpecificChart": "UnstackedColumn"
+                }
+              },
+              "partHeader": {
+                "title": "Time taken to submit referral - statistics",
+                "subtitle": "for the number of days set on the dashboard"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 31,
+              "y": 38,
+              "colSpan": 13,
+              "rowSpan": 9
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "97534e90-2a8b-4c46-a311-394872a068ca",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Number 'referral created' and 'referral submitted' by Day",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name has 'POST /refer/referrals/new'\n| extend userName = tostring(parse_json(Properties).username)\n| where userName != 'ACP_TEST'\n| extend Action = iff(Name endswith \"submit\", \"Submitted\", \"Created\")\n| summarize Count=count() by Action, Date=bin(TimeGenerated, 1d)\n| render columnchart with (title=\"Number 'referral created' and 'referral submitted' by Day\")\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "ControlType": "FrameControlChart",
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [],
+                    "xAxis": {
+                      "name": "Date",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "AverageTimeTakenMinutes",
+                        "type": "real"
+                      }
+                    ]
+                  },
+                  "IsQueryContainTimeRange": true,
+                  "Query": "let searchQuery = \n    AppRequests\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Name has 'POST /refer/referrals/new'\n    | where Name endswith '/new'    \n    | where isnotempty(SessionId)\n    | project searchTime = todatetime(TimeGenerated), SessionId\n    | order by searchTime asc;\nlet completedQuery = \n    AppRequests\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Name has 'POST /refer/referrals/new'\n    | where Name endswith '/submit' \n    | where isnotempty(SessionId)   \n    | project submittedTime = todatetime(TimeGenerated), SessionId\n    | order by submittedTime asc;\ncompletedQuery\n| join kind=innerunique searchQuery on SessionId\n| where submittedTime > searchTime\n| extend TimeTakenRaw = datetime_diff(\"Second\", submittedTime, searchTime)\n| project Date = format_datetime(submittedTime, 'yyyy-MM-dd'), TimeTakenRaw\n| summarize AverageTimeTakenMinutes = avg(TimeTakenRaw)/60 by Date\n| order by Date asc\n\n",
+                  "SpecificChart": "UnstackedColumn"
+                }
+              },
+              "partHeader": {
+                "title": "Average Time taken to submit referral per day in minutes",
+                "subtitle": ""
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "utc",
+                "granularity": "auto",
+                "relative": "30d"
+              },
+              "displayCache": {
+                "name": "UTC Time",
+                "value": "Past 30 days"
+              },
+              "filteredPartIds": [
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62d7",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62d9",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62db",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62dd",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62df",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62e1",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62e3",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62e5",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62e7",
+                "StartboardPart-LogsDashboardPart-1005aa26-6d03-4682-9d3d-5b1cd4ad62e9"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "ACP-Refer - PROD",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "ACP-Refer - PROD"
+  },
+  "apiVersion": "2022-12-01-preview"
+}
