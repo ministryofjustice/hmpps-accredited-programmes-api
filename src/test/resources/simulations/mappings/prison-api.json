@@ -77,6 +77,19 @@
         },
         "bodyFileName": "sentence-info2.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/api/offenders/A1234AA/booking/latest/sentence-summary",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "sentence-info_A1234AA_PACT.json"
+      }
     }
   ]
 }

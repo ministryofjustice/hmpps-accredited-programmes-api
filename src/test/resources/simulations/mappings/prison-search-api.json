@@ -63,6 +63,22 @@
         },
         "bodyFileName": "prison-search-results-match.json"
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/prisoner-search/prisoner-numbers",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "A1234AA"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results_A1234AA.json"
+      }
     }
   ]
 }
