@@ -1,0 +1,1913 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 8,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "\n### Probation Digital Performance Metrics\nThis section of the deashboard is dedicated to reporting on the standardised set of performance measures: \n- Front-end availability (done)\n- Uptake (done)\n- Page load time (done)\n- Page errors (done)\n- User satisfaction (in progress)\n\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 8,
+              "y": 0,
+              "colSpan": 10,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "5c48befd-972d-421d-b9d3-e29e0578e246",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where name == \"Case list - Prepare a case for sentence\"\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| extend courtCode = extract(\"(.*/)([A-Z{1}0-9{1}A-Z{3}]+)(/cases.*)\", 2, url)\n| summarize round(todouble(dcount(courtCode) * 100) / 134, 2) by bin(timestamp, 1d)\n| render timechart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Column1",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics')\n| where Name !startswith 'GET /assets'\n| order by TimeGenerated desc\n| extend Day = startofday(TimeGenerated)\n| extend userName = tostring(parse_json(Properties).username)\n| extend caseload = tostring(parse_json(Properties).activeCaseLoadId)\n| where isnotempty(caseload)\n| where isnotempty(userName)\n| where Success == True\n| where userName !in (\"P_BELL\", \"3ebbaa0f-ea27-4190-9c33-6842d0aa2057\", \"EG006619\")\n| summarize PageViewCount = dcount(Id), UniqueUsers = dcount(userName), UniqueSessions = dcount(SessionId) by Day\n| render columnchart\n\n",
+                  "SpecificChart": "StackedColumn",
+                  "PartTitle": "Uptake",
+                  "PartSubTitle": "Confidence: High",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "PageViewCount",
+                        "type": "long"
+                      },
+                      {
+                        "name": "UniqueUsers",
+                        "type": "long"
+                      },
+                      {
+                        "name": "UniqueSessions",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Usage",
+                "subtitle": "Number of unique users, unique sessions and pages"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 19,
+              "y": 0,
+              "colSpan": 14,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "### TRANSACTION: FIND \n\n**KPI:** Reduce the time taken to find an Accredited Programme\n\nBelow are some visualisations which show some context for how FIND is performing and being used.\n\n\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 34,
+              "y": 0,
+              "colSpan": 11,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "### REFER\n\nOnce we've built refer we will start building visualisations here.",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 5,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "5c48befd-972d-421d-b9d3-e29e0578e246",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where name == \"Case list - Prepare a case for sentence\"\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| extend courtCode = extract(\"(.*/)([A-Z{1}0-9{1}A-Z{3}]+)(/cases.*)\", 2, url)\n| summarize round(todouble(dcount(courtCode) * 100) / 134, 2) by bin(timestamp, 1d)\n| render timechart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Column1",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": " AppAvailabilityResults\n| where TimeGenerated > ago(30d) and TimeGenerated < ago(0d)\n| where Properties[\"WebtestArmReSourceName\"] == \"accredited programmes front-end availability - health kick-nomisapi-prod\"\n| where Name == \"Accredited Programmes Front-End Availability - Health Kick\" and true\n| extend percentage = toint(Success) * 100\n| summarize avg(percentage) by bin(TimeGenerated, 1h)\n| render timechart\n",
+                  "SpecificChart": "Line",
+                  "PartTitle": "Front-end availability",
+                  "PartSubTitle": "Front-end availability",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "TimeGenerated",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_percentage",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "IsQueryContainTimeRange": true
+                }
+              },
+              "partHeader": {
+                "title": "Service Availability",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 12,
+              "y": 5,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15d186a8-8803-4b3a-b86f-31e91c269c5d",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| project url, duration\n| top 10 by duration\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "url": "539.998px",
+                    "duration": "289px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == \"hmpps-accredited-programmes-ui\"\n| extend PageError = iif(Name == \"HMPPS Accredited Programmes - Error\",true,false)\n| extend Day = startofday(TimeGenerated)\n| summarize  CountOfPageError = countif(PageError == true) by Day\n| render timechart  with (ymin=0)\n\n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "Line",
+                  "PartTitle": "Page error graph",
+                  "PartSubTitle": "Page errors",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "CountOfPageError",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "IsQueryContainTimeRange": false
+                }
+              },
+              "partHeader": {
+                "title": "Errors",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 19,
+              "y": 7,
+              "colSpan": 14,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15d186a8-8803-4b3a-b86f-31e91c269c5d",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| project url, duration\n| top 10 by duration\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "url": "539.998px",
+                    "duration": "289px"
+                  },
+                  "Query": "AppMetrics\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name == 'PageVisitTime'\n| where extract_json(\"$.PageUrl\", tostring(Properties)) contains '/programmes/'\n| summarize Count = count() by extract_json(\"$.PageName\", tostring(Properties))\n| project Count,  Course = replace_string(Column1, 'HMPPS Accredited Programmes -', '')\n| render columnchart\n\n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "StackedColumn",
+                  "PartTitle": "Which programmes are being \"found\"?",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Course",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Count",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Which programmes are being \"found\"?",
+                "subtitle": "Views by programme/offering page"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 9,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.Insights/components/nomisapi-prod"
+                          },
+                          "name": "pageViews/duration",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.insights/components/kusto",
+                          "metricVisualization": {
+                            "displayName": "Page view load time"
+                          }
+                        }
+                      ],
+                      "title": "Avg Page view load time for nomisapi-prod where Cloud role name = 'hmpps-accredited-programmes-ui'",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideSubtitle": false
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "cloud/roleName": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "hmpps-accredited-programmes-ui"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 9,
+              "colSpan": 13,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "103dd91d-04c9-4fd8-a915-b06ef7912cc4",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "customEvents | where name == 'PiCPrepareACaseErrorTrace'\n| summarize TotalNumberofErrors=sum(itemCount) by bin(timestamp, 1d)\n| render timechart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "TotalNumberofErrors",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "name": "477.995px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend Day = startofday(TimeGenerated)\n| extend PageLoadTime = todouble(DurationMs) / 1000\n| extend PageType = iff(Name has \"(HMP\", \"Programme offering page\", iff(Name has \"List of\", \"List of all Accredited Programmes page\", iff(Name has \"Home\",\"Home page\",\"IndivIdual Programme page\")))\n| summarize avg(PageLoadTime) by Day\n| render barchart \n\n",
+                  "ControlType": "FrameControlChart",
+                  "PartTitle": "Page load time",
+                  "PartSubTitle": "Confidence: High",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_PageLoadTime",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "IsQueryContainTimeRange": false
+                }
+              },
+              "partHeader": {
+                "title": "Page load times",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 19,
+              "y": 12,
+              "colSpan": 7,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15d186a8-8803-4b3a-b86f-31e91c269c5d",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| project url, duration\n| top 10 by duration\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "range Day_of_Interest from toscalar(AppRequests | where AppRoleName == 'hmpps-accredited-programmes-ui' | where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics') | summarize min(startofday(TimeGenerated))) to toscalar(AppRequests | where AppRoleName == 'hmpps-accredited-programmes-ui' | where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics') | summarize max(startofday(TimeGenerated))) step 1d\n| extend key = 1\n| join kind=inner (\n    AppRequests\n    | where AppRoleName == 'hmpps-accredited-programmes-ui'\n    | where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics')\n    | where Name !startswith 'GET /assets'\n    | extend UserId = tostring(parse_json(Properties).username)\n    | where UserId !in (\"P_BELL\", \"3ebbaa0f-ea27-4190-9c33-6842d0aa2057\", \"EG006619\")\n    | extend user_Day = startofday(TimeGenerated)\n    | where isnotempty(UserId)\n    | distinct user_Day, UserId\n    | extend key = 1\n) on key\n| where user_Day <= Day_of_Interest\n| summarize CumulativeUniqueUsers = dcount(UserId) by Day = Day_of_Interest\n| order by Day\n\n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "StackedColumn",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "CumulativeUniqueUsers",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "IsQueryContainTimeRange": true
+                }
+              },
+              "partHeader": {
+                "title": "How many people are \"finding\"?",
+                "subtitle": "Monthly cumulative unique users -"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 26,
+              "y": 12,
+              "colSpan": 7,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "5c48befd-972d-421d-b9d3-e29e0578e246",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where name == \"Case list - Prepare a case for sentence\"\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| extend courtCode = extract(\"(.*/)([A-Z{1}0-9{1}A-Z{3}]+)(/cases.*)\", 2, url)\n| summarize round(todouble(dcount(courtCode) * 100) / 134, 2) by bin(timestamp, 1d)\n| render timechart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Column1",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "establishmentName": "203px"
+                  },
+                  "Query": "AppPageViews\n| where TimeGenerated >= datetime(2023-01-09)\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend fixedName = replace_regex(Name, \"HMPPS Accredited Programmes -\", \"\")\n| extend Day = startofday(TimeGenerated)\n| join kind = inner (\nAppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics')\n| where Name !startswith 'GET /assets'\n| extend userName = tostring(parse_json(Properties).userName)\n| where isnotempty(userName)\n| extend caseload = tostring(parse_json(Properties).activeCaseLoadId)\n| where userName !in (\"P_BELL\", \"3ebbaa0f-ea27-4190-9c33-6842d0aa2057\", \"EG006619\")\n) on SessionId\n| join kind=inner (\nDatatable(establishmentName: string, caseload: string, region: string) \n[ \n\"ACKLINGTON (HMP)\" , \"AKI\" , \"North East\",\"ALBANY (HMP)\" , \"ALI\" , \"South Central\",\"ALTCOURSE (HMP)\" , \"ACI\" , \"North West\",\"ASHFIELD (HMP)\" , \"ASI\" , \"South West\",\"ASHWELL (HMP)\" , \"AWI\" , \"East MIdlands\",\"ASKHAM GRANGE (HMP & YOI)\" , \"AGI\" , \"Yorkshire & HumbersIde\",\"AYLESBURY (HMP)\" , \"AYI\" , \"South Central\",\"BEDFORD (HMP)\" , \"BFI\" , \"Eastern\",\"BELMARSH (HMP)\" , \"BAI\" , \"London\",\"BIRMINGHAM (HMP)\" , \"BMI\" , \"West MIdlands\",\"BLANTYRE HOUSE (HMP)\" , \"BHI\" , \"Kent and Sussex\",\"BLUNDESTON (HMP)\" , \"BDI\" , \"Eastern\",\"BRINSFORD (HMP)\" , \"BSI\" , \"West MIdlands\",\"BRISTOL (HMP)\" , \"BLI\" , \"South West\",\"BRIXTON (HMP)\" , \"BXI\" , \"London\",\"BRONZEFIELD (HMP)\" , \"BZI\" , \"London\",\"BUCKLEY HALL (HMP)\" , \"BCI\" , \"North West\",\"BULLINGDON (HMP)\" , \"BNI\" , \"South Central\",\"BULLWOOD HALL (HMP & YOI)\" , \"BUI\" , \"Eastern\",\"BURE (HMP)\" , \"BRI\" , \"Eastern\",\"CAMP HILL (HMP)\" , \"CHI\" , \"South Central\",\"CANTERBURY (HMP)\" , \"CYI\" , \"Kent and Sussex\",\"CARDIFF (HMP)\" , \"CFI\" , \"Wales\",\"CASTINGTON (HMP & YOI)\" , \"CSI\" , \"North East\",\"CHANNINGS WOOD (HMP)\" , \"CWI\" , \"South West\",\"CHELMSFORD (HMP)\" , \"CDI\" , \"Eastern\",\"COLDINGLEY (HMP)\" , \"CLI\" , \"South Central\",\"COOKHAM WOOD (HMP)\" , \"CKI\" , \"Kent and Sussex\",\"DARTMOOR (HMP)\" , \"DAI\" , \"South West\",\"DEERBOLT (HMPYOI)\" , \"DTI\" , \"North East\",\"DONCASTER (HMP)\" , \"DNI\" , \"Yorkshire & HumbersIde\",\"DORCHESTER (HMP)\" , \"DRI\" , \"South West\",\"DOVEGATE (HMP)\" , \"DGI\" , \"West MIdlands\",\"Dover Immigration Removal Centre\" , \"DVI\" , \"Kent and Sussex\",\"DOWNVIEW (HMP)\" , \"DWI\" , \"South Central\",\"DRAKE HALL (HMP & YOI)\" , \"DHI\" , \"West MIdlands\",\"DURHAM (HMP)\" , \"DMI\" , \"North East\",\"East\" , \"G4\" , \"Not Available\",\"EAST SUTTON PARK (HMP & YOI)\" , \"ESI\" , \"Kent and Sussex\",\"EASTWOOD PARK (HMP)\" , \"EWI\" , \"South West\",\"EDMUNDS HILL (HMP)\" , \"NEI\" , \"Eastern\",\"ELMLEY (HMP)\" , \"EYI\" , \"Kent and Sussex\",\"ERLESTOKE (HMP)\" , \"EEI\" , \"South West\",\"EVERTHORPE (HMP)\" , \"EVI\" , \"Yorkshire & HumbersIde\",\"EXETER (HMP)\" , \"EXI\" , \"South West\",\"FEATHERSTONE (HMP)\" , \"FSI\" , \"West MIdlands\",\"FELTHAM (HMP & YOI)\" , \"FMI\" , \"London\",\"FORD (HMP)\" , \"FDI\" , \"Kent and Sussex\",\"FOREST BANK (HMP & YOI)\" , \"FBI\" , \"North West\",\"FOSTON HALL (HMP)\" , \"FHI\" , \"East MIdlands\",\"FRANKLAND (HMP)\" , \"FKI\" , \"North East\",\"FULL SUTTON (HMP)\" , \"FNI\" , \"Yorkshire & HumbersIde\",\"GARTH (HMP)\" , \"GHI\" , \"North West\",\"GARTREE (HMP)\" , \"GTI\" , \"East MIdlands\",\"GHOST HOLDING ESTABLISHMENT\" , \"ZZGHI\" , \"Not Available\",\"GLEN PARVA (HMPYOI & RC)\" , \"GPI\" , \"East MIdlands\",\"GLOUCESTER (HMP)\" , \"GLI\" , \"South West\",\"GRENDON (HMP)\" , \"GNI\" , \"South Central\",\"GUYS MARSH (HMP)\" , \"GMI\" , \"South West\",\"Haslar Immigration Removal Centre\" , \"HRI\" , \"South Central\",\"HAVERIGG (HMP)\" , \"HVI\" , \"North West\",\"HIGH DOWN (HMP)\" , \"HOI\" , \"South Central\",\"HIGHPOINT (HMP)\" , \"HPI\" , \"Eastern\",\"HINDLEY (HMP & YOI)\" , \"HII\" , \"North West\",\"HMP HEWELL\" , \"HEI\" , \"West MIdlands\",\"HOLLESLEY BAY (HMP)\" , \"HBI\" , \"Eastern\",\"HOLLOWAY (HMP)\" , \"HYI\" , \"London\",\"HOLME HOUSE (HMP)\" , \"HHI\" , \"North East\",\"HULL (HMP)\" , \"HLI\" , \"Yorkshire & HumbersIde\",\"HUNTERCOMBE (HMPYOI)\" , \"HCI\" , \"South Central\",\"Inter Prison Escorts\" , \"G5\" , \"Not Available\",\"KENNET (HMP)\" , \"KTI\" , \"North West\",\"KINGSTON (HMP)\" , \"PTI\" , \"South Central\",\"KIRKHAM (HMP)\" , \"KMI\" , \"North West\",\"KIRKLEVINGTON GRANGE (HMP)\" , \"KVI\" , \"North East\",\"LANCASTER CASTLE (HMP)\" , \"LAI\" , \"North West\",\"LANCASTER FARMS (HMPYOI)\" , \"LFI\" , \"North West\",\"LATCHMERE HOUSE (HMP)\" , \"LMI\" , \"London\",\"LEEDS (HMP)\" , \"LEI\" , \"Yorkshire & HumbersIde\",\"LEICESTER (HMP)\" , \"LCI\" , \"East MIdlands\",\"LEWES (HMP)\" , \"LWI\" , \"Kent and Sussex\",\"LEYHILL (HMP)\" , \"LYI\" , \"South West\",\"LINCOLN (HMP)\" , \"LII\" , \"East MIdlands\",\"LINDHOLME (HMP)\" , \"LHI\" , \"Yorkshire & HumbersIde\",\"LITTLEHEY (HMP)\" , \"LTI\" , \"Eastern\",\"LIVERPOOL (HMP)\" , \"LPI\" , \"North West\",\"London and South East\" , \"G1\" , \"Not Available\",\"LONG LARTIN (HMP)\" , \"LLI\" , \"West MIdlands\",\"LOWDHAM GRANGE (HMP)\" , \"LGI\" , \"East MIdlands\",\"LOW NEWTON (HMP)\" , \"LNI\" , \"North East\",\"MAIDSTONE (HMP)\" , \"MSI\" , \"Kent and Sussex\",\"MANCHESTER (HMP)\" , \"MRI\" , \"North West\",\"MOORLAND CLOSED (HMP & YOI)\" , \"MDI\" , \"Yorkshire & HumbersIde\",\"MOORLAND OPEN (HMP & YOI)\" , \"HDI\" , \"Yorkshire & HumbersIde\",\"MORTON HALL (HMP)\" , \"MHI\" , \"East MIdlands\",\"National Operations Unit\" , \"NOU\" , \"Not Available\",\"NEW HALL (HMP)\" , \"NHI\" , \"Yorkshire & HumbersIde\",\"NORTHALLERTON (HMP)\" , \"NNI\" , \"Yorkshire & HumbersIde\",\"NORTH SEA CAMP (HMP)\" , \"NSI\" , \"East MIdlands\",\"NORWICH (HMP & YOI)\" , \"NWI\" , \"Eastern\",\"NOTTINGHAM (HMP)\" , \"NMI\" , \"East MIdlands\",\"ONLEY (HMP & YOI)\" , \"ONI\" , \"East MIdlands\",\"PARC (HMP)\" , \"PRI\" , \"Wales\",\"PARKHURST (HMP)\" , \"PKI\" , \"South Central\",\"PENTONVILLE (HMP)\" , \"PVI\" , \"London\",\"PETERBOROUGH (HMP)\" , \"PBI\" , \"Eastern\",\"PORTLAND (HMPYOI)\" , \"PDI\" , \"South West\",\"PRESCOED (HMP & YOI)\" , \"UPI\" , \"Wales\",\"PRESTON (HMP)\" , \"PNI\" , \"North West\",\"RANBY (HMP)\" , \"RNI\" , \"East MIdlands\",\"READING (HMP & YOI)\" , \"RDI\" , \"South Central\",\"RISLEY (HMP)\" , \"RSI\" , \"North West\",\"ROCHESTER (HMP & YOI)\" , \"RCI\" , \"Kent and Sussex\",\"RYE HILL (HMP)\" , \"RHI\" , \"East MIdlands\",\"SEND (HMP)\" , \"SDI\" , \"South Central\",\"SHEPTON MALLET (HMP)\" , \"SMI\" , \"South West\",\"SHREWSBURY (HMP)\" , \"SYI\" , \"West MIdlands\",\"South Wales and The West\" , \"G2\" , \"Not Available\",\"SPRING HILL (HMP)\" , \"SPI\" , \"South Central\",\"STAFFORD (HMP)\" , \"SFI\" , \"West MIdlands\",\"STANDFORD HILL (HMP)\" , \"EHI\" , \"Kent and Sussex\",\"STOCKEN (HMP)\" , \"SKI\" , \"East MIdlands\",\"STOKE HEATH (HMPYOI)\" , \"SHI\" , \"West MIdlands\",\"STYAL (HMP & YOI)\" , \"STI\" , \"North West\",\"SUDBURY (HMP)\" , \"SUI\" , \"East MIdlands\",\"SWALESIDE (HMP)\" , \"SLI\" , \"Kent and Sussex\",\"SWANSEA (HMP)\" , \"SWI\" , \"Wales\",\"SWINFEN HALL (HMP)\" , \"SNI\" , \"West MIdlands\",\"THE MOUNT (HMP)\" , \"MTI\" , \"Eastern\",\"The North\" , \"G3\" , \"Not Available\",\"THE VERNE (HMP)\" , \"VEI\" , \"South West\",\"THORN CROSS (HMPYOI)\" , \"TCI\" , \"North West\",\"TRANSFER\" , \"TRN\" , \"Not Available\",\"USK (HMP)\" , \"UKI\" , \"Wales\",\"WAKEFIELD (HMP)\" , \"WDI\" , \"Yorkshire & HumbersIde\",\"WANDSWORTH (HMP)\" , \"WWI\" , \"London\",\"WARREN HILL (HMP & YOI)\" , \"WII\" , \"Eastern\",\"WAYLAND (HMP)\" , \"WLI\" , \"Eastern\",\"WEALSTUN (HMP)\" , \"WEI\" , \"Yorkshire & HumbersIde\",\"WELLINGBOROUGH (HMP)\" , \"WBI\" , \"East MIdlands\",\"WERRINGTON (HMPYOI)\" , \"WNI\" , \"West MIdlands\",\"WETHERBY (HMPYOI)\" , \"WYI\" , \"Yorkshire & HumbersIde\",\"WHATTON (HMP)\" , \"WTI\" , \"East MIdlands\",\"WHITEMOOR (HMP)\" , \"WRI\" , \"Eastern\",\"WINCHESTER (HMP)\" , \"WCI\" , \"South Central\",\"WOLDS (HMP)\" , \"WOI\" , \"Yorkshire & HumbersIde\",\"WOODHILL (HMP)\" , \"WHI\" , \"South Central\",\"WORMWOOD SCRUBS (HMP)\" , \"WSI\" , \"London\",\"WYMOTT (HMP)\" , \"WMI\" , \"North West\", \"No caseload\", \"\", \"NO CASELOAD\"\n] \n) on caseload\n| summarize View = arg_min(TimeGenerated1, *) by TimeGenerated\n| summarize UsersCount = dcount(userName), ViewsCount = dcount(Id), SessionsCount = dcount(SessionId) by caseload, establishmentName, region\n| project establishmentName, UsersCount, SessionsCount,ViewsCount, region\n| order by ViewsCount desc\n\n",
+                  "ControlType": "AnalyticsGrid",
+                  "SpecificChart": "StackedColumn",
+                  "PartTitle": "Digital up-take: Unique users by day",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "caseload",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "UsersCount",
+                        "type": "long"
+                      },
+                      {
+                        "name": "ViewsCount",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "IsQueryContainTimeRange": true
+                }
+              },
+              "partHeader": {
+                "title": "Which prisons are doing the \"finding\"?",
+                "subtitle": "Count and Views by Prison Site"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 19,
+              "y": 16,
+              "colSpan": 7,
+              "rowSpan": 7
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "103dd91d-04c9-4fd8-a915-b06ef7912cc4",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "customEvents | where name == 'PiCPrepareACaseErrorTrace'\n| summarize TotalNumberofErrors=sum(itemCount) by bin(timestamp, 1d)\n| render timechart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "TotalNumberofErrors",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "name": "508px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where notempty(DurationMs)\n| extend pageView_DurationMs = iif(Type == 'pageView', DurationMs, todouble(''))\n| extend _sum = pageView_DurationMs\n| extend _count = ItemCount\n| extend _sum = _sum * _count\n| summarize round(AveragePageLoad = avg(DurationMs), 1) by Name\n| sort by AveragePageLoad\n\n",
+                  "ControlType": "AnalyticsGrid",
+                  "PartTitle": "Which pages are taking the longest to load?",
+                  "PartSubTitle": "Page load times table",
+                  "IsQueryContainTimeRange": false
+                }
+              },
+              "partHeader": {
+                "title": "Which programmes pages are taking the longest to load?",
+                "subtitle": "Page load times by page"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 26,
+              "y": 16,
+              "colSpan": 7,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "103dd91d-04c9-4fd8-a915-b06ef7912cc4",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "customEvents | where name == 'PiCPrepareACaseErrorTrace'\n| summarize TotalNumberofErrors=sum(itemCount) by bin(timestamp, 1d)\n| render timechart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "TotalNumberofErrors",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "name": "477.995px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend Time = format_datetime(TimeGenerated, \"HH:MM\")\n| summarize Sessions = count() by Time\n| order by Time asc \n| render columnchart \n\n",
+                  "ControlType": "FrameControlChart",
+                  "PartTitle": "Usage by time of day",
+                  "PartSubTitle": "Confidence: High",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Time",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Sessions",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "IsQueryContainTimeRange": false
+                }
+              },
+              "partHeader": {
+                "title": "Usage by time of day",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 17,
+              "colSpan": 10,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "\n#### Contextual session-level summary\n\nBelow is a session list where we can see each session a user has, which site the user is from and some detail on the number of pages.\n\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 18,
+              "colSpan": 18,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15d186a8-8803-4b3a-b86f-31e91c269c5d",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| project url, duration\n| top 10 by duration\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "url": "702px",
+                    "name": "495px",
+                    "timestamp": "211px",
+                    "user_Id": "235.993px",
+                    "session_Id": "219.998px",
+                    "username": "132.997px",
+                    "name1": "405px",
+                    "Day": "116.994px",
+                    "fixedname": "286.005px",
+                    "establishmentName": "223px",
+                    "id": "310px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend fixedName = replace_regex(Name, \"HMPPS Accredited Programmes -\", \"\")\n| where fixedName !contains \"Home\"\n| join kind = leftouter (\nAppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics')\n| where Name !startswith 'GET /assets'\n| extend userName = tostring(parse_json(Properties).userName)\n| extend caseload = tostring(parse_json(Properties).activeCaseLoadId)\n| where userName !in ( \"P_BELL\",\"3ebbaa0f-ea27-4190-9c33-6842d0aa2057\",\"EG006619\")\n| where isnotempty(userName)\n| where isnotempty(SessionId)\n| distinct SessionId, userName, caseload, TimeGenerated\n) on SessionId\n| join kind = inner ( \nAppMetrics\n| where Name == \"PageVisitTime\"\n| where Properties.PageName contains \"HMPPS Accredited Programmes\"\n| extend valueseconds = value / 1000\n) on OperationId\n| join kind=inner (\nDatatable(establishmentName: string, caseload: string, region: string) \n[ \n\"ACKLINGTON (HMP)\" , \"AKI\" , \"North East\",\"ALBANY (HMP)\" , \"ALI\" , \"South Central\",\"ALTCOURSE (HMP)\" , \"ACI\" , \"North West\",\"ASHFIELD (HMP)\" , \"ASI\" , \"South West\",\"ASHWELL (HMP)\" , \"AWI\" , \"East MIdlands\",\"ASKHAM GRANGE (HMP & YOI)\" , \"AGI\" , \"Yorkshire & HumbersIde\",\"AYLESBURY (HMP)\" , \"AYI\" , \"South Central\",\"BEDFORD (HMP)\" , \"BFI\" , \"Eastern\",\"BELMARSH (HMP)\" , \"BAI\" , \"London\",\"BIRMINGHAM (HMP)\" , \"BMI\" , \"West MIdlands\",\"BLANTYRE HOUSE (HMP)\" , \"BHI\" , \"Kent and Sussex\",\"BLUNDESTON (HMP)\" , \"BDI\" , \"Eastern\",\"BRINSFORD (HMP)\" , \"BSI\" , \"West MIdlands\",\"BRISTOL (HMP)\" , \"BLI\" , \"South West\",\"BRIXTON (HMP)\" , \"BXI\" , \"London\",\"BRONZEFIELD (HMP)\" , \"BZI\" , \"London\",\"BUCKLEY HALL (HMP)\" , \"BCI\" , \"North West\",\"BULLINGDON (HMP)\" , \"BNI\" , \"South Central\",\"BULLWOOD HALL (HMP & YOI)\" , \"BUI\" , \"Eastern\",\"BURE (HMP)\" , \"BRI\" , \"Eastern\",\"CAMP HILL (HMP)\" , \"CHI\" , \"South Central\",\"CANTERBURY (HMP)\" , \"CYI\" , \"Kent and Sussex\",\"CARDIFF (HMP)\" , \"CFI\" , \"Wales\",\"CASTINGTON (HMP & YOI)\" , \"CSI\" , \"North East\",\"CHANNINGS WOOD (HMP)\" , \"CWI\" , \"South West\",\"CHELMSFORD (HMP)\" , \"CDI\" , \"Eastern\",\"COLDINGLEY (HMP)\" , \"CLI\" , \"South Central\",\"COOKHAM WOOD (HMP)\" , \"CKI\" , \"Kent and Sussex\",\"DARTMOOR (HMP)\" , \"DAI\" , \"South West\",\"DEERBOLT (HMPYOI)\" , \"DTI\" , \"North East\",\"DONCASTER (HMP)\" , \"DNI\" , \"Yorkshire & HumbersIde\",\"DORCHESTER (HMP)\" , \"DRI\" , \"South West\",\"DOVEGATE (HMP)\" , \"DGI\" , \"West MIdlands\",\"Dover Immigration Removal Centre\" , \"DVI\" , \"Kent and Sussex\",\"DOWNVIEW (HMP)\" , \"DWI\" , \"South Central\",\"DRAKE HALL (HMP & YOI)\" , \"DHI\" , \"West MIdlands\",\"DURHAM (HMP)\" , \"DMI\" , \"North East\",\"East\" , \"G4\" , \"Not Available\",\"EAST SUTTON PARK (HMP & YOI)\" , \"ESI\" , \"Kent and Sussex\",\"EASTWOOD PARK (HMP)\" , \"EWI\" , \"South West\",\"EDMUNDS HILL (HMP)\" , \"NEI\" , \"Eastern\",\"ELMLEY (HMP)\" , \"EYI\" , \"Kent and Sussex\",\"ERLESTOKE (HMP)\" , \"EEI\" , \"South West\",\"EVERTHORPE (HMP)\" , \"EVI\" , \"Yorkshire & HumbersIde\",\"EXETER (HMP)\" , \"EXI\" , \"South West\",\"FEATHERSTONE (HMP)\" , \"FSI\" , \"West MIdlands\",\"FELTHAM (HMP & YOI)\" , \"FMI\" , \"London\",\"FORD (HMP)\" , \"FDI\" , \"Kent and Sussex\",\"FOREST BANK (HMP & YOI)\" , \"FBI\" , \"North West\",\"FOSTON HALL (HMP)\" , \"FHI\" , \"East MIdlands\",\"FRANKLAND (HMP)\" , \"FKI\" , \"North East\",\"FULL SUTTON (HMP)\" , \"FNI\" , \"Yorkshire & HumbersIde\",\"GARTH (HMP)\" , \"GHI\" , \"North West\",\"GARTREE (HMP)\" , \"GTI\" , \"East MIdlands\",\"GHOST HOLDING ESTABLISHMENT\" , \"ZZGHI\" , \"Not Available\",\"GLEN PARVA (HMPYOI & RC)\" , \"GPI\" , \"East MIdlands\",\"GLOUCESTER (HMP)\" , \"GLI\" , \"South West\",\"GRENDON (HMP)\" , \"GNI\" , \"South Central\",\"GUYS MARSH (HMP)\" , \"GMI\" , \"South West\",\"Haslar Immigration Removal Centre\" , \"HRI\" , \"South Central\",\"HAVERIGG (HMP)\" , \"HVI\" , \"North West\",\"HIGH DOWN (HMP)\" , \"HOI\" , \"South Central\",\"HIGHPOINT (HMP)\" , \"HPI\" , \"Eastern\",\"HINDLEY (HMP & YOI)\" , \"HII\" , \"North West\",\"HMP HEWELL\" , \"HEI\" , \"West MIdlands\",\"HOLLESLEY BAY (HMP)\" , \"HBI\" , \"Eastern\",\"HOLLOWAY (HMP)\" , \"HYI\" , \"London\",\"HOLME HOUSE (HMP)\" , \"HHI\" , \"North East\",\"HULL (HMP)\" , \"HLI\" , \"Yorkshire & HumbersIde\",\"HUNTERCOMBE (HMPYOI)\" , \"HCI\" , \"South Central\",\"Inter Prison Escorts\" , \"G5\" , \"Not Available\",\"KENNET (HMP)\" , \"KTI\" , \"North West\",\"KINGSTON (HMP)\" , \"PTI\" , \"South Central\",\"KIRKHAM (HMP)\" , \"KMI\" , \"North West\",\"KIRKLEVINGTON GRANGE (HMP)\" , \"KVI\" , \"North East\",\"LANCASTER CASTLE (HMP)\" , \"LAI\" , \"North West\",\"LANCASTER FARMS (HMPYOI)\" , \"LFI\" , \"North West\",\"LATCHMERE HOUSE (HMP)\" , \"LMI\" , \"London\",\"LEEDS (HMP)\" , \"LEI\" , \"Yorkshire & HumbersIde\",\"LEICESTER (HMP)\" , \"LCI\" , \"East MIdlands\",\"LEWES (HMP)\" , \"LWI\" , \"Kent and Sussex\",\"LEYHILL (HMP)\" , \"LYI\" , \"South West\",\"LINCOLN (HMP)\" , \"LII\" , \"East MIdlands\",\"LINDHOLME (HMP)\" , \"LHI\" , \"Yorkshire & HumbersIde\",\"LITTLEHEY (HMP)\" , \"LTI\" , \"Eastern\",\"LIVERPOOL (HMP)\" , \"LPI\" , \"North West\",\"London and South East\" , \"G1\" , \"Not Available\",\"LONG LARTIN (HMP)\" , \"LLI\" , \"West MIdlands\",\"LOWDHAM GRANGE (HMP)\" , \"LGI\" , \"East MIdlands\",\"LOW NEWTON (HMP)\" , \"LNI\" , \"North East\",\"MAIDSTONE (HMP)\" , \"MSI\" , \"Kent and Sussex\",\"MANCHESTER (HMP)\" , \"MRI\" , \"North West\",\"MOORLAND CLOSED (HMP & YOI)\" , \"MDI\" , \"Yorkshire & HumbersIde\",\"MOORLAND OPEN (HMP & YOI)\" , \"HDI\" , \"Yorkshire & HumbersIde\",\"MORTON HALL (HMP)\" , \"MHI\" , \"East MIdlands\",\"National Operations Unit\" , \"NOU\" , \"Not Available\",\"NEW HALL (HMP)\" , \"NHI\" , \"Yorkshire & HumbersIde\",\"NORTHALLERTON (HMP)\" , \"NNI\" , \"Yorkshire & HumbersIde\",\"NORTH SEA CAMP (HMP)\" , \"NSI\" , \"East MIdlands\",\"NORWICH (HMP & YOI)\" , \"NWI\" , \"Eastern\",\"NOTTINGHAM (HMP)\" , \"NMI\" , \"East MIdlands\",\"ONLEY (HMP & YOI)\" , \"ONI\" , \"East MIdlands\",\"PARC (HMP)\" , \"PRI\" , \"Wales\",\"PARKHURST (HMP)\" , \"PKI\" , \"South Central\",\"PENTONVILLE (HMP)\" , \"PVI\" , \"London\",\"PETERBOROUGH (HMP)\" , \"PBI\" , \"Eastern\",\"PORTLAND (HMPYOI)\" , \"PDI\" , \"South West\",\"PRESCOED (HMP & YOI)\" , \"UPI\" , \"Wales\",\"PRESTON (HMP)\" , \"PNI\" , \"North West\",\"RANBY (HMP)\" , \"RNI\" , \"East MIdlands\",\"READING (HMP & YOI)\" , \"RDI\" , \"South Central\",\"RISLEY (HMP)\" , \"RSI\" , \"North West\",\"ROCHESTER (HMP & YOI)\" , \"RCI\" , \"Kent and Sussex\",\"RYE HILL (HMP)\" , \"RHI\" , \"East MIdlands\",\"SEND (HMP)\" , \"SDI\" , \"South Central\",\"SHEPTON MALLET (HMP)\" , \"SMI\" , \"South West\",\"SHREWSBURY (HMP)\" , \"SYI\" , \"West MIdlands\",\"South Wales and The West\" , \"G2\" , \"Not Available\",\"SPRING HILL (HMP)\" , \"SPI\" , \"South Central\",\"STAFFORD (HMP)\" , \"SFI\" , \"West MIdlands\",\"STANDFORD HILL (HMP)\" , \"EHI\" , \"Kent and Sussex\",\"STOCKEN (HMP)\" , \"SKI\" , \"East MIdlands\",\"STOKE HEATH (HMPYOI)\" , \"SHI\" , \"West MIdlands\",\"STYAL (HMP & YOI)\" , \"STI\" , \"North West\",\"SUDBURY (HMP)\" , \"SUI\" , \"East MIdlands\",\"SWALESIDE (HMP)\" , \"SLI\" , \"Kent and Sussex\",\"SWANSEA (HMP)\" , \"SWI\" , \"Wales\",\"SWINFEN HALL (HMP)\" , \"SNI\" , \"West MIdlands\",\"THE MOUNT (HMP)\" , \"MTI\" , \"Eastern\",\"The North\" , \"G3\" , \"Not Available\",\"THE VERNE (HMP)\" , \"VEI\" , \"South West\",\"THORN CROSS (HMPYOI)\" , \"TCI\" , \"North West\",\"TRANSFER\" , \"TRN\" , \"Not Available\",\"USK (HMP)\" , \"UKI\" , \"Wales\",\"WAKEFIELD (HMP)\" , \"WDI\" , \"Yorkshire & HumbersIde\",\"WANDSWORTH (HMP)\" , \"WWI\" , \"London\",\"WARREN HILL (HMP & YOI)\" , \"WII\" , \"Eastern\",\"WAYLAND (HMP)\" , \"WLI\" , \"Eastern\",\"WEALSTUN (HMP)\" , \"WEI\" , \"Yorkshire & HumbersIde\",\"WELLINGBOROUGH (HMP)\" , \"WBI\" , \"East MIdlands\",\"WERRINGTON (HMPYOI)\" , \"WNI\" , \"West MIdlands\",\"WETHERBY (HMPYOI)\" , \"WYI\" , \"Yorkshire & HumbersIde\",\"WHATTON (HMP)\" , \"WTI\" , \"East MIdlands\",\"WHITEMOOR (HMP)\" , \"WRI\" , \"Eastern\",\"WINCHESTER (HMP)\" , \"WCI\" , \"South Central\",\"WOLDS (HMP)\" , \"WOI\" , \"Yorkshire & HumbersIde\",\"WOODHILL (HMP)\" , \"WHI\" , \"South Central\",\"WORMWOOD SCRUBS (HMP)\" , \"WSI\" , \"London\",\"WYMOTT (HMP)\" , \"WMI\" , \"North West\",\n] \n) on caseload\n| extend DayWithTimestamp = startofday(TimeGenerated)\n| extend Day = format_datetime(DayWithTimestamp, 'yyyy-MM-dd')\n| summarize View = arg_min(TimeGenerated1, *) by TimeGenerated\n| summarize session_length = max(TimeGenerated) - min(TimeGenerated), page_num = dcount(TimeGenerated), avg_page_time = percentile(valueseconds, 50) by SessionId, userName, Day, establishmentName, region\n| extend session_length = format_timespan(session_length,'hh:mm:ss')\n| project Day, userName, establishmentName, SessionId, session_length, page_num,  avg_page_time\n| order by Day \n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Sessions Summary",
+                "subtitle": "Summary of session details. N.B This does not including the 'Home Page' and does not account for time actually spent viewing page."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 23,
+              "colSpan": 11,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "### Draft \n\nThis is a working space to test queries etc",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 24,
+              "colSpan": 8,
+              "rowSpan": 8
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15d186a8-8803-4b3a-b86f-31e91c269c5d",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| project url, duration\n| top 10 by duration\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "url": "702px",
+                    "name": "447.998px",
+                    "timestamp": "211px",
+                    "user_Id": "235.993px",
+                    "session_Id": "190.993px",
+                    "username": "98.997px",
+                    "name1": "405px",
+                    "Day": "155.998px",
+                    "fixedname": "346.009px",
+                    "establishmentName": "198.998px",
+                    "region": "118px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend fixedName = replace_regex(Name, \"HMPPS Accredited Programmes -\", \"\")\n| join kind = inner (\nAppMetrics\n| where Name == \"PageVisitTime\"\n| where Properties.PageName contains \"HMPPS Accredited Programmes\"\n) on OperationId\n| extend PageVisitTimeInSeconds = todouble(value) / 1000\n| join kind = inner (\nAppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics')\n| where Name !startswith 'GET /assets'\n| extend userName = tostring(parse_json(Properties).userName)\n| extend caseload = tostring(parse_json(Properties).activeCaseLoadId)\n| where userName !in ( \"P_BELL\",\"3ebbaa0f-ea27-4190-9c33-6842d0aa2057\",\"EG006619\")\n| where isnotempty(userName)\n| where isnotempty(SessionId)\n| distinct SessionId, userName, caseload, TimeGenerated\n) on SessionId\n| summarize MedianPageVisitTimeInSeconds = percentile(PageVisitTimeInSeconds, 50), AveragePageVisitTimeInSeconds = avg(PageVisitTimeInSeconds) by fixedName\n| project fixedName, AveragePageVisitTimeInSeconds, MedianPageVisitTimeInSeconds\n\n",
+                  "PartTitle": "Page visit-level list"
+                }
+              },
+              "partHeader": {
+                "title": "Page Views by Session",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 32,
+              "colSpan": 12,
+              "rowSpan": 8
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15d186a8-8803-4b3a-b86f-31e91c269c5d",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| project url, duration\n| top 10 by duration\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "url": "702px",
+                    "name": "598.998px",
+                    "timestamp": "211px",
+                    "user_Id": "235.993px",
+                    "session_Id": "202.996px",
+                    "username": "98.997px",
+                    "name1": "405px",
+                    "Day": "82.996px",
+                    "fixedname": "346.009px",
+                    "establishmentName": "198.998px",
+                    "region": "118px",
+                    "Time": "80px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend fixedName = replace_regex(Name, \"HMPPS Accredited Programmes -\", \"\")\n| extend Day = format_datetime(TimeGenerated, 'yy-MM-dd')\n| extend Time = format_datetime(TimeGenerated, 'HH:mm:ss')\n| project Day, Time, SessionId, Name\n| sort by Day, Time desc\n\n",
+                  "PartTitle": "Page visit-level list"
+                }
+              },
+              "partHeader": {
+                "title": "Page Views by Session",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 40,
+              "colSpan": 14,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15d186a8-8803-4b3a-b86f-31e91c269c5d",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where url has \"https://prepare-case-probation.service.justice.gov.uk\"\n| project url, duration\n| top 10 by duration\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "url": "539.998px",
+                    "duration": "289px"
+                  },
+                  "Query": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics')\n| where Name !startswith 'GET /assets'\n| extend Day = startofday(TimeGenerated)\n| extend userName = tostring(parse_json(Properties).username)\n| where isnotempty(userName)\n| where userName !in (\"P_BELL\", \"3ebbaa0f-ea27-4190-9c33-6842d0aa2057\",\"EG006619\")\n\t| join kind=leftouter AppPageViews on SessionId\n\t| where Name1 <>  \"HMPPS Accredited Programmes - Home\"\n\t| where Name1 <>  \"HMPPS Accredited Programmes - List of accredited programmes\"\n\t| extend Name1 = replace(\"HMPPS Accredited Programmes - \", \"\", Name1)\n\t| extend ProgrammeType = iff(Name1 has \"(TSP)\", \"Thinking Skills Programme\", iff(Name1 has \"(IM)\", \"Identity Matters\", iff(Name1 has \"(BNM+)\", \"Becoming new me+\", iff(Name1 has \"HSP\", \"Health Sex Programme\", iff(Name1 has \"HII\", \"Health Identity Intervention\",  iff(Name1 has \"BBR\", \"Building Better Relationships\", iff(Name1 has \"LNM\", \"Living As New Me\", iff(Name1 has \"NMS\", \"New Me Strengths\", iff(Name1 has \"Kaizen\", \"Kaizen\", \"Other\")))))))))\n\t| where Name1 <> 'Error'\n\t| where isnotempty(Name1)\n\t| distinct Day, ProgrammeType, userName, Name1, SessionId, ClientCity, ClientStateOrProvince, ClientCountryOrRegion\n| summarize TotalViews = count() by ProgrammeType\n| order by TotalViews desc\n| render columnchart\n\n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "StackedColumn",
+                  "PartTitle": "Which programmes are being \"found\"?",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "ProgrammeType",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "TotalViews",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Which programmes are being \"found\"?",
+                "subtitle": "Views by programme/offering page"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "utc",
+                "granularity": "30m",
+                "relative": "30d"
+              },
+              "displayCache": {
+                "name": "UTC Time",
+                "value": "Past 30 days"
+              },
+              "filteredPartIds": [
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610b0",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610b6",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610b8",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610ba",
+                "StartboardPart-MonitorChartPart-0ed4c174-23b5-468d-99ba-ec3db10610bc",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610be",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610c0",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610c2",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610c4",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610c6",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610ca",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610ce",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610d0",
+                "StartboardPart-LogsDashboardPart-0ed4c174-23b5-468d-99ba-ec3db10610d2"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "Refer & Monitor - Accredited Programmes UI (WIP)",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Refer & Monitor - Accredited Programmes UI (WIP)"
+  },
+  "apiVersion": "2022-12-01-preview"
+}

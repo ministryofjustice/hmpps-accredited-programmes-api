@@ -1,0 +1,1352 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 8,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "12086866-1337-4a57-8500-f7752b23def2",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend Day = startofday(TimeGenerated)\n| extend PageLoadTime = todouble(DurationMs) / 1000\n| extend PageType = iff(Name has \"(HMP\", \"Programme offering page\", iff(Name has \"List of\", \"List of all Accredited Programmes page\", iff(Name has \"Home\",\"Home page\",\"IndivIdual Programme page\")))\n| summarize avg(PageLoadTime) by Day\n| render barchart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedBar",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_PageLoadTime",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where OperationName != \"/\"\n| where OperationName != \"/programmes\"\n| extend Day = startofday(TimeGenerated)\n| extend PageLoadTime = todouble(DurationMs) / 1000\n| summarize avg(PageLoadTime) by Day\n\n",
+                  "SpecificChart": "Line"
+                }
+              },
+              "partHeader": {
+                "title": "Average page load times per day",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 9,
+              "y": 0,
+              "colSpan": 8,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "12086866-1337-4a57-8500-f7752b23def2",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend Day = startofday(TimeGenerated)\n| extend PageLoadTime = todouble(DurationMs) / 1000\n| extend PageType = iff(Name has \"(HMP\", \"Programme offering page\", iff(Name has \"List of\", \"List of all Accredited Programmes page\", iff(Name has \"Home\",\"Home page\",\"IndivIdual Programme page\")))\n| summarize avg(PageLoadTime) by Day\n| render barchart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedBar",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_PageLoadTime",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend Day = startofday(TimeGenerated)\n| extend PageLoadTime = todouble(DurationMs) / 1000\n| where OperationName != \"/\"\n| where OperationName != \"/programmes\"\n| where OperationName != \"/autherror\"\n| extend PageType = iff(Url has \"find\", \"Find\", \niff(Url has \"assess\", \"Assess\",\niff(Url has \"refer\",\"Refer\",\"Other\")))\n| summarize avg(PageLoadTime) by Day, PageType\n\n",
+                  "SpecificChart": "StackedColumn",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_PageLoadTime",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "PageType",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Average page load time by user journey",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 5,
+              "colSpan": 12,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "12086866-1337-4a57-8500-f7752b23def2",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| extend Day = startofday(TimeGenerated)\n| extend PageLoadTime = todouble(DurationMs) / 1000\n| extend PageType = iff(Name has \"(HMP\", \"Programme offering page\", iff(Name has \"List of\", \"List of all Accredited Programmes page\", iff(Name has \"Home\",\"Home page\",\"IndivIdual Programme page\")))\n| summarize avg(PageLoadTime) by Day\n| render barchart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedBar",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_PageLoadTime",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "Url": "713.992px"
+                  },
+                  "Query": "AppPageViews\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where OperationName != \"/programmes\"\n| where OperationName != \"/\"\n| extend loadTimeSec = todouble(DurationMs) / 1000\n| where loadTimeSec > 3\n| where Name has \"Accredited Programmes\"\n| project Url, page_load_time_in_s = loadTimeSec, time_of_event = TimeGenerated\n| top 20 by page_load_time_in_s desc\n\n",
+                  "ControlType": "AnalyticsGrid",
+                  "SpecificChart": "Line",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_page_load_time_seconds",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "top 20 Slow loading pages",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 10,
+              "colSpan": 13,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "4a054752-a2a4-45cd-8149-8e076b12bece",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppPageViews\n| where AppRoleName == \"hmpps-accredited-programmes-ui\"\n| extend PageError = iif(Name == \"HMPPS Accredited Programmes - Error\",true,false)\n| extend Day = startofday(TimeGenerated)\n| summarize  CountOfPageError = countif(PageError == true) by Day\n| render timechart  with (ymin=0)\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "CountOfPageError",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Number of times error screen is displayed per day",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 14,
+              "colSpan": 13,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourcegroups/nomisapi-prod-rg/providers/microsoft.insights/components/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "2ae33c24-241d-4892-9369-c4f1b3111b6a",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "requests\n| extend success = tobool(success)\n| where cloud_RoleName == 'hmpps-accredited-programmes-ui'\n| where client_Type == \"PC\"\n| where name !in ('GET /metrics', 'GET /ping', 'GET /health')\n| where operation_Name !contains 'GET /assets/'\n| summarize\n    succeeded = sumif(itemCount, success == true),\n    failed = sumif(itemCount, success == false)\n    by bin(timestamp, 1m)\n| render timechart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "succeeded",
+                        "type": "long"
+                      },
+                      {
+                        "name": "failed",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "requests\n| extend success = tobool(success)\n| where cloud_RoleName == 'hmpps-accredited-programmes-ui'\n| where client_Type == \"PC\"\n| where name !in ('GET /metrics', 'GET /ping', 'GET /health')\n| where operation_Name !contains 'GET /assets/'\n| extend Day = startofday(timestamp)\n| summarize\n    succeeded = sumif(itemCount, success == true),\n    failed = sumif(itemCount, success == false)\n    by Day\n| render timechart \n\n",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "succeeded",
+                        "type": "long"
+                      },
+                      {
+                        "name": "failed",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Number of successful and failed UI requests per day",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 20,
+              "colSpan": 13,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.OperationalInsights/workspaces/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "12f25530-1262-49bd-be51-3cacf18a03de",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "AppRequests\n| where AppRoleName == 'hmpps-accredited-programmes-ui'\n| where Name !in ('GET /ping', 'GET /health', 'HEAD /', 'GET /metrics')\n| where Name !startswith 'GET /assets'\n| order by TimeGenerated desc\n| extend Day = startofday(TimeGenerated)\n| extend userName = tostring(parse_json(Properties).username)\n| extend caseload = tostring(parse_json(Properties).activeCaseLoadId)\n| where isnotempty(caseload)\n| where isnotempty(userName)\n| where Success == True\n| where userName !in (\"P_BELL\", \"3ebbaa0f-ea27-4190-9c33-6842d0aa2057\", \"EG006619\")\n| summarize PageViewCount = dcount(Id), UniqueUsers = dcount(userName), UniqueSessions = dcount(SessionId) by Day\n| render columnchart\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "PageViewCount",
+                        "type": "long"
+                      },
+                      {
+                        "name": "UniqueUsers",
+                        "type": "long"
+                      },
+                      {
+                        "name": "UniqueSessions",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Page view counts, overall, by session and users",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 28,
+              "colSpan": 20,
+              "rowSpan": 7
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourcegroups/nomisapi-prod-rg/providers/microsoft.insights/components/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "5de6b1d6-01b2-47b7-aa11-f34f37372297",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "requests\n| where cloud_RoleName == 'hmpps-accredited-programmes-api'\n| where name has \"health\"\n| extend hour = datetime_part(\"hour\", timestamp)\n| where hour between (09 .. 18)\n| order by timestamp desc\n| order by timestamp desc\n| extend Day = startofday(timestamp)\n| summarize \n    succeeded=sumif(itemCount, success == true),\n    failed=sumif(itemCount, success == false)\n    by Day\n| render timechart\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "succeeded",
+                        "type": "long"
+                      },
+                      {
+                        "name": "failed",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "union \n(\n    requests\n    | where cloud_RoleName == 'hmpps-accredited-programmes-api'\n    | where name has \"health\"\n    | extend Day = startofday(timestamp)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by Day\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Accredited Programmes API\", Day, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-nomis-prisoner-api'\n    | where name has \"health\"\n    | extend Day = startofday(timestamp)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by Day\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Nomis Prisoner API\", Day, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-prisoner-search'\n    | where name has \"health\"\n    | extend Day = startofday(timestamp)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by Day\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Prisoner Search API\", Day, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-assess-risks-and-needs'\n    | where name has \"health\"\n    | extend Day = startofday(timestamp)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by Day\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"ARNS API\", Day, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-external-users-api'\n    | where name has \"health\"\n    | extend Day = startofday(timestamp)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by Day\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Manage users\", Day, availability\n)\n| render timechart\n\n",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "availability",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "Type",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "API availability per day",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 21,
+              "y": 28,
+              "colSpan": 13,
+              "rowSpan": 7
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourcegroups/nomisapi-prod-rg/providers/microsoft.insights/components/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "5de6b1d6-01b2-47b7-aa11-f34f37372297",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "requests\n| where cloud_RoleName == 'hmpps-accredited-programmes-api'\n| where name has \"health\"\n| extend hour = datetime_part(\"hour\", timestamp)\n| where hour between (09 .. 18)\n| order by timestamp desc\n| order by timestamp desc\n| extend Day = startofday(timestamp)\n| summarize \n    succeeded=sumif(itemCount, success == true),\n    failed=sumif(itemCount, success == false)\n    by Day\n| render timechart\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "Day",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "succeeded",
+                        "type": "long"
+                      },
+                      {
+                        "name": "failed",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "union \n(\n    requests\n    | where cloud_RoleName == 'hmpps-accredited-programmes-api'\n    | where name has \"health\"\n    | where timestamp >= ago(3d)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by bin(timestamp, 1h)\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Accredited Programmes API\", Hour = timestamp, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-nomis-prisoner-api'\n    | where name has \"health\"\n    | where timestamp >= ago(3d)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by bin(timestamp, 1h)\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Nomis Prisoner API\", Hour = timestamp, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-prisoner-search'\n    | where name has \"health\"\n    | where timestamp >= ago(3d)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by bin(timestamp, 1h)\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Prisoner Search API\", Hour = timestamp, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-assess-risks-and-needs'\n    | where name has \"health\"\n    | where timestamp >= ago(3d)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by bin(timestamp, 1h)\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"ARNS API\", Hour = timestamp, availability\n),\n(\n    requests\n    | where cloud_RoleName == 'hmpps-external-users-api'\n    | where name has \"health\"\n    | where timestamp >= ago(3d)\n    | summarize \n        totalRequests = sum(itemCount),\n        succeeded = sumif(itemCount, success == true),\n        failed = sumif(itemCount, success == false)\n        by bin(timestamp, 1h)\n    | extend availability = 100.0 * succeeded / totalRequests\n    | project Type = \"Manage users\", Hour = timestamp, availability\n)\n| render timechart\n\n",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Hour",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "availability",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "Type",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  },
+                  "IsQueryContainTimeRange": true
+                }
+              },
+              "partHeader": {
+                "title": "API availability per hour (for the last three days)",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 35,
+              "colSpan": 20,
+              "rowSpan": 7
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.Insights/components/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "5a36caf8-440d-4ec1-bf15-1dd8e1f2c525",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "traces\n| where cloud_RoleName in (\"hmpps-accredited-programmes-api\", \"hmpps-accredited-programmes-ui\")\n| where message has 'is of interest'\n| summarize count() by bin(timestamp, 1d)\n| order by timestamp desc\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "traces\n| where cloud_RoleName  == \"hmpps-accredited-programmes-api\"\n| where message has 'is of interest'\n| summarize count() by bin(timestamp, 1d)\n| order by timestamp desc\n\n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "StackedColumn",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "count_",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Domain events where prisoner was of interest to ACP",
+                "subtitle": "ie Prisoner update messages processed"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 42,
+              "colSpan": 20,
+              "rowSpan": 9
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-prod-rg/providers/Microsoft.Insights/components/nomisapi-prod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "138f549d-5d50-4588-9a6c-6a3365128deb",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "traces\n| where cloud_RoleName == \"hmpps-accredited-programmes-api\"\n| where message has 'interest to ACP'\n| extend Action = \n    iff(message has 'is of interest', \n       \"update\",\n        \"not update\")\n| summarize count() by bin(timestamp, 1h),Action\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-prod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "count_",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "Action",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "update prisoner domain event messages buy hour",
+                "subtitle": "update means an ACP person was updated, not update means the person is not in ACP"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "utc",
+                "granularity": "auto",
+                "relative": "30d"
+              },
+              "displayCache": {
+                "name": "UTC Time",
+                "value": "Past 30 days"
+              },
+              "filteredPartIds": [
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781a9",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781ab",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781bb",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781ad",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781af",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781b1",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781b3",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781b5",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781b7",
+                "StartboardPart-LogsDashboardPart-7c409b5e-cbf8-4933-b7d7-7004a51781b9"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "ACP Performance metrics PROD",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "ACP Performance metrics PROD"
+  },
+  "apiVersion": "2022-12-01-preview"
+}
