@@ -48,6 +48,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
@@ -81,6 +82,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var referralRepository: ReferralRepository
+
+  @Autowired
+  lateinit var pniResultRepository: PNIResultEntityRepository
 
   @BeforeEach
   fun setUp() {
@@ -176,6 +180,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val referralHistory = referralHistories[0]
     referralHistory.status.code shouldBeEqual "REFERRAL_STARTED"
+
+    // check for PNI
+    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.referralId, PRISON_NUMBER_1) shouldNotBe null
   }
 
   @Test

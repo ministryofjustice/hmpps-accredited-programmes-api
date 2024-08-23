@@ -2,6 +2,45 @@
   "mappings": [
     {
       "request": {
+        "url": "/assessments/timeline/C6666CC",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "assessments_C6666CC.json"
+      }
+    },
+    {
+      "request": {
+        "url": "/assessments/timeline/A1234AA",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "assessments_A1234AA_PACT.json"
+      }
+    },
+    {
+      "request": {
+        "url": "/assessments/timeline/C6666DD",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "assessments_C6666DD.json"
+      }
+    },
+    {
+      "request": {
         "url": "/assessments/timeline/A9999BB",
         "method": "GET"
       },

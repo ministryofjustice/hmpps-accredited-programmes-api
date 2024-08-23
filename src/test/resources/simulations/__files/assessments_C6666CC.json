@@ -1,0 +1,24 @@
+{
+  "probNumber": "D006518",
+  "prisNumber": "C6666CC",
+  "timeline": [
+    {
+      "id": 2114584,
+      "type": "LAYER3",
+      "status": "COMPLETE",
+      "completedAt": "2022-06-13T09:59:22"
+    },
+    {
+      "id": 2114588,
+      "type": "LAYER3",
+      "status": "LOCKED_INCOMPLETE",
+      "completedAt": "2012-06-20T23:00:06"
+    },
+    {
+      "id": 10083387,
+      "type": "LAYER3",
+      "status": "OPEN"
+    }
+  ]
+}
+

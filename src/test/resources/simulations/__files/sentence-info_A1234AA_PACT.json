@@ -1,0 +1,316 @@
+{
+  "prisonerNumber": "C6666CC",
+  "latestPrisonTerm": {
+    "bookNumber": "M54371",
+    "bookingId": 876623,
+    "courtSentences": [
+      {
+        "caseInfoNumber": "T20137744",
+        "id": 1100799,
+        "caseSeq": 1,
+        "beginDate": "2014-06-10",
+        "court": {
+          "agencyId": "SHEFCC",
+          "description": "Sheffield Crown Court",
+          "longDescription": "Sheffield Crown Court",
+          "agencyType": "CRT",
+          "active": true,
+          "courtType": "CC"
+        },
+        "caseType": "Adult",
+        "caseStatus": "ACTIVE",
+        "sentences": [
+          {
+            "sentenceSequence": 1,
+            "sentenceStatus": "A",
+            "sentenceCategory": "2003",
+            "sentenceCalculationType": "ADIMP",
+            "sentenceTypeDescription": "CJA03 Standard Determinate Sentence",
+            "sentenceStartDate": "2014-07-10",
+            "sentenceEndDate": "2016-07-29",
+            "lineSeq": 1,
+            "offences": [
+              {
+                "offenderChargeId": 2614091,
+                "offenceStartDate": "2012-10-21",
+                "offenceEndDate": "2012-11-02",
+                "offenceStatute": "SX03",
+                "offenceCode": "SX03174",
+                "offenceDescription": "Adult sexual activity with a girl 13 to 17 family member - no penetration",
+                "indicators": [
+                  "ERS",
+                  "M",
+                  "S",
+                  "24",
+                  "S1",
+                  "PIMMS1",
+                  "V",
+                  "S15/CJIB"
+                ]
+              }
+            ],
+            "terms": [
+              {
+                "termSequence": 1,
+                "sentenceTermCode": "IMP",
+                "startDate": "2014-08-01",
+                "years": 2,
+                "lifeSentence": false
+              }
+            ]
+          }
+        ],
+        "issuingCourt": {
+          "agencyId": "SHEFCC",
+          "description": "Sheffield Crown Court",
+          "longDescription": "Sheffield Crown Court",
+          "agencyType": "CRT",
+          "active": true,
+          "courtType": "CC"
+        },
+        "issuingCourtDate": "2014-06-10"
+      },
+      {
+        "caseInfoNumber": "T20157172",
+        "id": 1225927,
+        "caseSeq": 4,
+        "beginDate": "2015-03-12",
+        "court": {
+          "agencyId": "SHEFCC",
+          "description": "Sheffield Crown Court",
+          "longDescription": "Sheffield Crown Court",
+          "agencyType": "CRT",
+          "active": true,
+          "courtType": "CC"
+        },
+        "caseType": "Adult",
+        "caseStatus": "ACTIVE",
+        "sentences": [
+          {
+            "sentenceSequence": 17,
+            "sentenceStatus": "A",
+            "sentenceCategory": "2003",
+            "sentenceCalculationType": "ADIMP",
+            "sentenceTypeDescription": "CJA03 Standard Determinate Sentence",
+            "sentenceStartDate": "2015-09-28",
+            "sentenceEndDate": "2020-03-29",
+            "lineSeq": 4,
+            "offences": [
+              {
+                "offenderChargeId": 2958488,
+                "offenceStartDate": "2007-11-06",
+                "offenceEndDate": "2008-10-21",
+                "offenceStatute": "SX03",
+                "offenceCode": "SX03013",
+                "offenceDescription": "Rape a girl under 13",
+                "indicators": [
+                  "S",
+                  "M",
+                  "23",
+                  "ERS",
+                  "PIMMS1",
+                  "S1",
+                  "SOR",
+                  "V",
+                  "S15/CJIB",
+                  "SCH15/CJIB/L",
+                  "PCSC/SDS",
+                  "PCSC/SEC250",
+                  "PCSC/SDS+"
+                ]
+              }
+            ],
+            "terms": [
+              {
+                "termSequence": 1,
+                "sentenceTermCode": "IMP",
+                "startDate": "2015-10-07",
+                "years": 4,
+                "months": 6,
+                "lifeSentence": false
+              }
+            ]
+          },
+          {
+            "sentenceSequence": 18,
+            "sentenceStatus": "A",
+            "sentenceCategory": "2003",
+            "sentenceCalculationType": "ADIMP",
+            "sentenceTypeDescription": "CJA03 Standard Determinate Sentence",
+            "sentenceStartDate": "2015-09-23",
+            "sentenceEndDate": "2020-03-17",
+            "lineSeq": 5,
+            "offences": [
+              {
+                "offenderChargeId": 2958490,
+                "offenceStartDate": "2007-12-12",
+                "offenceEndDate": "2008-10-21",
+                "offenceStatute": "SX03",
+                "offenceCode": "SX03014",
+                "offenceDescription": "Rape of a boy under 13 - SOA 2003",
+                "indicators": [
+                  "S",
+                  "M",
+                  "23",
+                  "ERS",
+                  "PIMMS1",
+                  "S1",
+                  "SOR",
+                  "V",
+                  "PCSC/SDS+",
+                  "S15/CJIB",
+                  "SCH15/CJIB/L",
+                  "PCSC/SDS",
+                  "PCSC/SEC250"
+                ]
+              }
+            ],
+            "terms": [
+              {
+                "termSequence": 1,
+                "sentenceTermCode": "IMP",
+                "startDate": "2015-09-29",
+                "years": 4,
+                "months": 6,
+                "lifeSentence": false
+              }
+            ]
+          },
+          {
+            "sentenceSequence": 19,
+            "sentenceStatus": "A",
+            "sentenceCategory": "2003",
+            "sentenceCalculationType": "ADIMP",
+            "sentenceTypeDescription": "CJA03 Standard Determinate Sentence",
+            "sentenceStartDate": "2015-09-28",
+            "sentenceEndDate": "2020-04-04",
+            "lineSeq": 6,
+            "offences": [
+              {
+                "offenderChargeId": 3168310,
+                "offenceStartDate": "2007-11-16",
+                "offenceEndDate": "2008-10-21",
+                "offenceStatute": "SX03",
+                "offenceCode": "SX03014",
+                "offenceDescription": "Rape of a boy under 13 - SOA 2003",
+                "indicators": [
+                  "S",
+                  "M",
+                  "23",
+                  "ERS",
+                  "PIMMS1",
+                  "S1",
+                  "SOR",
+                  "V",
+                  "PCSC/SDS+",
+                  "S15/CJIB",
+                  "SCH15/CJIB/L",
+                  "PCSC/SDS",
+                  "PCSC/SEC250"
+                ]
+              }
+            ],
+            "terms": [
+              {
+                "termSequence": 1,
+                "sentenceTermCode": "IMP",
+                "startDate": "2015-09-13",
+                "years": 4,
+                "months": 6,
+                "lifeSentence": false
+              }
+            ]
+          },
+          {
+            "sentenceSequence": 20,
+            "sentenceStatus": "A",
+            "sentenceCategory": "2003",
+            "sentenceCalculationType": "ADIMP",
+            "sentenceTypeDescription": "CJA03 Standard Determinate Sentence",
+            "sentenceStartDate": "2015-10-05",
+            "sentenceEndDate": "2020-04-11",
+            "lineSeq": 7,
+            "offences": [
+              {
+                "offenderChargeId": 3168317,
+                "offenceStartDate": "2007-12-07",
+                "offenceEndDate": "2008-10-21",
+                "offenceStatute": "SX03",
+                "offenceCode": "SX03014",
+                "offenceDescription": "Rape of a boy under 13 - SOA 2003",
+                "indicators": [
+                  "S",
+                  "M",
+                  "23",
+                  "ERS",
+                  "PIMMS1",
+                  "S1",
+                  "SOR",
+                  "V",
+                  "PCSC/SDS+",
+                  "S15/CJIB",
+                  "SCH15/CJIB/L",
+                  "PCSC/SDS",
+                  "PCSC/SEC250"
+                ]
+              }
+            ],
+            "terms": [
+              {
+                "termSequence": 1,
+                "sentenceTermCode": "IMP",
+                "startDate": "2015-09-18",
+                "years": 4,
+                "months": 6,
+                "lifeSentence": false
+              }
+            ]
+          }
+        ],
+        "issuingCourt": {
+          "agencyId": "SHEFCC",
+          "description": "Sheffield Crown Court",
+          "longDescription": "Sheffield Crown Court",
+          "agencyType": "CRT",
+          "active": true,
+          "courtType": "CC"
+        },
+        "issuingCourtDate": "2015-08-26"
+      }
+    ],
+    "licenceSentences": [
+      {
+        "sentenceSequence": 16,
+        "sentenceStatus": "I",
+        "sentenceCategory": "LICENCE",
+        "sentenceCalculationType": "AP",
+        "sentenceTypeDescription": "Adult prisoner 2003 CJA",
+        "sentenceStartDate": "2015-09-26",
+        "sentenceEndDate": "2016-10-27",
+        "offences": [],
+        "terms": []
+      }
+    ],
+    "keyDates": {
+      "sentenceStartDate": "2014-08-01",
+      "effectiveSentenceEndDate": "2020-03-18",
+      "additionalDaysAwarded": 7,
+      "nonDtoReleaseDateType": "CRD",
+      "confirmedReleaseDate": "2020-05-13",
+      "releaseDate": "2020-05-13",
+      "sentenceExpiryDate": "2023-01-02",
+      "conditionalReleaseDate": "2020-05-13",
+      "licenceExpiryDate": "2022-01-01",
+      "homeDetentionCurfewEligibilityDate": "2023-01-03",
+      "earlyTermDate": "2022-01-04",
+      "lateTermDate": "2022-01-06",
+      "nonDtoReleaseDate": "2024-01-05",
+      "automaticReleaseDate": "2024-01-05",
+      "postRecallReleaseDate": "2017-08-06"
+    }
+  },
+  "sentenceAdjustments": {
+    "additionalDaysAwarded": 7,
+    "remand": 21
+  }
+}

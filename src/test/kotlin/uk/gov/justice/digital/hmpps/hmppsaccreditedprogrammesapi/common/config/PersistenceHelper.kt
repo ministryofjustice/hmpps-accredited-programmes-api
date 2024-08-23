@@ -18,6 +18,7 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM referral_status_history").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM prerequisite").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course_participation").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM pni_result").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course").executeUpdate()
