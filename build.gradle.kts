@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.4"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.0.10"
-  kotlin("plugin.jpa") version "2.0.10"
+  kotlin("plugin.spring") version "2.0.20"
+  kotlin("plugin.jpa") version "2.0.20"
 }
 
 configurations {
@@ -16,10 +16,10 @@ dependencies {
   val springdocVersion = "2.6.0"
   val sentryVersion = "7.14.0"
   val jsonWebtokenVersion = "0.12.6"
-  val springSecurityVersion = "6.3.1"
+  val springSecurityVersion = "6.3.3"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.3")
-  runtimeOnly("org.postgresql:postgresql:42.7.3")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.5")
+  runtimeOnly("org.postgresql:postgresql:42.7.4")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
@@ -27,17 +27,17 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
-  implementation("com.google.guava:guava:33.2.1-jre")
+  implementation("com.google.guava:guava:33.3.0-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.3.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.3.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
-  runtimeOnly("org.postgresql:postgresql:42.7.3")
+  runtimeOnly("org.postgresql:postgresql:42.7.4")
 
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -45,7 +45,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.13")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.14")
   testImplementation("io.github.bluegroundltd:kfactory:1.0.0")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
