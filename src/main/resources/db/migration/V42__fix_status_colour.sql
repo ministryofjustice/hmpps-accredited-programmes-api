@@ -1,1 +1,0 @@
-update referral_status set colour = 'pink' where colour = 'light-pink';

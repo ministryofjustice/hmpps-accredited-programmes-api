@@ -1,1 +1,0 @@
-update referral_status set hint_text='This person has completed the programme. The referral will be closed.' where code = 'PROGRAMME_COMPLETE' AND description = 'Programme complete';

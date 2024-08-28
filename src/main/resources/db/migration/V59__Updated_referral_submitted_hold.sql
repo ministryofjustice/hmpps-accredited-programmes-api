@@ -1,2 +1,0 @@
-update referral_status_transitions set description = 'Remove hold' where transition_from_status = 'ON_HOLD_REFERRAL_SUBMITTED' and transition_to_status = 'REFERRAL_SUBMITTED';
-update referral_status_transitions set hint_text = 'The referral will resume because the person is ready to continue.' where transition_from_status = 'ON_HOLD_REFERRAL_SUBMITTED' and transition_to_status = 'REFERRAL_SUBMITTED';

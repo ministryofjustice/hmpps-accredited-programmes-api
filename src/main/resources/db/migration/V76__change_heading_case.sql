@@ -1,1 +1,0 @@
-update referral_status_transitions set secondary_heading = 'Not eligible' where secondary_heading = 'Not Eligible';

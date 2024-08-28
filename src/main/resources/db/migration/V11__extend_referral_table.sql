@@ -1,6 +1,0 @@
-ALTER TABLE referral
-    ADD COLUMN reason TEXT;
-ALTER TABLE referral
-    ADD COLUMN oasys_confirmed BOOLEAN NOT NULL DEFAULT false;
-    ALTER TABLE referral
-    ADD COLUMN status TEXT NOT NULL DEFAULT 'REFERRAL_STARTED';

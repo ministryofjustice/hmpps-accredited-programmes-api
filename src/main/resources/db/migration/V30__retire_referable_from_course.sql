@@ -1,1 +1,0 @@
-ALTER TABLE course DROP COLUMN referable;
