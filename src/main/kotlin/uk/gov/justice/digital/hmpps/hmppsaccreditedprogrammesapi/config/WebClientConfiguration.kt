@@ -95,7 +95,7 @@ class WebClientConfiguration(
     @Value("\${services.manage-offences-api.base-url}") manageOffencesApiBaseUrl: String,
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-    oauth2Client.setDefaultClientRegistrationId("arns-api")
+    oauth2Client.setDefaultClientRegistrationId("manage-offences-api")
 
     return buildWebClient(manageOffencesApiBaseUrl, oauth2Client)
   }

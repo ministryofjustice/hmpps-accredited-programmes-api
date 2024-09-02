@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
@@ -11,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
@@ -118,19 +118,19 @@ fun risks(
   oasysOffendingInfo: OasysOffendingInfo?,
   oasysRelationships: OasysRelationships?,
   oasysRoshSummary: OasysRoshSummary?,
-  oasysArnsSummary: RiskSummary?,
-  oasysArnsPredictor: ArnsScores?,
+  oasysRiskSummary: RiskSummary?,
+  oasysRiskPredictorScores: OasysRiskPredictorScores?,
   activeAlerts: List<NomisAlert>?,
 ) = Risks(
-  ogrsYear1 = oasysArnsPredictor?.groupReconvictionScore?.oneYear,
-  ogrsYear2 = oasysArnsPredictor?.groupReconvictionScore?.twoYears,
-  ogrsRisk = oasysArnsPredictor?.groupReconvictionScore?.scoreLevel?.fixCase(),
+  ogrsYear1 = oasysRiskPredictorScores?.groupReconvictionScore?.oneYear,
+  ogrsYear2 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears,
+  ogrsRisk = oasysRiskPredictorScores?.groupReconvictionScore?.scoreLevel?.fixCase(),
 
-  ovpYear1 = oasysArnsPredictor?.violencePredictorScore?.oneYear,
-  ovpYear2 = oasysArnsPredictor?.violencePredictorScore?.twoYears,
-  ovpRisk = oasysArnsPredictor?.violencePredictorScore?.scoreLevel?.fixCase(),
-  rsrScore = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore,
-  rsrRisk = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.scoreLevel?.fixCase(),
+  ovpYear1 = oasysRiskPredictorScores?.violencePredictorScore?.oneYear,
+  ovpYear2 = oasysRiskPredictorScores?.violencePredictorScore?.twoYears,
+  ovpRisk = oasysRiskPredictorScores?.violencePredictorScore?.scoreLevel?.fixCase(),
+  rsrScore = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore,
+  rsrRisk = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.scoreLevel?.fixCase(),
 
   ospcScore = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
   ospiScore = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
@@ -148,7 +148,7 @@ fun risks(
   imminentRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
   imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
 
-  overallRoshLevel = oasysArnsSummary?.overallRiskLevel?.fixCase(),
+  overallRoshLevel = oasysRiskSummary?.overallRiskLevel?.fixCase(),
   alerts = activeAlerts?.map {
     Alert(
       description = it.alertCodeDescription,

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
@@ -19,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
@@ -152,16 +152,16 @@ class OasysService(
     val oasysOffendingInfo = getOffendingInfo(assessmentId)
     val oasysRelationships = getRelationships(assessmentId)
     val oasysRoshSummary = getRoshSummary(assessmentId)
-    val oasysArnsSummary = oasysRoshSummary?.getHighestPriorityScore()
-    val oasysArnsPredictor = getRiskPredictors(assessmentId)
+    val oasysScoreLevel = oasysRoshSummary?.getHighestPriorityScore()
+    val oasysRiskPredictorScores = getRiskPredictors(assessmentId)
     val activeAlerts = getActiveAlerts(prisonNumber)
 
     return risks(
       oasysOffendingInfo,
       oasysRelationships,
       oasysRoshSummary,
-      RiskSummary(oasysArnsSummary?.type),
-      oasysArnsPredictor,
+      RiskSummary(oasysScoreLevel?.type),
+      oasysRiskPredictorScores,
       activeAlerts,
     )
   }
@@ -290,7 +290,7 @@ class OasysService(
   fun getRoshSummary(assessmentId: Long): OasysRoshSummary? =
     fetchDetail(assessmentId, oasysApiClient::getRoshSummary, "RoshSummary")
 
-  fun getRiskPredictors(assessmentId: Long): ArnsScores? =
+  fun getRiskPredictors(assessmentId: Long): OasysRiskPredictorScores? =
     fetchDetail(assessmentId, oasysApiClient::getRiskPredictors, "RiskPredictors")
 
   fun getDrugDetail(assessmentId: Long): OasysDrugDetail? =

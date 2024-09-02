@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ArnsScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
@@ -75,11 +75,11 @@ class PniService(
 
     // risks
     val oasysOffendingInfo = oasysService.getOffendingInfo(assessmentId)
-    val oasysArnsPredictor = oasysService.getRiskPredictors(assessmentId)
+    val oasysRiskPredictor = oasysService.getRiskPredictors(assessmentId)
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
-      individualRiskScores = buildRiskScores(oasysArnsPredictor, relationships),
+      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships),
     )
 
     val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber, gender)
@@ -154,16 +154,16 @@ class PniService(
   }
 
   private fun buildRiskScores(
-    oasysArnsPredictor: ArnsScores?,
+    oasysRiskPredictorScores: OasysRiskPredictorScores?,
     relationships: OasysRelationships?,
   ) = IndividualRiskScores(
-    ogrs3 = oasysArnsPredictor?.groupReconvictionScore?.twoYears?.round(),
-    ovp = oasysArnsPredictor?.violencePredictorScore?.twoYears?.round(),
-    ospIic = oasysArnsPredictor?.sexualPredictorScore?.ospIndirectImagePercentageScore?.round()
-      ?: oasysArnsPredictor?.sexualPredictorScore?.ospIndecentPercentageScore?.round(),
-    ospDc = oasysArnsPredictor?.sexualPredictorScore?.ospDirectContactPercentageScore?.round()
-      ?: oasysArnsPredictor?.sexualPredictorScore?.ospContactPercentageScore?.round(),
-    rsr = oasysArnsPredictor?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
+    ogrs3 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears?.round(),
+    ovp = oasysRiskPredictorScores?.violencePredictorScore?.twoYears?.round(),
+    ospIic = oasysRiskPredictorScores?.sexualPredictorScore?.ospIndirectImagePercentageScore?.round()
+      ?: oasysRiskPredictorScores?.sexualPredictorScore?.ospIndecentPercentageScore?.round(),
+    ospDc = oasysRiskPredictorScores?.sexualPredictorScore?.ospDirectContactPercentageScore?.round()
+      ?: oasysRiskPredictorScores?.sexualPredictorScore?.ospContactPercentageScore?.round(),
+    rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
     sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
   )
 }
