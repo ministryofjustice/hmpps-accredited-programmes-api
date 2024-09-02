@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.math.BigDecimal
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class ArnsScores(
+data class OasysRiskPredictorScores(
   val groupReconvictionScore: Score? = null,
   val violencePredictorScore: Score? = null,
   val generalPredictorScore: Score? = null,
