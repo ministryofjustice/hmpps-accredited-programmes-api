@@ -87,6 +87,12 @@ class StatisticsController(
         locationCodes,
         "DESELECTED",
       )
+
+      ReportType.PNI_PATHWAY_COUNT -> statisticsRepository.pniPathwayCounts(
+        startDate,
+        endDate!!,
+        locationCodes,
+      )
     }
     return ReportContent(
       reportType = reportType.name,
@@ -150,6 +156,7 @@ enum class ReportType {
   NOT_ELIGIBLE_COUNT,
   NOT_SUITABLE_COUNT,
   DESELECTED_COUNT,
+  PNI_PATHWAY_COUNT,
 }
 
 data class ReportTypes(val types: List<String>)
