@@ -177,10 +177,6 @@ class ReferralServiceTest {
         },
       )
     }
-
-    verify {
-      pniService.savePni(PRISON_NUMBER_1, null, true, createdReferralId)
-    }
   }
 
   @Test
@@ -260,10 +256,6 @@ class ReferralServiceTest {
           it.prisonNumber == PRISON_NUMBER_1
         },
       )
-    }
-
-    verify {
-      pniService.savePni(PRISON_NUMBER_1, null, true, createdReferralId)
     }
   }
 

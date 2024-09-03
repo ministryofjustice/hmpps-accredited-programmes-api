@@ -180,9 +180,6 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val referralHistory = referralHistories[0]
     referralHistory.status.code shouldBeEqual "REFERRAL_STARTED"
-
-    // check for PNI
-    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.referralId, PRISON_NUMBER_1) shouldNotBe null
   }
 
   @Test
@@ -494,6 +491,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     statusHistories.size shouldBeEqual 2
     statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
     statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
+
+    // check for PNI
+    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.referralId, PRISON_NUMBER_1) shouldNotBe null
   }
 
   @Test
