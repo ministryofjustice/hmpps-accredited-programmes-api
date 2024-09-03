@@ -90,8 +90,6 @@ constructor(
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
 
-    savePNI(prisonNumber, savedReferral)
-
     log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber from $username referralId: ${savedReferral.id}")
     return savedReferral.id
   }
@@ -254,6 +252,8 @@ constructor(
       previousStatusCode = existingStatus,
       newStatus = referralStatusRepository.getByCode(referral.status),
     )
+
+    savePNI(referral.prisonNumber, referral)
   }
 
   fun getReferralViewByOrganisationId(
