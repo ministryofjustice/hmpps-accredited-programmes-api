@@ -206,4 +206,31 @@ FROM (
     statusCodes: List<String>,
     locationCodes: List<String>?,
   ): String
+
+  @Query(
+    """
+ SELECT json_build_object(
+               'count', sum(count),
+               'pniCounts', json_agg(json_build_object(
+                'pathway', pathway,
+                'count', count))
+       ) AS result
+FROM (
+         SELECT
+             pni.programme_pathway as pathway,
+             COUNT(*) AS count
+         FROM referral r
+                  JOIN offering o ON r.offering_id = o.offering_id
+                  JOIN course c ON o.course_id = c.course_id
+                  JOIN pni_result pni ON pni.referral_id = r.referral_id
+         WHERE r.deleted = FALSE
+           AND pni.pni_assessment_date >= :startDate
+           AND pni.pni_assessment_date < :endDate
+           AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
+         GROUP BY pni.programme_pathway
+     ) AS subquery;
+          """,
+    nativeQuery = true,
+  )
+  fun pniPathwayCounts(startDate: LocalDate, endDate: LocalDate, locationCodes: List<String>?): String?
 }
