@@ -77,17 +77,20 @@ constructor(
     return courseSaved.prerequisites.map { it.toApi() }
   }
 
-  fun createOrUpdateOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
+  fun createOrUpdateOffering(course: CourseEntity, courseOffering: CourseOffering, isCreate: Boolean): CourseOffering {
     val validPrisons = prisonRegisterApiService.getPrisons()
 
     validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
       ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
-    // validate that there isn't already an offering for this course/organisation
+
     val existingOffering =
       offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
-    existingOffering?.let {
-      throw BusinessException("Offering already exists for course ${course.name} and organisation ${it.organisationId}")
+    // validate that there isn't already an offering for this course/organisation
+    when {
+      isCreate && existingOffering != null -> throw BusinessException("Offering already exists for course ${course.name} and organisation ${existingOffering.organisationId}")
+      !isCreate && existingOffering == null -> throw BusinessException("Offering does not exist for course ${course.name} and organisation ${courseOffering.organisationId}")
     }
+
     val offering = OfferingEntity(
       id = courseOffering.id,
       organisationId = courseOffering.organisationId,
