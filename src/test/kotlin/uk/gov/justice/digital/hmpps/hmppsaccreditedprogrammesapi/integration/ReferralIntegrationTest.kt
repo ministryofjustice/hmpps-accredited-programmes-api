@@ -466,7 +466,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     assessedSuitable.hintText shouldBe "This person has been deselected. However, they still meet the suitability criteria and can be considered to join a programme when it runs again."
 
     assessedSuitableNotReady.description shouldBe "Assessed as suitable but not ready"
-    assessedSuitableNotReady.hintText shouldBe "This person meet the suitability criteria but is not ready to start the programme. The referral will be paused until they are ready."
+    assessedSuitableNotReady.hintText shouldBe "This person meets the suitability criteria but is not ready to start the programme. The referral will be paused until they are ready."
   }
 
   @Test
