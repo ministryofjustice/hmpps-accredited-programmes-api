@@ -69,7 +69,7 @@ class CourseController(
   fun addCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
-    return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createOrUpdateOffering(course, courseOffering, true))
+    return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createOffering(course, courseOffering))
   }
 
   @Operation(
@@ -363,7 +363,7 @@ class CourseController(
   fun updateCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
-    return ResponseEntity.ok(courseService.createOrUpdateOffering(course, courseOffering, false))
+    return ResponseEntity.ok(courseService.updateOffering(course, courseOffering))
   }
 
   @Operation(
