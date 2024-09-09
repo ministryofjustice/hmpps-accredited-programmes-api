@@ -67,6 +67,7 @@ data class PniScore(
       "    \"sara\": \"High\"\n" +
       "  }\n",
   )
-  @get:JsonProperty("validationErrors") val validationErrors: List<String>,
   @get:JsonProperty("RiskScore") val riskScore: RiskScore,
+  @Schema(example = "['impulsivity is missing ']", required = true)
+  @get:JsonProperty("validationErrors") val validationErrors: List<String>,
 )
