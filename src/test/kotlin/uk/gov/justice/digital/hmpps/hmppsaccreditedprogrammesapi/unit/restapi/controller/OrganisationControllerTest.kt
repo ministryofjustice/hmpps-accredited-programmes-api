@@ -100,7 +100,7 @@ constructor(
       val code = "WTI"
 
       val enabledOrganisations = listOf(
-        EnabledOrganisationEntityFactory().description(description).code(code)
+        EnabledOrganisationEntityFactory().withDescription(description).withCode(code)
           .produce(),
       )
 

@@ -33,7 +33,7 @@ class EnabledOrganisationsIntegrationTest : IntegrationTestBase() {
     val code = "ONI"
     val desc = "Onley"
 
-    val enabledOrganisation = EnabledOrganisationEntityFactory().code(code).description(desc).produce()
+    val enabledOrganisation = EnabledOrganisationEntityFactory().withCode(code).withDescription(desc).produce()
     enabledOrganisationRepository.save(enabledOrganisation)
 
     val enabledOrganisations = enabledOrganisationService.getEnabledOrganisations()
