@@ -77,7 +77,7 @@ constructor(
     return courseSaved.prerequisites.map { it.toApi() }
   }
 
-  fun createOrUpdateOffering(course: CourseEntity, courseOffering: CourseOffering, isCreate: Boolean): CourseOffering {
+  fun createOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
     val validPrisons = prisonRegisterApiService.getPrisons()
 
     validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
@@ -85,10 +85,11 @@ constructor(
 
     val existingOffering =
       offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
+
     // validate that there isn't already an offering for this course/organisation
-    when {
-      isCreate && existingOffering != null -> throw BusinessException("Offering already exists for course ${course.name} and organisation ${existingOffering.organisationId}")
-      !isCreate && existingOffering == null -> throw BusinessException("Offering does not exist for course ${course.name} and organisation ${courseOffering.organisationId}")
+
+    if (existingOffering != null) {
+      throw BusinessException("Offering already exists for course ${course.name} and organisation ${existingOffering.organisationId}")
     }
 
     val offering = OfferingEntity(
@@ -102,6 +103,34 @@ constructor(
     offering.course = course
 
     return offeringRepository.save(offering).toApi()
+  }
+
+  fun updateOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
+    val validPrisons = prisonRegisterApiService.getPrisons()
+
+    validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
+      ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
+
+    val offeringEntity =
+      (
+        offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
+          ?: throw BusinessException("Offering does not exist for course ${course.name}")
+        )
+
+    // validate that there isn't already an offering for this course/organisation
+
+    val updatedOfferingEntity = course.offerings.find { it.id == courseOffering.id }?.copy(
+      id = courseOffering.id,
+      organisationId = courseOffering.organisationId,
+      contactEmail = courseOffering.contactEmail,
+      secondaryContactEmail = courseOffering.secondaryContactEmail,
+      withdrawn = courseOffering.withdrawn ?: false,
+      referable = courseOffering.referable,
+    )!!
+
+    updatedOfferingEntity.course = course
+
+    return offeringRepository.save(updatedOfferingEntity).toApi()
   }
 
   fun deleteCourseOffering(id: UUID, offeringId: UUID) {
