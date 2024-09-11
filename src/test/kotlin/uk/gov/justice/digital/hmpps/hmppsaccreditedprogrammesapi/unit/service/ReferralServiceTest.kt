@@ -29,7 +29,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.FeatureSwitchService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
@@ -97,6 +99,12 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var pniService: PniService
+
+  @MockK(relaxed = true)
+  private lateinit var featureSwitchService: FeatureSwitchService
+
+  @MockK(relaxed = true)
+  private lateinit var caseNotesApiService: CaseNotesApiService
 
   @InjectMockKs
   private lateinit var referralService: ReferralService

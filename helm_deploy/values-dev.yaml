@@ -22,9 +22,12 @@ generic-service:
     SERVICES_PRISON-REGISTER-API_BASE-URL: https://prison-register-dev.hmpps.service.justice.gov.uk
     SERVICES_OASYS-API_BASE-URL: https://accredited-programmes-and-oasys-dev.hmpps.service.justice.gov.uk
     SERVICES_MANAGE-OFFENCES-API_BASE-URL: https://manage-offences-api-dev.hmpps.service.justice.gov.uk
+    SERVICES_CASE-NOTES-API_BASE-URL: https://dev.offender-case-notes.service.justice.gov.uk
     SENTRY_ENVIRONMENT: dev
     HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-dev-hmpps_audit_queue"
     LOGGING_LEVEL_UK_GOV_JUSTICE_DIGITAL_HMPPS_HMPPSACCREDITEDPROGRAMMESAPI_SERVICE: DEBUG
+    FEATURESWITCH_CASE-NOTES-ENABLED: true
+
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts

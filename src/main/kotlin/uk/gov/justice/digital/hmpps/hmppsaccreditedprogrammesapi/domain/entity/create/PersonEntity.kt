@@ -35,4 +35,6 @@ data class PersonEntity(
 
   var location: String?,
   var gender: String?,
-)
+) {
+  fun fullName() = "$forename $surname"
+}

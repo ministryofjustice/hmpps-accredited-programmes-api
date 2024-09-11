@@ -55,7 +55,7 @@ private const val DEFAULT_SORT = "surname"
   """,
 )
 @Transactional
-class ReferralsController(
+class ReferralController(
   private val referralService: ReferralService,
   private val securityService: SecurityService,
   private val referenceDataService: ReferralReferenceDataService,
