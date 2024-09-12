@@ -22,6 +22,10 @@ class PersonEntityFactory {
   private var location: String = randomAlphanumericString()
   private var gender: String = "Male"
 
+  fun withForename(forename: String) = apply { this.forename = forename }
+  fun withSurname(surname: String) = apply { this.surname = surname }
+  fun withPrisonNumber(prisonNumber: String) = apply { this.prisonNumber = prisonNumber }
+
   fun produce() = PersonEntity(
     id = this.id,
     forename = this.forename,
