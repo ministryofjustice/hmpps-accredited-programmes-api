@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.transaction.Transactional
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -62,6 +63,7 @@ class ReferralController(
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
 ) {
+  private val log = LoggerFactory.getLogger(this::class.java)
 
   @GetMapping("/referrals/{id}/status-transitions", produces = ["application/json"])
   fun getNextStatusTransitions(
@@ -363,7 +365,7 @@ class ReferralController(
       description = "Number of items per page",
       schema = Schema(defaultValue = "10"),
     ) @RequestParam(value = "size", required = false, defaultValue = "10") size: Int,
-    @Parameter(description = "The persons name: forename surname or surname or prison number. Name wll be a case insensitive like search. For example entering John will return people with the forename or surname containing the name john like johnathan. If two names are given then the assumption is that they are forename and surname. And if there is a single term that matches the regex for a prison number then only an exact prison number match will be carried out") @RequestParam(
+    @Parameter(description = "The persons name: forename surname or surname or prison number. Name wll be a case insensitive like search. For example entering John will return people with the forename or surname containing the name john like johnathan. If two names are given then the assumption is that they are forename and surname.Forename and surname could include a comma between them (John,Smith) And if there is a single term that matches the regex for a prison number then only an exact prison number match will be carried out") @RequestParam(
       value = "nameOrId",
       required = false,
     ) nameOrId: String?,
@@ -419,8 +421,8 @@ class ReferralController(
     )
   }
 
-  private fun parseNameOrId(nameOrId: String?): NameOrIdSearch {
-    val terms = nameOrId?.uppercase()?.split(" ") ?: return NameOrIdSearch()
+  fun parseNameOrId(nameOrId: String?): NameOrIdSearch {
+    val terms = nameOrId?.uppercase()?.split(",", " ")?.filter { it.trim().isNotEmpty() } ?: return NameOrIdSearch()
 
     return when {
       terms.size == 1 -> {
@@ -482,7 +484,7 @@ class ReferralController(
       description = "The organisationId of an organisation",
       required = true,
     ) @PathVariable("organisationId") organisationId: String,
-    @Parameter(description = "The persons name: forename surname or surname or prison number. Name wll be a case insensitive like search. For example entering John will return people with the forename or surname containing the name john like johnathan. If two names are given then the assumption is that they are forename and surname. And if there is a single term that matches the regex for a prison number then only an exact prison number match will be carried out") @RequestParam(
+    @Parameter(description = "The persons name: forename surname or surname or prison number. Name wll be a case insensitive like search. For example entering John will return people with the forename or surname containing the name john like johnathan. If two names are given then the assumption is that they are forename and surname.Forename and surname could include a comma between them (John,Smith) And if there is a single term that matches the regex for a prison number then only an exact prison number match will be carried out") @RequestParam(
       value = "nameOrId",
       required = false,
     ) nameOrId: String?,
