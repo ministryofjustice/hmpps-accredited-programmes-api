@@ -1,10 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
@@ -19,7 +17,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.A
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Health
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Lifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Psychiatric
@@ -102,16 +99,6 @@ fun OasysAttitude.toModel() = Attitude(
   proCriminalAttitudes = proCriminalAttitudes,
   motivationToAddressBehaviour = motivationToAddressBehaviour,
   hostileOrientation = hostileOrientation,
-)
-
-fun learningNeeds(oasysAccommodation: OasysAccommodation?, oasysLearning: OasysLearning?) = LearningNeeds(
-  noFixedAbodeOrTransient = oasysAccommodation?.noFixedAbodeOrTransient == YES,
-  workRelatedSkills = oasysLearning?.workRelatedSkills,
-  problemsReadWriteNum = oasysLearning?.problemsReadWriteNum,
-  learningDifficulties = oasysLearning?.learningDifficulties,
-  qualifications = oasysLearning?.qualifications,
-  basicSkillsScore = oasysLearning?.basicSkillsScore,
-  basicSkillsScoreDescription = oasysLearning?.eTEIssuesDetails,
 )
 
 fun risks(
