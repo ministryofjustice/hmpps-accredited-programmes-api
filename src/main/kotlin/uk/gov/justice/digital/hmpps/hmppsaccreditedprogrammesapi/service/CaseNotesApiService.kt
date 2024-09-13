@@ -12,9 +12,15 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.getByCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import java.time.LocalDateTime
+
+private const val ACP_USER = "Accredited Programmes automated case note"
+
+private const val ACP_TYPE = "ACP"
 
 @Service
 @Transactional
@@ -23,6 +29,7 @@ class CaseNotesApiService(
   private val featureSwitchService: FeatureSwitchService,
   private val personService: PersonService,
   private val organisationRepository: OrganisationRepository,
+  private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
 ) {
   companion object {
@@ -49,14 +56,16 @@ class CaseNotesApiService(
   fun buildAndCreateCaseNote(referral: ReferralEntity, referralStatusUpdate: ReferralStatusUpdate) {
     try {
       if (featureSwitchService.isCaseNotesEnabled()) {
-        val person = personService.getPerson(referral.prisonNumber)
-        val message = buildMessage(person, referral, referralStatusUpdate)
+        val person = personService.getPerson(referral.prisonNumber)!!
+        val referralStatusEntity = referralStatusRepository.getByCode(referralStatusUpdate.status)
+        val message = buildMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
+        log.warn("************* caseNoteMessage: $message")
         val createdCaseNote = createCaseNote(
           CaseNoteRequest(
-            type = "ACP",
-            subType = "REFD",
+            type = ACP_TYPE,
+            subType = referralStatusEntity.caseNotesSubtype,
             occurrenceDateTime = LocalDateTime.now().toString(),
-            authorName = "Accredited Programmes automated case note",
+            authorName = ACP_USER,
             text = message,
           ),
           referral.prisonNumber,
@@ -69,19 +78,20 @@ class CaseNotesApiService(
     }
   }
 
-  private fun buildMessage(
+  fun buildMessage(
     person: PersonEntity?,
     referral: ReferralEntity,
     referralStatusUpdate: ReferralStatusUpdate,
+    message: String,
   ): String {
-    log.warn("Request received for creating case notes :${referral.id} $referralStatusUpdate")
+    log.info("Request received for creating case notes :${referral.id} $referralStatusUpdate")
     val course = referral.offering.course
     val orgName = organisationRepository.findOrganisationEntityByCode(referral.offering.organisationId)?.name
+    val progDescMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n"
 
-    val customMessage =
-      "Referral to ${course.name}: ${course.audience} strand at $orgName \n" +
-        "${person?.fullName()} has been referred to ${course.name} : ${course.audience}.\n"
-
+    val prisonerName = person?.fullName().orEmpty()
+    val pgmNameAndStrand = "${course.name} : ${course.audience}"
+    val customMessage = message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", pgmNameAndStrand) + "\n"
     val details = referralStatusUpdate.notes?.trim()?.let { "Details: ${referralStatusUpdate.notes} \n" }.orEmpty()
 
     val reasonForClosingReferral =
@@ -92,6 +102,6 @@ class CaseNotesApiService(
         ""
       }
 
-    return customMessage + reasonForClosingReferral + details
+    return progDescMessage + customMessage + reasonForClosingReferral + details
   }
 }
