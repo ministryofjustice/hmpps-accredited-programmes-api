@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
@@ -73,6 +74,8 @@ class PniService(
     // section 12
     val attitude = oasysService.getAttitude(assessmentId)
 
+    val learning = oasysService.getLearning(assessmentId)
+
     // risks
     val oasysOffendingInfo = oasysService.getOffendingInfo(assessmentId)
     val oasysRiskPredictor = oasysService.getRiskPredictors(assessmentId)
@@ -104,13 +107,18 @@ class PniService(
     )
 
     if (savePni) {
-      pniResultEntityRepository.save(buildEntity(pniScore, assessmentIdDate, referralId))
+      pniResultEntityRepository.save(buildEntity(pniScore, assessmentIdDate, referralId, learning))
     }
 
     return pniScore
   }
 
-  private fun buildEntity(pniScore: PniScore, assessmentIdDate: Pair<Long, LocalDateTime?>, referralId: UUID?): PniResultEntity {
+  private fun buildEntity(
+    pniScore: PniScore,
+    assessmentIdDate: Pair<Long, LocalDateTime?>,
+    referralId: UUID?,
+    learning: OasysLearning?,
+  ): PniResultEntity {
     return PniResultEntity(
       crn = pniScore.crn,
       prisonNumber = pniScore.prisonNumber,
@@ -124,6 +132,7 @@ class PniService(
       pniValid = pniScore.validationErrors.isEmpty(),
       pniResultJson = objectMapper.writeValueAsString(pniScore),
       pniAssessmentDate = LocalDateTime.now(),
+      basicSkillsScore = learning?.basicSkillsScore?.toInt(),
     )
   }
 
