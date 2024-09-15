@@ -43,6 +43,7 @@ class PniService(
   private val pniRuleRepository: PniRuleRepository,
   private val pniResultEntityRepository: PNIResultEntityRepository,
   private val objectMapper: ObjectMapper,
+  private val peopleSearchApiService: PeopleSearchApiService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -110,7 +111,11 @@ class PniService(
     return pniScore
   }
 
-  private fun buildEntity(pniScore: PniScore, assessmentIdDate: Pair<Long, LocalDateTime?>, referralId: UUID?): PniResultEntity {
+  private fun buildEntity(
+    pniScore: PniScore,
+    assessmentIdDate: Pair<Long, LocalDateTime?>,
+    referralId: UUID?,
+  ): PniResultEntity {
     return PniResultEntity(
       crn = pniScore.crn,
       prisonNumber = pniScore.prisonNumber,
@@ -132,23 +137,28 @@ class PniService(
     overallRiskScore: RiskScore,
     prisonNumber: String,
   ): String {
-    val programmePathway = getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
-      ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
-        overallNeedsScore.classification,
-        overallRiskScore.classification,
-      )?.combinedPathway
-      ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
+    val programmePathway =
+      getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
+        ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
+          overallNeedsScore.classification,
+          overallRiskScore.classification,
+        )?.combinedPathway
+        ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
 
     log.info("Programme pathway for $prisonNumber: ${overallNeedsScore.classification} + ${overallRiskScore.classification}  -> $programmePathway")
 
     return programmePathway
   }
 
-  private fun getPathwayAfterApplyingExceptionRules(needsClassification: String, individualRiskScores: IndividualRiskScores): String? {
+  private fun getPathwayAfterApplyingExceptionRules(
+    needsClassification: String,
+    individualRiskScores: IndividualRiskScores,
+  ): String? {
     return when {
       pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> HIGH_INTENSITY_BC
       needsClassification == NeedsClassification.LOW_NEED.name &&
         (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MEDIUM_INTENSITY_BC
+
       else -> null
     }
   }
@@ -166,6 +176,46 @@ class PniService(
     rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
     sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
   )
+
+  fun getPniReport(prisonIds: List<String>): String {
+    val prisoners = peopleSearchApiService.getPrisoners(prisonIds)
+
+    val pniResults = mutableListOf<PniScore>()
+    var failures = mutableMapOf<String, String>()
+    prisoners.map {
+      try {
+        pniResults.add(getPniScore(it.prisonerNumber, it.gender))
+      } catch (ex: Exception) {
+        failures[it.prisonerNumber] = ex.message.orEmpty()
+        log.warn("PNI result could not be computed for ${it.prisonerNumber}")
+      }
+    }
+
+    val sb = StringBuilder()
+    val associateBy = pniResults.groupingBy { it.programmePathway }.eachCount()
+    val groupedByProgrammePathway = pniResults.groupBy { it.programmePathway }
+
+    // Process each group and count needs based on overAllSexDomainScore
+    groupedByProgrammePathway.forEach { (programmePathway, programmeResults) ->
+
+      sb.append("$programmePathway count ${associateBy[programmePathway]} \n")
+
+      val needCounts = programmeResults.groupingBy {
+        when (it.needsScore.domainScore.sexDomainScore.overAllSexDomainScore) {
+          0 -> "Low sex Need"
+          1 -> "Moderate sex Need"
+          2 -> "High sex Need"
+          else -> "Unknown"
+        }
+      }.eachCount()
+
+      needCounts.forEach { (needType, count) ->
+        sb.append("\n $needType - $count")
+      }
+    }
+    sb.append("\n Failure count ${failures.size} \n $failures")
+    return sb.toString()
+  }
 }
 
 private fun buildNeedsScores(

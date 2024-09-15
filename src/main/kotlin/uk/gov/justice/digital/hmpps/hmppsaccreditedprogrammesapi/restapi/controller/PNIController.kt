@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -54,5 +55,28 @@ class PNIController(
         referralId = referralId,
       ),
     )
+  }
+
+  @Operation(
+    tags = ["PNI"],
+    summary = "Get needs and risk data for prisoner",
+    operationId = "getPNIByPrisonNumber",
+    description = """Get needs (sex, cognitive, relationships & Self Management) and risk data for given prisoner""",
+    responses = [
+      ApiResponse(responseCode = "200", description = "successful operation", content = [Content(schema = Schema(implementation = PniScore::class))]),
+      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access person.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "Invalid prison number", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    ],
+  )
+  @RequestMapping(
+    method = [RequestMethod.POST],
+    value = ["/PNI/report"],
+    produces = ["application/json"],
+  )
+  fun getPNIByPrisonNumbers(
+    @Parameter(description = "", required = true) @RequestBody prisonIds: List<String>,
+  ): ResponseEntity<String> {
+    return ResponseEntity.ok(pniService.getPniReport(prisonIds))
   }
 }
