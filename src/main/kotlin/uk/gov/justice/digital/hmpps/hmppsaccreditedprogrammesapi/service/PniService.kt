@@ -32,7 +32,7 @@ import java.util.UUID
 
 private const val HIGH_INTENSITY_BC = "HIGH_INTENSITY_BC"
 
-private const val MEDIUM_INTENSITY_BC = "MEDIUM_INTENSITY_BC"
+private const val MODERATE_INTENSITY_BC = "MODERATE_INTENSITY_BC"
 
 @Service
 class PniService(
@@ -148,7 +148,7 @@ class PniService(
     return when {
       pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> HIGH_INTENSITY_BC
       needsClassification == NeedsClassification.LOW_NEED.name &&
-        (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MEDIUM_INTENSITY_BC
+        (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MODERATE_INTENSITY_BC
       else -> null
     }
   }

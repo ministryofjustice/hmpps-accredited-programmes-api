@@ -13,9 +13,6 @@ data class PniScore(
   @get:JsonProperty("programmePathway") val programmePathway: String,
   @Schema(
     example = "{\n" +
-      "  \"prisonNumber\": \"A1234BC\",\n" +
-      "  \"crn\": \"X739590\",\n" +
-      "  \"assessmentId\": 2114584,\n" +
       "  \"needsScore\": {\n" +
       "    \"overallNeedsScore\": 6,\n" +
       "    \"domainScore\": {\n" +

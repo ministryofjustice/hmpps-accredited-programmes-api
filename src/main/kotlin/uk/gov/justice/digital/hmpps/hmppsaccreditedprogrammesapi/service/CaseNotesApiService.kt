@@ -58,8 +58,7 @@ class CaseNotesApiService(
       if (featureSwitchService.isCaseNotesEnabled()) {
         val person = personService.getPerson(referral.prisonNumber)!!
         val referralStatusEntity = referralStatusRepository.getByCode(referralStatusUpdate.status)
-        val message = buildMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
-        log.warn("************* caseNoteMessage: $message")
+        val message = buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
         val createdCaseNote = createCaseNote(
           CaseNoteRequest(
             type = ACP_TYPE,
@@ -78,7 +77,7 @@ class CaseNotesApiService(
     }
   }
 
-  fun buildMessage(
+  fun buildCaseNoteMessage(
     person: PersonEntity?,
     referral: ReferralEntity,
     referralStatusUpdate: ReferralStatusUpdate,
@@ -87,7 +86,7 @@ class CaseNotesApiService(
     log.info("Request received for creating case notes :${referral.id} $referralStatusUpdate")
     val course = referral.offering.course
     val orgName = organisationRepository.findOrganisationEntityByCode(referral.offering.organisationId)?.name
-    val progDescMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n"
+    val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n"
 
     val prisonerName = person?.fullName().orEmpty()
     val pgmNameAndStrand = "${course.name} : ${course.audience}"
@@ -102,6 +101,6 @@ class CaseNotesApiService(
         ""
       }
 
-    return progDescMessage + customMessage + reasonForClosingReferral + details
+    return programmeDescriptionMessage + customMessage + reasonForClosingReferral + details
   }
 }
