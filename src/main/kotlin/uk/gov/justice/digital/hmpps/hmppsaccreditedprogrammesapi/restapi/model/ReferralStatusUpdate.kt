@@ -13,18 +13,18 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 data class ReferralStatusUpdate(
 
-  @Schema(example = "null", required = true, description = "")
+  @Schema(example = "ON_HOLD_REFERRAL_SUBMITTED", required = true, description = "")
   @get:JsonProperty("status", required = true) val status: String,
 
-  @Schema(example = "null", description = "")
+  @Schema(example = "W_ADMIN", description = "")
   @get:JsonProperty("category") val category: String? = null,
 
-  @Schema(example = "null", description = "")
+  @Schema(example = "Duplicate referral", description = "")
   @get:JsonProperty("reason") val reason: String? = null,
 
-  @Schema(example = "null", description = "")
+  @Schema(example = "E2E test put on hold reason", description = "")
   @get:JsonProperty("notes") val notes: String? = null,
 
-  @Schema(example = "null", description = "is the user a pt user")
+  @Schema(example = "false", description = "is the user a pt user")
   @get:JsonProperty("ptUser") val ptUser: Boolean? = false,
 )
