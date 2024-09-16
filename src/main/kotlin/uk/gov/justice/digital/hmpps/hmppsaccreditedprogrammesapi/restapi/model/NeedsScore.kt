@@ -12,7 +12,7 @@ data class NeedsScore(
   @get:JsonProperty("classification") val classification: String,
   @Schema(example = "5", required = true)
   @get:JsonProperty("DomainScore") val domainScore: DomainScore,
-  ) {
+) {
   fun validate() =
     listOf(
       domainScore.thinkingDomainScore.isAllValuesPresent(),
