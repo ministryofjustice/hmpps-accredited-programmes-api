@@ -50,6 +50,7 @@ class PniIntegrationTest :
     programmePathway = "HIGH_INTENSITY_BC",
     needsScore = NeedsScore(
       overallNeedsScore = 6,
+      basicSkillsScore = 33,
       classification = "HIGH_NEED",
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(

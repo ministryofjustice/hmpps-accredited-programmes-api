@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class NeedsScore(
   @Schema(example = "5", required = true)
   @get:JsonProperty("overallNeedsScore") val overallNeedsScore: Int,
+  @Schema(example = "6")
+  @get:JsonProperty("basicSkillsScore") val basicSkillsScore: Int?,
   @Schema(example = "High Intensity BC", required = true)
   @get:JsonProperty("classification") val classification: String,
   @Schema(example = "5", required = true)
   @get:JsonProperty("DomainScore") val domainScore: DomainScore,
-) {
+  ) {
   fun validate() =
     listOf(
       domainScore.thinkingDomainScore.isAllValuesPresent(),

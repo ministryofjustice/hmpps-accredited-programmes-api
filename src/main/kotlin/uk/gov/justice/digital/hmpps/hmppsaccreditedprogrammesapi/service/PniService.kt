@@ -85,7 +85,7 @@ class PniService(
       individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships),
     )
 
-    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber, gender)
+    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber, gender, learning?.basicSkillsScore?.toInt())
 
     log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
 
