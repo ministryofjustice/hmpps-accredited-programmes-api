@@ -64,6 +64,8 @@ services:
     base-url: http://localhost:#WIREMOCK_PORT
   case-notes-api:
     base-url: http://localhost:#WIREMOCK_PORT
+  manage-users-api:
+    base-url: http://localhost:#WIREMOCK_PORT
 
 feature-switch:
   case-notes-enabled: true
