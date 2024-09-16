@@ -214,6 +214,10 @@ class PniService(
       }
     }
     sb.append("\n Failure count ${failures.size} \n $failures")
+    println("******************************")
+    log.warn(sb.toString())
+    println("******************************")
+
     return sb.toString()
   }
 }
