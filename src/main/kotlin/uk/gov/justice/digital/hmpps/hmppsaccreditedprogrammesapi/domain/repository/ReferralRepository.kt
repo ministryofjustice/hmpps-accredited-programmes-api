@@ -23,4 +23,14 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
   ): List<ReferralEntity>
 
   fun countAllByOfferingId(id: UUID): Long
+
+  @EntityGraph(attributePaths = ["offering", "offering.course", "referrer"])
+  @Query(
+    """
+        SELECT r FROM ReferralEntity r
+        WHERE r.prisonNumber = :prisonerNumber
+        AND r.offering.id = :offeringId
+        """,
+  )
+  fun getReferralEntityByOfferingIdAndPrisonNumber(offeringId: UUID, prisonerNumber: String): ReferralEntity?
 }

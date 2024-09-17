@@ -22,8 +22,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusHistory
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -101,7 +101,7 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
-    referralId = referralCreated.referralId
+    referralId = referralCreated.id
 
     referrerUserRepository.save(ReferrerUserEntity("UNKNOWN_USER"))
 
@@ -156,12 +156,6 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
       .expectBody<List<ReferralStatusHistory>>()
       .returnResult().responseBody!!
 
-  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): ReferralCreated {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    return createReferral(offering.id, prisonNumber)
-  }
-
   fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
     webTestClient
       .post()
@@ -177,6 +171,6 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
       )
       .exchange()
       .expectStatus().isCreated
-      .expectBody<ReferralCreated>()
+      .expectBody<Referral>()
       .returnResult().responseBody!!
 }

@@ -59,14 +59,13 @@ class PniNeedsEngine(
   }
 
   fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, prisonerGender: String?): Int {
-    val gender = getGenderOfPrisoner(prisonNumber, prisonerGender)
-
     val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
 
     if (individualSexScores.isAllValuesPresent()) {
       return individualSexScores.overallSexDomainScore(individualSexScores.totalScore())
     }
 
+    val gender = getGenderOfPrisoner(prisonNumber, prisonerGender)
     val individualRiskScores = individualNeedsAndRiskScores.individualRiskScores
     if (gender.equals("Male", ignoreCase = true) &&
       (individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true || individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true)

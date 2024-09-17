@@ -55,7 +55,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreated
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
@@ -151,10 +150,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     personEntity.forename.shouldBeEqual(PRISONER_1.firstName)
     personEntity.location.shouldNotBeNull()
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
 
-    getReferralById(referralCreated.referralId) shouldBeEqual Referral(
-      id = referralCreated.referralId,
+    getReferralById(referralCreated.id) shouldBeEqual Referral(
+      id = referralCreated.id,
       offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
@@ -169,17 +168,28 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     )
 
     val auditEntity = auditRepository.findAll()
-      .firstOrNull { it.prisonNumber == PRISON_NUMBER_1 && it.referralId == referralCreated.referralId }
+      .firstOrNull { it.prisonNumber == PRISON_NUMBER_1 && it.referralId == referralCreated.id }
 
     auditEntity shouldNotBe null
 
     // check the referral status is as expected
     val referralHistories =
-      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.id)
     referralHistories.size shouldBeGreaterThan 0
 
     val referralHistory = referralHistories[0]
     referralHistory.status.code shouldBeEqual "REFERRAL_STARTED"
+  }
+
+  @Test
+  fun `Creating a referral which already exists results in conflict 409 response`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
+
+    createDuplicateReferralResultsInConflict(offering.id!!, PRISON_NUMBER_1)
   }
 
   @Test
@@ -190,10 +200,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id!!)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
 
-    getReferralById(referralCreated.referralId) shouldBeEqual Referral(
-      id = referralCreated.referralId,
+    getReferralById(referralCreated.id) shouldBeEqual Referral(
+      id = referralCreated.id,
       offeringId = offering.id!!,
       referrerUsername = "NONEXISTENT_USER",
       prisonNumber = PRISON_NUMBER_1,
@@ -208,7 +218,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     )
 
     val auditEntity = auditRepository.findAll()
-      .firstOrNull { it.prisonNumber == PRISON_NUMBER_1 && it.referralId == referralCreated.referralId }
+      .firstOrNull { it.prisonNumber == PRISON_NUMBER_1 && it.referralId == referralCreated.id }
 
     auditEntity shouldNotBe null
   }
@@ -226,10 +236,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = true,
     )
 
-    updateReferral(referralCreated.referralId, referralUpdate)
+    updateReferral(referralCreated.id, referralUpdate)
 
-    getReferralById(referralCreated.referralId) shouldBeEqual Referral(
-      id = referralCreated.referralId,
+    getReferralById(referralCreated.id) shouldBeEqual Referral(
+      id = referralCreated.id,
       offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
@@ -272,10 +282,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = REFERRAL_SUBMITTED,
     )
 
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate)
 
-    getReferralById(referralCreated.referralId) shouldBeEqual Referral(
-      id = referralCreated.referralId,
+    getReferralById(referralCreated.id) shouldBeEqual Referral(
+      id = referralCreated.id,
       offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
@@ -297,10 +307,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = REFERRAL_SUBMITTED,
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
 
     val statusHistory1 =
-      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.id)
     statusHistory1.size shouldBeEqual 2
     statusHistory1[0].status.code shouldBeEqual REFERRAL_SUBMITTED
     statusHistory1[1].status.code shouldBeEqual REFERRAL_STARTED
@@ -311,10 +321,10 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       reason = "W_DUPLICATE",
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate2)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
 
     val statusHistory2 =
-      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.id)
     statusHistory2.size shouldBeEqual 3
     statusHistory2[0].status.code shouldBeEqual REFERRAL_WITHDRAWN
     statusHistory2[0].category!!.code shouldBeEqual "W_ADMIN"
@@ -334,9 +344,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = REFERRAL_SUBMITTED,
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
 
-    val statuses = getReferralTransitions(referralCreated.referralId)
+    val statuses = getReferralTransitions(referralCreated.id)
     statuses.size shouldBeEqual 2
 
     val withdrawnStatus = ReferralStatusRefData(
@@ -375,7 +385,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   fun `Get referral confirmation text`() {
     val referralCreated = createReferral(PRISON_NUMBER_1)
 
-    val confirmationFields = getConfirmationText(referralCreated.referralId, "ON_HOLD_REFERRAL_SUBMITTED")
+    val confirmationFields = getConfirmationText(referralCreated.id, "ON_HOLD_REFERRAL_SUBMITTED")
 
     confirmationFields.warningText shouldBe "Submitting this will pause the referral."
   }
@@ -388,21 +398,21 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = REFERRAL_SUBMITTED,
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
     val referralStatusUpdate2 = ReferralStatusUpdate(
       status = "AWAITING_ASSESSMENT",
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate2)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
 
     val referralStatusUpdate3 = ReferralStatusUpdate(
       status = "ASSESSMENT_STARTED",
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate3)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
 
     val confirmationFields = getConfirmationText(
-      referralId = referralCreated.referralId,
+      referralId = referralCreated.id,
       chosenStatusCode = "SUITABLE_NOT_READY",
       ptUser = true,
     )
@@ -420,32 +430,32 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = REFERRAL_SUBMITTED,
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate1)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
     val referralStatusUpdate2 = ReferralStatusUpdate(
       status = "AWAITING_ASSESSMENT",
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate2)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
 
     val referralStatusUpdate3 = ReferralStatusUpdate(
       status = "ASSESSMENT_STARTED",
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate3)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
 
     val referralStatusUpdate4 = ReferralStatusUpdate(
       status = "ASSESSED_SUITABLE",
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate4)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate4)
 
     val referralStatusUpdate5 = ReferralStatusUpdate(
       status = "ON_PROGRAMME",
       ptUser = true,
     )
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate5)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate5)
 
-    val statuses = getReferralTransitions(referralCreated.referralId, true)
+    val statuses = getReferralTransitions(referralCreated.id, true)
 
     val statusDescriptions = statuses.map {
       it.description
@@ -458,7 +468,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     )
 
     // check that the follow on statuses are correct and that the alternative descriptions and hint text have been set
-    val deselectStatuses = getReferralTransitions(referralCreated.referralId, ptUser = true, deselectAndKeepOpen = true)
+    val deselectStatuses = getReferralTransitions(referralCreated.id, ptUser = true, deselectAndKeepOpen = true)
     val assessedSuitable = deselectStatuses.first { it.code == "ASSESSED_SUITABLE" }
     val assessedSuitableNotReady = deselectStatuses.first { it.code == "SUITABLE_NOT_READY" }
 
@@ -479,21 +489,21 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = true,
     )
 
-    updateReferral(referralCreated.referralId, referralUpdate)
-    val readyToSubmitReferral = getReferralById(referralCreated.referralId)
+    updateReferral(referralCreated.id, referralUpdate)
+    val readyToSubmitReferral = getReferralById(referralCreated.id)
 
     submitReferral(readyToSubmitReferral.id)
 
     getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED.lowercase()
 
     val statusHistories =
-      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.referralId)
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.id)
     statusHistories.size shouldBeEqual 2
     statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
     statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
 
     // check for PNI
-    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.referralId, PRISON_NUMBER_1) shouldNotBe null
+    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldNotBe null
   }
 
   @Test
@@ -507,11 +517,29 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNotFound
   }
 
-  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): ReferralCreated {
+  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): Referral {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     return createReferral(offering.id, prisonNumber)
   }
+
+  fun createDuplicateReferralResultsInConflict(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
+    webTestClient
+      .post()
+      .uri("/referrals")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        ReferralCreate(
+          offeringId = offeringId!!,
+          prisonNumber = prisonNumber,
+        ),
+      )
+      .exchange()
+      .expectStatus().is4xxClientError
+      .expectBody<Referral>()
+      .returnResult().responseBody!!
 
   fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
     webTestClient
@@ -528,7 +556,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       )
       .exchange()
       .expectStatus().isCreated
-      .expectBody<ReferralCreated>()
+      .expectBody<Referral>()
       .returnResult().responseBody!!
 
   fun getReferralById(createdReferralId: UUID) =
@@ -581,9 +609,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     val statusFilter = listOf(createdReferral.status)
@@ -659,9 +687,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusGroupFilter = "open")
@@ -705,9 +733,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     var summary = getReferralViewsByOrganisationId(
@@ -759,9 +787,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, nameOrId = "A1234BB")
@@ -805,9 +833,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, nameOrId = "STEVO")
@@ -851,9 +879,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, nameOrId = "STEVO MCSTEVO")
@@ -897,9 +925,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     val statusFilter = listOf(createdReferral.status)
@@ -916,9 +944,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     val statusFilter = listOf(createdReferral.status)
@@ -1017,7 +1045,17 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offering = getAllOfferingsForCourse(course.id).first()
 
     repeat(21) {
-      createReferral(offering.id, PRISON_NUMBER_1)
+      val courseId = UUID.randomUUID().toString()
+      val offeringId = UUID.randomUUID().toString()
+      createCourse(
+        courseId = courseId,
+        identifier = getRandomString(2),
+        courseName = getRandomString(10),
+        description = getRandomString(50),
+      )
+
+      createOffering(courseId = UUID.fromString(courseId), offeringId = UUID.fromString(offeringId), orgId = ORGANISATION_ID_MDI)
+      createReferral(offeringId = UUID.fromString(offeringId), PRISON_NUMBER_1)
     }
 
     val summaryPage0 =
@@ -1120,11 +1158,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       status = REFERRAL_SUBMITTED,
     )
 
-    updateReferralStatus(referralCreated.referralId, referralStatusUpdate)
+    updateReferralStatus(referralCreated.id, referralStatusUpdate)
 
     webTestClient
       .delete()
-      .uri("/referrals/${referralCreated.referralId}")
+      .uri("/referrals/${referralCreated.id}")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .exchange().expectStatus().isBadRequest
   }
@@ -1138,7 +1176,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val createdReferral = createReferral(offering.id, PRISON_NUMBER_1)
 
     val referralHistories =
-      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(createdReferral.referralId)
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(createdReferral.id)
     referralHistories.shouldNotBeEmpty()
     referralHistories.size shouldBe 1
     referralHistories[0].status.code.shouldBeEqual("REFERRAL_STARTED")
@@ -1146,7 +1184,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     webTestClient
       .delete()
-      .uri("/referrals/${createdReferral.referralId}")
+      .uri("/referrals/${createdReferral.id}")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .exchange().expectStatus().isNoContent
 
@@ -1154,7 +1192,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val auditEntity = auditRepository.findAll()
       .filter {
         it.prisonNumber == PRISON_NUMBER_1 &&
-          it.referralId == createdReferral.referralId &&
+          it.referralId == createdReferral.id &&
           it.auditAction == AuditAction.DELETE_REFERRAL.name &&
           it.auditDateTime.isAfter(twoSecondsAgo)
       }
@@ -1214,11 +1252,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
 
-    deleteReferral(referralCreated.referralId)
+    deleteReferral(referralCreated.id)
 
     webTestClient
       .get()
-      .uri("/referrals/${referralCreated.referralId}")
+      .uri("/referrals/${referralCreated.id}")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -1241,5 +1279,34 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .exchange()
       .expectStatus().isNoContent
+  }
+
+  fun createCourse(courseId: String, identifier: String, courseName: String, description: String, altName: String = "", audience: String = "General offence") {
+    persistenceHelper.createCourse(
+      UUID.fromString(courseId),
+      identifier,
+      courseName,
+      description,
+      altName,
+      audience,
+    )
+  }
+
+  fun createOffering(offeringId: UUID, courseId: UUID, orgId: String) {
+    persistenceHelper.createOffering(
+      offeringId,
+      courseId,
+      orgId,
+      "nobody-bwn@digital.justice.gov.uk",
+      "nobody2-bwn@digital.justice.gov.uk",
+      true,
+    )
+  }
+
+  fun getRandomString(length: Int): String {
+    val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+    return (1..length)
+      .map { allowedChars.random() }
+      .joinToString("")
   }
 }
