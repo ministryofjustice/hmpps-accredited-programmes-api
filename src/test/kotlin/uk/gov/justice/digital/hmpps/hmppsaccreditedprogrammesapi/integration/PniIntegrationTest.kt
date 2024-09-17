@@ -50,6 +50,7 @@ class PniIntegrationTest :
     programmePathway = "HIGH_INTENSITY_BC",
     needsScore = NeedsScore(
       overallNeedsScore = 6,
+      basicSkillsScore = 33,
       classification = "HIGH_NEED",
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(
@@ -103,18 +104,22 @@ class PniIntegrationTest :
 
   @Test
   fun `Save pni info for prisoner successful`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
+    // When
     getPniInfoByPrisonNumberAndSave(prisonNumber)
-    val results = pniResultEntityRepository.findAllByPrisonNumber(prisonNumber)
-    results[0].prisonNumber shouldBe prisonNumber
-    results[0].crn shouldBe pniScore(prisonNumber).crn
-    results[0].needsClassification shouldBe pniScore(prisonNumber).needsScore.classification
-    results[0].overallNeedsScore shouldBe pniScore(prisonNumber).needsScore.overallNeedsScore
-    results[0].programmePathway shouldBe pniScore(prisonNumber).programmePathway
-    results[0].riskClassification shouldBe pniScore(prisonNumber).riskScore.classification
-    results[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore(prisonNumber))
-    results[0].pniValid shouldBe false
+    // Then
+    val pniResults = pniResultEntityRepository.findAllByPrisonNumber(prisonNumber)
+    pniResults[0].prisonNumber shouldBe prisonNumber
+    pniResults[0].crn shouldBe pniScore(prisonNumber).crn
+    pniResults[0].needsClassification shouldBe pniScore(prisonNumber).needsScore.classification
+    pniResults[0].overallNeedsScore shouldBe pniScore(prisonNumber).needsScore.overallNeedsScore
+    pniResults[0].programmePathway shouldBe pniScore(prisonNumber).programmePathway
+    pniResults[0].riskClassification shouldBe pniScore(prisonNumber).riskScore.classification
+    pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore(prisonNumber))
+    pniResults[0].pniValid shouldBe false
+    pniResults[0].basicSkillsScore shouldBe 33
   }
 
   fun getPniInfoByPrisonNumber(prisonNumber: String) =

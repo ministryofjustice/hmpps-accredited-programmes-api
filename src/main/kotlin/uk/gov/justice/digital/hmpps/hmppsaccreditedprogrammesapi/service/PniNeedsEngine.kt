@@ -23,6 +23,7 @@ class PniNeedsEngine(
     individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
     prisonNumber: String,
     gender: String?,
+    basicSkillsScore: Int?,
   ): NeedsScore {
     val sexDomainScore = getSexDomainScore(individualNeedsAndRiskScores, prisonNumber, gender)
     val individualNeedsScores = individualNeedsAndRiskScores.individualNeedsScores
@@ -53,6 +54,7 @@ class PniNeedsEngine(
           individualSelfManagementScores = individualNeedsScores.individualSelfManagementScores,
         ),
       ),
+      basicSkillsScore = basicSkillsScore,
     )
   }
 

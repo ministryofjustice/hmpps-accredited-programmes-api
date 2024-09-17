@@ -36,4 +36,6 @@ data class PniResultEntity(
   val pniValid: Boolean,
   @Column
   val pniResultJson: String?,
+  @Column
+  val basicSkillsScore: Int?,
 )
