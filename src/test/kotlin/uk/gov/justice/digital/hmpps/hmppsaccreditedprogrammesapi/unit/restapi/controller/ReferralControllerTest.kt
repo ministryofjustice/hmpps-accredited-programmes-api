@@ -6,9 +6,12 @@ import io.kotest.matchers.shouldBe
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.mockk
 import io.mockk.verify
 import jakarta.validation.ValidationException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -28,9 +31,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -330,5 +336,22 @@ constructor(
 
     verify { referralService.getReferralById(referral.id!!) }
     verify { referralService.submitReferralById(referral.id!!) }
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = ["Del Hatton", "Del,Hatton", "Del, Hatton"])
+  fun `search by name with comma works as expected`(nameSearch: String) {
+    val referralService: ReferralService = mockk()
+    val securityService: SecurityService = mockk()
+    val referenceDataService: ReferralReferenceDataService = mockk()
+    val referralStatusHistoryService: ReferralStatusHistoryService = mockk()
+    val auditService: AuditService = mockk()
+
+    val referralController = ReferralController(referralService, securityService, referenceDataService, referralStatusHistoryService, auditService)
+
+    val parseNameOrId = referralController.parseNameOrId(nameSearch)
+    parseNameOrId.forename shouldBe "DEL"
+    parseNameOrId.surname shouldBe "HATTON"
+    parseNameOrId.surnameOnly shouldBe ""
   }
 }

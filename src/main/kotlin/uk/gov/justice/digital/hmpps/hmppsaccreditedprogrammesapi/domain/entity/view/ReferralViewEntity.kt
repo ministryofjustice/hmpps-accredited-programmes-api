@@ -52,11 +52,14 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
         AND (:status IS NULL OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
-         AND (:prisonNumber IS NULL  OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
-        AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%')
-                                  OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
-        AND (:forename IS NULL OR :forename = ''  OR r.forename LIKE CONCAT('%', :forename, '%'))
-        AND (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%'))
+        AND (:prisonNumber IS NULL  OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
+        AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%') 
+            OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
+        AND (
+              (:forename IS NULL OR :forename = '' OR r.forename LIKE CONCAT('%', :forename, '%') OR r.surname LIKE CONCAT('%', :forename, '%'))
+              AND 
+              (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%') OR r.forename LIKE CONCAT('%', :surname, '%'))
+            )
     """,
   )
   fun getReferralsByOrganisationId(
@@ -73,16 +76,19 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
 
   @Query(
     value = """
-      SELECT r from ReferralViewEntity r
+      SELECT r FROM ReferralViewEntity r
       WHERE r.referrerUsername = :username
         AND (:status IS NULL OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
-        AND (:prisonNumber IS NULL  OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
-        AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%')
-                                  OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
-        AND (:forename IS NULL OR :forename = ''  OR r.forename LIKE CONCAT('%', :forename, '%'))
-        AND (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%'))
+        AND (:prisonNumber IS NULL OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
+        AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%') 
+            OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
+        AND (
+             (:forename IS NULL OR :forename = '' OR r.forename LIKE CONCAT('%', :forename, '%') OR r.surname LIKE CONCAT('%', :forename, '%'))
+             AND 
+             (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%') OR r.forename LIKE CONCAT('%', :surname, '%'))
+            )
     """,
   )
   fun getReferralsByUsername(
