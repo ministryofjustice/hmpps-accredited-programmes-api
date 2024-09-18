@@ -585,8 +585,6 @@ class ReferralController(
       required = true,
     ) @PathVariable("id") id: UUID,
   ): ResponseEntity<List<ReferralStatusHistory>> {
-    referralService
-      .getReferralById(id)
     return ResponseEntity.ok(
       referralStatusHistoryService.getReferralStatusHistories(id),
     )

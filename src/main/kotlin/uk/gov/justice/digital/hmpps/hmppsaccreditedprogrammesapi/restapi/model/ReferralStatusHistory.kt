@@ -17,6 +17,8 @@ import java.util.UUID
  * @param notes The notes associated with the status change.
  * @param statusStartDate Date referral was changed to this status.
  * @param username Username of the person who changed to this status
+ * @param categoryDescription The description of the referral status category.
+ * @param reasonDescription The description of the referral status reason.
  */
 data class ReferralStatusHistory(
 
