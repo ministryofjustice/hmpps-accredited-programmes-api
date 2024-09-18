@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 
 /**
  *
@@ -35,4 +37,19 @@ data class LearningNeeds(
 
   @Schema(example = "free text about this persons learning needs", description = "")
   @get:JsonProperty("basicSkillsScoreDescription") val basicSkillsScoreDescription: String? = null,
-)
+) {
+  constructor(
+    oasysAccommodation: OasysAccommodation?,
+    oasysLearning: OasysLearning?,
+  ) : this(
+    noFixedAbodeOrTransient = oasysAccommodation?.noFixedAbodeOrTransient == YES,
+    workRelatedSkills = oasysLearning?.workRelatedSkills,
+    problemsReadWriteNum = oasysLearning?.problemsReadWriteNum,
+    learningDifficulties = oasysLearning?.learningDifficulties,
+    qualifications = oasysLearning?.qualifications,
+    basicSkillsScore = oasysLearning?.basicSkillsScore,
+    basicSkillsScoreDescription = oasysLearning?.eTEIssuesDetails,
+  )
+}
+
+private const val YES = "Yes"

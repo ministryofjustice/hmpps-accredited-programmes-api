@@ -40,7 +40,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.P
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.learningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 import java.time.LocalDateTime
@@ -141,7 +140,7 @@ class OasysService(
 
     val oasysLearning = getLearning(assessmentId)
     val oasysAccommodation = getAccommodation(assessmentId)
-    return learningNeeds(oasysAccommodation, oasysLearning)
+    return LearningNeeds(oasysAccommodation, oasysLearning)
   }
 
   fun getRisks(prisonNumber: String): Risks {
