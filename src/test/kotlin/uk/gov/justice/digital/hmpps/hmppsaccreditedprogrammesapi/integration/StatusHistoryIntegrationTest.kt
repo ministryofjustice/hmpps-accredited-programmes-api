@@ -131,15 +131,18 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `get referral status history for a referral`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
-    val response = getStatusHistories(referralId)
-    response.shouldNotBeNull()
-
-    response.size shouldBeEqual 1
-    val statusHistoryOne = response[0]
+    // When
+    val referralStatusHistories = getStatusHistories(referralId)
+    // Then
+    referralStatusHistories.shouldNotBeNull()
+    referralStatusHistories.size shouldBeEqual 1
+    val statusHistoryOne = referralStatusHistories[0]
     statusHistoryOne.status?.shouldBeEqual(WITHDRAWN)
     statusHistoryOne.previousStatus?.shouldBeEqual(REFERRAL_STARTED)
+    statusHistoryOne.categoryDescription?.shouldBeEqual("Administrative error")
+    statusHistoryOne.reasonDescription?.shouldBeEqual("Duplicate referral")
   }
 
   fun getStatusHistories(id: UUID?) =
