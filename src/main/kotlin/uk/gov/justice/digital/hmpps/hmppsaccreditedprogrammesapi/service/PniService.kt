@@ -141,6 +141,10 @@ class PniService(
     overallRiskScore: RiskScore,
     prisonNumber: String,
   ): String {
+    if (overallNeedsScore.validate().isNotEmpty()) {
+      return "MISSING_INFORMATION"
+    }
+
     val programmePathway = getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
       ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
         overallNeedsScore.classification,
