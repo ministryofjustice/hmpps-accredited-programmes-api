@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -32,24 +33,29 @@ data class IndividualSexScores(
   @Schema(example = "1", description = "")
   @get:JsonProperty("emotionalCongruence") val emotionalCongruence: Int? = null,
 ) {
+
+  @JsonIgnore
   fun hasSomeDataPresent() = listOf(
     sexualPreOccupation,
     offenceRelatedSexualInterests,
     emotionalCongruence,
   ).any { it != null }
 
+  @JsonIgnore
   fun isAllValuesPresent() = listOf(
     sexualPreOccupation,
     offenceRelatedSexualInterests,
     emotionalCongruence,
   ).all { it != null }
 
+  @JsonIgnore
   fun totalScore(): Int {
     return (sexualPreOccupation ?: 0) +
       (offenceRelatedSexualInterests ?: 0) +
       (emotionalCongruence ?: 0)
   }
 
+  @JsonIgnore
   fun overallSexDomainScore(totalScore: Int) = when {
     totalScore in 4..6 || (offenceRelatedSexualInterests == 2) -> 2
     totalScore in 0..1 -> 0

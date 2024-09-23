@@ -47,7 +47,7 @@ class PniIntegrationTest :
     prisonNumber = prisonNumber,
     crn = "X739590",
     assessmentId = 2114584,
-    programmePathway = "HIGH_INTENSITY_BC",
+    programmePathway = "MISSING_INFORMATION",
     needsScore = NeedsScore(
       overallNeedsScore = 6,
       basicSkillsScore = 33,

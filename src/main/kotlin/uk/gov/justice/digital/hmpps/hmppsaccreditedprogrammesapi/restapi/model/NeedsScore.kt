@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -42,6 +43,7 @@ data class ThinkingDomainScore(
   @get:JsonProperty("overallThinkingDomainScore") val overallThinkingDomainScore: Int,
   @get:JsonProperty("individualThinkingScores") val individualThinkingScores: IndividualCognitiveScores,
 ) {
+  @JsonIgnore
   fun isAllValuesPresent() =
     mutableListOf<String>().apply {
       if (individualThinkingScores.proCriminalAttitudes == null) {
@@ -57,6 +59,7 @@ data class RelationshipDomainScore(
   @get:JsonProperty("overallRelationshipDomainScore") val overallRelationshipDomainScore: Int,
   @get:JsonProperty("individualRelationshipScores") val individualRelationshipScores: IndividualRelationshipScores,
 ) {
+  @JsonIgnore
   fun isAllValuesPresent() = mutableListOf<String>().apply {
     if (individualRelationshipScores.curRelCloseFamily == null) {
       add("curRelCloseFamily in RelationshipScores is null")
@@ -77,6 +80,7 @@ data class SelfManagementDomainScore(
   @get:JsonProperty("overallSelfManagementDomainScore") val overallSelfManagementDomainScore: Int,
   @get:JsonProperty("individualSelfManagementScores") val individualSelfManagementScores: IndividualSelfManagementScores,
 ) {
+  @JsonIgnore
   fun isAllValuesPresent() = mutableListOf<String>().apply {
     if (individualSelfManagementScores.impulsivity == null) {
       add("impulsivity in SelfManagementScores is null")
