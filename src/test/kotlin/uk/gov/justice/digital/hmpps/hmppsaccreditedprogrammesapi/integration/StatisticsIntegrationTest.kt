@@ -20,7 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReportContent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreated
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -96,7 +95,7 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
       )
       .exchange()
       .expectStatus().isCreated
-      .expectBody<ReferralCreated>()
+      .expectBody<Referral>()
       .returnResult().responseBody!!
 
   @Test
@@ -109,9 +108,9 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
-    val createdReferral = getReferralById(referralCreated.referralId)
+    val createdReferral = getReferralById(referralCreated.id)
 
-    referralCreated.referralId.shouldNotBeNull()
+    referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
     val statistics = getStatistics(

@@ -6,5 +6,9 @@
   {
     "prisonId": "BXI",
     "prisonName": "Brixton (HMP)"
+  },
+  {
+    "prisonId": "MDI",
+    "prisonName": "Moorland (HMP & YOI)"
   }
 ]
