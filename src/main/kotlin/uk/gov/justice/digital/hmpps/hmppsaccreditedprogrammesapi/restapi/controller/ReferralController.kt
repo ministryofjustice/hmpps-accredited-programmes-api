@@ -146,9 +146,11 @@ class ReferralController(
       required = true,
     ) @RequestBody referralCreate: ReferralCreate,
   ): ResponseEntity<Referral> {
-    referralService.getReferral(referralCreate.offeringId, referralCreate.prisonNumber)?.let {
+    val duplicateReferrals = referralService.getDuplicateReferrals(referralCreate.offeringId, referralCreate.prisonNumber)
+
+    if (!duplicateReferrals.isNullOrEmpty()) {
       log.info("Referral already exists for prisonNumber ${referralCreate.prisonNumber} and offering ${referralCreate.offeringId} ")
-      return ResponseEntity.status(HttpStatus.CONFLICT).body(it.toApi())
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi())
     }
 
     val createdReferral = referralService.createReferral(

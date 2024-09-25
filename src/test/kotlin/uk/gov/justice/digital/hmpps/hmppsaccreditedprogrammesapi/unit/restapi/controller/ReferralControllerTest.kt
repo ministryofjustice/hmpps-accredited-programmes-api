@@ -89,7 +89,7 @@ constructor(
       "prisonNumber" to referral.prisonNumber,
     )
 
-    every { referralService.getReferral(referral.offeringId, referral.prisonNumber) } returns null
+    every { referralService.getDuplicateReferrals(referral.offeringId, referral.prisonNumber) } returns null
     every { referralService.createReferral(referral.prisonNumber, referral.offeringId) } returns referral
 
     mockMvc.post("/referrals") {
@@ -104,7 +104,7 @@ constructor(
       }
     }
 
-    verify { referralService.getReferral(referral.offeringId, referral.prisonNumber) }
+    verify { referralService.getDuplicateReferrals(referral.offeringId, referral.prisonNumber) }
     verify { referralService.createReferral(referral.prisonNumber, referral.offeringId) }
   }
 
@@ -132,7 +132,7 @@ constructor(
       "prisonNumber" to referral.prisonNumber,
     )
 
-    every { referralService.getReferral(any(), any()) } returns null
+    every { referralService.getDuplicateReferrals(any(), any()) } returns null
     every { referralService.createReferral(any(), any()) } returns referral.toApi()
 
     mockMvc.post("/referrals") {
@@ -148,7 +148,7 @@ constructor(
     }
 
     verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) }
-    verify { referralService.getReferral(referral.offering.id!!, referral.prisonNumber) }
+    verify { referralService.getDuplicateReferrals(referral.offering.id!!, referral.prisonNumber) }
     verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) }
   }
 
