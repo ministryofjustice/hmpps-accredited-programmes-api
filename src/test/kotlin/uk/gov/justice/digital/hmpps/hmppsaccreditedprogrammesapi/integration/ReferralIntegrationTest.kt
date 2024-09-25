@@ -187,7 +187,18 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
+    // only creates draft referral
     val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
+    // submits a referral
+    updateReferral(
+      referralCreated.id,
+      ReferralUpdate(
+        oasysConfirmed = true,
+        hasReviewedProgrammeHistory = true,
+        additionalInformation = "test",
+      ),
+    )
+    submitReferral(referralCreated.id)
 
     createDuplicateReferralResultsInConflict(offering.id!!, PRISON_NUMBER_1)
   }
@@ -1054,7 +1065,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
         description = getRandomString(50),
       )
 
-      createOffering(courseId = UUID.fromString(courseId), offeringId = UUID.fromString(offeringId), orgId = ORGANISATION_ID_MDI)
+      createOffering(
+        courseId = UUID.fromString(courseId),
+        offeringId = UUID.fromString(offeringId),
+        orgId = ORGANISATION_ID_MDI,
+      )
       createReferral(offeringId = UUID.fromString(offeringId), PRISON_NUMBER_1)
     }
 
@@ -1281,7 +1296,14 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNoContent
   }
 
-  fun createCourse(courseId: String, identifier: String, courseName: String, description: String, altName: String = "", audience: String = "General offence") {
+  fun createCourse(
+    courseId: String,
+    identifier: String,
+    courseName: String,
+    description: String,
+    altName: String = "",
+    audience: String = "General offence",
+  ) {
     persistenceHelper.createCourse(
       UUID.fromString(courseId),
       identifier,
