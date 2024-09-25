@@ -372,18 +372,10 @@ constructor(
     val openReferralStatuses =
       referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
 
-    log.warn("**********************")
-    log.warn("openReferralStatuses from repository: $openReferralStatuses")
-    log.warn("**********************")
-
-    val filterNot = referralRepository.getReferralEntitiesByOfferingIdAndPrisonNumberAndStatusIn(
+    return referralRepository.getReferralEntitiesByOfferingIdAndPrisonNumberAndStatusIn(
       offeringId,
       prisonNumber,
       openReferralStatuses,
     )?.filterNot { it.status == "REFERRAL_STARTED" }
-
-    log.warn("filterNot after applying : $filterNot")
-
-    return filterNot
   }
 }
