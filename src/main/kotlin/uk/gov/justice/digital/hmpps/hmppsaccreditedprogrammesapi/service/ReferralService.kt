@@ -28,7 +28,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -59,7 +61,7 @@ constructor(
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
-  ): UUID? {
+  ): Referral {
     val username = SecurityContextHolder.getContext().authentication?.name
       ?: throw SecurityException("Authentication information not found")
     log.info("STARTING - Request received to create a referral for prisonNumber $prisonNumber from $username")
@@ -92,7 +94,7 @@ constructor(
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
 
     log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber from $username referralId: ${savedReferral.id}")
-    return savedReferral.id
+    return savedReferral.toApi()
   }
 
   private fun savePNI(
@@ -364,5 +366,16 @@ constructor(
       val updatedReferral = referral.copy(deleted = true)
       referralRepository.save(updatedReferral)
     }
+  }
+
+  fun getDuplicateReferrals(offeringId: UUID, prisonNumber: String): List<ReferralEntity>? {
+    val openReferralStatuses =
+      referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
+
+    return referralRepository.getReferralEntitiesByOfferingIdAndPrisonNumberAndStatusIn(
+      offeringId,
+      prisonNumber,
+      openReferralStatuses,
+    )?.filterNot { it.status == "REFERRAL_STARTED" }
   }
 }
