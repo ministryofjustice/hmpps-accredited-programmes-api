@@ -156,9 +156,9 @@ class ReferralServiceTest {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
 
-    val createdReferralId = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
+    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
 
-    createdReferralId shouldBe referralId
+    createdReferral.id shouldBe referralId
 
     verify { referrerUserRepository.findById(REFERRER_USERNAME) }
     verify { offeringRepository.findById(offering.id!!) }
@@ -234,9 +234,9 @@ class ReferralServiceTest {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
 
-    val createdReferralId = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
+    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
 
-    createdReferralId shouldBe referralId
+    createdReferral.id shouldBe referralId
 
     verify { referrerUserRepository.findById(REFERRER_USERNAME) }
     verify { offeringRepository.findById(offering.id!!) }
@@ -293,9 +293,9 @@ class ReferralServiceTest {
 
     every { personRepository.save(any()) } returns person
 
-    val createdReferralId = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
+    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
 
-    createdReferralId shouldBe referralId
+    createdReferral.id shouldBe referralId
 
     verify {
       referrerUserRepository.save(

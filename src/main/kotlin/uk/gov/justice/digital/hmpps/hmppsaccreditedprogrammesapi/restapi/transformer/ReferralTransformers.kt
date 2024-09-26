@@ -24,6 +24,17 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferr
   submittedOn = submittedOn?.toString(),
 )
 
+fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
+  id = id!!,
+  offeringId = offering.id!!,
+  prisonNumber = prisonNumber,
+  referrerUsername = referrer.username,
+  oasysConfirmed = oasysConfirmed,
+  hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
+  additionalInformation = additionalInformation,
+  status = status,
+)
+
 fun ApiReferralUpdate.toDomain() = ReferralUpdate(
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
