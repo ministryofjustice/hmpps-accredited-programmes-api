@@ -368,5 +368,14 @@ constructor(
     }
   }
 
-  fun getReferral(offeringId: UUID, prisonNumber: String) = referralRepository.getReferralEntityByOfferingIdAndPrisonNumber(offeringId, prisonNumber)
+  fun getDuplicateReferrals(offeringId: UUID, prisonNumber: String): List<ReferralEntity>? {
+    val openReferralStatuses =
+      referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
+
+    return referralRepository.getReferralEntitiesByOfferingIdAndPrisonNumberAndStatusIn(
+      offeringId,
+      prisonNumber,
+      openReferralStatuses,
+    )?.filterNot { it.status == "REFERRAL_STARTED" }
+  }
 }
