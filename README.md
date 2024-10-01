@@ -91,7 +91,7 @@ To run linting and tests, do:
 ```
 
 Repository integration tests use an embedded H2 database. REST API tests start a
-local server which listens on a random port.
+local server which listens on a random port, and spin up a containerised Postgres instance as a backend Database via the test containers API.
 
 ### Pact
 
