@@ -19,10 +19,18 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
   datasource:
-    url: 'jdbc:h2:mem:postgres;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH'
-    username: sa
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+  sql:
+    init:
+      mode: always
 
 hmpps:
   auth:
