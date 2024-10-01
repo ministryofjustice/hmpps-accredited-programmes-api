@@ -1,0 +1,64 @@
+server:
+  shutdown: immediate
+
+logging:
+  level:
+    uk.gov: DEBUG
+
+management.endpoint:
+  health.cache.time-to-live: 0
+  info.cache.time-to-live: 0
+
+pactbroker:
+  host: 'pact-broker-prod.apps.live-1.cloud-platform.service.justice.gov.uk'
+  scheme: https
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    url: 'jdbc:h2:mem:postgres;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH'
+    username: sa
+
+  sql:
+    init:
+      mode: always
+
+hmpps:
+  auth:
+    url: http://localhost:#WIREMOCK_PORT/auth
+    client-id: integration-test-client-id
+    client-secret: secret
+  sqs:
+    provider: localstack
+    queues:
+      hmppsdomaineventsqueue:
+        queueName: hmpps_domain_events_queue
+        dlqName: hmpps_domain_events_dlq
+        subscribeTopicId: hmppsdomaineventstopic
+        subscribeFilter: '{"eventType":[ "prisoner-offender-search.prisoner.updated"] }'
+        asyncQueueClient: true
+
+    topics:
+      hmppsdomaineventstopic:
+        arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
+
+services:
+  prison-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+  prisoner-search-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+  prison-register-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+  oasys-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+  manage-offences-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+  case-notes-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+
+feature-switch:
+  case-notes-enabled: true
