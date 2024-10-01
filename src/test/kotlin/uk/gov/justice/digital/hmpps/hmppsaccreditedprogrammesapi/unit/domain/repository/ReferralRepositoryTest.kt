@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 @SpringBootTest
 @AutoConfigureTestDatabase
 @Transactional
-@ActiveProfiles("test")
+@ActiveProfiles("test-h2")
 class ReferralRepositoryTest {
 
   @Autowired

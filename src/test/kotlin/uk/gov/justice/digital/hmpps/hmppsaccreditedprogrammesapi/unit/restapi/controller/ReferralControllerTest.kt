@@ -50,7 +50,7 @@ private const val MY_REFERRALS_ENDPOINT = "/referrals/me/dashboard"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("test-h2")
 @Import(JwtAuthHelper::class)
 class ReferralControllerTest
 @Autowired
