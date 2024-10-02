@@ -34,7 +34,7 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.4.4")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.5.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
@@ -49,9 +49,9 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:1.20.1")
-  testImplementation("org.testcontainers:postgresql:1.20.1")
-  testImplementation("org.testcontainers:junit-jupiter:1.20.1")
+  testImplementation("org.testcontainers:testcontainers:1.20.2")
+  testImplementation("org.testcontainers:postgresql:1.20.2")
+  testImplementation("org.testcontainers:junit-jupiter:1.20.2")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
