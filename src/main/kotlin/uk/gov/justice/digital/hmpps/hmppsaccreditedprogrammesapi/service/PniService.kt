@@ -43,6 +43,7 @@ class PniService(
   private val pniRiskEngine: PniRiskEngine,
   private val pniRuleRepository: PniRuleRepository,
   private val pniResultEntityRepository: PNIResultEntityRepository,
+  private val personService: PersonService,
   private val objectMapper: ObjectMapper,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -85,12 +86,13 @@ class PniService(
       individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships),
     )
 
-    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber, gender, learning?.basicSkillsScore?.toInt())
+    val genderOfPerson = getGenderOfPerson(prisonNumber, gender)
+    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber, genderOfPerson, learning?.basicSkillsScore?.toInt())
 
     log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
 
     val overallRiskScore =
-      pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber)
+      pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber, genderOfPerson)
 
     log.info("Overall risk classification for prisonNumber $prisonNumber is ${overallNeedsScore.classification} ")
 
@@ -177,6 +179,16 @@ class PniService(
     rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
     sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
   )
+
+  fun getGenderOfPerson(prisonNumber: String, prisonerGender: String?): String {
+    return prisonerGender
+      ?: personService.getPerson(prisonNumber)?.gender
+      ?: run {
+        log.info("Prisoner $prisonNumber is not available in our db, fetching from external service.")
+        personService.createOrUpdatePerson(prisonNumber)
+        personService.getPerson(prisonNumber)?.gender
+      } ?: throw BusinessException("Gender information missing for prisonNumber $prisonNumber. PNI could not be determined")
+  }
 }
 
 private fun buildNeedsScores(
