@@ -54,10 +54,12 @@ class PniRiskEngine {
     individualRiskScores.ovp?.let { it > BigDecimal("60.00") } == true
 
   private fun isOspDcHigh(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.ospDc?.let { it >= BigDecimal("35.00") } == true
+    (individualRiskScores.ospDc?.equals("HIGH", ignoreCase = true) == true) ||
+      (individualRiskScores.ospDc?.equals("VERY_HIGH", ignoreCase = true) == true)
 
   private fun isOspIicHigh(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.ospIic?.let { it >= BigDecimal("35.00") } == true
+    (individualRiskScores.ospIic?.equals("HIGH", ignoreCase = true) == true) ||
+      (individualRiskScores.ospIic?.equals("VERY_HIGH", ignoreCase = true) == true)
 
   fun isHighSara(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.sara?.equals("High", ignoreCase = true) == true
@@ -73,10 +75,10 @@ class PniRiskEngine {
     individualRiskScores.ovp?.let { it in BigDecimal("30.00")..BigDecimal("59.00") } == true
 
   private fun isOspDcMedium(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.ospDc?.let { it in BigDecimal("30.00")..BigDecimal("35.00") } == true
+    individualRiskScores.ospDc?.equals("MEDIUM", ignoreCase = true) == true
 
   private fun isOspIicMedium(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.ospIic?.let { it in BigDecimal("30.00")..BigDecimal("35.00") } == true
+    individualRiskScores.ospIic?.equals("MEDIUM", ignoreCase = true) == true
 
   fun isMediumSara(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.sara?.equals("Medium", ignoreCase = true) == true

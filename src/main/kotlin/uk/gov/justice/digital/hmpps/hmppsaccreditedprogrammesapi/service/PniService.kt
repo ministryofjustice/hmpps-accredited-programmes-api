@@ -172,10 +172,8 @@ class PniService(
   ) = IndividualRiskScores(
     ogrs3 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears?.round(),
     ovp = oasysRiskPredictorScores?.violencePredictorScore?.twoYears?.round(),
-    ospIic = oasysRiskPredictorScores?.sexualPredictorScore?.ospIndirectImagePercentageScore?.round()
-      ?: oasysRiskPredictorScores?.sexualPredictorScore?.ospIndecentPercentageScore?.round(),
-    ospDc = oasysRiskPredictorScores?.sexualPredictorScore?.ospDirectContactPercentageScore?.round()
-      ?: oasysRiskPredictorScores?.sexualPredictorScore?.ospContactPercentageScore?.round(),
+    ospIic = oasysRiskPredictorScores?.sexualPredictorScore?.ospIndecentPercentageScoreLevel,
+    ospDc = oasysRiskPredictorScores?.sexualPredictorScore?.ospContactPercentageScoreLevel,
     rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
     sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
   )

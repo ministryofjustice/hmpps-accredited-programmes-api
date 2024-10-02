@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SelfManagementDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
-import java.math.BigDecimal
 
 private const val ZERO = 0
 
@@ -19,6 +18,7 @@ class PniNeedsEngine(
   private val personService: PersonService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
+  val validOspLevels = listOf("LOW", "MEDIUM", "HIGH", "VERY_HIGH")
   fun getOverallNeedsScore(
     individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
     prisonNumber: String,
@@ -68,7 +68,7 @@ class PniNeedsEngine(
     val gender = getGenderOfPrisoner(prisonNumber, prisonerGender)
     val individualRiskScores = individualNeedsAndRiskScores.individualRiskScores
     if (gender.equals("Male", ignoreCase = true) &&
-      (individualRiskScores.ospDc?.let { it > BigDecimal.ZERO } == true || individualRiskScores.ospIic?.let { it > BigDecimal.ZERO } == true)
+      (individualRiskScores.ospDc?.let { validOspLevels.contains(it) } == true || individualRiskScores.ospIic?.let { validOspLevels.contains(it) } == true)
     ) {
       throw BusinessException("PNI information cannot be computed for $gender prisoner $prisonNumber as ospDC or OspII scores are present but some values of SexDomainScore are null")
     }

@@ -94,7 +94,7 @@ class PniRiskEngineTest {
     val riskScores = IndividualRiskScores(
       ogrs3 = null,
       ovp = null,
-      ospDc = BigDecimal("35.00"),
+      ospDc = "VERY_HIGH",
       ospIic = null,
       rsr = null,
       sara = null,
@@ -108,7 +108,7 @@ class PniRiskEngineTest {
       ogrs3 = null,
       ovp = null,
       ospDc = null,
-      ospIic = BigDecimal("35.00"),
+      ospIic = "VERY_HIGH",
       rsr = null,
       sara = null,
     )
@@ -146,8 +146,8 @@ class PniRiskEngineTest {
     val riskScores = IndividualRiskScores(
       ogrs3 = BigDecimal("50.00"),
       ovp = BigDecimal("30.00"),
-      ospDc = BigDecimal("20.00"),
-      ospIic = BigDecimal("20.00"),
+      ospDc = "NOT_APPLICABLE",
+      ospIic = "LOW",
       rsr = BigDecimal("1.00"),
       sara = "Low",
     )
@@ -185,7 +185,7 @@ class PniRiskEngineTest {
     val riskScores = IndividualRiskScores(
       ogrs3 = null,
       ovp = null,
-      ospDc = BigDecimal("30.00"),
+      ospDc = "MEDIUM",
       ospIic = null,
       rsr = null,
       sara = null,
@@ -199,7 +199,7 @@ class PniRiskEngineTest {
       ogrs3 = null,
       ovp = null,
       ospDc = null,
-      ospIic = BigDecimal("30.00"),
+      ospIic = "MEDIUM",
       rsr = null,
       sara = null,
     )
@@ -237,8 +237,8 @@ class PniRiskEngineTest {
     val riskScores = IndividualRiskScores(
       ogrs3 = BigDecimal("20.00"),
       ovp = BigDecimal("20.00"),
-      ospDc = BigDecimal("20.00"),
-      ospIic = BigDecimal("20.00"),
+      ospDc = "HIGH",
+      ospIic = "VERY_HIGH",
       rsr = BigDecimal("0.50"),
       sara = "Low",
     )
@@ -250,8 +250,8 @@ class PniRiskEngineTest {
     val riskScores = IndividualRiskScores(
       ogrs3 = BigDecimal("50.00"),
       ovp = BigDecimal("30.00"),
-      ospDc = BigDecimal("35.00"),
-      ospIic = BigDecimal("35.00"),
+      ospDc = "VERY_HIGH",
+      ospIic = "HIGH",
       rsr = BigDecimal("3.00"),
       sara = "Low",
     )
@@ -263,8 +263,8 @@ class PniRiskEngineTest {
     val riskScores = IndividualRiskScores(
       ogrs3 = BigDecimal("50.00"),
       ovp = BigDecimal("30.00"),
-      ospDc = BigDecimal("30.00"),
-      ospIic = BigDecimal("30.00"),
+      ospDc = "MEDIUM",
+      ospIic = "MEDIUM",
       rsr = BigDecimal("2.50"),
       sara = "Low",
     )
@@ -276,8 +276,8 @@ class PniRiskEngineTest {
     val riskScores = IndividualRiskScores(
       ogrs3 = BigDecimal("20.00"),
       ovp = BigDecimal("20.00"),
-      ospDc = BigDecimal("20.00"),
-      ospIic = BigDecimal("20.00"),
+      ospDc = "LOW",
+      ospIic = "LOW",
       rsr = BigDecimal("0.50"),
       sara = "Low",
     )
