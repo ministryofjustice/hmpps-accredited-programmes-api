@@ -38,7 +38,7 @@ import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("test-h2")
 @Import(JwtAuthHelper::class)
 class CourseParticipationControllerTest
 @Autowired

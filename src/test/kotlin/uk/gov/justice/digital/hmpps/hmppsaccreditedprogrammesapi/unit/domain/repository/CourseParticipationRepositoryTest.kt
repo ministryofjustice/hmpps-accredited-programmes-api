@@ -25,7 +25,7 @@ import java.time.Year
 @SpringBootTest
 @AutoConfigureTestDatabase
 @Transactional
-@ActiveProfiles("test")
+@ActiveProfiles("test-h2")
 class CourseParticipationRepositoryTest {
 
   @Autowired

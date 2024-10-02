@@ -93,6 +93,13 @@ class StatisticsController(
         endDate!!,
         locationCodes,
       )
+
+      ReportType.ON_PROGRAMME_COUNT -> statisticsRepository.finalStatusCodeCounts(
+        startDate,
+        endDate!!,
+        locationCodes,
+        "ON_PROGRAMME",
+      )
     }
     return ReportContent(
       reportType = reportType.name,
@@ -157,6 +164,7 @@ enum class ReportType {
   NOT_SUITABLE_COUNT,
   DESELECTED_COUNT,
   PNI_PATHWAY_COUNT,
+  ON_PROGRAMME_COUNT,
 }
 
 data class ReportTypes(val types: List<String>)

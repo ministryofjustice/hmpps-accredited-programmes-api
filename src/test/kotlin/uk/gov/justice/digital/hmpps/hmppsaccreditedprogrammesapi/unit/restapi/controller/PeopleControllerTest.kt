@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("test-h2")
 @Import(JwtAuthHelper::class)
 class PeopleControllerTest
 @Autowired

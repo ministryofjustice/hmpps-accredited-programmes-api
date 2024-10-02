@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class AuditIntegrationTest {
+class AuditIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var auditRepository: AuditRepository
@@ -27,7 +27,7 @@ class AuditIntegrationTest {
   lateinit var auditService: AuditService
 
   @Test
-  fun `Creating an interal audit record is successful with expected body`() {
+  fun `Creating an internal audit record is successful with expected body`() {
     val offeringEntity = OfferingEntityFactory().produce()
     offeringEntity.course = CourseEntityFactory().produce()
     val referralEntity = ReferralEntityFactory().withOffering(offeringEntity).produce()

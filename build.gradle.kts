@@ -37,7 +37,6 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.4.4")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
-  runtimeOnly("org.postgresql:postgresql:42.7.4")
 
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -49,6 +48,11 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
   testImplementation("org.awaitility:awaitility-kotlin")
+
+  testImplementation("org.testcontainers:testcontainers:1.20.1")
+  testImplementation("org.testcontainers:postgresql:1.20.1")
+  testImplementation("org.testcontainers:junit-jupiter:1.20.1")
+  testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
 java {
