@@ -18,6 +18,7 @@ cmake-build-debug/
 # IntelliJ
 out/
 *.iml
+.kotlin/sessions/*
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -77,5 +78,5 @@ sonar-project.properties
 
 ### MacOS ###
 .DS_Store
-.kotlin/*
+
 
