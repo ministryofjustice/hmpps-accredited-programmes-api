@@ -94,8 +94,8 @@ class PniIntegrationTest :
       individualRiskScores = IndividualRiskScores(
         ogrs3 = "15.00".toBigDecimal(),
         ovp = "15.00".toBigDecimal(),
-        ospDc = 1.07.toBigDecimal(),
-        ospIic = 0.11.toBigDecimal(),
+        ospDc = "MEDIUM",
+        ospIic = "LOW",
         rsr = 1.46.toBigDecimal(),
         sara = "High",
       ),

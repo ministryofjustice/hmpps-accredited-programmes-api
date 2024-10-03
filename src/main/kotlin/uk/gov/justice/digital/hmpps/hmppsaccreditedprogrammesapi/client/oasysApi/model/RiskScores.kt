@@ -29,6 +29,6 @@ class RsrScore(
 class SexualPredictorScore(
   val ospIndecentPercentageScore: BigDecimal? = null,
   val ospContactPercentageScore: BigDecimal? = null,
-  val ospIndirectImagePercentageScore: BigDecimal? = null,
-  val ospDirectContactPercentageScore: BigDecimal? = null,
+  val ospIndecentPercentageScoreLevel: String? = null,
+  val ospContactPercentageScoreLevel: String? = null,
 )

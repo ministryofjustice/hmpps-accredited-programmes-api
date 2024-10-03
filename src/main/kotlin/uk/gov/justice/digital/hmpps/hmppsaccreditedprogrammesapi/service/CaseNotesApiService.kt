@@ -103,7 +103,7 @@ class CaseNotesApiService(
     val reasonForClosingReferral =
       if (referral.status == "WITHDRAWN" || referral.status == "DESELECTED") {
         val referralStatusReason = referralStatusReasonRepository.findByCode(referralStatusUpdate.reason!!)
-        "Reason for closing referral: ${referralStatusReason?.description} \n"
+        "Reason for closing referral: ${referralStatusReason?.description} \n\n"
       } else {
         "\n"
       }

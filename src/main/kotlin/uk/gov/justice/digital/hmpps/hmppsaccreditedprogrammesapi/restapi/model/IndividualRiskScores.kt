@@ -22,10 +22,10 @@ data class IndividualRiskScores(
   @get:JsonProperty("ovp") val ovp: BigDecimal? = null,
 
   @Schema(example = "0", description = "")
-  @get:JsonProperty("ospDc") val ospDc: BigDecimal? = null,
+  @get:JsonProperty("ospDc") val ospDc: String? = null,
 
   @Schema(example = "1", description = "")
-  @get:JsonProperty("ospIic") val ospIic: BigDecimal? = null,
+  @get:JsonProperty("ospIic") val ospIic: String? = null,
 
   @Schema(example = "5", description = "")
   @get:JsonProperty("rsr") val rsr: BigDecimal? = null,
