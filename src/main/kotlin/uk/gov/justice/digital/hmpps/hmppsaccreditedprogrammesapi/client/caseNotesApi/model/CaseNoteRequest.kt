@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesClient.model
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesApi.model
 
 data class CaseNoteRequest(
   val type: String,

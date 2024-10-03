@@ -1,13 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesClient.CaseNotesApiClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesClient.model.CaseNoteCreatedResponse
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesClient.model.CaseNoteRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesApi.CaseNotesApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesApi.model.CaseNoteCreatedResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesApi.model.CaseNoteRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -31,6 +32,7 @@ class CaseNotesApiService(
   private val organisationRepository: OrganisationRepository,
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
+  private val manageUsersService: ManageUsersService,
 ) {
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -58,7 +60,8 @@ class CaseNotesApiService(
       if (featureSwitchService.isCaseNotesEnabled()) {
         val person = personService.getPerson(referral.prisonNumber)!!
         val referralStatusEntity = referralStatusRepository.getByCode(referralStatusUpdate.status)
-        val message = buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
+        val message =
+          buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
         val createdCaseNote = createCaseNote(
           CaseNoteRequest(
             type = ACP_TYPE,
@@ -86,21 +89,36 @@ class CaseNotesApiService(
     log.info("Request received for creating case notes :${referral.id} $referralStatusUpdate")
     val course = referral.offering.course
     val orgName = organisationRepository.findOrganisationEntityByCode(referral.offering.organisationId)?.name
-    val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n"
+    val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
 
     val prisonerName = person?.fullName().orEmpty()
-    val pgmNameAndStrand = "${course.name} : ${course.audience}"
-    val customMessage = message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", pgmNameAndStrand) + "\n"
-    val details = referralStatusUpdate.notes?.trim()?.let { "Details: ${referralStatusUpdate.notes} \n" }.orEmpty()
+    val programNameAndStrand = "${course.name} : ${course.audience}"
+    val customMessage =
+      message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
+    val details = referralStatusUpdate.notes
+      ?.takeIf { it.isNotBlank() }
+      ?.let { "Details: $it \n\n" }
+      ?: ""
 
     val reasonForClosingReferral =
       if (referral.status == "WITHDRAWN" || referral.status == "DESELECTED") {
         val referralStatusReason = referralStatusReasonRepository.findByCode(referralStatusUpdate.reason!!)
         "Reason for closing referral: ${referralStatusReason?.description} \n"
       } else {
-        ""
+        "\n"
       }
 
-    return programmeDescriptionMessage + customMessage + reasonForClosingReferral + details
+    val statusUpdatedBy = "Updated by: ${getFullName()}\n"
+    return programmeDescriptionMessage + customMessage + reasonForClosingReferral + details + statusUpdatedBy
+  }
+
+  fun getFullName(): String? {
+    val username = SecurityContextHolder.getContext().authentication?.name!!
+    return try {
+      manageUsersService.getUserDetail(username)?.name ?: username
+    } catch (ex: Exception) {
+      log.warn("Error getting full name for username $username. Will write case-notes with username instead. $ex")
+      username
+    }
   }
 }
