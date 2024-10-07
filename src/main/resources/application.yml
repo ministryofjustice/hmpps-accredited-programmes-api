@@ -128,6 +128,8 @@ services:
     base-url: http://localhost:9098
   case-notes-api:
     base-url: http://localhost:9099
+  manage-users-api:
+    base-url: http://localhost:9100
 
 feature-switch:
   case-notes-enabled: true
