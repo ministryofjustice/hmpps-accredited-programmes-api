@@ -3512,7 +3512,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Referral Status Reasons",
+					"name": "Get Referral Status Reasons By Category Code",
 					"request": {
 						"auth": {
 							"type": "oauth2",
@@ -3576,7 +3576,7 @@
 								},
 								{
 									"key": "categoryCode",
-									"value": "W_MOTIVATION"
+									"value": "W_ADMIN"
 								}
 							]
 						}
@@ -3644,6 +3644,83 @@
 								{
 									"key": "code",
 									"value": "W_MOTIVATION"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Referral Status Reasons By Referral Status Type",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "scope",
+									"value": "read",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "{{oauth_client_secret}}",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "{{oauth_client_id}}",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "{{access_token_url}}",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "HMPPS Auth",
+									"type": "string"
+								},
+								{
+									"key": "refreshTokenUrl",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{accredited_programmes_api}}/reference-data/referral-statuses/:referralStatusType/categories/reasons",
+							"host": [
+								"{{accredited_programmes_api}}"
+							],
+							"path": [
+								"reference-data",
+								"referral-statuses",
+								":referralStatusType",
+								"categories",
+								"reasons"
+							],
+							"variable": [
+								{
+									"key": "referralStatusType",
+									"value": "WITHDRAWN"
 								}
 							]
 						}
