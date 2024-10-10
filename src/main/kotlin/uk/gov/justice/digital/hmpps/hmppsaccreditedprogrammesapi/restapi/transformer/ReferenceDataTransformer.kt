@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 
 fun ReferralStatusEntity.toModel(altDescription: String?, altHintText: String?) =
@@ -18,4 +20,11 @@ fun ReferralStatusEntity.toModel(altDescription: String?, altHintText: String?) 
     release = release,
     deselectAndKeepOpen = false,
     notesOptional = notesOptional,
+  )
+
+fun ReferralStatusReasonEntity.toModel() =
+  ReferralStatusReason(
+    code = code,
+    description = description,
+    referralCategoryCode = referralStatusCategoryCode,
   )

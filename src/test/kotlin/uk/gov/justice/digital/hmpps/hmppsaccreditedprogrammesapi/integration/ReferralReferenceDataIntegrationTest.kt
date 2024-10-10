@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -14,9 +16,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_DESCRIPTION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_HINT
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusCategory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusType
 
 private const val WITHDRAWN = "WITHDRAWN"
 private const val CATEGORY_ADMIN = "W_ADMIN"
@@ -139,6 +143,56 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     response.shouldNotBeNull()
   }
 
+  @Test
+  fun `should return all withdrawal referral status reasons`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    // When
+    val response = getAllReferralStatusReasonsForType(ReferralStatusType.WITHDRAWN.name)
+    // Then
+    response.shouldNotBeNull()
+    response.size.shouldBeEqual(17)
+    response[0].code shouldBeEqual REASON_DUPLICATE
+    response[0].description shouldBeEqual "Duplicate referral"
+    response[0].referralCategoryCode shouldBe CATEGORY_ADMIN
+  }
+
+  @Test
+  fun `should return all deselected referral status reasons`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    // When
+    val response = getAllReferralStatusReasonsForType(ReferralStatusType.DESELECTED.name)
+    // Then
+    response.shouldNotBeNull()
+    response.size.shouldBeEqual(21)
+    response[0].code shouldBeEqual "D_ATTITUDE"
+    response[0].description shouldBeEqual "Attitude to group facilitators or others"
+    response[0].referralCategoryCode shouldBe "D_MOTIVATION"
+  }
+
+  @Test
+  fun `should return bad request and error response when referral status type is not WITHDRAWN or DESELECTED`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    // When
+    val response = webTestClient
+      .get()
+      .uri("/reference-data/referral-statuses/invalid-request/categories/reasons")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isBadRequest
+      .expectBody<ErrorResponse>()
+      .returnResult().responseBody!!
+
+    // Then
+    response.shouldNotBeNull()
+    response.status shouldBe 400
+    response.userMessage shouldStartWith "Request not readable: Failed to convert value of type 'java.lang.String' to required type"
+  }
+
   fun getReferralStatuses() =
     webTestClient
       .get()
@@ -225,5 +279,16 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<ReferralStatusReason>()
+      .returnResult().responseBody!!
+
+  fun getAllReferralStatusReasonsForType(referralStatusType: String) =
+    webTestClient
+      .get()
+      .uri("/reference-data/referral-statuses/$referralStatusType/categories/reasons")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<ReferralStatusReason>>()
       .returnResult().responseBody!!
 }

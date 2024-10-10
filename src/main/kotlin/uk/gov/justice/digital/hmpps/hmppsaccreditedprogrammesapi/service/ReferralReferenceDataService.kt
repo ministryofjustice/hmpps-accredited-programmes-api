@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusCategory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 
 @Service
@@ -119,5 +120,10 @@ class ReferralReferenceDataService(
     } else {
       referralStatusTransitionRepository.getPOMTransition(currentStatus, chosenStatus)
     }
+  }
+
+  fun getAllReferralStatusReasonsForType(referralStatusType: ReferralStatusType): List<ReferralStatusReason> {
+    return referralStatusReasonRepository.findReferralStatusReasonsByStatusCode(referralStatusType.name)
+      .map { it.toModel() }
   }
 }
