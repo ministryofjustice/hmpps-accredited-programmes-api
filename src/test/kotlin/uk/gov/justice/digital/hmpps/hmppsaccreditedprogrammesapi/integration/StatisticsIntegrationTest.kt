@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import au.com.dius.pact.core.support.isNotEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -17,11 +18,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORG
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReportContent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReportType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
+import java.time.LocalDate
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,6 +34,9 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var referralStatusHistoryRepository: ReferralStatusHistoryRepository
+
+  @Autowired
+  lateinit var statisticsRepository: StatisticsRepository
 
   @BeforeEach
   fun setUp() {
@@ -146,6 +152,29 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
     // Then
     reportContent.content.count shouldBe 1
     reportContent.reportType shouldBe ReportType.ON_PROGRAMME_COUNT.toString()
+  }
+
+  @Test
+  fun `should return statistics by status `() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+    createdReferral.shouldNotBeNull()
+
+    progressReferralStatusToOnProgramme(createdReferral.id)
+
+    val referral = getReferralById(createdReferral.id)
+    referral.shouldNotBeNull()
+    referral.status.shouldBe("on_programme") //
+
+    val referralCountByStatus =
+      statisticsRepository.referralCountByStatus(
+        LocalDate.now().minusDays(1),
+        LocalDate.now(),
+        listOf(),
+      )
+
+    referralCountByStatus.isNotEmpty()
   }
 
   private fun progressReferralStatusToOnProgramme(referralId: UUID) {
