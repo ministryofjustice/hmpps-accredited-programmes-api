@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.6"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.0.20"
-  kotlin("plugin.jpa") version "2.0.20"
+  kotlin("plugin.spring") version "2.0.21"
+  kotlin("plugin.jpa") version "2.0.21"
 }
 
 configurations {
@@ -14,7 +14,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "2.6.0"
-  val sentryVersion = "7.14.0"
+  val sentryVersion = "7.15.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.3.3"
 
