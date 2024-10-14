@@ -645,7 +645,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
           referrerUsername = REFERRER_USERNAME,
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
-          sentenceType = "CJA03 Standard Determinate Sentence",
+          sentenceType = "Determinate",
 
         ),
       ).forEach { referralView ->
