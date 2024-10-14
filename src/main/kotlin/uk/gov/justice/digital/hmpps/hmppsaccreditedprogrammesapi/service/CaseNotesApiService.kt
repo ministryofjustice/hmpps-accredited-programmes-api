@@ -92,7 +92,7 @@ class CaseNotesApiService(
     val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
 
     val prisonerName = person?.fullName().orEmpty()
-    val programNameAndStrand = "${course.name} : ${course.audience}"
+    val programNameAndStrand = "${course.name}: ${course.audience}"
     val customMessage =
       message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
     val details = referralStatusUpdate.notes
