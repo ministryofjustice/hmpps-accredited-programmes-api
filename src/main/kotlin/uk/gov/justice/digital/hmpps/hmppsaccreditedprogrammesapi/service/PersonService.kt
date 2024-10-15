@@ -109,18 +109,31 @@ class PersonService(
   }
 
   fun determineSentenceType(sentenceInformation: SentenceInformation?): String {
-    sentenceInformation ?: return "No active sentences"
+    sentenceInformation ?: return SentenceCategoryType.NO_ACTIVE_SENTENCES.description
     val distinctActiveSentences = sentenceInformation.latestPrisonTerm.courtSentences
       .flatMap { it.sentences }
       .mapNotNull { it.sentenceTypeDescription }
       .distinct()
 
+    if (distinctActiveSentences.isEmpty()) {
+      log.info("No court sentences exist for prisoner - setting sentence type to NO_ACTIVE_SENTENCES")
+      return SentenceCategoryType.NO_ACTIVE_SENTENCES.description
+    }
+
+    distinctActiveSentences.forEach { sentence ->
+      log.info("Distinct active sentence for prisoner: {}", sentence)
+    }
+
     val matchingSentenceCategories = sentenceCategoryRepository.findAllByDescriptionIn(distinctActiveSentences)
       .map { it.category }
 
-    return when {
-      matchingSentenceCategories.isEmpty() -> SentenceCategoryType.UNKNOWN.description
-      else -> SentenceCategoryType.determineOverallCategory(matchingSentenceCategories).description
+    return if (matchingSentenceCategories.isEmpty()) {
+      log.info("No matching categories exist")
+      SentenceCategoryType.UNKNOWN.description
+    } else {
+      val overallCategoryDescription = SentenceCategoryType.determineOverallCategory(matchingSentenceCategories).description
+      log.info("Category matches found for active sentences: $overallCategoryDescription")
+      overallCategoryDescription
     }
   }
 

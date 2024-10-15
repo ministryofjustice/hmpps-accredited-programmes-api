@@ -10,6 +10,7 @@ enum class SentenceCategoryType(val description: String) {
   DETERMINATE_INDETERMINATE_RECALL("Determinate and Indeterminate and Recall"),
   UNKNOWN("Unknown"),
   RECALL("Recall"),
+  NO_ACTIVE_SENTENCES("No active sentences"),
   ;
 
   companion object {

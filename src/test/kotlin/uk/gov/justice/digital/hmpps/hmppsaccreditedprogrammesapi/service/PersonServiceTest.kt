@@ -93,33 +93,7 @@ class PersonServiceTest {
             issuingCourtDate = "firstIssuingCourtDate",
           ),
         ),
-        keyDates = KeyDates(
-          sentenceStartDate = LocalDate.now(),
-          effectiveSentenceEndDate = LocalDate.now().plusDays(1),
-          confirmedReleaseDate = LocalDate.now().plusDays(2),
-          releaseDate = LocalDate.now().plusDays(3),
-          sentenceExpiryDate = LocalDate.now().plusDays(4),
-          automaticReleaseDate = LocalDate.now().plusDays(5),
-          conditionalReleaseDate = LocalDate.now().plusDays(6),
-          nonParoleDate = LocalDate.now().plusDays(7),
-          postRecallReleaseDate = LocalDate.now().plusDays(8),
-          licenceExpiryDate = LocalDate.now().plusDays(9),
-          homeDetentionCurfewEligibilityDate = LocalDate.now().plusDays(10),
-          paroleEligibilityDate = LocalDate.now().plusDays(11),
-          homeDetentionCurfewActualDate = LocalDate.now().plusDays(12),
-          actualParoleDate = LocalDate.now().plusDays(13),
-          releaseOnTemporaryLicenceDate = LocalDate.now().plusDays(14),
-          earlyRemovalSchemeEligibilityDate = LocalDate.now().plusDays(15),
-          earlyTermDate = LocalDate.now().plusDays(16),
-          midTermDate = LocalDate.now().plusDays(17),
-          lateTermDate = LocalDate.now().plusDays(18),
-          topupSupervisionExpiryDate = LocalDate.now().plusDays(19),
-          tariffDate = LocalDate.now().plusDays(20),
-          dtoPostRecallReleaseDate = LocalDate.now().plusDays(21),
-          tariffEarlyRemovalSchemeEligibilityDate = LocalDate.now().plusDays(22),
-          topupSupervisionStartDate = LocalDate.now().plusDays(23),
-          homeDetentionCurfewEndDate = LocalDate.now().plusDays(24),
-        ),
+        keyDates = createKeyDates(),
       ),
     )
     val response = ClientResult.Success(HttpStatus.OK, sentenceInformation)
@@ -274,6 +248,28 @@ class PersonServiceTest {
   }
 
   @Test
+  fun `should set No active sentences category when no sentence information is available`() {
+    // Given
+    val sentenceInformation = SentenceInformation(
+      prisonerNumber = PRISON_NUMBER,
+      latestPrisonTerm = PrisonTerm(
+        courtSentences = emptyList(),
+        keyDates = createKeyDates(),
+      ),
+    )
+    val response = ClientResult.Success(HttpStatus.OK, sentenceInformation)
+    whenever(prisonApiClient.getSentenceInformation(PRISON_NUMBER)).thenReturn(response)
+
+    // When
+    personService.createOrUpdatePerson(PRISON_NUMBER)
+
+    // Then
+    verify(personRepository).save(personEntityCaptor.capture())
+    val personEntity = personEntityCaptor.value
+    personEntity.sentenceType shouldBe "No active sentences"
+  }
+
+  @Test
   fun `should add sentence information when creating a person`() {
     // Given
     whenever(personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER)).thenReturn(null)
@@ -295,4 +291,32 @@ class PersonServiceTest {
     val personEntity = personEntityCaptor.value
     personEntity.sentenceType shouldBe "Determinate and Indeterminate"
   }
+
+  private fun createKeyDates(): KeyDates = KeyDates(
+    sentenceStartDate = LocalDate.now(),
+    effectiveSentenceEndDate = LocalDate.now().plusDays(1),
+    confirmedReleaseDate = LocalDate.now().plusDays(2),
+    releaseDate = LocalDate.now().plusDays(3),
+    sentenceExpiryDate = LocalDate.now().plusDays(4),
+    automaticReleaseDate = LocalDate.now().plusDays(5),
+    conditionalReleaseDate = LocalDate.now().plusDays(6),
+    nonParoleDate = LocalDate.now().plusDays(7),
+    postRecallReleaseDate = LocalDate.now().plusDays(8),
+    licenceExpiryDate = LocalDate.now().plusDays(9),
+    homeDetentionCurfewEligibilityDate = LocalDate.now().plusDays(10),
+    paroleEligibilityDate = LocalDate.now().plusDays(11),
+    homeDetentionCurfewActualDate = LocalDate.now().plusDays(12),
+    actualParoleDate = LocalDate.now().plusDays(13),
+    releaseOnTemporaryLicenceDate = LocalDate.now().plusDays(14),
+    earlyRemovalSchemeEligibilityDate = LocalDate.now().plusDays(15),
+    earlyTermDate = LocalDate.now().plusDays(16),
+    midTermDate = LocalDate.now().plusDays(17),
+    lateTermDate = LocalDate.now().plusDays(18),
+    topupSupervisionExpiryDate = LocalDate.now().plusDays(19),
+    tariffDate = LocalDate.now().plusDays(20),
+    dtoPostRecallReleaseDate = LocalDate.now().plusDays(21),
+    tariffEarlyRemovalSchemeEligibilityDate = LocalDate.now().plusDays(22),
+    topupSupervisionStartDate = LocalDate.now().plusDays(23),
+    homeDetentionCurfewEndDate = LocalDate.now().plusDays(24),
+  )
 }

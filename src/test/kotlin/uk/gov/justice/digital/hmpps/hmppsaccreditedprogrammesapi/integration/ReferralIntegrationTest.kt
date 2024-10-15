@@ -1260,6 +1260,62 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should set sentence category to no active sentences when updating all people and no sentence data is returned`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val nomsNumber = "A8610DY"
+
+    val results = ResourceLoader.file<List<Prisoner>>("prison-search-results_A8610DY")
+    wiremockServer.stubFor(
+      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
+        WireMock.containing(
+          nomsNumber,
+        ),
+      )
+        .willReturn(
+          WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              objectMapper.writeValueAsString(results),
+            ),
+        ),
+    )
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    createReferral(offering.id, nomsNumber)
+
+    val result = results[0]
+    result.lastName = "changed"
+    result.firstName = "name"
+    wiremockServer.stubFor(
+      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
+        WireMock.containing(
+          nomsNumber,
+        ),
+      )
+        .willReturn(
+          WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(listOf(result))),
+        ),
+    )
+
+    // When
+    updateAllPeople()
+
+    await untilCallTo {
+      personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    } matches { it?.surname == "changed" }
+
+    val referralViewAfter = personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+
+    // Then
+    referralViewAfter shouldNotBe null
+    referralViewAfter?.sentenceType?.shouldBeEqual("No active sentences")
+  }
+
+  @Test
   fun `deleted referrals does not appear when we searching for specific referral`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 

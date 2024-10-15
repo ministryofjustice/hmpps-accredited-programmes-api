@@ -16,7 +16,6 @@ data class Prisoner(
   var paroleEligibilityDate: LocalDate? = null,
   var prisonName: String?,
   var gender: String?,
-
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
