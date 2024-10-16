@@ -182,6 +182,14 @@ class PersonService(
     log.info("Updated all people in person cache.")
   }
 
+  fun updatePeople(prisonNumbers: List<String>) {
+    log.info("Attempting to update $prisonNumbers in person cache.")
+    prisonNumbers.forEach {
+      updatePerson(it, true)
+    }
+    log.info("Updated $prisonNumbers  people in person cache.")
+  }
+
   private fun buildKeyDates(sentenceInformation: SentenceInformation): List<KeyDate> {
     val keyDates = ArrayList<KeyDate>()
     for (date in KeyDates::class.memberProperties) {

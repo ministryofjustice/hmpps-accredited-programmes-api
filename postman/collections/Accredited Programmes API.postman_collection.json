@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0300c49c-3f3c-4307-a601-a3808387c7bf",
+		"_postman_id": "1523e31d-88d6-4957-b5f1-7f27d510839a",
 		"name": "Accredited Programmes API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "30592384"
@@ -20,6 +20,44 @@
 								"{{accredited_programmes_api}}"
 							],
 							"path": [
+								"person",
+								"updateAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Person by prison number",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\"prisonNumber1\", \"prisonNumber2\"]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{accredited_programmes_api}}/admin/person/updateAll",
+							"host": [
+								"{{accredited_programmes_api}}"
+							],
+							"path": [
+								"admin",
 								"person",
 								"updateAll"
 							]
