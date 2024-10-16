@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "f9e16867-03ca-4668-8e21-5968153b7cf0",
+		"_postman_id": "0300c49c-3f3c-4307-a601-a3808387c7bf",
 		"name": "Accredited Programmes API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "38281215"
+		"_exporter_id": "30592384"
 	},
 	"item": [
 		{
@@ -4953,6 +4953,84 @@
 								{
 									"key": "report-type",
 									"value": "REFERRAL_COUNT_BY_COURSE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Referral status counts by status",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "clientSecret",
+									"value": "{{oauth_client_secret}}",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "{{oauth_client_id}}",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "{{access_token_url}}",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "HMPPS Auth",
+									"type": "string"
+								},
+								{
+									"key": "refreshTokenUrl",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:9090/auth/oauth/token?grant_type=client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{accredited_programmes_api}}/statistics/report/countByStatus?startDate=2024-08-01&endDate=2024-08-30&locationCodes=WTI",
+							"host": [
+								"{{accredited_programmes_api}}"
+							],
+							"path": [
+								"statistics",
+								"report",
+								"countByStatus"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-08-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-08-30"
+								},
+								{
+									"key": "locationCodes",
+									"value": "WTI"
 								}
 							]
 						}
