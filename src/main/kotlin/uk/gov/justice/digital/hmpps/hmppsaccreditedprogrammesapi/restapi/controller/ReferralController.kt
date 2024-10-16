@@ -146,7 +146,8 @@ class ReferralController(
       required = true,
     ) @RequestBody referralCreate: ReferralCreate,
   ): ResponseEntity<Referral> {
-    val duplicateReferrals = referralService.getDuplicateReferrals(referralCreate.offeringId, referralCreate.prisonNumber)
+    val duplicateReferrals =
+      referralService.getDuplicateReferrals(referralCreate.offeringId, referralCreate.prisonNumber)
 
     if (!duplicateReferrals.isNullOrEmpty()) {
       log.info("Referral already exists for prisonNumber ${referralCreate.prisonNumber} and offering ${referralCreate.offeringId} ")
@@ -676,6 +677,11 @@ class ReferralController(
         description = "The referral does not exist.",
         content = [Content(schema = Schema(implementation = ErrorResponse::class))],
       ),
+      ApiResponse(
+        responseCode = "409",
+        description = "Conflict - Duplicate referral",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
     security = [SecurityRequirement(name = "bearerAuth")],
   )
@@ -688,10 +694,14 @@ class ReferralController(
       description = "The id (UUID) of a referral",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<Unit> {
+  ): ResponseEntity<Referral> {
     referralService.getReferralById(id)?.let {
-      referralService.submitReferralById(id)
-      return ResponseEntity.noContent().build()
+      val duplicateReferrals = referralService.getDuplicateReferrals(it.offering.id!!, it.prisonNumber)
+      if (!duplicateReferrals.isNullOrEmpty()) {
+        log.info("Referral already exists for prisonNumber ${it.prisonNumber} and offering ${it.offering.id} ")
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi())
+      }
+      return ResponseEntity.status(HttpStatus.OK).body(referralService.submitReferralById(id).toApi())
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
 
