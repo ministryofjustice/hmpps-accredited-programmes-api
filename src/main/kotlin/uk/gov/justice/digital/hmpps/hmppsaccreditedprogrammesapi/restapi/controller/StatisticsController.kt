@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,23 +27,17 @@ class StatisticsController(
   private val statisticsRepository: StatisticsRepository,
   private val objectMapper: ObjectMapper,
 ) {
-  companion object {
-    private val log = LoggerFactory.getLogger(this::class.java)
-  }
-
   @GetMapping("/report/countByStatus", produces = ["application/json"])
   fun getReportTypes(
     @RequestParam startDate: LocalDate,
     @RequestParam endDate: LocalDate? = LocalDate.now().plusDays(1),
     @RequestParam locationCodes: List<String>? = listOf(),
-  ): List<StatisticsRepository.ReportStatusCountProjection> {
-    val referralCountByStatus = statisticsRepository.referralCountByStatus(
+  ) =
+    statisticsRepository.referralCountByStatus(
       startDate,
       endDate!!,
       locationCodes,
-    )
-    return referralCountByStatus.orEmpty()
-  }
+    ).orEmpty()
 
   @GetMapping("/report-types", produces = ["application/json"])
   fun getReportTypes(): ReportTypes {
