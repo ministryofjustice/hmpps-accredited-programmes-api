@@ -1060,7 +1060,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       val offeringId = UUID.randomUUID().toString()
       createCourse(
         courseId = courseId,
-        identifier = getRandomString(2),
+        identifier = getRandomString(3),
         courseName = getRandomString(10),
         description = getRandomString(50),
       )
