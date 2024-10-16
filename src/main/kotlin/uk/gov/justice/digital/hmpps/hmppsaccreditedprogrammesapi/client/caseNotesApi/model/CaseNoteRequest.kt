@@ -6,4 +6,5 @@ data class CaseNoteRequest(
   val occurrenceDateTime: String,
   val authorName: String,
   val text: String,
+  val locationId: String,
 )

@@ -9,4 +9,6 @@ import java.util.UUID
 interface OrganisationRepository : JpaRepository<OrganisationEntity, UUID> {
 
   fun findOrganisationEntityByCode(code: String): OrganisationEntity?
+
+  fun findOrganisationEntityByName(name: String): OrganisationEntity?
 }

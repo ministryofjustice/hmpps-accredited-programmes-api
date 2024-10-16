@@ -69,6 +69,7 @@ class CaseNotesApiService(
             occurrenceDateTime = LocalDateTime.now().toString(),
             authorName = ACP_USER,
             text = message,
+            locationId = getLocationId(person),
           ),
           referral.prisonNumber,
         )
@@ -77,6 +78,14 @@ class CaseNotesApiService(
       }
     } catch (ex: Exception) {
       log.warn("Error writing case notes for ${referral.prisonNumber} ${ex.message} $ex")
+    }
+  }
+
+  private fun getLocationId(person: PersonEntity): String {
+    return if (person.location.equals("RELEASED", ignoreCase = true)) {
+      "OUT"
+    } else {
+      organisationRepository.findOrganisationEntityByName(person.location!!)?.code!!
     }
   }
 
