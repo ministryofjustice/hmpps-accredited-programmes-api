@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
@@ -83,7 +84,7 @@ class PniService(
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
-      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships),
+      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships, oasysOffendingInfo),
     )
 
     val genderOfPerson = getGenderOfPerson(prisonNumber, gender)
@@ -171,11 +172,12 @@ class PniService(
   private fun buildRiskScores(
     oasysRiskPredictorScores: OasysRiskPredictorScores?,
     relationships: OasysRelationships?,
+    offendingInfo: OasysOffendingInfo?,
   ) = IndividualRiskScores(
     ogrs3 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears?.round(),
     ovp = oasysRiskPredictorScores?.violencePredictorScore?.twoYears?.round(),
-    ospIic = oasysRiskPredictorScores?.sexualPredictorScore?.ospIndecentPercentageScoreLevel,
-    ospDc = oasysRiskPredictorScores?.sexualPredictorScore?.ospContactPercentageScoreLevel,
+    ospIic = offendingInfo?.ospIICRisk ?: offendingInfo?.ospIRisk,
+    ospDc = offendingInfo?.ospDCRisk ?: offendingInfo?.ospCRisk,
     rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
     sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
   )
