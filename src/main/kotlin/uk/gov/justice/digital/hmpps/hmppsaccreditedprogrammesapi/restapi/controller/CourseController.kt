@@ -177,7 +177,7 @@ class CourseController(
   fun getAllCourseNames(@Parameter(description = "flag to include withdrawn") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: Boolean?): ResponseEntity<List<String>> = ResponseEntity
     .ok(
       courseService
-        .getCourseNames(includeWithdrawn),
+        .getCourseNames(includeWithdrawn ?: false),
     )
 
   @Operation(
@@ -186,7 +186,7 @@ class CourseController(
     operationId = "getAllCourses",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Return a JSON representation of all courses that are not withdrawn.", content = [Content(array = ArraySchema(schema = Schema(implementation = Course::class)))]),
+      ApiResponse(responseCode = "200", description = "Return a JSON representation of all courses. If includeWithdrawn is set to true, it will all courses (including withdrawn courses). Setting it to false will return only active courses ", content = [Content(array = ArraySchema(schema = Schema(implementation = Course::class)))]),
     ],
     security = [ SecurityRequirement(name = "bearerAuth") ],
   )
@@ -195,11 +195,11 @@ class CourseController(
     value = ["/courses"],
     produces = ["application/json"],
   )
-  fun getAllCourses(@Parameter(description = "flag to return withdrawn") @RequestParam(value = "withdrawn", required = false) withdrawn: Boolean?): ResponseEntity<List<Course>> =
+  fun getAllCourses(@Parameter(description = "flag to return withdrawn") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: Boolean?): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
         courseService
-          .getAllCourses(withdrawn ?: false)
+          .getAllCourses(includeWithdrawn ?: false)
           .map(CourseEntity::toApi),
       )
 
@@ -218,8 +218,11 @@ class CourseController(
     value = ["/courses/{id}/offerings"],
     produces = ["application/json"],
   )
-  fun getAllOfferingsByCourseId(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<List<CourseOffering>> {
-    val offerings = courseService.getAllOfferingsByCourseId(id)
+  fun getAllOfferingsByCourseId(
+    @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
+    @Parameter(description = "flag to return withdrawn offerings") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: Boolean?,
+  ): ResponseEntity<List<CourseOffering>> {
+    val offerings = courseService.getAllOfferings(id, includeWithdrawn ?: false)
     val mappedOfferings = offerings.map { offeringEntity ->
       val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringEntity.organisationId) != null
       offeringEntity.toApi(enabledOrg)
