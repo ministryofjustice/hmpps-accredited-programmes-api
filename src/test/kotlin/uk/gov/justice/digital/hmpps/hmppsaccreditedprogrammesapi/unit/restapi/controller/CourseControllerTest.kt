@@ -197,7 +197,7 @@ constructor(
         OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce(),
       )
 
-      every { courseService.getAllOfferingsByCourseId(any()) } returns offerings
+      every { courseService.getAllOfferingsByCourseId(any(), any()) } returns offerings
 
       mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON

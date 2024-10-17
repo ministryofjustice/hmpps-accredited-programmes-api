@@ -52,7 +52,17 @@ class CourseServiceTest {
       val offerings = listOf(o1, o2)
       every { offeringRepository.findAllByCourseId(any()) } returns offerings
 
-      courseService.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(o2)
+      courseService.getAllOfferingsByCourseId(UUID.randomUUID(), false).shouldContainExactly(o2)
+    }
+
+    @Test
+    fun `Withdrawn offerings returned from getAllOfferingsByCourseId when `() {
+      val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+      val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
+      val offerings = listOf(o1, o2)
+      every { offeringRepository.findAllByCourseId(any()) } returns offerings
+
+      courseService.getAllOfferingsByCourseId(UUID.randomUUID(), true).shouldContainExactly(offerings)
     }
 
     @Test
