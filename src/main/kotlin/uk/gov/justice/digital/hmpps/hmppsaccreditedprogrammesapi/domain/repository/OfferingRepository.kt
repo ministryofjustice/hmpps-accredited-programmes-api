@@ -10,6 +10,7 @@ import java.util.UUID
 @Repository
 interface OfferingRepository : JpaRepository<OfferingEntity, UUID> {
   fun findAllByCourseId(courseId: UUID): List<OfferingEntity>
+  fun findAllByCourseIdAAndWithdrawnIsFalse(courseId: UUID): List<OfferingEntity>
   fun findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(courseId: UUID, organisationId: String): OfferingEntity?
   fun findByCourseIdAndIdAndWithdrawnIsFalse(courseId: UUID, offeringId: UUID): OfferingEntity?
 

@@ -35,13 +35,8 @@ constructor(
     }
   }
 
-  fun getCourseNames(includeWithdrawn: Boolean? = true): List<String> {
-    return if (includeWithdrawn == null) {
-      courseRepository.getCourseNames(true)
-    } else {
-      courseRepository.getCourseNames(includeWithdrawn)
-    }
-  }
+  fun getCourseNames(includeWithdrawn: Boolean = false) =
+    courseRepository.getCourseNames(includeWithdrawn)
 
   fun getNotWithdrawnCourseById(courseId: UUID): CourseEntity? =
     courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
@@ -59,12 +54,15 @@ constructor(
   }
 
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
-  fun getAllOfferings(): List<OfferingEntity> = offeringRepository.findAll().filterNot { it.withdrawn }
   fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> =
     offeringRepository.findAll().filter { it.organisationId == organisationId }
 
-  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> =
-    offeringRepository.findAllByCourseId(courseId).filterNot { it.withdrawn }
+  fun getAllOfferings(courseId: UUID, includeWithdrawn: Boolean = false): List<OfferingEntity> {
+    if (includeWithdrawn) {
+      return offeringRepository.findAllByCourseId(courseId)
+    }
+    return offeringRepository.findAllByCourseIdAAndWithdrawnIsFalse(courseId)
+  }
 
   fun getOfferingById(offeringId: UUID): OfferingEntity? =
     offeringRepository.findByIdOrNull(offeringId)?.takeIf { !it.withdrawn }

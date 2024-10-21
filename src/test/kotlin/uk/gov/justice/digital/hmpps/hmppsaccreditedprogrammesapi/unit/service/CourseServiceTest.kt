@@ -46,13 +46,23 @@ class CourseServiceTest {
   @DisplayName("Handle withdrawn Offerings")
   inner class WithdrawnOfferingsTests {
     @Test
-    fun `Withdrawn offerings should not be returned from getAllOfferingsByCourseId`() {
+    fun `Withdrawn offerings should not be returned from getAllOfferings when withdrawn is false`() {
+      val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+      val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
+
+      every { offeringRepository.findAllByCourseIdAAndWithdrawnIsFalse(any()) } returns listOf(o2)
+
+      courseService.getAllOfferings(UUID.randomUUID()).shouldContainExactly(o2)
+    }
+
+    @Test
+    fun `All offerings should be returned from getAllOfferings when withdrawn is true`() {
       val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
       val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
       val offerings = listOf(o1, o2)
       every { offeringRepository.findAllByCourseId(any()) } returns offerings
 
-      courseService.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(o2)
+      courseService.getAllOfferings(UUID.randomUUID(), true).shouldContainExactly(o1, o2)
     }
 
     @Test
