@@ -87,7 +87,7 @@ constructor(
       every { courseService.getAllCourses(false) } returns courses
 
       val uniqueCourseNames = courses.map { it.name }.distinct()
-      every { courseService.getCourseNames(null) } returns uniqueCourseNames
+      every { courseService.getCourseNames() } returns uniqueCourseNames
 
       mockMvc.get("/courses/course-names") {
         accept = MediaType.APPLICATION_JSON
@@ -197,7 +197,7 @@ constructor(
         OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce(),
       )
 
-      every { courseService.getAllOfferingsByCourseId(any()) } returns offerings
+      every { courseService.getAllOfferings(any(), any()) } returns offerings
 
       mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON

@@ -27,21 +27,15 @@ constructor(
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val referralRepository: ReferralRepository,
 ) {
-  fun getAllCourses(withdrawn: Boolean): List<CourseEntity> {
-    return if (withdrawn) {
-      courseRepository.findAll().filter { it.withdrawn }
-    } else {
-      courseRepository.findAll().filterNot { it.withdrawn }
+  fun getAllCourses(includeWithdrawn: Boolean = false): List<CourseEntity> {
+    if (includeWithdrawn) {
+      return courseRepository.findAll()
     }
+    return courseRepository.findAllByWithdrawnIsFalse()
   }
 
-  fun getCourseNames(includeWithdrawn: Boolean? = true): List<String> {
-    return if (includeWithdrawn == null) {
-      courseRepository.getCourseNames(true)
-    } else {
-      courseRepository.getCourseNames(includeWithdrawn)
-    }
-  }
+  fun getCourseNames(includeWithdrawn: Boolean = false) =
+    courseRepository.getCourseNames(includeWithdrawn)
 
   fun getNotWithdrawnCourseById(courseId: UUID): CourseEntity? =
     courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
@@ -59,12 +53,16 @@ constructor(
   }
 
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
-  fun getAllOfferings(): List<OfferingEntity> = offeringRepository.findAll().filterNot { it.withdrawn }
   fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> =
     offeringRepository.findAll().filter { it.organisationId == organisationId }
 
-  fun getAllOfferingsByCourseId(courseId: UUID): List<OfferingEntity> =
-    offeringRepository.findAllByCourseId(courseId).filterNot { it.withdrawn }
+  fun getAllOfferings(courseId: UUID, includeWithdrawn: Boolean = false): List<OfferingEntity> {
+    return if (includeWithdrawn) {
+      offeringRepository.findAllByCourseId(courseId)
+    } else {
+      offeringRepository.findAllByCourseIdAndWithdrawnIsFalse(courseId)
+    }
+  }
 
   fun getOfferingById(offeringId: UUID): OfferingEntity? =
     offeringRepository.findByIdOrNull(offeringId)?.takeIf { !it.withdrawn }
