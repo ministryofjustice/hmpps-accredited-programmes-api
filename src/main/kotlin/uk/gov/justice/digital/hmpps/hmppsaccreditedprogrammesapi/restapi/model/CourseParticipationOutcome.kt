@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CourseParticipationOutcome(
 
   @Schema(example = "null", required = true, description = "")
-  @get:JsonProperty("status", required = true) val status: CourseParticipationOutcome.Status,
+  @get:JsonProperty("status", required = true) val status: Status,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("yearStarted") val yearStarted: Int? = null,
