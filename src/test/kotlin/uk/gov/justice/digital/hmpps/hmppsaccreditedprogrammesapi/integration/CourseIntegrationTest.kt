@@ -33,6 +33,7 @@ val NEW_COURSE_ID: UUID = UUID.fromString("790a2dfe-ddd1-4504-bb9c-83e6e53a6537"
 val UNUSED_COURSE_ID: UUID = UUID.fromString("891a2dfe-ddd1-4801-ab9b-94e6f53a6537")
 
 private const val OFFERING_ID = "7fffcc6a-11f8-4713-be35-cf5ff1aee517"
+private const val WITHDRAWN_OFFERING_ID = "7fffcc6a-11f8-4713-be35-cf5ff1aee518"
 private const val UNUSED_OFFERING_ID = "7fffbb9a-11f8-9743-be35-cf5881aee517"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -102,6 +103,16 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "MDI",
       "nobody-mdi@digital.justice.gov.uk",
       "nobody2-mdi@digital.justice.gov.uk",
+      true,
+    )
+
+    persistenceHelper.createOffering(
+      UUID.fromString(WITHDRAWN_OFFERING_ID),
+      COURSE_ID,
+      "SKI",
+      "nobody-ski@digital.justice.gov.uk",
+      "nobody2-ski@digital.justice.gov.uk",
+      true,
       true,
     )
 
@@ -211,7 +222,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Searching for all course names with JWT returns 200 with correct body`() {
-    val expectedCourseNames = courseRepository.getCourseNames(true)
+    val expectedCourseNames = courseRepository.getCourseNames(false)
 
     val responseBodySpec = webTestClient
       .get()
@@ -293,7 +304,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
   fun `Searching for all offerings for a course with JWT and valid id returns 200 and correct body`() {
     webTestClient
       .get()
-      .uri("/courses/$COURSE_ID/offerings")
+      .uri("/courses/$COURSE_ID/offerings?includeWithdrawn=false")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -305,6 +316,28 @@ class CourseIntegrationTest : IntegrationTestBase() {
         [
           { "organisationId": "MDI", "contactEmail":"nobody-mdi@digital.justice.gov.uk" },
           { "organisationId": "BWN", "contactEmail":"nobody-bwn@digital.justice.gov.uk" }
+        ]
+      """,
+      )
+  }
+
+  @Test
+  fun `Searching for all offerings including withdran for a course with JWT and valid id returns 200 and correct body`() {
+    webTestClient
+      .get()
+      .uri("/courses/$COURSE_ID/offerings?includeWithdrawn=true")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .json(
+        """
+        [
+          { "organisationId": "MDI", "contactEmail":"nobody-mdi@digital.justice.gov.uk" },
+          { "organisationId": "BWN", "contactEmail":"nobody-bwn@digital.justice.gov.uk" },
+          { "organisationId": "SKI", "contactEmail":"nobody-ski@digital.justice.gov.uk" }
         ]
       """,
       )
