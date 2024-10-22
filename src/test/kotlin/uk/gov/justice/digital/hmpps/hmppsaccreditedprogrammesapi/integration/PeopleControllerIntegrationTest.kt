@@ -149,12 +149,12 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri { builder ->
-          builder
-              .path("/people/$prisonNumber/course-participation-history")
-              .queryParam("outcomeStatus", outcomeStatus.joinToString(","))
-              .build()
+        builder
+          .path("/people/$prisonNumber/course-participation-history")
+          .queryParam("outcomeStatus", outcomeStatus.joinToString(","))
+          .build()
       }
-        .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
