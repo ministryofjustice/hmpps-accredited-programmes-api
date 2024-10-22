@@ -47,76 +47,106 @@ class CourseServiceTest {
   inner class WithdrawnOfferingsTests {
     @Test
     fun `Withdrawn offerings should not be returned from getAllOfferingsByCourseId`() {
-      val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
-      val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
-      val offerings = listOf(o1, o2)
-      every { offeringRepository.findAllByCourseId(any()) } returns offerings
+      fun `Withdrawn offerings should not be returned from getAllOfferings when withdrawn is false`() {
+        val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+        val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
 
-      courseService.getAllOfferingsByCourseId(UUID.randomUUID()).shouldContainExactly(o2)
+        every { offeringRepository.findAllByCourseIdAndWithdrawnIsFalse(any()) } returns listOf(o2)
+
+        courseService.getAllOfferings(UUID.randomUUID()).shouldContainExactly(o2)
+      }
+
+      @Test
+      fun `All offerings should be returned from getAllOfferings when withdrawn is true`() {
+        val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+        val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
+        val offerings = listOf(o1, o2)
+        every { offeringRepository.findAllByCourseId(any()) } returns offerings
+
+        courseService.getAllOfferings(UUID.randomUUID(), true).shouldContainExactly(o1, o2)
+      }
+
+      @Test
+      fun `Withdrawn offerings returned from getAllOfferingsByCourseId when `() {
+        val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+        val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
+        val offerings = listOf(o1, o2)
+        every { offeringRepository.findAllByCourseId(any()) } returns offerings
+
+        courseService.getAllOfferings(UUID.randomUUID(), true).shouldContainExactly(offerings)
+      }
+
+      @Test
+      fun `A withdrawn Offering should not be returned from getOfferingById`() {
+        val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+        every { offeringRepository.findById(any()) } returns Optional.of(o1)
+
+        courseService.getOfferingById(UUID.randomUUID()).shouldBeNull()
+      }
+
+      @Test
+      fun `An active Offering should be returned from getOfferingById`() {
+        val o1 = OfferingEntityFactory().withOrganisationId("MDI").produce()
+        every { offeringRepository.findById(any()) } returns Optional.of(o1)
+
+        courseService.getOfferingById(UUID.randomUUID()) shouldBe o1
+      }
     }
 
-    @Test
-    fun `A withdrawn Offering should not be returned from getOfferingById`() {
-      val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
-      every { offeringRepository.findById(any()) } returns Optional.of(o1)
+    @Nested
+    @DisplayName("Handle withdrawn CourseEntities")
+    inner class WithdrawnCourseTests {
+      @Test
+      fun `A withdrawn course should not be returned from getCourseById`() {
+        val c1 = CourseEntityFactory().withIdentifier("C1").withWithdrawn(true).produce()
+        every { courseRepository.findById(any()) } returns Optional.of(c1)
+        courseService.getNotWithdrawnCourseById(UUID.randomUUID()).shouldBeNull()
+      }
 
-      courseService.getOfferingById(UUID.randomUUID()).shouldBeNull()
+      @Test
+      fun `An active course should  be returned from getCourseById`() {
+        val c1 = CourseEntityFactory().withIdentifier("C1").produce()
+        every { courseRepository.findById(any()) } returns Optional.of(c1)
+        courseService.getNotWithdrawnCourseById(UUID.randomUUID()) shouldBe c1
+      }
+
+      @Test
+      fun `getAllCourses should exclude withdrawn courses`() {
+        val c1 = CourseEntityFactory().withIdentifier("C1").withWithdrawn(true).produce()
+        val c2 = CourseEntityFactory().withIdentifier("C2").produce()
+        every { courseRepository.findAllByWithdrawnIsFalse() } returns listOf(c2)
+        courseService.getAllCourses().shouldContainExactly(c2)
+      }
+
+      @Test
+      fun `getAllCourses should return all courses when includeWithdrawn courses is true`() {
+        val c1 = CourseEntityFactory().withIdentifier("C1").withWithdrawn(true).produce()
+        val c2 = CourseEntityFactory().withIdentifier("C2").produce()
+        val courseEntities = listOf(c1, c2)
+        every { courseRepository.findAll() } returns courseEntities
+        courseService.getAllCourses(true).shouldContainExactly(courseEntities)
+      }
     }
 
-    @Test
-    fun `An active Offering should be returned from getOfferingById`() {
-      val o1 = OfferingEntityFactory().withOrganisationId("MDI").produce()
-      every { offeringRepository.findById(any()) } returns Optional.of(o1)
+    @Nested
+    @DisplayName("Get Offerings by organisationId")
+    inner class GetOfferingsByOrganisationId {
+      @Test
+      fun `should return empty list when no offerings exist for an organisationId`() {
+        val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+        val offerings = listOf(o1)
+        every { offeringRepository.findAll() } returns offerings
+        courseService.getAllOfferingsByOrganisationId("xxx").shouldBeEmpty()
+      }
 
-      courseService.getOfferingById(UUID.randomUUID()) shouldBe o1
-    }
-  }
-
-  @Nested
-  @DisplayName("Handle withdrawn CourseEntities")
-  inner class WithdrawnCourseTests {
-    @Test
-    fun `A withdrawn course should not be returned from getCourseById`() {
-      val c1 = CourseEntityFactory().withIdentifier("C1").withWithdrawn(true).produce()
-      every { courseRepository.findById(any()) } returns Optional.of(c1)
-      courseService.getNotWithdrawnCourseById(UUID.randomUUID()).shouldBeNull()
-    }
-
-    @Test
-    fun `An active course should  be returned from getCourseById`() {
-      val c1 = CourseEntityFactory().withIdentifier("C1").produce()
-      every { courseRepository.findById(any()) } returns Optional.of(c1)
-      courseService.getNotWithdrawnCourseById(UUID.randomUUID()) shouldBe c1
-    }
-
-    @Test
-    fun `getAllCourses should exclude withdrawn courses`() {
-      val c1 = CourseEntityFactory().withIdentifier("C1").withWithdrawn(true).produce()
-      val c2 = CourseEntityFactory().withIdentifier("C2").produce()
-      val courses = listOf(c1, c2)
-      every { courseRepository.findAll() } returns courses
-      courseService.getAllCourses(false).shouldContainExactly(c2)
-    }
-  }
-
-  @Nested
-  @DisplayName("Get Offerings by organisationId")
-  inner class GetOfferingsByOrganisationId {
-    @Test
-    fun `should return empty list when no offerings exist for an organisationId`() {
-      val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
-      val offerings = listOf(o1)
-      every { offeringRepository.findAll() } returns offerings
-      courseService.getAllOfferingsByOrganisationId("xxx").shouldBeEmpty()
-    }
-
-    @Test
-    fun `should return only offerings for requested organisationID`() {
-      val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
-      val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
-      val offerings = listOf(o1, o2)
-      every { offeringRepository.findAll() } returns offerings
-      courseService.getAllOfferingsByOrganisationId(o1.organisationId).shouldContainExactly(o1)
+      @Test
+      fun `should return only offerings for requested organisationID`() {
+        val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
+        val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
+        val offerings = listOf(o1, o2)
+        every { offeringRepository.findAll() } returns offerings
+        courseService.getAllOfferingsByOrganisationId(o1.organisationId).shouldContainExactly(o1)
+      }
     }
   }
 }
