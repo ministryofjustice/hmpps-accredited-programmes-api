@@ -322,7 +322,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Searching for all offerings including withdran for a course with JWT and valid id returns 200 and correct body`() {
+  fun `Searching for all offerings including withdrawn for a course with JWT and valid id returns 200 and correct body`() {
     webTestClient
       .get()
       .uri("/courses/$COURSE_ID/offerings?includeWithdrawn=true")
