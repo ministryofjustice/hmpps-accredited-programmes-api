@@ -67,7 +67,7 @@ class CourseServiceTest {
       }
 
       @Test
-      fun `Withdrawn offerings returned from getAllOfferingsByCourseId when `() {
+      fun `Withdrawn offerings returned from getAllOfferingsByCourseId when include withdrawn flag is set to true`() {
         val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
         val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
         val offerings = listOf(o1, o2)
