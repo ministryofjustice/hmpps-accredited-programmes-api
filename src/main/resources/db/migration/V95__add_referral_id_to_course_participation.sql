@@ -1,0 +1,2 @@
+ALTER TABLE course_participation ADD COLUMN referral_id UUID NULL;
+ALTER TABLE course_participation ADD CONSTRAINT course_participation_referral_fk FOREIGN KEY (referral_id) REFERENCES referral(referral_id);
