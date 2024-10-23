@@ -83,6 +83,7 @@ fun CourseStatus.toApi() = when (this) {
 fun CourseParticipationEntity.toApi() = ApiCourseParticipation(
   courseName = courseName,
   id = id!!,
+  referralId = referralId,
   prisonNumber = prisonNumber,
   setting = setting?.toApi(),
   source = source,
