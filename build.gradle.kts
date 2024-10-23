@@ -14,7 +14,7 @@ configurations {
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "2.6.0"
-  val sentryVersion = "7.15.0"
+  val sentryVersion = "7.16.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.3.4"
 
@@ -49,9 +49,9 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:1.20.2")
-  testImplementation("org.testcontainers:postgresql:1.20.2")
-  testImplementation("org.testcontainers:junit-jupiter:1.20.2")
+  testImplementation("org.testcontainers:testcontainers:1.20.3")
+  testImplementation("org.testcontainers:postgresql:1.20.3")
+  testImplementation("org.testcontainers:junit-jupiter:1.20.3")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
