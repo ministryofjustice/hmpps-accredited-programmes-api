@@ -289,16 +289,18 @@ constructor(
       .produce()
 
     every { referralService.getReferralById(referral.id!!) } returns referral
-    every { referralService.submitReferralById(referral.id!!) } just Runs
+    every { referralService.getDuplicateReferrals(referral.offering.id!!, referral.prisonNumber) } returns null
+    every { referralService.submitReferralById(referral.id!!) } returns referral
 
     mockMvc.post("/referrals/${referral.id}/submit") {
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
-      status { isNoContent() }
+      status { isOk() }
     }
 
     verify { referralService.getReferralById(referral.id!!) }
     verify { referralService.submitReferralById(referral.id!!) }
+    verify { referralService.getDuplicateReferrals(referral.offering.id!!, referral.prisonNumber) }
   }
 
   @Test
@@ -333,6 +335,7 @@ constructor(
       .produce()
 
     every { referralService.getReferralById(referral.id!!) } returns referral
+    every { referralService.getDuplicateReferrals(any(), any()) } returns null
     every { referralService.submitReferralById(referral.id!!) } throws ValidationException("additionalInformation is not valid: null")
 
     mockMvc.post("/referrals/${referral.id}/submit") {

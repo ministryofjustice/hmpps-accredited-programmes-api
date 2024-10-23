@@ -607,7 +607,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectStatus().isNoContent
+      .expectStatus().isOk
   }
 
   private fun encodeValue(value: String): String {
@@ -1060,7 +1060,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       val offeringId = UUID.randomUUID().toString()
       createCourse(
         courseId = courseId,
-        identifier = getRandomString(2),
+        identifier = getRandomString(3),
         courseName = getRandomString(10),
         description = getRandomString(50),
       )
