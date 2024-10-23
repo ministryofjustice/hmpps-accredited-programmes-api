@@ -49,14 +49,15 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createOffering(offeringId: UUID, courseId: UUID, orgId: String, contactEmail: String, secondaryContactEmail: String, referable: Boolean) {
-    entityManager.createNativeQuery("INSERT INTO offering (offering_id, course_id, organisation_id, contact_email, secondary_contact_email, referable) VALUES (:id, :courseId, :orgId, :contactEmail, :secondaryContactEmail, :referable)")
+  fun createOffering(offeringId: UUID, courseId: UUID, orgId: String, contactEmail: String, secondaryContactEmail: String, referable: Boolean, withdrawn: Boolean = false) {
+    entityManager.createNativeQuery("INSERT INTO offering (offering_id, course_id, organisation_id, contact_email, secondary_contact_email, referable, withdrawn) VALUES (:id, :courseId, :orgId, :contactEmail, :secondaryContactEmail, :referable, :withdrawn)")
       .setParameter("id", offeringId)
       .setParameter("courseId", courseId)
       .setParameter("orgId", orgId)
       .setParameter("contactEmail", contactEmail)
       .setParameter("secondaryContactEmail", secondaryContactEmail)
       .setParameter("referable", referable)
+      .setParameter("withdrawn", withdrawn)
       .executeUpdate()
   }
 
@@ -87,9 +88,10 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createParticipation(participationId: UUID, prisonNumber: String, courseName: String, source: String, detail: String, location: String, type: String, outcomeStatus: String, yearStarted: Int?, yearCompleted: Int?, createdByUsername: String, createdDateTime: LocalDateTime, lastModifiedByUsername: String?, lastModifiedDateTime: LocalDateTime?) {
-    entityManager.createNativeQuery("INSERT INTO course_participation (course_participation_id, prison_number, course_name, source, detail, location, type, outcome_status, year_started, year_completed, created_by_username, created_date_time, last_modified_by_username, last_modified_date_time) VALUES (:id, :prisonNumber, :courseName, :source, :detail, :location, :type, :outcomeStatus, :yearStarted, :yearCompleted, :createdByUsername, :createdDateTime, :lastModifiedByUsername, :lastModifiedDateTime)")
+  fun createParticipation(participationId: UUID, referralId: UUID?, prisonNumber: String, courseName: String, source: String, detail: String, location: String, type: String, outcomeStatus: String, yearStarted: Int?, yearCompleted: Int?, createdByUsername: String, createdDateTime: LocalDateTime, lastModifiedByUsername: String?, lastModifiedDateTime: LocalDateTime?) {
+    entityManager.createNativeQuery("INSERT INTO course_participation (course_participation_id, referral_id, prison_number, course_name, source, detail, location, type, outcome_status, year_started, year_completed, created_by_username, created_date_time, last_modified_by_username, last_modified_date_time) VALUES (:id, :referralId, :prisonNumber, :courseName, :source, :detail, :location, :type, :outcomeStatus, :yearStarted, :yearCompleted, :createdByUsername, :createdDateTime, :lastModifiedByUsername, :lastModifiedDateTime)")
       .setParameter("id", participationId)
+      .setParameter("referralId", referralId)
       .setParameter("prisonNumber", prisonNumber)
       .setParameter("courseName", courseName)
       .setParameter("source", source)

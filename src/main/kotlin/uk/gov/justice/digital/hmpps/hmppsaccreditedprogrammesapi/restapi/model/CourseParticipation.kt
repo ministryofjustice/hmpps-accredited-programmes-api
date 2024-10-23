@@ -24,6 +24,9 @@ data class CourseParticipation(
   @Schema(example = "null", required = true, description = "A unique identifier for this record of participation in a course.")
   @get:JsonProperty("id", required = true) val id: UUID,
 
+  @Schema(example = "null", required = true, description = "The unique identifier for the associated referral.")
+  @get:JsonProperty("referralId", required = true) val referralId: UUID? = null,
+
   @Schema(example = "null", required = true, description = "The identity of the person who added this CourseParticipation")
   @get:JsonProperty("addedBy", required = true) val addedBy: String,
 

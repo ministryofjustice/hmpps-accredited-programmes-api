@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import java.util.UUID
@@ -37,6 +38,10 @@ constructor(
 
   fun deleteCourseParticipationById(historicCourseParticipationId: UUID) {
     courseParticipationRepository.deleteById(historicCourseParticipationId)
+  }
+
+  fun getCourseParticipationsByPrisonNumberAndStatus(prisonNumber: String, outcomeStatus: List<CourseStatus>): List<CourseParticipationEntity> {
+    return courseParticipationRepository.findByPrisonNumberAndOutcomeStatusIn(prisonNumber, outcomeStatus)
   }
 }
 

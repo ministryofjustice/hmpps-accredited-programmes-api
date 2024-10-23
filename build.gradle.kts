@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.6"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.7"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.0.21"
   kotlin("plugin.jpa") version "2.0.21"
@@ -16,7 +16,7 @@ dependencies {
   val springdocVersion = "2.6.0"
   val sentryVersion = "7.15.0"
   val jsonWebtokenVersion = "0.12.6"
-  val springSecurityVersion = "6.3.3"
+  val springSecurityVersion = "6.3.4"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.7")
   runtimeOnly("org.postgresql:postgresql:42.7.4")

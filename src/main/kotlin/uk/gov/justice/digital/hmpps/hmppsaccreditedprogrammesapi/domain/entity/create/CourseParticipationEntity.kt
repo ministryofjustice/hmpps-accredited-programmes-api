@@ -29,6 +29,8 @@ data class CourseParticipationEntity(
   @Column(name = "course_participation_id")
   val id: UUID? = null,
 
+  val referralId: UUID? = null,
+
   val prisonNumber: String,
   var courseName: String?,
 

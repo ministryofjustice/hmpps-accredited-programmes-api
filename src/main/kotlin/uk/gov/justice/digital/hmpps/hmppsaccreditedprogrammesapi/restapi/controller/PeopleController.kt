@@ -9,20 +9,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationOutcome.Status
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Offence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PeopleSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PeopleSearchResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SentenceDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ManageOffencesService
@@ -44,6 +48,10 @@ class PeopleController(
   private val auditService: AuditService,
 ) {
 
+  @Deprecated(
+    "This endpoint is deprecated",
+    ReplaceWith("getCourseParticipationsByPrisonNumberAndStatus"),
+  )
   @Operation(
     tags = ["Course Participations"],
     summary = "Retrieve course participation information for a person identified by their prison number.",
@@ -81,6 +89,47 @@ class PeopleController(
     return ResponseEntity.ok(
       courseParticipationService
         .getCourseParticipationsByPrisonNumber(prisonNumber)
+        .map(CourseParticipationEntity::toApi),
+    )
+  }
+
+  @Operation(
+    tags = ["Course Participations"],
+    summary = "Retrieve course participation information for a person identified by their prison number and outcome status.",
+    operationId = "getCourseParticipationsByPrisonNumberAndStatus",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "All historic course participation information for the person.  Empty if none found.",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = CourseParticipation::class)))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "The client is not authorised to perform this operation.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @GetMapping(
+    value = ["/people/{prisonNumber}/course-participation-history"],
+    produces = ["application/json"],
+  )
+  fun getCourseParticipationsByPrisonNumberAndStatus(
+    @Parameter(
+      description = "The prison number of the person for whom the information should be retrieved.",
+      required = true,
+    ) @PathVariable("prisonNumber") prisonNumber: String,
+    @RequestParam(value = "outcomeStatus", required = true) outcomeStatus: List<Status>,
+  ): ResponseEntity<List<CourseParticipation>> {
+    auditService.audit(
+      prisonNumber = prisonNumber,
+      auditAction = AuditAction.COURSE_PARTICIPATION.name,
+    )
+    return ResponseEntity.ok(
+      courseParticipationService
+        .getCourseParticipationsByPrisonNumberAndStatus(prisonNumber, outcomeStatus.map { it.toDomain() })
         .map(CourseParticipationEntity::toApi),
     )
   }
