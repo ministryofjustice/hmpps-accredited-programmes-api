@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisites
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseUpdateRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
@@ -587,6 +588,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
           referable = true,
           withdrawn = false,
           organisationEnabled = true,
+          gender = Gender.M,
         ),
       )
       .exchange()

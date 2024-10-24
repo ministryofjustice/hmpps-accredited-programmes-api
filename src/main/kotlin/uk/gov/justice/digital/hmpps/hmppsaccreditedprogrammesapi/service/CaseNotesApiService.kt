@@ -96,7 +96,7 @@ class CaseNotesApiService(
   ): String {
     log.info("Request received for creating case notes :${referral.id} $referralStatusUpdate")
     val course = referral.offering.course
-    val orgName = organisationService.findOrganisationEntityByCode(referral.offering.organisationId)?.name
+    val orgName = organisationService.findOrganisationEntityByCode(referral.offering.organisation.code)?.name
     val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
 
     val prisonerName = person?.fullName().orEmpty()

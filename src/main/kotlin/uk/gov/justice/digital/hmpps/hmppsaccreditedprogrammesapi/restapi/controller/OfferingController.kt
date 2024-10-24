@@ -76,7 +76,7 @@ class OfferingController(
   )
   fun getOfferingById(@Parameter(description = "A course offering identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CourseOffering> {
     val offeringById = courseService.getOfferingById(id)
-    val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringById?.organisationId.orEmpty()) != null
+    val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringById?.organisation?.code.orEmpty()) != null
 
     return offeringById?.toApi(enabledOrg)?.let {
       ResponseEntity.ok(it)

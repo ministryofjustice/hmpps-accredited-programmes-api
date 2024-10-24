@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditSe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AuditEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.hmpps.sqs.audit.HmppsAuditService
 import java.util.*
@@ -37,6 +38,7 @@ class AuditServiceTest {
   fun `create audit record from referral entity successful`() {
     val offering = OfferingEntityFactory().produce()
     offering.course = CourseEntityFactory().produce()
+    offering.organisation = OrganisationEntityFactory().produce()
 
     val referralEntity = ReferralEntityFactory().withPrisonNumber(PRISON_NUMBER_1)
       .withOffering(offering).produce()

@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomAlphanumericString
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomUppercaseString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import java.util.UUID
 
@@ -8,7 +9,7 @@ class OrganisationEntityFactory {
   private var id: UUID = UUID.randomUUID()
   private var code: String = randomAlphanumericString()
   private var name: String = randomAlphanumericString()
-  private var gender: String = "M"
+  private var gender: String = randomUppercaseString(1)
 
   fun withId(id: UUID) = apply { this.id = id }
   fun withCode(code: String) = apply { this.code = code }

@@ -205,7 +205,6 @@ class ReferralServiceTest {
 
     val offering = OfferingEntityFactory()
       .withId(UUID.randomUUID())
-      .withOrganisationId(prisonCode)
       .produce()
     every { offeringRepository.findById(any()) } returns Optional.of(offering)
     every { enabledOrganisationService.getEnabledOrganisation(any()) } returns EnabledOrganisationEntityFactory().produce()
