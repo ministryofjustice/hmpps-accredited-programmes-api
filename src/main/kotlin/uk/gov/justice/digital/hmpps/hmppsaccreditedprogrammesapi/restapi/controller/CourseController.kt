@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisites
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AudienceService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
@@ -221,6 +222,7 @@ class CourseController(
   fun getAllOfferingsByCourseId(
     @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
     @Parameter(description = "flag to return withdrawn offerings") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: Boolean?,
+    @Parameter(description = "Offerings for a gender") @RequestParam(value = "gender", required = false) gender: Gender?,
   ): ResponseEntity<List<CourseOffering>> {
     val offerings = courseService.getAllOfferings(id, includeWithdrawn ?: false)
     val mappedOfferings = offerings.map { offeringEntity ->
