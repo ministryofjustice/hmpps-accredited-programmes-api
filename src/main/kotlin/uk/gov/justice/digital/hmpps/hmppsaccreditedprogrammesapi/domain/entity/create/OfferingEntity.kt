@@ -33,3 +33,5 @@ data class OfferingEntity(
   @JoinColumn(name = "course_id")
   lateinit var course: CourseEntity
 }
+
+data class GenderOffering(val offeringEntity: OfferingEntity, val gender: String)

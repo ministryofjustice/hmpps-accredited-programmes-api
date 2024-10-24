@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.GenderOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
@@ -57,6 +58,14 @@ constructor(
     offeringRepository.findAll().filter { it.organisationId == organisationId }
 
   fun getAllOfferings(courseId: UUID, includeWithdrawn: Boolean = false): List<OfferingEntity> {
+    return if (includeWithdrawn) {
+      offeringRepository.findAllByCourseId(courseId)
+    } else {
+      offeringRepository.findAllByCourseIdAndWithdrawnIsFalse(courseId)
+    }
+  }
+
+  fun getAllOfferings1(courseId: UUID, includeWithdrawn: Boolean = false): List<GenderOffering> {
     return if (includeWithdrawn) {
       offeringRepository.findAllByCourseId(courseId)
     } else {
