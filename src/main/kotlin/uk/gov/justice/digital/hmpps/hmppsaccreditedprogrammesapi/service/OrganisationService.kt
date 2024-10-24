@@ -19,7 +19,7 @@ class OrganisationService(
     private val log = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun createOrganisationIfNotPresent(code: String, prison: Prison?) {
+  fun createOrganisationIfNotPresent(code: String, prison: Prison?): OrganisationEntity {
     val organisation = organisationRepository.findOrganisationEntityByCode(code)
 
     if (organisation == null) {
@@ -36,16 +36,20 @@ class OrganisationService(
             }
           }
 
-          organisationRepository.save(OrganisationEntity(code = it.prisonId, name = it.prisonName, gender = gender))
+          return organisationRepository.save(
+            OrganisationEntity(
+              code = it.prisonId,
+              name = it.prisonName,
+              gender = gender,
+            ),
+          )
         } catch (e: Exception) {
           log.warn("Failed to save organisation details for prison $code", e)
           throw BusinessException("Failed to save organisation details for prison $code", e)
         }
-      } ?: {
-        log.warn("Prison details could not be fetched for $code")
-        throw BusinessException("Prison details could not be fetched for $code")
       }
     }
+    return organisation
   }
 
   fun findOrganisationEntityByName(personLocation: String) = organisationRepository.findOrganisationEntityByName(personLocation)

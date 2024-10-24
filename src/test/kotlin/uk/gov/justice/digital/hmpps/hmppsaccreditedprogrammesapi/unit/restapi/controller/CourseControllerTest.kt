@@ -207,7 +207,7 @@ constructor(
         content {
           contentType(MediaType.APPLICATION_JSON)
           offerings.forEachIndexed { index, offering ->
-            jsonPath("$[$index].organisationId") { value(offering.organisationId) }
+            jsonPath("$[$index].organisationId") { value(offering.organisation.code) }
             jsonPath("$[$index].contactEmail") { value(offering.contactEmail) }
           }
         }

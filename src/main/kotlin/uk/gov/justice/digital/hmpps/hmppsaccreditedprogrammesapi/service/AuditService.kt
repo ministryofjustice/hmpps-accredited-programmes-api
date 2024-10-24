@@ -71,7 +71,7 @@ class AuditService(
       referralStatusTo = referralEntity.status,
       courseId = referralEntity.offering.course.id,
       courseName = referralEntity.offering.course.name,
-      courseLocation = referralEntity.offering.organisationId,
+      courseLocation = referralEntity.offering.organisation.code,
       auditAction = auditAction,
     )
   }

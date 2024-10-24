@@ -100,15 +100,15 @@ constructor(
       referable = courseOffering.referable,
     )
     offering.course = course
+    offering.organisation = organisationService.createOrganisationIfNotPresent(offering.organisation.code, prison)
 
-    organisationService.createOrganisationIfNotPresent(offering.organisationId, prison)
     return offeringRepository.save(offering).toApi()
   }
 
   fun updateOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
     val validPrisons = prisonRegisterApiService.getPrisons()
 
-    validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
+    val prison = validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
       ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
 
     val offeringEntity =
@@ -129,6 +129,8 @@ constructor(
     )!!
 
     updatedOfferingEntity.course = course
+    updatedOfferingEntity.organisation =
+      organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
 
     return offeringRepository.save(updatedOfferingEntity).toApi()
   }

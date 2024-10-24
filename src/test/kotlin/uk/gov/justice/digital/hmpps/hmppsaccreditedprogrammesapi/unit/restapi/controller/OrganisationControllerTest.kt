@@ -73,8 +73,8 @@ constructor(
           contentType(MediaType.APPLICATION_JSON)
           assertThat(offerings.size).isEqualTo(2)
 
-          assertThat(offerings[0].organisationId).isEqualTo(ORGANISATION_ID_MDI)
-          assertThat(offerings[1].organisationId).isEqualTo(ORGANISATION_ID_MDI)
+          assertThat(offerings[0].organisation.code).isEqualTo(ORGANISATION_ID_MDI)
+          assertThat(offerings[1].organisation.code).isEqualTo(ORGANISATION_ID_MDI)
           assertThat(offerings[0].contactEmail).isEqualTo("of1@digital.justice.gov.uk")
           assertThat(offerings[1].contactEmail).isEqualTo("of2@digital.justice.gov.uk")
         }

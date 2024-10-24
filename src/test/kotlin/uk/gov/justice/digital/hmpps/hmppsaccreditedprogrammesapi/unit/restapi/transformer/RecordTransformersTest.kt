@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
 
 class RecordTransformersTest {
@@ -69,6 +70,8 @@ class RecordTransformersTest {
     val offering = OfferingEntityFactory()
       .withSecondaryContactEmail("nobody-bwn2@digital.justice.gov.uk")
       .produce()
+
+    offering.organisation = OrganisationEntityFactory().produce()
 
     with(offering.toApi(true)) {
       id shouldBe offering.id

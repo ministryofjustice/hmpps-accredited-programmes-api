@@ -226,7 +226,7 @@ class CourseController(
   ): ResponseEntity<List<CourseOffering>> {
     val offerings = courseService.getAllOfferings(id, includeWithdrawn ?: false)
     val mappedOfferings = offerings.map { offeringEntity ->
-      val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringEntity.organisationId) != null
+      val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringEntity.organisation.code) != null
       offeringEntity.toApi(enabledOrg)
     }
     return ResponseEntity.ok(mappedOfferings)

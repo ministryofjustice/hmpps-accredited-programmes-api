@@ -32,4 +32,8 @@ data class OfferingEntity(
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")
   lateinit var course: CourseEntity
+
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
+  @JoinColumn(name = "organisation_id")
+  lateinit var organisation: OrganisationEntity
 }
