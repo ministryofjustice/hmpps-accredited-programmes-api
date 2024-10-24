@@ -26,6 +26,7 @@ constructor(
   private val offeringRepository: OfferingRepository,
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val referralRepository: ReferralRepository,
+  private val organisationService: OrganisationService,
 ) {
   fun getAllCourses(includeWithdrawn: Boolean = false): List<CourseEntity> {
     if (includeWithdrawn) {
@@ -78,7 +79,7 @@ constructor(
   fun createOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
     val validPrisons = prisonRegisterApiService.getPrisons()
 
-    validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
+    val prison = validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
       ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
 
     val existingOffering =
@@ -100,6 +101,7 @@ constructor(
     )
     offering.course = course
 
+    organisationService.createOrganisationIfNotPresent(offering.organisationId, prison)
     return offeringRepository.save(offering).toApi()
   }
 

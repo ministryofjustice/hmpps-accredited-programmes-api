@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryEntity
@@ -25,7 +24,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.u
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
@@ -43,8 +41,6 @@ constructor(
   private val referralRepository: ReferralRepository,
   private val referrerUserRepository: ReferrerUserRepository,
   private val offeringRepository: OfferingRepository,
-  private val prisonRegisterApiService: PrisonRegisterApiService,
-  private val organisationRepository: OrganisationRepository,
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
@@ -56,6 +52,7 @@ constructor(
   private val personService: PersonService,
   private val pniService: PniService,
   private val caseNotesApiService: CaseNotesApiService,
+  private val organisationService: OrganisationService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -79,7 +76,7 @@ constructor(
 
     personService.createOrUpdatePerson(prisonNumber)
 
-    createOrganisationIfNotPresent(offering.organisationId)
+    organisationService.createOrganisationIfNotPresent(offering.organisationId, null)
 
     val savedReferral = referralRepository.save(
       ReferralEntity(
@@ -105,24 +102,6 @@ constructor(
       pniService.savePni(prisonNumber = prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
     } catch (ex: Exception) {
       log.warn("PNI could not be stored ${ex.message} for prisonNumber $prisonNumber")
-    }
-  }
-
-  private fun createOrganisationIfNotPresent(code: String) {
-    val organisation = organisationRepository.findOrganisationEntityByCode(code)
-
-    if (organisation == null) {
-      prisonRegisterApiService.getPrisonById(code)?.let {
-        try {
-          organisationRepository.save(OrganisationEntity(code = it.prisonId, name = it.prisonName))
-        } catch (e: Exception) {
-          log.warn("Failed to save organisation details for prison $code", e)
-          throw BusinessException("Failed to save organisation details for prison $code", e)
-        }
-      } ?: {
-        log.warn("Prison details could not be fetched for $code")
-        throw BusinessException("Prison details could not be fetched for $code")
-      }
     }
   }
 

@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditSe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.FeatureSwitchService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
@@ -71,7 +72,7 @@ class ReferralServiceTest {
   private lateinit var personRepository: PersonRepository
 
   @MockK(relaxed = true)
-  private lateinit var organisationRepository: OrganisationRepository
+  private lateinit var organisationService: OrganisationService
 
   @MockK(relaxed = true)
   private lateinit var auditService: AuditService
@@ -105,6 +106,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var caseNotesApiService: CaseNotesApiService
+
+  @MockK(relaxed = true)
+  private lateinit var organisationRepository: OrganisationRepository
 
   @InjectMockKs
   private lateinit var referralService: ReferralService
@@ -149,7 +153,7 @@ class ReferralServiceTest {
     every { personRepository.save(any()) } returns person
 
     val organisation = OrganisationEntityFactory().withCode(ORGANISATION_ID_MDI).produce()
-    every { organisationRepository.findOrganisationEntityByCode(ORGANISATION_ID_MDI) } returns organisation
+    every { organisationService.findOrganisationEntityByCode(ORGANISATION_ID_MDI) } returns organisation
 
     val referralId = UUID.randomUUID()
     every { referralRepository.save(any<ReferralEntity>()) } answers {
@@ -211,7 +215,7 @@ class ReferralServiceTest {
 
     every { personRepository.save(any()) } returns person
 
-    every { organisationRepository.findOrganisationEntityByCode(prisonCode) } returns null
+    every { organisationService.findOrganisationEntityByCode(prisonCode) } returns null
 
     val prisonDetail = Prison(
       prisonId = prisonCode,
@@ -240,6 +244,7 @@ class ReferralServiceTest {
 
     verify { referrerUserRepository.findById(REFERRER_USERNAME) }
     verify { offeringRepository.findById(offering.id!!) }
+    verify { organisationService.createOrganisationIfNotPresent(any(), any()) }
     verify {
       referralRepository.save(
         match {
@@ -250,14 +255,6 @@ class ReferralServiceTest {
       )
     }
 
-    verify {
-      organisationRepository.save(
-        match {
-          it.code == prisonCode &&
-            it.name == prisonName
-        },
-      )
-    }
     verify {
       auditService.audit(
         match {
