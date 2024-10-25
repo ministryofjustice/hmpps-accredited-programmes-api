@@ -94,6 +94,7 @@ constructor(
     organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
     val offering = OfferingEntity(
       id = courseOffering.id,
+      organisationId = courseOffering.organisationId,
       organisation = organisationService.findOrganisationEntityByCode(courseOffering.organisationId)!!,
       contactEmail = courseOffering.contactEmail,
       secondaryContactEmail = courseOffering.secondaryContactEmail,

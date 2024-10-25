@@ -23,8 +23,10 @@ data class OfferingEntity(
   @Column(name = "version", nullable = false)
   val version: Long = 0,
 
+  val organisationId: String,
+
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "organisation_id", referencedColumnName = "code", insertable = false, updatable = false)
+  @JoinColumn(name = "organisationId", referencedColumnName = "code", insertable = false, updatable = false)
   val organisation: OrganisationEntity,
 
   var contactEmail: String,

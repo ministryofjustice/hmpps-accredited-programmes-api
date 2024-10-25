@@ -1,14 +1,89 @@
 [
   {
     "prisonId": "AWI",
-    "prisonName": "Ashwell (HMP)"
+    "prisonName": "Ashwell (HMP)",
+    "active": false,
+    "male": true,
+    "female": false,
+    "contracted": false,
+    "lthse": false,
+    "types": [],
+    "categories": [],
+    "addresses": [],
+    "operators": [
+      {
+        "name": "PSP"
+      }
+    ]
   },
   {
     "prisonId": "BXI",
-    "prisonName": "Brixton (HMP)"
+    "prisonName": "Brixton (HMP)",
+    "active": true,
+    "male": true,
+    "female": false,
+    "contracted": false,
+    "lthse": false,
+    "types": [
+      {
+        "code": "HMP",
+        "description": "His Majesty’s Prison"
+      }
+    ],
+    "categories": [],
+    "addresses": [
+      {
+        "id": 11,
+        "addressLine1": "Jebb Avenue",
+        "addressLine2": "Brixton Hill",
+        "town": "London",
+        "county": "Greater London",
+        "postcode": "SW2 5XF",
+        "country": "England"
+      }
+    ],
+    "operators": [
+      {
+        "name": "PSP"
+      }
+    ]
   },
   {
     "prisonId": "MDI",
-    "prisonName": "Moorland (HMP & YOI)"
+    "prisonName": "Moorland (HMP & YOI)",
+    "active": true,
+    "male": true,
+    "female": false,
+    "contracted": false,
+    "lthse": false,
+    "types": [
+      {
+        "code": "YOI",
+        "description": "His Majesty’s Youth Offender Institution"
+      },
+      {
+        "code": "HMP",
+        "description": "His Majesty’s Prison"
+      }
+    ],
+    "categories": [
+      "C"
+    ],
+    "addresses": [
+      {
+        "id": 77,
+        "addressLine1": "Bawtry Road",
+        "addressLine2": "Hatfield Woodhouse",
+        "town": "Doncaster",
+        "county": "South Yorkshire",
+        "postcode": "DN7 6BW",
+        "country": "England"
+      }
+    ],
+    "operators": [
+      {
+        "name": "PSP"
+      }
+    ]
   }
 ]
