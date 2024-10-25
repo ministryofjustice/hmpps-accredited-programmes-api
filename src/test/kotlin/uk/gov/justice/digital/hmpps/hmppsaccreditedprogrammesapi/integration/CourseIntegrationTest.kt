@@ -90,6 +90,8 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "pr name2",
       "pr description2",
     )
+
+    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org", gender = "M")
     persistenceHelper.createOffering(
       UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
       COURSE_ID,
@@ -98,6 +100,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "nobody2-bwn@digital.justice.gov.uk",
       true,
     )
+    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org", gender = "M")
     persistenceHelper.createOffering(
       UUID.fromString(OFFERING_ID),
       COURSE_ID,
@@ -107,6 +110,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       true,
     )
 
+    persistenceHelper.createdOrganisation(code = "SKI", name = "SKI org", gender = "M")
     persistenceHelper.createOffering(
       UUID.fromString(WITHDRAWN_OFFERING_ID),
       COURSE_ID,
@@ -117,6 +121,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       true,
     )
 
+    persistenceHelper.createdOrganisation(code = "SKN", name = "SKN org", gender = "M")
     persistenceHelper.createOffering(
       UUID.fromString(UNUSED_OFFERING_ID),
       NEW_COURSE_ID,

@@ -70,6 +70,8 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
     )
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
+    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
 
     persistenceHelper.createOffering(
       UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),

@@ -21,6 +21,7 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM pni_result").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM organisation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referrer_user").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audit_record").executeUpdate()
@@ -65,6 +66,15 @@ class PersistenceHelper {
     entityManager.createNativeQuery("INSERT INTO enabled_organisation (code, description) VALUES (:code, :description)")
       .setParameter("code", code)
       .setParameter("description", description)
+      .executeUpdate()
+  }
+
+  fun createdOrganisation(orgId: UUID = UUID.randomUUID(), code: String, name: String, gender: String = "M") {
+    entityManager.createNativeQuery("INSERT INTO organisation (organisation_id, code, name, gender) VALUES (:organisation_id, :code, :name, :gender)")
+      .setParameter("organisation_id", orgId)
+      .setParameter("code", code)
+      .setParameter("name", name)
+      .setParameter("gender", gender)
       .executeUpdate()
   }
 

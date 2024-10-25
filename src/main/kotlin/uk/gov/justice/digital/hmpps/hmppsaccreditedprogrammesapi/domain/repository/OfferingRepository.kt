@@ -11,7 +11,8 @@ import java.util.UUID
 interface OfferingRepository : JpaRepository<OfferingEntity, UUID> {
   fun findAllByCourseId(courseId: UUID): List<OfferingEntity>
   fun findAllByCourseIdAndWithdrawnIsFalse(courseId: UUID): List<OfferingEntity>
-  fun findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(courseId: UUID, organisationId: String): OfferingEntity?
+  fun findByCourseIdAndOrganisationCodeAndWithdrawnIsFalse(courseId: UUID, organisationId: String): OfferingEntity?
+
   fun findByCourseIdAndIdAndWithdrawnIsFalse(courseId: UUID, offeringId: UUID): OfferingEntity?
 
   @Modifying

@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -51,12 +52,14 @@ constructor(
     @Test
     fun `getAllCoursesByOrganisationId with JWT returns 200 with correct body`() {
       val offeringEntity1 =
-        OfferingEntityFactory().withOrganisationId(ORGANISATION_ID_MDI).withContactEmail("of1@digital.justice.gov.uk")
+        OfferingEntityFactory().withContactEmail("of1@digital.justice.gov.uk")
+          .withOrganisation(OrganisationEntityFactory().withCode(ORGANISATION_ID_MDI).produce())
           .produce()
       offeringEntity1.course = CourseEntityFactory().produce()
 
       val offeringEntity2 =
-        OfferingEntityFactory().withOrganisationId(ORGANISATION_ID_MDI).withContactEmail("of2@digital.justice.gov.uk")
+        OfferingEntityFactory().withContactEmail("of2@digital.justice.gov.uk")
+          .withOrganisation(OrganisationEntityFactory().withCode(ORGANISATION_ID_MDI).produce())
           .produce()
       offeringEntity2.course = CourseEntityFactory().produce()
 

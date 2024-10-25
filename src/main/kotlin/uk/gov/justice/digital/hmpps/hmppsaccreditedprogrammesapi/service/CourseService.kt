@@ -55,7 +55,7 @@ constructor(
 
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
   fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> =
-    offeringRepository.findAll().filter { it.organisationId == organisationId }
+    offeringRepository.findAll().filter { it.organisation.code == organisationId }
 
   fun getAllOfferings(courseId: UUID, includeWithdrawn: Boolean = false): List<OfferingEntity> {
     return if (includeWithdrawn) {
@@ -83,24 +83,24 @@ constructor(
       ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
 
     val existingOffering =
-      offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
+      offeringRepository.findByCourseIdAndOrganisationCodeAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
 
     // validate that there isn't already an offering for this course/organisation
 
     if (existingOffering != null) {
-      throw BusinessException("Offering already exists for course ${course.name} and organisation ${existingOffering.organisationId}")
+      throw BusinessException("Offering already exists for course ${course.name} and organisation ${existingOffering.organisation.code}")
     }
 
+    organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
     val offering = OfferingEntity(
       id = courseOffering.id,
-      organisationId = courseOffering.organisationId,
+      organisation = organisationService.findOrganisationEntityByCode(courseOffering.organisationId)!!,
       contactEmail = courseOffering.contactEmail,
       secondaryContactEmail = courseOffering.secondaryContactEmail,
       withdrawn = courseOffering.withdrawn ?: false,
       referable = courseOffering.referable,
     )
     offering.course = course
-    offering.organisation = organisationService.createOrganisationIfNotPresent(offering.organisation.code, prison)
 
     return offeringRepository.save(offering).toApi()
   }
@@ -113,7 +113,7 @@ constructor(
 
     val offeringEntity =
       (
-        offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
+        offeringRepository.findByCourseIdAndOrganisationCodeAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
           ?: throw BusinessException("Offering does not exist for course ${course.name}")
         )
 
@@ -121,7 +121,7 @@ constructor(
 
     val updatedOfferingEntity = course.offerings.find { it.id == courseOffering.id }?.copy(
       id = courseOffering.id,
-      organisationId = courseOffering.organisationId,
+      organisation = organisationService.findOrganisationEntityByCode(courseOffering.organisationId)!!,
       contactEmail = courseOffering.contactEmail,
       secondaryContactEmail = courseOffering.secondaryContactEmail,
       withdrawn = courseOffering.withdrawn ?: false,
@@ -129,8 +129,6 @@ constructor(
     )!!
 
     updatedOfferingEntity.course = course
-    updatedOfferingEntity.organisation =
-      organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
 
     return offeringRepository.save(updatedOfferingEntity).toApi()
   }

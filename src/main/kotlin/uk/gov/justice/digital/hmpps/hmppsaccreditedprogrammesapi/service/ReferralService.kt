@@ -70,13 +70,13 @@ constructor(
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found for $offeringId") }
 
-    if (enabledOrganisationService.getEnabledOrganisation(offering.organisationId) == null) {
-      throw BusinessException("Organisation ${offering.organisationId} not enabled for referrals")
+    if (enabledOrganisationService.getEnabledOrganisation(offering.organisation.code) == null) {
+      throw BusinessException("Organisation ${offering.organisation.code} not enabled for referrals")
     }
 
     personService.createOrUpdatePerson(prisonNumber)
 
-    organisationService.createOrganisationIfNotPresent(offering.organisationId, null)
+    organisationService.createOrganisationIfNotPresent(offering.organisation.code, null)
 
     val savedReferral = referralRepository.save(
       ReferralEntity(

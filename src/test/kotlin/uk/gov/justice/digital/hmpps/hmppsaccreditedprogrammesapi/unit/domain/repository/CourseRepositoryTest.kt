@@ -15,7 +15,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -56,9 +58,9 @@ class CourseRepositoryTest {
     var course = CourseEntityFactory().produce()
     course = entityManager.merge(course)
 
-    val offering1 = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
-    val offering2 = OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce()
-    val offering3 = OfferingEntityFactory().withOrganisationId("BXI").withContactEmail("bxi@a.com").produce()
+    val offering1 = OfferingEntityFactory().withOrganisation(OrganisationEntityFactory().withId(UUID.randomUUID()).withCode("BWI").produce()).withContactEmail("bwi@a.com").produce()
+    val offering2 = OfferingEntityFactory().withOrganisation(OrganisationEntityFactory().withId(UUID.randomUUID()).withCode("MDI").produce()).withContactEmail("mdi@a.com").produce()
+    val offering3 = OfferingEntityFactory().withOrganisation(OrganisationEntityFactory().withId(UUID.randomUUID()).withCode("BXI").produce()).withContactEmail("bxi@a.com").produce()
 
     offering1.course = course
     offering2.course = course
@@ -68,7 +70,6 @@ class CourseRepositoryTest {
     entityManager.merge(offering3)
 
     course.offerings.addAll(listOf(offering1, offering2, offering3))
-    course = entityManager.merge(course)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
     persistedCourse.offerings shouldHaveSize 3
@@ -80,7 +81,7 @@ class CourseRepositoryTest {
     var course = CourseEntityFactory().produce()
     course = entityManager.merge(course)
 
-    var offering = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
+    var offering = OfferingEntityFactory().withOrganisation(OrganisationEntityFactory().withCode("BWI").produce()).withContactEmail("bwi@a.com").produce()
     offering.course = course
     offering = entityManager.merge(offering)
 

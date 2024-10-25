@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
 import java.util.UUID
 
@@ -73,9 +74,9 @@ constructor(
 
     @Test
     fun `getAllCourseNames with JWT returns 200 with correct body`() {
-      val offering1 = OfferingEntityFactory().withOrganisationId("OF1").withContactEmail("of1@digital.justice.gov.uk").produce()
-      val offering2 = OfferingEntityFactory().withOrganisationId("OF2").withContactEmail("of2@digital.justice.gov.uk").produce()
-      val offering3 = OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce()
+      val offering1 = OfferingEntityFactory().withContactEmail("of1@digital.justice.gov.uk").produce()
+      val offering2 = OfferingEntityFactory().withContactEmail("of2@digital.justice.gov.uk").produce()
+      val offering3 = OfferingEntityFactory().withContactEmail("of3@digital.justice.gov.uk").produce()
 
       val courses = listOf(
         CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering1)).produce(),
@@ -192,9 +193,12 @@ constructor(
     @Test
     fun `getAllOfferingsByCourseId with JWT returns 200 with correct body`() {
       val offerings = listOf(
-        OfferingEntityFactory().withOrganisationId("OF1").withContactEmail("of1@digital.justice.gov.uk").produce(),
-        OfferingEntityFactory().withOrganisationId("OF2").withContactEmail("of2@digital.justice.gov.uk").produce(),
-        OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce(),
+        OfferingEntityFactory().withContactEmail("of1@digital.justice.gov.uk").withWithdrawn(false)
+          .withOrganisation(OrganisationEntityFactory().withCode("OF1").produce()).produce(),
+        OfferingEntityFactory().withContactEmail("of2@digital.justice.gov.uk").withWithdrawn(false)
+          .withOrganisation(OrganisationEntityFactory().withCode("OF2").produce()).produce(),
+        OfferingEntityFactory().withContactEmail("of3@digital.justice.gov.uk").withWithdrawn(false)
+          .withOrganisation(OrganisationEntityFactory().withCode("OF3").produce()).produce(),
       )
 
       every { courseService.getAllOfferings(any(), any()) } returns offerings
@@ -207,7 +211,7 @@ constructor(
         content {
           contentType(MediaType.APPLICATION_JSON)
           offerings.forEachIndexed { index, offering ->
-            jsonPath("$[$index].organisationId") { value(offering.organisation.code) }
+            jsonPath("$[$index].withdrawn") { value(offering.withdrawn) }
             jsonPath("$[$index].contactEmail") { value(offering.contactEmail) }
           }
         }

@@ -23,7 +23,10 @@ data class OfferingEntity(
   @Column(name = "version", nullable = false)
   val version: Long = 0,
 
-  val organisationId: String,
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "organisation_id", referencedColumnName = "code", insertable = false, updatable = false)
+  val organisation: OrganisationEntity,
+
   var contactEmail: String,
   var secondaryContactEmail: String? = null,
   var withdrawn: Boolean = false,
@@ -32,8 +35,4 @@ data class OfferingEntity(
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")
   lateinit var course: CourseEntity
-
-  @ManyToOne(fetch = FetchType.EAGER, optional = false)
-  @JoinColumn(name = "organisation_id")
-  lateinit var organisation: OrganisationEntity
 }

@@ -38,7 +38,7 @@ data class CourseOffering(
   @get:JsonProperty("withdrawn") val withdrawn: Boolean? = false,
 
   @Schema(example = "M", description = "Gender for which course is offered")
-  @get:JsonProperty("withdrawn") val gender: Gender,
+  @get:JsonProperty("gender") val gender: Gender,
 )
 
 enum class Gender {
