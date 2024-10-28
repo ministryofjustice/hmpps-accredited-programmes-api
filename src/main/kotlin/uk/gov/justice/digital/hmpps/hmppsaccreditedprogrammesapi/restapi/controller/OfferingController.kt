@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.E
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import java.util.UUID
 
 @RestController
@@ -31,6 +32,7 @@ import java.util.UUID
 class OfferingController(
   private val courseService: CourseService,
   private val enabledOrganisationService: EnabledOrganisationService,
+  private val organisationService: OrganisationService,
 ) {
 
   @Operation(
@@ -77,8 +79,9 @@ class OfferingController(
   fun getOfferingById(@Parameter(description = "A course offering identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CourseOffering> {
     val offeringById = courseService.getOfferingById(id)
     val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringById?.organisationId.orEmpty()) != null
+    val organisation = organisationService.findOrganisationEntityByCode(offeringById?.organisationId!!)?.gender!!
 
-    return offeringById?.toApi(enabledOrg)?.let {
+    return offeringById.toApi(enabledOrg, organisation).let {
       ResponseEntity.ok(it)
     } ?: throw NotFoundException("No Offering found at /offerings/$id")
   }

@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.getByCode
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import java.time.LocalDateTime
 
@@ -29,7 +28,7 @@ class CaseNotesApiService(
   private val caseNotesApiClient: CaseNotesApiClient,
   private val featureSwitchService: FeatureSwitchService,
   private val personService: PersonService,
-  private val organisationRepository: OrganisationRepository,
+  private val organisationService: OrganisationService,
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val manageUsersService: ManageUsersService,
@@ -85,7 +84,7 @@ class CaseNotesApiService(
     return if (person.location.equals("RELEASED", ignoreCase = true)) {
       "OUT"
     } else {
-      organisationRepository.findOrganisationEntityByName(person.location!!)?.code!!
+      organisationService.findOrganisationEntityByName(person.location!!)?.code!!
     }
   }
 
@@ -97,7 +96,7 @@ class CaseNotesApiService(
   ): String {
     log.info("Request received for creating case notes :${referral.id} $referralStatusUpdate")
     val course = referral.offering.course
-    val orgName = organisationRepository.findOrganisationEntityByCode(referral.offering.organisationId)?.name
+    val orgName = organisationService.findOrganisationEntityByCode(referral.offering.organisationId)?.name
     val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
 
     val prisonerName = person?.fullName().orEmpty()

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
@@ -32,6 +33,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AudienceService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import java.util.UUID
 import kotlin.random.Random
 
@@ -47,7 +49,11 @@ class CourseController(
   private val courseService: CourseService,
   private val enabledOrganisationService: EnabledOrganisationService,
   private val audienceService: AudienceService,
+  private val organisationService: OrganisationService,
 ) {
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
 
   @Operation(
     tags = ["Course Offerings"],
@@ -225,7 +231,13 @@ class CourseController(
     val offerings = courseService.getAllOfferings(id, includeWithdrawn ?: false)
     val mappedOfferings = offerings.map { offeringEntity ->
       val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringEntity.organisationId) != null
-      offeringEntity.toApi(enabledOrg)
+      val organisation = organisationService.findOrganisationEntityByCode(offeringEntity.organisationId)
+      if (organisation == null) {
+        log.warn("Organisation does not exist for id ${offeringEntity.organisationId}")
+        throw BusinessException("Organisation does not exist for id ${offeringEntity.organisationId}")
+      }
+
+      offeringEntity.toApi(enabledOrg, organisation.gender)
     }
     return ResponseEntity.ok(mappedOfferings)
   }

@@ -24,6 +24,7 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM course").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referrer_user").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audit_record").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM organisation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM enabled_organisation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audience").executeUpdate()
   }
@@ -58,6 +59,15 @@ class PersistenceHelper {
       .setParameter("secondaryContactEmail", secondaryContactEmail)
       .setParameter("referable", referable)
       .setParameter("withdrawn", withdrawn)
+      .executeUpdate()
+  }
+
+  fun createdOrganisation(orgId: UUID = UUID.randomUUID(), code: String, name: String, gender: String = "M") {
+    entityManager.createNativeQuery("INSERT INTO organisation (organisation_id, code, name, gender) VALUES (:organisation_id, :code, :name, :gender)")
+      .setParameter("organisation_id", orgId)
+      .setParameter("code", code)
+      .setParameter("name", name)
+      .setParameter("gender", gender)
       .executeUpdate()
   }
 

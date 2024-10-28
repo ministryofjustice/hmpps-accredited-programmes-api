@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -70,13 +71,14 @@ class RecordTransformersTest {
       .withSecondaryContactEmail("nobody-bwn2@digital.justice.gov.uk")
       .produce()
 
-    with(offering.toApi(true)) {
+    with(offering.toApi(true, "M")) {
       id shouldBe offering.id
       organisationId shouldBe offering.organisationId
       organisationEnabled shouldBe true
       contactEmail shouldBe offering.contactEmail
       secondaryContactEmail shouldBe offering.secondaryContactEmail
       referable shouldBe true
+      gender shouldBe Gender.M
     }
   }
 }
