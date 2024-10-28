@@ -72,6 +72,10 @@ INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e074', 'EEI', 'Erlestoke (HMP)', 'M');
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e075', 'ACI', 'Altcourse (HMP & YOI)', 'M');
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e076', 'CKI', 'Cookham Wood (HMYOI)', 'M');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e077', 'BLI', 'Bristol (HMP & YOI)', 'M');
+-- INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e078', 'LCI', 'Leicester (HMP)', 'M');
+-- INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e079', 'HEI', 'Hewell (HMP)', 'M');
+-- INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e080', 'WWI', 'Wandsworth (HMP & YOI)', 'M');
 -- Female Prisons
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424f001', 'DWI', 'Downview (HMP & YOI)', 'F');
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424f002', 'LNI', 'Low Newton (HMP & YOI)', 'F');
