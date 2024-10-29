@@ -609,7 +609,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectStatus().isNoContent
+      .expectStatus().isOk
   }
 
   private fun encodeValue(value: String): String {
