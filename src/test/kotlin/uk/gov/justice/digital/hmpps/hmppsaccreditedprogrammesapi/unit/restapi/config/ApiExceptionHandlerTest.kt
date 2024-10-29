@@ -19,7 +19,7 @@ class ApiExceptionHandlerTest {
     val response = handler.handleMethodArgumentTypeMismatchException(exception)
 
     assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-    assertThat(response.body?.userMessage).isEqualTo("Request not readable: Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Conversion error")
+    assertThat(response.body?.userMessage).isEqualTo("Request not readable: Method parameter 'uuid': Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Conversion error")
     assertThat(response.body?.developerMessage).isEqualTo("Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Conversion error")
   }
 
