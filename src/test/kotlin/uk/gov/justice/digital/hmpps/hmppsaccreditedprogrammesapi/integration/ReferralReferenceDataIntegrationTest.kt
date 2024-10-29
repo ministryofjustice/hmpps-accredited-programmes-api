@@ -190,7 +190,7 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     // Then
     response.shouldNotBeNull()
     response.status shouldBe 400
-    response.userMessage shouldStartWith "Request not readable: Failed to convert value of type 'java.lang.String' to required type"
+    response.userMessage shouldStartWith "Request not readable: Method parameter 'referralStatusType': Failed to convert value of type 'java.lang.String' to required type"
   }
 
   fun getReferralStatuses() =
