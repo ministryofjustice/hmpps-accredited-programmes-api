@@ -42,6 +42,6 @@ data class CourseOffering(
 )
 
 enum class Gender {
-  M,
-  F,
+  MALE,
+  FEMALE,
 }

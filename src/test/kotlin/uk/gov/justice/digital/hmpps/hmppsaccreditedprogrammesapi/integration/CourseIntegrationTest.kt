@@ -601,7 +601,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
           referable = true,
           withdrawn = false,
           organisationEnabled = true,
-          gender = Gender.M,
+          gender = Gender.MALE,
         ),
       )
       .exchange()

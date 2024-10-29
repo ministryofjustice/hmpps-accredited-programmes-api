@@ -8,7 +8,7 @@ class OrganisationEntityFactory {
   private var id: UUID = UUID.randomUUID()
   private var code: String = randomAlphanumericString()
   private var name: String = randomAlphanumericString()
-  private var gender: String = listOf("M", "F").asSequence().shuffled().first()
+  private var gender: String = listOf("MALE", "FEMALE").asSequence().shuffled().first()
 
   fun withId(id: UUID) = apply { this.id = id }
   fun withCode(code: String) = apply { this.code = code }

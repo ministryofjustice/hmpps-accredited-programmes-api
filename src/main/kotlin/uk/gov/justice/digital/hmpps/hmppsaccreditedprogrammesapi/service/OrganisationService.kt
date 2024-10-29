@@ -28,8 +28,8 @@ class OrganisationService(
       prisonById.let {
         try {
           val gender = when {
-            it.male -> "M"
-            it.female -> "F"
+            it.male -> "MALE"
+            it.female -> "FEMALE"
             else -> {
               log.warn("Prison gender could not be determined for $it")
               throw BusinessException("$prisonById does not have gender information")
