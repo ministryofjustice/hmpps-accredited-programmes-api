@@ -229,6 +229,7 @@ class OasysService(
         }
       }
     }
+    log.warn("No completed assessment with SARA data found for prison number $prisonNumber")
     return null
   }
 
