@@ -97,7 +97,9 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       "SC++",
       "General offence",
     )
+    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
+    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createOffering(
@@ -607,7 +609,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectStatus().isNoContent
+      .expectStatus().isOk
   }
 
   private fun encodeValue(value: String): String {
@@ -1060,7 +1062,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       val offeringId = UUID.randomUUID().toString()
       createCourse(
         courseId = courseId,
-        identifier = getRandomString(2),
+        identifier = getRandomString(4),
         courseName = getRandomString(10),
         description = getRandomString(50),
       )

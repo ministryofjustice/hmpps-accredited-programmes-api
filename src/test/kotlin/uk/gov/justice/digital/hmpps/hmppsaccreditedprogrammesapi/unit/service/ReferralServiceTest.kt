@@ -32,6 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditSe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.FeatureSwitchService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
@@ -105,6 +106,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var caseNotesApiService: CaseNotesApiService
+
+  @MockK(relaxed = true)
+  private lateinit var organisationService: OrganisationService
 
   @InjectMockKs
   private lateinit var referralService: ReferralService
@@ -240,6 +244,7 @@ class ReferralServiceTest {
 
     verify { referrerUserRepository.findById(REFERRER_USERNAME) }
     verify { offeringRepository.findById(offering.id!!) }
+    verify { organisationService.createOrganisationIfNotPresent(prisonCode) }
     verify {
       referralRepository.save(
         match {
@@ -250,14 +255,6 @@ class ReferralServiceTest {
       )
     }
 
-    verify {
-      organisationRepository.save(
-        match {
-          it.code == prisonCode &&
-            it.name == prisonName
-        },
-      )
-    }
     verify {
       auditService.audit(
         match {

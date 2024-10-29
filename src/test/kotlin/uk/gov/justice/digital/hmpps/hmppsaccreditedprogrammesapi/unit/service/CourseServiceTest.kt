@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -34,12 +35,15 @@ class CourseServiceTest {
   @MockK(relaxed = true)
   private lateinit var referralRepository: ReferralRepository
 
+  @MockK(relaxed = true)
+  private lateinit var organisationService: OrganisationService
+
   private lateinit var courseService: CourseService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    courseService = CourseService(courseRepository, offeringRepository, prisonRegisterApiService, referralRepository)
+    courseService = CourseService(courseRepository, offeringRepository, prisonRegisterApiService, referralRepository, organisationService)
   }
 
   @Nested

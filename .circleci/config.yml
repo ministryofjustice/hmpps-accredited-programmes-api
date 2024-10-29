@@ -50,7 +50,7 @@ jobs:
 
   end_to_end_test:
     docker:
-      - image: mcr.microsoft.com/playwright:v1.44.1-focal
+      - image: mcr.microsoft.com/playwright:v1.48.1-focal
     circleci_ip_ranges: true # opt-in to jobs running on a restricted set of IPs
     steps:
       - run:
