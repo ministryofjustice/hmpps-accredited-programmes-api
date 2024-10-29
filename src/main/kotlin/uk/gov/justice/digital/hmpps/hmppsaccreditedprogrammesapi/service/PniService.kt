@@ -66,7 +66,7 @@ class PniService(
     val assessmentId = assessmentIdDate.first
 
     // section 6
-    val relationships = oasysService.getRelationships(assessmentId)
+    val relationshipAssessmentIdPair = oasysService.getRelationshipsWithCompletedSara(prisonNumber)
     // section 7
     val lifestyle = oasysService.getLifestyle(assessmentId)
     // section 10
@@ -83,8 +83,8 @@ class PniService(
     val oasysRiskPredictor = oasysService.getRiskPredictors(assessmentId)
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
-      individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
-      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships, oasysOffendingInfo),
+      individualNeedsScores = buildNeedsScores(behavior, relationshipAssessmentIdPair?.first, attitude, lifestyle, psychiatric),
+      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationshipAssessmentIdPair, oasysOffendingInfo),
     )
 
     val genderOfPerson = getGenderOfPerson(prisonNumber, gender)
@@ -93,7 +93,7 @@ class PniService(
     log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
 
     val overallRiskScore =
-      pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber, genderOfPerson)
+      pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, genderOfPerson)
 
     log.info("Overall risk classification for prisonNumber $prisonNumber is ${overallNeedsScore.classification} ")
 
@@ -171,15 +171,17 @@ class PniService(
 
   private fun buildRiskScores(
     oasysRiskPredictorScores: OasysRiskPredictorScores?,
-    relationships: OasysRelationships?,
-    offendingInfo: OasysOffendingInfo?,
+    oasysRelationships: Pair<OasysRelationships, Long>?,
+    oasysOffendingInfo: OasysOffendingInfo?,
   ) = IndividualRiskScores(
     ogrs3 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears?.round(),
     ovp = oasysRiskPredictorScores?.violencePredictorScore?.twoYears?.round(),
-    ospIic = offendingInfo?.ospIICRisk ?: offendingInfo?.ospIRisk,
-    ospDc = offendingInfo?.ospDCRisk ?: offendingInfo?.ospCRisk,
+    ospIic = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
+    ospDc = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
     rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
-    sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
+    saraRiskOfViolenceTowardsPartner = oasysRelationships?.first?.sara?.imminentRiskOfViolenceTowardsPartner,
+    saraRiskOfViolenceTowardsOthers = oasysRelationships?.first?.sara?.imminentRiskOfViolenceTowardsOthers,
+    saraAssessmentId = oasysRelationships?.second,
   )
 
   fun getGenderOfPerson(prisonNumber: String, prisonerGender: String?): String {

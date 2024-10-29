@@ -1,5 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -19,11 +22,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Sara
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
 import java.time.LocalDateTime
 
-class OasysApiServiceTest {
+class OasysServiceTest {
 
   private val oasysApiClient = mockk<OasysApiClient>()
   private val prisonApiClient = mockk<PrisonApiClient>()
@@ -265,5 +269,148 @@ class OasysApiServiceTest {
     val result = service.getDrugDetail(123123)
 
     assertEquals(oasysDrugDetail, result)
+  }
+
+  @Test
+  fun `should not return relationships when no completed SARA exists for provided prison number within six week period`() {
+    // Given
+    val oasysAssessmentTimeline = createAssessmentTimelineWithSaraOlderThanSixWeeks()
+
+    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
+
+    val oasysRelationShips1 = OasysRelationships(
+      sara = null,
+      prevOrCurrentDomesticAbuse = null,
+      victimOfPartner = null,
+      victimOfFamily = null,
+      perpAgainstFamily = null,
+      perpAgainstPartner = null,
+      relIssuesDetails = null,
+      emotionalCongruence = null,
+      relCloseFamily = null,
+      prevCloseRelationships = null,
+    )
+
+    val oasysRelationShips2 = OasysRelationships(
+      sara = Sara(
+        imminentRiskOfViolenceTowardsOthers = "HIGH",
+        imminentRiskOfViolenceTowardsPartner = "HIGH",
+      ),
+      prevOrCurrentDomesticAbuse = null,
+      victimOfPartner = null,
+      victimOfFamily = null,
+      perpAgainstFamily = null,
+      perpAgainstPartner = null,
+      relIssuesDetails = null,
+      emotionalCongruence = null,
+      relCloseFamily = null,
+      prevCloseRelationships = null,
+    )
+
+    every { oasysApiClient.getRelationships(123123) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips1)
+    every { oasysApiClient.getRelationships(999999) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips2)
+
+    // When
+    val oasysRelationships = service.getRelationshipsWithCompletedSara("A9999BB")
+
+    // Then
+    oasysRelationships.shouldBeNull()
+  }
+
+  @Test
+  fun `should return relationships with completed SARA for provided prison number`() {
+    // Given
+    val oasysAssessmentTimeline = createAssessmentTimeline()
+
+    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
+
+    val oasysRelationShips1 = OasysRelationships(
+      sara = null,
+      prevOrCurrentDomesticAbuse = null,
+      victimOfPartner = null,
+      victimOfFamily = null,
+      perpAgainstFamily = null,
+      perpAgainstPartner = null,
+      relIssuesDetails = null,
+      emotionalCongruence = null,
+      relCloseFamily = null,
+      prevCloseRelationships = null,
+    )
+
+    val oasysRelationShips2 = OasysRelationships(
+      sara = Sara(
+        imminentRiskOfViolenceTowardsOthers = "HIGH",
+        imminentRiskOfViolenceTowardsPartner = "HIGH",
+      ),
+      prevOrCurrentDomesticAbuse = null,
+      victimOfPartner = null,
+      victimOfFamily = null,
+      perpAgainstFamily = null,
+      perpAgainstPartner = null,
+      relIssuesDetails = null,
+      emotionalCongruence = null,
+      relCloseFamily = null,
+      prevCloseRelationships = null,
+    )
+
+    every { oasysApiClient.getRelationships(123123) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips1)
+    every { oasysApiClient.getRelationships(999999) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips2)
+
+    // When
+    val oasysRelationships = service.getRelationshipsWithCompletedSara("A9999BB")
+
+    // Then
+    oasysRelationships.shouldNotBeNull()
+    oasysRelationships.first.sara?.imminentRiskOfViolenceTowardsOthers.shouldBe("HIGH")
+    oasysRelationships.first.sara?.imminentRiskOfViolenceTowardsPartner.shouldBe("HIGH")
+    oasysRelationships.second.shouldBe(999999)
+  }
+
+  private fun createAssessmentTimeline(): OasysAssessmentTimeline {
+    val assessment1 = Timeline(
+      id = 123123,
+      status = "COMPLETE",
+      type = "LAYER3",
+      completedAt = LocalDateTime.now(),
+    )
+    val assessment2 = Timeline(
+      id = 999999,
+      status = "COMPLETE",
+      type = "LAYER3",
+      completedAt = LocalDateTime.now().minusWeeks(5),
+    )
+    val assessment3 = Timeline(
+      id = 111111,
+      status = "STARTED",
+      type = "LAYER3",
+      completedAt = null,
+    )
+    val oasysAssessmentTimeline =
+      OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
+    return oasysAssessmentTimeline
+  }
+
+  private fun createAssessmentTimelineWithSaraOlderThanSixWeeks(): OasysAssessmentTimeline {
+    val assessment1 = Timeline(
+      id = 123123,
+      status = "COMPLETE",
+      type = "LAYER3",
+      completedAt = LocalDateTime.now(),
+    )
+    val assessment2 = Timeline(
+      id = 999999,
+      status = "COMPLETE",
+      type = "LAYER3",
+      completedAt = LocalDateTime.now().minusWeeks(7),
+    )
+    val assessment3 = Timeline(
+      id = 111111,
+      status = "STARTED",
+      type = "LAYER3",
+      completedAt = null,
+    )
+    val oasysAssessmentTimeline =
+      OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
+    return oasysAssessmentTimeline
   }
 }
