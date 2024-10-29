@@ -34,10 +34,10 @@ data class IndividualRiskScores(
   @get:JsonProperty("sara") val sara: String? = null,
 
   @Schema(example = "LOW")
-  @get:JsonProperty("saraRiskOfViolenceTowardsPartner")val saraRiskOfViolenceTowardsPartner: String? = null,
+  @get:JsonProperty("saraRiskOfViolenceTowardsPartner") val saraRiskOfViolenceTowardsPartner: String? = null,
 
   @Schema(example = "LOW")
-  @get:JsonProperty("saraRiskOfViolenceTowardsOthers")val saraRiskOfViolenceTowardsOthers: String? = null,
+  @get:JsonProperty("saraRiskOfViolenceTowardsOthers") val saraRiskOfViolenceTowardsOthers: String? = null,
 
   @Schema(example = "2512235167", description = "Assessment ID relevant to the SARA version of the assessment")
   @get:JsonProperty("saraAssessmentId") val saraAssessmentId: Long? = null,
