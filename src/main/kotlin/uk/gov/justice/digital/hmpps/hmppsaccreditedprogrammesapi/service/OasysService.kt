@@ -217,7 +217,7 @@ class OasysService(
       .sortedByDescending { it.completedAt }
   }
 
-  fun getRelationshipsWithCompletedSara(prisonNumber: String): Pair<OasysRelationships, Long>? {
+  fun getAssessmentWithCompletedSara(prisonNumber: String): Long? {
     val assessmentTimeline = getAssessments(prisonNumber)
     val completedLayerThreeAssessments = getAllCompletedLayerThreeAssessments(assessmentTimeline)
     val latestAssessmentDate = completedLayerThreeAssessments.first().completedAt
@@ -225,7 +225,7 @@ class OasysService(
     for (assessment in completedLayerThreeAssessments) {
       getRelationships(assessment.id)?.let { relationships ->
         if (relationships.sara != null && isWithinSixWeeks(assessment.completedAt, latestAssessmentDate)) {
-          return Pair(relationships, assessment.id)
+          return assessment.id
         }
       }
     }
