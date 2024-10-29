@@ -195,7 +195,7 @@ constructor(
     return Triple(status, category, reason)
   }
 
-  fun submitReferralById(referralId: UUID) {
+  fun submitReferralById(referralId: UUID): ReferralEntity {
     val referral = referralRepository.getReferenceById(referralId)
     val existingStatus = referral.status
 
@@ -241,6 +241,7 @@ constructor(
       previousStatusCode = existingStatus,
       newStatus = referralStatusRepository.getByCode(referral.status),
     )
+    return referral
   }
 
   fun getReferralViewByOrganisationId(
