@@ -21,4 +21,8 @@ data class OrganisationEntity(
 
   @Column
   var name: String,
+
+  @Column
+  var gender: String,
+
 )

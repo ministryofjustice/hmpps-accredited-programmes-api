@@ -17,8 +17,10 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
 import java.util.UUID
 
@@ -35,6 +37,9 @@ constructor(
 
   @MockkBean
   private lateinit var courseService: CourseService
+
+  @MockkBean
+  private lateinit var organisationService: OrganisationService
 
   @Nested
   inner class GetCoursesTests {
@@ -198,6 +203,7 @@ constructor(
       )
 
       every { courseService.getAllOfferings(any(), any()) } returns offerings
+      every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory().produce()
 
       mockMvc.get("/courses/${UUID.randomUUID()}/offerings") {
         accept = MediaType.APPLICATION_JSON

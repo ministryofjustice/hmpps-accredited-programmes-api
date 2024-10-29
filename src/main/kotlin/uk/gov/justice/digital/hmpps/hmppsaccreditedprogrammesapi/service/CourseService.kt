@@ -26,6 +26,7 @@ constructor(
   private val offeringRepository: OfferingRepository,
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val referralRepository: ReferralRepository,
+  private val organisationService: OrganisationService,
 ) {
   fun getAllCourses(includeWithdrawn: Boolean = false): List<CourseEntity> {
     if (includeWithdrawn) {
@@ -78,14 +79,13 @@ constructor(
   fun createOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
     val validPrisons = prisonRegisterApiService.getPrisons()
 
-    validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
+    val prison = validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
       ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
 
     val existingOffering =
       offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
 
     // validate that there isn't already an offering for this course/organisation
-
     if (existingOffering != null) {
       throw BusinessException("Offering already exists for course ${course.name} and organisation ${existingOffering.organisationId}")
     }
@@ -100,13 +100,16 @@ constructor(
     )
     offering.course = course
 
-    return offeringRepository.save(offering).toApi()
+    organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
+
+    val genderForWhichCourseIsOffered = organisationService.findOrganisationEntityByCode(courseOffering.organisationId)?.gender!!
+    return offeringRepository.save(offering).toApi(genderForWhichCourseIsOffered)
   }
 
   fun updateOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
     val validPrisons = prisonRegisterApiService.getPrisons()
 
-    validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
+    val prison = validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
       ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
 
     val offeringEntity =
@@ -128,7 +131,9 @@ constructor(
 
     updatedOfferingEntity.course = course
 
-    return offeringRepository.save(updatedOfferingEntity).toApi()
+    organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
+    val genderForWhichCourseIsOffered = organisationService.findOrganisationEntityByCode(courseOffering.organisationId)?.gender!!
+    return offeringRepository.save(updatedOfferingEntity).toApi(genderForWhichCourseIsOffered)
   }
 
   fun deleteCourseOffering(id: UUID, offeringId: UUID) {
