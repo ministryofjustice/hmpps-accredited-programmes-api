@@ -21,9 +21,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.N
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PniScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RelationshipDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RiskScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sara
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SelfManagementDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -97,9 +99,13 @@ class PniIntegrationTest :
         ospDc = "High",
         ospIic = "Medium",
         rsr = 1.46.toBigDecimal(),
-        saraRiskOfViolenceTowardsOthers = "High",
-        saraRiskOfViolenceTowardsPartner = "High",
-        saraAssessmentId = 2114584,
+        sara = Sara(
+          overallResult = SaraRisk.HIGH,
+          saraRiskOfViolenceTowardsOthers = "High",
+          saraRiskOfViolenceTowardsPartner = "High",
+          saraAssessmentId = 2114584,
+        ),
+
       ),
     ),
   )

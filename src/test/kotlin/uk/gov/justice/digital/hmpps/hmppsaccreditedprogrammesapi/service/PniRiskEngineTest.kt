@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualRiskScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sara
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
 import java.math.BigDecimal
 
 class PniRiskEngineTest {
@@ -21,9 +23,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertTrue(riskEngine.isHighIntensityBasedOnRiskScores(riskScores))
   }
@@ -36,8 +40,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = "High",
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = "High",
+        overallResult = null,
+      ),
     )
     assertTrue(riskEngine.isHighIntensityBasedOnRiskScores(riskScores))
   }
@@ -50,8 +57,10 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+      ),
     )
     assertFalse(riskEngine.isHighIntensityBasedOnRiskScores(riskScores))
   }
@@ -64,8 +73,10 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = "Medium",
-      saraRiskOfViolenceTowardsOthers = "Medium",
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Medium",
+        saraRiskOfViolenceTowardsOthers = "Medium",
+      ),
     )
     assertFalse(riskEngine.isHighIntensityBasedOnRiskScores(riskScores))
   }
@@ -79,9 +90,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isHighRisk(riskScores, gender))
   }
@@ -95,8 +108,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isHighRisk(riskScores, gender))
   }
@@ -110,9 +126,11 @@ class PniRiskEngineTest {
       ospDc = "VERY_HIGH",
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isHighRisk(riskScores, gender))
   }
@@ -126,9 +144,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = "VERY_HIGH",
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isHighRisk(riskScores, gender))
   }
@@ -142,9 +162,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = BigDecimal("3.00"),
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isHighRisk(riskScores, gender))
   }
@@ -158,9 +180,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = "High",
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "High",
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isHighRisk(riskScores, gender))
   }
@@ -174,9 +198,11 @@ class PniRiskEngineTest {
       ospDc = "NOT_APPLICABLE",
       ospIic = "LOW",
       rsr = BigDecimal("1.00"),
-      saraRiskOfViolenceTowardsPartner = "Low",
-      saraRiskOfViolenceTowardsOthers = "Low",
-      sara = "Low",
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Low",
+        saraRiskOfViolenceTowardsOthers = "Low",
+        overallResult = SaraRisk.LOW,
+      ),
     )
     assertEquals(result, riskEngine.isHighRisk(riskScores, gender))
   }
@@ -190,9 +216,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -206,9 +234,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -222,9 +252,11 @@ class PniRiskEngineTest {
       ospDc = "MEDIUM",
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -238,9 +270,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = "MEDIUM",
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -254,9 +288,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = BigDecimal("2.50"),
-      saraRiskOfViolenceTowardsPartner = null,
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -270,9 +306,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = "Medium",
-      saraRiskOfViolenceTowardsOthers = null,
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Medium",
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -286,9 +324,11 @@ class PniRiskEngineTest {
       ospDc = null,
       ospIic = null,
       rsr = null,
-      saraRiskOfViolenceTowardsPartner = "Low",
-      saraRiskOfViolenceTowardsOthers = "Medium",
-      sara = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Low",
+        saraRiskOfViolenceTowardsOthers = "Medium",
+        overallResult = null,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -302,9 +342,11 @@ class PniRiskEngineTest {
       ospDc = "HIGH",
       ospIic = "VERY_HIGH",
       rsr = BigDecimal("0.50"),
-      saraRiskOfViolenceTowardsPartner = "Low",
-      saraRiskOfViolenceTowardsOthers = "Low",
-      sara = "Low",
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Low",
+        saraRiskOfViolenceTowardsOthers = "Low",
+        overallResult = SaraRisk.LOW,
+      ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
   }
@@ -318,9 +360,11 @@ class PniRiskEngineTest {
       ospDc = "VERY_HIGH",
       ospIic = "HIGH",
       rsr = BigDecimal("3.00"),
-      saraRiskOfViolenceTowardsPartner = "Low",
-      saraRiskOfViolenceTowardsOthers = "Low",
-      sara = "Low",
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Low",
+        saraRiskOfViolenceTowardsOthers = "Low",
+        overallResult = SaraRisk.LOW,
+      ),
     )
     assertEquals(RiskClassification.HIGH_RISK.name, riskEngine.getRiskClassification(riskScores, gender))
   }
@@ -334,9 +378,11 @@ class PniRiskEngineTest {
       ospDc = "MEDIUM",
       ospIic = "MEDIUM",
       rsr = BigDecimal("2.50"),
-      saraRiskOfViolenceTowardsPartner = "Low",
-      saraRiskOfViolenceTowardsOthers = "Low",
-      sara = "Low",
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Low",
+        saraRiskOfViolenceTowardsOthers = "Low",
+        overallResult = SaraRisk.LOW,
+      ),
     )
     assertEquals(RiskClassification.MEDIUM_RISK.name, riskEngine.getRiskClassification(riskScores, gender))
   }
@@ -350,9 +396,11 @@ class PniRiskEngineTest {
       ospDc = "LOW",
       ospIic = "LOW",
       rsr = BigDecimal("0.50"),
-      saraRiskOfViolenceTowardsPartner = "Low",
-      saraRiskOfViolenceTowardsOthers = "Low",
-      sara = "Low",
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = "Low",
+        saraRiskOfViolenceTowardsOthers = "Low",
+        overallResult = SaraRisk.LOW,
+      ),
     )
     assertEquals(RiskClassification.LOW_RISK.name, riskEngine.getRiskClassification(riskScores, gender))
   }

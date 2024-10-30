@@ -364,6 +364,53 @@ class OasysServiceTest {
     completedSaraAssessment.shouldBe(999999)
   }
 
+  @Test
+  fun `should return relationships with completed SARA for provided prison number when completed Sara occurs on same day as assessment`() {
+    // Given
+    val oasysAssessmentTimeline = createAssessmentTimelineWithSaraOnTheSameDay()
+
+    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
+
+    val oasysRelationShips1 = OasysRelationships(
+      sara = null,
+      prevOrCurrentDomesticAbuse = null,
+      victimOfPartner = null,
+      victimOfFamily = null,
+      perpAgainstFamily = null,
+      perpAgainstPartner = null,
+      relIssuesDetails = null,
+      emotionalCongruence = null,
+      relCloseFamily = null,
+      prevCloseRelationships = null,
+    )
+
+    val oasysRelationShips2 = OasysRelationships(
+      sara = Sara(
+        imminentRiskOfViolenceTowardsOthers = "HIGH",
+        imminentRiskOfViolenceTowardsPartner = "HIGH",
+      ),
+      prevOrCurrentDomesticAbuse = null,
+      victimOfPartner = null,
+      victimOfFamily = null,
+      perpAgainstFamily = null,
+      perpAgainstPartner = null,
+      relIssuesDetails = null,
+      emotionalCongruence = null,
+      relCloseFamily = null,
+      prevCloseRelationships = null,
+    )
+
+    every { oasysApiClient.getRelationships(123123) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips1)
+    every { oasysApiClient.getRelationships(999999) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips2)
+
+    // When
+    val completedSaraAssessment = service.getAssessmentWithCompletedSara("A9999BB")
+
+    // Then
+    completedSaraAssessment.shouldNotBeNull()
+    completedSaraAssessment.shouldBe(999999)
+  }
+
   private fun createAssessmentTimeline(): OasysAssessmentTimeline {
     val assessment1 = Timeline(
       id = 123123,
@@ -376,6 +423,31 @@ class OasysServiceTest {
       status = "COMPLETE",
       type = "LAYER3",
       completedAt = LocalDateTime.now().minusWeeks(5),
+    )
+    val assessment3 = Timeline(
+      id = 111111,
+      status = "STARTED",
+      type = "LAYER3",
+      completedAt = null,
+    )
+    val oasysAssessmentTimeline =
+      OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
+    return oasysAssessmentTimeline
+  }
+
+  private fun createAssessmentTimelineWithSaraOnTheSameDay(): OasysAssessmentTimeline {
+    val completedAssessmentDateTime = LocalDateTime.of(2024, 10, 20, 15, 30)
+    val assessment1 = Timeline(
+      id = 123123,
+      status = "COMPLETE",
+      type = "LAYER3",
+      completedAt = completedAssessmentDateTime,
+    )
+    val assessment2 = Timeline(
+      id = 999999,
+      status = "COMPLETE",
+      type = "LAYER3",
+      completedAt = completedAssessmentDateTime.minusHours(2),
     )
     val assessment3 = Timeline(
       id = 111111,

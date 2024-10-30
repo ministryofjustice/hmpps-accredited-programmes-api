@@ -68,8 +68,8 @@ class PniRiskEngine {
   }
 
   fun isHighSara(individualRiskScores: IndividualRiskScores) =
-    (individualRiskScores.saraRiskOfViolenceTowardsOthers?.equals("High", ignoreCase = true) == true) ||
-      (individualRiskScores.saraRiskOfViolenceTowardsPartner?.equals("High", ignoreCase = true) == true)
+    (individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals("High", ignoreCase = true) == true) ||
+      (individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals("High", ignoreCase = true) == true)
 
   private fun isRsrHigh(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     val isHighRsr = individualRiskScores.rsr?.let { it >= BigDecimal("3.00") } == true
@@ -95,8 +95,8 @@ class PniRiskEngine {
   }
 
   fun isMediumSara(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.saraRiskOfViolenceTowardsOthers?.equals("Medium", ignoreCase = true) == true ||
-      individualRiskScores.saraRiskOfViolenceTowardsPartner?.equals("Medium", ignoreCase = true) == true
+    individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals("Medium", ignoreCase = true) == true ||
+      individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals("Medium", ignoreCase = true) == true
 
   private fun isRsrMedium(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     val rsrMediumRsr = individualRiskScores.rsr?.let { it in BigDecimal("1.00")..BigDecimal("2.99") } == true
