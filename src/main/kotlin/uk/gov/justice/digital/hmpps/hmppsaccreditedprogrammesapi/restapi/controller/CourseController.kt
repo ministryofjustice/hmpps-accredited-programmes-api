@@ -116,6 +116,7 @@ class CourseController(
       audience = audience.name,
       audienceColour = audience.colour,
       withdrawn = courseCreateRequest.withdrawn,
+      displayOnPgmdir = courseCreateRequest.displayOnPgmdir,
     )
 
     val savedCourse = courseService.save(course)

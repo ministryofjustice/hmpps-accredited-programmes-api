@@ -51,6 +51,7 @@ data class CourseEntity(
   var audienceColour: String?,
   var withdrawn: Boolean = false,
   var listDisplayName: String? = null,
+  var displayOnPgmdir: Boolean? = true,
 ) {
   fun addOffering(offering: OfferingEntity) {
     offering.course = this
