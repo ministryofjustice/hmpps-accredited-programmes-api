@@ -7,7 +7,7 @@ import java.math.BigDecimal
 
 @Service
 class PniRiskEngine {
-  fun getOverallRiskScore(individualRiskScores: IndividualRiskScores, prisonNumber: String, gender: String): RiskScore {
+  fun getOverallRiskScore(individualRiskScores: IndividualRiskScores, gender: String): RiskScore {
     val classification = getRiskClassification(individualRiskScores, gender)
 
     return RiskScore(
@@ -68,7 +68,8 @@ class PniRiskEngine {
   }
 
   fun isHighSara(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.sara?.equals("High", ignoreCase = true) == true
+    (individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals("High", ignoreCase = true) == true) ||
+      (individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals("High", ignoreCase = true) == true)
 
   private fun isRsrHigh(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     val isHighRsr = individualRiskScores.rsr?.let { it >= BigDecimal("3.00") } == true
@@ -94,7 +95,8 @@ class PniRiskEngine {
   }
 
   fun isMediumSara(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.sara?.equals("Medium", ignoreCase = true) == true
+    individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals("Medium", ignoreCase = true) == true ||
+      individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals("Medium", ignoreCase = true) == true
 
   private fun isRsrMedium(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     val rsrMediumRsr = individualRiskScores.rsr?.let { it in BigDecimal("1.00")..BigDecimal("2.99") } == true

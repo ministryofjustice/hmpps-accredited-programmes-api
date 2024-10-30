@@ -27,6 +27,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.I
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.NeedsScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PniScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RiskScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sara
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
@@ -66,7 +68,8 @@ class PniService(
     val assessmentId = assessmentIdDate.first
 
     // section 6
-    val relationships = oasysService.getRelationships(assessmentId)
+    var completedAssessmentWithSara = oasysService.getAssessmentWithCompletedSara(prisonNumber) ?: assessmentId
+    val relationships = oasysService.getRelationships(completedAssessmentWithSara)
     // section 7
     val lifestyle = oasysService.getLifestyle(assessmentId)
     // section 10
@@ -84,7 +87,7 @@ class PniService(
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
-      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships, oasysOffendingInfo),
+      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships, oasysOffendingInfo, completedAssessmentWithSara),
     )
 
     val genderOfPerson = getGenderOfPerson(prisonNumber, gender)
@@ -93,7 +96,7 @@ class PniService(
     log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
 
     val overallRiskScore =
-      pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, prisonNumber, genderOfPerson)
+      pniRiskEngine.getOverallRiskScore(individualNeedsAndRiskScores.individualRiskScores, genderOfPerson)
 
     log.info("Overall risk classification for prisonNumber $prisonNumber is ${overallNeedsScore.classification} ")
 
@@ -171,16 +174,29 @@ class PniService(
 
   private fun buildRiskScores(
     oasysRiskPredictorScores: OasysRiskPredictorScores?,
-    relationships: OasysRelationships?,
-    offendingInfo: OasysOffendingInfo?,
+    oasysRelationships: OasysRelationships?,
+    oasysOffendingInfo: OasysOffendingInfo?,
+    saraAssessmentId: Long?,
   ) = IndividualRiskScores(
     ogrs3 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears?.round(),
     ovp = oasysRiskPredictorScores?.violencePredictorScore?.twoYears?.round(),
-    ospIic = offendingInfo?.ospIICRisk ?: offendingInfo?.ospIRisk,
-    ospDc = offendingInfo?.ospDCRisk ?: offendingInfo?.ospCRisk,
+    ospIic = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
+    ospDc = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
     rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
-    sara = relationships?.sara?.imminentRiskOfViolenceTowardsPartner,
+    sara = Sara(
+      overallResult = getOverallSARAResult(oasysRelationships?.sara),
+      saraRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
+      saraRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
+      saraAssessmentId = saraAssessmentId,
+    ),
   )
+
+  private fun getOverallSARAResult(sara: uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Sara?): SaraRisk? {
+    return SaraRisk.highestRisk(
+      SaraRisk.fromString(sara?.imminentRiskOfViolenceTowardsPartner),
+      SaraRisk.fromString(sara?.imminentRiskOfViolenceTowardsOthers),
+    )
+  }
 
   fun getGenderOfPerson(prisonNumber: String, prisonerGender: String?): String {
     return prisonerGender

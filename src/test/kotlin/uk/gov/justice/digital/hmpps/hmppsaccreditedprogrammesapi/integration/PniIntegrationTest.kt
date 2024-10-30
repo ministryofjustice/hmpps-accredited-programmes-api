@@ -21,9 +21,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.N
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PniScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RelationshipDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RiskScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sara
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SelfManagementDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -40,10 +42,10 @@ class PniIntegrationTest :
     val prisonNumber = "A9999BB"
     val pniScore = getPniInfoByPrisonNumber(prisonNumber)
 
-    pniScore shouldBe pniScore(prisonNumber)
+    pniScore shouldBe buildPniScore(prisonNumber)
   }
 
-  fun pniScore(prisonNumber: String) = PniScore(
+  fun buildPniScore(prisonNumber: String) = PniScore(
     prisonNumber = prisonNumber,
     crn = "X739590",
     assessmentId = 2114584,
@@ -97,7 +99,13 @@ class PniIntegrationTest :
         ospDc = "High",
         ospIic = "Medium",
         rsr = 1.46.toBigDecimal(),
-        sara = "High",
+        sara = Sara(
+          overallResult = SaraRisk.HIGH,
+          saraRiskOfViolenceTowardsOthers = "High",
+          saraRiskOfViolenceTowardsPartner = "High",
+          saraAssessmentId = 2114584,
+        ),
+
       ),
     ),
   )
@@ -112,12 +120,12 @@ class PniIntegrationTest :
     // Then
     val pniResults = pniResultEntityRepository.findAllByPrisonNumber(prisonNumber)
     pniResults[0].prisonNumber shouldBe prisonNumber
-    pniResults[0].crn shouldBe pniScore(prisonNumber).crn
-    pniResults[0].needsClassification shouldBe pniScore(prisonNumber).needsScore.classification
-    pniResults[0].overallNeedsScore shouldBe pniScore(prisonNumber).needsScore.overallNeedsScore
-    pniResults[0].programmePathway shouldBe pniScore(prisonNumber).programmePathway
-    pniResults[0].riskClassification shouldBe pniScore(prisonNumber).riskScore.classification
-    pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore(prisonNumber))
+    pniResults[0].crn shouldBe buildPniScore(prisonNumber).crn
+    pniResults[0].needsClassification shouldBe buildPniScore(prisonNumber).needsScore.classification
+    pniResults[0].overallNeedsScore shouldBe buildPniScore(prisonNumber).needsScore.overallNeedsScore
+    pniResults[0].programmePathway shouldBe buildPniScore(prisonNumber).programmePathway
+    pniResults[0].riskClassification shouldBe buildPniScore(prisonNumber).riskScore.classification
+    pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(buildPniScore(prisonNumber))
     pniResults[0].pniValid shouldBe false
     pniResults[0].basicSkillsScore shouldBe 33
   }

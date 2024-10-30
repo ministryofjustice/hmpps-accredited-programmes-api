@@ -43,6 +43,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 
 @Service
 class OasysService(
@@ -206,6 +208,34 @@ class OasysService(
       .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
       .sortedByDescending { it.completedAt }
       .firstOrNull()
+  }
+
+  private fun getAllCompletedLayerThreeAssessments(assessment: OasysAssessmentTimeline): List<Timeline> {
+    return assessment
+      .timeline
+      .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
+      .sortedByDescending { it.completedAt }
+  }
+
+  fun getAssessmentWithCompletedSara(prisonNumber: String): Long? {
+    val assessmentTimeline = getAssessments(prisonNumber)
+    val completedLayerThreeAssessments = getAllCompletedLayerThreeAssessments(assessmentTimeline)
+    val latestAssessmentDate = completedLayerThreeAssessments.first().completedAt
+
+    for (assessment in completedLayerThreeAssessments) {
+      getRelationships(assessment.id)?.let { relationships ->
+        if (relationships.sara != null && isWithinSixWeeks(assessment.completedAt, latestAssessmentDate)) {
+          return assessment.id
+        }
+      }
+    }
+    log.warn("No completed assessment with SARA data found for prison number $prisonNumber")
+    return null
+  }
+
+  fun isWithinSixWeeks(date1: LocalDateTime?, date2: LocalDateTime?): Boolean {
+    val daysBetween = ChronoUnit.DAYS.between(date1, date2)
+    return abs(daysBetween) <= 42 // 6 weeks * 7 days/week = 42 days
   }
 
   private fun getAssessments(prisonNumber: String): OasysAssessmentTimeline {
