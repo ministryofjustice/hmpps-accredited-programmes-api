@@ -79,3 +79,23 @@ VALUES ('f925d6c5-d1be-4246-88ba-91bf77dbd202', 'Setting', 'Custody or community
        ('f925d6c5-d1be-4246-88ba-91bf77dbd202', 'Needs criteria', 'Medium need for OGRS, OVP, OSP and SNSV. At least low need for SARA. This is based on their programme needs identifier score.'),
        ('f925d6c5-d1be-4246-88ba-91bf77dbd202', 'Suitable for people with learning disabilities or challenges (LDC)', 'Yes'),
        ('f925d6c5-d1be-4246-88ba-91bf77dbd202', 'Time to complete', 'Around 10 to 13 weeks (2 to 3 sessions a week)');
+
+-- create course variant
+
+CREATE TABLE IF NOT EXISTS course_variant
+(
+    id UUID NOT NULL,
+    course_id UUID NOT NULL REFERENCES course(course_id),
+    variant_course_id UUID NOT NULL REFERENCES course(course_id),
+    CONSTRAINT course_variant_courseid_fk FOREIGN KEY (course_id) REFERENCES course(course_id),
+    CONSTRAINT course_variant_variant_courseid_fk FOREIGN KEY (variant_course_id) REFERENCES course(course_id)
+);
+
+INSERT INTO course_variant(id, course_id, variant_course_id) VALUES ('55104cd1-27e9-404a-82ab-ffd96e3dd37a', 'f925d6c5-d1be-4246-88ba-91bf77dbd101', 'f925d6c5-d1be-4246-88ba-91bf77dbd102');
+INSERT INTO course_variant(id, course_id, variant_course_id) VALUES ('55104cd1-27e9-404a-82ab-ffd96e3dd37b', 'f925d6c5-d1be-4246-88ba-91bf77dbd201', 'f925d6c5-d1be-4246-88ba-91bf77dbd202');
+
+-- link offering with organisation
+
+ALTER TABLE organisation ADD CONSTRAINT organisation_code UNIQUE(code);
+ALTER TABLE offering ADD CONSTRAINT offering_organisation_fk FOREIGN KEY (organisation_id) REFERENCES organisation(code);
+
