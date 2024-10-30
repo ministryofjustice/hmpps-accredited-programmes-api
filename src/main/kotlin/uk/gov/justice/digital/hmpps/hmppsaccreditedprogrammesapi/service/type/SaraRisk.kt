@@ -8,9 +8,6 @@ enum class SaraRisk(private val score: Int) {
   VERY_HIGH(40),
   ;
 
-  //  val scoreValue: Int
-//    get() = score
-
   companion object {
     fun fromString(value: String?): SaraRisk {
       return SaraRisk.entries.find { it.name.equals(value, ignoreCase = true) }
