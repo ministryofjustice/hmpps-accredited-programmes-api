@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 data class NeedsScore(
   @Schema(example = "5", required = true)
-  @get:JsonProperty("overallNeedsScore") val overallNeedsScore: Int,
+  @get:JsonProperty("overallNeedsScore") val overallNeedsScore: Int?,
   @Schema(example = "6")
   @get:JsonProperty("basicSkillsScore") val basicSkillsScore: Int?,
   @Schema(example = "High Intensity BC", required = true)
@@ -35,12 +35,12 @@ data class DomainScore(
 
 data class SexDomainScore(
   @Schema(example = "2", required = true)
-  @get:JsonProperty("overallSexDomainScore") val overAllSexDomainScore: Int,
+  @get:JsonProperty("overallSexDomainScore") val overAllSexDomainScore: Int?,
   @get:JsonProperty("individualSexScores") val individualSexScores: IndividualSexScores,
 )
 
 data class ThinkingDomainScore(
-  @get:JsonProperty("overallThinkingDomainScore") val overallThinkingDomainScore: Int,
+  @get:JsonProperty("overallThinkingDomainScore") val overallThinkingDomainScore: Int?,
   @get:JsonProperty("individualThinkingScores") val individualThinkingScores: IndividualCognitiveScores,
 ) {
   @JsonIgnore
@@ -56,7 +56,7 @@ data class ThinkingDomainScore(
 }
 
 data class RelationshipDomainScore(
-  @get:JsonProperty("overallRelationshipDomainScore") val overallRelationshipDomainScore: Int,
+  @get:JsonProperty("overallRelationshipDomainScore") val overallRelationshipDomainScore: Int?,
   @get:JsonProperty("individualRelationshipScores") val individualRelationshipScores: IndividualRelationshipScores,
 ) {
   @JsonIgnore
@@ -77,7 +77,7 @@ data class RelationshipDomainScore(
 }
 
 data class SelfManagementDomainScore(
-  @get:JsonProperty("overallSelfManagementDomainScore") val overallSelfManagementDomainScore: Int,
+  @get:JsonProperty("overallSelfManagementDomainScore") val overallSelfManagementDomainScore: Int?,
   @get:JsonProperty("individualSelfManagementScores") val individualSelfManagementScores: IndividualSelfManagementScores,
 ) {
   @JsonIgnore

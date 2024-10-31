@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DomainScore
@@ -11,11 +10,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.S
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
 
-private const val ZERO = 0
-
 @Service
 class PniNeedsEngine {
-  private val log = LoggerFactory.getLogger(this::class.java)
   val validOspLevels = listOf("LOW", "MEDIUM", "HIGH", "VERY_HIGH")
   fun getOverallNeedsScore(
     individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
@@ -23,32 +19,34 @@ class PniNeedsEngine {
     gender: String,
     basicSkillsScore: Int?,
   ): NeedsScore {
-    val sexDomainScore = getSexDomainScore(individualNeedsAndRiskScores, prisonNumber, gender)
+    val overallSexDomainScore = getSexDomainScore(individualNeedsAndRiskScores, prisonNumber, gender)
     val individualNeedsScores = individualNeedsAndRiskScores.individualNeedsScores
-    val thinkingDomainScore = individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore()
-    val relationshipDomainScore = individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
-    val selfManagementDomainScore = individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
+    val overallThinkingDomainScore = individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore()
+    val overallRelationshipDomainScore = individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
+    val overallSelfManagementScore = individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
     val overallNeedsScore =
-      listOf(sexDomainScore, thinkingDomainScore, relationshipDomainScore, selfManagementDomainScore).sum()
+      listOf(overallSexDomainScore, overallThinkingDomainScore, overallRelationshipDomainScore, overallSelfManagementScore)
+        .filterNotNull()
+        .sum()
 
     return NeedsScore(
       overallNeedsScore = overallNeedsScore,
       classification = getClassification(overallNeedsScore),
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(
-          overAllSexDomainScore = sexDomainScore,
+          overAllSexDomainScore = overallSexDomainScore,
           individualSexScores = individualNeedsScores.individualSexScores,
         ),
         thinkingDomainScore = ThinkingDomainScore(
-          overallThinkingDomainScore = thinkingDomainScore,
+          overallThinkingDomainScore = overallThinkingDomainScore,
           individualThinkingScores = individualNeedsScores.individualCognitiveScores,
         ),
         relationshipDomainScore = RelationshipDomainScore(
-          overallRelationshipDomainScore = relationshipDomainScore,
+          overallRelationshipDomainScore = overallRelationshipDomainScore,
           individualRelationshipScores = individualNeedsScores.individualRelationshipScores,
         ),
         selfManagementDomainScore = SelfManagementDomainScore(
-          overallSelfManagementDomainScore = selfManagementDomainScore,
+          overallSelfManagementDomainScore = overallSelfManagementScore,
           individualSelfManagementScores = individualNeedsScores.individualSelfManagementScores,
         ),
       ),
@@ -56,7 +54,7 @@ class PniNeedsEngine {
     )
   }
 
-  fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String?): Int {
+  fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String?): Int? {
     val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
 
     if (individualSexScores.isAllValuesPresent()) {
@@ -73,8 +71,7 @@ class PniNeedsEngine {
     if (gender.equals("Female", ignoreCase = true) && individualSexScores.hasSomeDataPresent()) {
       throw BusinessException("PNI information cannot be computed for $gender prisoner $prisonNumber some SexDomainScore is present but not all")
     }
-
-    return ZERO
+    return null
   }
 }
 

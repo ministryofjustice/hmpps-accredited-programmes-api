@@ -26,7 +26,7 @@ class IndividualSelfManagementScoresTest {
     @JvmStatic
     fun scoresForOverallSelfManagementScore(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of(IndividualSelfManagementScores(0, 0, 0, 0), 0),
+        Arguments.of(IndividualSelfManagementScores(0, 0, 0, 0), null),
         Arguments.of(IndividualSelfManagementScores(1, 0, 0, 0), 0),
         Arguments.of(IndividualSelfManagementScores(1, 1, 0, 0), 1),
         Arguments.of(IndividualSelfManagementScores(1, 1, 1, 0), 1),
@@ -45,7 +45,7 @@ class IndividualSelfManagementScoresTest {
 
   @ParameterizedTest
   @MethodSource("scoresForOverallSelfManagementScore")
-  fun `overallSelfManagementScore returned as expected`(scores: IndividualSelfManagementScores, expected: Int) {
+  fun `overallSelfManagementScore returned as expected`(scores: IndividualSelfManagementScores, expected: Int?) {
     assertEquals(expected, scores.overallSelfManagementScore())
   }
 }
