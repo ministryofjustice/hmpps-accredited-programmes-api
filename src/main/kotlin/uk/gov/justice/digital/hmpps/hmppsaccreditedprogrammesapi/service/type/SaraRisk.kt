@@ -11,7 +11,7 @@ enum class SaraRisk(private val score: Int) {
   companion object {
     fun fromString(value: String?): SaraRisk {
       return SaraRisk.entries.find { it.name.equals(value, ignoreCase = true) }
-        ?: throw IllegalArgumentException("Unknown SARA Risk: $value")
+        ?: NOT_APPLICABLE
     }
 
     fun highestRisk(risk1: SaraRisk, risk2: SaraRisk): SaraRisk {

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type
 
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Test
 
 class SaraRiskTest {
@@ -49,10 +48,24 @@ class SaraRiskTest {
   }
 
   @Test
-  fun `fromString should throw IllegalArgumentException when value is unknown`() {
-    assertThatIllegalArgumentException().isThrownBy {
-      SaraRisk.fromString("UNKNOWN")
-    }.withMessage("Unknown SARA Risk: UNKNOWN")
+  fun `fromString should NOT_APPLICABLE for null risk`() {
+    // Given & When
+    val saraRisk = SaraRisk.fromString(null)
+    // Then
+    assertThat(saraRisk).isSameAs(SaraRisk.NOT_APPLICABLE)
+  }
+
+  @Test
+  fun `should return not applicable when sara risk does not exist`() {
+    // Given
+    val risk1 = SaraRisk.NOT_APPLICABLE
+    val risk2 = SaraRisk.NOT_APPLICABLE
+
+    // When
+    val highestRisk = SaraRisk.highestRisk(risk1, risk2)
+
+    // Then
+    assertThat(highestRisk).isEqualTo(SaraRisk.NOT_APPLICABLE)
   }
 
   @Test
