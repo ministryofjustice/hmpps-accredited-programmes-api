@@ -1,9 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.repository
 
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import jakarta.persistence.EntityManager
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,5 +40,4 @@ class OfferingRepositoryTest {
     persistedOfferings.first().withdrawn shouldBe isWithdrawn
     persistedOfferings.first().course.id shouldBe course.id
   }
-
 }
