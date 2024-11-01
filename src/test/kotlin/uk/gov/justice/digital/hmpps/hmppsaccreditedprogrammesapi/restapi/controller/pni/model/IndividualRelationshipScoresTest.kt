@@ -26,7 +26,7 @@ class IndividualRelationshipScoresTest {
     @JvmStatic
     fun scoresForOverallRelationshipScore(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of(IndividualRelationshipScores(0, 0, 0, 0), 0),
+        Arguments.of(IndividualRelationshipScores(0, 0, 0, 0), null),
         Arguments.of(IndividualRelationshipScores(1, 0, 0, 0), 0),
         Arguments.of(IndividualRelationshipScores(1, 1, 0, 0), 1),
         Arguments.of(IndividualRelationshipScores(1, 1, 1, 0), 1),
@@ -39,13 +39,13 @@ class IndividualRelationshipScoresTest {
 
   @ParameterizedTest
   @MethodSource("scoresForTotalScore")
-  fun `totalScore returned as expected`(scores: IndividualRelationshipScores, expected: Int) {
+  fun `totalScore returned as expected`(scores: IndividualRelationshipScores, expected: Int?) {
     assertEquals(expected, scores.totalScore())
   }
 
   @ParameterizedTest
   @MethodSource("scoresForOverallRelationshipScore")
-  fun `overall relationship score returned as expected`(scores: IndividualRelationshipScores, expected: Int) {
+  fun `overall relationship score returned as expected`(scores: IndividualRelationshipScores, expected: Int?) {
     assertEquals(expected, scores.overallRelationshipScore())
   }
 }
