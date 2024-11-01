@@ -14,8 +14,8 @@ class CourseVariantEntity(
   val id: UUID = UUID.randomUUID(),
 
   @Column
-  val courseId: UUID?,
+  val courseId: UUID,
 
   @Column
-  val variantCourseId: UUID?,
+  val variantCourseId: UUID,
 )

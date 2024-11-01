@@ -127,4 +127,12 @@ class PersistenceHelper {
       .setParameter("colour", colour)
       .executeUpdate()
   }
+
+  fun createCourseVariant(id: UUID = UUID.randomUUID(), courseId: UUID, variantCourseId: UUID = UUID.randomUUID()) {
+    entityManager.createNativeQuery("INSERT INTO course_variant (id, course_id, variant_course_id) VALUES (:id, :courseId, :variantCourseId)")
+      .setParameter("id", id)
+      .setParameter("courseId", courseId)
+      .setParameter("variantCourseId", variantCourseId)
+      .executeUpdate()
+  }
 }
