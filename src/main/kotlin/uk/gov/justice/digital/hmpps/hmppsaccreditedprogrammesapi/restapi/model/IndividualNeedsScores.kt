@@ -48,13 +48,6 @@ data class IndividualSexScores(
     emotionalCongruence,
   ).any { it != null }
 
-//  @JsonIgnore
-//  fun isAllValuesPresent() = listOf(
-//    sexualPreOccupation,
-//    offenceRelatedSexualInterests,
-//    emotionalCongruence,
-//  ).all { it != null }
-
   @JsonIgnore
   fun totalScore(): Int {
     return (sexualPreOccupation ?: 0) +
@@ -119,14 +112,6 @@ data class IndividualSelfManagementScores(
       (difficultiesCoping ?: 0)
   }
 
-//  @JsonIgnore
-//  fun areAllValuesPresent() = listOf(
-//    impulsivity,
-//    temperControl,
-//    problemSolvingSkills,
-//    difficultiesCoping,
-//  ).all { it != null }
-
   fun overallSelfManagementScore(): Int? {
     if (!areAllValuesPresent()) return null
 
@@ -161,14 +146,6 @@ data class IndividualRelationshipScores(
       (easilyInfluenced ?: 0) +
       (aggressiveControllingBehaviour ?: 0)
   }
-
-//  @JsonIgnore
-//  fun areAllValuesPresent() = listOf(
-//    curRelCloseFamily,
-//    prevExpCloseRel,
-//    easilyInfluenced,
-//    aggressiveControllingBehaviour,
-//  ).all { it != null }
 
   fun overallRelationshipScore(): Int? {
     if (!areAllValuesPresent()) return null
