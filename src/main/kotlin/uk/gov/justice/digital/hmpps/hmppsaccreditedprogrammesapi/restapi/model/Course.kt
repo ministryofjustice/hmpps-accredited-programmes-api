@@ -16,7 +16,7 @@ import java.util.UUID
  * @param displayName
  * @param audienceColour
  * @param withdrawn
- * @param displayOnPgmdir
+ * @param displayOnProgrammeDirectory
  */
 data class Course(
 
@@ -51,5 +51,5 @@ data class Course(
   @get:JsonProperty("withdrawn") val withdrawn: Boolean? = null,
 
   @Schema(example = "true", description = "")
-  @get:JsonProperty("displayOnPgmdir") val displayOnPgmdir: Boolean? = null,
+  @get:JsonProperty("displayOnProgrammeDirectory") val displayOnProgrammeDirectory: Boolean? = null,
 )

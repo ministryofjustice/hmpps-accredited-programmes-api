@@ -20,7 +20,7 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
   @Query(
     """
     SELECT distinct (c.name) FROM CourseEntity c
-    WHERE ((:includeWithdrawn IS true OR c.withdrawn IS false) AND c.displayOnPgmdir IS TRUE)
+    WHERE ((:includeWithdrawn IS true OR c.withdrawn IS false) AND c.displayOnProgrammeDirectory IS TRUE)
     order by c.name asc 
   """,
   )

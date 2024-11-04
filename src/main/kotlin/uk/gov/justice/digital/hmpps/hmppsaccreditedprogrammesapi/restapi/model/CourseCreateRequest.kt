@@ -34,5 +34,5 @@ data class CourseCreateRequest(
   @get:JsonProperty("alternateName") val alternateName: String? = null,
 
   @Schema(example = "true", required = true, description = "flag is used to display course on the find dir")
-  @get:JsonProperty("displayOnPgmdir", required = true) val displayOnPgmdir: Boolean? = true,
+  @get:JsonProperty("displayOnProgrammeDirectory", required = true) val displayOnProgrammeDirectory: Boolean? = true,
 )

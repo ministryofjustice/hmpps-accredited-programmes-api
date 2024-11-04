@@ -1,10 +1,10 @@
 
 ALTER TABLE course
-    ADD COLUMN display_on_pgmdir BOOLEAN NOT NULL DEFAULT FALSE;
-UPDATE course set display_on_pgmdir = true;
+    ADD COLUMN display_on_programme_directory BOOLEAN NOT NULL DEFAULT FALSE;
+UPDATE course set display_on_programme_directory = true;
 
 -- High Intensity building choices
-INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_pgmdir)
+INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_programme_directory)
 VALUES ('f925d6c5-d1be-4246-88ba-91bf77dbd101', 'Building Choices: high intensity', 'Building Choices helps people to develop skills for change and future-focused goals. It is a cognitive-behavioural programme, combining group and one-to-one sessions. It develops skills such as emotion management, healthy thinking, healthy relationships, sense of purpose and healthy sex. This is the high intensity pathway, including Getting Ready.', 'BCH-1', false,
         'Sexual offence', 'orange', 'Building Choices: high intensity', true);
 
@@ -30,7 +30,7 @@ VALUES ('f925d6c5-d1be-4246-88ba-91bf77dbd101', 'Setting', 'Custody or community
        ('f925d6c5-d1be-4246-88ba-91bf77dbd101', 'Suitable for people with learning disabilities or challenges (LDC)', 'Yes'),
        ('f925d6c5-d1be-4246-88ba-91bf77dbd101', 'Time to complete', 'Around 17 to 25 weeks (2 to 3 sessions a week)');
 
-INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_pgmdir)
+INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_programme_directory)
 VALUES ('f925d6c5-d1be-4246-88ba-91bf77dbd102', 'Building Choices: high intensity', 'Building Choices helps people to develop skills for change and future-focused goals. It is a cognitive-behavioural programme, combining group and one-to-one sessions. It develops skills such as emotion management, healthy thinking, healthy relationships, sense of purpose and healthy sex. This is the high intensity pathway, including Getting Ready.', 'BCH-2', false,
         'General offence', 'light-blue', 'Building Choices: high intensity', false);
 
@@ -68,7 +68,7 @@ VALUES ('f925d6c5-d1be-4246-88ba-91bf77dbd102', 'Setting', 'Custody or community
 
 -- Moderate Intensity building choices
 
-INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_pgmdir)
+INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_programme_directory)
 VALUES ('f925d6c5-d1be-4246-88ba-91bf77dbd201', 'Building Choices: moderate intensity', 'Building Choices helps people to develop skills for change and future-focused goals. It is a cognitive-behavioural programme, combining group and one-to-one sessions. It develops skills such as emotion management, healthy thinking, healthy relationships, sense of purpose and healthy sex. This is the moderate intensity pathway.', 'BCM-1', false,
         'Sexual offence', 'orange', 'Building Choices: moderate intensity', true);
 
@@ -96,7 +96,7 @@ INSERT INTO offering (offering_id, course_id, organisation_id, contact_email, se
         ('09a684c5-ebb1-43b3-ac63-b53c1da20645', 'f925d6c5-d1be-4246-88ba-91bf77dbd201', 'LPI', 'programmes.liverpool@justice.gov.uk', NULL, true, false),
         ('09a684c5-ebb1-43b3-ac63-b53c1da20646', 'f925d6c5-d1be-4246-88ba-91bf77dbd201', 'RSI', 'programmesrisley@justice.gov.uk', NULL, true, false);
 
-INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_pgmdir)
+INSERT INTO course (course_id, name, description, identifier, withdrawn, audience, audience_colour, list_display_name, display_on_programme_directory)
 VALUES ('f925d6c5-d1be-4246-88ba-91bf77dbd202', 'Building Choices: moderate intensity', 'Building Choices helps people to develop skills for change and future-focused goals. It is a cognitive-behavioural programme, combining group and one-to-one sessions. It develops skills such as emotion management, healthy thinking, healthy relationships, sense of purpose and healthy sex. This is the moderate intensity pathway.', 'BCM-2', false,
         'General offence', 'light-blue', 'Building Choices: moderate intensity', false);
 

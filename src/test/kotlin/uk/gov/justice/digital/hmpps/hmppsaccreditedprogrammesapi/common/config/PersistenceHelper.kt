@@ -30,8 +30,8 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM audience").executeUpdate()
   }
 
-  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue", displayOnPgmdir: Boolean = true) {
-    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn, audience_colour, display_on_pgmdir) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn, :audienceColour, :display_on_pgmdir)")
+  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue", displayOnProgrammeDirectory: Boolean = true) {
+    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn, audience_colour, display_on_programme_directory) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn, :audienceColour, :display_on_programme_directory)")
       .setParameter("id", courseId)
       .setParameter("identifier", identifier)
       .setParameter("name", name)
@@ -40,7 +40,7 @@ class PersistenceHelper {
       .setParameter("audience", audience)
       .setParameter("withdrawn", withdrawn)
       .setParameter("audienceColour", audienceColour)
-      .setParameter("display_on_pgmdir", displayOnPgmdir)
+      .setParameter("display_on_programme_directory", displayOnProgrammeDirectory)
       .executeUpdate()
   }
 

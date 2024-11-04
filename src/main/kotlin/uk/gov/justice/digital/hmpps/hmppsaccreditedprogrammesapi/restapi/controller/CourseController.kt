@@ -120,7 +120,7 @@ class CourseController(
       audience = audience.name,
       audienceColour = audience.colour,
       withdrawn = courseCreateRequest.withdrawn,
-      displayOnPgmdir = courseCreateRequest.displayOnPgmdir,
+      displayOnProgrammeDirectory = courseCreateRequest.displayOnProgrammeDirectory,
     )
 
     val savedCourse = courseService.save(course)
@@ -430,17 +430,17 @@ class CourseController(
   )
   @RequestMapping(
     method = [RequestMethod.POST],
-    value = ["/courses/bc/{courseId}"],
+    value = ["/courses/building-choices/{courseId}"],
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun getBuildingCourseVariants(@Parameter(description = "A course identifier which has variants", required = true) @PathVariable("courseId") courseId: UUID, @Parameter(description = "", required = true) @RequestBody bcSearchRequest: BuildingChoicesSearchRequest): List<CourseEntity>? {
+  fun getBuildingCourseVariants(@Parameter(description = "A course identifier which has variants", required = true) @PathVariable("courseId") courseId: UUID, @Parameter(description = "", required = true) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest): List<CourseEntity>? {
     val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
       ?: throw BusinessException("$courseId is not a Building choices course")
 
     val listOfBCCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
-    val audience = if (bcSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
-    val genderOffering = if (bcSearchRequest.isInAWomensPrison) Gender.FEMALE.name else Gender.MALE.name
+    val audience = if (buildingChoicesSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
+    val genderOffering = if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE.name else Gender.MALE.name
 
     return courseService.findBuildingChoicesCourses(listOfBCCourseIds, audience, genderOffering)
   }
