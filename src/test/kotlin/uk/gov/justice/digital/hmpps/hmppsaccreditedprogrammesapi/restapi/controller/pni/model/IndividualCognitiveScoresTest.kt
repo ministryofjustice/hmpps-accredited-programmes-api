@@ -24,12 +24,14 @@ class IndividualCognitiveScoresTest {
     @JvmStatic
     fun scoresForOverallCognitiveDomainScore(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of(IndividualCognitiveScores(0, 0), 0, null),
-        Arguments.of(IndividualCognitiveScores(1, 0), 1, 1),
-        Arguments.of(IndividualCognitiveScores(1, 1), 2, 1),
-        Arguments.of(IndividualCognitiveScores(2, 1), 3, 2),
-        Arguments.of(IndividualCognitiveScores(2, 2), 4, 2),
-        Arguments.of(IndividualCognitiveScores(2, 0), 2, 2),
+        Arguments.of(IndividualCognitiveScores(0, 0), null),
+        Arguments.of(IndividualCognitiveScores(1, null), null),
+        Arguments.of(IndividualCognitiveScores(null, 0), null),
+        Arguments.of(IndividualCognitiveScores(1, 0), 1),
+        Arguments.of(IndividualCognitiveScores(1, 1), 1),
+        Arguments.of(IndividualCognitiveScores(2, 1), 2),
+        Arguments.of(IndividualCognitiveScores(2, 2), 2),
+        Arguments.of(IndividualCognitiveScores(2, 0), 2),
       )
     }
   }
@@ -42,7 +44,7 @@ class IndividualCognitiveScoresTest {
 
   @ParameterizedTest
   @MethodSource("scoresForOverallCognitiveDomainScore")
-  fun `overallCognitiveDomainScore returned as expected`(scores: IndividualCognitiveScores, totalScore: Int, expected: Int?) {
+  fun `overallCognitiveDomainScore returned as expected`(scores: IndividualCognitiveScores, expected: Int?) {
     assertEquals(expected, scores.overallCognitiveDomainScore())
   }
 }

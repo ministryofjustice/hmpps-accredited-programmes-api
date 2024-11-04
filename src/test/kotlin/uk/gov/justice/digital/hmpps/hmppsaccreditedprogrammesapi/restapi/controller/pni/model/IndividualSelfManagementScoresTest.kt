@@ -27,6 +27,10 @@ class IndividualSelfManagementScoresTest {
     fun scoresForOverallSelfManagementScore(): Stream<Arguments> {
       return Stream.of(
         Arguments.of(IndividualSelfManagementScores(0, 0, 0, 0), null),
+        Arguments.of(IndividualSelfManagementScores(null, 2, 3, 4), null),
+        Arguments.of(IndividualSelfManagementScores(1, null, 3, 4), null),
+        Arguments.of(IndividualSelfManagementScores(1, 2, null, 4), null),
+        Arguments.of(IndividualSelfManagementScores(1, 2, 3, null), null),
         Arguments.of(IndividualSelfManagementScores(1, 0, 0, 0), 0),
         Arguments.of(IndividualSelfManagementScores(1, 1, 0, 0), 1),
         Arguments.of(IndividualSelfManagementScores(1, 1, 1, 0), 1),

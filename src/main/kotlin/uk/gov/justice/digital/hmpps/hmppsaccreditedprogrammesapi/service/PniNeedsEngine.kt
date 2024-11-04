@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SelfManagementDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.areAllValuesPresent
 
 @Service
 class PniNeedsEngine {
@@ -57,7 +58,7 @@ class PniNeedsEngine {
   fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String?): Int? {
     val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
 
-    if (individualSexScores.isAllValuesPresent()) {
+    if (individualSexScores.areAllValuesPresent()) {
       return individualSexScores.overallSexDomainScore(individualSexScores.totalScore())
     }
 
