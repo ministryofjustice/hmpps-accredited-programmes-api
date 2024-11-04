@@ -101,6 +101,8 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
 
     val referralId = UUID.randomUUID()
     persistenceHelper.clearAllTableContent()
+    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
     persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")

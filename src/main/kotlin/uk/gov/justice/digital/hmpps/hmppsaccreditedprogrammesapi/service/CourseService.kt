@@ -146,6 +146,8 @@ constructor(
     }
     offeringRepository.delete(existingOffering.id!!)
   }
+
+  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String, gender: String) = courseRepository.findBuildingChoicesCourses(courseIds, audience, gender)
 }
 
 fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> {

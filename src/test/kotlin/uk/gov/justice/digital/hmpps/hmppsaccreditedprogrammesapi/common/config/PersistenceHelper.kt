@@ -21,6 +21,7 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM pni_result").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM course_variant").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referrer_user").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audit_record").executeUpdate()
@@ -29,8 +30,8 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM audience").executeUpdate()
   }
 
-  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue") {
-    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn, audience_colour) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn, :audienceColour)")
+  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue", displayOnProgrammeDirectory: Boolean = true) {
+    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn, audience_colour, display_on_programme_directory) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn, :audienceColour, :display_on_programme_directory)")
       .setParameter("id", courseId)
       .setParameter("identifier", identifier)
       .setParameter("name", name)
@@ -39,6 +40,7 @@ class PersistenceHelper {
       .setParameter("audience", audience)
       .setParameter("withdrawn", withdrawn)
       .setParameter("audienceColour", audienceColour)
+      .setParameter("display_on_programme_directory", displayOnProgrammeDirectory)
       .executeUpdate()
   }
 
@@ -123,6 +125,14 @@ class PersistenceHelper {
       .setParameter("id", id)
       .setParameter("name", name)
       .setParameter("colour", colour)
+      .executeUpdate()
+  }
+
+  fun createCourseVariant(id: UUID = UUID.randomUUID(), courseId: UUID, variantCourseId: UUID = UUID.randomUUID()) {
+    entityManager.createNativeQuery("INSERT INTO course_variant (id, course_id, variant_course_id) VALUES (:id, :courseId, :variantCourseId)")
+      .setParameter("id", id)
+      .setParameter("courseId", courseId)
+      .setParameter("variantCourseId", variantCourseId)
       .executeUpdate()
   }
 }

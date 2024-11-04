@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseCreateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
@@ -29,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisites
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AudienceService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
@@ -50,6 +53,7 @@ class CourseController(
   private val enabledOrganisationService: EnabledOrganisationService,
   private val audienceService: AudienceService,
   private val organisationService: OrganisationService,
+  private val courseVariantRepository: CourseVariantRepository,
 ) {
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -116,6 +120,7 @@ class CourseController(
       audience = audience.name,
       audienceColour = audience.colour,
       withdrawn = courseCreateRequest.withdrawn,
+      displayOnProgrammeDirectory = courseCreateRequest.displayOnProgrammeDirectory,
     )
 
     val savedCourse = courseService.save(course)
@@ -409,6 +414,35 @@ class CourseController(
         ),
       ),
     )
+  }
+
+  @Operation(
+    tags = ["Courses"],
+    summary = "Building choices",
+    operationId = "getBuildingCourseVariants",
+    description = """""",
+    responses = [
+      ApiResponse(responseCode = "200", description = "Return a JSON representation of the created course", content = [Content(schema = Schema(implementation = Course::class))]),
+      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    ],
+    security = [ SecurityRequirement(name = "bearerAuth") ],
+  )
+  @RequestMapping(
+    method = [RequestMethod.POST],
+    value = ["/courses/building-choices/{courseId}"],
+    produces = ["application/json"],
+    consumes = ["application/json"],
+  )
+  fun getBuildingCourseVariants(@Parameter(description = "A course identifier which has variants", required = true) @PathVariable("courseId") courseId: UUID, @Parameter(description = "", required = true) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest): List<CourseEntity>? {
+    val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
+      ?: throw BusinessException("$courseId is not a Building choices course")
+
+    val listOfBCCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
+    val audience = if (buildingChoicesSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
+    val genderOffering = if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE.name else Gender.MALE.name
+
+    return courseService.findBuildingChoicesCourses(listOfBCCourseIds, audience, genderOffering)
   }
 
   fun generateRandom10AlphaString(): String {
