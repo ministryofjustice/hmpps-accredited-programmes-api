@@ -123,8 +123,8 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       riskKnownAdultCommunity = LOW,
       riskPublicCommunity = MEDIUM,
       riskChildrenCommunity = LOW,
-      imminentRiskOfViolenceTowardsPartner = HIGH,
-      imminentRiskOfViolenceTowardsOthers = HIGH,
+      imminentRiskOfViolenceTowardsPartner = null,
+      imminentRiskOfViolenceTowardsOthers = null,
       alerts = listOf(
         Alert(
           description = "ACCT Open (HMPS)",

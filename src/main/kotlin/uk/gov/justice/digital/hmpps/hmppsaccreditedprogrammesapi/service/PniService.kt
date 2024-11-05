@@ -68,8 +68,9 @@ class PniService(
     val assessmentId = assessmentIdDate.first
 
     // section 6
-    var completedAssessmentWithSara = oasysService.getAssessmentWithCompletedSara(prisonNumber) ?: assessmentId
-    val relationships = oasysService.getRelationships(completedAssessmentWithSara)
+    var completedAssessmentIdWithSara = oasysService.getAssessmentWithCompletedSara(prisonNumber)
+    val relationshipsForCompletedAssessmentWithSara = completedAssessmentIdWithSara?.let { oasysService.getRelationships(it) }
+    val relationships = oasysService.getRelationships(assessmentId)
     // section 7
     val lifestyle = oasysService.getLifestyle(assessmentId)
     // section 10
@@ -87,11 +88,16 @@ class PniService(
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
-      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships, oasysOffendingInfo, completedAssessmentWithSara),
+      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationshipsForCompletedAssessmentWithSara, oasysOffendingInfo, completedAssessmentIdWithSara),
     )
 
     val genderOfPerson = getGenderOfPerson(prisonNumber, gender)
-    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber, genderOfPerson, learning?.basicSkillsScore?.toInt())
+    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(
+      individualNeedsAndRiskScores,
+      prisonNumber,
+      genderOfPerson,
+      learning?.basicSkillsScore?.toInt(),
+    )
 
     log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
 
@@ -115,7 +121,6 @@ class PniService(
     if (savePni) {
       pniResultEntityRepository.save(buildEntity(pniScore, assessmentIdDate, referralId, learning))
     }
-
     return pniScore
   }
 
@@ -151,23 +156,28 @@ class PniService(
       return "MISSING_INFORMATION"
     }
 
-    val programmePathway = getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
-      ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
-        overallNeedsScore.classification,
-        overallRiskScore.classification,
-      )?.combinedPathway
-      ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
+    val programmePathway =
+      getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
+        ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
+          overallNeedsScore.classification,
+          overallRiskScore.classification,
+        )?.combinedPathway
+        ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
 
     log.info("Programme pathway for $prisonNumber: ${overallNeedsScore.classification} + ${overallRiskScore.classification}  -> $programmePathway")
 
     return programmePathway
   }
 
-  private fun getPathwayAfterApplyingExceptionRules(needsClassification: String, individualRiskScores: IndividualRiskScores): String? {
+  private fun getPathwayAfterApplyingExceptionRules(
+    needsClassification: String,
+    individualRiskScores: IndividualRiskScores,
+  ): String? {
     return when {
       pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> HIGH_INTENSITY_BC
       needsClassification == NeedsClassification.LOW_NEED.name &&
         (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MODERATE_INTENSITY_BC
+
       else -> null
     }
   }

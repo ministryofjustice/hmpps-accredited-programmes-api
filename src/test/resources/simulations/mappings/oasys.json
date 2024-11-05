@@ -106,6 +106,19 @@
     },
     {
       "request": {
+        "urlPattern": "/assessments/2114999/section/section6",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "relationships-with-SARA.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/assessments/2114584/section/sectionroshfull",
         "method": "GET"
       },
