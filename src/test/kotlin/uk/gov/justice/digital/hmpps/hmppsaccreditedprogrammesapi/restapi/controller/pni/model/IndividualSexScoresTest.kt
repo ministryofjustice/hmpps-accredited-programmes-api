@@ -34,10 +34,15 @@ class IndividualSexScoresTest {
     @JvmStatic
     fun scoresForOverallSexDomainScore(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of(IndividualSexScores(0, 0, 0), 0, null),
+        Arguments.of(IndividualSexScores(0, 0, 0), 0, 0),
+        Arguments.of(IndividualSexScores(null, 1, 2), 1, 0),
+        Arguments.of(IndividualSexScores(1, null, 3), 2, 1),
+        Arguments.of(IndividualSexScores(1, 2, null), 2, 2),
+        Arguments.of(IndividualSexScores(null, null, null), 0, 0),
         Arguments.of(IndividualSexScores(0, 1, 0), 1, 0),
         Arguments.of(IndividualSexScores(1, 1, 1), 3, 1),
         Arguments.of(IndividualSexScores(2, 2, 2), 6, 2),
+        Arguments.of(IndividualSexScores(3, 2, 3), 6, 2),
         Arguments.of(IndividualSexScores(1, 2, 1), 4, 2),
         Arguments.of(IndividualSexScores(1, 2, 1), 2, 2),
       )
@@ -58,7 +63,7 @@ class IndividualSexScoresTest {
 
   @ParameterizedTest
   @MethodSource("scoresForOverallSexDomainScore")
-  fun `test overallSexDomainScore method`(scores: IndividualSexScores, totalScore: Int, expected: Int?) {
+  fun `test overallSexDomainScore method`(scores: IndividualSexScores, totalScore: Int?, expected: Int?) {
     assertEquals(expected, scores.overallSexDomainScore(totalScore))
   }
 }

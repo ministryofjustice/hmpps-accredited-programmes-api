@@ -120,12 +120,13 @@ class PniIntegrationTest :
     // Then
     val pniResults = pniResultEntityRepository.findAllByPrisonNumber(prisonNumber)
     pniResults[0].prisonNumber shouldBe prisonNumber
-    pniResults[0].crn shouldBe buildPniScore(prisonNumber).crn
-    pniResults[0].needsClassification shouldBe buildPniScore(prisonNumber).needsScore.classification
-    pniResults[0].overallNeedsScore shouldBe buildPniScore(prisonNumber).needsScore.overallNeedsScore
-    pniResults[0].programmePathway shouldBe buildPniScore(prisonNumber).programmePathway
-    pniResults[0].riskClassification shouldBe buildPniScore(prisonNumber).riskScore.classification
-    pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(buildPniScore(prisonNumber))
+    val pniScore = buildPniScore(prisonNumber)
+    pniResults[0].crn shouldBe pniScore.crn
+    pniResults[0].needsClassification shouldBe pniScore.needsScore.classification
+    pniResults[0].overallNeedsScore shouldBe pniScore.needsScore.overallNeedsScore
+    pniResults[0].programmePathway shouldBe pniScore.programmePathway
+    pniResults[0].riskClassification shouldBe pniScore.riskScore.classification
+    pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore)
     pniResults[0].pniValid shouldBe false
     pniResults[0].basicSkillsScore shouldBe 33
   }

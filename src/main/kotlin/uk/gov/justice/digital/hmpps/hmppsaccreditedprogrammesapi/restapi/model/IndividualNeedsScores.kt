@@ -3,6 +3,13 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import kotlin.reflect.full.memberProperties
+
+// Extension function to check if all properties of a data class are non-null
+fun <T : Any> T.areAllValuesPresent(): Boolean {
+  return this::class.memberProperties
+    .all { property -> property.call(this) != null }
+}
 
 /**
  *
@@ -42,13 +49,6 @@ data class IndividualSexScores(
   ).any { it != null }
 
   @JsonIgnore
-  fun isAllValuesPresent() = listOf(
-    sexualPreOccupation,
-    offenceRelatedSexualInterests,
-    emotionalCongruence,
-  ).all { it != null }
-
-  @JsonIgnore
   fun totalScore(): Int {
     return (sexualPreOccupation ?: 0) +
       (offenceRelatedSexualInterests ?: 0) +
@@ -56,12 +56,11 @@ data class IndividualSexScores(
   }
 
   @JsonIgnore
-  fun overallSexDomainScore(totalScore: Int) = when {
-    totalScore == 0 -> null
+  fun overallSexDomainScore(totalScore: Int?) = when {
     totalScore in 4..6 || (offenceRelatedSexualInterests == 2) -> 2
     totalScore in 0..1 -> 0
     totalScore in 2..3 -> 1
-    else -> null
+    else -> 0
   }
 }
 
@@ -82,7 +81,7 @@ data class IndividualCognitiveScores(
     val totalScore = totalScore()
 
     return when {
-      totalScore == 0 -> null
+      totalScore == 0 -> 0
       totalScore in 3..4 || (proCriminalAttitudes == 2) -> 2
       totalScore in 1..2 -> 1
       else -> null
@@ -110,14 +109,14 @@ data class IndividualSelfManagementScores(
       (difficultiesCoping ?: 0)
   }
 
-  fun overallSelfManagementScore() =
-    when (totalScore()) {
-      0 -> null
+  fun overallSelfManagementScore(): Int? {
+    return when (totalScore()) {
       in 0..1 -> 0
       in 2..4 -> 1
       in 5..8 -> 2
       else -> null
     }
+  }
 }
 
 data class IndividualRelationshipScores(
@@ -142,11 +141,12 @@ data class IndividualRelationshipScores(
       (aggressiveControllingBehaviour ?: 0)
   }
 
-  fun overallRelationshipScore() = when (totalScore()) {
-    0 -> null
-    in 0..1 -> 0
-    in 2..4 -> 1
-    in 5..8 -> 2
-    else -> null
+  fun overallRelationshipScore(): Int? {
+    return when (totalScore()) {
+      in 0..1 -> 0
+      in 2..4 -> 1
+      in 5..8 -> 2
+      else -> null
+    }
   }
 }
