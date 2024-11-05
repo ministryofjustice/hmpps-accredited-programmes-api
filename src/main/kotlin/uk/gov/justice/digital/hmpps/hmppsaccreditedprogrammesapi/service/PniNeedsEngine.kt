@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.a
 @Service
 class PniNeedsEngine {
   val validOspLevels = listOf("LOW", "MEDIUM", "HIGH", "VERY_HIGH")
+
   fun getOverallNeedsScore(
     individualNeedsAndRiskScores: IndividualNeedsAndRiskScores,
     prisonNumber: String,
@@ -25,10 +26,8 @@ class PniNeedsEngine {
     val overallThinkingDomainScore = individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore()
     val overallRelationshipDomainScore = individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
     val overallSelfManagementScore = individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
-    val overallNeedsScore =
-      listOf(overallSexDomainScore, overallThinkingDomainScore, overallRelationshipDomainScore, overallSelfManagementScore)
-        .filterNotNull()
-        .sum()
+
+    val overallNeedsScore = calculateOverallNeedScore(individualNeedsAndRiskScores, prisonNumber, gender)
 
     return NeedsScore(
       overallNeedsScore = overallNeedsScore,
@@ -55,6 +54,16 @@ class PniNeedsEngine {
     )
   }
 
+  fun calculateOverallNeedScore(needsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String): Int? {
+    val scores = listOf(
+      getSexDomainScore(needsAndRiskScores, prisonNumber, gender),
+      needsAndRiskScores.individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore(),
+      needsAndRiskScores.individualNeedsScores.individualRelationshipScores.overallRelationshipScore(),
+      needsAndRiskScores.individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore(),
+    )
+    return if (scores.all { it != null }) scores.filterNotNull().sum() else null
+  }
+
   fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String?): Int? {
     val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
 
@@ -76,8 +85,9 @@ class PniNeedsEngine {
   }
 }
 
-private fun getClassification(overallNeedsScore: Int): String {
+private fun getClassification(overallNeedsScore: Int?): String {
   return when (overallNeedsScore) {
+    null -> NeedsClassification.INFORMATION_MISSING.name
     in 0..2 -> NeedsClassification.LOW_NEED.name
     in 3..5 -> NeedsClassification.MEDIUM_NEED.name
     in 6..8 -> NeedsClassification.HIGH_NEED.name
@@ -89,4 +99,5 @@ enum class NeedsClassification {
   LOW_NEED,
   MEDIUM_NEED,
   HIGH_NEED,
+  INFORMATION_MISSING,
 }

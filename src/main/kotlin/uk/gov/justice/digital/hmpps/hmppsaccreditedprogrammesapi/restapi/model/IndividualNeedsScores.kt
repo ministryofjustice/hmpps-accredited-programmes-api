@@ -57,11 +57,10 @@ data class IndividualSexScores(
 
   @JsonIgnore
   fun overallSexDomainScore(totalScore: Int?) = when {
-    !areAllValuesPresent() -> null
-    totalScore == 1 -> 0
     totalScore in 4..6 || (offenceRelatedSexualInterests == 2) -> 2
+    totalScore in 0..1 -> 0
     totalScore in 2..3 -> 1
-    else -> null
+    else -> 0
   }
 }
 
@@ -79,10 +78,10 @@ data class IndividualCognitiveScores(
   }
 
   fun overallCognitiveDomainScore(): Int? {
-    if (!areAllValuesPresent()) return null
     val totalScore = totalScore()
 
     return when {
+      totalScore == 0 -> 0
       totalScore in 3..4 || (proCriminalAttitudes == 2) -> 2
       totalScore in 1..2 -> 1
       else -> null
@@ -111,10 +110,8 @@ data class IndividualSelfManagementScores(
   }
 
   fun overallSelfManagementScore(): Int? {
-    if (!areAllValuesPresent()) return null
-
     return when (totalScore()) {
-      1 -> 0
+      in 0..1 -> 0
       in 2..4 -> 1
       in 5..8 -> 2
       else -> null
@@ -145,10 +142,8 @@ data class IndividualRelationshipScores(
   }
 
   fun overallRelationshipScore(): Int? {
-    if (!areAllValuesPresent()) return null
-
     return when (totalScore()) {
-      1 -> 0
+      in 0..1 -> 0
       in 2..4 -> 1
       in 5..8 -> 2
       else -> null

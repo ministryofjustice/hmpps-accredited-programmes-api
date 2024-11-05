@@ -51,9 +51,9 @@ class PniIntegrationTest :
     assessmentId = 2114584,
     programmePathway = "MISSING_INFORMATION",
     needsScore = NeedsScore(
-      overallNeedsScore = 4,
+      overallNeedsScore = 6,
       basicSkillsScore = 33,
-      classification = "MEDIUM_NEED",
+      classification = "HIGH_NEED",
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(
           overAllSexDomainScore = 2,
@@ -80,7 +80,7 @@ class PniIntegrationTest :
           ),
         ),
         selfManagementDomainScore = SelfManagementDomainScore(
-          overallSelfManagementDomainScore = null,
+          overallSelfManagementDomainScore = 2,
           individualSelfManagementScores = IndividualSelfManagementScores(
             impulsivity = 1,
             temperControl = 4,

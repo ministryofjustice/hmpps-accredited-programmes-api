@@ -26,12 +26,12 @@ class IndividualRelationshipScoresTest {
     @JvmStatic
     fun scoresForOverallRelationshipScore(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of(IndividualRelationshipScores(0, 0, 0, 0), null),
+        Arguments.of(IndividualRelationshipScores(0, 0, 0, 0), 0),
         Arguments.of(IndividualRelationshipScores(1, 0, 0, 0), 0),
-        Arguments.of(IndividualRelationshipScores(null, 2, 3, 4), null),
-        Arguments.of(IndividualRelationshipScores(1, null, 3, 4), null),
-        Arguments.of(IndividualRelationshipScores(1, 2, null, 4), null),
-        Arguments.of(IndividualRelationshipScores(1, 2, 3, null), null),
+        Arguments.of(IndividualRelationshipScores(null, 1, 2, 3), 2),
+        Arguments.of(IndividualRelationshipScores(1, null, 3, 4), 2),
+        Arguments.of(IndividualRelationshipScores(1, 2, null, 4), 2),
+        Arguments.of(IndividualRelationshipScores(1, 2, 3, null), 2),
         Arguments.of(IndividualRelationshipScores(1, 1, 0, 0), 1),
         Arguments.of(IndividualRelationshipScores(1, 1, 1, 0), 1),
         Arguments.of(IndividualRelationshipScores(1, 1, 1, 1), 1),

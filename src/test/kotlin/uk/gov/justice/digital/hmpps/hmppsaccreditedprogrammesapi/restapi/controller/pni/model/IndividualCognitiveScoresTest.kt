@@ -24,9 +24,9 @@ class IndividualCognitiveScoresTest {
     @JvmStatic
     fun scoresForOverallCognitiveDomainScore(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of(IndividualCognitiveScores(0, 0), null),
-        Arguments.of(IndividualCognitiveScores(1, null), null),
-        Arguments.of(IndividualCognitiveScores(null, 0), null),
+        Arguments.of(IndividualCognitiveScores(0, 0), 0),
+        Arguments.of(IndividualCognitiveScores(1, null), 1),
+        Arguments.of(IndividualCognitiveScores(null, 2), 1),
         Arguments.of(IndividualCognitiveScores(1, 0), 1),
         Arguments.of(IndividualCognitiveScores(1, 1), 1),
         Arguments.of(IndividualCognitiveScores(2, 1), 2),
