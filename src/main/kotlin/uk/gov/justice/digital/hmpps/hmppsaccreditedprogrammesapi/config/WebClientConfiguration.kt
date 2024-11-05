@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
+import uk.gov.justice.hmpps.kotlin.auth.healthWebClient
 import java.time.Duration
 
 @Configuration
@@ -127,7 +128,6 @@ class WebClientConfiguration(
   ): WebClient {
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
     oauth2Client.setDefaultClientRegistrationId("manage-users-api")
-
     return buildWebClient(manageUsersApiBaseUrl, oauth2Client)
   }
 
@@ -148,4 +148,10 @@ class WebClientConfiguration(
     )
     .filter(oauth2Client)
     .build()
+
+  @Bean
+  fun prisonRegisterWebClient(
+    builder: WebClient.Builder,
+    @Value("\${services.prison-register-api.base-url}") prisonRegisterApiBaseUrl: String,
+  ): WebClient = builder.healthWebClient(prisonRegisterApiBaseUrl)
 }

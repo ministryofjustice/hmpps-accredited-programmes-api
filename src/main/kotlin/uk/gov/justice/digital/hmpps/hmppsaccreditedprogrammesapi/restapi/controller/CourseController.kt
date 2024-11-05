@@ -434,15 +434,18 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun getBuildingCourseVariants(@Parameter(description = "A course identifier which has variants", required = true) @PathVariable("courseId") courseId: UUID, @Parameter(description = "", required = true) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest): List<CourseEntity>? {
+  fun getBuildingCourseVariants(@Parameter(description = "A course identifier which has variants", required = true) @PathVariable("courseId") courseId: UUID, @Parameter(description = "", required = true) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest): List<Course>? {
     val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
       ?: throw BusinessException("$courseId is not a Building choices course")
 
-    val listOfBCCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
+    val listOfBuildingCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
     val audience = if (buildingChoicesSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
-    val genderOffering = if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE.name else Gender.MALE.name
+    val genderToWhichCourseIsOffered = if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE.name else Gender.MALE.name
 
-    return courseService.findBuildingChoicesCourses(listOfBCCourseIds, audience, genderOffering)
+    val buildingChoicesCourses =
+      courseService.findBuildingChoicesCourses(listOfBuildingCourseIds, audience, genderToWhichCourseIsOffered)
+
+    return courseService.mapCourses(buildingChoicesCourses, genderToWhichCourseIsOffered)
   }
 
   fun generateRandom10AlphaString(): String {

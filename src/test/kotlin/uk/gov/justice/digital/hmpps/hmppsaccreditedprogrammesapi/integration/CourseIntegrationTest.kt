@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseCreateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
@@ -607,6 +608,87 @@ class CourseIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isCreated
       .expectBody<CourseOffering>()
+      .returnResult().responseBody!!
+  }
+
+  @Test
+  fun `Building choices courses are returned as expected`() {
+    val bc1MainCourseId = UUID.randomUUID()
+    val bc1VariantCourseId = UUID.randomUUID()
+    val bc1CourseOfferingMainId = UUID.randomUUID()
+    val bc1CourseOfferingVariantId = UUID.randomUUID()
+
+    persistenceHelper.createdOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
+    persistenceHelper.createEnabledOrganisation("WSI", "WSI org")
+
+    persistenceHelper.createdOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
+    persistenceHelper.createEnabledOrganisation("ESI", "ESI org")
+
+    persistenceHelper.createCourse(
+      bc1MainCourseId,
+      "BCH-1",
+      "Building Choices: high intensity",
+      "Building Choices helps people to develop high...",
+      "BCH-1",
+      "Sexual offence",
+    )
+
+    persistenceHelper.createCourse(
+      bc1VariantCourseId,
+      "BCH-2",
+      "Building Choices: medium intensity",
+      "Building Choices helps people to develop medium...",
+      "BCH-2",
+      "General offence",
+    )
+
+    persistenceHelper.createOffering(
+      bc1CourseOfferingVariantId,
+      bc1MainCourseId,
+      "ESI",
+      "nobody-wsi@digital.justice.gov.uk",
+      "nobody2-wsi@digital.justice.gov.uk",
+      true,
+    )
+
+    persistenceHelper.createOffering(
+      bc1CourseOfferingMainId,
+      bc1VariantCourseId,
+      "WSI",
+      "nobody-esi@digital.justice.gov.uk",
+      "nobody2-esi@digital.justice.gov.uk",
+      true,
+    )
+
+    persistenceHelper.createCourseVariant(courseId = bc1MainCourseId, variantCourseId = bc1VariantCourseId)
+
+    val courseVariants = getCourseVariants(bc1MainCourseId, isConvictedOfSexualOffence = true, isInAWomensPrison = true)
+
+    courseVariants.size shouldBe 1
+
+    val buildingChoicesCourse = courseVariants[0]
+    buildingChoicesCourse.id shouldBe bc1MainCourseId
+    buildingChoicesCourse.name shouldBe "Building Choices: high intensity"
+    buildingChoicesCourse.displayOnProgrammeDirectory shouldBe true
+    buildingChoicesCourse.courseOfferings[0].id shouldBe bc1CourseOfferingVariantId
+    buildingChoicesCourse.courseOfferings[0].organisationId shouldBe "ESI"
+  }
+
+  fun getCourseVariants(mainCourseId: UUID, isConvictedOfSexualOffence: Boolean, isInAWomensPrison: Boolean): List<Course> {
+    return webTestClient
+      .post()
+      .uri("/courses/building-choices/$mainCourseId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        BuildingChoicesSearchRequest(
+          isConvictedOfSexualOffence = isConvictedOfSexualOffence,
+          isInAWomensPrison = isInAWomensPrison,
+        ),
+      ).exchange()
+      .expectStatus().isOk
+      .expectBody<List<Course>>()
       .returnResult().responseBody!!
   }
 }
