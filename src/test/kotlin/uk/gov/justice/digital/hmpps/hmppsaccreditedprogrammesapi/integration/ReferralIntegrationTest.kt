@@ -287,9 +287,30 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Updating a referral status should return 204 with no body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id)
+
+    val courseId = UUID.randomUUID()
+    val courseName = getRandomString(10)
+    val audience = getRandomString(10)
+    val offeringId = UUID.randomUUID()
+
+    persistenceHelper.createdOrganisation(code = "XXX", name = "XXX org")
+    persistenceHelper.createEnabledOrganisation("XXX", "XXX org")
+
+    createCourse(
+      courseId = courseId,
+      identifier = getRandomString(4),
+      courseName = courseName,
+      description = getRandomString(100),
+      audience = audience,
+    )
+
+    createOffering(
+      courseId = courseId,
+      offeringId = offeringId,
+      orgId = "XXX",
+    )
+
+    val referralCreated = createReferral(offeringId)
 
     val referralStatusUpdate = ReferralStatusUpdate(
       status = REFERRAL_SUBMITTED,
@@ -299,7 +320,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
     getReferralById(referralCreated.id) shouldBeEqual Referral(
       id = referralCreated.id,
-      offeringId = offering.id!!,
+      offeringId = offeringId!!,
       referrerUsername = REFERRER_USERNAME,
       prisonNumber = PRISON_NUMBER_1,
       status = REFERRAL_SUBMITTED.lowercase(),
@@ -843,26 +864,46 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Retrieving a referral views for an organisation one name return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
+    val courseId = UUID.randomUUID()
+    val courseName = getRandomString(10)
+    val audience = getRandomString(10)
+    val offeringId = UUID.randomUUID()
+
+    persistenceHelper.createdOrganisation(code = "XXX", name = "XXX org")
+    persistenceHelper.createEnabledOrganisation("XXX", "XXX org")
+
+    createCourse(
+      courseId = courseId,
+      identifier = getRandomString(4),
+      courseName = courseName,
+      description = getRandomString(100),
+      audience = audience,
+    )
+
+    createOffering(
+      courseId = courseId,
+      offeringId = offeringId,
+      orgId = "XXX",
+    )
+
+    val referralCreated = createReferral(offeringId, PRISON_NUMBER_1)
     val createdReferral = getReferralById(referralCreated.id)
 
     referralCreated.id.shouldNotBeNull()
     createdReferral.shouldNotBeNull()
 
-    var summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, nameOrId = "STEVO")
+    var summary = getReferralViewsByOrganisationId("XXX", nameOrId = "STEVO")
     summary.content.shouldBeEmpty()
 
-    summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, nameOrId = "OHN")
+    summary = getReferralViewsByOrganisationId("XXX", nameOrId = "OHN")
     summary.content.shouldNotBeEmpty()
 
     summary.content?.forEach { actualSummary ->
       listOf(
         ReferralView(
           id = createdReferral.id,
-          courseName = course.name,
-          audience = course.audience,
+          courseName = courseName,
+          audience = audience,
           status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
@@ -1058,8 +1099,8 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     val offering = getAllOfferingsForCourse(course.id).first()
 
     repeat(21) {
-      val courseId = UUID.randomUUID().toString()
-      val offeringId = UUID.randomUUID().toString()
+      val courseId = UUID.randomUUID()
+      val offeringId = UUID.randomUUID()
       createCourse(
         courseId = courseId,
         identifier = getRandomString(4),
@@ -1068,11 +1109,11 @@ class ReferralIntegrationTest : IntegrationTestBase() {
       )
 
       createOffering(
-        courseId = UUID.fromString(courseId),
-        offeringId = UUID.fromString(offeringId),
+        courseId = courseId,
+        offeringId = offeringId,
         orgId = ORGANISATION_ID_MDI,
       )
-      createReferral(offeringId = UUID.fromString(offeringId), PRISON_NUMBER_1)
+      createReferral(offeringId = offeringId, PRISON_NUMBER_1)
     }
 
     val summaryPage0 =
@@ -1355,7 +1396,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
   }
 
   fun createCourse(
-    courseId: String,
+    courseId: UUID,
     identifier: String,
     courseName: String,
     description: String,
@@ -1363,7 +1404,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     audience: String = "General offence",
   ) {
     persistenceHelper.createCourse(
-      UUID.fromString(courseId),
+      courseId,
       identifier,
       courseName,
       description,

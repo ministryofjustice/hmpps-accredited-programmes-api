@@ -52,4 +52,7 @@ data class Course(
 
   @Schema(example = "true", description = "")
   @get:JsonProperty("displayOnProgrammeDirectory") val displayOnProgrammeDirectory: Boolean? = null,
+
+  @Schema(example = "null", description = "List of offerings for the course")
+  @get:JsonProperty("courseOfferings") val courseOfferings: List<CourseOffering> = emptyList(),
 )
