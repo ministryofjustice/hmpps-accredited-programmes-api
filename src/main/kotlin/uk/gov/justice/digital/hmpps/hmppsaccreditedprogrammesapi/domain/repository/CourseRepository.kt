@@ -35,6 +35,7 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
     SELECT c FROM CourseEntity c 
     JOIN FETCH c.offerings o 
     INNER JOIN OrganisationEntity org ON o.organisationId = org.code  
+    INNER JOIN EnabledOrganisation enOrg ON org.code = enOrg.code  
     WHERE c.id IN :courseIds
     AND c.audience = :audience
     AND org.gender = :gender

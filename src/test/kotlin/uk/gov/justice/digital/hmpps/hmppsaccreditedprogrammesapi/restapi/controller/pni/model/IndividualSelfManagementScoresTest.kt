@@ -26,7 +26,11 @@ class IndividualSelfManagementScoresTest {
     @JvmStatic
     fun scoresForOverallSelfManagementScore(): Stream<Arguments> {
       return Stream.of(
-        Arguments.of(IndividualSelfManagementScores(0, 0, 0, 0), null),
+        Arguments.of(IndividualSelfManagementScores(0, 0, 0, 0), 0),
+        Arguments.of(IndividualSelfManagementScores(null, 1, 2, 3), 2),
+        Arguments.of(IndividualSelfManagementScores(1, null, 3, 4), 2),
+        Arguments.of(IndividualSelfManagementScores(1, 2, null, 4), 2),
+        Arguments.of(IndividualSelfManagementScores(1, 2, 3, null), 2),
         Arguments.of(IndividualSelfManagementScores(1, 0, 0, 0), 0),
         Arguments.of(IndividualSelfManagementScores(1, 1, 0, 0), 1),
         Arguments.of(IndividualSelfManagementScores(1, 1, 1, 0), 1),

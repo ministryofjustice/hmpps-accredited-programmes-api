@@ -7,7 +7,7 @@ import jakarta.persistence.Table
 import java.util.*
 
 @Entity
-@Table(name = "course_vairant")
+@Table(name = "course_variant")
 class CourseVariantEntity(
 
   @Id
