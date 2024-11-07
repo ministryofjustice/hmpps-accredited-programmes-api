@@ -174,8 +174,7 @@ class OasysService(
   fun getAssessmentIdDate(prisonNumber: String): Pair<Long, LocalDateTime?>? {
     val assessmentTimeline = getAssessments(prisonNumber)
 
-    val assessment =
-      getLatestCompletedLayerThreeAssessment(assessmentTimeline)
+    val assessment = getLatestCompletedLayerThreeAssessment(assessmentTimeline)
 
     return if (assessment == null) {
       log.warn("No completed assessment found for prison number $prisonNumber")
@@ -201,7 +200,7 @@ class OasysService(
     )
   }
 
-  private fun getLatestCompletedLayerThreeAssessment(assessment: OasysAssessmentTimeline): Timeline? {
+  fun getLatestCompletedLayerThreeAssessment(assessment: OasysAssessmentTimeline): Timeline? {
     // get the most recent completed assessment
     return assessment
       .timeline
@@ -217,9 +216,8 @@ class OasysService(
       .sortedByDescending { it.completedAt }
   }
 
-  fun getAssessmentWithCompletedSara(prisonNumber: String): Long? {
-    val assessmentTimeline = getAssessments(prisonNumber)
-    val completedLayerThreeAssessments = getAllCompletedLayerThreeAssessments(assessmentTimeline)
+  fun getAssessmentIdWithCompletedSara(oasysAssessmentTimeline: OasysAssessmentTimeline): Long? {
+    val completedLayerThreeAssessments = getAllCompletedLayerThreeAssessments(oasysAssessmentTimeline)
     val latestAssessmentDate = completedLayerThreeAssessments.first().completedAt
 
     for (assessment in completedLayerThreeAssessments) {
@@ -229,7 +227,7 @@ class OasysService(
         }
       }
     }
-    log.warn("No completed assessment with SARA data found for prison number $prisonNumber")
+    log.warn("No completed assessment with SARA data found for prison number ${oasysAssessmentTimeline.prisNumber}")
     return null
   }
 
@@ -238,7 +236,7 @@ class OasysService(
     return abs(daysBetween) <= 42 // 6 weeks * 7 days/week = 42 days
   }
 
-  private fun getAssessments(prisonNumber: String): OasysAssessmentTimeline {
+  fun getAssessments(prisonNumber: String): OasysAssessmentTimeline {
     val assessments = when (val result = oasysApiClient.getAssessments(prisonNumber)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve Assessment for $prisonNumber reason ${result.toException().cause}")

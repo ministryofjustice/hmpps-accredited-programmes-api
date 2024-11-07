@@ -1,5 +1,5 @@
 {
-  "assessmentPk": 2114584,
+  "assessmentPk": 2114999,
   "assessmentType": "LAYER3",
   "dateCompleted": "2023-12-19T16:57:25",
   "assessorSignedDate": "2023-12-19T16:55:32",
@@ -33,7 +33,10 @@
   "relationshipWithPartner": "0-No problems",
   "experienceOfChildhood": "0-No problems",
   "emotionalCongruence": "0-No problems",
-  "SARA": null,
+  "SARA": {
+    "imminentRiskOfViolenceTowardsPartner": "High",
+    "imminentRiskOfViolenceTowardsOthers": "High"
+  },
   "assessor": {
     "name": "LevelTwo CentralSupport"
   }

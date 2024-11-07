@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
@@ -11,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
@@ -63,13 +65,13 @@ class PniService(
       auditAction = AuditAction.PNI.name,
     )
 
-    val assessmentIdDate = oasysService.getAssessmentIdDate(prisonNumber)
-      ?: throw NotFoundException("No assessment id found for $prisonNumber")
-    val assessmentId = assessmentIdDate.first
+    val oasysAssessmentTimeline = oasysService.getAssessments(prisonNumber)
+    val completedAssessment = oasysService.getLatestCompletedLayerThreeAssessment(oasysAssessmentTimeline) ?: throw NotFoundException("No completed assessments found for $prisonNumber")
+
+    val assessmentId = completedAssessment.id
 
     // section 6
-    var completedAssessmentWithSara = oasysService.getAssessmentWithCompletedSara(prisonNumber) ?: assessmentId
-    val relationships = oasysService.getRelationships(completedAssessmentWithSara)
+    val relationships = oasysService.getRelationships(assessmentId)
     // section 7
     val lifestyle = oasysService.getLifestyle(assessmentId)
     // section 10
@@ -81,17 +83,25 @@ class PniService(
 
     val learning = oasysService.getLearning(assessmentId)
 
+    // SARA result
+    val saraResult = buildSaraResult(oasysAssessmentTimeline, relationships, assessmentId)
+
     // risks
     val oasysOffendingInfo = oasysService.getOffendingInfo(assessmentId)
     val oasysRiskPredictor = oasysService.getRiskPredictors(assessmentId)
 
     val individualNeedsAndRiskScores = IndividualNeedsAndRiskScores(
       individualNeedsScores = buildNeedsScores(behavior, relationships, attitude, lifestyle, psychiatric),
-      individualRiskScores = buildRiskScores(oasysRiskPredictor, relationships, oasysOffendingInfo, completedAssessmentWithSara),
+      individualRiskScores = buildRiskScores(oasysRiskPredictor, oasysOffendingInfo, saraResult),
     )
 
     val genderOfPerson = getGenderOfPerson(prisonNumber, gender)
-    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(individualNeedsAndRiskScores, prisonNumber, genderOfPerson, learning?.basicSkillsScore?.toInt())
+    val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(
+      individualNeedsAndRiskScores,
+      prisonNumber,
+      genderOfPerson,
+      learning?.basicSkillsScore?.toInt(),
+    )
 
     log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
 
@@ -113,15 +123,34 @@ class PniService(
     )
 
     if (savePni) {
-      pniResultEntityRepository.save(buildEntity(pniScore, assessmentIdDate, referralId, learning))
+      pniResultEntityRepository.save(buildEntity(pniScore, completedAssessment, referralId, learning))
     }
-
     return pniScore
+  }
+
+  private fun buildSaraResult(timeline: OasysAssessmentTimeline, oasysRelationships: OasysRelationships?, assessmentId: Long): Sara {
+    return if (oasysRelationships?.sara == null) {
+      val completedAssessmentIdWithSara = oasysService.getAssessmentIdWithCompletedSara(timeline)
+      val relationshipsWithSara = completedAssessmentIdWithSara?.let { oasysService.getRelationships(it) }
+      Sara(
+        overallResult = getOverallSARAResult(relationshipsWithSara?.sara),
+        saraRiskOfViolenceTowardsPartner = relationshipsWithSara?.sara?.imminentRiskOfViolenceTowardsPartner,
+        saraRiskOfViolenceTowardsOthers = relationshipsWithSara?.sara?.imminentRiskOfViolenceTowardsOthers,
+        saraAssessmentId = completedAssessmentIdWithSara,
+      )
+    } else {
+      Sara(
+        overallResult = getOverallSARAResult(oasysRelationships.sara),
+        saraRiskOfViolenceTowardsPartner = oasysRelationships.sara.imminentRiskOfViolenceTowardsPartner,
+        saraRiskOfViolenceTowardsOthers = oasysRelationships.sara.imminentRiskOfViolenceTowardsOthers,
+        saraAssessmentId = assessmentId,
+      )
+    }
   }
 
   private fun buildEntity(
     pniScore: PniScore,
-    assessmentIdDate: Pair<Long, LocalDateTime?>,
+    completedAssessment: Timeline?,
     referralId: UUID?,
     learning: OasysLearning?,
   ): PniResultEntity {
@@ -129,8 +158,8 @@ class PniService(
       crn = pniScore.crn,
       prisonNumber = pniScore.prisonNumber,
       referralId = referralId,
-      oasysAssessmentId = assessmentIdDate.first,
-      oasysAssessmentCompletedDate = assessmentIdDate.second,
+      oasysAssessmentId = completedAssessment?.id,
+      oasysAssessmentCompletedDate = completedAssessment?.completedAt,
       needsClassification = pniScore.needsScore.classification,
       riskClassification = pniScore.riskScore.classification,
       overallNeedsScore = pniScore.needsScore.overallNeedsScore,
@@ -151,45 +180,46 @@ class PniService(
       return "MISSING_INFORMATION"
     }
 
-    val programmePathway = getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
-      ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
-        overallNeedsScore.classification,
-        overallRiskScore.classification,
-      )?.combinedPathway
-      ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
+    val programmePathway =
+      getPathwayAfterApplyingExceptionRules(overallNeedsScore.classification, overallRiskScore.individualRiskScores)
+        ?: pniRuleRepository.findPniRuleEntityByOverallNeedAndOverallRisk(
+          overallNeedsScore.classification,
+          overallRiskScore.classification,
+        )?.combinedPathway
+        ?: throw BusinessException("Programme pathway for $prisonNumber is missing for the combination of needsClassification ${overallNeedsScore.classification} and riskClassification ${overallRiskScore.classification}")
 
     log.info("Programme pathway for $prisonNumber: ${overallNeedsScore.classification} + ${overallRiskScore.classification}  -> $programmePathway")
 
     return programmePathway
   }
 
-  private fun getPathwayAfterApplyingExceptionRules(needsClassification: String, individualRiskScores: IndividualRiskScores): String? {
+  private fun getPathwayAfterApplyingExceptionRules(
+    needsClassification: String,
+    individualRiskScores: IndividualRiskScores,
+  ): String? {
     return when {
       pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> HIGH_INTENSITY_BC
       needsClassification == NeedsClassification.LOW_NEED.name &&
         (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MODERATE_INTENSITY_BC
+
       else -> null
     }
   }
 
   private fun buildRiskScores(
     oasysRiskPredictorScores: OasysRiskPredictorScores?,
-    oasysRelationships: OasysRelationships?,
     oasysOffendingInfo: OasysOffendingInfo?,
-    saraAssessmentId: Long?,
-  ) = IndividualRiskScores(
-    ogrs3 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears?.round(),
-    ovp = oasysRiskPredictorScores?.violencePredictorScore?.twoYears?.round(),
-    ospIic = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
-    ospDc = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
-    rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
-    sara = Sara(
-      overallResult = getOverallSARAResult(oasysRelationships?.sara),
-      saraRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
-      saraRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
-      saraAssessmentId = saraAssessmentId,
-    ),
-  )
+    sara: Sara,
+  ): IndividualRiskScores {
+    return IndividualRiskScores(
+      ogrs3 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears?.round(),
+      ovp = oasysRiskPredictorScores?.violencePredictorScore?.twoYears?.round(),
+      ospIic = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
+      ospDc = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
+      rsr = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore?.round(),
+      sara = sara,
+    )
+  }
 
   private fun getOverallSARAResult(sara: uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Sara?): SaraRisk? {
     return SaraRisk.highestRisk(

@@ -30,9 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.Sa
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class PniIntegrationTest :
-  IntegrationTestBase() {
-
+class PniIntegrationTest : IntegrationTestBase() {
   @Autowired
   lateinit var pniResultEntityRepository: PNIResultEntityRepository
 
@@ -103,9 +101,8 @@ class PniIntegrationTest :
           overallResult = SaraRisk.HIGH,
           saraRiskOfViolenceTowardsOthers = "High",
           saraRiskOfViolenceTowardsPartner = "High",
-          saraAssessmentId = 2114584,
+          saraAssessmentId = 2114999,
         ),
-
       ),
     ),
   )
