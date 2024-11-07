@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.addAudience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.util.UUID
@@ -149,8 +150,8 @@ constructor(
     offeringRepository.delete(existingOffering.id!!)
   }
 
-  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String, gender: String) = courseRepository.findBuildingChoicesCourses(courseIds, audience, gender)
-  fun mapCourses(findBuildingChoicesCourses: List<CourseEntity>?, gender: String): List<Course>? {
+  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String?, gender: String) = courseRepository.findBuildingChoicesCourses(courseIds, audience, gender)
+  fun mapCourses(findBuildingChoicesCourses: List<CourseEntity>?, gender: Gender): List<Course>? {
     return findBuildingChoicesCourses?.map {
       Course(
         id = it.id!!,
@@ -164,7 +165,7 @@ constructor(
         displayName = it.name + addAudience(it.name, it.audience),
         withdrawn = it.withdrawn,
         displayOnProgrammeDirectory = it.displayOnProgrammeDirectory,
-        courseOfferings = it.offerings.map { offeringEntity -> offeringEntity.toApi(gender) },
+        courseOfferings = it.offerings.map { offeringEntity -> offeringEntity.toApi(gender.name) },
       )
     }
   }
