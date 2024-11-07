@@ -311,7 +311,7 @@ class OasysServiceTest {
     every { oasysApiClient.getRelationships(999999) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips2)
 
     // When
-    val oasysRelationships = service.getAssessmentWithCompletedSara("A9999BB")
+    val oasysRelationships = service.getAssessmentIdWithCompletedSara(oasysAssessmentTimeline)
 
     // Then
     oasysRelationships.shouldBeNull()
@@ -357,7 +357,7 @@ class OasysServiceTest {
     every { oasysApiClient.getRelationships(999999) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips2)
 
     // When
-    val completedSaraAssessment = service.getAssessmentWithCompletedSara("A9999BB")
+    val completedSaraAssessment = service.getAssessmentIdWithCompletedSara(oasysAssessmentTimeline)
 
     // Then
     completedSaraAssessment.shouldNotBeNull()
@@ -404,7 +404,7 @@ class OasysServiceTest {
     every { oasysApiClient.getRelationships(999999) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips2)
 
     // When
-    val completedSaraAssessment = service.getAssessmentWithCompletedSara("A9999BB")
+    val completedSaraAssessment = service.getAssessmentIdWithCompletedSara(oasysAssessmentTimeline)
 
     // Then
     completedSaraAssessment.shouldNotBeNull()
