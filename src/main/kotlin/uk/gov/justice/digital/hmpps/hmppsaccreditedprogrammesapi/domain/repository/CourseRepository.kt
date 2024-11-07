@@ -37,9 +37,9 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
     INNER JOIN OrganisationEntity org ON o.organisationId = org.code  
     INNER JOIN EnabledOrganisation enOrg ON org.code = enOrg.code  
     WHERE c.id IN :courseIds
-    AND c.audience = :audience
+    AND (:audience IS NULL OR c.audience = :audience)
     AND org.gender = :gender
   """,
   )
-  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String, gender: String): List<CourseEntity>?
+  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String? = null, gender: String): List<CourseEntity>?
 }

@@ -440,10 +440,12 @@ class CourseController(
 
     val listOfBuildingCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
     val audience = if (buildingChoicesSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
-    val genderToWhichCourseIsOffered = if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE.name else Gender.MALE.name
+    val genderToWhichCourseIsOffered = if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE else Gender.MALE
+
+    val audienceBasedOnGender = if (genderToWhichCourseIsOffered == Gender.FEMALE) null else audience
 
     val buildingChoicesCourses =
-      courseService.findBuildingChoicesCourses(listOfBuildingCourseIds, audience, genderToWhichCourseIsOffered)
+      courseService.findBuildingChoicesCourses(listOfBuildingCourseIds, audienceBasedOnGender, genderToWhichCourseIsOffered.name)
 
     return courseService.mapCourses(buildingChoicesCourses, genderToWhichCourseIsOffered)
   }
