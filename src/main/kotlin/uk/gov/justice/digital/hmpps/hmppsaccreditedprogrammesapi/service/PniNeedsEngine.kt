@@ -27,7 +27,7 @@ class PniNeedsEngine {
     val overallRelationshipDomainScore = individualNeedsScores.individualRelationshipScores.overallRelationshipScore()
     val overallSelfManagementScore = individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore()
 
-    val overallNeedsScore = calculateOverallNeedScore(individualNeedsAndRiskScores, prisonNumber, gender)
+    val overallNeedsScore = listOf(overallSexDomainScore, overallThinkingDomainScore, overallRelationshipDomainScore, overallSelfManagementScore).sum()
 
     return NeedsScore(
       overallNeedsScore = overallNeedsScore,
@@ -54,17 +54,7 @@ class PniNeedsEngine {
     )
   }
 
-  fun calculateOverallNeedScore(needsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String): Int? {
-    val scores = listOf(
-      getSexDomainScore(needsAndRiskScores, prisonNumber, gender),
-      needsAndRiskScores.individualNeedsScores.individualCognitiveScores.overallCognitiveDomainScore(),
-      needsAndRiskScores.individualNeedsScores.individualRelationshipScores.overallRelationshipScore(),
-      needsAndRiskScores.individualNeedsScores.individualSelfManagementScores.overallSelfManagementScore(),
-    )
-    return if (scores.all { it != null }) scores.filterNotNull().sum() else null
-  }
-
-  fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String?): Int? {
+  fun getSexDomainScore(individualNeedsAndRiskScores: IndividualNeedsAndRiskScores, prisonNumber: String, gender: String?): Int {
     val individualSexScores = individualNeedsAndRiskScores.individualNeedsScores.individualSexScores
 
     if (individualSexScores.areAllValuesPresent()) {
@@ -81,7 +71,7 @@ class PniNeedsEngine {
     if (gender.equals("Female", ignoreCase = true) && individualSexScores.hasSomeDataPresent()) {
       throw BusinessException("PNI information cannot be computed for $gender prisoner $prisonNumber some SexDomainScore is present but not all")
     }
-    return null
+    return 0
   }
 }
 

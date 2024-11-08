@@ -77,14 +77,14 @@ data class IndividualCognitiveScores(
       (hostileOrientation ?: 0)
   }
 
-  fun overallCognitiveDomainScore(): Int? {
+  fun overallCognitiveDomainScore(): Int {
     val totalScore = totalScore()
 
     return when {
       totalScore == 0 -> 0
       totalScore in 3..4 || (proCriminalAttitudes == 2) -> 2
       totalScore in 1..2 -> 1
-      else -> null
+      else -> 0
     }
   }
 }
@@ -109,12 +109,12 @@ data class IndividualSelfManagementScores(
       (difficultiesCoping ?: 0)
   }
 
-  fun overallSelfManagementScore(): Int? {
+  fun overallSelfManagementScore(): Int {
     return when (totalScore()) {
       in 0..1 -> 0
       in 2..4 -> 1
       in 5..8 -> 2
-      else -> null
+      else -> 0
     }
   }
 }
@@ -141,12 +141,12 @@ data class IndividualRelationshipScores(
       (aggressiveControllingBehaviour ?: 0)
   }
 
-  fun overallRelationshipScore(): Int? {
+  fun overallRelationshipScore(): Int {
     return when (totalScore()) {
       in 0..1 -> 0
       in 2..4 -> 1
       in 5..8 -> 2
-      else -> null
+      else -> 0
     }
   }
 }
