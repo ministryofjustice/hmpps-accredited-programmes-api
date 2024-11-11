@@ -21,11 +21,11 @@ Change the namespace and local port number (the left-hand one of the pair) as ne
 
 ### Using the Service Pod:
 
-Execute the script for the appropriate k8s namespace by amending the variable on line 2: `namespace=hmpps-accredited-programmes-preprod`:
+Execute the script for the appropriate k8s namespace: 
 ```
-$ ./setup-service-pod.bash
+$ ./setup-service-pod.bash -ns preprod
 ```
-The script will either spin up the service pod, or log you into the existing service pod if it already exists.
+The script will either spin up the service pod, or log you into the existing service pod if it already exists. This can take a few seconds.
 
 The script sets up useful environment variables that are available to the bash session and can be used to invoke aws cli 
 commands as if you were authorised with the IRSA such as:

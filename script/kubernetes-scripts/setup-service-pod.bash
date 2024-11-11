@@ -1,17 +1,51 @@
 #!/bin/bash
 namespace=hmpps-accredited-programmes-preprod
+usage() {
+  echo
+  echo "Usage:"
+  echo
+  echo " command line parameters:"
+  echo
+  echo "   -ns <namespace>            One of 'dev', 'preprod' or 'prod'. Selects the kubernetes namespace. "
+  echo
+  exit
+}
 
-hostname=$(hostname)
-# Read any named params
-while [ $# -gt 0 ]; do
+check_namespace() {
+  case "$NS_KEY" in
+  dev | preprod | prod)
+    namespace=hmpps-accredited-programmes-${NS_KEY}
+    ;;
+  *)
+    echo "-ns must be 'dev', 'preprod' or 'prod'"
+    exit
+    ;;
+  esac
+}
 
-   if [[ $1 == *"--"* ]]; then
-        param="${1/--/}"
-        declare $param="$2"
-   fi
+read_command_line() {
+  if [[ ! $1 ]]; then
+    usage
+  fi
+  while [[ $1 ]]; do
+    case $1 in
+    -ns)
+      shift
+      NS_KEY=$1
+      ;;
+    *)
+      echo
+      echo "Unknown argument '$1'"
+      echo
+      exit
+      ;;
+    esac
+    shift
+  done
+}
 
-  shift
-done
+read_command_line "$@"
+check_namespace
 
 set -o history -o histexpand
 set -e
@@ -29,7 +63,7 @@ exit_on_error() {
 
 debug_pod_name=service-pod-$namespace
 echo "service pod name: $debug_pod_name"
-service_pod_exists="$(kubectl get pods $debug_pod_name || echo 'NotFound')"
+service_pod_exists="$(kubectl --namespace=$namespace get pods $debug_pod_name || echo 'NotFound')"
 
 
 if [[ ! $service_pod_exists =~ 'NotFound' ]]; then
