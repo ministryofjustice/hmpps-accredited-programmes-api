@@ -22,7 +22,8 @@ import java.util.UUID
 @AutoConfigureMockMvc
 @ActiveProfiles("test-h2")
 @Import(JwtAuthHelper::class)
-class OfferingControllerTest@Autowired
+class OfferingControllerTest
+@Autowired
 constructor(
   val mockMvc: MockMvc,
   val jwtAuthHelper: JwtAuthHelper,
