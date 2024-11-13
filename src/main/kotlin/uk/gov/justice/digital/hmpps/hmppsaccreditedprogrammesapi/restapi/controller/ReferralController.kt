@@ -274,7 +274,7 @@ class ReferralController(
     var defaultConfirmationFields = ConfirmationFields(
       primaryHeading = "Move referral to ${chosenStatus.description.lowercase()}",
       primaryDescription = "Submitting this will change the status to ${chosenStatus.description.lowercase()}.",
-      secondaryHeading = "Confirm status change",
+      secondaryHeading = chosenStatus.description,
       secondaryDescription = chosenStatus.confirmationText,
       warningText = when {
         currentStatus.code == "ON_PROGRAMME" && chosenStatus.code == "PROGRAMME_COMPLETE" -> {
