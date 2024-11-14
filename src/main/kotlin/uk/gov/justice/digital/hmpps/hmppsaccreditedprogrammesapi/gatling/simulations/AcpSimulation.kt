@@ -5,6 +5,9 @@ import io.gatling.javaapi.core.*
 import io.gatling.javaapi.core.CoreDsl.*
 import io.gatling.javaapi.http.HttpDsl.*
 import java.util.*
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 class AcpSimulation : Simulation() {
   private val httpProtocol = http
@@ -20,12 +23,7 @@ class AcpSimulation : Simulation() {
         .check(status().`is`(200))
         .check(bodyString().saveAs("responseBody")),
     )
-    .exec { session ->
-      // Log the response body
-      val responseBody = session.getString("responseBody")
-//      println("Response Body: $responseBody")
-      session
-    }
+    .pause(10.seconds.toJavaDuration())
 
   private val courseAudienceScenario = scenario("GET all audiences")
     .exec(
@@ -34,6 +32,7 @@ class AcpSimulation : Simulation() {
         .check(status().`is`(200))
         .check(bodyString().saveAs("responseBody")),
     )
+    .pause(10.seconds.toJavaDuration())
 
   private val courseNamesScenario = scenario("GET all course names")
     .exec(
@@ -42,6 +41,7 @@ class AcpSimulation : Simulation() {
         .check(status().`is`(200))
         .check(bodyString().saveAs("responseBody")),
     )
+    .pause(10.seconds.toJavaDuration())
 
   private val coursesByOrganisationScenario = scenario("GET all WTI courses")
     .exec(
@@ -50,35 +50,29 @@ class AcpSimulation : Simulation() {
         .check(status().`is`(200))
         .check(bodyString().saveAs("responseBody")),
     )
+    .pause(10.seconds.toJavaDuration())
 
-//  private val createReferral = scenario("Create referrals")
-//    .exec(
-//      http("POST create referral")
-//        .post("/referrals")
-//        .body(
-//          toJson {
-//            ReferralCreate(
-//              offeringId = UUID.fromString("72820fe9-ad4a-4d1a-b730-ded300075749"),
-//              prisonNumber = "G8335GI",
-//            )
-//          },
-//        )
-//        .check(status().`is`(201))
-//        .check(bodyString().saveAs("responseBody"))
-//    ).exec { session ->
-//      // Log the response body
-//      val responseBody = session.getString("responseBody")
-//      println("Response Body: $responseBody")
-//      session
-//    }
 
   init {
     setUp(
-      allCoursesScenario.injectOpen(atOnceUsers(1)),
-      courseAudienceScenario.injectOpen(atOnceUsers(1)),
-      courseNamesScenario.injectOpen(atOnceUsers(1)),
-      coursesByOrganisationScenario.injectOpen(atOnceUsers(1)),
-//        createReferral.injectOpen(atOnceUsers(1))
+      allCoursesScenario.injectOpen(
+        constantUsersPerSec(50.0).during(1.minutes.toJavaDuration()).randomized(),
+        stressPeakUsers(40).during(1.minutes.toJavaDuration()),
+      ),
+      courseAudienceScenario.injectOpen(
+        constantUsersPerSec(10.0).during(1.minutes.toJavaDuration()).randomized(),
+        stressPeakUsers(40).during(1.minutes.toJavaDuration()),
+      ),
+
+      courseNamesScenario.injectOpen(
+        constantUsersPerSec(20.0).during(2.minutes.toJavaDuration()).randomized(),
+        stressPeakUsers(40).during(1.minutes.toJavaDuration()),
+      ),
+
+      coursesByOrganisationScenario.injectOpen(
+        constantUsersPerSec(20.0).during(2.minutes.toJavaDuration()).randomized(),
+        stressPeakUsers(40).during(1.minutes.toJavaDuration()),
+      ),
     ).protocols(httpProtocol)
   }
 }
