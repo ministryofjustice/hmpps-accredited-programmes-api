@@ -68,7 +68,7 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class ReferralIntegrationTest : IntegrationTestBase() {
+class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var personRepository: PersonRepository
@@ -426,6 +426,7 @@ class ReferralIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get referral confirmation text assessment started to suitable not ready`() {
+    // Given
     val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralStatusUpdate1 = ReferralStatusUpdate(
@@ -445,14 +446,203 @@ class ReferralIntegrationTest : IntegrationTestBase() {
     )
     updateReferralStatus(referralCreated.id, referralStatusUpdate3)
 
+    // When
     val confirmationFields = getConfirmationText(
       referralId = referralCreated.id,
       chosenStatusCode = "SUITABLE_NOT_READY",
       ptUser = true,
     )
 
+    // Then
     confirmationFields.primaryHeading shouldBe "Pause referral: suitable but not ready"
     confirmationFields.primaryDescription shouldBe "The referral will be paused until the person is ready to continue."
+    confirmationFields.secondaryHeading shouldBe "Give a reason"
+    confirmationFields.secondaryDescription shouldBe "You must give a reason why the person is not ready to continue."
+  }
+
+  @Test
+  fun `Get referral confirmation text assessment started to assessed as suitable`() {
+    // Given
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
+
+    // When
+    val confirmationFields = getConfirmationText(
+      referralId = referralCreated.id,
+      chosenStatusCode = "ASSESSED_SUITABLE",
+      ptUser = true,
+    )
+
+    // Then
+    confirmationFields.primaryHeading shouldBe "Move referral to assessed as suitable"
+    confirmationFields.primaryDescription shouldBe "Submitting this will change the status to assessed as suitable."
+    confirmationFields.secondaryHeading shouldBe "Assessed as suitable"
+    confirmationFields.secondaryDescription shouldBe "You can give more details about this status update."
+  }
+
+  @Test
+  fun `Get referral confirmation text referral submitted to awaiting assessment`() {
+    // Given
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
+
+    // When
+    val confirmationFields = getConfirmationText(
+      referralId = referralCreated.id,
+      chosenStatusCode = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+
+    // Then
+    confirmationFields.primaryHeading shouldBe "Move referral to awaiting assessment"
+    confirmationFields.primaryDescription shouldBe "Submitting this will change the status to awaiting assessment."
+    confirmationFields.secondaryHeading shouldBe "Awaiting assessment"
+    confirmationFields.secondaryDescription shouldBe "You can give more details about this status update."
+  }
+
+  @Test
+  fun `Get referral confirmation text awaiting assessment to assessment started`() {
+    // Given
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
+
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
+
+    // When
+    val confirmationFields = getConfirmationText(
+      referralId = referralCreated.id,
+      chosenStatusCode = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+
+    // Then
+    confirmationFields.primaryHeading shouldBe "Move referral to assessment started"
+    confirmationFields.primaryDescription shouldBe "Submitting this will change the status to assessment started."
+    confirmationFields.secondaryHeading shouldBe "Assessment started"
+    confirmationFields.secondaryDescription shouldBe "You can give more details about this status update."
+  }
+
+  @Test
+  fun `Get referral confirmation text assessment as suitable to on programme`() {
+    // Given
+    setUp()
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
+
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = "ASSESSED_SUITABLE",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate4)
+
+    // When
+    val confirmationFields = getConfirmationText(
+      referralId = referralCreated.id,
+      chosenStatusCode = "ON_PROGRAMME",
+      ptUser = true,
+    )
+
+    // Then
+    confirmationFields.primaryHeading shouldBe "Move referral to on programme"
+    confirmationFields.primaryDescription shouldBe "Submitting this will change the status to on programme."
+    confirmationFields.secondaryHeading shouldBe "On programme"
+    confirmationFields.secondaryDescription shouldBe "You can give more details about this status update."
+  }
+
+  @Test
+  fun `Get referral confirmation text on programme to programme complete`() {
+    // Given
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
+
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = "ASSESSED_SUITABLE",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate4)
+
+    val referralStatusUpdate5 = ReferralStatusUpdate(
+      status = "ON_PROGRAMME",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate5)
+
+    // When
+    val confirmationFields = getConfirmationText(
+      referralId = referralCreated.id,
+      chosenStatusCode = "PROGRAMME_COMPLETE",
+      ptUser = true,
+    )
+
+    // Then
+    confirmationFields.primaryHeading shouldBe "Move referral to programme complete"
+    confirmationFields.primaryDescription shouldBe "Submitting this will change the status to programme complete."
+    confirmationFields.secondaryHeading shouldBe "Programme complete"
+    confirmationFields.secondaryDescription shouldBe "You can give more details about this status update."
   }
 
   @Test
