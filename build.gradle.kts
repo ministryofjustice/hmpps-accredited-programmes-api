@@ -6,6 +6,7 @@ plugins {
   kotlin("plugin.spring") version "2.0.21"
   kotlin("plugin.jpa") version "2.0.21"
   id("io.gatling.gradle") version "3.12.0.4"
+  kotlin("plugin.serialization") version "1.8.10"
 }
 
 configurations {
@@ -42,8 +43,19 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
-  implementation("io.gatling:gatling-core-java:3.12.0") // Gatling Java API for Kotlin compatibility
-  implementation("io.gatling:gatling-http-java:3.9.5") // Gatling HTTP library
+//  implementation("io.gatling:gatling-core-java:3.12.0") // Gatling Java API for Kotlin compatibility
+//  implementation("io.gatling:gatling-http-java:3.9.5") // Gatling HTTP library
+//
+//  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
+
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+
+  implementation("io.gatling:gatling-core-java:3.12.0")
+  implementation("io.gatling:gatling-http-java:3.12.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
+  gatlingImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
 
   testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
