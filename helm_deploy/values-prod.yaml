@@ -23,7 +23,7 @@ generic-service:
     SERVICES_MANAGE-USERS-API_BASE-URL: https://manage-users-api.hmpps.service.justice.gov.uk
     SENTRY_ENVIRONMENT: prod
     HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-prod-hmpps_audit_queue"
-    FEATURESWITCH_CASE-NOTES-ENABLED: false
+    FEATURESWITCH_CASE-NOTES-ENABLED: true
 
   allowlist:
     groups:
