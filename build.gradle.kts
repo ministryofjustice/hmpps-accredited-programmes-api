@@ -19,6 +19,9 @@ dependencies {
   val springSecurityVersion = "6.3.4"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.8")
+  // Override netty-common version to address https://osv.dev/vulnerability/GHSA-xq3w-v528-46rv
+  implementation("io.netty:netty-common:4.1.115.Final")
+
   runtimeOnly("org.postgresql:postgresql:42.7.4")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -46,7 +49,8 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.15")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
-  testImplementation("com.github.tomakehurst:wiremock-standalone:3.0.1")
+  testImplementation("org.wiremock:wiremock-standalone:3.9.2")
+
   testImplementation("org.awaitility:awaitility-kotlin")
 
   testImplementation("org.testcontainers:testcontainers:1.20.3")
