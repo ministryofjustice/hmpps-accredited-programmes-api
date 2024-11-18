@@ -77,12 +77,10 @@ class OfferingController(
     produces = ["application/json"],
   )
   fun getOfferingById(@Parameter(description = "A course offering identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CourseOffering> {
-    val offeringById = courseService.getOfferingById(id)
-    val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringById?.organisationId.orEmpty()) != null
-    val organisation = organisationService.findOrganisationEntityByCode(offeringById?.organisationId!!)?.gender!!
-
-    return offeringById.toApi(enabledOrg, organisation).let {
-      ResponseEntity.ok(it)
+    return courseService.getOfferingById(id)?.let {
+      val enabledOrg = enabledOrganisationService.getEnabledOrganisation(it.organisationId) != null
+      val genderOfOrganisation = organisationService.findOrganisationEntityByCode(it.organisationId)?.gender!!
+      ResponseEntity.ok(it.toApi(enabledOrg, genderOfOrganisation))
     } ?: throw NotFoundException("No Offering found at /offerings/$id")
   }
 }

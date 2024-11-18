@@ -375,6 +375,26 @@ class CourseIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Should return 404 with error body when searching for an offering with an unknown id`() {
+    val randomId = UUID.randomUUID()
+
+    webTestClient
+      .get()
+      .uri("/offerings/$randomId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNotFound
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.status").isEqualTo(404)
+      .jsonPath("$.errorCode").isEmpty
+      .jsonPath("$.userMessage").value(startsWith("Not Found: No Offering found at /offerings/$randomId"))
+      .jsonPath("$.developerMessage").value(startsWith("No Offering found at /offerings/$randomId"))
+      .jsonPath("$.moreInfo").isEmpty
+  }
+
+  @Test
   fun `Get all audiences returns 200 with correct body`() {
     webTestClient
       .get()
