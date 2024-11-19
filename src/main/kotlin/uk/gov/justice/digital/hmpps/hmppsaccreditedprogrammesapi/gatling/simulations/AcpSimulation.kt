@@ -8,6 +8,7 @@ import io.gatling.javaapi.core.CoreDsl.bodyString
 import io.gatling.javaapi.core.CoreDsl.constantUsersPerSec
 import io.gatling.javaapi.core.CoreDsl.csv
 import io.gatling.javaapi.core.CoreDsl.jsonPath
+import io.gatling.javaapi.core.CoreDsl.rampUsers
 import io.gatling.javaapi.core.CoreDsl.scenario
 import io.gatling.javaapi.core.CoreDsl.stressPeakUsers
 import io.gatling.javaapi.core.Simulation
@@ -40,7 +41,7 @@ class AcpSimulation : Simulation() {
     .baseUrl("https://accredited-programmes-api-preprod.hmpps.service.justice.gov.uk")
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
-    .authorizationHeader("Bearer ")
+    .authorizationHeader("Bearer <TOKEN>")
 
 
   private val createReferral = scenario("Create and Submit Referral")
@@ -150,48 +151,43 @@ class AcpSimulation : Simulation() {
 
   init {
     setUp(
-      
       courseSimulation.allCoursesScenario.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
+        rampUsers(100).during(2.minutes.toJavaDuration()), // Ramp-up to 50 users in 2 mins
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized() // Maintain load
       ),
       courseSimulation.courseAudienceScenario.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
+        rampUsers(100).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized()
       ),
-
       courseSimulation.courseNamesScenario.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
+        rampUsers(100).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized()
       ),
-
       courseSimulation.coursesByOrganisationScenario.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
+        rampUsers(100).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized()
       ),
-
       createReferral.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
+        rampUsers(100).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized()
       ),
-
       pniScenario.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
+        rampUsers(100).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized()
       ),
-
       myCaseLoadScenario.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
+        rampUsers(100).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized()
       ),
-
       caseLoadForAnOrgScenario.injectOpen(
-        constantUsersPerSec(0.25).during(30.minutes.toJavaDuration()).randomized(),
-        stressPeakUsers(40).during(10.minutes.toJavaDuration()),
-      ),
-
+        rampUsers(100).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized()
+      )
     ).protocols(httpProtocol)
   }
+
+
+
 }
 
 private val objectMapper = lazy { ObjectMapper().findAndRegisterModules() }

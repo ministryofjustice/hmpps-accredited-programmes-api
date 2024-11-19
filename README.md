@@ -143,3 +143,13 @@ manual intervention to get working with our build.
 We may get reports of vulnerabilities in our dependencies through Trivy. Most of these can be resolved by updating
 the `uk.gov.justice.hmpps.gradle-spring-boot` package in `build.gradle.kts`, as the team managing that package have
 fixed them for us.
+
+## Performance tests
+
+We've seen a maximum of 700 requests a minute in prod. 
+Our service is tested for close to over 12,000 requests a minute in the performance test (https://grafana.live.cloud-platform.service.justice.gov.uk/d/golden-signals/golden-signals?orgId=1&var-namespace=hmpps-accredited-programmes-preprod&var-service=hmpps-accredited-programmes-api&var-DS_PROMETHEUS=prometheus&var-DS_THANOS=P5DCFC7561CCDE821&from=1731941602000&to=1731947479000).
+You can edit the params in the `AcpSimulation.kt` file if you want to test for more requests per minute or add additional load on any of the endpoints.
+
+Before running the performance tests, you need to change the url and get a token for that environment. 
+```bash
+`./gradlew clean gatlingRun -Dgatling.simulationClass=uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.gatling.simulations.AcpSimulation`

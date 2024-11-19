@@ -43,11 +43,6 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
-//  implementation("io.gatling:gatling-core-java:3.12.0") // Gatling Java API for Kotlin compatibility
-//  implementation("io.gatling:gatling-http-java:3.9.5") // Gatling HTTP library
-//
-//  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.3")
-
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
   implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 
