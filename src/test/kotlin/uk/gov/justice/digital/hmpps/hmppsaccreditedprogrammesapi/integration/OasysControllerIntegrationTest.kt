@@ -94,9 +94,9 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
       relCloseFamily = "0-No problems",
       relCurrRelationshipStatus = "Not in a relationship",
       prevCloseRelationships = "2-Significant problems",
-      emotionalCongruence="0-No problems",
-      relationshipWithPartner="0-No problems",
-      prevOrCurrentDomesticAbuse="Yes"
+      emotionalCongruence = "0-No problems",
+      relationshipWithPartner = "0-No problems",
+      prevOrCurrentDomesticAbuse = "Yes",
     )
   }
 
