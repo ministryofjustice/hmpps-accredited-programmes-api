@@ -7,7 +7,6 @@ import kotlin.time.toJavaDuration
 
 class CourseSimulation {
 
-
   val allCoursesScenario = CoreDsl.scenario("GET all courses endpoint")
     .exec(
       HttpDsl.http("Get all courses") // Name of the request
