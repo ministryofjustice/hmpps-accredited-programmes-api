@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.gatling.simulations
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.gatling.javaapi.core.CoreDsl
 import io.gatling.javaapi.core.CoreDsl.StringBody
 import io.gatling.javaapi.core.CoreDsl.bodyString
@@ -13,17 +12,6 @@ import io.gatling.javaapi.core.Simulation
 import io.gatling.javaapi.http.HttpDsl
 import io.gatling.javaapi.http.HttpDsl.http
 import io.gatling.javaapi.http.HttpDsl.status
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -146,66 +134,37 @@ class AcpSimulation : Simulation() {
   init {
     setUp(
       courseSimulation.allCoursesScenario.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
       courseSimulation.courseAudienceScenario.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
       courseSimulation.courseNamesScenario.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
       courseSimulation.coursesByOrganisationScenario.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
       createReferral.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
       pniScenario.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
       myCaseLoadScenario.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
       caseLoadForAnOrgScenario.injectOpen(
-        rampUsers(100).during(2.minutes.toJavaDuration()),
-        constantUsersPerSec(6.0).during(16.minutes.toJavaDuration()).randomized(),
+        rampUsers(1).during(2.minutes.toJavaDuration()),
+        constantUsersPerSec(1.0).during(16.minutes.toJavaDuration()).randomized(),
       ),
     ).protocols(httpProtocol)
   }
 }
-
-private val objectMapper = lazy { ObjectMapper().findAndRegisterModules() }
-
-val json = Json {
-  serializersModule = SerializersModule {
-    contextual(UUID::class, UUIDSerializer)
-  }
-}
-object UUIDSerializer : KSerializer<UUID> {
-  override val descriptor: SerialDescriptor =
-    PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
-
-  override fun serialize(encoder: Encoder, value: UUID) {
-    encoder.encodeString(value.toString())
-  }
-
-  override fun deserialize(decoder: Decoder): UUID {
-    return UUID.fromString(decoder.decodeString())
-  }
-}
-
-private fun toJson(referralCreate: ReferralCreate): String =
-  json.encodeToString(referralCreate)
-
-@Serializable
-data class ReferralCreate(
-  @Contextual val offeringId: UUID,
-  val prisonNumber: String,
-)
