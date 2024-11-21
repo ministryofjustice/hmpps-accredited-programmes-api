@@ -46,4 +46,11 @@ data class Relationships(
 
   @Schema(example = "0-No problems", description = "")
   @get:JsonProperty("emotionalCongruence") val emotionalCongruence: String? = null,
+
+  @Schema(example = "0-No problems", description = "")
+  @get:JsonProperty("relationshipWithPartner") val relationshipWithPartner: String? = null,
+
+  @Schema(example = "No", description = "")
+  @get:JsonProperty("prevOrCurrentDomesticAbuse") val prevOrCurrentDomesticAbuse: String? = null,
+
 )

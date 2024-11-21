@@ -50,6 +50,11 @@ fun OasysRelationships.toModel() = Relationships(
   perpOfPartnerOrFamily = perpAgainstPartner == YES,
   relIssuesDetails = relIssuesDetails,
   relCloseFamily = relCloseFamily,
+  relCurrRelationshipStatus = relCurrRelationshipStatus,
+  prevCloseRelationships = prevCloseRelationships,
+  emotionalCongruence = emotionalCongruence,
+  relationshipWithPartner = relationshipWithPartner,
+  prevOrCurrentDomesticAbuse = prevOrCurrentDomesticAbuse,
 )
 
 fun OasysRoshFull.toModel() = RoshAnalysis(
