@@ -136,7 +136,117 @@ class PniRiskEngineTest {
   }
 
   @ParameterizedTest
-  @CsvSource(value = ["Female,true", "Male,true"], delimiter = ',')
+  @CsvSource(value = ["VERY_HIGH", "VERY HIGH", "Very High", "HIGH", "High"])
+  fun `should return isHighRisk for a male with High or Very High ospIic `(ospIicValue: String) {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = null,
+      ospIic = ospIicValue,
+      rsr = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertTrue(riskEngine.isHighRisk(riskScores, "Male"))
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = ["VERY_HIGH", "VERY HIGH", "Very High", "HIGH", "High"])
+  fun `should return isHighRisk for a male with High or Very High ospDc `(ospDcValue: String) {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = ospDcValue,
+      ospIic = null,
+      rsr = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertTrue(riskEngine.isHighRisk(riskScores, "Male"))
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = ["VERY_HIGH", "VERY HIGH", "Very High", "HIGH", "High"])
+  fun `should return isHighRisk for a person with High or Very High Sara risk of violence towards partner`(saraRiskValue: String) {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = null,
+      ospIic = null,
+      rsr = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = saraRiskValue,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertTrue(riskEngine.isHighRisk(riskScores, "Male"))
+    assertTrue(riskEngine.isHighRisk(riskScores, "Female"))
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = ["VERY_HIGH", "VERY HIGH", "Very High", "HIGH", "High"])
+  fun `should return isHighRisk for a person with High or Very High Sara risk of violence towards others`(saraRiskValue: String) {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = null,
+      ospIic = null,
+      rsr = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = saraRiskValue,
+        overallResult = null,
+      ),
+    )
+    assertTrue(riskEngine.isHighRisk(riskScores, "Male"))
+    assertTrue(riskEngine.isHighRisk(riskScores, "Female"))
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = ["VERY_HIGH", "VERY HIGH", "Very High", "HIGH", "High"])
+  fun `should NOT return isHighRisk for a female with High or Very High ospDc`(ospDcValue: String) {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = ospDcValue,
+      ospIic = null,
+      rsr = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertFalse(riskEngine.isHighRisk(riskScores, "Female"))
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = ["VERY_HIGH", "VERY HIGH", "Very High", "HIGH", "High"])
+  fun `should NOT return isHighRisk for a female with High or Very High ospIic`(ospIicValue: String) {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = null,
+      ospIic = ospIicValue,
+      rsr = null,
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertFalse(riskEngine.isHighRisk(riskScores, "Female"))
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = ["Female,false", "Male,true"], delimiter = ',')
   fun `isHighRisk should return expected result if ospIic is high`(gender: String, result: Boolean) {
     val riskScores = IndividualRiskScores(
       ogrs3 = null,
