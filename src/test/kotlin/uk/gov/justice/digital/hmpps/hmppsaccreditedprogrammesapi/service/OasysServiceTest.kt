@@ -82,6 +82,7 @@ class OasysServiceTest {
 
   @Test
   fun `should return relationships`() {
+    // Given
     val oasysRelationships = OasysRelationships(
       prevOrCurrentDomesticAbuse = "Yes",
       victimOfPartner = "Yes",
@@ -93,6 +94,8 @@ class OasysServiceTest {
       emotionalCongruence = "0-No problems",
       relCloseFamily = "0-No problems",
       prevCloseRelationships = "2-Significant problems",
+      relationshipWithPartner = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
     )
 
     every { oasysApiClient.getRelationships(any()) } returns ClientResult.Success(
@@ -100,8 +103,10 @@ class OasysServiceTest {
       oasysRelationships,
     )
 
+    // When
     val result = service.getRelationships(123123)
 
+    // Then
     assertEquals(oasysRelationships, result)
   }
 
@@ -289,6 +294,8 @@ class OasysServiceTest {
       emotionalCongruence = null,
       relCloseFamily = null,
       prevCloseRelationships = null,
+      relationshipWithPartner = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
     )
 
     val oasysRelationShips2 = OasysRelationships(
@@ -305,6 +312,8 @@ class OasysServiceTest {
       emotionalCongruence = null,
       relCloseFamily = null,
       prevCloseRelationships = null,
+      relationshipWithPartner = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
     )
 
     every { oasysApiClient.getRelationships(123123) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips1)
@@ -335,6 +344,8 @@ class OasysServiceTest {
       emotionalCongruence = null,
       relCloseFamily = null,
       prevCloseRelationships = null,
+      relationshipWithPartner = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
     )
 
     val oasysRelationShips2 = OasysRelationships(
@@ -351,6 +362,8 @@ class OasysServiceTest {
       emotionalCongruence = null,
       relCloseFamily = null,
       prevCloseRelationships = null,
+      relationshipWithPartner = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
     )
 
     every { oasysApiClient.getRelationships(123123) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips1)
@@ -382,6 +395,8 @@ class OasysServiceTest {
       emotionalCongruence = null,
       relCloseFamily = null,
       prevCloseRelationships = null,
+      relationshipWithPartner = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
     )
 
     val oasysRelationShips2 = OasysRelationships(
@@ -398,6 +413,8 @@ class OasysServiceTest {
       emotionalCongruence = null,
       relCloseFamily = null,
       prevCloseRelationships = null,
+      relationshipWithPartner = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
     )
 
     every { oasysApiClient.getRelationships(123123) } returns ClientResult.Success(HttpStatus.OK, oasysRelationShips1)
