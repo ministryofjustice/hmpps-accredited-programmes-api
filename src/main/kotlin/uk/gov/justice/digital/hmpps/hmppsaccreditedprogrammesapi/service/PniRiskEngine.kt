@@ -55,17 +55,17 @@ class PniRiskEngine {
 
   private fun isOspDcHigh(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     return gender.equals("Male", ignoreCase = true) &&
-      (individualRiskScores.ospDc?.contains("HIGH", ignoreCase = true) == true)
+      (individualRiskScores.ospDc?.contains(RiskClassification.HIGH_RISK.description, ignoreCase = true) == true)
   }
 
   private fun isOspIicHigh(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     return gender.equals("Male", ignoreCase = true) &&
-      (individualRiskScores.ospIic?.contains("HIGH", ignoreCase = true) == true)
+      (individualRiskScores.ospIic?.contains(RiskClassification.HIGH_RISK.description, ignoreCase = true) == true)
   }
 
   fun isHighSara(individualRiskScores: IndividualRiskScores) =
-    (individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.contains("High", ignoreCase = true) == true) ||
-      (individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.contains("High", ignoreCase = true) == true)
+    (individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.contains(RiskClassification.HIGH_RISK.description, ignoreCase = true) == true) ||
+      (individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.contains(RiskClassification.HIGH_RISK.description, ignoreCase = true) == true)
 
   private fun isRsrHigh(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     val isHighRsr = individualRiskScores.rsr?.let { it >= BigDecimal("3.00") } == true
@@ -83,16 +83,18 @@ class PniRiskEngine {
     individualRiskScores.ovp?.let { it in BigDecimal("30.00")..BigDecimal("59.00") } == true
 
   private fun isOspDcMedium(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
-    return gender.equals("Male", ignoreCase = true) && individualRiskScores.ospDc?.equals("MEDIUM", ignoreCase = true) == true
+    return gender.equals("Male", ignoreCase = true) &&
+      individualRiskScores.ospDc?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true
   }
 
   private fun isOspIicMedium(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
-    return gender.equals("Male", ignoreCase = true) && individualRiskScores.ospIic?.equals("MEDIUM", ignoreCase = true) == true
+    return gender.equals("Male", ignoreCase = true) &&
+      individualRiskScores.ospIic?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true
   }
 
   fun isMediumSara(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals("Medium", ignoreCase = true) == true ||
-      individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals("Medium", ignoreCase = true) == true
+    individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true ||
+      individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true
 
   private fun isRsrMedium(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     val rsrMediumRsr = individualRiskScores.rsr?.let { it in BigDecimal("1.00")..BigDecimal("2.99") } == true
@@ -104,8 +106,9 @@ class PniRiskEngine {
   }
 }
 
-enum class RiskClassification {
-  HIGH_RISK,
-  MEDIUM_RISK,
-  LOW_RISK,
+enum class RiskClassification(val description: String) {
+  VERY_HIGH_RISK("Very High"),
+  HIGH_RISK("High"),
+  MEDIUM_RISK("Medium"),
+  LOW_RISK("Low"),
 }
