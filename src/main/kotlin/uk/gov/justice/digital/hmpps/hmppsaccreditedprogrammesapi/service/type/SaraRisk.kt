@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type
 
-enum class SaraRisk(private val score: Int) {
-  NOT_APPLICABLE(0),
-  LOW(10),
-  MEDIUM(20),
-  HIGH(30),
-  VERY_HIGH(40),
+enum class SaraRisk(private val score: Int, val description: String? = null) {
+  NOT_APPLICABLE(0, "Not Applicable"),
+  LOW(10, "Low"),
+  MEDIUM(20, "Medium"),
+  HIGH(30, "High"),
+  VERY_HIGH(40, "Very High"),
   ;
 
   companion object {
     fun fromString(value: String?): SaraRisk {
-      return SaraRisk.entries.find { it.name.equals(value, ignoreCase = true) }
+      return SaraRisk.entries.find { it.description.equals(value?.replace('_', ' '), ignoreCase = true) }
         ?: NOT_APPLICABLE
     }
 
