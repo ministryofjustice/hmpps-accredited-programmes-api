@@ -64,7 +64,7 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createdOrganisation(orgId: UUID = UUID.randomUUID(), code: String, name: String, gender: String = "MALE") {
+  fun createOrganisation(orgId: UUID = UUID.randomUUID(), code: String, name: String, gender: String = "MALE") {
     entityManager.createNativeQuery("INSERT INTO organisation (organisation_id, code, name, gender) VALUES (:organisation_id, :code, :name, :gender)")
       .setParameter("organisation_id", orgId)
       .setParameter("code", code)

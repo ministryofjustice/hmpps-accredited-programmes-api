@@ -44,9 +44,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 exists`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
   }
@@ -55,9 +55,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure course d3abc217-75ee-46e9-a010-368f30282367 has offerings 790a2dfe-7de5-4504-bb9c-83e6e53a6537 and 7fffcc6a-11f8-4713-be35-cf5ff1aee517`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
   }
@@ -66,9 +66,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure courses d3abc217-75ee-46e9-a010-368f30282367, 28e47d30-30bf-4dab-a8eb-9fda3f6400e8, and 1811faa6-d568-4fc4-83ce-41118b90242e and no others exist`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -80,9 +80,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure in order, the names of all the courses are Super Course, Custom Course, and RAPID Course`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -94,9 +94,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists for course d3abc217-75ee-46e9-a010-368f30282367`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
   }
@@ -105,7 +105,7 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure offering 790a2dfe-7de5-4504-bb9c-83e6e53a6537 exists`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
   }
 
@@ -113,7 +113,7 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure offering 7fffcc6a-11f8-4713-be35-cf5ff1aee517 exists`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
   }
 
@@ -142,9 +142,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure referral 0c46ed09-170b-4c0f-aee8-a24eeaeeddaa exists with status REFERRAL_STARTED`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -157,9 +157,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure referral 0c46ed09-170b-4c0f-aee8-a24eeaeeddaa exists`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -172,9 +172,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure referrals exist for the logged in user`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -192,9 +192,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure referrals exist for logged in user with status REFERRAL_SUBMITTED`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -210,9 +210,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure referrals exist for organisation BWN`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -230,9 +230,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure organisation BWN has courses d3abc217-75ee-46e9-a010-368f30282367, 28e47d30-30bf-4dab-a8eb-9fda3f6400e8, and 1811faa6-d568-4fc4-83ce-41118b90242e and no others`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 
@@ -251,9 +251,9 @@ class PactContractTest : IntegrationTestBase() {
   fun `ensure Super Course referral(s) exist for organisation BWM with status REFERRAL_SUBMITTED to offerings for courses with audience General offence`() {
     persistenceHelper.createCourse(UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "SC", "Super Course", "Sample description", "SC++", "General offence")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createOffering(UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
     persistenceHelper.createOffering(UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"), "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
 

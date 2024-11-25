@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.restapi.c
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_ID_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
@@ -49,9 +51,9 @@ constructor(
   @Nested
   inner class GetCoursesByOrganisationIdTests {
     @Test
-    fun `getAllCoursesByOrganisationId with JWT returns 200 with correct body`() {
+    fun `getAllCoursesByOrganisationId with JWT returns 200 with correct body`() { // TODO extend this to include withdrawn courses
       val offeringEntity1 =
-        OfferingEntityFactory().withOrganisationId(ORGANISATION_ID_MDI).withContactEmail("of1@digital.justice.gov.uk")
+        OfferingEntityFactory().withOrganisationId(ORGANISATION_ID_MDI).withContactEmail("of2@digital.justice.gov.uk")
           .produce()
       offeringEntity1.course = CourseEntityFactory().produce()
 
@@ -60,7 +62,12 @@ constructor(
           .produce()
       offeringEntity2.course = CourseEntityFactory().produce()
 
-      val offerings = listOf(offeringEntity1, offeringEntity2)
+      val offeringEntity3 =
+        OfferingEntityFactory().withOrganisationId(ORGANISATION_ID_MDI).withContactEmail("of2@digital.justice.gov.uk")
+          .produce()
+      offeringEntity3.course = CourseEntityFactory().withWithdrawn(true).produce()
+
+      val offerings = listOf(offeringEntity1, offeringEntity2, offeringEntity3)
 
       every { courseService.getAllOfferingsByOrganisationId(ORGANISATION_ID_MDI) } returns offerings
 
@@ -71,12 +78,10 @@ constructor(
         status { isOk() }
         content {
           contentType(MediaType.APPLICATION_JSON)
-          assertThat(offerings.size).isEqualTo(2)
-
-          assertThat(offerings[0].organisationId).isEqualTo(ORGANISATION_ID_MDI)
-          assertThat(offerings[1].organisationId).isEqualTo(ORGANISATION_ID_MDI)
-          assertThat(offerings[0].contactEmail).isEqualTo("of1@digital.justice.gov.uk")
-          assertThat(offerings[1].contactEmail).isEqualTo("of2@digital.justice.gov.uk")
+          assertThat(offerings.size).isEqualTo(3)
+          assertThat(offerings)
+            .extracting(OfferingEntity::organisationId, OfferingEntity::contactEmail)
+            .containsOnly(tuple(ORGANISATION_ID_MDI, "of2@digital.justice.gov.uk"))
         }
       }
     }
