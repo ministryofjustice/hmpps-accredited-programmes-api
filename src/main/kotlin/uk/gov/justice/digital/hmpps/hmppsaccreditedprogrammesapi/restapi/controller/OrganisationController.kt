@@ -53,8 +53,7 @@ class OrganisationController(
   fun getAllCoursesByOrganisationId(@Parameter(description = "A organisation identifier", required = true) @PathVariable("organisationId") organisationId: String): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
-        courseService
-          .getAllOfferingsByOrganisationId(organisationId).filter { !it.withdrawn }
+        courseService.getAllOfferingsByOrganisationId(organisationId)
           .map { it.course }
           .map { it.toApi() },
       )

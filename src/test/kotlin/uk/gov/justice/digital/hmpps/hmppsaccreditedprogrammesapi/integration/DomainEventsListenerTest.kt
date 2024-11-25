@@ -49,10 +49,10 @@ class DomainEventsListenerTest : IntegrationTestBase() {
       "SC++",
       "General offence",
     )
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
 
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createOffering(

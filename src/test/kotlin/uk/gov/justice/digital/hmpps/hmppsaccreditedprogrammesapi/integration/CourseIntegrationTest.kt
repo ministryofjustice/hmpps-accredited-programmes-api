@@ -92,7 +92,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "pr description2",
     )
 
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
 
     persistenceHelper.createOffering(
@@ -104,7 +104,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       true,
     )
 
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createOffering(
@@ -116,7 +116,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       true,
     )
 
-    persistenceHelper.createdOrganisation(code = "SKI", name = "SKI org")
+    persistenceHelper.createOrganisation(code = "SKI", name = "SKI org")
     persistenceHelper.createEnabledOrganisation("SKI", "SKI org")
 
     persistenceHelper.createOffering(
@@ -129,7 +129,7 @@ class CourseIntegrationTest : IntegrationTestBase() {
       true,
     )
 
-    persistenceHelper.createdOrganisation(code = "SKN", name = "SKN org")
+    persistenceHelper.createOrganisation(code = "SKN", name = "SKN org")
     persistenceHelper.createEnabledOrganisation("SKN", "SKN org")
     persistenceHelper.createOffering(
       UUID.fromString(UNUSED_OFFERING_ID),
@@ -638,10 +638,10 @@ class CourseIntegrationTest : IntegrationTestBase() {
     val bc1CourseOfferingMainId = UUID.randomUUID()
     val bc1CourseOfferingVariantId = UUID.randomUUID()
 
-    persistenceHelper.createdOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
+    persistenceHelper.createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
     persistenceHelper.createEnabledOrganisation("WSI", "WSI org")
 
-    persistenceHelper.createdOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
+    persistenceHelper.createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
     persistenceHelper.createEnabledOrganisation("ESI", "ESI org")
 
     persistenceHelper.createCourse(

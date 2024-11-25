@@ -97,9 +97,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       "SC++",
       "General offence",
     )
-    persistenceHelper.createdOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createdOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createOffering(
@@ -293,7 +293,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val audience = getRandomString(10)
     val offeringId = UUID.randomUUID()
 
-    persistenceHelper.createdOrganisation(code = "XXX", name = "XXX org")
+    persistenceHelper.createOrganisation(code = "XXX", name = "XXX org")
     persistenceHelper.createEnabledOrganisation("XXX", "XXX org")
 
     createCourse(
@@ -1059,7 +1059,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val audience = getRandomString(10)
     val offeringId = UUID.randomUUID()
 
-    persistenceHelper.createdOrganisation(code = "XXX", name = "XXX org")
+    persistenceHelper.createOrganisation(code = "XXX", name = "XXX org")
     persistenceHelper.createEnabledOrganisation("XXX", "XXX org")
 
     createCourse(
