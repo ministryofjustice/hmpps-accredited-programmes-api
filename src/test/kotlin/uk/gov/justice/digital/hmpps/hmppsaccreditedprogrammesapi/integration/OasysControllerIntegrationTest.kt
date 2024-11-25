@@ -35,7 +35,7 @@ import java.time.Month
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class OasysApiIntegrationTest : IntegrationTestBase() {
+class OasysControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get offence details from Oasys`() {
@@ -92,6 +92,11 @@ class OasysApiIntegrationTest : IntegrationTestBase() {
       perpOfPartnerOrFamily = true,
       relIssuesDetails = "Free text",
       relCloseFamily = "0-No problems",
+      relCurrRelationshipStatus = "Not in a relationship",
+      prevCloseRelationships = "2-Significant problems",
+      emotionalCongruence = "0-No problems",
+      relationshipWithPartner = "0-No problems",
+      prevOrCurrentDomesticAbuse = "Yes",
     )
   }
 

@@ -32,6 +32,14 @@ class SaraRiskTest {
   }
 
   @Test
+  fun `fromString should return VERY_HIGH when value is Very High`() {
+    // Given & When
+    val saraRisk = SaraRisk.fromString("Very High")
+    // Then
+    assertThat(saraRisk).isSameAs(SaraRisk.VERY_HIGH)
+  }
+
+  @Test
   fun `fromString should return VERY_HIGH when value is VERY_HIGH`() {
     // Given & When
     val saraRisk = SaraRisk.fromString("VERY_HIGH")
