@@ -64,6 +64,17 @@ spring:
             client-id: hmpps-accredited-programmes-client-1
             client-secret: clientsecret
             authorization-grant-type: client_credentials
+          allocation-manager-api:
+            provider: hmpps-auth
+            client-id: hmpps-accredited-programmes-client-1
+            client-secret: clientsecret
+            authorization-grant-type: client_credentials
+          nomis-user-role-management-api:
+            provider: hmpps-auth
+            client-id: hmpps-accredited-programmes-client-1
+            client-secret: clientsecret
+            authorization-grant-type: client_credentials
+
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
@@ -130,6 +141,10 @@ services:
     base-url: http://localhost:9099
   manage-users-api:
     base-url: http://localhost:9100
+  allocation-manager-api:
+    base-url: http://localhost:9101
+  nomis-user-role-management-api:
+    base-url: http://localhost:9102
 
 feature-switch:
   case-notes-enabled: true

@@ -66,6 +66,13 @@ services:
     base-url: http://localhost:#WIREMOCK_PORT
   manage-users-api:
     base-url: http://localhost:#WIREMOCK_PORT
+  allocation-manager-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+  nomis-user-role-management-api:
+    base-url: http://localhost:#WIREMOCK_PORT
+
+
+
 
 feature-switch:
   case-notes-enabled: true

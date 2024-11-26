@@ -1,0 +1,30 @@
+{
+  "staffId": 487505,
+  "firstName": "John",
+  "lastName": "Smith",
+  "status": "ACTIVE",
+  "primaryEmail": "john.smith@digital.justice.gov.uk",
+  "adminAccount": {
+    "username": "JSMITH_ADM",
+    "active": true,
+    "accountType": "ADMIN",
+    "activeCaseload": {
+      "id": "WTI",
+      "name": "Whatton (HMP)"
+    },
+    "caseloads": [
+      {
+        "id": "MDI",
+        "name": "Moorland (HMP & YOI)"
+      },
+      {
+        "id": "WTI",
+        "name": "Whatton (HMP)"
+      },
+      {
+        "id": "NWEB",
+        "name": "Nomis-web Application"
+      }
+    ]
+  }
+}

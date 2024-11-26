@@ -1,0 +1,26 @@
+{
+  "staffId": 487691,
+  "firstName": "Thor",
+  "lastName": "Odinson",
+  "status": "ACTIVE",
+  "primaryEmail": "thor.odinson@digital.justice.gov.uk",
+  "generalAccount": {
+    "username": "TODINSON_GEN",
+    "active": true,
+    "accountType": "GENERAL",
+    "activeCaseload": {
+      "id": "MDI",
+      "name": "Moorland (HMP & YOI)"
+    },
+    "caseloads": [
+      {
+        "id": "NWEB",
+        "name": "Nomis-web Application"
+      },
+      {
+        "id": "MDI",
+        "name": "Moorland (HMP & YOI)"
+      }
+    ]
+  }
+}

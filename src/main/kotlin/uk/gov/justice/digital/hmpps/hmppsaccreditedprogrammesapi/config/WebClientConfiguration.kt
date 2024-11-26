@@ -131,6 +131,30 @@ class WebClientConfiguration(
     return buildWebClient(manageUsersApiBaseUrl, oauth2Client)
   }
 
+  @Bean(name = ["allocationManagerApiWebClient"])
+  fun allocationManagerApiWebClient(
+    clientRegistrations: ClientRegistrationRepository,
+    authorizedClients: OAuth2AuthorizedClientRepository,
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    @Value("\${services.allocation-manager-api.base-url}") allocationManagerApiBaseUrl: String,
+  ): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+    oauth2Client.setDefaultClientRegistrationId("allocation-manager-api")
+    return buildWebClient(allocationManagerApiBaseUrl, oauth2Client)
+  }
+
+  @Bean(name = ["nomisUserRoleManagementApiWebClient"])
+  fun nomisUserRoleManagementApiWebClient(
+    clientRegistrations: ClientRegistrationRepository,
+    authorizedClients: OAuth2AuthorizedClientRepository,
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    @Value("\${services.nomis-user-role-management-api.base-url}") nomisUserRoleManagementApiBaseUrl: String,
+  ): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+    oauth2Client.setDefaultClientRegistrationId("nomis-user-role-management-api")
+    return buildWebClient(nomisUserRoleManagementApiBaseUrl, oauth2Client)
+  }
+
   fun buildWebClient(url: String, oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction): WebClient = WebClient.builder()
     .baseUrl(url)
     .clientConnector(
