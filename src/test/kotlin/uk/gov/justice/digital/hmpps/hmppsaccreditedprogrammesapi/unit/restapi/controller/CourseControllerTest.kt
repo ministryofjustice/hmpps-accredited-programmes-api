@@ -119,7 +119,7 @@ constructor(
         .withPrerequisites(prerequisites)
         .produce()
 
-      every { courseService.getNotWithdrawnCourseById(expectedCourse.id!!) } returns expectedCourse
+      every { courseService.getCourseById(expectedCourse.id!!) } returns expectedCourse
 
       mockMvc.get("/courses/${expectedCourse.id}") {
         accept = MediaType.APPLICATION_JSON
@@ -135,14 +135,14 @@ constructor(
         }
       }
 
-      verify { courseService.getNotWithdrawnCourseById(expectedCourse.id!!) }
+      verify { courseService.getCourseById(expectedCourse.id!!) }
     }
 
     @Test
     fun `getCourseById with random UUID returns 404 with error body`() {
       val randomId = UUID.randomUUID()
 
-      every { courseService.getNotWithdrawnCourseById(any()) } returns null
+      every { courseService.getCourseById(any()) } returns null
 
       mockMvc.get("/courses/$randomId") {
         accept = MediaType.APPLICATION_JSON

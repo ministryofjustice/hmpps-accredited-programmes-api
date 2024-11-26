@@ -4,6 +4,7 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,15 +34,16 @@ import java.util.UUID
 val COURSE_ID: UUID = UUID.fromString("790a2dfe-8df1-4504-bb9c-83e6e53a6537")
 val NEW_COURSE_ID: UUID = UUID.fromString("790a2dfe-ddd1-4504-bb9c-83e6e53a6537")
 val UNUSED_COURSE_ID: UUID = UUID.fromString("891a2dfe-ddd1-4801-ab9b-94e6f53a6537")
+val WITHDRAWN_COURSE_ID: UUID = UUID.fromString("44e3cdab-c996-4234-afe5-a9d8ddb13be8")
+val WITHDRAWN_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee518")
 
 private const val OFFERING_ID = "7fffcc6a-11f8-4713-be35-cf5ff1aee517"
-private const val WITHDRAWN_OFFERING_ID = "7fffcc6a-11f8-4713-be35-cf5ff1aee518"
 private const val UNUSED_OFFERING_ID = "7fffbb9a-11f8-9743-be35-cf5881aee517"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class CourseIntegrationTest : IntegrationTestBase() {
+class CourseControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var courseRepository: CourseRepository
@@ -78,6 +80,16 @@ class CourseIntegrationTest : IntegrationTestBase() {
       "Unused course for testing",
       "UN1",
       "General offence",
+    )
+
+    persistenceHelper.createCourse(
+      WITHDRAWN_COURSE_ID,
+      "WITHDRAWN",
+      "A withdrawn Course",
+      "Withdrawn course for testing",
+      "UN1",
+      "General offence",
+      withdrawn = true,
     )
 
     persistenceHelper.createPrerequisite(
@@ -120,13 +132,13 @@ class CourseIntegrationTest : IntegrationTestBase() {
     persistenceHelper.createEnabledOrganisation("SKI", "SKI org")
 
     persistenceHelper.createOffering(
-      UUID.fromString(WITHDRAWN_OFFERING_ID),
+      WITHDRAWN_OFFERING_ID,
       COURSE_ID,
       "SKI",
       "nobody-ski@digital.justice.gov.uk",
       "nobody2-ski@digital.justice.gov.uk",
       true,
-      true,
+      withdrawn = true,
     )
 
     persistenceHelper.createOrganisation(code = "SKN", name = "SKN org")
@@ -282,6 +294,20 @@ class CourseIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Get course by Id should return withdrawn course with 200 with correct body`() {
+    webTestClient
+      .get()
+      .uri("/courses/$WITHDRAWN_COURSE_ID")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+      .jsonPath("$.id").isEqualTo(WITHDRAWN_COURSE_ID.toString())
+  }
+
+  @Test
   fun `Searching for a course with JWT and random id returns 404 with error body`() {
     val randomId = UUID.randomUUID()
 
@@ -360,18 +386,23 @@ class CourseIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Searching for all offerings with JWT and correct course offering id returns 200 and correct body`() {
-    webTestClient
-      .get()
-      .uri("/offerings/$COURSE_OFFERING_ID")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBody()
-      .jsonPath("$.id").isEqualTo(COURSE_OFFERING_ID.toString())
-      .jsonPath("$.organisationId").isNotEmpty
-      .jsonPath("$.contactEmail").isNotEmpty
+    // Given & When
+    val offering = getOfferingsById(COURSE_OFFERING_ID)
+    // Then
+    assertThat(offering.id).isEqualTo(COURSE_OFFERING_ID)
+    assertThat(offering.organisationId).isNotEmpty()
+    assertThat(offering.contactEmail).isNotEmpty()
+  }
+
+  @Test
+  fun `Should return withdrawn offerings with 200 and correct body`() {
+    // Given & When
+    val offering = getOfferingsById(WITHDRAWN_OFFERING_ID)
+    // Then
+    assertThat(offering.id).isEqualTo(WITHDRAWN_OFFERING_ID)
+    assertThat(offering.organisationId).isEqualTo("SKI")
+    assertThat(offering.contactEmail).isEqualTo("nobody-ski@digital.justice.gov.uk")
+    assertThat(offering.withdrawn).isTrue
   }
 
   @Test
@@ -709,6 +740,19 @@ class CourseIntegrationTest : IntegrationTestBase() {
       ).exchange()
       .expectStatus().isOk
       .expectBody<List<Course>>()
+      .returnResult().responseBody!!
+  }
+
+  fun getOfferingsById(id: UUID): CourseOffering {
+    return webTestClient
+      .get()
+      .uri("/offerings/$id")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody<CourseOffering>()
       .returnResult().responseBody!!
   }
 }
