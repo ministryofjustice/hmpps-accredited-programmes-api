@@ -43,6 +43,7 @@ fun OfferingEntity.toApi(orgEnabled: Boolean, genderForWhichCourseIsOffered: Str
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
   referable = referable,
+  withdrawn = withdrawn,
   gender = Gender.valueOf(genderForWhichCourseIsOffered),
 )
 
@@ -53,5 +54,6 @@ fun OfferingEntity.toApi(genderForWhichCourseIsOffered: String): CourseOffering 
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
   referable = referable,
+  withdrawn = withdrawn,
   gender = Gender.valueOf(genderForWhichCourseIsOffered),
 )

@@ -293,7 +293,7 @@ class CourseController(
     produces = ["application/json"],
   )
   fun getCourseById(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<Course> =
-    courseService.getNotWithdrawnCourseById(id)?.let {
+    courseService.getCourseById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /courses/$id")
 

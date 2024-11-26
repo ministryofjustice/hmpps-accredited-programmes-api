@@ -69,7 +69,7 @@ constructor(
   }
 
   fun getOfferingById(offeringId: UUID): OfferingEntity? =
-    offeringRepository.findByIdOrNull(offeringId)?.takeIf { !it.withdrawn }
+    offeringRepository.findByIdOrNull(offeringId)
 
   fun updateCoursePrerequisites(
     course: CourseEntity,
