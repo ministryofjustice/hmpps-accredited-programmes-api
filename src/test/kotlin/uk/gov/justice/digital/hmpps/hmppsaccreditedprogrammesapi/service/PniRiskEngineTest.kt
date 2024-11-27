@@ -397,7 +397,7 @@ class PniRiskEngineTest {
       ovp = BigDecimal("60.00"),
       ospDc = null,
       ospIic = null,
-      rsr = BigDecimal("3.41"), // over 3 is high
+      rsr = BigDecimal("3.41"),
       sara = Sara(
         saraRiskOfViolenceTowardsPartner = null,
         saraRiskOfViolenceTowardsOthers = null,
