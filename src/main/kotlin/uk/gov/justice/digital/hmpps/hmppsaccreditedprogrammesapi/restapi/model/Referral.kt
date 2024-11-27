@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail as PrisonOffenderManager
 
 /**
  *
@@ -56,4 +57,11 @@ data class Referral(
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("submittedOn") val submittedOn: String? = null,
+
+  @Schema(example = "null", description = "")
+  @get:JsonProperty("primaryPom") val primaryPom: PrisonOffenderManager? = null,
+
+  @Schema(example = "null", description = "")
+  @get:JsonProperty("secondaryPom") val secondaryPom: PrisonOffenderManager? = null,
+
 )

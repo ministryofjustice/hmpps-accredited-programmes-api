@@ -1,0 +1,10 @@
+{
+  "primary_pom": {
+    "staff_id": 487505,
+    "name": "John, Smith"
+  },
+  "secondary_pom": {
+    "staff_id": 487691,
+    "name": "Thor, Odinson"
+  }
+}
