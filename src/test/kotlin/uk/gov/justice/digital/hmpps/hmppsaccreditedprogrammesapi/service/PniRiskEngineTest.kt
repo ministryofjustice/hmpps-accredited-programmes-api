@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -387,6 +388,57 @@ class PniRiskEngineTest {
       ),
     )
     assertEquals(result, riskEngine.isMediumRisk(riskScores, gender))
+  }
+
+  @Test
+  fun `should NOT return a medium risk when rsr is high and no osp scores are present`() {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = BigDecimal("60.00"),
+      ospDc = null,
+      ospIic = null,
+      rsr = BigDecimal("3.41"), // over 3 is high
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertThat(riskEngine.isMediumRisk(riskScores, "Male")).isFalse
+  }
+
+  @Test
+  fun `should use RSR score to calculate high risk when OSP scores are set to Not Applicable`() {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = "Not Applicable",
+      ospIic = "Not Applicable",
+      rsr = BigDecimal("3.41"),
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertThat(riskEngine.isHighRisk(riskScores, "Male")).isTrue
+  }
+
+  @Test
+  fun `should use RSR score to calculate medium risk when OSP scores are set to Not Applicable`() {
+    val riskScores = IndividualRiskScores(
+      ogrs3 = null,
+      ovp = null,
+      ospDc = "Not Applicable",
+      ospIic = "Not Applicable",
+      rsr = BigDecimal("2.99"),
+      sara = Sara(
+        saraRiskOfViolenceTowardsPartner = null,
+        saraRiskOfViolenceTowardsOthers = null,
+        overallResult = null,
+      ),
+    )
+    assertThat(riskEngine.isMediumRisk(riskScores, "Male")).isTrue
   }
 
   @ParameterizedTest
