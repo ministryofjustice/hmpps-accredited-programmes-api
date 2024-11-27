@@ -74,11 +74,14 @@ class PniRiskEngine {
     }
     // osp scores needs to be ignored for females
     return rsrMediumRsr &&
-            (individualRiskScores.ospDc == null ||
-             individualRiskScores.ospDc == RiskClassification.NOT_APPLICABLE.description)
-            &&
-            (individualRiskScores.ospIic == null ||
-             individualRiskScores.ospIic == RiskClassification.NOT_APPLICABLE.description)
+      (
+        individualRiskScores.ospDc == null ||
+          individualRiskScores.ospDc == RiskClassification.NOT_APPLICABLE.description
+        ) &&
+      (
+        individualRiskScores.ospIic == null ||
+          individualRiskScores.ospIic == RiskClassification.NOT_APPLICABLE.description
+        )
   }
 
   private fun isRsrHigh(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
@@ -88,12 +91,15 @@ class PniRiskEngine {
       return isHighRsr
     }
     return isHighRsr &&
-            (individualRiskScores.ospDc == null ||
-             individualRiskScores.ospDc == RiskClassification.NOT_APPLICABLE.description)
-            &&
-            (individualRiskScores.ospIic == null ||
-             individualRiskScores.ospIic == RiskClassification.NOT_APPLICABLE.description)
-   }
+      (
+        individualRiskScores.ospDc == null ||
+          individualRiskScores.ospDc == RiskClassification.NOT_APPLICABLE.description
+        ) &&
+      (
+        individualRiskScores.ospIic == null ||
+          individualRiskScores.ospIic == RiskClassification.NOT_APPLICABLE.description
+        )
+  }
 
   private fun isOgrs3Medium(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.ogrs3?.let { it in BigDecimal("50.00")..BigDecimal("74.00") } == true
@@ -114,8 +120,6 @@ class PniRiskEngine {
   fun isMediumSara(individualRiskScores: IndividualRiskScores) =
     individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true ||
       individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true
-
-
 }
 
 enum class RiskClassification(val description: String) {
