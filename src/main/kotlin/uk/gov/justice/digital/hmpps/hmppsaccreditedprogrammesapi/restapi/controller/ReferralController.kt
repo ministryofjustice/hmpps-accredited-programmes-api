@@ -701,7 +701,9 @@ class ReferralController(
         log.info("Referral already exists for prisonNumber ${it.prisonNumber} and offering ${it.offering.id} ")
         return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi())
       }
-      return ResponseEntity.status(HttpStatus.OK).body(referralService.submitReferralById(id).toApi())
+      val submittedReferral = referralService.submitReferralById(id)
+
+      return ResponseEntity.status(HttpStatus.OK).body(submittedReferral.toApi())
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
 

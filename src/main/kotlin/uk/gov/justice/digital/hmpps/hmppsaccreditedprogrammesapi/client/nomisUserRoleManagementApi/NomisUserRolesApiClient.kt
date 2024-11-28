@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPP
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.UserDetail
 
-private const val NOMIS_USER_ROLE_MANAGEMENT_API = "NOMIS USER ROLEMANAGEMENT API"
+private const val NOMIS_USER_ROLE_MANAGEMENT_API = "NOMIS USER ROLE API"
 
 @Component
 class NomisUserRolesApiClient(

@@ -36,6 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Organis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonOffenderManagerService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
@@ -109,6 +110,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var organisationService: OrganisationService
+
+  @MockK(relaxed = true)
+  private lateinit var prisonOffenderManagerService: PrisonOffenderManagerService
 
   @InjectMockKs
   private lateinit var referralService: ReferralService

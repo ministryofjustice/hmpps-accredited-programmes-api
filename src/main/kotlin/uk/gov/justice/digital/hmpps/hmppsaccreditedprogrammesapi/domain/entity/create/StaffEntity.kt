@@ -46,8 +46,8 @@ data class StaffEntity(
 )
 
 enum class PomType {
-  PRIMARY_POM,
-  SECONDARY_POM,
+  PRIMARY,
+  SECONDARY,
 }
 
 enum class AccountType {

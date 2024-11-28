@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -53,6 +54,7 @@ constructor(
   private val pniService: PniService,
   private val caseNotesApiService: CaseNotesApiService,
   private val organisationService: OrganisationService,
+  private val prisonOffenderManagerService: PrisonOffenderManagerService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -241,6 +243,8 @@ constructor(
       previousStatusCode = existingStatus,
       newStatus = referralStatusRepository.getByCode(referral.status),
     )
+
+    savePomDetails(referral)
     return referral
   }
 
@@ -357,5 +361,17 @@ constructor(
       prisonNumber,
       openReferralStatuses,
     )?.filterNot { it.status == "REFERRAL_STARTED" }
+  }
+
+  fun savePomDetails(submittedReferral: ReferralEntity): List<StaffDetail?> {
+    return try {
+      val offenderAllocation = prisonOffenderManagerService.getOffenderAllocation(submittedReferral.prisonNumber)
+      prisonOffenderManagerService.savePrisonOffenderManagers(submittedReferral, offenderAllocation)
+
+      listOf(offenderAllocation.first, offenderAllocation.second)
+    } catch (ex: Exception) {
+      log.warn("POM could not be stored ${ex.message} for prisonNumber ${submittedReferral.prisonNumber}")
+      emptyList()
+    }
   }
 }
