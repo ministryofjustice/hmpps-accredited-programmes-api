@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
@@ -145,11 +146,12 @@ class CourseServiceTest {
 
       @Test
       fun `should return only offerings for requested organisationID`() {
-        val o1 = OfferingEntityFactory().withOrganisationId("BWI").withWithdrawn(true).produce()
-        val o2 = OfferingEntityFactory().withOrganisationId("MDI").produce()
-        val offerings = listOf(o1, o2)
-        every { offeringRepository.findAll() } returns offerings
-        courseService.getAllOfferingsByOrganisationId(o1.organisationId).shouldContainExactly(o1)
+        // Given
+        val o1 = OfferingEntityFactory().withOrganisationId("BWI").produce()
+        val offerings = listOf(o1)
+        every { offeringRepository.findByOrganisationId("BWI") } returns offerings
+        // When & Then
+        courseService.getAllOfferingsByOrganisationId(o1.organisationId).shouldContainOnly(o1)
       }
     }
   }

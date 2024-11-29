@@ -24,28 +24,61 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return all courses for a given organisation code including withdrawn courses`() {
+  fun `should return all courses for a given organisation code which are not withdrawn`() {
     // Given
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     val course1Uuid = UUID.randomUUID()
-    persistenceHelper.createCourse(course1Uuid, "SC1", "Course Numero Uno", "Sample description", "SC++", "General offence", withdrawn = false)
-    persistenceHelper.createOffering(UUID.randomUUID(), course1Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true)
+    persistenceHelper.createCourse(course1Uuid, "SC1", "Course Numero Uno", "Sample description", "SC++", "General offence")
+    persistenceHelper.createOffering(UUID.randomUUID(), course1Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, false)
+
+    val course2Uuid = UUID.randomUUID()
+    persistenceHelper.createCourse(course2Uuid, "SC2", "Course Numero Dos", "Sample description", "SC++", "General offence")
+    val offeringId2 = UUID.randomUUID()
+    persistenceHelper.createOffering(offeringId2, course2Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, false)
+
+    val course3Uuid = UUID.randomUUID()
+    persistenceHelper.createCourse(course3Uuid, "SC3", "Course Numero Tres", "Sample description", "SC++", "General offence")
+    val offeringId3 = UUID.randomUUID()
+    persistenceHelper.createOffering(offeringId3, course3Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, true)
+
+    // When
+    val courses = getAllCoursesForOrganisation("BWN")
+
+    // Then
+    assertThat(courses.size).isEqualTo(2)
+    assertThat(courses).extracting("identifier").containsExactlyInAnyOrder("SC1", "SC2")
+    assertThat(courses).extracting("name").containsExactlyInAnyOrder("Course Numero Uno", "Course Numero Dos")
+  }
+
+  @Test
+  fun `should only return withdrawn course offerings for a given organisation code for which referrals exist`() {
+    // Given
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
+    val course1Uuid = UUID.randomUUID()
+    persistenceHelper.createCourse(course1Uuid, "SC1", "Course Numero Uno", "Sample description", "SC++", "General offence", withdrawn = true)
+    persistenceHelper.createOffering(UUID.randomUUID(), course1Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, true)
 
     val course2Uuid = UUID.randomUUID()
     persistenceHelper.createCourse(course2Uuid, "SC2", "Course Numero Dos", "Sample description", "SC++", "General offence", withdrawn = true)
-    persistenceHelper.createOffering(UUID.randomUUID(), course2Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", false)
+    val offeringId2 = UUID.randomUUID()
+    persistenceHelper.createOffering(offeringId2, course2Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, true)
 
     val course3Uuid = UUID.randomUUID()
     persistenceHelper.createCourse(course3Uuid, "SC3", "Course Numero Tres", "Sample description", "SC++", "General offence", withdrawn = true)
-    persistenceHelper.createOffering(UUID.randomUUID(), course3Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", false)
+    val offeringId3 = UUID.randomUUID()
+    persistenceHelper.createOffering(offeringId3, course3Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, true)
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    persistenceHelper.createReferral(UUID.randomUUID(), offeringId3, "B2345BB", "TEST_REFERRER_USER_1", "This referral will be updated", false, false, "REFERRAL_STARTED", null)
 
     // When
-    val offerings = getAllCoursesForOrganisation("BWN")
+    val courses = getAllCoursesForOrganisation("BWN")
 
     // Then
-    assertThat(offerings.size).isEqualTo(3)
-    assertThat(offerings.count { it.withdrawn }).isEqualTo(2)
+    assertThat(courses.size).isEqualTo(1)
+    assertThat(courses[0].identifier).isEqualTo("SC3")
+    assertThat(courses[0].name).isEqualTo("Course Numero Tres")
   }
 
   fun getAllCoursesForOrganisation(organisationId: String): List<CourseEntity> =
