@@ -69,7 +69,7 @@ spring:
             client-id: hmpps-accredited-programmes-client-1
             client-secret: clientsecret
             authorization-grant-type: client_credentials
-          nomis-user-role-management-api:
+          nomis-user-roles-api:
             provider: hmpps-auth
             client-id: hmpps-accredited-programmes-client-1
             client-secret: clientsecret
@@ -143,7 +143,7 @@ services:
     base-url: http://localhost:9100
   allocation-manager-api:
     base-url: http://localhost:9101
-  nomis-user-role-management-api:
+  nomis-user-roles-api:
     base-url: http://localhost:9102
 
 feature-switch:

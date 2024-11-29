@@ -8,6 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import java.math.BigInteger
 import java.util.UUID
 
 @Entity
@@ -19,7 +20,7 @@ data class StaffEntity(
   var id: UUID? = null,
 
   @Column(name = "staffId")
-  var staffId: UUID? = null,
+  var staffId: BigInteger? = null,
 
   @Column(name = "first_name", nullable = false)
   var firstName: String,
@@ -37,7 +38,7 @@ data class StaffEntity(
   var pomType: PomType,
 
   @Column(name = "accountType", nullable = true)
-  var accountType: String,
+  var accountType: AccountType,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "referral_id", referencedColumnName = "referral_id")
@@ -47,4 +48,9 @@ data class StaffEntity(
 enum class PomType {
   PRIMARY_POM,
   SECONDARY_POM,
+}
+
+enum class AccountType {
+  GENERAL,
+  ADMIN,
 }
