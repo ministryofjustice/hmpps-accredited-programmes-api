@@ -124,6 +124,22 @@ services:
     ports:
       - '9097:8080'
 
+  nomis-user-roles-api:
+    container_name: nomis-user-roles-api
+    depends_on:
+      - hmpps-auth
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://hmpps-auth:8080/auth/.well-known/jwks.json
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+    image: quay.io/hmpps/nomis-user-roles-api:latest
+    networks:
+      - hmpps
+    ports:
+      - '9102:8080'
+
   hmpps-accredited-programmes-api:
     image: quay.io/hmpps/hmpps-accredited-programmes-api:latest
     container_name: hmpps-accredited-programmes-api
