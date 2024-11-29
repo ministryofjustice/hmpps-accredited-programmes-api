@@ -46,3 +46,4 @@ rdsAlertsDatabases:
   "db36754f4afedbe608": "Accredited Programmes API Database"
 
 dataExtractorEnabled: true
+dataRefreshEnabled: true
