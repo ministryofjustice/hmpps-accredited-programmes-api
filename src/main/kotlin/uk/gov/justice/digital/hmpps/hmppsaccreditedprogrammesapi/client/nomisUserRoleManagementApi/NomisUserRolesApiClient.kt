@@ -11,16 +11,16 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUse
 private const val NOMIS_USER_ROLE_MANAGEMENT_API = "NOMIS USER ROLEMANAGEMENT API"
 
 @Component
-class NomisUserRoleManagementApiClient(
-  @Qualifier("nomisUserRoleManagementApiWebClient")
+class NomisUserRolesApiClient(
+  @Qualifier("nomisUserRolesApiWebClient")
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getStaffDetails(staffId: String) = getRequest<StaffDetail>(NOMIS_USER_ROLE_MANAGEMENT_API) {
+  fun getStaffDetail(staffId: String) = getRequest<StaffDetail>(NOMIS_USER_ROLE_MANAGEMENT_API) {
     path = "/users/staff/$staffId"
   }
 
-  fun getUserDetails(username: String) = getRequest<UserDetail>(NOMIS_USER_ROLE_MANAGEMENT_API) {
+  fun getUserDetail(username: String) = getRequest<UserDetail>(NOMIS_USER_ROLE_MANAGEMENT_API) {
     path = "/users/$username"
   }
 }

@@ -59,9 +59,6 @@ data class Referral(
   @get:JsonProperty("submittedOn") val submittedOn: String? = null,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("primaryPom") val primaryPom: PrisonOffenderManager? = null,
-
-  @Schema(example = "null", description = "")
-  @get:JsonProperty("secondaryPom") val secondaryPom: PrisonOffenderManager? = null,
+  @get:JsonProperty("prisonOffenderManagers") val prisonOffenderMangers: List<PrisonOffenderManager> = emptyList(),
 
 )
