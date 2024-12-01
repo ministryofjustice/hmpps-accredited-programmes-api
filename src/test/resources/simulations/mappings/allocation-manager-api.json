@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "url": "/api/allocation/G0862VO",
+        "urlPattern": "/api/allocation/C6666CC",
         "method": "GET"
       },
       "response": {
@@ -10,7 +10,7 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "bodyFileName": "allocation-manager-api.json"
+        "bodyFileName": "pom_details_C6666CC.json"
       }
     }
   ]

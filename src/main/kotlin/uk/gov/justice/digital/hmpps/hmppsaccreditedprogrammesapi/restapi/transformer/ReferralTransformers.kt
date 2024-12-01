@@ -24,6 +24,7 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferr
   statusDescription = status.description,
   statusColour = status.colour,
   submittedOn = submittedOn?.toString(),
+  prisonOffenderMangers = staffDetails.map { it.toApi() },
 )
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
@@ -35,6 +36,7 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
   status = status,
+  prisonOffenderMangers = staffDetails.map { it.toApi() },
 )
 
 fun StaffEntity.toApi() = StaffDetail(

@@ -5,8 +5,8 @@ import java.math.BigInteger
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OffenderAllocation(
-  val primaryPrisonOffenderManager: PrisonOffenderManager,
-  val secondaryPrisonOffenderManager: PrisonOffenderManager,
+  val primaryPom: PrisonOffenderManager?,
+  val secondaryPom: PrisonOffenderManager?,
 )
 
 data class PrisonOffenderManager(

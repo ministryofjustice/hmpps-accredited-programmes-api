@@ -704,7 +704,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Submitting a referral with all fields set should return 204 with no body`() {
+  fun `Submitting a referral with all fields set should return 200`() {
     val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralUpdate = ReferralUpdate(
