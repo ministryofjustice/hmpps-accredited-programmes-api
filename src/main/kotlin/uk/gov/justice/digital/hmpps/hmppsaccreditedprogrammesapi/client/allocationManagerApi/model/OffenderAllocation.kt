@@ -1,15 +1,15 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.math.BigInteger
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class OffenderAllocation(
-  val primaryPom: PrisonOffenderManager?,
-  val secondaryPom: PrisonOffenderManager?,
+data class OffenderAllocationResponse(
+  val primaryPom: PomDetails,
+  val secondaryPom: PomDetails
 )
 
-data class PrisonOffenderManager(
-  val staffId: BigInteger,
-  val name: String,
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class PomDetails(
+  val staffId: Int,
+  val name: String
 )

@@ -71,8 +71,5 @@ services:
   nomis-user-roles-api:
     base-url: http://localhost:#WIREMOCK_PORT
 
-
-
-
 feature-switch:
   case-notes-enabled: true

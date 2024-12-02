@@ -22,8 +22,8 @@ class PrisonOffenderManagerService(
     val offenderAllocation = allocationManagerService.getOffenderAllocation(prisonNumber)
 
     offenderAllocation?.let {
-      val primaryPom = nomisUserRolesService.getStaffDetail(it.primaryPom?.staffId.toString())
-      val secondaryPom = nomisUserRolesService.getStaffDetail(it.secondaryPom?.staffId.toString())
+      val primaryPom = nomisUserRolesService.getStaffDetail(it.primaryPom.staffId.toString())
+      val secondaryPom = nomisUserRolesService.getStaffDetail(it.secondaryPom.staffId.toString())
 
       return Pair(primaryPom, secondaryPom)
     } ?: throw BusinessException("No POM details found for $prisonNumber")
