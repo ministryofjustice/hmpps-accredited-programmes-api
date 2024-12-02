@@ -57,8 +57,10 @@ constructor(
   }
 
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
-  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> =
-    offeringRepository.findAll().filter { it.organisationId == organisationId }
+
+  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> {
+    return offeringRepository.findOfferingsByOrganisationIdWithActiveReferrals(organisationId)
+  }
 
   fun getAllOfferings(courseId: UUID, includeWithdrawn: Boolean = false): List<OfferingEntity> {
     return if (includeWithdrawn) {
