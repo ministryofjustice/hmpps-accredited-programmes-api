@@ -39,10 +39,13 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get offence details from Oasys`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
+    // When
     val offenceDetail = getOffenceDetailsByPrisonNumber(prisonNumber)
 
+    // Then
     offenceDetail.shouldNotBeNull()
     offenceDetail shouldBeEqual OffenceDetail(
       offenceDetails = "An attack took place on christmas eve in Alfreds ex partners house. The children were in bed and the dog was left out side.",
@@ -54,7 +57,7 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
       victimWasStranger = true,
       stalking = true,
       recognisesImpact = false,
-      numberOfOthersInvolved = null,
+      numberOfOthersInvolved = "6-10",
       othersInvolvedDetail = null,
       peerGroupInfluences = "No",
       motivationAndTriggers = "Mainly due to jealousy and fuelled by drug use",
