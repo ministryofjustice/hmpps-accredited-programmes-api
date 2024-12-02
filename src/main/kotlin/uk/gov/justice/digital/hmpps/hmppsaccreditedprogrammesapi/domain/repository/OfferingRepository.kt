@@ -26,7 +26,7 @@ interface OfferingRepository : JpaRepository<OfferingEntity, UUID> {
     WHERE o.organisationId = :organisationId
     GROUP BY o.id
     HAVING o.withdrawn = false OR COUNT(r.id) > 0
-  """
+  """,
   )
   fun findOfferingsByOrganisationIdWithActiveReferrals(organisationId: String): List<OfferingEntity>
 }
