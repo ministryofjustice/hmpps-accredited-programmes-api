@@ -57,11 +57,12 @@ class OasysServiceTest {
 
   @Test
   fun `should return offence detail`() {
+    // Given
     val offenceDetail = OasysOffenceDetail(
       offenceAnalysis = "offence analysis",
       whatOccurred = listOf("Stalking"),
       recognisesImpact = "Yes",
-      numberOfOthersInvolved = 0,
+      numberOfOthersInvolved = "6-10",
       othersInvolved = "No",
       peerGroupInfluences = "influences",
       offenceMotivation = "motivation",
@@ -75,8 +76,10 @@ class OasysServiceTest {
       offenceDetail,
     )
 
+    // When
     val result = service.getOffenceDetail(123123)
 
+    // Then
     assertEquals(offenceDetail, result)
   }
 

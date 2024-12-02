@@ -7,7 +7,7 @@ data class OasysOffenceDetail(
   val offenceAnalysis: String?,
   val whatOccurred: List<String>?,
   val recognisesImpact: String?,
-  val numberOfOthersInvolved: Int?,
+  val numberOfOthersInvolved: String?,
   val othersInvolved: String?,
   val peerGroupInfluences: String?,
   val offenceMotivation: String?,

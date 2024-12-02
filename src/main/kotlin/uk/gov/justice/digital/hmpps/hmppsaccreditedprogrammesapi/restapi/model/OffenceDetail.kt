@@ -52,7 +52,7 @@ data class OffenceDetail(
   @get:JsonProperty("recognisesImpact") val recognisesImpact: Boolean? = false,
 
   @Schema(example = "null", description = "")
-  @get:JsonProperty("numberOfOthersInvolved") val numberOfOthersInvolved: Int? = 0,
+  @get:JsonProperty("numberOfOthersInvolved") val numberOfOthersInvolved: String? = null,
 
   @Schema(example = "There were two others involved who absconded at the scene", description = "")
   @get:JsonProperty("othersInvolvedDetail") val othersInvolvedDetail: String? = null,
