@@ -149,7 +149,7 @@ class CourseServiceTest {
         // Given
         val o1 = OfferingEntityFactory().withOrganisationId("BWI").produce()
         val offerings = listOf(o1)
-        every { offeringRepository.findByOrganisationId("BWI") } returns offerings
+        every { offeringRepository.findOfferingsByOrganisationIdWithActiveReferrals(o1.organisationId) } returns offerings
         // When & Then
         courseService.getAllOfferingsByOrganisationId(o1.organisationId).shouldContainOnly(o1)
       }

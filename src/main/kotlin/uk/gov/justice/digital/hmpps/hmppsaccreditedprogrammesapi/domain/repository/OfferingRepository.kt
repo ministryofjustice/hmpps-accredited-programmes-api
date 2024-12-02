@@ -18,4 +18,15 @@ interface OfferingRepository : JpaRepository<OfferingEntity, UUID> {
   @Modifying
   @Query("delete from OfferingEntity o where o.id = :offeringId")
   fun delete(offeringId: UUID)
+
+  @Query(
+    """
+    SELECT o FROM OfferingEntity o
+    LEFT JOIN ReferralEntity r ON r.offering.id = o.id
+    WHERE o.organisationId = :organisationId
+    GROUP BY o.id
+    HAVING o.withdrawn = false OR COUNT(r.id) > 0
+  """
+  )
+  fun findOfferingsByOrganisationIdWithActiveReferrals(organisationId: String): List<OfferingEntity>
 }
