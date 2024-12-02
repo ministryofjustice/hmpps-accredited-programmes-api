@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
@@ -11,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 
 @Service
-@Transactional
 class PrisonOffenderManagerService(
   private val allocationManagerService: AllocationManagerService,
   private val nomisUserRolesService: NomisUserRolesService,
@@ -22,8 +20,8 @@ class PrisonOffenderManagerService(
     val offenderAllocation = allocationManagerService.getOffenderAllocation(prisonNumber)
 
     offenderAllocation?.let {
-      val primaryPom = nomisUserRolesService.getStaffDetail(it.primaryPom.staffId.toString())
-      val secondaryPom = nomisUserRolesService.getStaffDetail(it.secondaryPom.staffId.toString())
+      val primaryPom = nomisUserRolesService.getStaffDetail(it.primaryPom?.staffId.toString())
+      val secondaryPom = nomisUserRolesService.getStaffDetail(it.secondaryPom?.staffId.toString())
 
       return Pair(primaryPom, secondaryPom)
     } ?: throw BusinessException("No POM details found for $prisonNumber")

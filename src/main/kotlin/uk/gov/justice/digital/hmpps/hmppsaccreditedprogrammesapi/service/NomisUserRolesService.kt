@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.NomisUserRolesApiClient
@@ -10,7 +9,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @Service
-@Transactional
 class NomisUserRolesService(val nomisUserRolesApiClient: NomisUserRolesApiClient) {
 
   companion object {

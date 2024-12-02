@@ -28,7 +28,7 @@
     },
     {
       "request": {
-        "urlPattern": "/users/staff/487505",
+        "url": "/users/staff/487505",
         "method": "GET"
       },
       "response": {
@@ -41,7 +41,7 @@
     },
     {
       "request": {
-        "urlPattern": "/users/staff/487691",
+        "url": "/users/staff/487691",
         "method": "GET"
       },
       "response": {

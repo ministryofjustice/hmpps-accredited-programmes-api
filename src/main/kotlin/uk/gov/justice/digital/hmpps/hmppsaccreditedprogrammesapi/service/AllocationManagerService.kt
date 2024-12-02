@@ -19,6 +19,11 @@ class AllocationManagerService(val allocationManagerApiClient: AllocationManager
 
   fun getOffenderAllocation(prisonNumber: String): OffenderAllocationResponse? {
     val offenderAllocation = when (val response = allocationManagerApiClient.getPomDetails(prisonNumber)) {
+      is ClientResult.Success -> {
+        log.debug("Retrieved POM information for $prisonNumber")
+        AuthorisableActionResult.Success(response.body)
+      }
+
       is ClientResult.Failure.Other -> throw ServiceUnavailableException(
         "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
         response.toException(),
@@ -27,11 +32,6 @@ class AllocationManagerService(val allocationManagerApiClient: AllocationManager
       is ClientResult.Failure -> {
         log.error("Failure to retrieve POM information $prisonNumber  ${response.toException().cause}")
         AuthorisableActionResult.Success(null)
-      }
-
-      is ClientResult.Success -> {
-        log.debug("Retrieved POM information for $prisonNumber")
-        AuthorisableActionResult.Success(response.body)
       }
     }
     return offenderAllocation.entity

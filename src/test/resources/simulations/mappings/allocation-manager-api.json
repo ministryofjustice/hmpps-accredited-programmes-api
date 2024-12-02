@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/api/allocation/C6666CC",
+        "url": "/api/allocation/C6666CC",
         "method": "GET"
       },
       "response": {
