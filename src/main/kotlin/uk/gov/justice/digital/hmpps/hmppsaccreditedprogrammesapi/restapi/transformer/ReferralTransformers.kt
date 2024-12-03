@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PomType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
@@ -25,7 +24,7 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferr
   statusDescription = status.description,
   statusColour = status.colour,
   submittedOn = submittedOn?.toString(),
-  prisonOffenderManger = getPrimaryPom(staffDetails),
+  prisonOffenderMangers = staffDetails.map { it.toApi() },
 )
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
@@ -37,9 +36,8 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
   status = status,
-  prisonOffenderManger = getPrimaryPom(staffDetails),
+  prisonOffenderMangers = staffDetails.map { it.toApi() },
 )
-fun getPrimaryPom(staffDetails: MutableSet<StaffEntity>) = staffDetails.first { it.pomType == PomType.PRIMARY }.toApi()
 
 fun StaffEntity.toApi() = StaffDetail(
   staffId = staffId!!,
