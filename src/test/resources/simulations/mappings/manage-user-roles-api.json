@@ -2,32 +2,6 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/users/TODINSON_GEN",
-        "method": "GET"
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "bodyFileName": "staffDetail_general_487691.json"
-      }
-    },
-    {
-      "request": {
-        "urlPattern": "/users/JSMITH_ADM",
-        "method": "GET"
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "bodyFileName": "staffDetail_admin_487505.json"
-      }
-    },
-    {
-      "request": {
         "url": "/users/staff/487505",
         "method": "GET"
       },

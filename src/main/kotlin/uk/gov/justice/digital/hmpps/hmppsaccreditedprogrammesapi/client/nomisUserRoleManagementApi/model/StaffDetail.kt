@@ -13,6 +13,7 @@ data class StaffDetail(
   val adminAccount: Account?,
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Account(
   val username: String,
 )
