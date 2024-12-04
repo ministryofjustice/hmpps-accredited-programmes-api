@@ -37,7 +37,7 @@ class PrisonOffenderManagerService(
     staffRepository.saveAll(listOf(primaryPom, secondaryPom))
   }
 
-  private fun buildStaffEntity(staffDetail: StaffDetail?, pomType: PomType, referralEntity: ReferralEntity): StaffEntity {
+  fun buildStaffEntity(staffDetail: StaffDetail?, pomType: PomType, referralEntity: ReferralEntity): StaffEntity {
     return StaffEntity(
       staffId = staffDetail?.staffId,
       firstName = staffDetail?.firstName.orEmpty(),
