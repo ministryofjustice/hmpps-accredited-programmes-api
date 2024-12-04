@@ -39,7 +39,7 @@ class PrisonOffenderManagerService(
 
   fun buildStaffEntity(staffDetail: StaffDetail?, pomType: PomType, referralEntity: ReferralEntity): StaffEntity {
     return StaffEntity(
-      staffId = staffDetail?.staffId,
+      staffId = staffDetail?.staffId!!,
       firstName = staffDetail?.firstName.orEmpty(),
       lastName = staffDetail?.lastName.orEmpty(),
       primaryEmail = staffDetail?.primaryEmail.orEmpty(),

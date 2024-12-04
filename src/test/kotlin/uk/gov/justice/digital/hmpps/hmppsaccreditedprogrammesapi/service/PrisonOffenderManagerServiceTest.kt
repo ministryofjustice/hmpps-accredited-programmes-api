@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PomType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
-import java.math.BigInteger
 
 @ExtendWith(MockKExtension::class)
 class PrisonOffenderManagerServiceTest {
@@ -37,7 +36,7 @@ class PrisonOffenderManagerServiceTest {
     )
 
     val primaryPomDetail = StaffDetail(
-      staffId = BigInteger("1"),
+      staffId = 1,
       firstName = "John",
       lastName = "Doe",
       status = "ACTIVE",
@@ -46,7 +45,7 @@ class PrisonOffenderManagerServiceTest {
       adminAccount = null,
     )
     val secondaryPomDetail = StaffDetail(
-      staffId = BigInteger("2"),
+      staffId = 2,
       firstName = "Jane",
       lastName = "Smith",
       status = "ACTIVE",
@@ -87,7 +86,7 @@ class PrisonOffenderManagerServiceTest {
   @Test
   fun `buildStaffEntity should build correct StaffEntity`() {
     val staffDetail = StaffDetail(
-      staffId = BigInteger("1"),
+      staffId = 1,
       firstName = "John",
       lastName = "Doe",
       status = "ACTIVE",
@@ -100,7 +99,7 @@ class PrisonOffenderManagerServiceTest {
 
     val result = service.buildStaffEntity(staffDetail, pomType, referralEntity)
 
-    assertEquals(BigInteger("1"), result.staffId)
+    assertEquals(1, result.staffId)
     assertEquals("John", result.firstName)
     assertEquals("Doe", result.lastName)
     assertEquals("john.doe@example.com", result.primaryEmail)

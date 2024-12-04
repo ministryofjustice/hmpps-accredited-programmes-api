@@ -8,7 +8,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import java.math.BigInteger
 import java.util.UUID
 
 @Entity
@@ -17,10 +16,10 @@ data class StaffEntity(
   @Id
   @GeneratedValue
   @Column(name = "id")
-  var id: UUID? = null,
+  val id: UUID? = null,
 
   @Column(name = "staffId")
-  var staffId: BigInteger? = null,
+  var staffId: Int,
 
   @Column(name = "first_name", nullable = false)
   var firstName: String,

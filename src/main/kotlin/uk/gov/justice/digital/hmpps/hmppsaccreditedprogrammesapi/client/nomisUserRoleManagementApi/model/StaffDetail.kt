@@ -1,11 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.math.BigInteger
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class StaffDetail(
-  val staffId: BigInteger,
+  val staffId: Int,
   val firstName: String,
   val lastName: String,
   val status: String,
