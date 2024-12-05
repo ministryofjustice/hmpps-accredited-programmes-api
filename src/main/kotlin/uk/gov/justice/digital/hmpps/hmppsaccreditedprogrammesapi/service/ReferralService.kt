@@ -94,14 +94,11 @@ constructor(
     return savedReferral.toApi()
   }
 
-  private fun savePNI(
-    prisonNumber: String,
-    savedReferral: ReferralEntity,
-  ) {
+  private fun savePNI(savedReferral: ReferralEntity) {
     try {
-      pniService.savePni(prisonNumber = prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
+      pniService.savePni(prisonNumber = savedReferral.prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
     } catch (ex: Exception) {
-      log.warn("PNI could not be stored ${ex.message} for prisonNumber $prisonNumber")
+      log.warn("PNI could not be stored ${ex.message} for prisonNumber $savedReferral.prisonNumber")
     }
   }
 
@@ -121,7 +118,7 @@ constructor(
     val statuses = validateStatus(referral, referralStatusUpdate)
     val existingStatus = referral.status
 
-    if (specialDeselectedCase(referralId, statuses, existingStatus, referralStatusUpdate)) {
+    if (isSpecialDeselectedCase(referralId, statuses, existingStatus, referralStatusUpdate)) {
       val updatedReferral = referralRepository.getReferenceById(referralId)
       // create the referral history
       referralStatusHistoryService.updateReferralHistory(
@@ -146,6 +143,11 @@ constructor(
     // write case notes
     caseNotesApiService.buildAndCreateCaseNote(referral, referralStatusUpdate)
 
+    // save PNI when referral is updated to "On Programme" status
+    if (referral.status == "ON_PROGRAMME") {
+      savePNI(referral)
+    }
+
     // audit the interaction
     auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
   }
@@ -155,7 +157,7 @@ constructor(
    *  status that is not closed we need to insert a deselected status here.
    *  This is unfortunate as it breaks the configuration of the status transitions [sad face]
    */
-  private fun specialDeselectedCase(
+  private fun isSpecialDeselectedCase(
     referralId: UUID,
     status: Triple<ReferralStatusEntity, ReferralStatusCategoryEntity?, ReferralStatusReasonEntity?>,
     existingStatus: String,
@@ -219,7 +221,6 @@ constructor(
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
-        savePNI(referral.prisonNumber, referral)
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
       }
 
