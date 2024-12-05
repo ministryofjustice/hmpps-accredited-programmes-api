@@ -6,7 +6,4 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import java.util.UUID
 
 @Repository
-interface StaffRepository : JpaRepository<StaffEntity, UUID> {
-
-  fun findByReferralId(referralRepository: ReferralRepository): StaffEntity?
-}
+interface StaffRepository : JpaRepository<StaffEntity, UUID>

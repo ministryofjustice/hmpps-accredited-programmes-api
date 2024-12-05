@@ -106,6 +106,6 @@ class PrisonOffenderManagerServiceTest {
     assertEquals("jdoe", result.username)
     assertEquals(PomType.PRIMARY, result.pomType)
     assertEquals(AccountType.GENERAL, result.accountType)
-    assertEquals(referralEntity, result.referral)
+    assertEquals(referralEntity.id, result.referralId)
   }
 }

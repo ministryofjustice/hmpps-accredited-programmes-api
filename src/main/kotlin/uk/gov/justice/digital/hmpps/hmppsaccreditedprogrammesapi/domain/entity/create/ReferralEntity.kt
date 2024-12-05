@@ -11,8 +11,6 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.persistence.Version
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 import java.util.UUID
@@ -52,8 +50,6 @@ data class ReferralEntity(
 
   var deleted: Boolean = false,
 
-  @OneToMany(mappedBy = "referral", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-  @Column(name = "staffDetails")
-  @Fetch(FetchMode.SUBSELECT)
+  @OneToMany(mappedBy = "referralId", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
   val staffDetails: MutableSet<StaffEntity> = mutableSetOf(),
 )

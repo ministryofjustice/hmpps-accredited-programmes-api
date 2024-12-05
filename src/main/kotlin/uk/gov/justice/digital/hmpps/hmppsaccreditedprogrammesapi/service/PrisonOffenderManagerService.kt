@@ -46,7 +46,7 @@ class PrisonOffenderManagerService(
       username = staffDetail?.generalAccount?.username ?: staffDetail?.adminAccount?.username.orEmpty(),
       pomType = pomType,
       accountType = staffDetail?.generalAccount?.let { AccountType.GENERAL } ?: AccountType.ADMIN,
-      referral = referralEntity,
+      referralId = referralEntity.id,
     )
   }
 }

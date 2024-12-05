@@ -62,6 +62,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.time.Duration
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -785,6 +786,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   fun getReferralById(createdReferralId: UUID) =
     webTestClient
+      .mutate()
+      .responseTimeout(Duration.ofSeconds(3000)) // Adjust the timeout as needed
+      .build()
       .get()
       .uri("/referrals/$createdReferralId")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
@@ -815,6 +819,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   fun submitReferral(createdReferralId: UUID) {
     webTestClient
+      .mutate()
+      .responseTimeout(Duration.ofSeconds(3000)) // Adjust the timeout as needed
+      .build()
       .post()
       .uri("/referrals/$createdReferralId/submit")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())

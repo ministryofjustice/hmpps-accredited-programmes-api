@@ -370,6 +370,7 @@ constructor(
 
       listOf(offenderAllocation.first, offenderAllocation.second)
     } catch (ex: Exception) {
+      println(ex.message)
       log.warn("POM could not be stored ${ex.message} for prisonNumber ${submittedReferral.prisonNumber}")
       emptyList()
     }
