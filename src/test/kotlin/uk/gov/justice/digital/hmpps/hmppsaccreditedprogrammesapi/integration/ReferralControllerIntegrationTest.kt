@@ -813,7 +813,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .bodyValue(referralStatusUpdate)
       .exchange().expectStatus().isNoContent
 
-  fun submitReferral(createdReferralId: UUID) =
+  fun submitReferral(createdReferralId: UUID) {
     webTestClient
       .post()
       .uri("/referrals/$createdReferralId/submit")
@@ -821,8 +821,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+  }
 
   private fun encodeValue(value: String): String {
     return URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
@@ -860,6 +859,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
           sentenceType = "Determinate",
+
         ),
       ).forEach { referralView ->
         actualSummary.id shouldBe referralView.id

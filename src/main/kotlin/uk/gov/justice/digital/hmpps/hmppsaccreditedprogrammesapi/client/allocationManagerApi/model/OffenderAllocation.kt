@@ -15,5 +15,6 @@ data class OffenderAllocationResponse(
 data class PomDetail(
   @JsonProperty("staff_id")
   val staffId: Int,
+  @JsonProperty("name")
   val name: String,
 )
