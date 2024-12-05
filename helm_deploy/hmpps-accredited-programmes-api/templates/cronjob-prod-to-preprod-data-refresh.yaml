@@ -31,7 +31,7 @@ data:
       --data-only \
       --no-privileges \
       --verbose \
-      --table public.referrer_users \
+      --table public.referrer_user \
       --file=/tmp/users.dump \
       "$DB_NAME_PREPROD"
 
