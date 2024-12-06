@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/users/TODINSON_GEN",
+        "url": "/users/TODINSON_GEN",
         "method": "GET"
       },
       "response": {
@@ -15,7 +15,7 @@
     },
     {
       "request": {
-        "urlPattern": "/users/JSMITH_ADM",
+        "url": "/users/JSMITH_ADM",
         "method": "GET"
       },
       "response": {
@@ -28,7 +28,7 @@
     },
     {
       "request": {
-        "urlPattern": "/users/staff/487505",
+        "url": "/users/staff/487505",
         "method": "GET"
       },
       "response": {
@@ -41,7 +41,7 @@
     },
     {
       "request": {
-        "urlPattern": "/users/staff/487691",
+        "url": "/users/staff/487691",
         "method": "GET"
       },
       "response": {

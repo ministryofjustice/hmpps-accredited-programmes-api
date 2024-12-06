@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.SQSMes
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
+import java.time.Duration
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -153,6 +154,9 @@ class DomainEventsListenerTest : IntegrationTestBase() {
 
   fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =
     webTestClient
+      .mutate()
+      .responseTimeout(Duration.ofSeconds(3000)) // Adjust the timeout as needed
+      .build()
       .post()
       .uri("/referrals")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())

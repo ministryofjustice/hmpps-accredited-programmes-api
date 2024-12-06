@@ -54,6 +54,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
@@ -124,6 +125,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var organisationService: OrganisationService
+
+  @MockK(relaxed = true)
+  private lateinit var staffService: StaffService
 
   @Captor
   private lateinit var referralEntityCaptor: CapturingSlot<ReferralEntity>

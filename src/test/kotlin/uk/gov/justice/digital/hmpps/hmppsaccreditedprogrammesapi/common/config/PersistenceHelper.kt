@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,6 +20,7 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM prerequisite").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course_participation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM pni_result").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM staff").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course_variant").executeUpdate()
@@ -86,8 +88,8 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?) {
-    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn)")
+  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?, primaryPomStaffId: BigInteger = "1".toBigInteger(), secondaryPomStaffId: BigInteger = "2".toBigInteger()) {
+    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on, primary_pom_staff_id, secondary_pom_staff_id) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn, :primaryPomStaffId, :secondaryPomStaffId)")
       .setParameter("id", referralId)
       .setParameter("offeringId", offeringId)
       .setParameter("prisonNumber", prisonNumber)
@@ -97,6 +99,8 @@ class PersistenceHelper {
       .setParameter("hasReviewedProgrammeHistory", hasReviewedProgrammeHistory)
       .setParameter("status", status)
       .setParameter("submittedOn", submittedOn)
+      .setParameter("primaryPomStaffId", primaryPomStaffId)
+      .setParameter("secondaryPomStaffId", secondaryPomStaffId)
       .executeUpdate()
   }
 
