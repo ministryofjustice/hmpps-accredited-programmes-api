@@ -14,18 +14,17 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PomType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 
 @ExtendWith(MockKExtension::class)
-class PrisonOffenderManagerServiceTest {
+class StaffServiceTest {
 
   private val allocationManagerService: AllocationManagerService = mockk()
   private val nomisUserRolesService: NomisUserRolesService = mockk()
   private val staffRepository: StaffRepository = mockk()
 
-  private val service = PrisonOffenderManagerService(allocationManagerService, nomisUserRolesService, staffRepository)
+  private val service = StaffService(allocationManagerService, nomisUserRolesService, staffRepository)
 
   @Test
   fun `getOffenderAllocation should return primary and secondary POM details`() {
@@ -95,17 +94,15 @@ class PrisonOffenderManagerServiceTest {
       adminAccount = null,
     )
     val referralEntity = ReferralEntityFactory().produce()
-    val pomType = PomType.PRIMARY
 
-    val result = service.buildStaffEntity(staffDetail, pomType, referralEntity)
+    val result = service.buildStaffEntity(staffDetail, referralEntity)
 
     assertEquals(1, result.staffId)
     assertEquals("John", result.firstName)
     assertEquals("Doe", result.lastName)
     assertEquals("john.doe@example.com", result.primaryEmail)
     assertEquals("jdoe", result.username)
-    assertEquals(PomType.PRIMARY, result.pomType)
     assertEquals(AccountType.GENERAL, result.accountType)
-    assertEquals(referralEntity, result.referral)
+    assertEquals(referralEntity.id, result.referralId)
   }
 }

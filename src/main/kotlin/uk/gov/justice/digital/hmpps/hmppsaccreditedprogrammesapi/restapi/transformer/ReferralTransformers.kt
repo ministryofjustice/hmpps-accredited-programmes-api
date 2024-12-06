@@ -11,7 +11,7 @@ import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate as ApiReferralUpdate
 
-fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferral(
+fun ReferralEntity.toApi(status: ReferralStatusRefData, pomDetail: StaffDetail? = null): ApiReferral = ApiReferral(
   id = id!!,
   offeringId = offering.id!!,
   prisonNumber = prisonNumber,
@@ -24,10 +24,10 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferr
   statusDescription = status.description,
   statusColour = status.colour,
   submittedOn = submittedOn?.toString(),
-  prisonOffenderMangers = staffDetails.map { it.toApi() },
+  primaryPrisonOffenderManager = pomDetail,
 )
 
-fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
+fun ReferralEntity.toApi(pomDetail: StaffDetail? = null): ApiReferral = ApiReferral(
   id = id!!,
   offeringId = offering.id!!,
   prisonNumber = prisonNumber,
@@ -36,7 +36,7 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
   status = status,
-  prisonOffenderMangers = staffDetails.map { it.toApi() },
+  primaryPrisonOffenderManager = pomDetail,
 )
 
 fun StaffEntity.toApi() = StaffDetail(
@@ -45,7 +45,6 @@ fun StaffEntity.toApi() = StaffDetail(
   lastName = lastName,
   primaryEmail = primaryEmail,
   username = username,
-  type = pomType,
   accountType = accountType,
 )
 

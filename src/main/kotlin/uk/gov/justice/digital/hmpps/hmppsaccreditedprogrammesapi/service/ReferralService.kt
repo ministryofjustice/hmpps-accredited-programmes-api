@@ -54,7 +54,7 @@ constructor(
   private val pniService: PniService,
   private val caseNotesApiService: CaseNotesApiService,
   private val organisationService: OrganisationService,
-  private val prisonOffenderManagerService: PrisonOffenderManagerService,
+  private val staffService: StaffService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -221,7 +221,11 @@ constructor(
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
-        savePNI(referral.prisonNumber, referral)
+        fetchAndSavePomDetails(referral)?.let {
+          referral.primaryPomStaffId = it.first?.staffId?.toBigInteger()
+          referral.secondaryPomStaffId = it.second?.staffId?.toBigInteger()
+        }
+
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
       }
 
@@ -244,7 +248,7 @@ constructor(
       newStatus = referralStatusRepository.getByCode(referral.status),
     )
 
-    savePomDetails(referral)
+    fetchAndSavePomDetails(referral)
     return referral
   }
 
@@ -363,15 +367,15 @@ constructor(
     )?.filterNot { it.status == "REFERRAL_STARTED" }
   }
 
-  fun savePomDetails(submittedReferral: ReferralEntity): List<StaffDetail?> {
+  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<StaffDetail?, StaffDetail?>? {
     return try {
-      val offenderAllocation = prisonOffenderManagerService.getOffenderAllocation(submittedReferral.prisonNumber)
-      prisonOffenderManagerService.savePrisonOffenderManagers(submittedReferral, offenderAllocation)
+      val offenderAllocation = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
+      staffService.savePrisonOffenderManagers(submittedReferral, offenderAllocation)
 
-      listOf(offenderAllocation.first, offenderAllocation.second)
+      Pair(offenderAllocation.first, offenderAllocation.second)
     } catch (ex: Exception) {
-      log.warn("POM could not be stored ${ex.message} for prisonNumber ${submittedReferral.prisonNumber}")
-      emptyList()
+      log.warn("POM could not be stored for prisonNumber ${submittedReferral.prisonNumber} ${ex.message} $ex")
+      null
     }
   }
 }

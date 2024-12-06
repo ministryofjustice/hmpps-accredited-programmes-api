@@ -44,6 +44,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 import java.util.UUID
 
 private const val DEFAULT_DIRECTION = "ascending"
@@ -63,6 +64,7 @@ class ReferralController(
   private val referenceDataService: ReferralReferenceDataService,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
+  private val staffService: StaffService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -370,7 +372,8 @@ class ReferralController(
       ?.let {
         auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
         val status = referenceDataService.getReferralStatus(it.status)
-        ResponseEntity.ok(it.toApi(status))
+        val primaryPomDetail = staffService.getStaffDetail(it.primaryPomStaffId!!)?.toApi()
+        ResponseEntity.ok(it.toApi(status, primaryPomDetail))
       }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 
@@ -697,13 +700,14 @@ class ReferralController(
   ): ResponseEntity<Referral> {
     referralService.getReferralById(id)?.let {
       val duplicateReferrals = referralService.getDuplicateReferrals(it.offering.id!!, it.prisonNumber)
+      val primaryPomDetail = staffService.getStaffDetail(it.primaryPomStaffId!!)?.toApi()
       if (!duplicateReferrals.isNullOrEmpty()) {
         log.info("Referral already exists for prisonNumber ${it.prisonNumber} and offering ${it.offering.id} ")
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi())
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi(primaryPomDetail))
       }
       val submittedReferral = referralService.submitReferralById(id)
 
-      return ResponseEntity.status(HttpStatus.OK).body(submittedReferral.toApi())
+      return ResponseEntity.status(HttpStatus.OK).body(submittedReferral.toApi(primaryPomDetail))
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
 

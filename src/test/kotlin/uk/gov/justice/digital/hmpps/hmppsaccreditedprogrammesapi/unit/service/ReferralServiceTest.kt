@@ -36,11 +36,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Organis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonOffenderManagerService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
@@ -112,7 +112,7 @@ class ReferralServiceTest {
   private lateinit var organisationService: OrganisationService
 
   @MockK(relaxed = true)
-  private lateinit var prisonOffenderManagerService: PrisonOffenderManagerService
+  private lateinit var staffService: StaffService
 
   @InjectMockKs
   private lateinit var referralService: ReferralService
