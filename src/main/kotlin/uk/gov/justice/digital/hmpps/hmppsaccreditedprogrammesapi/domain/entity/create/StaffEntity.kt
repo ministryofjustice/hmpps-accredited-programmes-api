@@ -33,9 +33,6 @@ data class StaffEntity(
 
   @Column(name = "accountType", nullable = true)
   var accountType: AccountType,
-
-  @Column(name = "referral_id", nullable = false)
-  val referralId: UUID? = null,
 )
 
 enum class AccountType {

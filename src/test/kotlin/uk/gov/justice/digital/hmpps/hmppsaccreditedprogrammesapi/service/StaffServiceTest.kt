@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.math.BigInteger
 
 @ExtendWith(MockKExtension::class)
@@ -94,9 +93,8 @@ class StaffServiceTest {
       generalAccount = Account("jdoe"),
       adminAccount = null,
     )
-    val referralEntity = ReferralEntityFactory().produce()
 
-    val result = service.buildStaffEntity(staffDetail, referralEntity)
+    val result = service.buildStaffEntity(staffDetail)
 
     assertEquals("1".toBigInteger(), result.staffId)
     assertEquals("John", result.firstName)
@@ -104,6 +102,5 @@ class StaffServiceTest {
     assertEquals("john.doe@example.com", result.primaryEmail)
     assertEquals("jdoe", result.username)
     assertEquals(AccountType.GENERAL, result.accountType)
-    assertEquals(referralEntity.id, result.referralId)
   }
 }

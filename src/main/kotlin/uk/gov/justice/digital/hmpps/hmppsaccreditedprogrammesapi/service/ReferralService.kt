@@ -369,7 +369,9 @@ constructor(
   fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<StaffDetail?, StaffDetail?>? {
     return try {
       val offenderAllocation = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
-      staffService.savePrisonOffenderManagers(submittedReferral, offenderAllocation)
+
+      staffService.saveStaffIfNotPresent(offenderAllocation.first)
+      staffService.saveStaffIfNotPresent(offenderAllocation.second)
 
       Pair(offenderAllocation.first, offenderAllocation.second)
     } catch (ex: Exception) {

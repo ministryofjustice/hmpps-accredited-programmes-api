@@ -9,6 +9,5 @@ import java.util.UUID
 @Repository
 interface StaffRepository : JpaRepository<StaffEntity, UUID> {
 
-  fun findByReferralId(referralId: UUID): StaffEntity?
   fun findByStaffId(staffId: BigInteger): StaffEntity?
 }

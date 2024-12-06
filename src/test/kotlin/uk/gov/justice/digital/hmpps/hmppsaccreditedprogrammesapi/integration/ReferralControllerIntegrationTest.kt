@@ -51,6 +51,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
@@ -84,6 +85,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var pniResultRepository: PNIResultEntityRepository
+
+  @Autowired
+  lateinit var staffRepository: StaffRepository
 
   @BeforeEach
   fun setUp() {
@@ -201,6 +205,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       ),
     )
     submitReferral(referralCreated.id)
+
+    val staffEntity = staffRepository.findAll()
+    staffEntity.shouldNotBeEmpty()
 
     createDuplicateReferralResultsInConflict(offering.id!!, PRISON_NUMBER_1)
   }
