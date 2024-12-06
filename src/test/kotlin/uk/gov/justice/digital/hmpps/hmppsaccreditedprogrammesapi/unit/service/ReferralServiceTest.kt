@@ -1,19 +1,31 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
 import io.kotest.matchers.shouldBe
+import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.slot
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Captor
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_COLOUR
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_DESCRIPTION
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_HINT
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME_COLOUR
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME_DESCRIPTION
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME_HINT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
@@ -28,6 +40,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
@@ -44,6 +58,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PersonEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
 import java.util.Optional
 import java.util.UUID
@@ -110,12 +125,16 @@ class ReferralServiceTest {
   @MockK(relaxed = true)
   private lateinit var organisationService: OrganisationService
 
+  @Captor
+  private lateinit var referralEntityCaptor: CapturingSlot<ReferralEntity>
+
   @InjectMockKs
   private lateinit var referralService: ReferralService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
+    referralEntityCaptor = slot()
   }
 
   private fun mockSecurityContext(username: String) {
@@ -320,5 +339,87 @@ class ReferralServiceTest {
         },
       )
     }
+  }
+
+  @Test
+  fun `should persist PNI when updating referral status to On Programme`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withId(referralId)
+      .withStatus("ASSESSED_SUITABLE")
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+
+    val referralStatusList =
+      mutableListOf<ReferralStatusRefData>(
+        ReferralStatusRefData(
+          code = ON_PROGRAMME,
+          description = ON_PROGRAMME_DESCRIPTION,
+          colour = ON_PROGRAMME_COLOUR,
+          hintText = ON_PROGRAMME_HINT,
+          hasNotes = true,
+          hasConfirmation = false,
+          closed = true,
+          draft = false,
+          hold = false,
+          release = false,
+          deselectAndKeepOpen = false,
+          notesOptional = false,
+        ),
+      )
+    every { referralReferenceDataService.getNextStatusTransitions("ASSESSED_SUITABLE") } returns referralStatusList
+
+    // When
+    val referralStatusUpdate = ReferralStatusUpdate(status = ON_PROGRAMME)
+    referralService.updateReferralStatusById(referralId, referralStatusUpdate)
+
+    // Then
+    verify { pniService.savePni(referral.prisonNumber, gender = null, savePni = true, referral.id) }
+    verify { auditService.audit(capture(referralEntityCaptor), any(), any()) }
+
+    val capturedReferralEntity = referralEntityCaptor.captured
+    assertThat(capturedReferralEntity.status).isEqualTo(ON_PROGRAMME)
+  }
+
+  @Test
+  fun `should NOT persist PNI when updating referral status for special deselected case`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withId(referralId)
+      .withStatus(ON_PROGRAMME)
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+
+    val referralStatusList =
+      mutableListOf<ReferralStatusRefData>(
+        ReferralStatusRefData(
+          code = ASSESSED_SUITABLE,
+          description = ASSESSED_SUITABLE_DESCRIPTION,
+          colour = ASSESSED_SUITABLE_COLOUR,
+          hintText = ASSESSED_SUITABLE_HINT,
+          hasNotes = true,
+          hasConfirmation = false,
+          closed = true,
+          draft = false,
+          hold = false,
+          release = false,
+          deselectAndKeepOpen = false,
+          notesOptional = false,
+        ),
+      )
+    every { referralReferenceDataService.getNextStatusTransitions(ON_PROGRAMME, true) } returns referralStatusList
+
+    // When
+    val referralStatusUpdate = ReferralStatusUpdate(status = "ASSESSED_SUITABLE", ptUser = true)
+    referralService.updateReferralStatusById(referralId, referralStatusUpdate)
+
+    // Then
+    verify(exactly = 0) { pniService.savePni(referral.prisonNumber, gender = null, savePni = true, referral.id) }
   }
 }

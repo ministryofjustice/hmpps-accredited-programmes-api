@@ -251,7 +251,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     updateReferral(referralCreated.id, referralUpdate)
 
-    getReferralById(referralCreated.id) shouldBeEqual Referral(
+    val referralById = getReferralById(referralCreated.id)
+
+    referralById shouldBeEqual Referral(
       id = referralCreated.id,
       offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
@@ -726,8 +728,52 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
     statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
 
-    // check for PNI
-    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldNotBe null
+    // check for PNI - should not be persisted at this stage
+    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldBe null
+  }
+
+  @Test
+  fun `should persist PNI when referral status is updated to On Programme`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = "ASSESSED_SUITABLE",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate4)
+
+    // When
+    val referralStatusUpdate5 = ReferralStatusUpdate(
+      status = "ON_PROGRAMME",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate5)
+
+    // Then
+    val pniResult = pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1)
+    pniResult shouldNotBe null
+    pniResult?.prisonNumber?.shouldBeEqual(PRISON_NUMBER_1)
+    pniResult?.crn?.shouldBeEqual("X739590")
+    pniResult?.oasysAssessmentId?.shouldBeEqual(2114584)
   }
 
   @Test
