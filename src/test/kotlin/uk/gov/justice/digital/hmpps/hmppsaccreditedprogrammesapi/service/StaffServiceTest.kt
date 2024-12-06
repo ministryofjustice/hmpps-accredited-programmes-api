@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.OffenderAllocationResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.PomDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.Account
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetail
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetailResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
@@ -34,7 +34,7 @@ class StaffServiceTest {
       secondaryPom = PomDetail(2, "Jane"),
     )
 
-    val primaryPomDetail = StaffDetail(
+    val primaryPomDetail = StaffDetailResponse(
       staffId = BigInteger("1"),
       firstName = "John",
       lastName = "Doe",
@@ -43,7 +43,7 @@ class StaffServiceTest {
       generalAccount = Account("jdoe"),
       adminAccount = null,
     )
-    val secondaryPomDetail = StaffDetail(
+    val secondaryPomDetail = StaffDetailResponse(
       staffId = BigInteger("2"),
       firstName = "Jane",
       lastName = "Smith",
@@ -84,7 +84,7 @@ class StaffServiceTest {
 
   @Test
   fun `buildStaffEntity should build correct StaffEntity`() {
-    val staffDetail = StaffDetail(
+    val staffDetailResponse = StaffDetailResponse(
       staffId = BigInteger("1"),
       firstName = "John",
       lastName = "Doe",
@@ -94,7 +94,7 @@ class StaffServiceTest {
       adminAccount = null,
     )
 
-    val result = service.buildStaffEntity(staffDetail)
+    val result = service.buildStaffEntity(staffDetailResponse)
 
     assertEquals("1".toBigInteger(), result.staffId)
     assertEquals("John", result.firstName)

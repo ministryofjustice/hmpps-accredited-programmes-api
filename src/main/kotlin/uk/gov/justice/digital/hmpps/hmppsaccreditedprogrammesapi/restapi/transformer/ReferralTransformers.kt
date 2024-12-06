@@ -1,15 +1,17 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralView
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate as ApiReferralUpdate
 
-fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferral(
+fun ReferralEntity.toApi(status: ReferralStatusRefData, staffDetail: StaffDetail?): ApiReferral = ApiReferral(
   id = id!!,
   offeringId = offering.id!!,
   prisonNumber = prisonNumber,
@@ -22,6 +24,7 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData): ApiReferral = ApiReferr
   statusDescription = status.description,
   statusColour = status.colour,
   submittedOn = submittedOn?.toString(),
+  primaryPrisonOffenderManager = staffDetail,
 )
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
@@ -33,6 +36,15 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
   status = status,
+)
+
+fun StaffEntity.toApi() = StaffDetail(
+  staffId = staffId!!,
+  firstName = firstName,
+  lastName = lastName,
+  primaryEmail = primaryEmail,
+  username = username,
+  accountType = accountType,
 )
 
 fun ApiReferralUpdate.toDomain() = ReferralUpdate(

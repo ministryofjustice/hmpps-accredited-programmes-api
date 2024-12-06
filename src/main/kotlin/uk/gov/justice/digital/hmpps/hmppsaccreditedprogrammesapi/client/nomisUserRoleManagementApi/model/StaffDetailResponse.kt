@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.math.BigInteger
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class StaffDetail(
+data class StaffDetailResponse(
   val staffId: BigInteger,
   val firstName: String,
   val lastName: String,
