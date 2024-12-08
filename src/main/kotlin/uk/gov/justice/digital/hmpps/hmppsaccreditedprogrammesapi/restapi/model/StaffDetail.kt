@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PomType
 import java.math.BigInteger
 
 data class StaffDetail(
@@ -10,6 +9,5 @@ data class StaffDetail(
   val lastName: String,
   val primaryEmail: String,
   val username: String,
-  val type: PomType,
   val accountType: AccountType,
 )

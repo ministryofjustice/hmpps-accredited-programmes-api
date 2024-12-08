@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetailResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -53,6 +54,7 @@ constructor(
   private val pniService: PniService,
   private val caseNotesApiService: CaseNotesApiService,
   private val organisationService: OrganisationService,
+  private val staffService: StaffService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
   fun createReferral(
@@ -221,6 +223,10 @@ constructor(
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
+        fetchAndSavePomDetails(referral)?.let {
+          referral.primaryPomStaffId = it.first?.staffId
+          referral.secondaryPomStaffId = it.second?.staffId
+        }
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
       }
 
@@ -358,5 +364,19 @@ constructor(
       prisonNumber,
       openReferralStatuses,
     )?.filterNot { it.status == "REFERRAL_STARTED" }
+  }
+
+  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<StaffDetailResponse?, StaffDetailResponse?>? {
+    return try {
+      val offenderAllocation = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
+
+      staffService.saveStaffIfNotPresent(offenderAllocation.first)
+      staffService.saveStaffIfNotPresent(offenderAllocation.second)
+
+      Pair(offenderAllocation.first, offenderAllocation.second)
+    } catch (ex: Exception) {
+      log.warn("POM could not be stored for prisonNumber ${submittedReferral.prisonNumber} ${ex.message} $ex")
+      null
+    }
   }
 }

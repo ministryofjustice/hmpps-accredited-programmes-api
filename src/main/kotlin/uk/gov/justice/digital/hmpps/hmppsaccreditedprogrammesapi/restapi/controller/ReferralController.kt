@@ -44,6 +44,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 import java.util.UUID
 
 private const val DEFAULT_DIRECTION = "ascending"
@@ -63,6 +64,7 @@ class ReferralController(
   private val referenceDataService: ReferralReferenceDataService,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
+  private val staffService: StaffService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -370,7 +372,8 @@ class ReferralController(
       ?.let {
         auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
         val status = referenceDataService.getReferralStatus(it.status)
-        ResponseEntity.ok(it.toApi(status))
+        val staffDetail = staffService.getStaffDetail(it.primaryPomStaffId)?.toApi()
+        ResponseEntity.ok(it.toApi(status, staffDetail))
       }
       ?: throw NotFoundException("No Referral found at /referrals/$id")
 

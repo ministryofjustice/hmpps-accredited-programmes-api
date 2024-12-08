@@ -45,12 +45,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_HINT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
@@ -59,7 +61,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralView
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
+import java.math.BigInteger
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
@@ -84,6 +88,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var pniResultRepository: PNIResultEntityRepository
+
+  @Autowired
+  lateinit var staffRepository: StaffRepository
 
   @BeforeEach
   fun setUp() {
@@ -167,6 +174,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
+      primaryPrisonOffenderManager = null,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -202,7 +210,42 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     )
     submitReferral(referralCreated.id)
 
+    val staffEntity = staffRepository.findAll()
+    staffEntity.shouldNotBeEmpty()
+
     createDuplicateReferralResultsInConflict(offering.id!!, PRISON_NUMBER_1)
+  }
+
+  @Test
+  fun `Submitting a referral and fetching it returns staff details as part of the referral`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    // only creates draft referral
+    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
+    // submits a referral
+    updateReferral(
+      referralCreated.id,
+      ReferralUpdate(
+        oasysConfirmed = true,
+        hasReviewedProgrammeHistory = true,
+        additionalInformation = "test",
+      ),
+    )
+    val submitReferral = submitReferral(referralCreated.id)
+
+    val referralById = getReferralById(submitReferral.id)
+
+    referralById.id shouldBe submitReferral.id
+    referralById.primaryPrisonOffenderManager shouldBe StaffDetail(
+      staffId = BigInteger("487505"),
+      firstName = "John",
+      lastName = "Smith",
+      primaryEmail = "john.smith@digital.justice.gov.uk",
+      username = "JSMITH_ADM",
+      accountType = AccountType.ADMIN,
+    )
   }
 
   @Test
@@ -859,7 +902,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .bodyValue(referralStatusUpdate)
       .exchange().expectStatus().isNoContent
 
-  fun submitReferral(createdReferralId: UUID) {
+  fun submitReferral(createdReferralId: UUID) =
     webTestClient
       .post()
       .uri("/referrals/$createdReferralId/submit")
@@ -867,7 +910,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-  }
+      .expectBody<Referral>()
+      .returnResult().responseBody!!
 
   private fun encodeValue(value: String): String {
     return URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
