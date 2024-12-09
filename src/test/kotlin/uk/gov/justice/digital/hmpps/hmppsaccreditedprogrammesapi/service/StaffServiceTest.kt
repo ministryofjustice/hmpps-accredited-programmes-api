@@ -118,7 +118,7 @@ class StaffServiceTest {
     assertEquals("Doe", result.lastName)
     assertEquals("john.doe@example.com", result.primaryEmail)
     assertEquals("jdoe", result.username)
-    assertEquals(AccountType.GENERAL, result.accountType)
+    assertEquals(AccountType.GENERAL.name, result.accountType)
   }
 
   @Test

@@ -31,7 +31,7 @@ data class StaffEntity(
   var username: String,
 
   @Column(name = "accountType", nullable = true)
-  var accountType: AccountType,
+  var accountType: String,
 )
 
 enum class AccountType {
