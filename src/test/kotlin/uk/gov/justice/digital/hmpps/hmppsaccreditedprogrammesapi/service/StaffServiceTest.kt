@@ -5,6 +5,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -14,8 +15,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetailResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
-import java.math.BigInteger
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 
 @ExtendWith(MockKExtension::class)
 class StaffServiceTest {
@@ -35,7 +37,7 @@ class StaffServiceTest {
     )
 
     val primaryPomDetail = StaffDetailResponse(
-      staffId = BigInteger("1"),
+      staffId = 1,
       firstName = "John",
       lastName = "Doe",
       status = "ACTIVE",
@@ -44,7 +46,7 @@ class StaffServiceTest {
       adminAccount = null,
     )
     val secondaryPomDetail = StaffDetailResponse(
-      staffId = BigInteger("2"),
+      staffId = 2,
       firstName = "Jane",
       lastName = "Smith",
       status = "ACTIVE",
@@ -53,19 +55,34 @@ class StaffServiceTest {
       adminAccount = null,
     )
 
-    every { allocationManagerService.getOffenderAllocation(prisonNumber) } returns offenderAllocation
+    every { allocationManagerService.getOffenderAllocation(any()) } returns offenderAllocation
     every { nomisUserRolesService.getStaffDetail("1") } returns primaryPomDetail
     every { nomisUserRolesService.getStaffDetail("2") } returns secondaryPomDetail
+    every { staffRepository.findByStaffId(1) } returns StaffEntityFactory()
+      .withStaffId(primaryPomDetail.staffId)
+      .withFirstName(primaryPomDetail.firstName)
+      .withLastName(primaryPomDetail.lastName)
+      .withPrimaryEmail(primaryPomDetail.primaryEmail)
+      .withUsername(primaryPomDetail.generalAccount?.username!!)
+      .withAccountType(AccountType.GENERAL)
+      .produce()
+
+    every { staffRepository.findByStaffId(2) } returns StaffEntityFactory()
+      .withStaffId(secondaryPomDetail.staffId)
+      .withFirstName(secondaryPomDetail.firstName)
+      .withLastName(secondaryPomDetail.lastName)
+      .withPrimaryEmail(secondaryPomDetail.primaryEmail)
+      .withUsername(secondaryPomDetail.generalAccount?.username!!)
+      .withAccountType(AccountType.GENERAL)
+      .produce()
 
     val result = service.getOffenderAllocation(prisonNumber)
 
-    assertEquals(primaryPomDetail, result.first)
-    assertEquals(secondaryPomDetail, result.second)
+    assertEquals(primaryPomDetail.staffId, result.first?.staffId)
+    assertEquals(secondaryPomDetail.staffId, result.second?.staffId)
 
     verify {
       allocationManagerService.getOffenderAllocation(prisonNumber)
-      nomisUserRolesService.getStaffDetail("1")
-      nomisUserRolesService.getStaffDetail("2")
     }
   }
 
@@ -85,7 +102,7 @@ class StaffServiceTest {
   @Test
   fun `buildStaffEntity should build correct StaffEntity`() {
     val staffDetailResponse = StaffDetailResponse(
-      staffId = BigInteger("1"),
+      staffId = 1,
       firstName = "John",
       lastName = "Doe",
       status = "ACTIVE",
@@ -96,11 +113,42 @@ class StaffServiceTest {
 
     val result = service.buildStaffEntity(staffDetailResponse)
 
-    assertEquals("1".toBigInteger(), result.staffId)
+    assertEquals(1, result.staffId)
     assertEquals("John", result.firstName)
     assertEquals("Doe", result.lastName)
     assertEquals("john.doe@example.com", result.primaryEmail)
     assertEquals("jdoe", result.username)
     assertEquals(AccountType.GENERAL, result.accountType)
+  }
+
+  @Test
+  fun `should log warning and return null when staffId is null`() {
+    val prisonNumber = "G8335GI"
+    val pomType = PomType.PRIMARY
+
+    val result = service.fetchPomDetailsIfNotAlreadyExists(null, prisonNumber, pomType)
+
+    assertNull(result)
+    verify(exactly = 0) { staffRepository.findByStaffId(any()) }
+  }
+
+  @Test
+  fun `should return existing staff entity if found in repository`() {
+    // Arrange
+    val staffId = 123
+    val prisonNumber = "G8335GI"
+    val pomType = PomType.PRIMARY
+    val existingStaffEntity = mockk<StaffEntity>()
+
+    every { staffRepository.findByStaffId(staffId) } returns existingStaffEntity
+
+    // Act
+    val result = service.fetchPomDetailsIfNotAlreadyExists(staffId, prisonNumber, pomType)
+
+    // Assert
+    assertEquals(existingStaffEntity, result)
+    verify { staffRepository.findByStaffId(staffId) }
+    verify(exactly = 0) { nomisUserRolesService.getStaffDetail(any()) }
+    verify(exactly = 0) { staffRepository.save(any()) }
   }
 }

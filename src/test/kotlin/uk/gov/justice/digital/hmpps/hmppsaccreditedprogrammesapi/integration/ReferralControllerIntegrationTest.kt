@@ -63,7 +63,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
-import java.math.BigInteger
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
@@ -239,7 +238,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     referralById.id shouldBe submitReferral.id
     referralById.primaryPrisonOffenderManager shouldBe StaffDetail(
-      staffId = BigInteger("487505"),
+      staffId = 487505,
       firstName = "John",
       lastName = "Smith",
       primaryEmail = "john.smith@digital.justice.gov.uk",

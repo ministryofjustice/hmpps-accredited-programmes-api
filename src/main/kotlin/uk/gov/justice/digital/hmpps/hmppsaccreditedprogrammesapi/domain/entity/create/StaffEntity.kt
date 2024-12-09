@@ -5,7 +5,6 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.math.BigInteger
 import java.util.UUID
 
 @Entity
@@ -17,7 +16,7 @@ data class StaffEntity(
   var id: UUID? = null,
 
   @Column(name = "staff_id")
-  var staffId: BigInteger? = null,
+  var staffId: Int? = null,
 
   @Column(name = "first_name", nullable = false)
   var firstName: String,
