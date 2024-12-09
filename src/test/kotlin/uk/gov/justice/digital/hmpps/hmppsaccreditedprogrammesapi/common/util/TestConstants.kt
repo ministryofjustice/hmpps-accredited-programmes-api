@@ -28,6 +28,16 @@ const val ON_HOLD_REFERRAL_SUBMITTED_DESCRIPTION = "On hold - referral submitted
 const val ON_HOLD_REFERRAL_SUBMITTED_COLOUR = "yellow"
 const val ON_HOLD_REFERRAL_SUBMITTED_HINT = "The referral will be paused until the person is ready to continue."
 
+const val ASSESSED_SUITABLE = "ASSESSED_SUITABLE"
+const val ASSESSED_SUITABLE_DESCRIPTION = "Assessed as suitable"
+const val ASSESSED_SUITABLE_COLOUR = "purple"
+const val ASSESSED_SUITABLE_HINT = "This person meets the suitability criteria. They can now be considered to join this programme."
+
+const val ON_PROGRAMME = "ON_PROGRAMME"
+const val ON_PROGRAMME_DESCRIPTION = "On programme"
+const val ON_PROGRAMME_COLOUR = "pink"
+const val ON_PROGRAMME_HINT = "This person has started the programme."
+
 const val PRISON_NUMBER_1 = "C6666CC"
 const val REFERRER_USERNAME = "TEST_REFERRER_USER_1"
 const val ORGANISATION_ID_MDI = "MDI"

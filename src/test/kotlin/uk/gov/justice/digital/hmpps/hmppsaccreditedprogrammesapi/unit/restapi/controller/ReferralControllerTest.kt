@@ -40,6 +40,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SecurityService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
@@ -356,8 +357,9 @@ constructor(
     val referenceDataService: ReferralReferenceDataService = mockk()
     val referralStatusHistoryService: ReferralStatusHistoryService = mockk()
     val auditService: AuditService = mockk()
+    val staffService: StaffService = mockk()
 
-    val referralController = ReferralController(referralService, securityService, referenceDataService, referralStatusHistoryService, auditService)
+    val referralController = ReferralController(referralService, securityService, referenceDataService, referralStatusHistoryService, auditService, staffService)
 
     val parseNameOrId = referralController.parseNameOrId(nameSearch)
     parseNameOrId.forename shouldBe "DEL"

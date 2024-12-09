@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.AllocationManagerApiClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.OffenderAllocation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.OffenderAllocationResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 
 @Service
@@ -17,7 +17,7 @@ class AllocationManagerService(val allocationManagerApiClient: AllocationManager
     private val log = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getOffenderAllocation(prisonNumber: String): OffenderAllocation? {
+  fun getOffenderAllocation(prisonNumber: String): OffenderAllocationResponse? {
     val offenderAllocation = when (val response = allocationManagerApiClient.getPomDetails(prisonNumber)) {
       is ClientResult.Failure.Other -> throw ServiceUnavailableException(
         "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
