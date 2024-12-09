@@ -21,10 +21,13 @@ class NomisUserRolesService(val nomisUserRolesApiClient: NomisUserRolesApiClient
     val userDetail = when (val response = nomisUserRolesApiClient.getStaffDetail(staffId)) {
       is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
 
-      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
-        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
-        response.toException(),
-      )
+      is ClientResult.Failure.Other -> {
+        log.warn("Failure to for get staff details for staffId $staffId Reason ${response.toException().message} ")
+        throw ServiceUnavailableException(
+          "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+          response.toException(),
+        )
+      }
 
       is ClientResult.Failure -> {
         log.warn("Failure to for get staff details for staffId $staffId Reason ${response.toException().message} ")

@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.nomisUserRoleManagementApi.model.StaffDetailResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -223,9 +222,9 @@ constructor(
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
-        fetchAndSavePomDetails(referral)?.let {
-          referral.primaryPomStaffId = it.first?.staffId
-          referral.secondaryPomStaffId = it.second?.staffId
+        fetchAndSavePomDetails(referral).let {
+          referral.primaryPomStaffId = it.first
+          referral.secondaryPomStaffId = it.second
         }
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
       }
@@ -366,17 +365,13 @@ constructor(
     )?.filterNot { it.status == "REFERRAL_STARTED" }
   }
 
-  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<StaffDetailResponse?, StaffDetailResponse?>? {
+  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<Int?, Int?> {
     return try {
-      val offenderAllocation = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
-
-      staffService.saveStaffIfNotPresent(offenderAllocation.first)
-      staffService.saveStaffIfNotPresent(offenderAllocation.second)
-
-      Pair(offenderAllocation.first, offenderAllocation.second)
+      val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
+      Pair(primaryPom?.staffId, secondaryPom?.staffId)
     } catch (ex: Exception) {
-      log.warn("POM could not be stored for prisonNumber ${submittedReferral.prisonNumber} ${ex.message} $ex")
-      null
+      log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}: ${ex.message}")
+      Pair(null, null)
     }
   }
 }
