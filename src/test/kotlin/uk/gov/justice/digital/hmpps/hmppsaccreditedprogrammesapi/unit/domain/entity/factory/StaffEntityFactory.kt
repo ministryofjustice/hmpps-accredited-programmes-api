@@ -48,6 +48,6 @@ class StaffEntityFactory {
     lastName = this.lastName,
     primaryEmail = this.primaryEmail,
     username = this.username,
-    accountType = this.accountType,
+    accountType = this.accountType.name,
   )
 }

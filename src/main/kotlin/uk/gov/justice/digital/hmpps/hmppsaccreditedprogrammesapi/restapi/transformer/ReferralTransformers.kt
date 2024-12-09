@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
@@ -44,7 +45,7 @@ fun StaffEntity.toApi() = StaffDetail(
   lastName = lastName,
   primaryEmail = primaryEmail,
   username = username,
-  accountType = accountType,
+  accountType = AccountType.valueOf(accountType),
 )
 
 fun ApiReferralUpdate.toDomain() = ReferralUpdate(

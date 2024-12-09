@@ -54,7 +54,7 @@ class StaffService(
       lastName = staffDetailResponse?.lastName.orEmpty(),
       primaryEmail = staffDetailResponse?.primaryEmail.orEmpty(),
       username = staffDetailResponse?.generalAccount?.username ?: staffDetailResponse?.adminAccount?.username.orEmpty(),
-      accountType = staffDetailResponse?.generalAccount?.let { AccountType.GENERAL } ?: AccountType.ADMIN,
+      accountType = staffDetailResponse?.generalAccount?.let { AccountType.GENERAL.name } ?: AccountType.ADMIN.name,
     )
   }
 }
