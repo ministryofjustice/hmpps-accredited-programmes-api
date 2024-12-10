@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationUpdate
@@ -135,6 +136,42 @@ class CourseParticipationController(private val courseParticipationService: Cour
     courseParticipationService.getCourseParticipationById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No course participation found for id $id")
+
+  @Operation(
+    tags = ["Course Participations"],
+    summary = "Return information about a person's participation in a course. Selected by the unique referral identifier.",
+    operationId = "getCourseParticipationByReferralId",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "The course participation records associated with the referral id.",
+        content = [Content(schema = Schema(implementation = CourseParticipation::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "The client is not authorised to perform this operation.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/course-participations/referral/{id}"],
+    produces = ["application/json"],
+  )
+  fun getCourseParticipationByReferralId(
+    @Parameter(
+      description = "The unique referral identifier assigned to this record when it was created.",
+      required = true,
+    ) @PathVariable("id") referralId: UUID,
+  ): ResponseEntity<List<CourseParticipation>> =
+    ResponseEntity.ok(
+      courseParticipationService
+        .getCourseParticipationHistoryByReferralId(referralId)
+        .map(CourseParticipationEntity::toApi),
+    )
 
   @Operation(
     tags = ["Course Participations"],

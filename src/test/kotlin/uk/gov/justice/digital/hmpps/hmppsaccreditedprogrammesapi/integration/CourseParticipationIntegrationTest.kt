@@ -6,6 +6,7 @@ import io.kotest.matchers.comparables.shouldBeGreaterThanOrEqualTo
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,16 +43,27 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   @Autowired
   lateinit var courseParticipationRepository: CourseParticipationRepository
 
+  private val referralId = UUID.randomUUID()
+
   @BeforeEach
   fun setUp() {
     persistenceHelper.clearAllTableContent()
 
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
+
+    val offeringId = UUID.randomUUID()
+    val courseId = UUID.randomUUID()
+    persistenceHelper.createCourse(courseId, "C1", "Course 1", "Sample description", "SC++", "General offence")
+
+    persistenceHelper.createOffering(offeringId, courseId, "MDI", "nobody-mdi@digital.justice.gov.uk", "nobody2-mdi@digital.justice.gov.uk", true)
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    persistenceHelper.createReferral(referralId, offeringId, "B2345BB", "TEST_REFERRER_USER_1", "This referral will be updated", false, false, "REFERRAL_STARTED", null)
+
     persistenceHelper.createParticipation(UUID.fromString("0cff5da9-1e90-4ee2-a5cb-94dc49c4b004"), null, "A1234AA", "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
-    persistenceHelper.createParticipation(UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e"), null, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
-    persistenceHelper.createParticipation(UUID.fromString("882a5a16-bcb8-4d8b-9692-a3006dcecffb"), null, "B2345BB", "Marzipan Course", "Reader's Digest", "This participation will be deleted", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, "Adele Chiellini", LocalDateTime.parse("2023-11-26T10:20:45"), null, null)
-    persistenceHelper.createParticipation(UUID.fromString("cc8eb19e-050a-4aa9-92e0-c654e5cfe281"), null, "C1234CC", "Orange Course", "squirrel", "This participation will be updated", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createParticipation(UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e"), referralId, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
+    persistenceHelper.createParticipation(UUID.fromString("882a5a16-bcb8-4d8b-9692-a3006dcecffb"), referralId, "B2345BB", "Marzipan Course", "Reader's Digest", "This participation will be deleted", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, "Adele Chiellini", LocalDateTime.parse("2023-11-26T10:20:45"), null, null)
+    persistenceHelper.createParticipation(UUID.fromString("cc8eb19e-050a-4aa9-92e0-c654e5cfe281"), referralId, "C1234CC", "Orange Course", "squirrel", "This participation will be updated", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
   }
 
   @Test
@@ -343,6 +355,49 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     }
   }
 
+  @Test
+  fun `should return course participation records for known referral id`() {
+    // Given
+    val knownReferralId = referralId.toString()
+
+    // When
+    val courseParticipationRecords = getCourseParticipationsByReferralId(knownReferralId)
+
+    // Then
+    courseParticipationRecords.shouldNotBeNull()
+    courseParticipationRecords.size shouldBe 3
+    assertThat(courseParticipationRecords).extracting("referralId").containsOnly(referralId)
+  }
+
+  @Test
+  fun `should return empty list of course participation records for unknown referral id`() {
+    // Given
+    val unknownReferralId = UUID.randomUUID().toString()
+
+    // When
+    val courseParticipationRecords = getCourseParticipationsByReferralId(unknownReferralId)
+
+    // Then
+    courseParticipationRecords.shouldBeEmpty()
+  }
+
+  @Test
+  fun `searching for course particpipations by referral id should return http bad request for malformed UUID`() {
+    // Given
+    val badReferralId = "not-a-uuid"
+
+    // When & Then
+    webTestClient
+      .get()
+      .uri("/course-participations/referral/$badReferralId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isBadRequest
+      .expectBody()
+      .jsonPath("$.userMessage").toString().contains("Invalid UUID string: not-a-uuid")
+  }
+
   private fun createCourseParticipation(courseParticipationToAdd: CourseParticipationCreate): CourseParticipation =
     webTestClient
       .post()
@@ -400,6 +455,17 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     webTestClient
       .get()
       .uri("/people/$prisonNumber/course-participations")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<CourseParticipation>>()
+      .returnResult().responseBody!!
+
+  private fun getCourseParticipationsByReferralId(referralId: String): List<CourseParticipation> =
+    webTestClient
+      .get()
+      .uri("/course-participations/referral/$referralId")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()

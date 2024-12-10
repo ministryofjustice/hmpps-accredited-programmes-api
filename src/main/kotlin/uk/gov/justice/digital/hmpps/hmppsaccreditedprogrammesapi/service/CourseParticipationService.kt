@@ -43,6 +43,10 @@ constructor(
   fun getCourseParticipationsByPrisonNumberAndStatus(prisonNumber: String, outcomeStatus: List<CourseStatus>): List<CourseParticipationEntity> {
     return courseParticipationRepository.findByPrisonNumberAndOutcomeStatusIn(prisonNumber, outcomeStatus)
   }
+
+  fun getCourseParticipationHistoryByReferralId(uuid: UUID): List<CourseParticipationEntity> {
+    return courseParticipationRepository.findByReferralId(uuid)
+  }
 }
 
 private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity =
