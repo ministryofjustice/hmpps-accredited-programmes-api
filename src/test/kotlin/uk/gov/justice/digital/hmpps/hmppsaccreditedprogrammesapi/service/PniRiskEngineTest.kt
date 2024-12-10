@@ -19,8 +19,8 @@ class PniRiskEngineTest {
   @Test
   fun `isHighIntensityBasedOnRiskScores should return true for high OGRS3 and high OVP`() {
     val riskScores = IndividualRiskScores(
-      ogrs3 = BigDecimal("76.00"),
-      ovp = BigDecimal("61.00"),
+      ogrs3 = BigDecimal("75.00"),
+      ovp = BigDecimal("60.00"),
       ospDc = null,
       ospIic = null,
       rsr = null,

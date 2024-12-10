@@ -62,8 +62,8 @@ class CaseNotesApiService(
 
         val person = personService.getPerson(referral.prisonNumber)
         val referralStatusEntity = referralStatusRepository.getByCode(referralStatusUpdate.status)
-        log.info("START - Request received to create automatic case notes for ${referral.prisonNumber} $referralStatusUpdate")
 
+        log.info("referralStatusEntity : $referralStatusEntity for status ${referralStatusUpdate.status}")
         val message =
           buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
 
@@ -83,7 +83,7 @@ class CaseNotesApiService(
           referral.prisonNumber,
         )
 
-        log.info("Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} ")
+        log.info("FINISH - Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} ")
       }
     } catch (ex: Exception) {
       log.warn("Error writing case notes for ${referral.prisonNumber} ${ex.message} $ex")
@@ -111,12 +111,12 @@ class CaseNotesApiService(
 
     val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
 
-    log.info("programmeDescriptionMessage Course and org name : $programmeDescriptionMessage \n $course \n $orgName")
+    log.info("programmeDescriptionMessage Course and org name : $programmeDescriptionMessage")
 
     val prisonerName = person?.fullName().orEmpty()
     val programNameAndStrand = "${course.name}: ${course.audience}"
 
-    log.info("prisonerName and programNameAndStrand : $prisonerName \n $programNameAndStrand")
+    log.info("programNameAndStrand : \n $programNameAndStrand")
 
     val customMessage =
       message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
