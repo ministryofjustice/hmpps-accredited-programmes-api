@@ -15,6 +15,8 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
 
   fun findByPrisonNumberAndOutcomeStatusIn(prisonNumber: String, outcomes: List<CourseStatus>): List<CourseParticipationEntity>
 
+  fun findByReferralId(referralId: UUID): List<CourseParticipationEntity>
+
   @Query(
     """
         SELECT cp FROM CourseParticipationEntity cp
