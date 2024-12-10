@@ -45,12 +45,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_HINT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
@@ -59,6 +61,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralView
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -84,6 +87,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var pniResultRepository: PNIResultEntityRepository
+
+  @Autowired
+  lateinit var staffRepository: StaffRepository
 
   @BeforeEach
   fun setUp() {
@@ -167,6 +173,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
+      primaryPrisonOffenderManager = null,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -202,7 +209,42 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     )
     submitReferral(referralCreated.id)
 
+    val staffEntity = staffRepository.findAll()
+    staffEntity.shouldNotBeEmpty()
+
     createDuplicateReferralResultsInConflict(offering.id!!, PRISON_NUMBER_1)
+  }
+
+  @Test
+  fun `Submitting a referral and fetching it returns staff details as part of the referral`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    // only creates draft referral
+    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
+    // submits a referral
+    updateReferral(
+      referralCreated.id,
+      ReferralUpdate(
+        oasysConfirmed = true,
+        hasReviewedProgrammeHistory = true,
+        additionalInformation = "test",
+      ),
+    )
+    val submitReferral = submitReferral(referralCreated.id)
+
+    val referralById = getReferralById(submitReferral.id)
+
+    referralById.id shouldBe submitReferral.id
+    referralById.primaryPrisonOffenderManager shouldBe StaffDetail(
+      staffId = 487505,
+      firstName = "John",
+      lastName = "Smith",
+      primaryEmail = "john.smith@digital.justice.gov.uk",
+      username = "JSMITH_ADM",
+      accountType = AccountType.ADMIN,
+    )
   }
 
   @Test
@@ -251,7 +293,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     updateReferral(referralCreated.id, referralUpdate)
 
-    getReferralById(referralCreated.id) shouldBeEqual Referral(
+    val referralById = getReferralById(referralCreated.id)
+
+    referralById shouldBeEqual Referral(
       id = referralCreated.id,
       offeringId = offering.id!!,
       referrerUsername = REFERRER_USERNAME,
@@ -726,8 +770,52 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
     statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
 
-    // check for PNI
-    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldNotBe null
+    // check for PNI - should not be persisted at this stage
+    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldBe null
+  }
+
+  @Test
+  fun `should persist PNI when referral status is updated to On Programme`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = REFERRAL_SUBMITTED,
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = "AWAITING_ASSESSMENT",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = "ASSESSMENT_STARTED",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = "ASSESSED_SUITABLE",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate4)
+
+    // When
+    val referralStatusUpdate5 = ReferralStatusUpdate(
+      status = "ON_PROGRAMME",
+      ptUser = true,
+    )
+    updateReferralStatus(referralCreated.id, referralStatusUpdate5)
+
+    // Then
+    val pniResult = pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1)
+    pniResult shouldNotBe null
+    pniResult?.prisonNumber?.shouldBeEqual(PRISON_NUMBER_1)
+    pniResult?.crn?.shouldBeEqual("X739590")
+    pniResult?.oasysAssessmentId?.shouldBeEqual(2114584)
   }
 
   @Test
@@ -813,7 +901,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .bodyValue(referralStatusUpdate)
       .exchange().expectStatus().isNoContent
 
-  fun submitReferral(createdReferralId: UUID) {
+  fun submitReferral(createdReferralId: UUID) =
     webTestClient
       .post()
       .uri("/referrals/$createdReferralId/submit")
@@ -821,7 +909,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-  }
+      .expectBody<Referral>()
+      .returnResult().responseBody!!
 
   private fun encodeValue(value: String): String {
     return URLEncoder.encode(value, StandardCharsets.UTF_8.toString())

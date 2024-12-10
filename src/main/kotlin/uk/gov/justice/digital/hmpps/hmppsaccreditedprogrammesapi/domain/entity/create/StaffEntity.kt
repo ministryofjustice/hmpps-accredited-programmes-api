@@ -2,13 +2,9 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import java.math.BigInteger
 import java.util.UUID
 
 @Entity
@@ -19,8 +15,8 @@ data class StaffEntity(
   @Column(name = "id")
   var id: UUID? = null,
 
-  @Column(name = "staffId")
-  var staffId: BigInteger? = null,
+  @Column(name = "staff_id")
+  var staffId: Int? = null,
 
   @Column(name = "first_name", nullable = false)
   var firstName: String,
@@ -34,21 +30,9 @@ data class StaffEntity(
   @Column(name = "username", nullable = false)
   var username: String,
 
-  @Column(name = "type", nullable = false)
-  var pomType: PomType,
-
   @Column(name = "accountType", nullable = true)
-  var accountType: AccountType,
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "referral_id", referencedColumnName = "referral_id")
-  var referral: ReferralEntity,
+  var accountType: String,
 )
-
-enum class PomType {
-  PRIMARY_POM,
-  SECONDARY_POM,
-}
 
 enum class AccountType {
   GENERAL,

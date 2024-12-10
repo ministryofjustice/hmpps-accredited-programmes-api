@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.BaseHMPPSClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.OffenderAllocation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.OffenderAllocationResponse
 
 private const val ALLOCATION_MANAGER_API = "ALLOCATION MANAGER API"
 
@@ -15,7 +15,7 @@ class AllocationManagerApiClient(
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun getPomDetails(prisonNumber: String) = getRequest<OffenderAllocation>(ALLOCATION_MANAGER_API) {
+  fun getPomDetails(prisonNumber: String) = getRequest<OffenderAllocationResponse>(ALLOCATION_MANAGER_API) {
     path = "/api/allocation/$prisonNumber"
   }
 }

@@ -8,5 +8,5 @@ import java.util.UUID
 @Repository
 interface StaffRepository : JpaRepository<StaffEntity, UUID> {
 
-  fun findByReferralId(referralRepository: ReferralRepository): StaffEntity?
+  fun findByStaffId(staffId: Int): StaffEntity?
 }

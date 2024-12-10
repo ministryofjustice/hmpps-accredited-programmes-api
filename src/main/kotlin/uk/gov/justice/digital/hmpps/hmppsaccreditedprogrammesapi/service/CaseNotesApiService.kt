@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesApi.CaseNotesApiClient
@@ -23,7 +22,6 @@ private const val ACP_USER = "Accredited Programmes automated case note"
 private const val ACP_TYPE = "ACP"
 
 @Service
-@Transactional
 class CaseNotesApiService(
   private val caseNotesApiClient: CaseNotesApiClient,
   private val featureSwitchService: FeatureSwitchService,
@@ -41,10 +39,13 @@ class CaseNotesApiService(
     val createdCaseNote = when (val response = caseNotesApiClient.createCaseNote(caseNoteRequest, prisonNumber)) {
       is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
 
-      is ClientResult.Failure.Other -> throw ServiceUnavailableException(
-        "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
-        response.toException(),
-      )
+      is ClientResult.Failure.Other -> {
+        log.warn("Failure to create case note for prisonNumbers $prisonNumber Reason ${response.toException().message} ")
+        throw ServiceUnavailableException(
+          "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
+          response.toException(),
+        )
+      }
 
       is ClientResult.Failure -> {
         log.warn("Failure to create case note for prisonNumbers $prisonNumber Reason ${response.toException().message} ")
@@ -57,34 +58,43 @@ class CaseNotesApiService(
   fun buildAndCreateCaseNote(referral: ReferralEntity, referralStatusUpdate: ReferralStatusUpdate) {
     try {
       if (featureSwitchService.isCaseNotesEnabled()) {
-        val person = personService.getPerson(referral.prisonNumber)!!
+        log.info("START - Request received to create automatic case notes for ${referral.prisonNumber} $referralStatusUpdate")
+
+        val person = personService.getPerson(referral.prisonNumber)
         val referralStatusEntity = referralStatusRepository.getByCode(referralStatusUpdate.status)
+
+        log.info("referralStatusEntity : $referralStatusEntity for status ${referralStatusUpdate.status}")
         val message =
           buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
+
+        log.info("Building case note request object for ${referral.prisonNumber}")
+
+        val caseNoteRequest = CaseNoteRequest(
+          type = ACP_TYPE,
+          subType = referralStatusEntity.caseNotesSubtype,
+          occurrenceDateTime = LocalDateTime.now().toString(),
+          authorName = ACP_USER,
+          text = message,
+          locationId = getLocationId(person),
+        )
+
         val createdCaseNote = createCaseNote(
-          CaseNoteRequest(
-            type = ACP_TYPE,
-            subType = referralStatusEntity.caseNotesSubtype,
-            occurrenceDateTime = LocalDateTime.now().toString(),
-            authorName = ACP_USER,
-            text = message,
-            locationId = getLocationId(person),
-          ),
+          caseNoteRequest,
           referral.prisonNumber,
         )
 
-        log.info("Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} with message $message")
+        log.info("FINISH - Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} ")
       }
     } catch (ex: Exception) {
       log.warn("Error writing case notes for ${referral.prisonNumber} ${ex.message} $ex")
     }
   }
 
-  private fun getLocationId(person: PersonEntity): String {
-    return if (person.location.equals("RELEASED", ignoreCase = true)) {
+  private fun getLocationId(person: PersonEntity?): String {
+    return if (person?.location.equals("RELEASED", ignoreCase = true)) {
       "OUT"
     } else {
-      organisationService.findOrganisationEntityByName(person.location!!)?.code!!
+      organisationService.findOrganisationEntityByName(person?.location!!)?.code!!
     }
   }
 
@@ -94,15 +104,23 @@ class CaseNotesApiService(
     referralStatusUpdate: ReferralStatusUpdate,
     message: String,
   ): String {
-    log.info("Request received for creating case notes :${referral.id} $referralStatusUpdate")
+    log.info("Building case notes message :${referral.id} $referralStatusUpdate")
+
     val course = referral.offering.course
     val orgName = organisationService.findOrganisationEntityByCode(referral.offering.organisationId)?.name
+
     val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
+
+    log.info("programmeDescriptionMessage Course and org name : $programmeDescriptionMessage")
 
     val prisonerName = person?.fullName().orEmpty()
     val programNameAndStrand = "${course.name}: ${course.audience}"
+
+    log.info("programNameAndStrand : \n $programNameAndStrand")
+
     val customMessage =
       message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
+
     val details = referralStatusUpdate.notes
       ?.takeIf { it.isNotBlank() }
       ?.let { "Details: $it \n\n" }
@@ -117,6 +135,7 @@ class CaseNotesApiService(
       }
 
     val statusUpdatedBy = "Updated by: ${getFullName()}\n"
+
     return programmeDescriptionMessage + customMessage + reasonForClosingReferral + details + statusUpdatedBy
   }
 
