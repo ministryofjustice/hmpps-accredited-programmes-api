@@ -48,10 +48,10 @@ class PniRiskEngine {
   }
 
   private fun isHighOgrs3(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.ogrs3?.let { it > BigDecimal("75.00") } == true
+    individualRiskScores.ogrs3?.let { it >= BigDecimal("75.00") } == true
 
   private fun isHighOvp(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.ovp?.let { it > BigDecimal("60.00") } == true
+    individualRiskScores.ovp?.let { it >= BigDecimal("60.00") } == true
 
   private fun isOspDcHigh(individualRiskScores: IndividualRiskScores, gender: String): Boolean {
     return gender.equals("Male", ignoreCase = true) &&
