@@ -67,7 +67,7 @@ class CaseNotesApiService(
         val message =
           buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
 
-        log.info("Building case note request object for ${referral.prisonNumber} with message $message")
+        log.info("Building case note request object for ${referral.prisonNumber}")
 
         val caseNoteRequest = CaseNoteRequest(
           type = ACP_TYPE,
@@ -77,15 +77,13 @@ class CaseNotesApiService(
           text = message,
           locationId = getLocationId(person),
         )
-        log.info("case notes request built $caseNoteRequest")
 
         val createdCaseNote = createCaseNote(
           caseNoteRequest,
           referral.prisonNumber,
         )
-        log.info("case notes request built $createdCaseNote")
 
-        log.info("Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} with message $message")
+        log.info("Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} ")
       }
     } catch (ex: Exception) {
       log.warn("Error writing case notes for ${referral.prisonNumber} ${ex.message} $ex")
@@ -123,14 +121,10 @@ class CaseNotesApiService(
     val customMessage =
       message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
 
-    log.info("customMessage : $customMessage")
-
     val details = referralStatusUpdate.notes
       ?.takeIf { it.isNotBlank() }
       ?.let { "Details: $it \n\n" }
       ?: ""
-
-    log.info("details : $details")
 
     val reasonForClosingReferral =
       if (referral.status == "WITHDRAWN" || referral.status == "DESELECTED") {
@@ -139,7 +133,6 @@ class CaseNotesApiService(
       } else {
         "\n"
       }
-    log.info("reasonForClosingReferral : $reasonForClosingReferral")
 
     val statusUpdatedBy = "Updated by: ${getFullName()}\n"
 
