@@ -705,8 +705,13 @@ class ReferralController(
         return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi())
       }
 
-      val submittedReferral = referralService.submitReferralById(id)
-      return ResponseEntity.status(HttpStatus.OK).body(submittedReferral.toApi())
+      try {
+        val submittedReferral = referralService.submitReferralById(id)
+        return ResponseEntity.status(HttpStatus.OK).body(submittedReferral.toApi())
+      } catch (ex: Exception) {
+        log.warn("Error submitting referral for ${it.prisonNumber} ${ex.message} $ex")
+        throw BusinessException("Error submitting referral for ${it.prisonNumber} ${ex.message}")
+      }
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
 
