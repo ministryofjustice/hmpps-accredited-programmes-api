@@ -76,10 +76,10 @@ class StaffServiceTest {
       .withAccountType(AccountType.GENERAL)
       .produce()
 
-    val result = service.getOffenderAllocation(prisonNumber)
+    val (primaryPom, secondaryPom) = service.getOffenderAllocation(prisonNumber)
 
-    assertEquals(primaryPomDetail.staffId, result.first?.staffId)
-    assertEquals(secondaryPomDetail.staffId, result.second?.staffId)
+    assertEquals(primaryPomDetail.staffId, primaryPom?.staffId)
+    assertEquals(secondaryPomDetail.staffId, secondaryPom?.staffId)
 
     verify {
       allocationManagerService.getOffenderAllocation(prisonNumber)

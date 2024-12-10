@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusEntity
@@ -374,5 +375,23 @@ constructor(
       log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}: ${ex.message}", ex)
       Pair(null, null)
     }
+  }
+
+  fun getPrisonIdsWithNoPrimaryPom() =
+    referralRepository.findAllDistinctPrisonNumbersWithoutPrimaryPom()
+
+  fun updatePoms(it: String, primaryPom: StaffEntity?, secondaryPom: StaffEntity?) {
+    val referrals = referralRepository.findAllByPrisonNumber(it)
+    val updatedReferrals = mutableListOf<ReferralEntity>()
+    log.info("Fetched ${referrals.size} referrals for prisoner $it referralIds ${referrals.map { it.id }}")
+    referrals.forEach { referral ->
+      referral.primaryPomStaffId = primaryPom?.staffId
+      referral.secondaryPomStaffId = secondaryPom?.staffId
+      updatedReferrals.add(referral)
+      log.info("Updated referral ${referral.id}  with primary pom ${referral.primaryPomStaffId} and secondary POM ${referral.secondaryPomStaffId} for prisoner $it")
+    }
+
+    val savedReferrals = referralRepository.saveAll(updatedReferrals)
+    log.info("Update successful for ${referrals.size} referrals for prisoner $it referralIds ${savedReferrals.map { it.id }}")
   }
 }
