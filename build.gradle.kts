@@ -39,6 +39,7 @@ dependencies {
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.1.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   testImplementation("com.h2database:h2")

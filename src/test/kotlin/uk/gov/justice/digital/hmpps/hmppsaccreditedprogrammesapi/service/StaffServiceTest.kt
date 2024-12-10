@@ -32,12 +32,12 @@ class StaffServiceTest {
   fun `getOffenderAllocation should return primary and secondary POM details`() {
     val prisonNumber = "A1234BC"
     val offenderAllocation = OffenderAllocationResponse(
-      primaryPom = PomDetail(1, "John"),
-      secondaryPom = PomDetail(2, "Jane"),
+      primaryPom = PomDetail("1".toBigInteger(), "John"),
+      secondaryPom = PomDetail("2".toBigInteger(), "Jane"),
     )
 
     val primaryPomDetail = StaffDetailResponse(
-      staffId = 1,
+      staffId = "1".toBigInteger(),
       firstName = "John",
       lastName = "Doe",
       status = "ACTIVE",
@@ -46,7 +46,7 @@ class StaffServiceTest {
       adminAccount = null,
     )
     val secondaryPomDetail = StaffDetailResponse(
-      staffId = 2,
+      staffId = "2".toBigInteger(),
       firstName = "Jane",
       lastName = "Smith",
       status = "ACTIVE",
@@ -58,7 +58,7 @@ class StaffServiceTest {
     every { allocationManagerService.getOffenderAllocation(any()) } returns offenderAllocation
     every { nomisUserRolesService.getStaffDetail("1") } returns primaryPomDetail
     every { nomisUserRolesService.getStaffDetail("2") } returns secondaryPomDetail
-    every { staffRepository.findByStaffId(1) } returns StaffEntityFactory()
+    every { staffRepository.findByStaffId("1".toBigInteger()) } returns StaffEntityFactory()
       .withStaffId(primaryPomDetail.staffId)
       .withFirstName(primaryPomDetail.firstName)
       .withLastName(primaryPomDetail.lastName)
@@ -67,7 +67,7 @@ class StaffServiceTest {
       .withAccountType(AccountType.GENERAL)
       .produce()
 
-    every { staffRepository.findByStaffId(2) } returns StaffEntityFactory()
+    every { staffRepository.findByStaffId("2".toBigInteger()) } returns StaffEntityFactory()
       .withStaffId(secondaryPomDetail.staffId)
       .withFirstName(secondaryPomDetail.firstName)
       .withLastName(secondaryPomDetail.lastName)
@@ -102,7 +102,7 @@ class StaffServiceTest {
   @Test
   fun `buildStaffEntity should build correct StaffEntity`() {
     val staffDetailResponse = StaffDetailResponse(
-      staffId = 1,
+      staffId = "1".toBigInteger(),
       firstName = "John",
       lastName = "Doe",
       status = "ACTIVE",
@@ -135,7 +135,7 @@ class StaffServiceTest {
   @Test
   fun `should return existing staff entity if found in repository`() {
     // Arrange
-    val staffId = 123
+    val staffId = "123".toBigInteger()
     val prisonNumber = "G8335GI"
     val pomType = PomType.PRIMARY
     val existingStaffEntity = mockk<StaffEntity>()

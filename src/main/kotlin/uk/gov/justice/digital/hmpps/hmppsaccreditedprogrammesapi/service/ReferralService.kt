@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
+import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -218,15 +219,25 @@ constructor(
       }
     }
 
+    log.info("START referral BEFORE when method $referral")
     when (referral.status) {
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
-//        fetchAndSavePomDetails(referral).let {
-//          referral.primaryPomStaffId = it.first
-//          referral.secondaryPomStaffId = it.second
-//        }
+        val fetchAndSavePomDetails = fetchAndSavePomDetails(referral)
+        log.info("*********** fetchAndSavePomDetails $fetchAndSavePomDetails")
+
+        log.info("*********** setting pom staffid")
+        fetchAndSavePomDetails?.let {
+          referral.primaryPomStaffId = it?.first
+          referral.secondaryPomStaffId = it?.second
+        }
+
+        log.info("*********** setting pom staffid finished")
+
+        log.info("*********** START starting to write case note")
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
+        log.info("*********** FINISH starting to write case note")
       }
 
       "REFERRAL_SUBMITTED" -> {
@@ -241,12 +252,19 @@ constructor(
         throw IllegalArgumentException("Referral $referralId is already submitted and currently being assessed")
       }
     }
-
+    log.info("*********** START starting to referral history")
     referralStatusHistoryService.updateReferralHistory(
       referralId = referralId,
       previousStatusCode = existingStatus,
       newStatus = referralStatusRepository.getByCode(referral.status),
     )
+
+    log.info("*********** START saving referral")
+
+    val save = referralRepository.save(referral)
+
+    log.info("*********** FINISH starting to referral $save. Referral saved")
+
     return referral
   }
 
@@ -365,12 +383,12 @@ constructor(
     )?.filterNot { it.status == "REFERRAL_STARTED" }
   }
 
-  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<Int?, Int?> {
+  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<BigInteger?, BigInteger?>? {
     return try {
       val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
       Pair(primaryPom?.staffId, secondaryPom?.staffId)
     } catch (ex: Exception) {
-      log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}: ${ex.message}")
+      log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}", ex)
       Pair(null, null)
     }
   }

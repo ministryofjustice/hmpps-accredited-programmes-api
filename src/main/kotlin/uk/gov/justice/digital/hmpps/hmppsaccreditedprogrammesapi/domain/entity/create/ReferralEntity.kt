@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import jakarta.persistence.Version
 import org.hibernate.annotations.SQLRestriction
+import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -49,7 +50,7 @@ data class ReferralEntity(
   var deleted: Boolean = false,
 
   @Column(name = "primary_pom_staff_id")
-  var primaryPomStaffId: Int? = null,
+  var primaryPomStaffId: BigInteger? = null,
   @Column(name = "secondary_pom_staff_id")
-  var secondaryPomStaffId: Int? = null,
+  var secondaryPomStaffId: BigInteger? = null,
 )

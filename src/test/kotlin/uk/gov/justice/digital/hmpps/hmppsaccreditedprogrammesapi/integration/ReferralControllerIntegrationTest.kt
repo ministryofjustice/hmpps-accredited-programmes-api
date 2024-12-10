@@ -241,7 +241,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     referralById.id shouldBe submitReferral.id
     referralById.primaryPrisonOffenderManager shouldBe StaffDetail(
-      staffId = 487505,
+      staffId = "487505".toBigInteger(),
       firstName = "John",
       lastName = "Smith",
       primaryEmail = "john.smith@digital.justice.gov.uk",

@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.caseNotesApi.CaseNotesApiClient
@@ -22,6 +23,7 @@ private const val ACP_USER = "Accredited Programmes automated case note"
 private const val ACP_TYPE = "ACP"
 
 @Service
+@Transactional
 class CaseNotesApiService(
   private val caseNotesApiClient: CaseNotesApiClient,
   private val featureSwitchService: FeatureSwitchService,
