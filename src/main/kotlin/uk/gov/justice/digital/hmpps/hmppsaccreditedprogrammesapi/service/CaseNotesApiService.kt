@@ -140,8 +140,9 @@ class CaseNotesApiService(
   }
 
   fun getFullName(): String? {
-    val username = SecurityContextHolder.getContext().authentication?.name!!
+    var username = ""
     return try {
+      username = SecurityContextHolder.getContext().authentication?.name!!
       manageUsersService.getUserDetail(username)?.name ?: username
     } catch (ex: Exception) {
       log.warn("Error getting full name for username $username. Will write case-notes with username instead. $ex")
