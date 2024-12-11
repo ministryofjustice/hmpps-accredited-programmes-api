@@ -222,10 +222,10 @@ constructor(
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
-        fetchAndSavePomDetails(referral).let {
-          referral.primaryPomStaffId = it.first
-          referral.secondaryPomStaffId = it.second
-        }
+//        fetchAndSavePomDetails(referral).let {
+//          referral.primaryPomStaffId = it.first
+//          referral.secondaryPomStaffId = it.second
+//        }
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
       }
 
