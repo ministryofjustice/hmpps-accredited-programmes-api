@@ -160,6 +160,8 @@ class ReferralController(
       prisonNumber = referralCreate.prisonNumber,
       offeringId = referralCreate.offeringId,
     )
+
+    // TODO create CourseParticiaption here??
     return ResponseEntity.status(HttpStatus.CREATED).body(createdReferral)
   }
 

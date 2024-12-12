@@ -26,6 +26,8 @@ fun ApiCourseParticipationCreate.toDomain() =
     detail = detail,
     setting = setting?.toDomain(),
     outcome = outcome?.toDomain(),
+    referralId = referralId,
+    isDraft = isDraft,
   )
 
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(

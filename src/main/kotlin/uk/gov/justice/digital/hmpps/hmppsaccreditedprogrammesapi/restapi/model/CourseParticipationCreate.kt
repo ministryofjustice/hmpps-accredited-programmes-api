@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import java.util.UUID
 
 /**
  *
@@ -31,4 +32,10 @@ data class CourseParticipationCreate(
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("source") val source: String? = null,
-)
+
+   @Schema(example = "null", description = "The unique id (UUID) of the associated referral.")
+  @get:JsonProperty("referralId") val referralId: UUID?,
+
+  @Schema(example = "null", description = "Whether this is a draft record or not.")
+  @get:JsonProperty("isDraft") val isDraft: Boolean? = false,
+  )
