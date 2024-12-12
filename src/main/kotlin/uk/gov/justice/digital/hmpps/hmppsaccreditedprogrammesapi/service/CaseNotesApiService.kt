@@ -63,7 +63,6 @@ class CaseNotesApiService(
         val person = personService.getPerson(referral.prisonNumber)
         val referralStatusEntity = referralStatusRepository.getByCode(referralStatusUpdate.status)
 
-        log.info("referralStatusEntity : $referralStatusEntity for status ${referralStatusUpdate.status}")
         val message =
           buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
 
@@ -86,16 +85,27 @@ class CaseNotesApiService(
         log.info("FINISH - Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} ")
       }
     } catch (ex: Exception) {
-      log.warn("Error writing case notes for ${referral.prisonNumber} ${ex.message} $ex")
+      log.warn("Error writing case notes for ${referral.prisonNumber}", ex)
     }
   }
 
   private fun getLocationId(person: PersonEntity?): String {
-    return if (person?.location.equals("RELEASED", ignoreCase = true)) {
-      "OUT"
-    } else {
-      organisationService.findOrganisationEntityByName(person?.location!!)?.code!!
+    var location = ""
+    try {
+      location = if (person?.location.equals("RELEASED", ignoreCase = true)) {
+        "OUT"
+      } else {
+        return person?.location?.run {
+          organisationService.findOrganisationEntityByName(this)?.code ?: location
+        } ?: location
+      }
+    } catch (ex: Exception) {
+      log.warn("Error getting location id for ${person?.location}. Will write case-notes with location as null.", ex)
+      return location
     }
+
+    log.info("Location of person: ${person?.location}  code: $location")
+    return location
   }
 
   fun buildCaseNoteMessage(
