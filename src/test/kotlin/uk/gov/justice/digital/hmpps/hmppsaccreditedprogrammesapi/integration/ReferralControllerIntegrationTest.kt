@@ -14,7 +14,6 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -192,7 +191,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  @Disabled("This test is disabled as we have removed saving of pom ")
   fun `Creating a referral which already exists results in conflict 409 response`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
@@ -218,7 +216,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  @Disabled("This test is disabled as we have removed saving of pom ")
   fun `Submitting a referral and fetching it returns staff details as part of the referral`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
@@ -241,7 +238,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     referralById.id shouldBe submitReferral.id
     referralById.primaryPrisonOffenderManager shouldBe StaffDetail(
-      staffId = 487505,
+      staffId = "487505".toBigInteger(),
       firstName = "John",
       lastName = "Smith",
       primaryEmail = "john.smith@digital.justice.gov.uk",
