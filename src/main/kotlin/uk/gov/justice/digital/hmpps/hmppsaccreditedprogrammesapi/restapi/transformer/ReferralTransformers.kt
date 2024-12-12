@@ -40,7 +40,7 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
 )
 
 fun StaffEntity.toApi() = StaffDetail(
-  staffId = staffId?.or("0".toBigInteger())!!,
+  staffId = staffId,
   firstName = firstName,
   lastName = lastName,
   primaryEmail = primaryEmail,

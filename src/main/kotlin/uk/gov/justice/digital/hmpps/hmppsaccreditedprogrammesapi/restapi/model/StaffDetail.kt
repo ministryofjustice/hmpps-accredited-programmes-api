@@ -4,7 +4,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import java.math.BigInteger
 
 data class StaffDetail(
-  val staffId: BigInteger,
+  val staffId: BigInteger?,
   val firstName: String,
   val lastName: String,
   val primaryEmail: String,
