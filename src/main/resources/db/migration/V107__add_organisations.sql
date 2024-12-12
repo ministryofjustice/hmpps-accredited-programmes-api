@@ -42,8 +42,8 @@ INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e120', 'WII', 'Warren Hill (HMP)', 'MALE');
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e121', 'WNI', 'Werrington (HMYOI)', 'MALE');
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e122', 'WSI', 'Wormwood Scrubs (HMP)', 'MALE');
-INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e123', 'WWI', 'Wandsworth (HMP)', 'MALE');
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e124', 'WYI', 'Wetherby (HMYOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e125', 'WWI', 'Wandsworth (HMP)', 'MALE');
 
 -- Female Prisons
 INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424f008', 'BZI', 'Bronzefield (HMP & YOI)', 'FEMALE');
