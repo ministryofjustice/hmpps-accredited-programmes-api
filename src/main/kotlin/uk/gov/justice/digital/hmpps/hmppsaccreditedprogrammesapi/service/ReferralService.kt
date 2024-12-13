@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
+import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -222,10 +223,10 @@ constructor(
       "REFERRAL_STARTED" -> {
         referral.status = "REFERRAL_SUBMITTED"
         referral.submittedOn = LocalDateTime.now()
-//        fetchAndSavePomDetails(referral).let {
-//          referral.primaryPomStaffId = it.first
-//          referral.secondaryPomStaffId = it.second
-//        }
+        fetchAndSavePomDetails(referral).let {
+          referral.primaryPomStaffId = it?.first
+          referral.secondaryPomStaffId = it?.second
+        }
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
       }
 
@@ -365,12 +366,12 @@ constructor(
     )?.filterNot { it.status == "REFERRAL_STARTED" }
   }
 
-  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<Int?, Int?> {
+  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<BigInteger?, BigInteger?> {
     return try {
       val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
       Pair(primaryPom?.staffId, secondaryPom?.staffId)
     } catch (ex: Exception) {
-      log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}: ${ex.message}")
+      log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}: ${ex.message}", ex)
       Pair(null, null)
     }
   }

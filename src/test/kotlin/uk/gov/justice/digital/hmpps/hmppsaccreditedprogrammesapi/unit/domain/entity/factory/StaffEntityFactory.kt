@@ -2,11 +2,12 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.en
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
+import java.math.BigInteger
 import java.util.UUID
 
 class StaffEntityFactory {
   private var id: UUID? = UUID.randomUUID()
-  private var staffId: Int = 487505
+  private var staffId: BigInteger = "487505".toBigInteger()
   private var firstName: String = "John"
   private var lastName: String = "Smith"
   private var primaryEmail: String = "john.smith@digital.justice.gov.uk"
@@ -17,7 +18,7 @@ class StaffEntityFactory {
     this.id = id
   }
 
-  fun withStaffId(staffId: Int) = apply {
+  fun withStaffId(staffId: BigInteger) = apply {
     this.staffId = staffId
   }
 

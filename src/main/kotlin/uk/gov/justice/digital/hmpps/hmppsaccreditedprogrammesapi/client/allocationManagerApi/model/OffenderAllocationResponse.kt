@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocat
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.math.BigInteger
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OffenderAllocationResponse(
@@ -14,7 +15,7 @@ data class OffenderAllocationResponse(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PomDetail(
   @JsonProperty("staff_id")
-  val staffId: Int,
+  val staffId: BigInteger?,
   @JsonProperty("name")
-  val name: String,
+  val name: String?,
 )
