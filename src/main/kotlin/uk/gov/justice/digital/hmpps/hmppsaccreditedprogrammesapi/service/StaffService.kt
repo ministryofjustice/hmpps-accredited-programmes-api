@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
+import java.math.BigInteger
 
 @Service
 class StaffService(
@@ -22,6 +23,8 @@ class StaffService(
   fun getOffenderAllocation(prisonNumber: String): Pair<StaffEntity?, StaffEntity?> {
     val offenderAllocation = allocationManagerService.getOffenderAllocation(prisonNumber)
 
+    log.info("Offender allocation for $prisonNumber: Primary Pom staffId ${offenderAllocation?.primaryPom?.staffId}")
+    log.info("Offender allocation for $prisonNumber: Secondary Pom staffId ${offenderAllocation?.secondaryPom?.staffId}")
     offenderAllocation?.let {
       return Pair(
         fetchPomDetailsIfNotAlreadyExists(it.primaryPom?.staffId, prisonNumber, PomType.PRIMARY),
@@ -30,7 +33,7 @@ class StaffService(
     } ?: throw BusinessException("No POM details found for $prisonNumber")
   }
 
-  fun fetchPomDetailsIfNotAlreadyExists(staffId: Int?, prisonNumber: String, pomType: PomType): StaffEntity? {
+  fun fetchPomDetailsIfNotAlreadyExists(staffId: BigInteger?, prisonNumber: String, pomType: PomType): StaffEntity? {
     if (staffId == null) {
       log.warn("No $pomType pom staffId found for $prisonNumber")
       return null
@@ -45,7 +48,7 @@ class StaffService(
     }
   }
 
-  fun getStaffDetail(staffId: Int?): StaffEntity? = staffId?.let { staffRepository.findByStaffId(it) }
+  fun getStaffDetail(staffId: BigInteger?): StaffEntity? = staffId?.let { staffRepository.findByStaffId(it) }
 
   fun buildStaffEntity(staffDetailResponse: StaffDetailResponse?): StaffEntity {
     return StaffEntity(

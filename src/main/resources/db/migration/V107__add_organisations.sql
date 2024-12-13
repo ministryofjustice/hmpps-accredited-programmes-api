@@ -1,0 +1,52 @@
+-- Male Prisons
+
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e080', 'AGI', 'Askham Grange (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e081', 'BFI', 'Bedford (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e082', 'BXI', 'Brixton (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e083', 'CDI', 'Chelmsford (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e084', 'CFI', 'Cardiff (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e085', 'CLI', 'Coldingley (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e086', 'DMI', 'Durham (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e087', 'EHI', 'Standford Hill (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e088', 'EXI', 'Exeter (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e089', 'FDI', 'Ford (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e090', 'FYI', 'Feltham A (HMYOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e091', 'GNI', 'Grendon (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e092', 'HBI', 'Hollesley Bay (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e093', 'HCI', 'Huntercombe (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e094', 'HDI', 'Hatfield (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e095', 'HEI', 'Hewell (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e096', 'HVI', 'Haverigg (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e097', 'KMI', 'Kirkham (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e098', 'KVI', 'Kirklevington Grange (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e099', 'LCI', 'Leicester (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e100', 'LEI', 'Leeds (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e101', 'LII', 'Lincoln (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e102', 'LYI', 'Leyhill (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e103', 'MHI', 'Morton Hall (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e104', 'MSI', 'Maidstone (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e105', 'NMI', 'Nottingham (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e106', 'NSI', 'North Sea Camp (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e107', 'NWI', 'Norwich (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e108', 'PNI', 'Preston (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e109', 'PVI', 'Pentonville (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e111', 'SPI', 'Spring Hill (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e112', 'STC3', 'Oakhill (STC)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e113', 'SUI', 'Sudbury (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e114', 'SWI', 'Swansea (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e115', 'TCI', 'Thorn Cross (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e116', 'TSI', 'Thameside (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e117', 'UPI', 'Prescoed (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e118', 'VEI', 'The Verne (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e119', 'WCI', 'Winchester (HMP & YOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e120', 'WII', 'Warren Hill (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e121', 'WNI', 'Werrington (HMYOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e122', 'WSI', 'Wormwood Scrubs (HMP)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e124', 'WYI', 'Wetherby (HMYOI)', 'MALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424e125', 'WWI', 'Wandsworth (HMP)', 'MALE');
+
+-- Female Prisons
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424f008', 'BZI', 'Bronzefield (HMP & YOI)', 'FEMALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424f009', 'ESI', 'East Sutton Park (HMP & YOI)', 'FEMALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424f010', 'EWI', 'Eastwood Park (HMP & YOI)', 'FEMALE');
+INSERT INTO ORGANISATION (organisation_id, code, name, gender) VALUES ('c177c813-8178-4822-b915-25d9e424f011', 'SDI', 'Send (HMP)', 'FEMALE');
