@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -50,14 +52,19 @@ class AdminController(
     summary = "Update referrals to update primary and secondary POMs",
     tags = ["Admin"],
   )
-  fun updatePoms() {
+  fun updatePoms(): ResponseEntity<String> {
     referralService.getPrisonIdsWithNoPrimaryPom().forEach {
-      log.info("START: Updating POMs for prisoner $it")
-      val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(it)
-
-      referralService.updatePoms(it, primaryPom, secondaryPom)
-      log.info("FINISH: Updating POMs for prisoner $it")
+      log.info("**** START: Updating POMs for prisoner $it")
+      try {
+        val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(it)
+        referralService.updatePoms(it, primaryPom, secondaryPom)
+        log.info("**** FINISH: Updating POMs for prisoner $it")
+      } catch (ex: Exception) {
+        log.info("**** ERROR: Updating POMs for prisoner $it - ${ex.message}")
+      }
     }
+
+    return ResponseEntity.status(HttpStatus.OK).body("POMs updated")
   }
 
   companion object {

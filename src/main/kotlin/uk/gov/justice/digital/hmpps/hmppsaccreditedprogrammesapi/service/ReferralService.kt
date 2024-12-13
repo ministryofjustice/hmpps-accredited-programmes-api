@@ -383,15 +383,15 @@ constructor(
   fun updatePoms(it: String, primaryPom: StaffEntity?, secondaryPom: StaffEntity?) {
     val referrals = referralRepository.findAllByPrisonNumber(it)
     val updatedReferrals = mutableListOf<ReferralEntity>()
-    log.info("Fetched ${referrals.size} referrals for prisoner $it referralIds ${referrals.map { it.id }}")
+    log.info("Fetched ${referrals.size} referrals for prisoner $it referralIds ${referrals.map { it.id }}. Start updating referrals with primary pom ${primaryPom?.staffId} and secondary POM ${secondaryPom?.staffId} ")
     referrals.forEach { referral ->
       referral.primaryPomStaffId = primaryPom?.staffId
       referral.secondaryPomStaffId = secondaryPom?.staffId
       updatedReferrals.add(referral)
-      log.info("Updated referral ${referral.id}  with primary pom ${referral.primaryPomStaffId} and secondary POM ${referral.secondaryPomStaffId} for prisoner $it")
+      log.info("Referral ${referral.id}  for prisoner $it marked for update")
     }
 
     val savedReferrals = referralRepository.saveAll(updatedReferrals)
-    log.info("Update successful for ${referrals.size} referrals for prisoner $it referralIds ${savedReferrals.map { it.id }}")
+    log.info("Update successful for ${referrals.size} referrals for prisoner $it referralIds ${savedReferrals.map { it.id }} Finished updating referrals with primary pom ${primaryPom?.staffId} and secondary POM ${secondaryPom?.staffId} ")
   }
 }
