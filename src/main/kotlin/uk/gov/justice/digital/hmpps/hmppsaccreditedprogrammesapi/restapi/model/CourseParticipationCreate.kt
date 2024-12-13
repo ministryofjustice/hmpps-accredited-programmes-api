@@ -33,9 +33,9 @@ data class CourseParticipationCreate(
   @Schema(example = "null", description = "")
   @get:JsonProperty("source") val source: String? = null,
 
-   @Schema(example = "null", description = "The unique id (UUID) of the associated referral.")
+  @Schema(example = "null", description = "The unique id (UUID) of the associated referral.")
   @get:JsonProperty("referralId") val referralId: UUID? = null,
 
   @Schema(example = "null", description = "Whether this is a draft record or not.")
   @get:JsonProperty("isDraft") val isDraft: Boolean? = false,
-  )
+)

@@ -710,7 +710,6 @@ class ReferralController(
     } ?: throw NotFoundException("No referral found at /referral/$id")
   }
 
-
   @Operation(
     tags = ["Referrals"],
     summary = "Update a referral",
