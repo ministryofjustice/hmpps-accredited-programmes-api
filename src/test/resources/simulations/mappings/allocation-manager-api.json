@@ -12,6 +12,19 @@
         },
         "bodyFileName": "pom_details_C6666CC.json"
       }
+    },
+    {
+      "request": {
+        "url": "/api/allocation/NON-EXISTENT",
+        "method": "GET"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body" : "{}"
+      }
     }
   ]
 }
