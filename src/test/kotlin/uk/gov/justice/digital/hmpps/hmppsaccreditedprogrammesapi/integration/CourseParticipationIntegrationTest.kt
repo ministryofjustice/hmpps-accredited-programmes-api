@@ -148,6 +148,42 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Creating a draft course participation with minimal fields should tolerantly return 201 with correct body`() {
+    // Given
+    val courseParticipationCreate =  CourseParticipationCreate(
+      courseName = null,
+      prisonNumber = randomPrisonNumber(),
+      setting = null,
+      outcome = null,
+      isDraft = true,
+      referralId = referralId
+    )
+
+    // When
+    val created = createCourseParticipation(courseParticipationCreate)
+
+    // Then
+    val retrieved = getCourseParticipation(created.id)
+
+    retrieved.shouldBeEqualToIgnoringFields(
+      CourseParticipation(
+        id = created.id,
+        courseName = null,
+        prisonNumber = created.prisonNumber,
+        source = null,
+        detail = null,
+        setting = null,
+        outcome = null,
+        addedBy = REFERRER_USERNAME,
+        createdAt = LocalDateTime.MAX.format(DateTimeFormatter.ISO_DATE_TIME),
+        isDraft = true,
+        referralId = referralId
+      ),
+      CourseParticipation::createdAt,
+    )
+  }
+
+  @Test
   fun `Creating a course participation with invalid year value returns 400 and validation error message`() {
     val invalidCourseParticipation = CourseParticipationCreate(
       courseName = "Course name",

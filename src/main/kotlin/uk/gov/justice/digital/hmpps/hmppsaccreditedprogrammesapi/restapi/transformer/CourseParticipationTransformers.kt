@@ -97,6 +97,7 @@ fun CourseParticipationEntity.toApi() = ApiCourseParticipation(
       yearCompleted = it.yearCompleted?.value,
     )
   },
+  isDraft = isDraft,
   addedBy = createdByUsername,
   createdAt = createdDateTime.format(DateTimeFormatter.ISO_DATE_TIME),
 )
