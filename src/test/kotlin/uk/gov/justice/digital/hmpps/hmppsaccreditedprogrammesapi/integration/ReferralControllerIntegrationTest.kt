@@ -212,7 +212,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val staffEntity = staffRepository.findAll()
     staffEntity.shouldNotBeEmpty()
 
-    createDuplicateReferralResultsInConflict(offering.id!!, PRISON_NUMBER_1)
+    createDuplicateReferralResultsInConflict(offering.id, PRISON_NUMBER_1)
   }
 
   @Test
@@ -772,6 +772,37 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // check for PNI - should not be persisted at this stage
     pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldBe null
+  }
+
+  @Test
+  fun `Submitting a referral when pom does not exist should return all fields and an HTTP 204`() {
+    // Given
+    val nonExistentPrisonNumber = "NON-EXISTENT"
+    val referralCreated = createReferral(nonExistentPrisonNumber)
+
+    val referralUpdate = ReferralUpdate(
+      additionalInformation = "Additional information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+    )
+
+    updateReferral(referralCreated.id, referralUpdate)
+    val readyToSubmitReferral = getReferralById(referralCreated.id)
+
+    // When
+    submitReferral(readyToSubmitReferral.id)
+
+    // Then
+    getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED.lowercase()
+
+    val statusHistories =
+      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.id)
+    statusHistories.size shouldBeEqual 2
+    statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
+    statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
+
+    // check for PNI - should not be persisted at this stage
+    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, nonExistentPrisonNumber) shouldBe null
   }
 
   @Test
