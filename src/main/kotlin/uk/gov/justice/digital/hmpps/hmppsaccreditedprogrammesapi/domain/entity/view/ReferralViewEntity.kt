@@ -40,6 +40,7 @@ data class ReferralViewEntity(
   val sentenceType: String?,
   val listDisplayName: String?,
   val location: String?,
+  val primaryPomUsername: String?,
 )
 
 @Repository
@@ -77,7 +78,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
   @Query(
     value = """
       SELECT r FROM ReferralViewEntity r
-      WHERE r.referrerUsername = :username
+      WHERE ( r.referrerUsername = :username OR r.primaryPomUsername = :username)
         AND (:status IS NULL OR r.status IN :status)
         AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))

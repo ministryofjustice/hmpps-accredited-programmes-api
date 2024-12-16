@@ -60,7 +60,7 @@ class AdminController(
         referralService.updatePoms(it, primaryPom, secondaryPom)
         log.info("**** FINISH: Updating POMs for prisoner $it")
       } catch (ex: Exception) {
-        log.info("**** ERROR: Updating POMs for prisoner $it - ${ex.message}")
+        log.warn("**** ERROR: Updating POMs for prisoner $it - ${ex.message}", ex)
       }
     }
 
