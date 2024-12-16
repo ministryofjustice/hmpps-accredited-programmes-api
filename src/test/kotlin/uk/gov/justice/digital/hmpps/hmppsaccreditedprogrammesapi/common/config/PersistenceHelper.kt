@@ -150,7 +150,7 @@ class PersistenceHelper {
     primaryEmail: String,
     accountType: String = "GENERAL",
   ) {
-    entityManager.createNativeQuery("INSERT INTO staff (id, staff_id, first_name, last_name, username, primary_email, accountType) VALUES (:id, :staffId, :firstName, :lastName, :username, :primaryEmail, :accountType)")
+    entityManager.createNativeQuery("INSERT INTO staff (id, staff_id, first_name, last_name, username, primary_email, account_type) VALUES (:id, :staffId, :firstName, :lastName, :username, :primaryEmail, :accountType)")
       .setParameter("id", id)
       .setParameter("staffId", staffId)
       .setParameter("firstName", firstName)

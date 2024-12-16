@@ -1336,6 +1336,45 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Referrals visible in referrer and poms my referrals view`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralId = UUID.randomUUID()
+
+    persistenceHelper.createStaff(
+      staffId = "10".toBigInteger(),
+      firstName = "John",
+      lastName = "Doe",
+      username = "JOHN_DOE",
+      primaryEmail = "john.doe@test.com",
+    )
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    persistenceHelper.createReferral(
+      referralId,
+      offering.id!!,
+      PRISON_NUMBER_1,
+      "TEST_REFERRER_USER_1",
+      "more information",
+      true,
+      true,
+      "REFERRAL_SUBMITTED",
+      LocalDateTime.parse("2023-11-13T19:11:00"),
+      "10".toBigInteger(),
+    )
+    val statusFilter = listOf("REFERRAL_SUBMITTED")
+    val audienceFilter = course.audience
+    val courseNameFilter = course.name
+
+    val summary = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter)
+    summary.content.shouldNotBeEmpty()
+
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken("JOHN_DOE"))
+    val summary1 = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter, jwtAuthHelper.bearerToken("JOHN_DOE"))
+    summary1.content.shouldNotBeEmpty()
+  }
+
+  @Test
   fun `Retrieving a list of filtered referral views for the current user should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
@@ -1418,6 +1457,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     statusFilter: List<String>? = null,
     audienceFilter: String? = null,
     courseNameFilter: String? = null,
+    token: String? = null,
   ): PaginatedReferralView {
     val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/me/dashboard")
     statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
@@ -1427,7 +1467,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     return webTestClient
       .get()
       .uri(uriBuilder.toUriString())
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .header(HttpHeaders.AUTHORIZATION, token ?: jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
