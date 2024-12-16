@@ -47,4 +47,7 @@ data class CourseParticipation(
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("source") val source: String? = null,
+
+  @Schema(example = "null", description = "Whether this is a draft record or not.")
+  @get:JsonProperty("isDraft") val isDraft: Boolean? = false,
 )

@@ -1,0 +1,1 @@
+ALTER TABLE course_participation ADD COLUMN is_draft BOOLEAN NOT NULL DEFAULT FALSE;

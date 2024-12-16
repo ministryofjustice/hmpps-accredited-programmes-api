@@ -37,6 +37,9 @@ data class CourseParticipationEntity(
   var source: String?,
   var detail: String?,
 
+  @Column("is_draft")
+  var isDraft: Boolean? = false,
+
   @Embedded
   var setting: CourseParticipationSetting? = null,
 

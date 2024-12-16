@@ -61,6 +61,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PersonEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.util.Optional
 import java.util.UUID
 
@@ -425,5 +426,25 @@ class ReferralServiceTest {
 
     // Then
     verify(exactly = 0) { pniService.savePni(referral.prisonNumber, gender = null, savePni = true, referral.id) }
+  }
+
+  @Test
+  fun `updatePoms should update referrals with primary and secondary POMs`() {
+    val prisonNumber = "A1234BC"
+    val primaryPom = StaffEntityFactory().withStaffId("1".toBigInteger()).produce()
+    val secondaryPom = StaffEntityFactory().withStaffId("2".toBigInteger()).produce()
+    val referral = ReferralEntityFactory().withPrisonNumber(prisonNumber).withId(UUID.randomUUID()).produce()
+    val referrals = listOf(referral)
+
+    every { referralRepository.findAllByPrisonNumber(prisonNumber) } returns referrals
+    every { referralRepository.saveAll(any<List<ReferralEntity>>()) } returns referrals
+
+    referralService.updatePoms(prisonNumber, primaryPom, secondaryPom)
+
+    verify { referralRepository.findAllByPrisonNumber(prisonNumber) }
+    verify { referralRepository.saveAll(referrals) }
+
+    assert(referral.primaryPomStaffId == primaryPom.staffId)
+    assert(referral.secondaryPomStaffId == secondaryPom.staffId)
   }
 }
