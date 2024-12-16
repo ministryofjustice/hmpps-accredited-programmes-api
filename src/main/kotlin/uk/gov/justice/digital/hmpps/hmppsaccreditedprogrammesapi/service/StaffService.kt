@@ -23,8 +23,6 @@ class StaffService(
   fun getOffenderAllocation(prisonNumber: String): Pair<StaffEntity?, StaffEntity?> {
     val offenderAllocation = allocationManagerService.getOffenderAllocation(prisonNumber)
 
-    log.info("Offender allocation for $prisonNumber: Primary Pom staffId ${offenderAllocation?.primaryPom?.staffId}")
-    log.info("Offender allocation for $prisonNumber: Secondary Pom staffId ${offenderAllocation?.secondaryPom?.staffId}")
     offenderAllocation?.let {
       return Pair(
         fetchPomDetailsIfNotAlreadyExists(it.primaryPom?.staffId, prisonNumber, PomType.PRIMARY),
