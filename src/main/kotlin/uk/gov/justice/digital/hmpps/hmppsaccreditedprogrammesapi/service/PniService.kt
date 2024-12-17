@@ -222,10 +222,7 @@ class PniService(
   }
 
   private fun getOverallSARAResult(sara: uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Sara?): SaraRisk? {
-    return SaraRisk.highestRisk(
-      SaraRisk.fromString(sara?.imminentRiskOfViolenceTowardsPartner),
-      SaraRisk.fromString(sara?.imminentRiskOfViolenceTowardsOthers),
-    )
+    return SaraRisk.fromString(sara?.imminentRiskOfViolenceTowardsPartner)
   }
 
   fun getGenderOfPerson(prisonNumber: String, prisonerGender: String?): String {

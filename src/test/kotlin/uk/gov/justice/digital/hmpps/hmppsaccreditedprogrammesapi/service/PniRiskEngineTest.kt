@@ -42,8 +42,8 @@ class PniRiskEngineTest {
       ospIic = null,
       rsr = null,
       sara = Sara(
-        saraRiskOfViolenceTowardsPartner = null,
-        saraRiskOfViolenceTowardsOthers = "High",
+        saraRiskOfViolenceTowardsPartner = "High",
+        saraRiskOfViolenceTowardsOthers = null,
         overallResult = null,
       ),
     )
@@ -193,7 +193,7 @@ class PniRiskEngineTest {
 
   @ParameterizedTest
   @CsvSource(value = ["VERY_HIGH", "VERY HIGH", "Very High", "HIGH", "High"])
-  fun `should return isHighRisk for a person with High or Very High Sara risk of violence towards others`(saraRiskValue: String) {
+  fun `should NOT return isHighRisk for a person with High or Very High Sara risk of violence towards others`(saraRiskValue: String) {
     val riskScores = IndividualRiskScores(
       ogrs3 = null,
       ovp = null,
@@ -206,8 +206,8 @@ class PniRiskEngineTest {
         overallResult = null,
       ),
     )
-    assertTrue(riskEngine.isHighRisk(riskScores, "Male"))
-    assertTrue(riskEngine.isHighRisk(riskScores, "Female"))
+    assertFalse(riskEngine.isHighRisk(riskScores, "Male"))
+    assertFalse(riskEngine.isHighRisk(riskScores, "Female"))
   }
 
   @ParameterizedTest
@@ -487,8 +487,8 @@ class PniRiskEngineTest {
       ospIic = null,
       rsr = null,
       sara = Sara(
-        saraRiskOfViolenceTowardsPartner = "Low",
-        saraRiskOfViolenceTowardsOthers = "Medium",
+        saraRiskOfViolenceTowardsPartner = "Medium",
+        saraRiskOfViolenceTowardsOthers = "Low",
         overallResult = null,
       ),
     )
