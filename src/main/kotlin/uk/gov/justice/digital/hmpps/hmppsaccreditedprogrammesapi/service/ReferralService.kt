@@ -56,8 +56,10 @@ constructor(
   private val caseNotesApiService: CaseNotesApiService,
   private val organisationService: OrganisationService,
   private val staffService: StaffService,
+  private val courseParticipationService: CourseParticipationService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
+
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
@@ -229,6 +231,7 @@ constructor(
           referral.secondaryPomStaffId = it?.second
         }
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = "REFERRAL_SUBMITTED"))
+        courseParticipationService.updateDraftHistoryForSubmittedReferral(referralId)
       }
 
       "REFERRAL_SUBMITTED" -> {
