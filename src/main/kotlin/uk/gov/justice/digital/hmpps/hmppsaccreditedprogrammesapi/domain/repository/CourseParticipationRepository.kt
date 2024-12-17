@@ -34,6 +34,7 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
         WHERE cp.prisonNumber = :prisonerNumber
         """,
   )
-  fun getSarParticipations(@Param("prisonerNumber") prisonerNumber: String,
+  fun getSarParticipations(
+    @Param("prisonerNumber") prisonerNumber: String,
   ): List<CourseParticipationEntity>
 }

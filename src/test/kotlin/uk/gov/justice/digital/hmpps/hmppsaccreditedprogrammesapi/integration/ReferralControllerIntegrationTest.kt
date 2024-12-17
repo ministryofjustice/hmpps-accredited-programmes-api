@@ -96,7 +96,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   @Autowired
   lateinit var courseParticipationRepository: CourseParticipationRepository
 
-
   @BeforeEach
   fun setUp() {
     persistenceHelper.clearAllTableContent()
@@ -805,7 +804,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     assertThat(courseParticipationRecords).hasSize(1)
     assertThat(courseParticipationRecords[0].id).isEqualTo(courseParticipationId)
     assertThat(courseParticipationRecords[0].isDraft).isFalse
-
   }
 
   @Test
