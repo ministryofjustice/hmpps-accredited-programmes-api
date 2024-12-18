@@ -140,4 +140,24 @@ class PersistenceHelper {
       .setParameter("variantCourseId", variantCourseId)
       .executeUpdate()
   }
+
+  fun createStaff(
+    id: UUID = UUID.randomUUID(),
+    staffId: BigInteger,
+    firstName: String,
+    lastName: String,
+    username: String,
+    primaryEmail: String,
+    accountType: String = "GENERAL",
+  ) {
+    entityManager.createNativeQuery("INSERT INTO staff (id, staff_id, first_name, last_name, username, primary_email, accountType) VALUES (:id, :staffId, :firstName, :lastName, :username, :primaryEmail, :accountType)")
+      .setParameter("id", id)
+      .setParameter("staffId", staffId)
+      .setParameter("firstName", firstName)
+      .setParameter("lastName", lastName)
+      .setParameter("username", username)
+      .setParameter("primaryEmail", primaryEmail)
+      .setParameter("accountType", accountType)
+      .executeUpdate()
+  }
 }
