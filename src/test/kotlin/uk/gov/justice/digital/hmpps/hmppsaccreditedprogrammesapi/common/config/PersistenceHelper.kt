@@ -104,8 +104,8 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createParticipation(participationId: UUID, referralId: UUID?, prisonNumber: String, courseName: String, source: String, detail: String, location: String, type: String, outcomeStatus: String, yearStarted: Int?, yearCompleted: Int?, createdByUsername: String, createdDateTime: LocalDateTime, lastModifiedByUsername: String?, lastModifiedDateTime: LocalDateTime?) {
-    entityManager.createNativeQuery("INSERT INTO course_participation (course_participation_id, referral_id, prison_number, course_name, source, detail, location, type, outcome_status, year_started, year_completed, created_by_username, created_date_time, last_modified_by_username, last_modified_date_time) VALUES (:id, :referralId, :prisonNumber, :courseName, :source, :detail, :location, :type, :outcomeStatus, :yearStarted, :yearCompleted, :createdByUsername, :createdDateTime, :lastModifiedByUsername, :lastModifiedDateTime)")
+  fun createParticipation(participationId: UUID, referralId: UUID?, prisonNumber: String, courseName: String, source: String, detail: String, location: String, type: String, outcomeStatus: String, yearStarted: Int?, yearCompleted: Int?, isDraft: Boolean? = false, createdByUsername: String, createdDateTime: LocalDateTime, lastModifiedByUsername: String?, lastModifiedDateTime: LocalDateTime?) {
+    entityManager.createNativeQuery("INSERT INTO course_participation (course_participation_id, referral_id, prison_number, course_name, source, detail, location, type, outcome_status, year_started, year_completed, is_draft, created_by_username, created_date_time, last_modified_by_username, last_modified_date_time) VALUES (:id, :referralId, :prisonNumber, :courseName, :source, :detail, :location, :type, :outcomeStatus, :yearStarted, :yearCompleted, :isDraft, :createdByUsername, :createdDateTime, :lastModifiedByUsername, :lastModifiedDateTime)")
       .setParameter("id", participationId)
       .setParameter("referralId", referralId)
       .setParameter("prisonNumber", prisonNumber)
@@ -117,6 +117,7 @@ class PersistenceHelper {
       .setParameter("outcomeStatus", outcomeStatus)
       .setParameter("yearStarted", yearStarted)
       .setParameter("yearCompleted", yearCompleted)
+      .setParameter("isDraft", isDraft)
       .setParameter("createdByUsername", createdByUsername)
       .setParameter("createdDateTime", createdDateTime)
       .setParameter("lastModifiedByUsername", lastModifiedByUsername)

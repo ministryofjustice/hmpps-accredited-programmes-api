@@ -10,6 +10,7 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
@@ -49,6 +50,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
@@ -90,6 +92,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var staffRepository: StaffRepository
+
+  @Autowired
+  lateinit var courseParticipationRepository: CourseParticipationRepository
 
   @BeforeEach
   fun setUp() {
@@ -772,6 +777,33 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // check for PNI - should not be persisted at this stage
     pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldBe null
+  }
+
+  @Test
+  fun `Submitting a referral sets related course participation records draft status to false`() {
+    // Given
+    val referralCreated = createReferral(PRISON_NUMBER_1)
+
+    val referralUpdate = ReferralUpdate(
+      additionalInformation = "Additional information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+    )
+
+    updateReferral(referralCreated.id, referralUpdate)
+    val readyToSubmitReferral = getReferralById(referralCreated.id)
+
+    val courseParticipationId = UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e")
+    persistenceHelper.createParticipation(courseParticipationId, referralCreated.id, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, isDraft = true, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
+
+    // When
+    submitReferral(readyToSubmitReferral.id)
+
+    // Then
+    val courseParticipationRecords = courseParticipationRepository.findByReferralId(referralCreated.id)
+    assertThat(courseParticipationRecords).hasSize(1)
+    assertThat(courseParticipationRecords[0].id).isEqualTo(courseParticipationId)
+    assertThat(courseParticipationRecords[0].isDraft).isFalse
   }
 
   @Test

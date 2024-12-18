@@ -47,6 +47,12 @@ constructor(
   fun getCourseParticipationHistoryByReferralId(uuid: UUID): List<CourseParticipationEntity> {
     return courseParticipationRepository.findByReferralId(uuid)
   }
+
+  fun updateDraftHistoryForSubmittedReferral(referralId: UUID) {
+    // Once a referral has been submitted, course participation records associated with that referral should no
+    // longer be marked as draft
+    courseParticipationRepository.updateDraftStatusByReferralId(referralId)
+  }
 }
 
 private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity =

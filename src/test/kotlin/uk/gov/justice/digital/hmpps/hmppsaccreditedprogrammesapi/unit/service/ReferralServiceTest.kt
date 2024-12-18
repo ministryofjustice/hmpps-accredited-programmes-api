@@ -28,6 +28,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME_HINT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
@@ -44,6 +46,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.FeatureSwitchService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
@@ -129,6 +132,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var staffService: StaffService
+
+  @MockK(relaxed = true)
+  private lateinit var courseParticipationService: CourseParticipationService
 
   @Captor
   private lateinit var referralEntityCaptor: CapturingSlot<ReferralEntity>
@@ -446,5 +452,31 @@ class ReferralServiceTest {
 
     assert(referral.primaryPomStaffId == primaryPom.staffId)
     assert(referral.secondaryPomStaffId == secondaryPom.staffId)
+  }
+
+  @Test
+  fun `should update course participation draft history on referral submission`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withOffering(OfferingEntityFactory().produce())
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withReferrer(ReferrerUserEntityFactory().produce())
+      .withAdditionalInformation("additional info")
+      .withId(referralId)
+      .withStatus(REFERRAL_STARTED)
+      .produce()
+
+    every { referralRepository.getReferenceById(referralId) } returns referral
+
+    // When
+    val updatedReferral = referralService.submitReferralById(referralId)
+
+    // Then
+    assertThat(updatedReferral).isNotNull
+    assertThat(updatedReferral.submittedOn).isNotNull
+    assertThat(updatedReferral.status).isEqualTo(REFERRAL_SUBMITTED)
+    verify { courseParticipationService.updateDraftHistoryForSubmittedReferral(referralId) }
   }
 }
