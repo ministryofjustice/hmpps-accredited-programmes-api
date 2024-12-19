@@ -12,6 +12,7 @@ import jakarta.validation.ValidationException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -48,6 +49,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralStatusRefDataFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.util.UUID
 
 private const val MY_REFERRALS_ENDPOINT = "/referrals/me/dashboard"
@@ -188,6 +190,11 @@ constructor(
       .produce()
 
     every { referralService.getReferralById(any()) } returns referral
+    val referralStatus = ReferralStatusRefDataFactory()
+      .withCode(REFERRAL_STARTED)
+      .produce()
+    every { referralReferenceDataService.getReferralStatus(REFERRAL_STARTED) } returns referralStatus
+    every { staffService.getStaffDetail(any()) } returns StaffEntityFactory().produce()
     every { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.VIEW_REFERRAL.name)) } returns Unit
 
     mockMvc.get("/referrals/${referral.id}?updatePerson=false") {
