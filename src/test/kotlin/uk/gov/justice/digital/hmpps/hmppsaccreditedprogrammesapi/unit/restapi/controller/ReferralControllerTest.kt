@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
@@ -36,6 +37,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
@@ -44,6 +46,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffSe
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralStatusRefDataFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
 import java.util.UUID
 
@@ -67,7 +70,19 @@ constructor(
   private lateinit var securityService: SecurityService
 
   @MockkBean
+  private lateinit var referralReferenceDataService: ReferralReferenceDataService
+
+  @MockkBean
+  private lateinit var referralStatusHistoryService: ReferralStatusHistoryService
+
+  @MockkBean
   private lateinit var auditService: AuditService
+
+  @MockkBean
+  private lateinit var staffService: StaffService
+
+  @MockkBean
+  private lateinit var courseParticipationService: CourseParticipationService
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {
@@ -358,12 +373,44 @@ constructor(
     val referralStatusHistoryService: ReferralStatusHistoryService = mockk()
     val auditService: AuditService = mockk()
     val staffService: StaffService = mockk()
+    val courseParticipationService: CourseParticipationService = mockk()
 
-    val referralController = ReferralController(referralService, securityService, referenceDataService, referralStatusHistoryService, auditService, staffService)
+    val referralController = ReferralController(referralService, securityService, referenceDataService, referralStatusHistoryService, auditService, staffService, courseParticipationService)
 
     val parseNameOrId = referralController.parseNameOrId(nameSearch)
     parseNameOrId.forename shouldBe "DEL"
     parseNameOrId.surname shouldBe "HATTON"
     parseNameOrId.surnameOnly shouldBe ""
+  }
+
+  @Test
+  fun `deleteReferralById removes referral and associated course participation records`() {
+    // Given
+    every { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.DELETE_REFERRAL.name)) } returns Unit
+
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withId(referralId)
+      .withOffering(OfferingEntityFactory().withId(UUID.randomUUID()).produce())
+      .withPrisonNumber(randomPrisonNumber())
+      .withReferrer(ReferrerUserEntityFactory().withUsername(REFERRER_USERNAME).produce())
+      .produce()
+
+    val draftReferralStatus = ReferralStatusRefDataFactory().withDraft(true).produce()
+    every { referralReferenceDataService.getReferralStatus(any()) } returns draftReferralStatus
+    every { referralService.getReferralById(referralId) } returns referral
+    every { courseParticipationService.deleteAllCourseParticipationsForReferral(referralId) } just Runs
+    every { referralService.deleteReferral(referralId) } just Runs
+
+    // When
+    mockMvc.delete("/referrals/$referralId") {
+      header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    }.andExpect {
+      status { isNoContent() }
+    }
+
+    // Then
+    verify { courseParticipationService.deleteAllCourseParticipationsForReferral(referralId) }
+    verify { referralService.deleteReferral(referralId) }
   }
 }
