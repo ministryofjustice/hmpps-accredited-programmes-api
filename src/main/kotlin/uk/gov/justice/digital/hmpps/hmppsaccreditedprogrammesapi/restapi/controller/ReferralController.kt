@@ -40,6 +40,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
@@ -65,6 +66,7 @@ class ReferralController(
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
   private val staffService: StaffService,
+  private val courseParticipationService: CourseParticipationService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -209,6 +211,7 @@ class ReferralController(
       throw BusinessException("Only draft referrals can be deleted. Referral with $id has a status of ${status.code}")
     }
 
+    courseParticipationService.deleteAllCourseParticipationsForReferral(id)
     referralService.deleteReferral(id)
     return ResponseEntity.noContent().build()
   }

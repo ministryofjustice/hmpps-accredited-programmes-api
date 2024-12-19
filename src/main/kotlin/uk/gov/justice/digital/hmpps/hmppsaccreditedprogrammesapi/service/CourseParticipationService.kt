@@ -53,6 +53,10 @@ constructor(
     // longer be marked as draft
     courseParticipationRepository.updateDraftStatusByReferralId(referralId)
   }
+
+  fun deleteAllCourseParticipationsForReferral(referralId: UUID) {
+    courseParticipationRepository.deleteByReferralId(referralId)
+  }
 }
 
 private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity =
