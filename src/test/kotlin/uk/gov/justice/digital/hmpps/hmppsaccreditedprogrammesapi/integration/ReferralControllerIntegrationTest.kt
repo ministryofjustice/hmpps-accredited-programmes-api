@@ -8,6 +8,7 @@ import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.optional.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.assertj.core.api.Assertions.assertThat
@@ -794,7 +795,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val readyToSubmitReferral = getReferralById(referralCreated.id)
 
     val courseParticipationId = UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e")
-    persistenceHelper.createParticipation(courseParticipationId, referralCreated.id, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, isDraft = true, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
+    persistenceHelper.createCourseParticipation(courseParticipationId, referralCreated.id, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, isDraft = true, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
 
     // When
     submitReferral(readyToSubmitReferral.id)
@@ -1582,11 +1583,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     referralHistories[0].status.code.shouldBeEqual("REFERRAL_STARTED")
     referralHistories[0].status.draft.shouldBe(true)
 
-    webTestClient
-      .delete()
-      .uri("/referrals/${createdReferral.id}")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .exchange().expectStatus().isNoContent
+    deleteReferralById(createdReferral.id)
 
     val twoSecondsAgo = LocalDateTime.now().minusSeconds(2)
     val auditEntity = auditRepository.findAll()
@@ -1598,6 +1595,27 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       }
 
     auditEntity shouldNotBe null
+  }
+
+  @Test
+  fun `should delete referral and associated course participation records`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val createdReferral = createReferral(offering.id, PRISON_NUMBER_1)
+
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), createdReferral.id, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), createdReferral.id, "B2345BB", "Marzipan Course", "Reader's Digest", "This participation will be deleted", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Adele Chiellini", LocalDateTime.parse("2023-11-26T10:20:45"), null, null)
+    courseParticipationRepository.findByReferralId(createdReferral.id).size shouldBe 2
+
+    // When
+    deleteReferral(createdReferral.id)
+
+    // Then
+    referralRepository.findById(createdReferral.id).shouldBeEmpty()
+    courseParticipationRepository.findByReferralId(createdReferral.id).size shouldBe 0
   }
 
   @Test
@@ -1771,5 +1789,13 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     return (1..length)
       .map { allowedChars.random() }
       .joinToString("")
+  }
+
+  private fun deleteReferralById(referralId: UUID) {
+    webTestClient
+      .delete()
+      .uri("/referrals/$referralId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .exchange().expectStatus().isNoContent
   }
 }

@@ -22,6 +22,8 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
   )
   fun updateDraftStatusByReferralId(@Param("referralId") referralId: UUID)
 
+  fun deleteByReferralId(referralId: UUID)
+
   fun findByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity>
 
   fun findByPrisonNumberAndOutcomeStatusIn(prisonNumber: String, outcomes: List<CourseStatus>): List<CourseParticipationEntity>

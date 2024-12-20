@@ -22,10 +22,10 @@ class CourseParticipationRepositoryIntegrationTest : IntegrationTestBase() {
   @BeforeEach
   fun setUp() {
     persistenceHelper.clearAllTableContent()
-    persistenceHelper.createParticipation(UUID.fromString("0cff5da9-1e90-4ee2-a5cb-94dc49c4b004"), null, "A1234AA", "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
-    persistenceHelper.createParticipation(UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e"), null, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
-    persistenceHelper.createParticipation(UUID.fromString("882a5a16-bcb8-4d8b-9692-a3006dcecffb"), null, "B2345BB", "Marzipan Course", "Reader's Digest", "This participation will be deleted", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Adele Chiellini", LocalDateTime.parse("2023-11-26T10:20:45"), null, null)
-    persistenceHelper.createParticipation(UUID.fromString("cc8eb19e-050a-4aa9-92e0-c654e5cfe281"), null, "A1234AA", "Orange Course", "squirrel", "This participation will be updated", "Schulist End", "COMMUNITY", "COMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.fromString("0cff5da9-1e90-4ee2-a5cb-94dc49c4b004"), null, "A1234AA", "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e"), null, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.fromString("882a5a16-bcb8-4d8b-9692-a3006dcecffb"), null, "B2345BB", "Marzipan Course", "Reader's Digest", "This participation will be deleted", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Adele Chiellini", LocalDateTime.parse("2023-11-26T10:20:45"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.fromString("cc8eb19e-050a-4aa9-92e0-c654e5cfe281"), null, "A1234AA", "Orange Course", "squirrel", "This participation will be updated", "Schulist End", "COMMUNITY", "COMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
   }
 
   @Test
