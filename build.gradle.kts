@@ -13,8 +13,8 @@ configurations {
 
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.6.0"
-  val sentryVersion = "7.18.0"
+  val springdocVersion = "2.8.1"
+  val sentryVersion = "7.20.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.0"
 
@@ -30,7 +30,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
-  implementation("com.google.guava:guava:33.3.1-jre")
+  implementation("com.google.guava:guava:33.4.0-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
@@ -38,7 +38,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.1.1")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   testImplementation("com.h2database:h2")
@@ -47,9 +47,9 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.15")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.16")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
-  testImplementation("org.wiremock:wiremock-standalone:3.9.2")
+  testImplementation("org.wiremock:wiremock-standalone:3.10.0")
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
