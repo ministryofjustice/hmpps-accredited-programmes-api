@@ -419,7 +419,7 @@ class CourseParticipationControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `searching for course particpipations by referral id should return http bad request for malformed UUID`() {
+  fun `searching for course participations by referral id should return http bad request for malformed UUID`() {
     // Given
     val badReferralId = "not-a-uuid"
 
