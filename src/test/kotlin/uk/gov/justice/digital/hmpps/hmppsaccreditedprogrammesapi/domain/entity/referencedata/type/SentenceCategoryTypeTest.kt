@@ -101,3 +101,4 @@ class SentenceCategoryTypeTest {
     assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.INDETERMINATE_RECALL)
   }
 }
+

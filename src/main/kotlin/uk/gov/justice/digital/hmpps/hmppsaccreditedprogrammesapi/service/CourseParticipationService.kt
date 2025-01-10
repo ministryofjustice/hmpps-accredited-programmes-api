@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseParticipationUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.projection.CourseParticipationProjection
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -44,8 +45,8 @@ constructor(
     return courseParticipationRepository.findByPrisonNumberAndOutcomeStatusIn(prisonNumber, outcomeStatus)
   }
 
-  fun getCourseParticipationHistoryByReferralId(uuid: UUID): List<CourseParticipationEntity> {
-    return courseParticipationRepository.findByReferralId(uuid)
+  fun getCourseParticipationHistoryByReferralId(uuid: UUID): List<CourseParticipationProjection> {
+    return courseParticipationRepository.findCourseParticipationByReferralId(uuid)
   }
 
   fun updateDraftHistoryForSubmittedReferral(referralId: UUID) {

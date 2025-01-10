@@ -33,4 +33,13 @@ data class CourseParticipationOutcome(
     @JsonProperty("complete")
     COMPLETE("complete"),
   }
+
+  companion object {
+    fun from(status: String?, yearStarted: Int?, yearCompleted: Int?): CourseParticipationOutcome? {
+      if (status == null) {
+        return null
+      }
+      return CourseParticipationOutcome(Status.valueOf(status.uppercase()), yearStarted, yearCompleted)
+    }
+  }
 }
