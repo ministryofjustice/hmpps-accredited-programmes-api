@@ -10,7 +10,7 @@ class StaffEntityFactory {
   private var staffId: BigInteger = "487505".toBigInteger()
   private var firstName: String = "John"
   private var lastName: String = "Smith"
-  private var primaryEmail: String = "john.smith@digital.justice.gov.uk"
+  private var primaryEmail: String? = "john.smith@digital.justice.gov.uk"
   private var username: String = "JSMITH_ADM"
   private var accountType: AccountType = AccountType.ADMIN
 
@@ -30,7 +30,7 @@ class StaffEntityFactory {
     this.lastName = lastName
   }
 
-  fun withPrimaryEmail(primaryEmail: String) = apply {
+  fun withPrimaryEmail(primaryEmail: String?) = apply {
     this.primaryEmail = primaryEmail
   }
 

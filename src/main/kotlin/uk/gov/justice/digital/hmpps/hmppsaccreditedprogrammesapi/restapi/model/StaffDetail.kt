@@ -7,7 +7,7 @@ data class StaffDetail(
   val staffId: BigInteger?,
   val firstName: String,
   val lastName: String,
-  val primaryEmail: String,
+  val primaryEmail: String?,
   val username: String,
   val accountType: AccountType,
 )

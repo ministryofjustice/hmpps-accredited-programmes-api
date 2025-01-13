@@ -10,7 +10,7 @@ data class StaffDetailResponse(
   val firstName: String,
   val lastName: String,
   val status: String,
-  val primaryEmail: String,
+  val primaryEmail: String? = null,
   @JsonProperty("generalAccount")
   val generalAccount: Account?,
   @JsonProperty("adminAccount")
