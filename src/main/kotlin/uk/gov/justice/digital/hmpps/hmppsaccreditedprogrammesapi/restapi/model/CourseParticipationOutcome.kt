@@ -35,11 +35,9 @@ data class CourseParticipationOutcome(
   }
 
   companion object {
-    fun from(status: String?, yearStarted: Int?, yearCompleted: Int?): CourseParticipationOutcome? {
-      if (status == null) {
-        return null
+    fun from(status: String?, yearStarted: Int?, yearCompleted: Int?): CourseParticipationOutcome? =
+      status?.let {
+        CourseParticipationOutcome(Status.valueOf(it.uppercase()), yearStarted, yearCompleted)
       }
-      return CourseParticipationOutcome(Status.valueOf(status.uppercase()), yearStarted, yearCompleted)
-    }
   }
 }
