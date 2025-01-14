@@ -38,7 +38,7 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class CourseParticipationIntegrationTest : IntegrationTestBase() {
+class CourseParticipationControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var courseParticipationRepository: CourseParticipationRepository
@@ -420,6 +420,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     courseParticipationRecords.shouldNotBeNull()
     courseParticipationRecords.size shouldBe 3
     assertThat(courseParticipationRecords).extracting("referralId").containsOnly(referralId)
+    assertThat(courseParticipationRecords).extracting("referralStatus").containsOnly("REFERRAL_STARTED")
   }
 
   @Test
@@ -435,7 +436,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `searching for course particpipations by referral id should return http bad request for malformed UUID`() {
+  fun `searching for course participations by referral id should return http bad request for malformed UUID`() {
     // Given
     val badReferralId = "not-a-uuid"
 

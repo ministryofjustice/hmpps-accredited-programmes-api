@@ -50,4 +50,7 @@ data class CourseParticipation(
 
   @Schema(example = "null", description = "Whether this is a draft record or not.")
   @get:JsonProperty("isDraft") val isDraft: Boolean? = false,
+
+  @Schema(example = "null", description = "The status of the associated referral.")
+  @get:JsonProperty("referralStatus") val referralStatus: String? = null,
 )
