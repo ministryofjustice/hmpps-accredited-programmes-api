@@ -15,4 +15,14 @@ data class CourseParticipationSetting(
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("location") val location: String? = null,
-)
+) {
+
+  companion object {
+    fun from(type: String?, location: String? = null): CourseParticipationSetting? {
+      if (type == null || location == null) {
+        return null
+      }
+      return CourseParticipationSetting(type = CourseParticipationSettingType.valueOf(type), location = location)
+    }
+  }
+}

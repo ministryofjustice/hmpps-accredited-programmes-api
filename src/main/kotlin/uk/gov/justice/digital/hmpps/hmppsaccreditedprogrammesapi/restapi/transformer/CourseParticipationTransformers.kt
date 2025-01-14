@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseParticipationUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.projection.CourseParticipationProjection
 import java.time.Year
 import java.time.format.DateTimeFormatter
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipation as ApiCourseParticipation
@@ -100,4 +101,19 @@ fun CourseParticipationEntity.toApi() = ApiCourseParticipation(
   isDraft = isDraft,
   addedBy = createdByUsername,
   createdAt = createdDateTime.format(DateTimeFormatter.ISO_DATE_TIME),
+)
+
+fun CourseParticipationProjection.toApi() = ApiCourseParticipation(
+  courseName = getCourseName(),
+  id = getId(),
+  referralId = getReferralId(),
+  prisonNumber = getPrisonNumber(),
+  setting = ApiCourseParticipationSetting.from(getType(), getLocation()),
+  source = getSource(),
+  detail = getDetail(),
+  outcome = ApiCourseParticipationOutcome.from(getOutcomeStatus(), getYearStarted(), getYearCompleted()),
+  isDraft = getIsDraft(),
+  addedBy = getAddedBy(),
+  createdAt = getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
+  referralStatus = getReferralStatus(),
 )

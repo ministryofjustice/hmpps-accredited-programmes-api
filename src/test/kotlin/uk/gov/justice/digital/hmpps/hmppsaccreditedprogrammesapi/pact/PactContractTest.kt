@@ -26,6 +26,7 @@ import java.util.*
 @Provider("Accredited Programmes API")
 @VerificationReports(value = ["markdown", "console"], reportDir = "build/pact")
 class PactContractTest : IntegrationTestBase() {
+
   @BeforeEach
   fun setup() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
@@ -33,7 +34,9 @@ class PactContractTest : IntegrationTestBase() {
   }
 
   @State("A participation can be created")
-  fun `ensure a participation can be created`() {}
+  fun `ensure a participation can be created`() {
+    createReferral()
+  }
 
   @State("A course can be created")
   fun `ensure a course can be created`() {
@@ -119,23 +122,56 @@ class PactContractTest : IntegrationTestBase() {
 
   @State("Participation 0cff5da9-1e90-4ee2-a5cb-94dc49c4b004 exists")
   fun `ensure participation 0cff5da9-1e90-4ee2-a5cb-94dc49c4b004 exists`() {
-    persistenceHelper.createCourseParticipation(UUID.fromString("0cff5da9-1e90-4ee2-a5cb-94dc49c4b004"), null, "A1234AA", "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    val referralId = createReferral()
+    persistenceHelper.createCourseParticipation(UUID.fromString("0cff5da9-1e90-4ee2-a5cb-94dc49c4b004"), referralId, "A1234AA", "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
   }
 
   @State("Participation 882a5a16-bcb8-4d8b-9692-a3006dcecffb exists")
   fun `ensure participation 882a5a16-bcb8-4d8b-9692-a3006dcecffb exists`() {
-    persistenceHelper.createCourseParticipation(UUID.fromString("882a5a16-bcb8-4d8b-9692-a3006dcecffb"), null, "B2345BB", "Marzipan Course", "Reader's Digest", "This participation will be deleted", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Adele Chiellini", LocalDateTime.parse("2023-11-26T10:20:45"), null, null)
+    val referralId = createReferral()
+    persistenceHelper.createCourseParticipation(UUID.fromString("882a5a16-bcb8-4d8b-9692-a3006dcecffb"), referralId, "B2345BB", "Marzipan Course", "Reader's Digest", "This participation will be deleted", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Adele Chiellini", LocalDateTime.parse("2023-11-26T10:20:45"), null, null)
   }
 
   @State("Participation cc8eb19e-050a-4aa9-92e0-c654e5cfe281 exists")
   fun `ensure participation cc8eb19e-050a-4aa9-92e0-c654e5cfe281 exists`() {
-    persistenceHelper.createCourseParticipation(UUID.fromString("cc8eb19e-050a-4aa9-92e0-c654e5cfe281"), null, "C1234CC", "Orange Course", "squirrel", "This participation will be updated", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    val referralId = createReferral()
+    persistenceHelper.createCourseParticipation(UUID.fromString("cc8eb19e-050a-4aa9-92e0-c654e5cfe281"), referralId, "C1234CC", "Orange Course", "squirrel", "This participation will be updated", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
   }
 
   @State("Person A1234AA has participations 0cff5da9-1e90-4ee2-a5cb-94dc49c4b004 and eb357e5d-5416-43bf-a8d2-0dc8fd92162e and no others")
   fun `ensure person A1234AA has participations 0cff5da9-1e90-4ee2-a5cb-94dc49c4b004 and eb357e5d-5416-43bf-a8d2-0dc8fd92162e and no others`() {
-    persistenceHelper.createCourseParticipation(UUID.fromString("0cff5da9-1e90-4ee2-a5cb-94dc49c4b004"), null, "A1234AA", "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
-    persistenceHelper.createCourseParticipation(UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e"), null, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
+    val referralId = createReferral()
+    persistenceHelper.createCourseParticipation(UUID.fromString("0cff5da9-1e90-4ee2-a5cb-94dc49c4b004"), referralId, "A1234AA", "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.fromString("eb357e5d-5416-43bf-a8d2-0dc8fd92162e"), referralId, "A1234AA", "Red Course", "deaden", "Some detail", "Schulist End", "CUSTODY", "INCOMPLETE", 2023, null, false, "Joanne Hamill", LocalDateTime.parse("2023-09-21T23:45:12"), null, null)
+  }
+
+  private fun createReferral(): UUID? {
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
+    val offeringId = UUID.randomUUID()
+    val courseId = UUID.randomUUID()
+    val referralId = UUID.fromString("0c46ed09-170b-4c0f-aee8-a24eeaeeddab")
+    persistenceHelper.createCourse(courseId, "C1", "Course 1", "Sample description", "SC++", "General offence")
+    persistenceHelper.createOffering(
+      offeringId,
+      courseId,
+      "MDI",
+      "nobody-mdi@digital.justice.gov.uk",
+      "nobody2-mdi@digital.justice.gov.uk",
+      true,
+    )
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    persistenceHelper.createReferral(
+      referralId,
+      offeringId,
+      "B2345BB",
+      "TEST_REFERRER_USER_1",
+      "This referral will be updated",
+      false,
+      false,
+      "REFERRAL_STARTED",
+      null,
+    )
+    return referralId
   }
 
   @State("Referral 0c46ed09-170b-4c0f-aee8-a24eeaeeddaa exists with status REFERRAL_STARTED")
@@ -220,6 +256,7 @@ class PactContractTest : IntegrationTestBase() {
     persistenceHelper.createReferrerUser("TEST_REFERRER_USER_2")
 
     persistenceHelper.createReferral(UUID.fromString("0c46ed09-170b-4c0f-aee8-a24eeaeeddaa"), UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), "B2345BB", "TEST_REFERRER_USER_1", "This referral will be updated", false, false, "REFERRAL_STARTED", null)
+    persistenceHelper.createReferral(UUID.fromString("0c46ed09-170b-4c0f-aee8-a24eeaeeddab"), UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"), "B2345BB", "TEST_REFERRER_USER_1", "This referral will be updated", false, false, "REFERRAL_STARTED", null)
     persistenceHelper.createReferral(UUID.fromString("fae2ed00-057e-4179-9e55-f6a4f4874cf0"), UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), "C3456CC", "TEST_REFERRER_USER_2", "more information", true, true, "REFERRAL_SUBMITTED", LocalDateTime.parse("2023-11-12T19:11:00"))
     persistenceHelper.createReferral(UUID.fromString("153383a4-b250-46a8-9950-43eb358c2805"), UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"), "D3456DD", "TEST_REFERRER_USER_2", "more information", true, true, "REFERRAL_SUBMITTED", LocalDateTime.parse("2023-11-13T19:11:00"))
 
