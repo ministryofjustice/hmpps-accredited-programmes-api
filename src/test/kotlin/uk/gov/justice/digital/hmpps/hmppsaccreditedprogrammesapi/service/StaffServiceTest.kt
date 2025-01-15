@@ -106,7 +106,7 @@ class StaffServiceTest {
       firstName = "John",
       lastName = "Doe",
       status = "ACTIVE",
-      primaryEmail = "john.doe@example.com",
+      primaryEmail = null,
       generalAccount = Account("jdoe"),
       adminAccount = null,
     )
@@ -116,7 +116,7 @@ class StaffServiceTest {
     assertEquals("1".toBigInteger(), result.staffId)
     assertEquals("John", result.firstName)
     assertEquals("Doe", result.lastName)
-    assertEquals("john.doe@example.com", result.primaryEmail)
+    assertNull(result.primaryEmail)
     assertEquals("jdoe", result.username)
     assertEquals(AccountType.GENERAL.name, result.accountType)
   }

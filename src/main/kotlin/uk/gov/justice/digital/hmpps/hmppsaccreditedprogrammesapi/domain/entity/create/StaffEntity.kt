@@ -26,7 +26,7 @@ data class StaffEntity(
   var lastName: String,
 
   @Column(name = "primary_email", nullable = false)
-  var primaryEmail: String,
+  var primaryEmail: String? = null,
 
   @Column(name = "username", nullable = false)
   var username: String,
