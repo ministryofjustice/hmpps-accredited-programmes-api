@@ -296,6 +296,23 @@ class CourseParticipationControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should NOT return draft course participations when searching by prison number`() {
+    // Given
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, true, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, true, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+
+    // When
+    val courseParticipations = getCourseParticipationsForPrisonNumber(PRISON_NUMBER_1)
+
+    // Then
+    assertThat(courseParticipations).size().isEqualTo(3)
+    assertThat(courseParticipations).extracting("isDraft").containsOnly(false)
+  }
+
+  @Test
   fun `Finding course participations by prison number should return 200 with matching entries`() {
     val expectedPrisonNumber = randomPrisonNumber()
     val otherPrisonNumber = randomPrisonNumber()

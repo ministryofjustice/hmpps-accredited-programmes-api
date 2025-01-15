@@ -36,6 +36,7 @@ constructor(
 
   fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity> =
     courseParticipationRepository.findByPrisonNumber(prisonNumber)
+      .filterNot { it.isDraft == true }
 
   fun deleteCourseParticipationById(historicCourseParticipationId: UUID) {
     courseParticipationRepository.deleteById(historicCourseParticipationId)
