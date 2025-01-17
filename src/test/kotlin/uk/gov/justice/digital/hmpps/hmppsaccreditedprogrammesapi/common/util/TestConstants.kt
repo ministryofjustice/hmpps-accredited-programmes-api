@@ -38,6 +38,9 @@ const val ON_PROGRAMME_DESCRIPTION = "On programme"
 const val ON_PROGRAMME_COLOUR = "pink"
 const val ON_PROGRAMME_HINT = "This person has started the programme."
 
+const val DESELECTED = "DESELECTED"
+const val PROGRAMME_COMPLETE = "PROGRAMME_COMPLETE"
+
 const val PRISON_NUMBER_1 = "C6666CC"
 const val REFERRER_USERNAME = "TEST_REFERRER_USER_1"
 const val ORGANISATION_ID_MDI = "MDI"

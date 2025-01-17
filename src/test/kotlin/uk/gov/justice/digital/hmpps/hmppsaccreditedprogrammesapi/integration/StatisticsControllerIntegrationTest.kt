@@ -4,6 +4,8 @@ import au.com.dius.pact.core.support.isNotEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,9 +16,12 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.DESELECTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PROGRAMME_COMPLETE
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReportContent
@@ -24,13 +29,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
 import java.time.LocalDate
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class StatisticsIntegrationTest : IntegrationTestBase() {
+class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var referralStatusHistoryRepository: ReferralStatusHistoryRepository
@@ -38,12 +44,15 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
   @Autowired
   lateinit var statisticsRepository: StatisticsRepository
 
+  val courseId1 = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
+  val offeringId1 = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
+
   @BeforeEach
   fun setUp() {
     persistenceHelper.clearAllTableContent()
 
     persistenceHelper.createCourse(
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      courseId1,
       "SC",
       "Super Course",
       "Sample description",
@@ -56,8 +65,8 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
     persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createOffering(
-      UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      offeringId1,
+      courseId1,
       "MDI",
       "nobody-mdi@digital.justice.gov.uk",
       "nobody2-mdi@digital.justice.gov.uk",
@@ -65,7 +74,7 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
     )
     persistenceHelper.createOffering(
       UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      courseId1,
       "BWN",
       "nobody-bwn@digital.justice.gov.uk",
       "nobody2-bwn@digital.justice.gov.uk",
@@ -157,7 +166,7 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return statistics by status `() {
+  fun `should return statistics by status`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
@@ -177,6 +186,131 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
       )
 
     referralCountByStatus.isNotEmpty()
+  }
+
+  @Test
+  fun `should return referral status statistics for a given course id and location`() {
+    // Given
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral.id)
+
+    // When
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+
+    // Then
+    assertThat(reportStatusesByProgrammeType).isNotNull
+      .hasSize(6)
+      .extracting("count", "status", "organisationCode")
+      .containsExactly(
+        tuple(1L, "ASSESSED_SUITABLE", ORGANISATION_ID_MDI),
+        tuple(1L, "ASSESSMENT_STARTED", ORGANISATION_ID_MDI),
+        tuple(1L, "AWAITING_ASSESSMENT", ORGANISATION_ID_MDI),
+        tuple(1L, "ON_PROGRAMME", ORGANISATION_ID_MDI),
+        tuple(1L, "REFERRAL_STARTED", ORGANISATION_ID_MDI),
+        tuple(1L, "REFERRAL_SUBMITTED", ORGANISATION_ID_MDI),
+      )
+  }
+
+  @Test
+  fun `should return referral status statistics for a given course id and ALL locations`() {
+    // Given
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral.id)
+
+    // When
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = null)
+
+    // Then
+    assertThat(reportStatusesByProgrammeType).isNotNull
+      .hasSize(6)
+      .extracting("count", "status", "organisationCode")
+      .containsExactly(
+        tuple(1L, "ASSESSED_SUITABLE", ORGANISATION_ID_MDI),
+        tuple(1L, "ASSESSMENT_STARTED", ORGANISATION_ID_MDI),
+        tuple(1L, "AWAITING_ASSESSMENT", ORGANISATION_ID_MDI),
+        tuple(1L, "ON_PROGRAMME", ORGANISATION_ID_MDI),
+        tuple(1L, "REFERRAL_STARTED", ORGANISATION_ID_MDI),
+        tuple(1L, "REFERRAL_SUBMITTED", ORGANISATION_ID_MDI),
+      )
+  }
+
+  @Test
+  fun `should return DESELECTED referral count for a given course id`() {
+    // Given
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral.id)
+    progressReferralStatusToStatus(createdReferral.id, DESELECTED)
+
+    // When
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+
+    // Then
+    assertThat(reportStatusesByProgrammeType)
+      .hasSize(7)
+      .extracting("count", "status", "organisationCode")
+      .contains(tuple(1L, DESELECTED, ORGANISATION_ID_MDI))
+  }
+
+  @Test
+  fun `should return PROGRAMME_COMPLETE referral count for a given course id`() {
+    // Given
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral.id)
+    progressReferralStatusToStatus(createdReferral.id, PROGRAMME_COMPLETE)
+
+    // When
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+
+    // Then
+    assertThat(reportStatusesByProgrammeType)
+      .hasSize(7)
+      .extracting("count", "status", "organisationCode")
+      .contains(tuple(1L, PROGRAMME_COMPLETE, ORGANISATION_ID_MDI))
+  }
+
+  @Test
+  fun `should return WITHDRAWN referral count for a given course id`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+    createdReferral.shouldNotBeNull()
+
+    progressReferralStatusToStatus(createdReferral.id, REFERRAL_SUBMITTED)
+    progressReferralStatusToStatus(createdReferral.id, REFERRAL_WITHDRAWN)
+
+    val courseId = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
+
+    // When
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+
+    // Then
+    assertThat(reportStatusesByProgrammeType)
+      .hasSize(3)
+      .extracting("count", "status", "organisationCode")
+      .contains(tuple(1L, REFERRAL_WITHDRAWN, ORGANISATION_ID_MDI))
+  }
+
+  @Test
+  fun `should return an empty list of referral statistics for an unknown course id`() {
+    // Given
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+
+    progressReferralStatusToOnProgramme(createdReferral.id)
+    val courseId = UUID.randomUUID()
+
+    // When
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+
+    // Then
+    assertThat(reportStatusesByProgrammeType).isEmpty()
+  }
+
+  private fun progressReferralStatusToStatus(referralId: UUID, status: String) {
+    val referralStatusUpdate = ReferralStatusUpdate(
+      status = status,
+      ptUser = true,
+    )
+    updateReferralStatus(referralId, referralStatusUpdate)
   }
 
   private fun progressReferralStatusToOnProgramme(referralId: UUID) {
@@ -212,10 +346,18 @@ class StatisticsIntegrationTest : IntegrationTestBase() {
   }
 
   fun createReferral(prisonNumber: String = PRISON_NUMBER_1): Referral {
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    return createReferral(offering.id, prisonNumber)
+    return createReferral(offeringId1, prisonNumber)
   }
+
+  fun getReportStatusesByProgrammeType(courseId: UUID, startDate: LocalDate, endDate: LocalDate, locations: List<String>?) =
+    webTestClient
+      .get()
+      .uri("/statistics/report/count-by-status-for-programme?startDate=$startDate&endDate=$endDate&" + locations?.joinToString("&") { "locationCodes=$it" } + "&courseId=$courseId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectBody<List<ReportStatusCount>>()
+      .returnResult().responseBody!!
 
   fun getReferralById(createdReferralId: UUID) =
     webTestClient
