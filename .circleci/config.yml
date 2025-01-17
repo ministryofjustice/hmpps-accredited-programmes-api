@@ -116,7 +116,6 @@ workflows:
             branches:
               only:
                 - main
-                - APG-449
           requires:
             - validate
             - build_docker
