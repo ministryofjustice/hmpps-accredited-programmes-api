@@ -260,6 +260,33 @@ FROM (
     locationCodes: List<String>?,
   ): List<ReportStatusCountProjection>?
 
+  @Query(
+    """
+       SELECT
+         COUNT(*) AS count,
+         rsh.status AS status,
+         o.organisation_id AS orgId
+       FROM referral r
+       JOIN offering o ON r.offering_id = o.offering_id
+       JOIN course c ON o.course_id = c.course_id
+       JOIN referral_status_history rsh ON rsh.referral_id = r.referral_id
+       WHERE r.deleted = FALSE
+         AND rsh.status_start_date >= :startDate
+         AND rsh.status_start_date < :endDate
+         AND (:locations is null OR o.organisation_id in :locations)
+         AND c.course_id = :courseId
+       GROUP BY rsh.status, o.organisation_id
+       ORDER BY o.organisation_id, rsh.status
+          """,
+    nativeQuery = true,
+  )
+  fun findReferralCountByCourseId(
+    startDate: LocalDate,
+    endDate: LocalDate,
+    locations: List<String>?,
+    courseId: UUID,
+  ): List<ReportStatusCountProjection>?
+
   interface ReportStatusCountProjection {
     fun getCount(): BigInteger
     fun getStatus(): String
