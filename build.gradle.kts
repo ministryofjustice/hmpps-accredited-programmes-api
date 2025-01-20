@@ -38,7 +38,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.1.1")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.3")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
