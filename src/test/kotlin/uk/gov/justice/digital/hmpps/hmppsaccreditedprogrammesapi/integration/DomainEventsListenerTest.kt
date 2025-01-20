@@ -110,7 +110,7 @@ class DomainEventsListenerTest : IntegrationTestBase() {
   ).get()
 
   @Test
-  fun `update offender message`() {
+  fun `should handle update offender message successfully`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val nomsNumber = "C6666DD"
@@ -160,7 +160,7 @@ class DomainEventsListenerTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `handle POM allocation message successful`() {
+  fun `should handle POM allocation message successfully`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val nomsNumber = "C6666CC"
     val course = getAllCourses().first()
