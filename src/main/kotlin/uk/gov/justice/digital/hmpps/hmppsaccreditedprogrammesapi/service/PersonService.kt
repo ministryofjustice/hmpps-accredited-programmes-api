@@ -168,8 +168,9 @@ class PersonService(
         updatePerson(it, personEntity, sentenceType)
       }
       personRepository.save(personEntity)
+      log.info("Prisoner $prisonNumber update successful")
     } else {
-      log.info("Prisoner is not of interest to ACP: $prisonNumber")
+      log.info("Prisoner is not of interest to ACP: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
     }
   }
 
