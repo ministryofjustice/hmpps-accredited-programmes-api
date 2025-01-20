@@ -7,10 +7,14 @@ import io.awspring.cloud.sqs.annotation.SqsListener
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 
 @Service
 class DomainEventsListener(
   private val personService: PersonService,
+  private val staffService: StaffService,
+  private val referralService: ReferralService,
   private val objectMapper: ObjectMapper,
 ) {
 
@@ -20,26 +24,49 @@ class DomainEventsListener(
   fun listen(msg: String) {
     val (message) = objectMapper.readValue<SQSMessage>(msg)
     val domainEventMessage = objectMapper.readValue<DomainEventsMessage>(message)
-    log.info("Processing prisoner offender search update message")
+    val prisonNumber = domainEventMessage.prisonerNumber ?: domainEventMessage.personReference.findNomsNumber()
+    log.info("Request received to process domain event type ${domainEventMessage.eventType} for prisoner number $prisonNumber")
     handleMessage(domainEventMessage)
   }
 
   private fun handleMessage(message: DomainEventsMessage) {
-    if (message.prisonerNumber != null) {
-      log.info("message contained prisoner number: ${message.prisonerNumber}")
-      personService.updatePerson(message.prisonerNumber)
-    } else {
-      log.error("Message did not contain prisoner number. " + message.additionalInformation)
+    when (message.eventType) {
+      "prisoner-offender-search.prisoner.updated" -> handlePrisonerUpdatedMessage(message)
+      "offender-management.allocation.changed" -> handlePomAllocationChangedMessage(message)
+      else -> log.error("Unknown event type: ${message.eventType}")
     }
+  }
+
+  private fun handlePomAllocationChangedMessage(message: DomainEventsMessage) {
+    val prisonNumber = message.personReference.findNomsNumber()
+
+    prisonNumber?.let {
+      val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(it)
+      referralService.updatePoms(it, primaryPom, secondaryPom)
+    } ?: log.error("POM allocation message did not contain prisoner number. " + message.personReference)
+  }
+
+  private fun handlePrisonerUpdatedMessage(message: DomainEventsMessage) {
+    message.prisonerNumber?.let {
+      personService.updatePerson(it)
+    } ?: log.error("Prison offender message did not contain prisoner number. " + message.additionalInformation)
   }
 }
 
 data class DomainEventsMessage(
   val eventType: String,
   val additionalInformation: Map<String, Any>? = mapOf(),
+  val personReference: PersonReference = PersonReference(),
 ) {
   val prisonerNumber = additionalInformation?.get("nomsNumber") as String?
 }
+
+data class PersonReference(val identifiers: List<PersonIdentifier> = listOf()) {
+  fun findCrn() = get("CRN")
+  fun findNomsNumber() = get("NOMS")
+  operator fun get(key: String) = identifiers.find { it.type == key }?.value
+}
+data class PersonIdentifier(val type: String, val value: String)
 
 data class SQSMessage(
   @JsonProperty("Message") val message: String,

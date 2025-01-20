@@ -38,7 +38,7 @@ import java.util.UUID
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class CourseParticipationIntegrationTest : IntegrationTestBase() {
+class CourseParticipationControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var courseParticipationRepository: CourseParticipationRepository
@@ -296,6 +296,23 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should NOT return draft course participations when searching by prison number`() {
+    // Given
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, true, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, true, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+    persistenceHelper.createCourseParticipation(UUID.randomUUID(), null, PRISON_NUMBER_1, "Green Course", "squirrel", "Some detail", "Schulist End", "COMMUNITY", "INCOMPLETE", 2023, null, false, "Carmelo Conn", LocalDateTime.parse("2023-10-11T13:11:06"), null, null)
+
+    // When
+    val courseParticipations = getCourseParticipationsForPrisonNumber(PRISON_NUMBER_1)
+
+    // Then
+    assertThat(courseParticipations).size().isEqualTo(3)
+    assertThat(courseParticipations).extracting("isDraft").containsOnly(false)
+  }
+
+  @Test
   fun `Finding course participations by prison number should return 200 with matching entries`() {
     val expectedPrisonNumber = randomPrisonNumber()
     val otherPrisonNumber = randomPrisonNumber()
@@ -403,6 +420,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
     courseParticipationRecords.shouldNotBeNull()
     courseParticipationRecords.size shouldBe 3
     assertThat(courseParticipationRecords).extracting("referralId").containsOnly(referralId)
+    assertThat(courseParticipationRecords).extracting("referralStatus").containsOnly("REFERRAL_STARTED")
   }
 
   @Test
@@ -418,7 +436,7 @@ class CourseParticipationIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `searching for course particpipations by referral id should return http bad request for malformed UUID`() {
+  fun `searching for course participations by referral id should return http bad request for malformed UUID`() {
     // Given
     val badReferralId = "not-a-uuid"
 

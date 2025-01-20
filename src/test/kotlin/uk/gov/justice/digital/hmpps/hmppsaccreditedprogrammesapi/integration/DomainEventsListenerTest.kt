@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
@@ -18,11 +19,15 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.OffenderAllocationResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.ResourceLoader
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.PersonIdentifier
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.PersonReference
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.SQSMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
@@ -36,6 +41,9 @@ class DomainEventsListenerTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var referralViewRepository: ReferralViewRepository
+
+  @Autowired
+  lateinit var referralRepository: ReferralRepository
 
   @BeforeEach
   fun setUp() {
@@ -102,7 +110,7 @@ class DomainEventsListenerTest : IntegrationTestBase() {
   ).get()
 
   @Test
-  fun `update offender message`() {
+  fun `should handle update offender message successfully`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val nomsNumber = "C6666DD"
@@ -149,6 +157,49 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     referralViewAfter shouldNotBe null
     referralViewAfter?.forename?.shouldBeEqual("name")
     referralViewAfter?.surname?.shouldBeEqual("changed")
+  }
+
+  @Test
+  fun `should handle POM allocation message successfully`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val nomsNumber = "C6666CC"
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    createReferral(offering.id!!, nomsNumber)
+
+    val referralViewBeforeEvent = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    referralViewBeforeEvent?.primaryPomUsername shouldBe null
+
+    val result = ResourceLoader.file<OffenderAllocationResponse>("pom_details_487577")
+
+    wiremockServer.stubFor(
+      WireMock.get(WireMock.urlEqualTo("/api/allocation/$nomsNumber"))
+        .willReturn(
+          WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(result)),
+        ),
+    )
+
+    val eventType = "offender-management.allocation.changed"
+    sendDomainEvent(
+      DomainEventsMessage(
+        eventType,
+        personReference = PersonReference(
+          identifiers = listOf(
+            PersonIdentifier("NOMS", nomsNumber),
+          ),
+        ),
+      ),
+    )
+
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    await untilCallTo {
+      referralRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    } matches { it?.primaryPomStaffId == "487577".toBigInteger() }
   }
 
   fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =

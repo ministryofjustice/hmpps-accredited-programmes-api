@@ -15,7 +15,7 @@ data class OffenderAllocationResponse(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PomDetail(
   @JsonProperty("staff_id")
-  val staffId: BigInteger?,
+  var staffId: BigInteger?,
   @JsonProperty("name")
   val name: String?,
 )

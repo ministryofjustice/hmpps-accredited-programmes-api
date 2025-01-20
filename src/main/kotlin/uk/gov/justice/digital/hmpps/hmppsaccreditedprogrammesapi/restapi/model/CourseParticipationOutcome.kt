@@ -33,4 +33,11 @@ data class CourseParticipationOutcome(
     @JsonProperty("complete")
     COMPLETE("complete"),
   }
+
+  companion object {
+    fun from(status: String?, yearStarted: Int?, yearCompleted: Int?): CourseParticipationOutcome? =
+      status?.let {
+        CourseParticipationOutcome(Status.valueOf(it.uppercase()), yearStarted, yearCompleted)
+      }
+  }
 }

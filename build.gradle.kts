@@ -13,7 +13,7 @@ configurations {
 
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.8.1"
+  val springdocVersion = "2.6.0"
   val sentryVersion = "7.20.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.2"
@@ -37,8 +37,9 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.2.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.1.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+  implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.3")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   testImplementation("com.h2database:h2")

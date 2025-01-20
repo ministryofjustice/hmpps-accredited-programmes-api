@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StatisticsService
 import java.time.LocalDate
+import java.util.UUID
 
 @RestController
 @Tag(
@@ -24,8 +27,10 @@ import java.time.LocalDate
 )
 @RequestMapping("statistics")
 class StatisticsController(
+
   private val statisticsRepository: StatisticsRepository,
   private val objectMapper: ObjectMapper,
+  private val statisticsService: StatisticsService,
 ) {
   @GetMapping("/report/countByStatus", produces = ["application/json"])
   fun getReportTypes(
@@ -38,6 +43,21 @@ class StatisticsController(
       endDate!!,
       locationCodes,
     ).orEmpty()
+
+  @GetMapping("/report/count-by-status-for-programme", produces = ["application/json"])
+  fun getReportStatusCountsForProgramme(
+    @RequestParam startDate: LocalDate,
+    @RequestParam endDate: LocalDate? = LocalDate.now().plusDays(1),
+    @RequestParam locationCodes: List<String>? = listOf(),
+    @RequestParam courseId: UUID,
+  ): List<ReportStatusCount> {
+    return statisticsService.getReferralStatusCountByProgramme(
+      startDate,
+      endDate!!,
+      locationCodes,
+      courseId,
+    )
+  }
 
   @GetMapping("/report-types", produces = ["application/json"])
   fun getReportTypes(): ReportTypes {

@@ -84,4 +84,20 @@ class SentenceCategoryTypeTest {
     // When & Then
     assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.INDETERMINATE)
   }
+
+  @Test
+  fun `Should return DETERMINATE_RECALL if it's the only category in the list`() {
+    // Given
+    val list = listOf(SentenceCategoryType.DETERMINATE_RECALL)
+    // When & Then
+    assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.DETERMINATE_RECALL)
+  }
+
+  @Test
+  fun `Should return INDETERMINATE_RECALL if it's the only category in the list`() {
+    // Given
+    val list = listOf(SentenceCategoryType.INDETERMINATE_RECALL)
+    // When & Then
+    assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.INDETERMINATE_RECALL)
+  }
 }

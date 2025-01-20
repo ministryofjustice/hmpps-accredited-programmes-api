@@ -41,6 +41,19 @@
     },
     {
       "request": {
+        "url": "/users/staff/487577",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "staffDetail_admin_487577.json"
+      }
+    },
+    {
+      "request": {
         "url": "/users/staff/487691",
         "method": "GET"
       },
