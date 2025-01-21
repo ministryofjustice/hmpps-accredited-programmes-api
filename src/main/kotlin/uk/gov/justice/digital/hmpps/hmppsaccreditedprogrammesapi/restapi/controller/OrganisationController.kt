@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.EnabledOrganisation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.O
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 
 @RestController
@@ -33,6 +35,7 @@ class OrganisationController(
   private val courseService: CourseService,
   private val enabledOrganisationService: EnabledOrganisationService,
   private val prisonRegisterApiService: PrisonRegisterApiService,
+  private val organisationService: OrganisationService,
 ) {
 
   @Operation(
@@ -115,4 +118,34 @@ class OrganisationController(
           )
         },
       )
+
+  @Operation(
+    tags = ["Organisation"],
+    summary = "Retrieve an Organisation by its Organisation code",
+    operationId = "getOrganisation",
+    description = """Returns an organisation's details""",
+    responses = [
+      ApiResponse(responseCode = "200", description = "Successfully retrieved organisation", content = [Content(array = ArraySchema(schema = Schema(implementation = Organisation::class)))]),
+      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    ],
+    security = [ SecurityRequirement(name = "bearerAuth") ],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/organisation/{code}"],
+    produces = ["application/json"],
+  )
+  fun getOrganisation(@Parameter(description = "The organisation identifier code", required = true) @PathVariable("code") code: String): ResponseEntity<Organisation> {
+    return organisationService.findOrganisationEntityByCode(code)?.let {
+      ResponseEntity.ok(
+        Organisation(
+          code = it.code,
+          prisonName = it.name,
+          gender = it.gender,
+        ),
+      )
+    } ?: throw NotFoundException("No Organisation found at /organisation/$code")
+  }
 }
