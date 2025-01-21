@@ -15,4 +15,7 @@ data class Organisation(
 
   @Schema(example = "Moorland HMP", description = "")
   @get:JsonProperty("prisonName") val prisonName: String? = null,
+
+  @Schema(example = "MALE", description = "The gender of inmates that a prison will accept")
+  @get:JsonProperty("gender") val gender: String? = null,
 )
