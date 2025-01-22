@@ -206,7 +206,10 @@ class CourseController(
     value = ["/courses"],
     produces = ["application/json"],
   )
-  fun getAllCourses(@Parameter(description = "flag to return withdrawn") @RequestParam(value = "withdrawn", required = false) withdrawn: Boolean?): ResponseEntity<List<Course>> =
+  fun getAllCourses(
+    @Parameter(description = "flag to return withdrawn") @RequestParam(value = "withdrawn", required = false) withdrawn: Boolean?,
+    @Parameter(description = "intensity of the course") @RequestParam(value = "intensity", required = false) intensity: String?,
+  ): ResponseEntity<List<Course>> =
     ResponseEntity
       .ok(
         courseService
