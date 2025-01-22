@@ -11,6 +11,8 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Organisation
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -81,6 +83,42 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
     assertThat(courses[0].name).isEqualTo("Course Numero Tres")
   }
 
+  @Test
+  fun `should return organisation details including gender for a known organisation code`() {
+    // Given
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org", gender = "MALE")
+
+    // When
+    val organisation = getOrganisation("BWN")
+
+    // Then
+    assertThat(organisation.code).isEqualTo("BWN")
+    assertThat(organisation.gender).isEqualTo("MALE")
+  }
+
+  @Test
+  fun `should return a 404 with ErrorResponse for an unknown organisation code`() {
+    // Given
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org", gender = "MALE")
+
+    // When
+    val errorResponse = webTestClient
+      .get()
+      .uri("/organisation/UNKNOWN_ORGANISATION_CODE")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNotFound
+      .expectBody<ErrorResponse>()
+      .returnResult().responseBody!!
+
+    // Then
+    assertThat(errorResponse).isNotNull
+    assertThat(errorResponse.status).isEqualTo(404)
+    assertThat(errorResponse.userMessage).isEqualTo("Not Found: No Organisation found at /organisation/UNKNOWN_ORGANISATION_CODE")
+    assertThat(errorResponse.developerMessage).isEqualTo("No Organisation found at /organisation/UNKNOWN_ORGANISATION_CODE")
+  }
+
   fun getAllCoursesForOrganisation(organisationId: String): List<CourseEntity> =
     webTestClient
       .get()
@@ -90,5 +128,16 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .expectBody<List<CourseEntity>>()
+      .returnResult().responseBody!!
+
+  fun getOrganisation(organisationCode: String): Organisation =
+    webTestClient
+      .get()
+      .uri("/organisation/$organisationCode")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<Organisation>()
       .returnResult().responseBody!!
 }
