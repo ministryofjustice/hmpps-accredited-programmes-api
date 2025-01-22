@@ -52,6 +52,7 @@ data class CourseEntity(
   var withdrawn: Boolean = false,
   var listDisplayName: String? = null,
   var displayOnProgrammeDirectory: Boolean? = true,
+  var intensity: String? = null,
 ) {
   fun addOffering(offering: OfferingEntity) {
     offering.course = this

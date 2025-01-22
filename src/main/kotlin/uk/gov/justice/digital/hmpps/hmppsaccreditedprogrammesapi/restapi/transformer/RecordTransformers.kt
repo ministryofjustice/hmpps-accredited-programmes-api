@@ -20,6 +20,7 @@ fun CourseEntity.toApi(): Course = Course(
   displayName = name + addAudience(name, audience),
   withdrawn = withdrawn,
   displayOnProgrammeDirectory = displayOnProgrammeDirectory,
+  intensity = intensity,
 )
 
 fun addAudience(name: String, audience: String): String {

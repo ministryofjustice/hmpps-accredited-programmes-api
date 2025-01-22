@@ -114,9 +114,8 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val nomsNumber = "C6666DD"
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    createReferral(offering.id!!, nomsNumber)
+    val offeringId = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
+    createReferral(offeringId, nomsNumber)
 
     val referralViewBefore = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     referralViewBefore shouldNotBe null
@@ -163,9 +162,8 @@ class DomainEventsListenerTest : IntegrationTestBase() {
   fun `should handle POM allocation message successfully`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val nomsNumber = "C6666CC"
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-    createReferral(offering.id!!, nomsNumber)
+    val offeringId = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
+    createReferral(offeringId, nomsNumber)
 
     val referralViewBeforeEvent = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     referralViewBeforeEvent?.primaryPomUsername shouldBe null
