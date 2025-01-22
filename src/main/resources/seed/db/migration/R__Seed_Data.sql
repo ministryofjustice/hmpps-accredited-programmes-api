@@ -5,6 +5,7 @@ DELETE from referral;
 DELETE from referrer_user;
 DELETE from offering;
 DELETE from prerequisite;
+DELETE from course_variant;
 DELETE from course;
 
 INSERT INTO course(course_id, name, identifier, description, audience, alternate_name)
