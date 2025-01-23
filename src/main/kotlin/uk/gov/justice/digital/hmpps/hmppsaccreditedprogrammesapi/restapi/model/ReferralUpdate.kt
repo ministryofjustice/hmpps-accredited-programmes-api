@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param oasysConfirmed
  * @param hasReviewedProgrammeHistory
  * @param additionalInformation
+ * @param overrideReason
  */
 data class ReferralUpdate(
 
@@ -19,4 +20,7 @@ data class ReferralUpdate(
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("additionalInformation") val additionalInformation: String? = null,
+
+  @Schema(example = "The reason for going with the recommended course is...", description = "Reason for overriding the recommended course")
+  @get:JsonProperty("overrideReason") val overrideReason: String? = null,
 )

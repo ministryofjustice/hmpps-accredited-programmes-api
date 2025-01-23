@@ -53,4 +53,6 @@ data class ReferralEntity(
   var primaryPomStaffId: BigInteger? = null,
   @Column(name = "secondary_pom_staff_id")
   var secondaryPomStaffId: BigInteger? = null,
+
+  var overrideReason: String? = null,
 )

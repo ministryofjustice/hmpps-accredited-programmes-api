@@ -90,8 +90,8 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?, primaryPomStaffId: BigInteger = "1".toBigInteger(), secondaryPomStaffId: BigInteger = "2".toBigInteger()) {
-    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on, primary_pom_staff_id, secondary_pom_staff_id) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn, :primaryPomStaffId, :secondaryPomStaffId)")
+  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?, primaryPomStaffId: BigInteger = "1".toBigInteger(), secondaryPomStaffId: BigInteger = "2".toBigInteger(), overrideReason: String? = null) {
+    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on, primary_pom_staff_id, secondary_pom_staff_id, override_reason) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn, :primaryPomStaffId, :secondaryPomStaffId, :overrideReason)")
       .setParameter("id", referralId)
       .setParameter("offeringId", offeringId)
       .setParameter("prisonNumber", prisonNumber)
@@ -103,6 +103,7 @@ class PersistenceHelper {
       .setParameter("submittedOn", submittedOn)
       .setParameter("primaryPomStaffId", primaryPomStaffId)
       .setParameter("secondaryPomStaffId", secondaryPomStaffId)
+      .setParameter("overrideReason", overrideReason)
       .executeUpdate()
   }
 

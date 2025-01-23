@@ -17,6 +17,7 @@ class ReferralEntityFactory {
   private var hasReviewedProgrammeHistory: Boolean = false
   private var status: String = REFERRAL_STARTED
   private var submittedOn: LocalDateTime? = null
+  private var overrideReason: String? = null
 
   fun withId(id: UUID?) = apply { this.id = id }
   fun withOffering(offering: OfferingEntity) = apply { this.offering = offering }
@@ -26,6 +27,7 @@ class ReferralEntityFactory {
   fun withOasysConfirmed(oasysConfirmed: Boolean) = apply { this.oasysConfirmed = oasysConfirmed }
   fun withHasReviewedProgrammeHistory(hasReviewedProgrammeHistory: Boolean) = apply { this.hasReviewedProgrammeHistory = hasReviewedProgrammeHistory }
   fun withStatus(status: String) = apply { this.status = status }
+  fun withOverrideReason(overrideReason: String?) = apply { this.overrideReason = overrideReason }
 
   fun produce() = ReferralEntity(
     id = this.id,
@@ -37,5 +39,6 @@ class ReferralEntityFactory {
     hasReviewedProgrammeHistory = this.hasReviewedProgrammeHistory,
     status = this.status,
     submittedOn = this.submittedOn,
+    overrideReason = this.overrideReason,
   )
 }

@@ -180,6 +180,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
       primaryPrisonOffenderManager = null,
+      overrideReason = null,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -211,6 +212,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         oasysConfirmed = true,
         hasReviewedProgrammeHistory = true,
         additionalInformation = "test",
+        overrideReason = "Scored higher in OSP, should go onto Kaizen",
       ),
     )
     submitReferral(referralCreated.id)
@@ -276,6 +278,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
+      overrideReason = null,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -295,6 +298,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = "Additional information",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
+      overrideReason = "Override reason",
     )
 
     updateReferral(referralCreated.id, referralUpdate)
@@ -314,6 +318,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
       submittedOn = null,
+      overrideReason = "Override reason",
     )
   }
 
@@ -329,6 +334,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
           additionalInformation = "Additional information",
           oasysConfirmed = true,
           hasReviewedProgrammeHistory = true,
+          overrideReason = "Override reason",
         ),
       )
       .exchange().expectStatus().isNotFound
@@ -380,6 +386,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       additionalInformation = null,
       submittedOn = null,
+      overrideReason = null,
     )
   }
 
@@ -761,6 +768,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = "Additional information",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
+      overrideReason = "Override reason",
     )
 
     updateReferral(referralCreated.id, referralUpdate)
@@ -789,6 +797,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = "Additional information",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
+      overrideReason = "Override reason",
     )
 
     updateReferral(referralCreated.id, referralUpdate)
@@ -817,6 +826,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = "Additional information",
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
+      overrideReason = null,
     )
 
     updateReferral(referralCreated.id, referralUpdate)
@@ -1564,6 +1574,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       courseOrganisation shouldBe offering.organisationId
       oasysConfirmed shouldBe referralEntity.oasysConfirmed
       additionalInformation shouldBe referralEntity.additionalInformation
+      overrideReason shouldBe referralEntity.overrideReason
       hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
       statusCode shouldBe referralEntity.status
       referrerUsername shouldBe referralEntity.referrer.username
