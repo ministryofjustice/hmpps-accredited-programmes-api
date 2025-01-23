@@ -60,6 +60,48 @@ class PNIController(
       )
     }
 
+    if (prisonNumber == "A9574EA") {
+      return ResponseEntity.ok(
+        PniScore(
+          prisonNumber = prisonNumber,
+          crn = "X739590",
+          assessmentId = 2114584,
+          programmePathway = "MODERATE_INTENSITY_BC",
+          needsScore = null,
+          riskScore = null,
+          validationErrors = listOf(""),
+        ),
+      )
+    }
+
+    if (prisonNumber == "A4433DZ") {
+      return ResponseEntity.ok(
+        PniScore(
+          prisonNumber = prisonNumber,
+          crn = "X739590",
+          assessmentId = 2114584,
+          programmePathway = "HIGH_INTENSITY_BC",
+          needsScore = null,
+          riskScore = null,
+          validationErrors = listOf(""),
+        ),
+      )
+    }
+
+    if (prisonNumber == "A5666EA") {
+      return ResponseEntity.ok(
+        PniScore(
+          prisonNumber = prisonNumber,
+          crn = "X739590",
+          assessmentId = 2114584,
+          programmePathway = "MISSING_INFORMATION",
+          needsScore = null,
+          riskScore = null,
+          validationErrors = listOf(""),
+        ),
+      )
+    }
+
     return ResponseEntity.ok(
       pniService.getPniScore(
         prisonNumber = prisonNumber,
