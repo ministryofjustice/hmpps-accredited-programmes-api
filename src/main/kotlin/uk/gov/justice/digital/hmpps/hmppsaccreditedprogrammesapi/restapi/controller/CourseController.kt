@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.A
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseCreateRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisites
@@ -65,10 +66,18 @@ class CourseController(
     operationId = "addCourseOffering",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "successful operation", content = [Content(schema = Schema(implementation = CourseOffering::class))]),
-      ApiResponse(responseCode = "404", description = "No Course found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "successful operation",
+        content = [Content(schema = Schema(implementation = CourseOffering::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "No Course found",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.POST],
@@ -76,7 +85,10 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun addCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
+  fun addCourseOffering(
+    @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
+    @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering,
+  ): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
     return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createOffering(course, courseOffering))
@@ -88,11 +100,23 @@ class CourseController(
     operationId = "createCourse",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Return a JSON representation of the created course", content = [Content(schema = Schema(implementation = Course::class))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "Return a JSON representation of the created course",
+        content = [Content(schema = Schema(implementation = Course::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "You are not authorized to view the resource",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Accessing the resource you were trying to reach is forbidden",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.POST],
@@ -100,7 +124,12 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun createCourse(@Parameter(description = "", required = true) @RequestBody courseCreateRequest: CourseCreateRequest): ResponseEntity<Course> {
+  fun createCourse(
+    @Parameter(
+      description = "",
+      required = true,
+    ) @RequestBody courseCreateRequest: CourseCreateRequest,
+  ): ResponseEntity<Course> {
     // temporary code to generate a unique identifier (look to remove this, it is a hangover from the CSV days):
     val identifier = courseCreateRequest.identifier ?: generateRandom10AlphaString()
     val courseByIdentifier = courseService.getCourseByIdentifier(identifier)
@@ -121,6 +150,7 @@ class CourseController(
       audienceColour = audience.colour,
       withdrawn = courseCreateRequest.withdrawn,
       displayOnProgrammeDirectory = courseCreateRequest.displayOnProgrammeDirectory,
+      intensity = courseCreateRequest.intensity,
     )
 
     val savedCourse = courseService.save(course)
@@ -135,18 +165,39 @@ class CourseController(
     description = """Deletes a course from the database. Note you can only delete a course if it's not being used.""",
     responses = [
       ApiResponse(responseCode = "200", description = "Successful delete"),
-      ApiResponse(responseCode = "400", description = "Bad input", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "404", description = "The course did not exist", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(
+        responseCode = "400",
+        description = "Bad input",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "You are not authorized to view the resource",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Accessing the resource you were trying to reach is forbidden",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The course did not exist",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.DELETE],
     value = ["/courses/{id}"],
   )
-  fun deleteCourse(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<Unit> {
+  fun deleteCourse(
+    @Parameter(
+      description = "A course identifier",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+  ): ResponseEntity<Unit> {
     courseService.delete(id)
     return ResponseEntity.ok(null)
   }
@@ -159,13 +210,22 @@ class CourseController(
     responses = [
       ApiResponse(responseCode = "200", description = "successful operation"),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.DELETE],
     value = ["/courses/{id}/offerings/{offeringId}"],
   )
-  fun deleteCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "An offering identifier", required = true) @PathVariable("offeringId") offeringId: UUID): ResponseEntity<Unit> {
+  fun deleteCourseOffering(
+    @Parameter(
+      description = "A course identifier",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+    @Parameter(
+      description = "An offering identifier",
+      required = true,
+    ) @PathVariable("offeringId") offeringId: UUID,
+  ): ResponseEntity<Unit> {
     courseService.deleteCourseOffering(id, offeringId)
     return ResponseEntity.ok(null)
   }
@@ -176,16 +236,25 @@ class CourseController(
     operationId = "getAllCourseNames",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Return a JSON representation of all unique course names that are not withdrawn.", content = [Content(array = ArraySchema(schema = Schema(implementation = String::class)))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "Return a JSON representation of all unique course names that are not withdrawn.",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = String::class)))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.GET],
     value = ["/courses/course-names"],
     produces = ["application/json"],
   )
-  fun getAllCourseNames(@Parameter(description = "flag to include withdrawn") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: Boolean?): ResponseEntity<List<String>> = ResponseEntity
+  fun getAllCourseNames(
+    @Parameter(description = "flag to include withdrawn") @RequestParam(
+      value = "includeWithdrawn",
+      required = false,
+    ) includeWithdrawn: Boolean?,
+  ): ResponseEntity<List<String>> = ResponseEntity
     .ok(
       courseService
         .getCourseNames(includeWithdrawn ?: false),
@@ -197,9 +266,13 @@ class CourseController(
     operationId = "getAllCourses",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Return a JSON representation of all courses. If withdrawn is set to true, it will all courses (including withdrawn courses). Setting it to false will return only active courses ", content = [Content(array = ArraySchema(schema = Schema(implementation = Course::class)))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "Return a JSON representation of all courses. If withdrawn is set to true, it will all courses (including withdrawn courses). Setting it to false will return only active courses ",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = Course::class)))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.GET],
@@ -207,15 +280,21 @@ class CourseController(
     produces = ["application/json"],
   )
   fun getAllCourses(
-    @Parameter(description = "flag to return withdrawn") @RequestParam(value = "withdrawn", required = false) withdrawn: Boolean?,
-    @Parameter(description = "intensity of the course") @RequestParam(value = "intensity", required = false) intensity: String?,
-  ): ResponseEntity<List<Course>> =
-    ResponseEntity
-      .ok(
-        courseService
-          .getAllCourses(withdrawn ?: false)
-          .map(CourseEntity::toApi),
-      )
+    @Parameter(description = "flag to return withdrawn") @RequestParam(
+      value = "withdrawn",
+      required = false,
+    ) withdrawn: Boolean?,
+    @Parameter(description = "intensity of the course") @RequestParam(
+      value = "intensity",
+      required = false,
+    ) intensity: CourseIntensity?,
+  ): ResponseEntity<List<Course>> = ResponseEntity.ok(
+    courseService
+      .getAllCourses(withdrawn ?: false)
+      .run {
+        intensity?.let { filter { it.intensity?.contains(intensity.name, ignoreCase = true) == true } } ?: this
+      }.map { it.toApi() },
+  )
 
   @Operation(
     tags = ["Course Offerings"],
@@ -223,9 +302,13 @@ class CourseController(
     operationId = "getAllOfferingsByCourseId",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "successful operation", content = [Content(array = ArraySchema(schema = Schema(implementation = CourseOffering::class)))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "successful operation",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = CourseOffering::class)))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.GET],
@@ -234,7 +317,10 @@ class CourseController(
   )
   fun getAllOfferingsByCourseId(
     @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
-    @Parameter(description = "flag to return withdrawn offerings") @RequestParam(value = "includeWithdrawn", required = false) includeWithdrawn: Boolean?,
+    @Parameter(description = "flag to return withdrawn offerings") @RequestParam(
+      value = "includeWithdrawn",
+      required = false,
+    ) includeWithdrawn: Boolean?,
   ): ResponseEntity<List<CourseOffering>> {
     val offerings = courseService.getAllOfferings(id, includeWithdrawn ?: false)
     val mappedOfferings = offerings.map { offeringEntity ->
@@ -256,12 +342,28 @@ class CourseController(
     operationId = "getAudiences",
     description = """Returns a list of audiences with their name and colour""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Successfully retrieved list of audience", content = [Content(array = ArraySchema(schema = Schema(implementation = Audience::class)))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "Successfully retrieved list of audience",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = Audience::class)))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "You are not authorized to view the resource",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Accessing the resource you were trying to reach is forbidden",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The resource you were trying to reach is not found",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.GET],
@@ -286,16 +388,25 @@ class CourseController(
     operationId = "getCourseById",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "successful operation", content = [Content(schema = Schema(implementation = Course::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "successful operation",
+        content = [Content(schema = Schema(implementation = Course::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.GET],
     value = ["/courses/{id}"],
     produces = ["application/json"],
   )
-  fun getCourseById(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<Course> =
+  fun getCourseById(
+    @Parameter(
+      description = "A course identifier",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+  ): ResponseEntity<Course> =
     courseService.getCourseById(id)?.let {
       ResponseEntity.ok(it.toApi())
     } ?: throw NotFoundException("No Course found at /courses/$id")
@@ -306,16 +417,25 @@ class CourseController(
     operationId = "getCoursePrerequisites",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "", content = [Content(schema = Schema(implementation = CoursePrerequisites::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "",
+        content = [Content(schema = Schema(implementation = CoursePrerequisites::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.GET],
     value = ["/courses/{id}/prerequisites"],
     produces = ["application/json"],
   )
-  fun getCoursePrerequisites(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CoursePrerequisites> =
+  fun getCoursePrerequisites(
+    @Parameter(
+      description = "A course identifier",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+  ): ResponseEntity<CoursePrerequisites> =
     ResponseEntity.ok(
       CoursePrerequisites(
         courseService
@@ -334,13 +454,33 @@ class CourseController(
     operationId = "updateCourse",
     description = """Updates the details of a specific course""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Successful update", content = [Content(schema = Schema(implementation = Course::class))]),
-      ApiResponse(responseCode = "400", description = "Bad input", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "404", description = "The resource you were trying to reach is not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "Successful update",
+        content = [Content(schema = Schema(implementation = Course::class))],
+      ),
+      ApiResponse(
+        responseCode = "400",
+        description = "Bad input",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "You are not authorized to view the resource",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Accessing the resource you were trying to reach is forbidden",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The resource you were trying to reach is not found",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.PUT],
@@ -348,7 +488,10 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun updateCourse(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseUpdateRequest: CourseUpdateRequest): ResponseEntity<Course> {
+  fun updateCourse(
+    @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
+    @Parameter(description = "", required = true) @RequestBody courseUpdateRequest: CourseUpdateRequest,
+  ): ResponseEntity<Course> {
     val existingCourse = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
 
@@ -373,9 +516,13 @@ class CourseController(
     operationId = "updateCourseOffering",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "successful operation", content = [Content(schema = Schema(implementation = CourseOffering::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "successful operation",
+        content = [Content(schema = Schema(implementation = CourseOffering::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.PUT],
@@ -383,7 +530,10 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun updateCourseOffering(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering): ResponseEntity<CourseOffering> {
+  fun updateCourseOffering(
+    @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
+    @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering,
+  ): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
     return ResponseEntity.ok(courseService.updateOffering(course, courseOffering))
@@ -395,10 +545,18 @@ class CourseController(
     operationId = "updateCoursePrerequisites",
     description = """Replace all prerequisites for a course""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Successful update", content = [Content(schema = Schema(implementation = CoursePrerequisites::class))]),
-      ApiResponse(responseCode = "400", description = "Bad input", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "Successful update",
+        content = [Content(schema = Schema(implementation = CoursePrerequisites::class))],
+      ),
+      ApiResponse(
+        responseCode = "400",
+        description = "Bad input",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.PUT],
@@ -406,7 +564,16 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun updateCoursePrerequisites(@Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID, @Parameter(description = "", required = true) @RequestBody coursePrerequisites: CoursePrerequisites): ResponseEntity<CoursePrerequisites> {
+  fun updateCoursePrerequisites(
+    @Parameter(
+      description = "A course identifier",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+    @Parameter(
+      description = "",
+      required = true,
+    ) @RequestBody coursePrerequisites: CoursePrerequisites,
+  ): ResponseEntity<CoursePrerequisites> {
     val course =
       courseService.getNotWithdrawnCourseById(id) ?: throw NotFoundException("No Course found at /courses/$id")
     return ResponseEntity.ok(
@@ -425,11 +592,23 @@ class CourseController(
     operationId = "getBuildingCourseVariants",
     description = """""",
     responses = [
-      ApiResponse(responseCode = "200", description = "Return a JSON representation of the created course", content = [Content(schema = Schema(implementation = Course::class))]),
-      ApiResponse(responseCode = "401", description = "You are not authorized to view the resource", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "403", description = "Accessing the resource you were trying to reach is forbidden", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(
+        responseCode = "200",
+        description = "Return a JSON representation of the created course",
+        content = [Content(schema = Schema(implementation = Course::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "You are not authorized to view the resource",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Accessing the resource you were trying to reach is forbidden",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
     ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   @RequestMapping(
     method = [RequestMethod.POST],
@@ -437,7 +616,16 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun getBuildingCourseVariants(@Parameter(description = "A course identifier which has variants", required = true) @PathVariable("courseId") courseId: UUID, @Parameter(description = "", required = true) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest): List<Course>? {
+  fun getBuildingCourseVariants(
+    @Parameter(
+      description = "A course identifier which has variants",
+      required = true,
+    ) @PathVariable("courseId") courseId: UUID,
+    @Parameter(
+      description = "",
+      required = true,
+    ) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest,
+  ): List<Course>? {
     val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
       ?: throw BusinessException("$courseId is not a Building choices course")
 
@@ -448,7 +636,11 @@ class CourseController(
     val audienceBasedOnGender = if (genderToWhichCourseIsOffered == Gender.FEMALE) null else audience
 
     val buildingChoicesCourses =
-      courseService.findBuildingChoicesCourses(listOfBuildingCourseIds, audienceBasedOnGender, genderToWhichCourseIsOffered.name)
+      courseService.findBuildingChoicesCourses(
+        listOfBuildingCourseIds,
+        audienceBasedOnGender,
+        genderToWhichCourseIsOffered.name,
+      )
 
     return courseService.mapCourses(buildingChoicesCourses, genderToWhichCourseIsOffered)
   }

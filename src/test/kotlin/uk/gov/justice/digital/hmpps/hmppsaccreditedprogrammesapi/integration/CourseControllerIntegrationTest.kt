@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseCreateRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisites
@@ -30,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.G
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
+import kotlin.test.assertTrue
 
 val COURSE_ID: UUID = UUID.fromString("790a2dfe-8df1-4504-bb9c-83e6e53a6537")
 val NEW_COURSE_ID: UUID = UUID.fromString("790a2dfe-ddd1-4504-bb9c-83e6e53a6537")
@@ -523,7 +525,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     val alternativeName = "LCO"
 
     val createdCourse =
-      createCourse(courseName, identifier, description, audienceId, withdrawn, alternativeName)
+      createCourse(courseName, identifier, description, audienceId, withdrawn, alternativeName, CourseIntensity.HIGH)
 
     createdCourse.id shouldNotBe null
     createdCourse.name shouldBe courseName
@@ -534,6 +536,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     createdCourse.alternateName shouldBe alternativeName
     createdCourse.displayName shouldBe "Legacy Course One"
     createdCourse.audienceColour shouldBe "green"
+    createdCourse.intensity shouldBe CourseIntensity.HIGH.name
   }
 
   fun createCourse(
@@ -543,6 +546,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     audienceId: UUID,
     withdrawn: Boolean,
     alternativeName: String,
+    intensity: CourseIntensity,
   ) =
     webTestClient
       .post()
@@ -558,6 +562,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
           audienceId = audienceId,
           withdrawn = withdrawn,
           alternateName = alternativeName,
+          intensity = intensity.name,
         ),
       )
       .exchange()
@@ -741,6 +746,44 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody<List<Course>>()
       .returnResult().responseBody!!
+  }
+
+  @Test
+  fun `should return courses matching intensity`() {
+    val courseIdWithHighIntensity = UUID.randomUUID()
+    persistenceHelper.createCourse(
+      courseId = courseIdWithHighIntensity,
+      identifier = "KAZ-1",
+      name = "Kaizen",
+      description = "kaizen general violence offence...",
+      altName = "KAZ-1",
+      audience = "General violence offence",
+      intensity = CourseIntensity.HIGH.name,
+    )
+
+    val courseIdWithHighAndModerateIntensity = UUID.randomUUID()
+    persistenceHelper.createCourse(
+      courseId = courseIdWithHighAndModerateIntensity,
+      identifier = "KAZ-2",
+      name = "Kaizen",
+      description = "kaizen general violence offence...",
+      altName = "KAZ-2",
+      audience = "General violence offence",
+      intensity = CourseIntensity.HIGH.name + "," + CourseIntensity.MODERATE.name,
+    )
+
+    val courses = webTestClient
+      .get()
+      .uri("/courses?includeWithdrawn=false&intensity=HIGH")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody<List<Course>>()
+      .returnResult().responseBody!!
+
+    assertTrue { courses.map { it.id }.containsAll(listOf(courseIdWithHighIntensity, courseIdWithHighAndModerateIntensity)) }
   }
 
   fun getOfferingsById(id: UUID): CourseOffering {

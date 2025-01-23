@@ -48,7 +48,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.15")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.16")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("org.wiremock:wiremock-standalone:3.10.0")
 
