@@ -16,7 +16,7 @@ dependencies {
   val springdocVersion = "2.6.0"
   val sentryVersion = "8.0.0"
   val jsonWebtokenVersion = "0.12.6"
-  val springSecurityVersion = "6.4.0"
+  val springSecurityVersion = "6.4.2"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.8")
   // Override netty-common version to address https://osv.dev/vulnerability/GHSA-xq3w-v528-46rv
