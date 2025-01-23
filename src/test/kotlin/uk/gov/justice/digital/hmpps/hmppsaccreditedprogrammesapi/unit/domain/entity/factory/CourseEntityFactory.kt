@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.CourseUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.NewPrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import java.util.UUID
 
 // Refactor CourseEntityFactory
@@ -22,6 +23,7 @@ class CourseEntityFactory {
   private var audience: String = randomUppercaseString()
   private var audienceColour: String = randomUppercaseString()
   private var withdrawn: Boolean = false
+  private var intensity: String = CourseIntensity.values().random().name
 
   fun withId(id: UUID?) = apply {
     this.id = id
@@ -55,6 +57,10 @@ class CourseEntityFactory {
     this.withdrawn = withdrawn
   }
 
+  fun withIntensity(intensity: String) = apply {
+    this.intensity = intensity
+  }
+
   fun produce() = CourseEntity(
     id = this.id,
     name = this.name,
@@ -66,6 +72,7 @@ class CourseEntityFactory {
     audience = this.audience,
     audienceColour = this.audienceColour,
     withdrawn = this.withdrawn,
+    intensity = this.intensity,
   )
 }
 
