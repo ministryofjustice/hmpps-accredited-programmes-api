@@ -119,10 +119,10 @@ class PniIntegrationTest : IntegrationTestBase() {
     pniResults[0].prisonNumber shouldBe prisonNumber
     val pniScore = buildPniScore(prisonNumber)
     pniResults[0].crn shouldBe pniScore.crn
-    pniResults[0].needsClassification shouldBe pniScore.needsScore.classification
-    pniResults[0].overallNeedsScore shouldBe pniScore.needsScore.overallNeedsScore
+    pniResults[0].needsClassification shouldBe pniScore.needsScore?.classification
+    pniResults[0].overallNeedsScore shouldBe pniScore.needsScore?.overallNeedsScore
     pniResults[0].programmePathway shouldBe pniScore.programmePathway
-    pniResults[0].riskClassification shouldBe pniScore.riskScore.classification
+    pniResults[0].riskClassification shouldBe pniScore.riskScore?.classification
     pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore)
     pniResults[0].pniValid shouldBe false
     pniResults[0].basicSkillsScore shouldBe 33
