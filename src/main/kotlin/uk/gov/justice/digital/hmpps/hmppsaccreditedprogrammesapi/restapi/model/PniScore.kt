@@ -53,7 +53,7 @@ data class PniScore(
       "  },\n" +
       "}\n",
   )
-  @get:JsonProperty("NeedsScore") val needsScore: NeedsScore,
+  @get:JsonProperty("NeedsScore") val needsScore: NeedsScore? = null,
   @Schema(
     example = "  \"riskScores\": {\n" +
       "    \"ogrs3\": 15.0,\n" +
@@ -64,7 +64,7 @@ data class PniScore(
       "    \"sara\": \"High\"\n" +
       "  }\n",
   )
-  @get:JsonProperty("RiskScore") val riskScore: RiskScore,
+  @get:JsonProperty("RiskScore") val riskScore: RiskScore? = null,
   @Schema(example = "['impulsivity is missing ']", required = true)
   @get:JsonProperty("validationErrors") val validationErrors: List<String>,
 )
