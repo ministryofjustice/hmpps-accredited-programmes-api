@@ -12,9 +12,23 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualCognitiveScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualRelationshipScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualRiskScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualSelfManagementScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualSexScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.NeedsScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PniScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RelationshipDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RiskScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sara
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SelfManagementDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
 import java.util.UUID
 
 @RestController
@@ -53,9 +67,63 @@ class PNIController(
           crn = "X739590",
           assessmentId = 2114584,
           programmePathway = "ALTERNATIVE_PATHWAY",
-          needsScore = null,
-          riskScore = null,
-          validationErrors = listOf(""),
+          needsScore = NeedsScore(
+            overallNeedsScore = 6,
+            basicSkillsScore = 33,
+            classification = "LOW_NEED",
+            domainScore = DomainScore(
+              sexDomainScore = SexDomainScore(
+                overAllSexDomainScore = 2,
+                individualSexScores = IndividualSexScores(
+                  sexualPreOccupation = 2,
+                  offenceRelatedSexualInterests = 2,
+                  emotionalCongruence = 0,
+                ),
+              ),
+              thinkingDomainScore = ThinkingDomainScore(
+                overallThinkingDomainScore = 1,
+                individualThinkingScores = IndividualCognitiveScores(
+                  proCriminalAttitudes = 1,
+                  hostileOrientation = 1,
+                ),
+              ),
+              relationshipDomainScore = RelationshipDomainScore(
+                overallRelationshipDomainScore = 1,
+                individualRelationshipScores = IndividualRelationshipScores(
+                  curRelCloseFamily = 0,
+                  prevExpCloseRel = 2,
+                  easilyInfluenced = 1,
+                  aggressiveControllingBehaviour = 1,
+                ),
+              ),
+              selfManagementDomainScore = SelfManagementDomainScore(
+                overallSelfManagementDomainScore = 2,
+                individualSelfManagementScores = IndividualSelfManagementScores(
+                  impulsivity = 1,
+                  temperControl = 4,
+                  problemSolvingSkills = 2,
+                  difficultiesCoping = 2,
+                ),
+              ),
+            ),
+          ),
+          validationErrors = listOf(),
+          riskScore = RiskScore(
+            classification = "HIGH_RISK",
+            individualRiskScores = IndividualRiskScores(
+              ogrs3 = "15.00".toBigDecimal(),
+              ovp = "15.00".toBigDecimal(),
+              ospDc = "High",
+              ospIic = "Medium",
+              rsr = 1.46.toBigDecimal(),
+              sara = Sara(
+                overallResult = SaraRisk.HIGH,
+                saraRiskOfViolenceTowardsOthers = "High",
+                saraRiskOfViolenceTowardsPartner = "High",
+                saraAssessmentId = 2114999,
+              ),
+            ),
+          ),
         ),
       )
     }
@@ -67,9 +135,63 @@ class PNIController(
           crn = "X739590",
           assessmentId = 2114584,
           programmePathway = "MODERATE_INTENSITY_BC",
-          needsScore = null,
-          riskScore = null,
-          validationErrors = listOf(""),
+          needsScore = NeedsScore(
+            overallNeedsScore = 6,
+            basicSkillsScore = 33,
+            classification = "MEDIUM_NEED",
+            domainScore = DomainScore(
+              sexDomainScore = SexDomainScore(
+                overAllSexDomainScore = 2,
+                individualSexScores = IndividualSexScores(
+                  sexualPreOccupation = 2,
+                  offenceRelatedSexualInterests = 2,
+                  emotionalCongruence = 0,
+                ),
+              ),
+              thinkingDomainScore = ThinkingDomainScore(
+                overallThinkingDomainScore = 1,
+                individualThinkingScores = IndividualCognitiveScores(
+                  proCriminalAttitudes = 1,
+                  hostileOrientation = 1,
+                ),
+              ),
+              relationshipDomainScore = RelationshipDomainScore(
+                overallRelationshipDomainScore = 1,
+                individualRelationshipScores = IndividualRelationshipScores(
+                  curRelCloseFamily = 0,
+                  prevExpCloseRel = 2,
+                  easilyInfluenced = 1,
+                  aggressiveControllingBehaviour = 1,
+                ),
+              ),
+              selfManagementDomainScore = SelfManagementDomainScore(
+                overallSelfManagementDomainScore = 2,
+                individualSelfManagementScores = IndividualSelfManagementScores(
+                  impulsivity = 1,
+                  temperControl = 4,
+                  problemSolvingSkills = 2,
+                  difficultiesCoping = 2,
+                ),
+              ),
+            ),
+          ),
+          validationErrors = listOf(),
+          riskScore = RiskScore(
+            classification = "HIGH_RISK",
+            individualRiskScores = IndividualRiskScores(
+              ogrs3 = "15.00".toBigDecimal(),
+              ovp = "15.00".toBigDecimal(),
+              ospDc = "High",
+              ospIic = "Medium",
+              rsr = 1.46.toBigDecimal(),
+              sara = Sara(
+                overallResult = SaraRisk.HIGH,
+                saraRiskOfViolenceTowardsOthers = "High",
+                saraRiskOfViolenceTowardsPartner = "High",
+                saraAssessmentId = 2114999,
+              ),
+            ),
+          ),
         ),
       )
     }
@@ -81,9 +203,63 @@ class PNIController(
           crn = "X739590",
           assessmentId = 2114584,
           programmePathway = "HIGH_INTENSITY_BC",
-          needsScore = null,
-          riskScore = null,
-          validationErrors = listOf(""),
+          needsScore = NeedsScore(
+            overallNeedsScore = 6,
+            basicSkillsScore = 33,
+            classification = "HIGH_NEED",
+            domainScore = DomainScore(
+              sexDomainScore = SexDomainScore(
+                overAllSexDomainScore = 2,
+                individualSexScores = IndividualSexScores(
+                  sexualPreOccupation = 2,
+                  offenceRelatedSexualInterests = 2,
+                  emotionalCongruence = 0,
+                ),
+              ),
+              thinkingDomainScore = ThinkingDomainScore(
+                overallThinkingDomainScore = 1,
+                individualThinkingScores = IndividualCognitiveScores(
+                  proCriminalAttitudes = 1,
+                  hostileOrientation = 1,
+                ),
+              ),
+              relationshipDomainScore = RelationshipDomainScore(
+                overallRelationshipDomainScore = 1,
+                individualRelationshipScores = IndividualRelationshipScores(
+                  curRelCloseFamily = 0,
+                  prevExpCloseRel = 2,
+                  easilyInfluenced = 1,
+                  aggressiveControllingBehaviour = 1,
+                ),
+              ),
+              selfManagementDomainScore = SelfManagementDomainScore(
+                overallSelfManagementDomainScore = 2,
+                individualSelfManagementScores = IndividualSelfManagementScores(
+                  impulsivity = 1,
+                  temperControl = 4,
+                  problemSolvingSkills = 2,
+                  difficultiesCoping = 2,
+                ),
+              ),
+            ),
+          ),
+          validationErrors = listOf(),
+          riskScore = RiskScore(
+            classification = "HIGH_RISK",
+            individualRiskScores = IndividualRiskScores(
+              ogrs3 = "15.00".toBigDecimal(),
+              ovp = "15.00".toBigDecimal(),
+              ospDc = "High",
+              ospIic = "Medium",
+              rsr = 1.46.toBigDecimal(),
+              sara = Sara(
+                overallResult = SaraRisk.HIGH,
+                saraRiskOfViolenceTowardsOthers = "High",
+                saraRiskOfViolenceTowardsPartner = "High",
+                saraAssessmentId = 2114999,
+              ),
+            ),
+          ),
         ),
       )
     }
@@ -95,9 +271,63 @@ class PNIController(
           crn = "X739590",
           assessmentId = 2114584,
           programmePathway = "MISSING_INFORMATION",
-          needsScore = null,
-          riskScore = null,
-          validationErrors = listOf(""),
+          needsScore = NeedsScore(
+            overallNeedsScore = 6,
+            basicSkillsScore = 33,
+            classification = "HIGH_NEED",
+            domainScore = DomainScore(
+              sexDomainScore = SexDomainScore(
+                overAllSexDomainScore = 2,
+                individualSexScores = IndividualSexScores(
+                  sexualPreOccupation = 2,
+                  offenceRelatedSexualInterests = 2,
+                  emotionalCongruence = 0,
+                ),
+              ),
+              thinkingDomainScore = ThinkingDomainScore(
+                overallThinkingDomainScore = 1,
+                individualThinkingScores = IndividualCognitiveScores(
+                  proCriminalAttitudes = 1,
+                  hostileOrientation = 1,
+                ),
+              ),
+              relationshipDomainScore = RelationshipDomainScore(
+                overallRelationshipDomainScore = 1,
+                individualRelationshipScores = IndividualRelationshipScores(
+                  curRelCloseFamily = 0,
+                  prevExpCloseRel = 2,
+                  easilyInfluenced = 1,
+                  aggressiveControllingBehaviour = 1,
+                ),
+              ),
+              selfManagementDomainScore = SelfManagementDomainScore(
+                overallSelfManagementDomainScore = 2,
+                individualSelfManagementScores = IndividualSelfManagementScores(
+                  impulsivity = 1,
+                  temperControl = 4,
+                  problemSolvingSkills = 2,
+                  difficultiesCoping = null,
+                ),
+              ),
+            ),
+          ),
+          validationErrors = listOf("difficultiesCoping in SelfManagementScores is null"),
+          riskScore = RiskScore(
+            classification = "HIGH_RISK",
+            individualRiskScores = IndividualRiskScores(
+              ogrs3 = "15.00".toBigDecimal(),
+              ovp = "15.00".toBigDecimal(),
+              ospDc = "High",
+              ospIic = "Medium",
+              rsr = 1.46.toBigDecimal(),
+              sara = Sara(
+                overallResult = SaraRisk.HIGH,
+                saraRiskOfViolenceTowardsOthers = "High",
+                saraRiskOfViolenceTowardsPartner = "High",
+                saraAssessmentId = 2114999,
+              ),
+            ),
+          ),
         ),
       )
     }
