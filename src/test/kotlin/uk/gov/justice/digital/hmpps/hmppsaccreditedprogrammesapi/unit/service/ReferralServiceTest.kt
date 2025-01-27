@@ -466,6 +466,7 @@ class ReferralServiceTest {
       .withAdditionalInformation("additional info")
       .withId(referralId)
       .withStatus(REFERRAL_STARTED)
+      .withOverrideReason("override reason")
       .produce()
 
     every { referralRepository.getReferenceById(referralId) } returns referral
