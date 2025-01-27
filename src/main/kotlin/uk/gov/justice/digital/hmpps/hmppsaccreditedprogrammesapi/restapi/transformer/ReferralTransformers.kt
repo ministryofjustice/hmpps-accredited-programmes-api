@@ -26,6 +26,7 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData, staffDetail: StaffDetail
   statusColour = status.colour,
   submittedOn = submittedOn?.toString(),
   primaryPrisonOffenderManager = staffDetail,
+  overrideReason = overrideReason,
 )
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
@@ -37,6 +38,7 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   additionalInformation = additionalInformation,
   status = status,
+  overrideReason = overrideReason,
 )
 
 fun StaffEntity.toApi() = StaffDetail(
@@ -52,12 +54,14 @@ fun ApiReferralUpdate.toDomain() = ReferralUpdate(
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
+  overrideReason = overrideReason,
 )
 
 fun ReferralUpdate.toApi() = ApiReferralUpdate(
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
+  overrideReason = overrideReason,
 )
 
 fun ReferralViewEntity.toApi() = ReferralView(
