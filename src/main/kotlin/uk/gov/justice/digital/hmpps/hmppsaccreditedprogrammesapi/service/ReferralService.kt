@@ -115,6 +115,7 @@ constructor(
     referral.additionalInformation = update.additionalInformation
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
+    referral.overrideReason = update.overrideReason
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
