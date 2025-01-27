@@ -1,0 +1,30 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/prisoners/A1234AA/alerts",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prisoner-alerts-results.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/prisoners/UNKNOWN/alerts",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prisoner-alerts-unknown-results.json"
+      }
+    }
+  ]
+}
