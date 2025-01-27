@@ -33,3 +33,6 @@ class AllocationManagerApiWebClientHealthCheck(@Qualifier("allocationManagerApiW
 
 @Component
 class NomisUserRolesApiWebClientHealthCheck(@Qualifier("nomisUserRolesApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
+
+@Component
+class PrisonerAlertsApiWebClientHealthCheck(@Qualifier("prisonerSearchApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
