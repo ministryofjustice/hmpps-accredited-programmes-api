@@ -155,6 +155,18 @@ class WebClientConfiguration(
     return buildWebClient(nomisUserRolesApiBaseUrl, oauth2Client)
   }
 
+  @Bean(name = ["prisonerAlertsApiWebClient"])
+  fun prisonerAlertsApiWebClient(
+    clientRegistrations: ClientRegistrationRepository,
+    authorizedClients: OAuth2AuthorizedClientRepository,
+    authorizedClientManager: OAuth2AuthorizedClientManager,
+    @Value("\${services.prisoner-alerts-api.base-url}") prisonerAlertsApiBaseUrl: String,
+  ): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+    oauth2Client.setDefaultClientRegistrationId("prisoner-alerts-api")
+    return buildWebClient(prisonerAlertsApiBaseUrl, oauth2Client)
+  }
+
   fun buildWebClient(url: String, oauth2Client: ServletOAuth2AuthorizedClientExchangeFilterFunction): WebClient = WebClient.builder()
     .baseUrl(url)
     .clientConnector(

@@ -74,7 +74,11 @@ spring:
             client-id: hmpps-accredited-programmes-client-1
             client-secret: clientsecret
             authorization-grant-type: client_credentials
-
+          prisoner-alerts-api:
+            provider: hmpps-auth
+            client-id: hmpps-accredited-programmes-client-1
+            client-secret: clientsecret
+            authorization-grant-type: client_credentials
         provider:
           hmpps-auth:
             token-uri: ${hmpps.auth.url}/oauth/token
@@ -145,6 +149,8 @@ services:
     base-url: http://localhost:9101
   nomis-user-roles-api:
     base-url: http://localhost:9102
+  prisoner-alerts-api:
+    base-url: http://localhost:9103
 
 feature-switch:
   case-notes-enabled: true
