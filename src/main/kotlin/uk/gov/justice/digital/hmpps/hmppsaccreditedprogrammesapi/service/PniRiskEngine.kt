@@ -118,7 +118,8 @@ class PniRiskEngine {
   }
 
   fun isMediumSara(individualRiskScores: IndividualRiskScores) =
-    individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true
+    individualRiskScores.sara?.saraRiskOfViolenceTowardsOthers?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true ||
+      individualRiskScores.sara?.saraRiskOfViolenceTowardsPartner?.equals(RiskClassification.MEDIUM_RISK.description, ignoreCase = true) == true
 }
 
 enum class RiskClassification(val description: String) {
