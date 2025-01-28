@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
@@ -19,6 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseCreateRequest
@@ -187,6 +189,16 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       "Sample description test",
       "LC test",
       "General offence test",
+      false,
+    )
+
+    persistenceHelper.createCourse(
+      UUID.randomUUID(),
+      "LEGTEST 1",
+      "Legacy Course test",
+      "Sample description test 1",
+      "LC test 1",
+      "Sexual offence test",
       false,
     )
 
@@ -446,6 +458,22 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
         ]
       """,
       )
+  }
+
+  @Test
+  fun `Should return audiences as expected for a given courseId`() {
+    val courseId = UUID.fromString("1811faa6-d568-4fc4-83ce-41111230242f")
+    val audiences = webTestClient
+      .get()
+      .uri("/courses/audiences?courseId=$courseId")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<Audience>>()
+      .returnResult().responseBody!!
+
+    audiences shouldContainOnly listOf(Audience(name = "Sexual offence test"), Audience(name = "General offence test"))
   }
 
   @Test
