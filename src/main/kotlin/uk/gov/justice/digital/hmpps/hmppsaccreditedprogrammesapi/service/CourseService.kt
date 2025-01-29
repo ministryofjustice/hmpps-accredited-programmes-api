@@ -171,6 +171,10 @@ constructor(
       )
     }
   }
+
+  fun getCourseName(courseId: UUID): String? = courseRepository.findById(courseId).get().name
+
+  fun getCoursesByName(name: String): List<CourseEntity> = courseRepository.findAllByName(name)
 }
 
 fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> {
