@@ -42,4 +42,6 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
   """,
   )
   fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String? = null, gender: String): List<CourseEntity>?
+
+  fun findAllByName(name: String): List<CourseEntity>
 }

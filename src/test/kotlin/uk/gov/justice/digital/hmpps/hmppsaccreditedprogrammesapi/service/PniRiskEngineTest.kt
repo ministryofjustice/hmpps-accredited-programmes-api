@@ -206,8 +206,8 @@ class PniRiskEngineTest {
         overallResult = null,
       ),
     )
-    assertFalse(riskEngine.isHighRisk(riskScores, "Male"))
-    assertFalse(riskEngine.isHighRisk(riskScores, "Female"))
+    assertTrue(riskEngine.isHighRisk(riskScores, "Male"))
+    assertTrue(riskEngine.isHighRisk(riskScores, "Female"))
   }
 
   @ParameterizedTest

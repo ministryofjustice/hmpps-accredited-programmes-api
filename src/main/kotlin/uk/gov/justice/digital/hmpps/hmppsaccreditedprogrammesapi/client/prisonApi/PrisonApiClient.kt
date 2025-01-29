@@ -17,6 +17,10 @@ class PrisonApiClient(
   webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
+  @Deprecated(
+    "Due to existence of new Prisoner Alerts API",
+    ReplaceWith("getPrisonerAlertsByPrisonNumber", "uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.PrisonerAlertsApiClient"),
+  )
   fun getAlertsByPrisonNumber(prisonNumber: String) = getRequest<List<NomisAlert>>(PRISON_API) {
     path = "/api/offenders/$prisonNumber/alerts/v2"
   }
