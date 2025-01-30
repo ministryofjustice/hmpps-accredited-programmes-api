@@ -450,11 +450,7 @@ class OasysController(val oasysService: OasysService) {
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
   ): ResponseEntity<Risks> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getRisks(prisonNumber),
-      )
+    ResponseEntity.ok(oasysService.getRisks(prisonNumber))
 
   @Operation(
     tags = ["Oasys Integration"],
