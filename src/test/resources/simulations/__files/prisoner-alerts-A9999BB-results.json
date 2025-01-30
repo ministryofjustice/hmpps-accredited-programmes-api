@@ -1,0 +1,52 @@
+{
+  "content": [
+    {
+      "alertUuid": "10156554-12ed-49f0-b85f-d273801628ba",
+      "prisonNumber": "A9999BB",
+      "alertCode": {
+        "alertTypeCode": "X",
+        "alertTypeDescription": "Self Harm",
+        "code": "XCDO",
+        "description": "ACCT Open (HMPS)"
+      },
+      "description": "Put this one back",
+      "authorisedBy": "Michael Willis ",
+      "activeFrom": "2024-09-06",
+      "activeTo": null,
+      "isActive": true,
+      "createdAt": "2016-01-21T12:09:07",
+      "createdBy": "MWILLIS_GEN",
+      "createdByDisplayName": "Michael Willis",
+      "lastModifiedAt": null,
+      "lastModifiedBy": null,
+      "lastModifiedByDisplayName": null,
+      "activeToLastSetAt": null,
+      "activeToLastSetBy": null,
+      "activeToLastSetByDisplayName": null
+    },
+    {
+      "alertUuid": "617e46f6-461f-4bce-aab1-85e751d95fa8",
+      "prisonNumber": "A9999BB",
+      "alertCode": {
+        "alertTypeCode": "H",
+        "alertTypeDescription": "Child Communication Measures",
+        "code": "HA",
+        "description": "L1 Restriction No contact with any child"
+      },
+      "description": "Alert description",
+      "authorisedBy": "A. Nurse, An Agency",
+      "activeFrom": "2021-09-27",
+      "activeTo": "2022-07-15",
+      "isActive": true,
+      "createdAt": "2014-07-23T09:43:32",
+      "createdBy": "JBOWDIDGE",
+      "createdByDisplayName": "Jamie Bowdidge",
+      "lastModifiedAt": null,
+      "lastModifiedBy": null,
+      "lastModifiedByDisplayName": null,
+      "activeToLastSetAt": null,
+      "activeToLastSetBy": null,
+      "activeToLastSetByDisplayName": null
+    }
+  ]
+}

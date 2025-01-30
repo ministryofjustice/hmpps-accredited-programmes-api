@@ -1,5 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -146,6 +149,28 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
         ),
       ),
     )
+  }
+
+  @Test
+  fun `should NOT populate risk alerts when prisoner alerts API returns empty alerts list`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A9999BB"
+
+    wiremockServer.stubFor(
+      get(urlEqualTo("/prisoners/$prisonNumber/alerts"))
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody("{\"content\": []}"),
+        ),
+    )
+    // When
+    val risks = getRisksByPrisonNumber(prisonNumber)
+
+    // Then
+    risks.shouldNotBeNull()
+    risks.alerts shouldBe emptyList()
   }
 
   @Test

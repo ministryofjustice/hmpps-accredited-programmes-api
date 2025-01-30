@@ -1,13 +1,18 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
@@ -24,15 +29,17 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Sara
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.PrisonerAlertsApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.AlertsResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AlertFactory
 import java.time.LocalDateTime
 
 class OasysServiceTest {
 
   private val oasysApiClient = mockk<OasysApiClient>()
-  private val prisonApiClient = mockk<PrisonApiClient>()
+  private val prisonerAlertsApiClient = mockk<PrisonerAlertsApiClient>()
   private val auditService = mockk<AuditService>()
-  val service = OasysService(oasysApiClient, prisonApiClient, auditService)
+  val service = OasysService(oasysApiClient, prisonerAlertsApiClient, auditService)
 
   @Test
   fun `should return assessmentId`() {
@@ -429,6 +436,64 @@ class OasysServiceTest {
     // Then
     completedSaraAssessment.shouldNotBeNull()
     completedSaraAssessment.shouldBe(999999)
+  }
+
+  @Test
+  fun `should return active prisoner alerts for known prisoner number`() {
+    // Given
+    val prisonNumber = "A9999BB"
+    val alertsResponse = AlertsResponse(
+      content = listOf(
+        AlertFactory().withPrisonNumber(prisonNumber).build(),
+        AlertFactory().withPrisonNumber(prisonNumber).build(),
+        AlertFactory().withPrisonNumber(prisonNumber).build(),
+        AlertFactory().withPrisonNumber(prisonNumber).withIsActive(false).build(),
+        AlertFactory().withPrisonNumber(prisonNumber).withIsActive(false).build(),
+      ),
+    )
+    every { prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber) } returns ClientResult.Success(HttpStatus.OK, alertsResponse)
+
+    // When
+    val activeAlerts = service.getActiveAlerts(prisonNumber)
+
+    // Then
+    activeAlerts?.shouldHaveSize(3)
+    assertThat(activeAlerts).extracting("prisonNumber").containsOnly(prisonNumber)
+    assertThat(activeAlerts).extracting("isActive").containsOnly(true)
+  }
+
+  @Test
+  fun `should NOT return inactive prisoner alerts for known prisoner number`() {
+    // Given
+    val prisonNumber = "A9999BB"
+    val alertsResponse = AlertsResponse(
+      content = listOf(
+        AlertFactory().withPrisonNumber(prisonNumber).withIsActive(false).build(),
+        AlertFactory().withPrisonNumber(prisonNumber).withIsActive(false).build(),
+        AlertFactory().withPrisonNumber(prisonNumber).withIsActive(false).build(),
+      ),
+    )
+    every { prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber) } returns ClientResult.Success(HttpStatus.OK, alertsResponse)
+
+    // When
+    val activeAlerts = service.getActiveAlerts(prisonNumber)
+
+    // Then
+    activeAlerts?.shouldBeEmpty()
+  }
+
+  @Test
+  fun `should return empty prisoner alerts list for prisoner alerts api client failure`() {
+    // Given
+    val prisonNumber = "A9999BB"
+    every { prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber) } returns ClientResult.Failure
+      .StatusCode(HttpMethod.GET, "/prisoners/A9999BB/alerts", HttpStatusCode.valueOf(500), "")
+
+    // When
+    val activeAlerts = service.getActiveAlerts(prisonNumber)
+
+    // Then
+    activeAlerts?.shouldBeEmpty()
   }
 
   private fun createAssessmentTimeline(): OasysAssessmentTimeline {

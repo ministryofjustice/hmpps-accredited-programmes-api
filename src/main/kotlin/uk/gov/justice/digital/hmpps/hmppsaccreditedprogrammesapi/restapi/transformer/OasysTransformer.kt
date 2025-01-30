@@ -12,8 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Alert
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.Alert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Health
@@ -106,13 +105,13 @@ fun OasysAttitude.toModel() = Attitude(
   hostileOrientation = hostileOrientation,
 )
 
-fun risks(
+fun createRisks(
   oasysOffendingInfo: OasysOffendingInfo?,
   oasysRelationships: OasysRelationships?,
   oasysRoshSummary: OasysRoshSummary?,
   oasysRiskSummary: RiskSummary?,
   oasysRiskPredictorScores: OasysRiskPredictorScores?,
-  activeAlerts: List<NomisAlert>?,
+  activeAlerts: List<Alert>?,
 ) = Risks(
   ogrsYear1 = oasysRiskPredictorScores?.groupReconvictionScore?.oneYear,
   ogrsYear2 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears,
@@ -142,10 +141,10 @@ fun risks(
 
   overallRoshLevel = oasysRiskSummary?.overallRiskLevel?.fixCase(),
   alerts = activeAlerts?.map {
-    Alert(
-      description = it.alertCodeDescription,
-      alertType = it.alertTypeDescription,
-      dateCreated = it.dateCreated,
+    uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Alert(
+      description = it.alertCode.description,
+      alertType = it.alertCode.alertTypeDescription,
+      dateCreated = it.createdAt.toLocalDate(),
     )
   }?.distinctBy {
     Triple(it.description, it.alertType, it.dateCreated)
