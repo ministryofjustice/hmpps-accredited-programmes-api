@@ -340,7 +340,7 @@ class CourseController(
     tags = ["Courses"],
     summary = "Get all audiences",
     operationId = "getAudiences",
-    description = """Returns a list of audiences with their name and colour""",
+    description = """Returns a list of audiences with their name and colour. If a courseId is provided, it will returl all audiences matching the course name""",
     responses = [
       ApiResponse(
         responseCode = "200",
@@ -370,17 +370,27 @@ class CourseController(
     value = ["/courses/audiences"],
     produces = ["application/json"],
   )
-  fun getAudiences(): ResponseEntity<List<Audience>> = ResponseEntity
-    .ok(
-      audienceService
-        .getAllAudiences().map {
-          Audience(
-            id = it.id,
-            name = it.name,
-            colour = it.colour,
-          )
-        },
-    )
+  fun getAudiences(
+    @Parameter(description = "courseId") @RequestParam(
+      value = "courseId",
+      required = false,
+    ) courseId: UUID?,
+  ): ResponseEntity<List<Audience>> {
+    val audiences = courseId?.let { id ->
+      val courseName = courseService.getCourseName(id)
+        ?: throw NotFoundException("No Course found at /courses/$id")
+      courseService.getCoursesByName(courseName)
+        .distinctBy { it.audience }
+        .map { Audience(name = it.audience) }
+    } ?: audienceService.getAllAudiences().map {
+      Audience(
+        id = it.id,
+        name = it.name,
+        colour = it.colour,
+      )
+    }
+    return ResponseEntity.ok(audiences)
+  }
 
   @Operation(
     tags = ["Courses"],
@@ -631,7 +641,8 @@ class CourseController(
 
     val listOfBuildingCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
     val audience = if (buildingChoicesSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
-    val genderToWhichCourseIsOffered = if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE else Gender.MALE
+    val genderToWhichCourseIsOffered =
+      if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE else Gender.MALE
 
     val audienceBasedOnGender = if (genderToWhichCourseIsOffered == Gender.FEMALE) null else audience
 
