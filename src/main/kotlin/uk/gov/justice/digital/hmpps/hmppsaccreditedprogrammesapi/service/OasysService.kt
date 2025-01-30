@@ -24,8 +24,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.getHighestPriorityScore
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.NomisAlert
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.PrisonerAlertsApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.Alert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Attitude
@@ -40,7 +40,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.P
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.risks
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.buildRisks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -49,7 +49,7 @@ import kotlin.math.abs
 @Service
 class OasysService(
   val oasysApiClient: OasysApiClient,
-  val prisonApiClient: PrisonApiClient,
+  val prisonerAlertsApiClient: PrisonerAlertsApiClient,
   val auditService: AuditService,
 ) {
   fun getOffenceDetail(prisonNumber: String): OffenceDetail? {
@@ -157,7 +157,7 @@ class OasysService(
     val oasysRiskPredictorScores = getRiskPredictors(assessmentId)
     val activeAlerts = getActiveAlerts(prisonNumber)
 
-    return risks(
+    return buildRisks(
       oasysOffendingInfo,
       oasysRelationships,
       oasysRoshSummary,
@@ -269,8 +269,8 @@ class OasysService(
     )
   }
 
-  fun getActiveAlerts(prisonNumber: String): List<NomisAlert>? {
-    val nomisAlerts = when (val response = prisonApiClient.getAlertsByPrisonNumber(prisonNumber)) {
+  fun getActiveAlerts(prisonNumber: String): List<Alert>? {
+    val prisonerAlerts = when (val response = prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber)) {
       is ClientResult.Failure -> {
         log.warn("Failure to retrieve ActiveAlerts for prisonNumber $prisonNumber reason ${response.toException().cause}")
         AuthorisableActionResult.Success(null)
@@ -280,7 +280,7 @@ class OasysService(
         AuthorisableActionResult.Success(response.body)
       }
     }
-    return nomisAlerts.entity?.filter { it.active && !it.expired }?.sortedByDescending { it.dateCreated }
+    return prisonerAlerts.entity?.content?.filter { it.isActive }?.sortedByDescending { it.createdAt }
   }
 
   fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? =
