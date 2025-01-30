@@ -40,7 +40,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.P
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.createRisks
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.buildRisks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -157,7 +157,7 @@ class OasysService(
     val oasysRiskPredictorScores = getRiskPredictors(assessmentId)
     val activeAlerts = getActiveAlerts(prisonNumber)
 
-    return createRisks(
+    return buildRisks(
       oasysOffendingInfo,
       oasysRelationships,
       oasysRoshSummary,

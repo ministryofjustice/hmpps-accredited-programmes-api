@@ -105,7 +105,7 @@ fun OasysAttitude.toModel() = Attitude(
   hostileOrientation = hostileOrientation,
 )
 
-fun createRisks(
+fun buildRisks(
   oasysOffendingInfo: OasysOffendingInfo?,
   oasysRelationships: OasysRelationships?,
   oasysRoshSummary: OasysRoshSummary?,
