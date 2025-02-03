@@ -401,7 +401,7 @@ constructor(
       offeringId,
       prisonNumber,
       openReferralStatuses,
-    )?.filterNot { it.status ==  ReferralStatus.REFERRAL_STARTED.name }
+    )?.filterNot { it.status == ReferralStatus.REFERRAL_STARTED.name }
   }
 
   fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<BigInteger?, BigInteger?> {
