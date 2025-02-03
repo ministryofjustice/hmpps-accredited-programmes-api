@@ -175,11 +175,11 @@ constructor(
       source = referralEntity.referrer.username,
       detail = referralEntity.additionalInformation,
       createdDateTime = LocalDateTime.now(),
-      outcome = getCourseParticipationOutcomeByStatus(referralEntity.status),
+      outcome = buildCourseParticipationOutcomeByStatus(referralEntity.status),
     )
   }
 
-  private fun getCourseParticipationOutcomeByStatus(referralStatus: String): CourseParticipationOutcome? {
+  private fun buildCourseParticipationOutcomeByStatus(referralStatus: String): CourseParticipationOutcome? {
     return when (referralStatus) {
       ReferralStatus.PROGRAMME_COMPLETE.name -> CourseParticipationOutcome(
         CourseStatus.COMPLETE,
