@@ -34,7 +34,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
@@ -482,11 +481,7 @@ class ReferralServiceTest {
     referralService.updateReferralStatusById(referralId, referralStatusUpdate)
 
     // Then
-    verify { courseParticipationService.createCourseParticipation(capture(courseParticipationEntityCaptor)) }
-    val courseParticipationEntity = courseParticipationEntityCaptor.captured
-    assertThat(courseParticipationEntity.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
-    assertThat(courseParticipationEntity.prisonNumber).isEqualTo(referral.prisonNumber)
-    assertThat(courseParticipationEntity.referralId).isEqualTo(referral.id)
+    verify { courseParticipationService.createOrUpdateCourseParticipation(referral) }
   }
 
   @Test
@@ -527,12 +522,7 @@ class ReferralServiceTest {
     referralService.updateReferralStatusById(referralId, referralStatusUpdate)
 
     // Then
-    verify { courseParticipationService.createCourseParticipation(capture(courseParticipationEntityCaptor)) }
-    val courseParticipationEntity = courseParticipationEntityCaptor.captured
-    assertThat(courseParticipationEntity.outcome?.status).isEqualTo(CourseStatus.INCOMPLETE)
-    assertThat(courseParticipationEntity.outcome?.yearCompleted).isNull()
-    assertThat(courseParticipationEntity.prisonNumber).isEqualTo(referral.prisonNumber)
-    assertThat(courseParticipationEntity.referralId).isEqualTo(referral.id)
+    verify { courseParticipationService.createOrUpdateCourseParticipation(referral) }
   }
 
   @Test

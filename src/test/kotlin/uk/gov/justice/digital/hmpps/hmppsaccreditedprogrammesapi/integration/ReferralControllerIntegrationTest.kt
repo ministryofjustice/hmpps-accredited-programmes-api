@@ -29,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.ResourceLoader
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED_COLOUR
@@ -50,6 +51,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
@@ -69,6 +71,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationSettingFactory
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
@@ -106,7 +111,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     persistenceHelper.clearAllTableContent()
 
     persistenceHelper.createCourse(
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      COURSE_ID,
       "SC",
       COURSE_NAME,
       "Sample description",
@@ -120,7 +125,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     persistenceHelper.createOffering(
       UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
+      COURSE_ID,
       "MDI",
       "nobody-mdi@digital.justice.gov.uk",
       "nobody2-mdi@digital.justice.gov.uk",
@@ -442,8 +447,78 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val courseParticipation = courseParticipationList[0]
     assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
     assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
+    assertThat(courseParticipation.courseId).isEqualTo(COURSE_ID)
+    assertThat(courseParticipation.referralId).isEqualTo(createdReferral.id)
     assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
     assertThat(courseParticipation.outcome?.yearCompleted).isEqualTo(Year.now())
+    assertThat(courseParticipation.setting?.type).isEqualTo(CourseSetting.CUSTODY)
+    assertThat(courseParticipation.setting?.location).isEqualTo("MDI org")
+  }
+
+  @Test
+  fun `Updating a referral status to PROGRAMME_COMPLETE should update an existing course participation record with the same course name and prison number`() {
+    // Given
+    val createdReferral = createReferral(PRISON_NUMBER_1)
+
+    val existCourseParticipation = CourseParticipationEntityFactory()
+      .withCourseName(COURSE_NAME)
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).withLocation("Location").produce())
+      .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).withYearStarted(Year.of(2018)).produce())
+      .withCreatedDateTime(LocalDateTime.now())
+      .produce()
+    courseParticipationRepository.save(existCourseParticipation)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate1)
+
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = ReferralStatus.AWAITING_ASSESSMENT.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = ReferralStatus.ASSESSMENT_STARTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = ReferralStatus.ASSESSED_SUITABLE.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate4)
+
+    val referralStatusUpdate5 = ReferralStatusUpdate(
+      status = ReferralStatus.ON_PROGRAMME.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate5)
+
+    // When
+    val referralStatusUpdate6 = ReferralStatusUpdate(
+      status = ReferralStatus.PROGRAMME_COMPLETE.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate6)
+
+    // Then
+    val courseParticipationList = courseParticipationRepository.findByPrisonNumber(PRISON_NUMBER_1)
+    assertThat(courseParticipationList).hasSize(1)
+    val courseParticipation = courseParticipationList[0]
+    assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
+    assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
+    assertThat(courseParticipation.courseId).isEqualTo(COURSE_ID)
+    assertThat(courseParticipation.referralId).isEqualTo(createdReferral.id)
+    assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
+    assertThat(courseParticipation.outcome?.yearStarted).isEqualTo(Year.of(2018))
+    assertThat(courseParticipation.outcome?.yearCompleted).isEqualTo(Year.now())
+    assertThat(courseParticipation.setting?.type).isEqualTo(CourseSetting.CUSTODY)
+    assertThat(courseParticipation.setting?.location).isEqualTo("MDI org")
   }
 
   @Test
