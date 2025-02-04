@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.en
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomAlphanumericString
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomEmailAddress
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import java.util.UUID
 class OfferingEntityFactory {
@@ -11,6 +12,7 @@ class OfferingEntityFactory {
   private var secondaryContactEmail: String? = null
   private var withdrawn: Boolean = false
   private var referable: Boolean = true
+  private var course: CourseEntity = CourseEntityFactory().produce()
 
   fun withId(id: UUID?) = apply { this.id = id }
   fun withOrganisationId(organisationId: String) = apply { this.organisationId = organisationId }
@@ -25,5 +27,6 @@ class OfferingEntityFactory {
     secondaryContactEmail = this.secondaryContactEmail,
     withdrawn = this.withdrawn,
     referable = this.referable,
-  )
+
+  ).apply { course = this@OfferingEntityFactory.course }
 }

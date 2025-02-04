@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_DESCRIPTION
@@ -31,6 +32,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
@@ -58,6 +62,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
@@ -65,8 +70,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
-import java.util.Optional
-import java.util.UUID
+import java.util.*
 
 class ReferralServiceTest {
 
@@ -139,6 +143,9 @@ class ReferralServiceTest {
   @Captor
   private lateinit var referralEntityCaptor: CapturingSlot<ReferralEntity>
 
+  @Captor
+  private lateinit var courseParticipationEntityCaptor: CapturingSlot<CourseParticipationEntity>
+
   @InjectMockKs
   private lateinit var referralService: ReferralService
 
@@ -146,6 +153,7 @@ class ReferralServiceTest {
   fun setup() {
     MockKAnnotations.init(this)
     referralEntityCaptor = slot()
+    courseParticipationEntityCaptor = slot()
   }
 
   private fun mockSecurityContext(username: String) {
@@ -393,6 +401,160 @@ class ReferralServiceTest {
 
     val capturedReferralEntity = referralEntityCaptor.captured
     assertThat(capturedReferralEntity.status).isEqualTo(ON_PROGRAMME)
+  }
+
+  @Test
+  fun `should update referral status to a valid new status`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withId(referralId)
+      .withStatus(ReferralStatus.REFERRAL_STARTED.name)
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+
+    val newStatus = ReferralStatus.REFERRAL_SUBMITTED.name
+    val referralStatusList =
+      mutableListOf(
+        ReferralStatusRefData(
+          code = newStatus,
+          description = "Referral successfully submitted",
+          colour = "pink",
+          hintText = null,
+          hasNotes = false,
+          hasConfirmation = false,
+          closed = false,
+          draft = false,
+          hold = false,
+          release = false,
+          deselectAndKeepOpen = false,
+          notesOptional = false,
+        ),
+      )
+    every { referralReferenceDataService.getNextStatusTransitions(ReferralStatus.REFERRAL_STARTED.name) } returns referralStatusList
+
+    // When
+    val referralStatusUpdate = ReferralStatusUpdate(status = newStatus)
+    referralService.updateReferralStatusById(referralId, referralStatusUpdate)
+
+    // Then
+    assertThat(referral.status).isEqualTo(newStatus)
+    verify { auditService.audit(referral, ReferralStatus.REFERRAL_STARTED.name, AuditAction.UPDATE_REFERRAL.name) }
+  }
+
+  @Test
+  fun `should create course participation record when updating referral status to a programme complete`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withId(referralId)
+      .withStatus(ReferralStatus.ON_PROGRAMME.name)
+      .withOffering(OfferingEntityFactory().produce())
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+
+    val newStatus = ReferralStatus.PROGRAMME_COMPLETE.name
+    val referralStatusList =
+      mutableListOf(
+        ReferralStatusRefData(
+          code = newStatus,
+          description = "Programme complete",
+          colour = "grey",
+          hintText = null,
+          hasNotes = false,
+          hasConfirmation = false,
+          closed = false,
+          draft = false,
+          hold = false,
+          release = false,
+          deselectAndKeepOpen = false,
+          notesOptional = false,
+        ),
+      )
+    every { referralReferenceDataService.getNextStatusTransitions(ReferralStatus.ON_PROGRAMME.name) } returns referralStatusList
+
+    // When
+    val referralStatusUpdate = ReferralStatusUpdate(status = newStatus)
+    referralService.updateReferralStatusById(referralId, referralStatusUpdate)
+
+    // Then
+    verify { courseParticipationService.createCourseParticipation(capture(courseParticipationEntityCaptor)) }
+    val courseParticipationEntity = courseParticipationEntityCaptor.captured
+    assertThat(courseParticipationEntity.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
+    assertThat(courseParticipationEntity.prisonNumber).isEqualTo(referral.prisonNumber)
+    assertThat(courseParticipationEntity.referralId).isEqualTo(referral.id)
+  }
+
+  @Test
+  fun `should create course participation record when updating referral status to DESELECTED`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withId(referralId)
+      .withStatus(ReferralStatus.ON_PROGRAMME.name)
+      .withOffering(OfferingEntityFactory().produce())
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+
+    val newStatus = ReferralStatus.DESELECTED.name
+    val referralStatusList =
+      mutableListOf(
+        ReferralStatusRefData(
+          code = newStatus,
+          description = "Deselected",
+          colour = "taupe",
+          hintText = null,
+          hasNotes = false,
+          hasConfirmation = false,
+          closed = false,
+          draft = false,
+          hold = false,
+          release = false,
+          deselectAndKeepOpen = false,
+          notesOptional = false,
+        ),
+      )
+    every { referralReferenceDataService.getNextStatusTransitions(ReferralStatus.ON_PROGRAMME.name, true) } returns referralStatusList
+
+    // When
+    val referralStatusUpdate = ReferralStatusUpdate(status = newStatus, ptUser = true)
+    referralService.updateReferralStatusById(referralId, referralStatusUpdate)
+
+    // Then
+    verify { courseParticipationService.createCourseParticipation(capture(courseParticipationEntityCaptor)) }
+    val courseParticipationEntity = courseParticipationEntityCaptor.captured
+    assertThat(courseParticipationEntity.outcome?.status).isEqualTo(CourseStatus.INCOMPLETE)
+    assertThat(courseParticipationEntity.outcome?.yearCompleted).isNull()
+    assertThat(courseParticipationEntity.prisonNumber).isEqualTo(referral.prisonNumber)
+    assertThat(courseParticipationEntity.referralId).isEqualTo(referral.id)
+  }
+
+  @Test
+  fun `should throw BusinessException for invalid status transition`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val referral = ReferralEntityFactory()
+      .withId(referralId)
+      .withStatus(ReferralStatus.REFERRAL_STARTED.name)
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+    every { referralReferenceDataService.getNextStatusTransitions(ReferralStatus.REFERRAL_STARTED.name) } returns emptyList()
+
+    // When/Then
+    val referralStatusUpdate = ReferralStatusUpdate(status = "NON_EXISTENT_STATUS")
+    val exception = org.junit.jupiter.api.assertThrows<BusinessException> {
+      referralService.updateReferralStatusById(referralId, referralStatusUpdate)
+    }
+
+    assertThat(exception.message).isEqualTo("Cannot transition referral $referralId from REFERRAL_STARTED to NON_EXISTENT_STATUS")
   }
 
   @Test

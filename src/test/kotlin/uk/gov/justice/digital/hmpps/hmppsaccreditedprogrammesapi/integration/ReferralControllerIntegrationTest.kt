@@ -29,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.ResourceLoader
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED_DESCRIPTION
@@ -49,6 +50,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AccountType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
@@ -66,9 +68,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
+import java.time.Year
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -104,7 +108,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     persistenceHelper.createCourse(
       UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
       "SC",
-      "Super Course",
+      COURSE_NAME,
       "Sample description",
       "SC++",
       "General offence",
@@ -388,6 +392,110 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       overrideReason = null,
     )
+  }
+
+  @Test
+  fun `Updating a referral status to PROGRAMME_COMPLETE should create a course participation record`() {
+    // Given
+    val createdReferral = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate1)
+
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = ReferralStatus.AWAITING_ASSESSMENT.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = ReferralStatus.ASSESSMENT_STARTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = ReferralStatus.ASSESSED_SUITABLE.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate4)
+
+    val referralStatusUpdate5 = ReferralStatusUpdate(
+      status = ReferralStatus.ON_PROGRAMME.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate5)
+
+    // When
+    val referralStatusUpdate6 = ReferralStatusUpdate(
+      status = ReferralStatus.PROGRAMME_COMPLETE.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate6)
+
+    // Then
+    val courseParticipationList = courseParticipationRepository.findByReferralId(createdReferral.id)
+    assertThat(courseParticipationList).hasSize(1)
+    val courseParticipation = courseParticipationList[0]
+    assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
+    assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
+    assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
+    assertThat(courseParticipation.outcome?.yearCompleted).isEqualTo(Year.now())
+  }
+
+  @Test
+  fun `Updating a referral status to DESELECTED should create a course participation record`() {
+    // Given
+    val createdReferral = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate1)
+
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = ReferralStatus.AWAITING_ASSESSMENT.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate2)
+
+    val referralStatusUpdate3 = ReferralStatusUpdate(
+      status = ReferralStatus.ASSESSMENT_STARTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate3)
+
+    val referralStatusUpdate4 = ReferralStatusUpdate(
+      status = ReferralStatus.ASSESSED_SUITABLE.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate4)
+
+    val referralStatusUpdate5 = ReferralStatusUpdate(
+      status = ReferralStatus.ON_PROGRAMME.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate5)
+
+    // When
+    val referralStatusUpdate6 = ReferralStatusUpdate(
+      status = ReferralStatus.DESELECTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate6)
+
+    // Then
+    val courseParticipationList = courseParticipationRepository.findByReferralId(createdReferral.id)
+    assertThat(courseParticipationList).hasSize(1)
+    val courseParticipation = courseParticipationList[0]
+    assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
+    assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
+    assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.INCOMPLETE)
+    assertThat(courseParticipation.outcome?.yearCompleted).isNull()
   }
 
   @Test
