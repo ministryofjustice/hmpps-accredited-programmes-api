@@ -57,7 +57,7 @@ class PniService(
     getPniScore(prisonNumber, gender, savePni, referralId)
   }
 
-  fun getPniScore(prisonNumber: String, gender: String?, savePni: Boolean = false, referralId: UUID? = null): PniScore {
+  fun getPniScore(prisonNumber: String, gender: String? = null, savePni: Boolean = false, referralId: UUID? = null): PniScore {
     log.info("Request received to process PNI for prisonNumber $prisonNumber")
 
     auditService.audit(
