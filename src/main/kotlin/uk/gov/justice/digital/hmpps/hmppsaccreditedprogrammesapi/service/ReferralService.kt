@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
@@ -36,7 +33,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.math.BigInteger
 import java.time.LocalDateTime
-import java.time.Year
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -155,7 +151,7 @@ constructor(
     caseNotesApiService.buildAndCreateCaseNote(referral, referralStatusUpdate)
 
     if (referral.status == ReferralStatus.PROGRAMME_COMPLETE.name || referral.status == ReferralStatus.DESELECTED.name) {
-      courseParticipationService.createCourseParticipation(buildCourseParticipation(referral))
+      courseParticipationService.createOrUpdateCourseParticipation(referral)
     }
 
     // save PNI when referral is updated to "On Programme" status
@@ -165,30 +161,6 @@ constructor(
 
     // audit the interaction
     auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
-  }
-
-  private fun buildCourseParticipation(referralEntity: ReferralEntity): CourseParticipationEntity {
-    return CourseParticipationEntity(
-      referralId = referralEntity.id,
-      prisonNumber = referralEntity.prisonNumber,
-      courseName = referralEntity.offering.course.name,
-      source = referralEntity.referrer.username,
-      detail = referralEntity.additionalInformation,
-      createdDateTime = LocalDateTime.now(),
-      outcome = buildCourseParticipationOutcomeByStatus(referralEntity.status),
-    )
-  }
-
-  private fun buildCourseParticipationOutcomeByStatus(referralStatus: String): CourseParticipationOutcome? {
-    return when (referralStatus) {
-      ReferralStatus.PROGRAMME_COMPLETE.name -> CourseParticipationOutcome(
-        CourseStatus.COMPLETE,
-        yearCompleted = Year.now(),
-      )
-
-      ReferralStatus.DESELECTED.name -> CourseParticipationOutcome(CourseStatus.INCOMPLETE)
-      else -> null
-    }
   }
 
   /**
