@@ -196,8 +196,8 @@ class ReferralServiceTest {
     every { referralRepository.save(any<ReferralEntity>()) } answers {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
-
-    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
+    val originalReferralId = UUID.randomUUID()
+    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!, originalReferralId)
 
     createdReferral.id shouldBe referralId
 
@@ -209,6 +209,7 @@ class ReferralServiceTest {
           it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == REFERRER_USERNAME &&
             it.offering.id == offering.id
+          it.originalReferralId == originalReferralId
         },
       )
     }
@@ -274,8 +275,8 @@ class ReferralServiceTest {
     every { referralRepository.save(any<ReferralEntity>()) } answers {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
-
-    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
+    val originalReferralId = UUID.randomUUID()
+    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!, originalReferralId)
 
     createdReferral.id shouldBe referralId
 
@@ -288,6 +289,7 @@ class ReferralServiceTest {
           it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == REFERRER_USERNAME &&
             it.offering.id == offering.id
+          it.originalReferralId == originalReferralId
         },
       )
     }
