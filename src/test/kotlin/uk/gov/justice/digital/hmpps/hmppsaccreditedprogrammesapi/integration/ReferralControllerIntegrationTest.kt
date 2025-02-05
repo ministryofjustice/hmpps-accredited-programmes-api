@@ -164,7 +164,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
+    val originalReferralId = UUID.randomUUID()
+    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1, originalReferralId)
 
     val personEntity = personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER_1)
 
@@ -190,6 +191,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       primaryPrisonOffenderManager = null,
       overrideReason = null,
+      transferReason = null,
+      originalReferralId = originalReferralId,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -213,7 +216,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     // only creates draft referral
-    val referralCreated = createReferral(offering.id!!, PRISON_NUMBER_1)
+    val referralCreated = createReferral(offeringId = offering.id!!, prisonNumber = PRISON_NUMBER_1)
     // submits a referral
     updateReferral(
       referralCreated.id,
@@ -308,6 +311,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
       overrideReason = "Override reason",
+      transferReason = "Transfer reason",
     )
 
     updateReferral(referralCreated.id, referralUpdate)
@@ -328,6 +332,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = true,
       submittedOn = null,
       overrideReason = "Override reason",
+      transferReason = "Transfer reason",
     )
   }
 
@@ -1034,10 +1039,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNotFound
   }
 
-  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): Referral {
+  fun createReferral(prisonNumber: String = PRISON_NUMBER_1, originalReferralId: UUID? = null): Referral {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
-    return createReferral(offering.id, prisonNumber)
+    return createReferral(offering.id, prisonNumber, originalReferralId)
   }
 
   fun createDuplicateReferralResultsInConflict(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
@@ -1058,7 +1063,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .expectBody<Referral>()
       .returnResult().responseBody!!
 
-  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
+  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1, originalReferralId: UUID? = null) =
     webTestClient
       .post()
       .uri("/referrals")
@@ -1069,6 +1074,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         ReferralCreate(
           offeringId = offeringId!!,
           prisonNumber = prisonNumber,
+          originalReferralId = originalReferralId,
         ),
       )
       .exchange()
@@ -1706,6 +1712,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed shouldBe referralEntity.oasysConfirmed
       additionalInformation shouldBe referralEntity.additionalInformation
       overrideReason shouldBe referralEntity.overrideReason
+      transferReason shouldBe referralEntity.transferReason
+      originalReferralId shouldBe referralEntity.originalReferralId
       hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
       statusCode shouldBe referralEntity.status
       referrerUsername shouldBe referralEntity.referrer.username

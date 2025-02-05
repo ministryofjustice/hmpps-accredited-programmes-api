@@ -64,6 +64,7 @@ constructor(
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
+    originalReferralId: UUID? = null,
   ): Referral {
     val username = SecurityContextHolder.getContext().authentication?.name
       ?: throw SecurityException("Authentication information not found")
@@ -89,6 +90,7 @@ constructor(
         offering = offering,
         prisonNumber = prisonNumber,
         referrer = referrerUser,
+        originalReferralId = originalReferralId,
       ),
     )
       ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
@@ -117,6 +119,7 @@ constructor(
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
+    referral.transferReason = update.transferReason
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {

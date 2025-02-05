@@ -161,6 +161,7 @@ class ReferralController(
     val createdReferral = referralService.createReferral(
       prisonNumber = referralCreate.prisonNumber,
       offeringId = referralCreate.offeringId,
+      originalReferralId = referralCreate.originalReferralId,
     )
     return ResponseEntity.status(HttpStatus.CREATED).body(createdReferral)
   }
