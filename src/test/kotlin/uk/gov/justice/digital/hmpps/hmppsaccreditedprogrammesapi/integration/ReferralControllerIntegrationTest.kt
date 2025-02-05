@@ -404,35 +404,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     // Given
     val createdReferral = createReferral(PRISON_NUMBER_1)
 
-    val referralStatusUpdate1 = ReferralStatusUpdate(
-      status = ReferralStatus.REFERRAL_SUBMITTED.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate1)
-
-    val referralStatusUpdate2 = ReferralStatusUpdate(
-      status = ReferralStatus.AWAITING_ASSESSMENT.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate2)
-
-    val referralStatusUpdate3 = ReferralStatusUpdate(
-      status = ReferralStatus.ASSESSMENT_STARTED.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate3)
-
-    val referralStatusUpdate4 = ReferralStatusUpdate(
-      status = ReferralStatus.ASSESSED_SUITABLE.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate4)
-
-    val referralStatusUpdate5 = ReferralStatusUpdate(
-      status = ReferralStatus.ON_PROGRAMME.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate5)
+    updateReferralStatusToOnProgramme(createdReferral)
 
     // When
     val referralStatusUpdate6 = ReferralStatusUpdate(
@@ -469,35 +441,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .produce()
     courseParticipationRepository.save(existCourseParticipation)
 
-    val referralStatusUpdate1 = ReferralStatusUpdate(
-      status = ReferralStatus.REFERRAL_SUBMITTED.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate1)
-
-    val referralStatusUpdate2 = ReferralStatusUpdate(
-      status = ReferralStatus.AWAITING_ASSESSMENT.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate2)
-
-    val referralStatusUpdate3 = ReferralStatusUpdate(
-      status = ReferralStatus.ASSESSMENT_STARTED.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate3)
-
-    val referralStatusUpdate4 = ReferralStatusUpdate(
-      status = ReferralStatus.ASSESSED_SUITABLE.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate4)
-
-    val referralStatusUpdate5 = ReferralStatusUpdate(
-      status = ReferralStatus.ON_PROGRAMME.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate5)
+    updateReferralStatusToOnProgramme(createdReferral)
 
     // When
     val referralStatusUpdate6 = ReferralStatusUpdate(
@@ -526,6 +470,26 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     // Given
     val createdReferral = createReferral(PRISON_NUMBER_1)
 
+    updateReferralStatusToOnProgramme(createdReferral)
+
+    // When
+    val referralStatusUpdate6 = ReferralStatusUpdate(
+      status = ReferralStatus.DESELECTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate6)
+
+    // Then
+    val courseParticipationList = courseParticipationRepository.findByReferralId(createdReferral.id)
+    assertThat(courseParticipationList).hasSize(1)
+    val courseParticipation = courseParticipationList[0]
+    assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
+    assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
+    assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.INCOMPLETE)
+    assertThat(courseParticipation.outcome?.yearCompleted).isNull()
+  }
+
+  private fun updateReferralStatusToOnProgramme(createdReferral: Referral) {
     val referralStatusUpdate1 = ReferralStatusUpdate(
       status = ReferralStatus.REFERRAL_SUBMITTED.name,
       ptUser = true,
@@ -555,22 +519,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       ptUser = true,
     )
     updateReferralStatus(createdReferral.id, referralStatusUpdate5)
-
-    // When
-    val referralStatusUpdate6 = ReferralStatusUpdate(
-      status = ReferralStatus.DESELECTED.name,
-      ptUser = true,
-    )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate6)
-
-    // Then
-    val courseParticipationList = courseParticipationRepository.findByReferralId(createdReferral.id)
-    assertThat(courseParticipationList).hasSize(1)
-    val courseParticipation = courseParticipationList[0]
-    assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
-    assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
-    assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.INCOMPLETE)
-    assertThat(courseParticipation.outcome?.yearCompleted).isNull()
   }
 
   @Test

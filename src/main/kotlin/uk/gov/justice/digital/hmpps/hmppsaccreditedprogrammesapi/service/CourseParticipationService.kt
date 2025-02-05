@@ -38,8 +38,15 @@ constructor(
     val organisationEntity = organisationRepository.findOrganisationEntityByCode(referral.offering.organisationId)
       ?: throw IllegalArgumentException("Organisation not found for code: ${referral.offering.organisationId}")
 
+    // If an existing course participation record exists for a particular referral and course, we should update it.
+    // This should be done by comparing referralId and courseId ideally but the existing data set is incomplete
+    // in this regard, hence the filter below
     val filteredParticipations = courseParticipationRepository.findByPrisonNumber(referral.prisonNumber)
-      .filter { it.courseName == courseName }
+      .filter {
+        it.courseName == courseName &&
+          it.outcome?.yearCompleted == null &&
+          it.outcome?.status != CourseStatus.INCOMPLETE
+      }
 
     when (filteredParticipations.size) {
       1 -> updateExistingParticipation(filteredParticipations.first(), referral, organisationEntity)
