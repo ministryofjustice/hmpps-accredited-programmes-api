@@ -151,7 +151,7 @@ class ReferralController(
     ) @RequestBody referralCreate: ReferralCreate,
   ): ResponseEntity<Referral> {
     val duplicateReferrals =
-      referralService.getDuplicateReferrals(referralCreate.offeringId, referralCreate.prisonNumber)
+      referralService.getDuplicateReferrals(referralCreate.prisonNumber, referralCreate.offeringId)
 
     if (!duplicateReferrals.isNullOrEmpty()) {
       log.info("Referral already exists for prisonNumber ${referralCreate.prisonNumber} and offering ${referralCreate.offeringId} ")
@@ -703,7 +703,7 @@ class ReferralController(
     ) @PathVariable("id") id: UUID,
   ): ResponseEntity<Referral> {
     referralService.getReferralById(id)?.let {
-      val duplicateReferrals = referralService.getDuplicateReferrals(it.offering.id!!, it.prisonNumber)
+      val duplicateReferrals = referralService.getDuplicateReferrals(it.prisonNumber, it.offering.id!!)
       if (!duplicateReferrals.isNullOrEmpty()) {
         log.info("Referral already exists for prisonNumber ${it.prisonNumber} and offering ${it.offering.id} ")
         return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi())
@@ -802,5 +802,56 @@ class ReferralController(
   ): ResponseEntity<Unit> {
     referralService.updateReferralStatusById(id, referralStatusUpdate)
     return ResponseEntity.noContent().build()
+  }
+
+  @Operation(
+    tags = ["Referrals"],
+    summary = "Fetch duplicate referrals based on prison number and offeringId",
+    operationId = "getDuplicateReferrals",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Paginated summary of referrals for an organisation",
+        content = [Content(schema = Schema(implementation = Referral::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "The request was unauthorised",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Not authorised to access this endpoint/these referrals",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "No referrals for supplied organisationId (Not Found).",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/referrals/duplicates"],
+    produces = ["application/json"],
+  )
+  fun getDuplicateReferrals(
+    @Parameter(description = "Prison number of person") @RequestParam(
+      value = "prisonNumber",
+      required = true,
+    ) prisonNumber: String,
+    @Parameter(description = "Offering id on where the programme is offered") @RequestParam(
+      value = "offeringId",
+      required = true,
+    ) offeringId: UUID,
+  ): ResponseEntity<List<Referral>?> {
+    val duplicateReferrals = referralService.getDuplicateReferrals(prisonNumber, offeringId)
+    if (duplicateReferrals.isNullOrEmpty()) {
+      return ResponseEntity.noContent().build()
+    }
+    return ResponseEntity.ok(duplicateReferrals.map { referral -> referral.toApi() })
   }
 }

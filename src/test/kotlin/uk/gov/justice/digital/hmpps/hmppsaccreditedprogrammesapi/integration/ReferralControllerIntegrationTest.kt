@@ -1927,6 +1927,58 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .expectStatus().isNotFound
   }
 
+  @Test
+  fun `get duplicate referrals returns 204 when there is no duplicate referral`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+
+    webTestClient
+      .get()
+      .uri("/referrals/duplicates?prisonNumber=$PRISON_NUMBER_1&offeringId=${offering.id}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNoContent
+  }
+
+  @Test
+  fun `get duplicate referrals returns duplicate referrals for matching prisonNumber and offeringId`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    val referralId = UUID.randomUUID()
+    persistenceHelper.createReferral(
+      referralId,
+      offering.id!!,
+      PRISON_NUMBER_1,
+      "TEST_REFERRER_USER_1",
+      "more information",
+      true,
+      true,
+      "REFERRAL_SUBMITTED",
+      LocalDateTime.now(),
+    )
+
+    val responseBody = webTestClient
+      .get()
+      .uri("/referrals/duplicates?prisonNumber=$PRISON_NUMBER_1&offeringId=${offering.id}")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody<List<Referral>>()
+      .returnResult().responseBody!!
+
+    responseBody.size shouldBe 1
+    responseBody.first().id shouldBe referralId
+    responseBody.first().offeringId shouldBe offering.id!!
+    responseBody.first().prisonNumber shouldBe PRISON_NUMBER_1
+  }
+
   fun updateAllPeople() =
     webTestClient
       .post()
