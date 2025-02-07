@@ -368,7 +368,7 @@ constructor(
     }
   }
 
-  fun getDuplicateReferrals(offeringId: UUID, prisonNumber: String): List<ReferralEntity>? {
+  fun getDuplicateReferrals(prisonNumber: String, offeringId: UUID): List<ReferralEntity>? {
     val openReferralStatuses =
       referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
 

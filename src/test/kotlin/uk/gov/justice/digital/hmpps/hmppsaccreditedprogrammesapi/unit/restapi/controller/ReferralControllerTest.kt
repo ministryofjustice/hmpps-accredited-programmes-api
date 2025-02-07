@@ -107,7 +107,7 @@ constructor(
       "prisonNumber" to referral.prisonNumber,
     )
 
-    every { referralService.getDuplicateReferrals(referral.offeringId, referral.prisonNumber) } returns null
+    every { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offeringId) } returns null
     every { referralService.createReferral(referral.prisonNumber, referral.offeringId) } returns referral
 
     mockMvc.post("/referrals") {
@@ -122,7 +122,7 @@ constructor(
       }
     }
 
-    verify { referralService.getDuplicateReferrals(referral.offeringId, referral.prisonNumber) }
+    verify { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offeringId) }
     verify { referralService.createReferral(referral.prisonNumber, referral.offeringId) }
   }
 
@@ -166,7 +166,7 @@ constructor(
     }
 
     verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) }
-    verify { referralService.getDuplicateReferrals(referral.offering.id!!, referral.prisonNumber) }
+    verify { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offering.id!!) }
     verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) }
   }
 
@@ -313,7 +313,7 @@ constructor(
       .produce()
 
     every { referralService.getReferralById(referral.id!!) } returns referral
-    every { referralService.getDuplicateReferrals(referral.offering.id!!, referral.prisonNumber) } returns null
+    every { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offering.id!!) } returns null
     every { referralService.submitReferralById(referral.id!!) } returns referral
 
     mockMvc.post("/referrals/${referral.id}/submit") {
@@ -324,7 +324,7 @@ constructor(
 
     verify { referralService.getReferralById(referral.id!!) }
     verify { referralService.submitReferralById(referral.id!!) }
-    verify { referralService.getDuplicateReferrals(referral.offering.id!!, referral.prisonNumber) }
+    verify { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offering.id!!) }
   }
 
   @Test
