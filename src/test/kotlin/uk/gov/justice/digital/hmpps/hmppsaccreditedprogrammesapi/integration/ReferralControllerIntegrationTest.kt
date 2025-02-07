@@ -1945,7 +1945,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `get duplicate referrals returns duplicate referrals for matching prisonNumber and offeringId`() {
-
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
