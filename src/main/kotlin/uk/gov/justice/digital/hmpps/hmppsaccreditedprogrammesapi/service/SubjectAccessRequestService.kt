@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 @Service
 @Transactional
@@ -51,10 +52,12 @@ data class SarReferral(
   val additionalInformation: String?,
   val submittedOn: LocalDateTime?,
   val overrideReason: String?,
+  val transferReason: String?,
   val referrerUsername: String?,
   val courseName: String?,
   val audience: String?,
   val courseOrganisation: String?,
+  val originalReferralId: UUID?,
 )
 
 data class SarCourseParticipation(
@@ -103,10 +106,12 @@ private fun List<ReferralEntity>.toSarReferral(): List<SarReferral> {
       it.additionalInformation,
       it.submittedOn,
       it.overrideReason,
+      it.transferReason,
       it.referrer.username,
       it.offering.course.name,
       it.offering.course.audience,
       it.offering.organisationId,
+      it.originalReferralId,
     )
   }
 }

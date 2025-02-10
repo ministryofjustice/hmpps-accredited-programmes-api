@@ -34,7 +34,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
@@ -197,8 +196,8 @@ class ReferralServiceTest {
     every { referralRepository.save(any<ReferralEntity>()) } answers {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
-
-    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
+    val originalReferralId = UUID.randomUUID()
+    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!, originalReferralId)
 
     createdReferral.id shouldBe referralId
 
@@ -210,6 +209,7 @@ class ReferralServiceTest {
           it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == REFERRER_USERNAME &&
             it.offering.id == offering.id
+          it.originalReferralId == originalReferralId
         },
       )
     }
@@ -275,8 +275,8 @@ class ReferralServiceTest {
     every { referralRepository.save(any<ReferralEntity>()) } answers {
       firstArg<ReferralEntity>().apply { id = referralId }
     }
-
-    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!)
+    val originalReferralId = UUID.randomUUID()
+    val createdReferral = referralService.createReferral(PRISON_NUMBER_1, offering.id!!, originalReferralId)
 
     createdReferral.id shouldBe referralId
 
@@ -289,6 +289,7 @@ class ReferralServiceTest {
           it.prisonNumber == PRISON_NUMBER_1 &&
             it.referrer.username == REFERRER_USERNAME &&
             it.offering.id == offering.id
+          it.originalReferralId == originalReferralId
         },
       )
     }
@@ -482,11 +483,7 @@ class ReferralServiceTest {
     referralService.updateReferralStatusById(referralId, referralStatusUpdate)
 
     // Then
-    verify { courseParticipationService.createCourseParticipation(capture(courseParticipationEntityCaptor)) }
-    val courseParticipationEntity = courseParticipationEntityCaptor.captured
-    assertThat(courseParticipationEntity.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
-    assertThat(courseParticipationEntity.prisonNumber).isEqualTo(referral.prisonNumber)
-    assertThat(courseParticipationEntity.referralId).isEqualTo(referral.id)
+    verify { courseParticipationService.createOrUpdateCourseParticipation(referral) }
   }
 
   @Test
@@ -527,12 +524,7 @@ class ReferralServiceTest {
     referralService.updateReferralStatusById(referralId, referralStatusUpdate)
 
     // Then
-    verify { courseParticipationService.createCourseParticipation(capture(courseParticipationEntityCaptor)) }
-    val courseParticipationEntity = courseParticipationEntityCaptor.captured
-    assertThat(courseParticipationEntity.outcome?.status).isEqualTo(CourseStatus.INCOMPLETE)
-    assertThat(courseParticipationEntity.outcome?.yearCompleted).isNull()
-    assertThat(courseParticipationEntity.prisonNumber).isEqualTo(referral.prisonNumber)
-    assertThat(courseParticipationEntity.referralId).isEqualTo(referral.id)
+    verify { courseParticipationService.createOrUpdateCourseParticipation(referral) }
   }
 
   @Test

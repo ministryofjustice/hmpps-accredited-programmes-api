@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationOutcome
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
@@ -36,7 +33,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.math.BigInteger
 import java.time.LocalDateTime
-import java.time.Year
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
@@ -68,6 +64,7 @@ constructor(
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
+    originalReferralId: UUID? = null,
   ): Referral {
     val username = SecurityContextHolder.getContext().authentication?.name
       ?: throw SecurityException("Authentication information not found")
@@ -93,6 +90,7 @@ constructor(
         offering = offering,
         prisonNumber = prisonNumber,
         referrer = referrerUser,
+        originalReferralId = originalReferralId,
       ),
     )
       ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
@@ -121,6 +119,7 @@ constructor(
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
+    referral.transferReason = update.transferReason
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
@@ -155,7 +154,7 @@ constructor(
     caseNotesApiService.buildAndCreateCaseNote(referral, referralStatusUpdate)
 
     if (referral.status == ReferralStatus.PROGRAMME_COMPLETE.name || referral.status == ReferralStatus.DESELECTED.name) {
-      courseParticipationService.createCourseParticipation(buildCourseParticipation(referral))
+      courseParticipationService.createOrUpdateCourseParticipation(referral)
     }
 
     // save PNI when referral is updated to "On Programme" status
@@ -165,30 +164,6 @@ constructor(
 
     // audit the interaction
     auditService.audit(referral, existingStatus, AuditAction.UPDATE_REFERRAL.name)
-  }
-
-  private fun buildCourseParticipation(referralEntity: ReferralEntity): CourseParticipationEntity {
-    return CourseParticipationEntity(
-      referralId = referralEntity.id,
-      prisonNumber = referralEntity.prisonNumber,
-      courseName = referralEntity.offering.course.name,
-      source = referralEntity.referrer.username,
-      detail = referralEntity.additionalInformation,
-      createdDateTime = LocalDateTime.now(),
-      outcome = buildCourseParticipationOutcomeByStatus(referralEntity.status),
-    )
-  }
-
-  private fun buildCourseParticipationOutcomeByStatus(referralStatus: String): CourseParticipationOutcome? {
-    return when (referralStatus) {
-      ReferralStatus.PROGRAMME_COMPLETE.name -> CourseParticipationOutcome(
-        CourseStatus.COMPLETE,
-        yearCompleted = Year.now(),
-      )
-
-      ReferralStatus.DESELECTED.name -> CourseParticipationOutcome(CourseStatus.INCOMPLETE)
-      else -> null
-    }
   }
 
   /**
@@ -393,7 +368,7 @@ constructor(
     }
   }
 
-  fun getDuplicateReferrals(offeringId: UUID, prisonNumber: String): List<ReferralEntity>? {
+  fun getDuplicateReferrals(prisonNumber: String, offeringId: UUID): List<ReferralEntity>? {
     val openReferralStatuses =
       referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
 

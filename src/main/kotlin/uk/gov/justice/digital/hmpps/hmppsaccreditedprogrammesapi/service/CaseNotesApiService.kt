@@ -142,8 +142,12 @@ class CaseNotesApiService(
 
     val reasonForClosingReferral =
       if (referral.status == "WITHDRAWN" || referral.status == "DESELECTED") {
-        val referralStatusReason = referralStatusReasonRepository.findByCode(referralStatusUpdate.reason!!)
-        "Reason for closing referral: ${referralStatusReason?.description} \n\n"
+        "\nReason for closing referral: " +
+          (
+            referralStatusUpdate.reason?.let {
+              referralStatusReasonRepository.findByCode(it)?.description
+            } ?: "Other"
+            ) + "\n\n"
       } else {
         "\n"
       }
@@ -154,7 +158,7 @@ class CaseNotesApiService(
   }
 
   fun getFullName(): String? {
-    val username = SecurityContextHolder.getContext().authentication?.name!!
+    val username = SecurityContextHolder.getContext().authentication?.name.orEmpty()
     return try {
       manageUsersService.getUserDetail(username)?.name ?: username
     } catch (ex: Exception) {
