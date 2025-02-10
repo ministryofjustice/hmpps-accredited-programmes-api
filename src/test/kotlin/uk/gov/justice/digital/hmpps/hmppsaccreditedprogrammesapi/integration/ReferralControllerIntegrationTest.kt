@@ -405,6 +405,28 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should allow referral status updates to status of MOVE_TO_BUILDING_CHOICES`() {
+    // Given
+    val createdReferral = createReferral(PRISON_NUMBER_1)
+
+    val referralStatusUpdate1 = ReferralStatusUpdate(
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate1)
+
+    // When
+    val referralStatusUpdate2 = ReferralStatusUpdate(
+      status = ReferralStatus.MOVE_TO_BUILDING_CHOICES.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate2)
+
+    // Then
+    referralRepository.findById(createdReferral.id).get().status shouldBeEqual ReferralStatus.MOVE_TO_BUILDING_CHOICES.name
+  }
+
+  @Test
   fun `Updating a referral status to PROGRAMME_COMPLETE should create a course participation record`() {
     // Given
     val createdReferral = createReferral(PRISON_NUMBER_1)

@@ -128,8 +128,12 @@ class CaseNotesApiService(
 
     log.info("programNameAndStrand : \n $programNameAndStrand")
 
+    val buildingChoicesProgramNameAndStrand = "Building Choices: ${course.intensity?.lowercase()} intensity"
+
     val customMessage =
-      message.replace("PRISONER_NAME", prisonerName).replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
+      message.replace("PRISONER_NAME", prisonerName)
+        .replace("BC_STRAND", buildingChoicesProgramNameAndStrand)
+        .replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
 
     val details = referralStatusUpdate.notes
       ?.takeIf { it.isNotBlank() }
