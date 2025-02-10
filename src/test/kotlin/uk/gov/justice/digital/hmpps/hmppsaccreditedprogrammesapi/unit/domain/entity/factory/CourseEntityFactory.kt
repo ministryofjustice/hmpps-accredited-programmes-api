@@ -65,10 +65,6 @@ class CourseEntityFactory {
     this.intensity = intensity
   }
 
-  fun withAudience(audience: String) = apply {
-    this.audience = audience
-  }
-
   fun produce() = CourseEntity(
     id = this.id,
     name = this.name,

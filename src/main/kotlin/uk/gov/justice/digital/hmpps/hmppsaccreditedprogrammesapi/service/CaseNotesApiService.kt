@@ -132,8 +132,9 @@ class CaseNotesApiService(
 
     val customMessage =
       message.replace("PRISONER_NAME", prisonerName)
-        .replace("PGM_NAME_STRAND", programNameAndStrand)
         .replace("BC_STRAND", buildingChoicesProgramNameAndStrand)
+        .replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
+
 
     val details = referralStatusUpdate.notes
       ?.takeIf { it.isNotBlank() }
