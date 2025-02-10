@@ -135,7 +135,6 @@ class CaseNotesApiService(
         .replace("BC_STRAND", buildingChoicesProgramNameAndStrand)
         .replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
 
-
     val details = referralStatusUpdate.notes
       ?.takeIf { it.isNotBlank() }
       ?.let { "Details: $it \n\n" }
