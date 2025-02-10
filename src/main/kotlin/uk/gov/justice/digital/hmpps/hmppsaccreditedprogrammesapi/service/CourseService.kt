@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
@@ -30,6 +31,7 @@ constructor(
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val referralRepository: ReferralRepository,
   private val organisationService: OrganisationService,
+  private val courseVariantRepository: CourseVariantRepository,
 ) {
   fun getAllCourses(includeWithdrawn: Boolean = false): List<CourseEntity> {
     if (includeWithdrawn) {
@@ -175,6 +177,19 @@ constructor(
   fun getCourseName(courseId: UUID): String? = courseRepository.findById(courseId).get().name
 
   fun getCoursesByName(name: String): List<CourseEntity> = courseRepository.findAllByName(name)
+  fun getCourses(courseIds: List<UUID>): List<CourseEntity> = courseRepository.findAllById(courseIds)
+  fun getBuildingChoicesCourses(): List<CourseEntity> {
+    val findAllByCourseId = courseVariantRepository.findAll()
+
+    val bcParentCourseIds = findAllByCourseId.map { it.courseId }
+    val bcVariantCourseIds = findAllByCourseId.map { it.variantCourseId }
+
+    val buildingChoicesCourseIds = listOf(bcParentCourseIds, bcVariantCourseIds).flatten()
+
+    return getCourses(buildingChoicesCourseIds)
+  }
+
+  fun getCourseVariantsById(courseId: UUID) = courseVariantRepository.findAllByCourseId(courseId)
 }
 
 fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> {

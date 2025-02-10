@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
@@ -39,12 +40,15 @@ class CourseServiceTest {
   @MockK(relaxed = true)
   private lateinit var organisationService: OrganisationService
 
+  @MockK(relaxed = true)
+  private lateinit var courseVariantRepository: CourseVariantRepository
+
   private lateinit var courseService: CourseService
 
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    courseService = CourseService(courseRepository, offeringRepository, prisonRegisterApiService, referralRepository, organisationService)
+    courseService = CourseService(courseRepository, offeringRepository, prisonRegisterApiService, referralRepository, organisationService, courseVariantRepository)
   }
 
   @Nested
