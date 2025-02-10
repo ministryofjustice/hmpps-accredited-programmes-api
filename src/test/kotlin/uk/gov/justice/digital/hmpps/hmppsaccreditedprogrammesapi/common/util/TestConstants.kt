@@ -6,7 +6,8 @@ import java.util.UUID
 
 val COURSE_ID: UUID = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
 val COURSE_NAME: String = "Super course"
-val COURSE_LOCATION: String = "West Midlands"
+val COURSE_AUDIENCE: String = "Super audience"
+val COURSE_INTENSITY: String = "HIGH"
 val COURSE_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
 
 const val REFERRAL_STARTED = "REFERRAL_STARTED"

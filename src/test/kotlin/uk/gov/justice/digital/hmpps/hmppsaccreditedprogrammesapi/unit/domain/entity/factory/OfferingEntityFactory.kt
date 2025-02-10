@@ -19,6 +19,7 @@ class OfferingEntityFactory {
   fun withContactEmail(contactEmail: String) = apply { this.contactEmail = contactEmail }
   fun withSecondaryContactEmail(secondaryContactEmail: String?) = apply { this.secondaryContactEmail = secondaryContactEmail }
   fun withWithdrawn(withdrawn: Boolean) = apply { this.withdrawn = withdrawn }
+  fun withCourse(course: CourseEntity) = apply { this.course = course }
 
   fun produce() = OfferingEntity(
     id = this.id,
