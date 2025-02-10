@@ -814,6 +814,47 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     assertTrue { courses.map { it.id }.containsAll(listOf(courseIdWithHighIntensity, courseIdWithHighAndModerateIntensity)) }
   }
 
+  @Test
+  fun `Only return building choices courses `() {
+    val bc1MainCourseId = UUID.randomUUID()
+    val bc1VariantCourseId = UUID.randomUUID()
+
+    persistenceHelper.createCourse(
+      bc1MainCourseId,
+      "BCH-1",
+      "Building Choices: high intensity",
+      "Building Choices helps people to develop high...",
+      "BCH-1",
+      "Sexual offence",
+    )
+
+    persistenceHelper.createCourse(
+      bc1VariantCourseId,
+      "BCH-2",
+      "Building Choices: medium intensity",
+      "Building Choices helps people to develop medium...",
+      "BCH-2",
+      "General offence",
+    )
+
+    persistenceHelper.createCourseVariant(courseId = bc1MainCourseId, variantCourseId = bc1VariantCourseId)
+
+    val courses = webTestClient
+      .get()
+      .uri("/courses?buildingChoicesOnly=true")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody<List<Course>>()
+      .returnResult().responseBody!!
+
+    courses.size shouldBe 2
+
+    courses.map { it.id }.containsAll(listOf(bc1MainCourseId, bc1VariantCourseId))
+  }
+
   fun getOfferingsById(id: UUID): CourseOffering {
     return webTestClient
       .get()

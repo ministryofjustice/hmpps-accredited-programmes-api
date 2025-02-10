@@ -288,13 +288,25 @@ class CourseController(
       value = "intensity",
       required = false,
     ) intensity: CourseIntensity?,
-  ): ResponseEntity<List<Course>> = ResponseEntity.ok(
-    courseService
-      .getAllCourses(withdrawn ?: false)
-      .run {
-        intensity?.let { filter { it.intensity?.contains(intensity.name, ignoreCase = true) == true } } ?: this
-      }.map { it.toApi() },
-  )
+    @Parameter(description = "flag to return only building choices courses") @RequestParam(
+      value = "buildingChoicesOnly",
+      required = false,
+    ) buildingChoicesOnly: Boolean?,
+  ): ResponseEntity<List<Course>> {
+    if (buildingChoicesOnly == true) {
+      courseService.getBuildingChoicesCourses().let { courseEntities ->
+        return ResponseEntity.ok(courseEntities.map { it.toApi() })
+      }
+    }
+
+    return ResponseEntity.ok(
+      courseService
+        .getAllCourses(withdrawn ?: false)
+        .run {
+          intensity?.let { filter { it.intensity?.contains(intensity.name, ignoreCase = true) == true } } ?: this
+        }.map { it.toApi() },
+    )
+  }
 
   @Operation(
     tags = ["Course Offerings"],
