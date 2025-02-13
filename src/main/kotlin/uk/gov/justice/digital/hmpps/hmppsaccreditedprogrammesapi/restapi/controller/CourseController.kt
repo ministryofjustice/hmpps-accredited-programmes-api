@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
@@ -38,6 +37,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Audienc
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import java.util.UUID
 import kotlin.random.Random
 
@@ -54,7 +55,8 @@ class CourseController(
   private val enabledOrganisationService: EnabledOrganisationService,
   private val audienceService: AudienceService,
   private val organisationService: OrganisationService,
-  private val courseVariantRepository: CourseVariantRepository,
+  private val referralService: ReferralService,
+  private val pniService: PniService,
 ) {
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -611,7 +613,7 @@ class CourseController(
   @Operation(
     tags = ["Courses"],
     summary = "Building choices",
-    operationId = "getBuildingCourseVariants",
+    operationId = "getBuildingChoicesCourseVariants",
     description = """""",
     responses = [
       ApiResponse(
@@ -638,7 +640,7 @@ class CourseController(
     produces = ["application/json"],
     consumes = ["application/json"],
   )
-  fun getBuildingCourseVariants(
+  fun getBuildingChoicesCourseVariants(
     @Parameter(
       description = "A course identifier which has variants",
       required = true,
@@ -648,7 +650,7 @@ class CourseController(
       required = true,
     ) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest,
   ): List<Course>? {
-    val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
+    val findAllByCourseId = courseService.getCourseVariantsById(courseId)
       ?: throw BusinessException("$courseId is not a Building choices course")
 
     val listOfBuildingCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
@@ -666,6 +668,75 @@ class CourseController(
       )
 
     return courseService.mapCourses(buildingChoicesCourses, genderToWhichCourseIsOffered)
+  }
+
+  @Operation(
+    tags = ["Courses"],
+    summary = "Details for a single course",
+    operationId = "getBuildingChoicesCourseForReferral",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "successful operation",
+        content = [Content(schema = Schema(implementation = Course::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "You are not authorized to view the resource",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Accessing the resource you were trying to reach is forbidden",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The resource you were trying to reach is not found",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/courses/building-choices/referral/{id}"],
+    produces = ["application/json"],
+  )
+  fun getBuildingChoicesCourseForReferral(
+    @Parameter(
+      description = "The id (UUID) of a referral",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+    @Parameter(description = "result of PNI calculation") @RequestParam(
+      value = "programmePathway",
+      required = false,
+    ) programmePathway: String?,
+  ): ResponseEntity<Course> {
+    val referral = referralService.getReferralById(id) ?: throw NotFoundException("No Referral found at /referrals/$id")
+
+    val pniResult = programmePathway
+      ?: pniService.getPniScore(
+        prisonNumber = referral.prisonNumber,
+        referralId = referral.id,
+      ).programmePathway
+
+    val buildingChoicesCourses = courseService.getBuildingChoicesCourses()
+    val audience = referral.offering.course.audience
+    val buildingChoicesIntensity = courseService.getIntensityOfBuildingChoicesCourse(pniResult)
+    val recommendedBuildingChoicesCourse =
+      buildingChoicesCourses.filter { it.audience == audience }
+        .firstOrNull { it.name.contains(buildingChoicesIntensity) }
+        ?: throw BusinessException("Building choices course could not be found for audience $audience programmePathway $programmePathway buildingChoicesIntensity $buildingChoicesIntensity")
+
+    val organisation =
+      organisationService.findOrganisationEntityByCode(referral.offering.organisationId)
+
+    recommendedBuildingChoicesCourse.offerings.firstOrNull { it.organisationId == referral.offering.organisationId }
+      ?: throw BusinessException("Building choices course ${recommendedBuildingChoicesCourse.name} not offered at ${organisation?.name ?: referral.offering.organisationId}")
+
+    return ResponseEntity.ok(recommendedBuildingChoicesCourse.toApi())
   }
 
   fun generateRandom10AlphaString(): String {

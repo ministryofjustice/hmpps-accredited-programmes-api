@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainOnly
@@ -12,6 +13,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.CourseVariantEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
@@ -48,7 +52,14 @@ class CourseServiceTest {
   @BeforeEach
   fun setup() {
     MockKAnnotations.init(this)
-    courseService = CourseService(courseRepository, offeringRepository, prisonRegisterApiService, referralRepository, organisationService, courseVariantRepository)
+    courseService = CourseService(
+      courseRepository,
+      offeringRepository,
+      prisonRegisterApiService,
+      referralRepository,
+      organisationService,
+      courseVariantRepository,
+    )
   }
 
   @Nested
@@ -158,5 +169,53 @@ class CourseServiceTest {
         courseService.getAllOfferingsByOrganisationId(o1.organisationId).shouldContainOnly(o1)
       }
     }
+  }
+
+  @Test
+  fun `getBuildingChoicesCourseIntensity should return high intensity for HIGH_INTENSITY_BC`() {
+    val result = courseService.getIntensityOfBuildingChoicesCourse("HIGH_INTENSITY_BC")
+    result shouldBe "high intensity"
+  }
+
+  @Test
+  fun `getBuildingChoicesCourseIntensity should return moderate intensity for MODERATE_INTENSITY_BC`() {
+    val result = courseService.getIntensityOfBuildingChoicesCourse("MODERATE_INTENSITY_BC")
+    result shouldBe "moderate intensity"
+  }
+
+  @Test
+  fun `getBuildingChoicesCourseIntensity should throw BusinessException for unknown pathway`() {
+    val exception = shouldThrow<BusinessException> {
+      courseService.getIntensityOfBuildingChoicesCourse("UNKNOWN_PATHWAY")
+    }
+    exception.message shouldBe "Building choices course could not be found for programmePathway UNKNOWN_PATHWAY"
+  }
+
+  @Test
+  fun `getBuildingChoicesCourses should return list of CourseEntity`() {
+    val courseId1 = UUID.randomUUID()
+    val courseId2 = UUID.randomUUID()
+    val variantCourseId1 = UUID.randomUUID()
+    val variantCourseId2 = UUID.randomUUID()
+
+    val courseVariantEntities = listOf(
+      CourseVariantEntity(courseId = courseId1, variantCourseId = variantCourseId1),
+      CourseVariantEntity(courseId = courseId2, variantCourseId = variantCourseId2),
+    )
+
+    val courseEntities = listOf(
+      CourseEntityFactory().withId(courseId1).produce(),
+      CourseEntityFactory().withId(courseId2).produce(),
+      CourseEntityFactory().withId(variantCourseId1).produce(),
+      CourseEntityFactory().withId(variantCourseId2).produce(),
+    )
+
+    every { courseVariantRepository.findAll() } returns courseVariantEntities
+    every { courseRepository.findAllById(any()) } returns courseEntities
+
+    val result = courseService.getBuildingChoicesCourses()
+
+    result.size shouldBe 4
+    result.map { it.id } shouldContainOnly listOf(courseId1, courseId2, variantCourseId1, variantCourseId2)
   }
 }

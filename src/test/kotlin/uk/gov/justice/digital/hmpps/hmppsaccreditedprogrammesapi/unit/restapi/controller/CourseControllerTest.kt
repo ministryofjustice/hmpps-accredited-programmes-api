@@ -16,12 +16,17 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniScoreFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,6 +42,12 @@ constructor(
 
   @MockkBean
   private lateinit var courseService: CourseService
+
+  @MockkBean
+  private lateinit var referralService: ReferralService
+
+  @MockkBean
+  private lateinit var pniService: PniService
 
   @MockkBean
   private lateinit var organisationService: OrganisationService
@@ -78,9 +89,12 @@ constructor(
 
     @Test
     fun `getAllCourseNames with JWT returns 200 with correct body`() {
-      val offering1 = OfferingEntityFactory().withOrganisationId("OF1").withContactEmail("of1@digital.justice.gov.uk").produce()
-      val offering2 = OfferingEntityFactory().withOrganisationId("OF2").withContactEmail("of2@digital.justice.gov.uk").produce()
-      val offering3 = OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce()
+      val offering1 =
+        OfferingEntityFactory().withOrganisationId("OF1").withContactEmail("of1@digital.justice.gov.uk").produce()
+      val offering2 =
+        OfferingEntityFactory().withOrganisationId("OF2").withContactEmail("of2@digital.justice.gov.uk").produce()
+      val offering3 =
+        OfferingEntityFactory().withOrganisationId("OF3").withContactEmail("of3@digital.justice.gov.uk").produce()
 
       val courses = listOf(
         CourseEntityFactory().withName("Course1").withOfferings(mutableSetOf(offering1)).produce(),
@@ -226,6 +240,72 @@ constructor(
         accept = MediaType.APPLICATION_JSON
       }.andExpect {
         status { isUnauthorized() }
+      }
+    }
+
+    @Nested
+    inner class BuildingChoicesCourseForAReferral {
+      @Test
+      fun `for a non existent referral returns not found error`() {
+        val randomId = UUID.randomUUID()
+
+        every { referralService.getReferralById(randomId) } returns null
+
+        mockMvc.get("/courses/building-choices/referral/$randomId") {
+          accept = MediaType.APPLICATION_JSON
+          header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+        }.andExpect {
+          status { isNotFound() }
+          content {
+            contentType(MediaType.APPLICATION_JSON)
+            jsonPath("$.status") { value(404) }
+            jsonPath("$.developerMessage") { prefix("No Referral found at /referrals/$randomId") }
+          }
+        }
+      }
+
+      @Test
+      fun `for a referral with no matching course returns an error`() {
+        val referralId = UUID.randomUUID()
+
+        every { referralService.getReferralById(referralId) } returns ReferralEntityFactory().withId(referralId).produce()
+        every { pniService.getPniScore(any(), any(), any(), any()) } returns PniScoreFactory().withProgrammePathway("HIGH_INTENSITY_BC").produce()
+        every { courseService.getBuildingChoicesCourses() } returns emptyList()
+        every { courseService.getIntensityOfBuildingChoicesCourse("HIGH_INTENSITY_BC") } returns "high intensity"
+
+        mockMvc.get("/courses/building-choices/referral/$referralId") {
+          accept = MediaType.APPLICATION_JSON
+          header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+        }.andExpect {
+          status { isBadRequest() }
+          content {
+            contentType(MediaType.APPLICATION_JSON)
+            jsonPath("$.status") { value(400) }
+            jsonPath("$.userMessage") { prefix("Building choices course could not be found for audience") }
+          }
+        }
+      }
+
+      @Test
+      fun `for a referral with no matching intensity returns an error`() {
+        val referralId = UUID.randomUUID()
+
+        every { referralService.getReferralById(referralId) } returns ReferralEntityFactory().withId(referralId).produce()
+        every { pniService.getPniScore(any(), any(), any(), any()) } returns PniScoreFactory().withProgrammePathway("INTENSITY_BC").produce()
+        every { courseService.getBuildingChoicesCourses() } returns emptyList()
+        every { courseService.getIntensityOfBuildingChoicesCourse("INTENSITY_BC") } throws BusinessException("Building choices course could not be found for programmePathway INTENSITY_BC")
+
+        mockMvc.get("/courses/building-choices/referral/$referralId") {
+          accept = MediaType.APPLICATION_JSON
+          header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+        }.andExpect {
+          status { isBadRequest() }
+          content {
+            contentType(MediaType.APPLICATION_JSON)
+            jsonPath("$.status") { value(400) }
+            jsonPath("$.userMessage") { prefix("Building choices course could not be found for programmePathway") }
+          }
+        }
       }
     }
   }
