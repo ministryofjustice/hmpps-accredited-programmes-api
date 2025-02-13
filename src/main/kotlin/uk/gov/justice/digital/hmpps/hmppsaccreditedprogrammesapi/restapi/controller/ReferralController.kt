@@ -806,6 +806,58 @@ class ReferralController(
 
   @Operation(
     tags = ["Referrals"],
+    summary = "Transfer an existing referral to Building Choices",
+    operationId = "updateReferralToBuildingChoices",
+    description = """""",
+    responses = [
+      ApiResponse(responseCode = "200", description = "The referral has now been transferred."),
+      ApiResponse(
+        responseCode = "401",
+        description = "The request was unauthorised.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden.  The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The referral does not exist.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "409",
+        description = "The referral may not change its status to the supplied value.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "500",
+        description = "An error occurred when attempting to transfer the referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.POST],
+    value = ["/referrals/{id}/transfer-to-building-choices"],
+    consumes = ["application/json"],
+  )
+  fun transferReferralToBuildingChoices(
+    @Parameter(
+      description = "The id (UUID) of a referral",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+  ): ResponseEntity<Referral> {
+    referralService.getReferralById(id)?.let {
+      val newReferral = referralService.transferReferralToBuildingChoices(it)
+      return ResponseEntity.status(HttpStatus.OK).body(newReferral?.toApi())
+    } ?: throw NotFoundException("No referral found at /referrals/$id/transfer-to-building-choices")
+  }
+
+  @Operation(
+    tags = ["Referrals"],
     summary = "Fetch duplicate referrals based on prison number and offeringId",
     operationId = "getDuplicateReferrals",
     description = """""",

@@ -52,6 +52,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNot
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.FeatureSwitchService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OfferingService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
@@ -138,6 +139,9 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var courseParticipationService: CourseParticipationService
+
+  @MockK(relaxed = true)
+  private lateinit var offeringService: OfferingService
 
   @Captor
   private lateinit var referralEntityCaptor: CapturingSlot<ReferralEntity>

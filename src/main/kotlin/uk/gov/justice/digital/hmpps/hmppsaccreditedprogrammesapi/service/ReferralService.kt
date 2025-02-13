@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
@@ -44,6 +45,7 @@ constructor(
   private val referralRepository: ReferralRepository,
   private val referrerUserRepository: ReferrerUserRepository,
   private val offeringRepository: OfferingRepository,
+  private val offeringService: OfferingService,
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
@@ -66,13 +68,9 @@ constructor(
     offeringId: UUID,
     originalReferralId: UUID? = null,
   ): Referral {
-    val username = SecurityContextHolder.getContext().authentication?.name
-      ?: throw SecurityException("Authentication information not found")
-    log.info("STARTING - Request received to create a referral for prisonNumber $prisonNumber from $username")
+    log.info("STARTING - Request received to create a referral for prisonNumber $prisonNumber")
 
-    val referrerUser = referrerUserRepository.findById(username).orElseGet {
-      referrerUserRepository.save(ReferrerUserEntity(username = username))
-    }
+    val referrerUser = getAuthenticatedReferrerUser()
 
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found for $offeringId") }
@@ -98,8 +96,18 @@ constructor(
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
 
-    log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber from $username referralId: ${savedReferral.id}")
+    log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber with referralId: ${savedReferral.id}")
     return savedReferral.toApi()
+  }
+
+  private fun getAuthenticatedReferrerUser(): ReferrerUserEntity {
+    val username = SecurityContextHolder.getContext().authentication?.name
+      ?: throw SecurityException("Authentication information not found")
+
+    val referrerUser = referrerUserRepository.findById(username).orElseGet {
+      referrerUserRepository.save(ReferrerUserEntity(username = username))
+    }
+    return referrerUser
   }
 
   private fun savePNI(savedReferral: ReferralEntity) {
@@ -236,8 +244,8 @@ constructor(
         referral.status = ReferralStatus.REFERRAL_SUBMITTED.name
         referral.submittedOn = LocalDateTime.now()
         fetchAndSavePomDetails(referral).let {
-          referral.primaryPomStaffId = it?.first
-          referral.secondaryPomStaffId = it?.second
+          referral.primaryPomStaffId = it.first
+          referral.secondaryPomStaffId = it.second
         }
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.REFERRAL_SUBMITTED.name))
         courseParticipationService.updateDraftHistoryForSubmittedReferral(referralId)
@@ -405,5 +413,62 @@ constructor(
 
     val savedReferrals = referralRepository.saveAll(updatedReferrals)
     log.info("Update successful for ${referrals.size} referrals for prisoner $prisonNumber referralIds ${savedReferrals.map { it.id }} Finished updating referrals with primary pom ${primaryPom?.staffId} and secondary POM ${secondaryPom?.staffId} ")
+  }
+
+  fun transferReferralToBuildingChoices(referral: ReferralEntity): ReferralEntity? {
+    validateStatusTransition(referral.id!!, referral.status, ReferralStatus.MOVE_TO_BUILDING_CHOICES.name, true)
+
+    val newOffering = findBuildingChoicesOffering(referral)
+    val newReferral = createNewReferral(referral, newOffering)
+    referralStatusHistoryService.createReferralHistory(newReferral)
+    auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
+
+    updateOriginalReferralStatus(referral)
+
+    return newReferral
+  }
+
+  private fun findBuildingChoicesOffering(referral: ReferralEntity): OfferingEntity {
+    val courseIntensity = referral.offering.course.intensity!!
+    val courseAudience = referral.offering.course.audience
+    val organisationId = referral.offering.organisationId
+    return offeringService.findBuildingChoicesOffering(courseIntensity, courseAudience, organisationId)
+  }
+
+  private fun createNewReferral(referral: ReferralEntity, newOffering: OfferingEntity): ReferralEntity {
+    val pomDetails = fetchAndSavePomDetails(referral)
+    val newReferral = referralRepository.save(
+      ReferralEntity(
+        offering = newOffering,
+        prisonNumber = referral.prisonNumber,
+        referrer = getAuthenticatedReferrerUser(),
+        originalReferralId = referral.id,
+        status = ReferralStatus.REFERRAL_SUBMITTED.name,
+        submittedOn = LocalDateTime.now(),
+        primaryPomStaffId = pomDetails.first,
+        secondaryPomStaffId = pomDetails.second,
+      ),
+    ) ?: throw IllegalStateException("Referral creation failed for ${referral.prisonNumber}").also {
+      log.warn("Failed to create referral for ${referral.prisonNumber}")
+    }
+    return newReferral
+  }
+
+  private fun updateOriginalReferralStatus(referral: ReferralEntity) {
+    val previousStatus = referral.status
+    val newStatus = ReferralStatus.MOVE_TO_BUILDING_CHOICES.name
+
+    referralStatusHistoryService.updateReferralHistory(
+      referralId = referral.id!!,
+      previousStatusCode = previousStatus,
+      newStatus = referralStatusRepository.getByCode(newStatus),
+    )
+    referral.status = newStatus
+    referralRepository.save(referral)
+  }
+
+  private fun logErrorAndThrow(message: String, logMessage: String): Exception {
+    log.warn(logMessage)
+    return Exception(message)
   }
 }
