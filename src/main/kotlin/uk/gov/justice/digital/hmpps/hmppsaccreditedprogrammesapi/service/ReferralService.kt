@@ -466,9 +466,4 @@ constructor(
     referral.status = newStatus
     referralRepository.save(referral)
   }
-
-  private fun logErrorAndThrow(message: String, logMessage: String): Exception {
-    log.warn(logMessage)
-    return Exception(message)
-  }
 }
