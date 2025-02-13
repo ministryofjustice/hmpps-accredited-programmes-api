@@ -758,7 +758,93 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     buildingChoicesCourse.courseOfferings[0].organisationId shouldBe "ESI"
   }
 
-  fun getCourseVariants(mainCourseId: UUID, isConvictedOfSexualOffence: Boolean, isInAWomensPrison: Boolean): List<Course> {
+  @Test
+  fun `Building choices course fetched for matching intensity and audience`() {
+    val bc1MainCourseId = UUID.randomUUID()
+    val bc1VariantCourseId = UUID.randomUUID()
+    val bc1CourseOfferingMainId = UUID.randomUUID()
+    val bc1CourseOfferingVariantId = UUID.randomUUID()
+
+    persistenceHelper.createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
+    persistenceHelper.createEnabledOrganisation("WSI", "WSI org")
+
+    persistenceHelper.createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
+    persistenceHelper.createEnabledOrganisation("ESI", "ESI org")
+
+    persistenceHelper.createCourse(
+      bc1MainCourseId,
+      "BCH-1",
+      "Building Choices: high intensity",
+      "Building Choices helps people to develop high...",
+      "BCH-1",
+      "Sexual offence",
+    )
+
+    persistenceHelper.createCourse(
+      bc1VariantCourseId,
+      "BCH-2",
+      "Building Choices: medium intensity",
+      "Building Choices helps people to develop medium...",
+      "BCH-2",
+      "General offence",
+    )
+
+    persistenceHelper.createOffering(
+      bc1CourseOfferingVariantId,
+      bc1MainCourseId,
+      "ESI",
+      "nobody-wsi@digital.justice.gov.uk",
+      "nobody2-wsi@digital.justice.gov.uk",
+      true,
+    )
+
+    persistenceHelper.createOffering(
+      bc1CourseOfferingMainId,
+      bc1VariantCourseId,
+      "WSI",
+      "nobody-esi@digital.justice.gov.uk",
+      "nobody2-esi@digital.justice.gov.uk",
+      true,
+    )
+
+    val referralId = UUID.randomUUID()
+    persistenceHelper.createReferral(
+      referralId,
+      bc1CourseOfferingVariantId,
+      "B2345BB",
+      "TEST_REFERRER_USER_1",
+      "This referral will be updated",
+      false,
+      false,
+      "REFERRAL_SUBMITTED",
+      null,
+    )
+
+    persistenceHelper.createCourseVariant(courseId = bc1MainCourseId, variantCourseId = bc1VariantCourseId)
+
+    val buildingChoicesCourseForReferral = getBuildingChoicesCourseForReferral(referralId)
+
+    buildingChoicesCourseForReferral.id shouldBe bc1MainCourseId
+  }
+
+  fun getBuildingChoicesCourseForReferral(referralId: UUID): Course {
+    return webTestClient
+      .get()
+      .uri("/courses/building-choices/referral/$referralId?programmePathway=HIGH_INTENSITY_BC")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody<Course>()
+      .returnResult().responseBody!!
+  }
+
+  fun getCourseVariants(
+    mainCourseId: UUID,
+    isConvictedOfSexualOffence: Boolean,
+    isInAWomensPrison: Boolean,
+  ): List<Course> {
     return webTestClient
       .post()
       .uri("/courses/building-choices/$mainCourseId")
@@ -811,7 +897,9 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       .expectBody<List<Course>>()
       .returnResult().responseBody!!
 
-    assertTrue { courses.map { it.id }.containsAll(listOf(courseIdWithHighIntensity, courseIdWithHighAndModerateIntensity)) }
+    assertTrue {
+      courses.map { it.id }.containsAll(listOf(courseIdWithHighIntensity, courseIdWithHighAndModerateIntensity))
+    }
   }
 
   @Test

@@ -190,6 +190,12 @@ constructor(
   }
 
   fun getCourseVariantsById(courseId: UUID) = courseVariantRepository.findAllByCourseId(courseId)
+
+  fun getIntensityOfBuildingChoicesCourse(programmePathway: String): String = when (programmePathway) {
+    "HIGH_INTENSITY_BC" -> "high intensity"
+    "MODERATE_INTENSITY_BC" -> "moderate intensity"
+    else -> throw BusinessException("Building choices course could not be found for programmePathway $programmePathway")
+  }
 }
 
 fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> {
