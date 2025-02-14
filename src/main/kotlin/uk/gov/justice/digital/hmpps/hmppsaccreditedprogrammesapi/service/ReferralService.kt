@@ -244,8 +244,8 @@ constructor(
         referral.status = ReferralStatus.REFERRAL_SUBMITTED.name
         referral.submittedOn = LocalDateTime.now()
         fetchAndSavePomDetails(referral).let {
-          referral.primaryPomStaffId = it.first
-          referral.secondaryPomStaffId = it.second
+          referral.primaryPomStaffId = it?.first
+          referral.secondaryPomStaffId = it?.second
         }
         caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.REFERRAL_SUBMITTED.name))
         courseParticipationService.updateDraftHistoryForSubmittedReferral(referralId)
