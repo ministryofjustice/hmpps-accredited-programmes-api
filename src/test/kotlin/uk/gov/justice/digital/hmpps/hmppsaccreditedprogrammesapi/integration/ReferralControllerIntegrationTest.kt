@@ -181,7 +181,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   fun `should transfer existing referral to appropriate building choices course`() {
     // Given
     val buildingChoicesCourseId = UUID.randomUUID()
-    persistenceHelper.createBuildingChoicesCourses(variantCourseId =  buildingChoicesCourseId)
+    persistenceHelper.createBuildingChoicesCourses(variantCourseId = buildingChoicesCourseId)
     val course = getAllCourses().first { it.identifier == "RC" }
     val offering = getAllOfferingsForCourse(course.id).first()
     val createdReferral = createReferral(offering.id, PRISON_NUMBER_1, null)

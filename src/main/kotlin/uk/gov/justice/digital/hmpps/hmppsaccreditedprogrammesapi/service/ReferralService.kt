@@ -415,12 +415,11 @@ constructor(
   }
 
   fun transferReferralToBuildingChoices(referral: ReferralEntity, courseId: UUID): ReferralEntity? {
-
     validateStatusTransition(referral.id!!, referral.status, ReferralStatus.MOVE_TO_BUILDING_CHOICES.name, true)
     val organisationId = referral.offering.organisationId
     val newOffering = offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(
       courseId,
-      organisationId
+      organisationId,
     ) ?: throw IllegalStateException("Unable to find building choices offering for course: $courseId and organisation: $organisationId")
       .also { log.warn("Unable to find building choices offering during transfer for course: $courseId and organisation: $organisationId") }
 

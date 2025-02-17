@@ -853,7 +853,7 @@ class ReferralController(
       description = "The id (UUID) of the course",
       required = true,
     ) @PathVariable("courseId") courseId: UUID,
-    ): ResponseEntity<Referral> {
+  ): ResponseEntity<Referral> {
     referralService.getReferralById(id)?.let {
       val newReferral = referralService.transferReferralToBuildingChoices(it, courseId)
       return ResponseEntity.status(HttpStatus.OK).body(newReferral?.toApi())
