@@ -417,13 +417,13 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // When
     val referralStatusUpdate2 = ReferralStatusUpdate(
-      status = ReferralStatus.MOVE_TO_BUILDING_CHOICES.name,
+      status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name,
       ptUser = true,
     )
     updateReferralStatus(createdReferral.id, referralStatusUpdate2)
 
     // Then
-    referralRepository.findById(createdReferral.id).get().status shouldBeEqual ReferralStatus.MOVE_TO_BUILDING_CHOICES.name
+    referralRepository.findById(createdReferral.id).get().status shouldBeEqual ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
   }
 
   @Test
