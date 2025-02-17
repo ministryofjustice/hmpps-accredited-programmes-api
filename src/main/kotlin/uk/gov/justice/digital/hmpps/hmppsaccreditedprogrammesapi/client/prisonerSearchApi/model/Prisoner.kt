@@ -42,6 +42,7 @@ data class PrisonerSearchResponse(
 data class PeopleSearchResponse(
   val bookingId: String,
   val conditionalReleaseDate: LocalDate?,
+  val prisonId: String?,
   val prisonName: String?,
   val dateOfBirth: LocalDate?,
   val ethnicity: String?,

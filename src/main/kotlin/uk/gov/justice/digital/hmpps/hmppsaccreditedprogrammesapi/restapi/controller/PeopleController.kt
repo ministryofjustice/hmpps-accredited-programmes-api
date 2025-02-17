@@ -271,6 +271,7 @@ class PeopleController(
           PeopleSearchResponse(
             bookingId = it.bookingId,
             conditionalReleaseDate = it.conditionalReleaseDate,
+            prisonId = it.prisonId,
             prisonName = it.prisonName,
             dateOfBirth = it.dateOfBirth,
             ethnicity = it.ethnicity,
