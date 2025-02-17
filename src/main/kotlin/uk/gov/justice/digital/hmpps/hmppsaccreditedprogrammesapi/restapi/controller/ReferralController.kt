@@ -807,7 +807,7 @@ class ReferralController(
   @Operation(
     tags = ["Referrals"],
     summary = "Transfer an existing referral to Building Choices",
-    operationId = "updateReferralToBuildingChoices",
+    operationId = "transferReferralToBuildingChoices",
     description = """""",
     responses = [
       ApiResponse(responseCode = "200", description = "The referral has now been transferred."),
