@@ -20,7 +20,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
@@ -56,11 +59,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
@@ -78,12 +84,15 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.time.Year
-import java.util.UUID
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
 class ReferralControllerIntegrationTest : IntegrationTestBase() {
+
+  @Autowired
+  private lateinit var offeringRepository: OfferingRepository
 
   @Autowired
   lateinit var personRepository: PersonRepository
@@ -147,6 +156,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       "Sample description",
       "CC",
       "General offence",
+      intensity = CourseIntensity.MODERATE.name,
     )
     persistenceHelper.createCourse(
       UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
@@ -155,7 +165,95 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       "Sample description",
       "RC",
       "General offence",
+      intensity = CourseIntensity.HIGH.name,
     )
+    persistenceHelper.createOffering(
+      UUID.randomUUID(),
+      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
+      "WSI",
+      "nobody-bwn@digital.justice.gov.uk",
+      "nobody2-bwn@digital.justice.gov.uk",
+      true,
+    )
+  }
+
+  @Test
+  fun `should transfer existing referral to appropriate building choices course`() {
+    // Given
+    val buildingChoicesCourseId = UUID.randomUUID()
+    persistenceHelper.createBuildingChoicesCourses(variantCourseId = buildingChoicesCourseId)
+    val course = getAllCourses().first { it.identifier == "RC" }
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val createdReferral = createReferral(offering.id, PRISON_NUMBER_1, null)
+
+    val referralStatusUpdate = ReferralStatusUpdate(
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate)
+
+    // When
+    val newReferral = transferReferralToBuildingChoices(createdReferral.id, buildingChoicesCourseId)
+
+    // Then
+    val originalReferral = referralRepository.findById(createdReferral.id).get()
+    originalReferral.status shouldBeEqual ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
+
+    val updatedNewReferral = referralRepository.findById(newReferral.id).get()
+    updatedNewReferral.status shouldBeEqual ReferralStatus.REFERRAL_SUBMITTED.name
+    updatedNewReferral.originalReferralId!! shouldBeEqual createdReferral.id
+
+    val buildingChoicesOffering = offeringRepository.findById(newReferral.offeringId)
+    buildingChoicesOffering.get().course.name shouldBeEqual "Building Choices: high intensity"
+  }
+
+  @Test
+  fun `should return HTTP 500 when attempting to transfer an existing referral to building choices course and no matching building choices courses can be found`() {
+    // Given
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val createdReferral = createReferral(offering.id, PRISON_NUMBER_1, null)
+
+    val referralStatusUpdate = ReferralStatusUpdate(
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
+      ptUser = true,
+    )
+    updateReferralStatus(createdReferral.id, referralStatusUpdate)
+
+    // When
+    val unknownCourseId = UUID.randomUUID()
+    val errorResponse = performRequestAndExpectStatus(
+      HttpMethod.POST,
+      "/referrals/${createdReferral.id}/transfer-to-building-choices/$unknownCourseId",
+      object : ParameterizedTypeReference<ErrorResponse>() {},
+      HttpStatus.INTERNAL_SERVER_ERROR.value(),
+    )
+
+    // Then
+    val originalReferral = referralRepository.findById(createdReferral.id).get()
+    originalReferral.status shouldBeEqual ReferralStatus.REFERRAL_SUBMITTED.name
+
+    errorResponse.status shouldBeEqual 500
+    errorResponse.developerMessage?.shouldBeEqual("Unable to find building choices offering for course: $unknownCourseId and organisation: MDI")
+  }
+
+  @Test
+  fun `should return NOT FOUND when attempting to transfer an non existent referral to building choices`() {
+    // Given
+    val referralId = UUID.randomUUID()
+    val courseId = UUID.randomUUID()
+
+    // When
+    val errorResponse = performRequestAndExpectStatus(
+      HttpMethod.POST,
+      "/referrals/$referralId/transfer-to-building-choices/$courseId",
+      object : ParameterizedTypeReference<ErrorResponse>() {},
+      HttpStatus.NOT_FOUND.value(),
+    )
+
+    // Then
+    errorResponse.status shouldBeEqual 404
+    errorResponse.developerMessage?.shouldBeEqual("No referral found at /referrals/$referralId/transfer-to-building-choices/$courseId")
   }
 
   @Test
@@ -1105,15 +1203,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody!!
 
   fun getReferralById(createdReferralId: UUID) =
-    webTestClient
-      .get()
-      .uri("/referrals/$createdReferralId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+    performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
 
   fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate): Any =
     webTestClient
@@ -1135,15 +1225,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .exchange().expectStatus().isNoContent
 
   fun submitReferral(createdReferralId: UUID) =
-    webTestClient
-      .post()
-      .uri("/referrals/$createdReferralId/submit")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+    performRequestAndExpectOk(HttpMethod.POST, "/referrals/$createdReferralId/submit", referralTypeReference())
 
   private fun encodeValue(value: String): String {
     return URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
@@ -1201,15 +1283,11 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   fun getReferralTransitions(referralId: UUID, ptUser: Boolean = false, deselectAndKeepOpen: Boolean = false) =
-    webTestClient
-      .get()
-      .uri("/referrals/$referralId/status-transitions?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<ReferralStatusRefData>>()
-      .returnResult().responseBody!!
+    performRequestAndExpectOk(
+      HttpMethod.GET,
+      "/referrals/$referralId/status-transitions?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen",
+      object : ParameterizedTypeReference<List<ReferralStatusRefData>>() {},
+    )
 
   fun getConfirmationText(
     referralId: UUID,
@@ -1217,15 +1295,11 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     ptUser: Boolean = false,
     deselectAndKeepOpen: Boolean = false,
   ) =
-    webTestClient
-      .get()
-      .uri("/referrals/$referralId/confirmation-text/$chosenStatusCode?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<ConfirmationFields>()
-      .returnResult().responseBody!!
+    performRequestAndExpectOk(
+      HttpMethod.GET,
+      "/referrals/$referralId/confirmation-text/$chosenStatusCode?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen",
+      object : ParameterizedTypeReference<ConfirmationFields>() {},
+    )
 
   @Test
   fun `Retrieving a list of draft referral views for an organisation using referral group should return 200 with correct body`() {
@@ -1611,15 +1685,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     sortDirection?.let { uriBuilder.queryParam("sortDirection", encodeValue(it)) }
     nameOrId?.let { uriBuilder.queryParam("nameOrId", encodeValue(it)) }
 
-    return webTestClient
-      .get()
-      .uri(uriBuilder.toUriString())
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<PaginatedReferralView>()
-      .returnResult().responseBody!!
+    return performRequestAndExpectOk(HttpMethod.GET, uriBuilder.toUriString(), paginatedReferralViewTypeReference())
   }
 
   fun getReferralViewsByUsername(
@@ -1742,16 +1808,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     }
   }
 
-  fun getSubjectAccessReport(prisonerId: String) =
-    webTestClient
-      .get()
-      .uri("/subject-access-request?prn=$prisonerId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<HmppsSubjectAccessRequestContent>()
-      .returnResult().responseBody!!
+  fun getSubjectAccessReport(prisonerId: String): HmppsSubjectAccessRequestContent {
+    val responseType: ParameterizedTypeReference<HmppsSubjectAccessRequestContent> = object : ParameterizedTypeReference<HmppsSubjectAccessRequestContent>() {}
+    return performRequestAndExpectOk(HttpMethod.GET, "/subject-access-request?prn=$prisonerId", responseType)
+  }
 
   @Test
   fun `Delete a nonexistent referral should return 404`() {
@@ -1985,15 +2045,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       LocalDateTime.now(),
     )
 
-    val responseBody = webTestClient
-      .get()
-      .uri("/referrals/duplicates?prisonNumber=$PRISON_NUMBER_1&offeringId=${offering.id}")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<Referral>>()
-      .returnResult().responseBody!!
+    val responseBody = performRequestAndExpectOk(HttpMethod.GET, "/referrals/duplicates?prisonNumber=$PRISON_NUMBER_1&offeringId=${offering.id}", referralListTypeReference())
 
     responseBody.size shouldBe 1
     responseBody.first().id shouldBe referralId
@@ -2062,4 +2114,12 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .exchange().expectStatus().isNoContent
   }
+
+  private fun transferReferralToBuildingChoices(referralId: UUID, courseId: UUID): Referral {
+    return performRequestAndExpectOk(HttpMethod.POST, "/referrals/$referralId/transfer-to-building-choices/$courseId", referralTypeReference())
+  }
+
+  private fun paginatedReferralViewTypeReference(): ParameterizedTypeReference<PaginatedReferralView> = object : ParameterizedTypeReference<PaginatedReferralView>() {}
+  private fun referralTypeReference(): ParameterizedTypeReference<Referral> = object : ParameterizedTypeReference<Referral>() {}
+  private fun referralListTypeReference(): ParameterizedTypeReference<List<Referral>> = object : ParameterizedTypeReference<List<Referral>>() {}
 }

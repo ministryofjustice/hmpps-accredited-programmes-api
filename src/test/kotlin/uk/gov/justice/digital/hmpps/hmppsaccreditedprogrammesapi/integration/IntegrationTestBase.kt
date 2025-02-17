@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -208,24 +211,42 @@ abstract class IntegrationTestBase {
   )
 
   fun getAllCourses(): List<Course> =
-    webTestClient
-      .get()
-      .uri("/courses")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<Course>>()
-      .returnResult().responseBody!!
+    performRequestAndExpectOk(
+      HttpMethod.GET,
+      "/courses",
+      object : ParameterizedTypeReference<List<Course>>() {},
+    )
 
   fun getAllOfferingsForCourse(courseId: UUID): List<CourseOffering> =
-    webTestClient
-      .get()
-      .uri("/courses/$courseId/offerings")
+    performRequestAndExpectOk(
+      HttpMethod.GET,
+      "/courses/$courseId/offerings",
+      object : ParameterizedTypeReference<List<CourseOffering>>() {},
+    )
+
+  fun <T> performRequestAndExpectOk(
+    httpMethod: HttpMethod,
+    uri: String,
+    returnType: ParameterizedTypeReference<T>,
+  ): T {
+    return performRequestAndExpectStatus(httpMethod, uri, returnType, HttpStatus.OK.value())
+  }
+
+  fun <T> performRequestAndExpectStatus(
+    httpMethod: HttpMethod,
+    uri: String,
+    returnType: ParameterizedTypeReference<T>,
+    expectedResponseStatus: Int,
+  ): T {
+    return webTestClient
+      .method(httpMethod)
+      .uri(uri)
+      .contentType(MediaType.APPLICATION_JSON)
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseOffering>>()
+      .expectStatus().isEqualTo(expectedResponseStatus)
+      .expectBody(returnType)
       .returnResult().responseBody!!
+  }
 }

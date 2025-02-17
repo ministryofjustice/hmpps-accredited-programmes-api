@@ -165,4 +165,57 @@ class PersistenceHelper {
       .setParameter("accountType", accountType)
       .executeUpdate()
   }
+
+  fun createBuildingChoicesCourses(courseId: UUID = UUID.randomUUID(), variantCourseId: UUID = UUID.randomUUID()) {
+    val bc1MainCourseId = courseId
+    val bc1VariantCourseId = variantCourseId
+    val bc1CourseOfferingMainId = UUID.randomUUID()
+    val bc1CourseOfferingVariantId = UUID.randomUUID()
+
+    createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
+    createEnabledOrganisation("WSI", "WSI org")
+
+    createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
+    createEnabledOrganisation("ESI", "ESI org")
+
+    createCourse(
+      bc1MainCourseId,
+      "BCH-1",
+      "Building Choices: moderate intensity",
+      "Building Choices helps people to develop moderate...",
+      "BCH-1",
+      "Sexual offence",
+      intensity = CourseIntensity.MODERATE.name,
+    )
+
+    createCourse(
+      bc1VariantCourseId,
+      "BCH-2",
+      "Building Choices: high intensity",
+      "Building Choices helps people to develop high...",
+      "BCH-2",
+      "General offence",
+      intensity = CourseIntensity.HIGH.name,
+    )
+
+    createOffering(
+      bc1CourseOfferingVariantId,
+      bc1MainCourseId,
+      "ESI",
+      "nobody-wsi@digital.justice.gov.uk",
+      "nobody2-wsi@digital.justice.gov.uk",
+      true,
+    )
+
+    createOffering(
+      bc1CourseOfferingMainId,
+      bc1VariantCourseId,
+      "WSI",
+      "nobody-esi@digital.justice.gov.uk",
+      "nobody2-esi@digital.justice.gov.uk",
+      true,
+    )
+
+    createCourseVariant(courseId = bc1MainCourseId, variantCourseId = bc1VariantCourseId)
+  }
 }
