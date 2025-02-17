@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param bookingId
  * @param prisonerNumber
  * @param conditionalReleaseDate
+ * @param prisonId
  * @param prisonName
  * @param dateOfBirth
  * @param ethnicity
@@ -33,7 +34,10 @@ data class PeopleSearchResponse(
   @Schema(example = "null", description = "")
   @get:JsonProperty("conditionalReleaseDate") val conditionalReleaseDate: java.time.LocalDate? = null,
 
-  @Schema(example = "null", description = "")
+  @Schema(example = "MDI", description = "ID of the prison")
+  @get:JsonProperty("prisonId") val prisonId: String? = null,
+
+  @Schema(example = "HMP Leeds", description = "")
   @get:JsonProperty("prisonName") val prisonName: String? = null,
 
   @Schema(example = "null", description = "")
