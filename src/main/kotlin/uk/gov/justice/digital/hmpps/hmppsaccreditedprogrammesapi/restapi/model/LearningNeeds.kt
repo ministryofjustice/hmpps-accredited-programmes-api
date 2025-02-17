@@ -29,6 +29,14 @@ data class LearningNeeds(
   @Schema(example = "0-No problems", description = "")
   @get:JsonProperty("learningDifficulties") val learningDifficulties: String? = null,
 
+  @Schema(
+    example = "[\"Numeracy\"," +
+      "        \"Reading\"," +
+      "        \"Writing\"]",
+    description = "",
+  )
+  @get:JsonProperty("problemAreas") val problemAreas: List<String>? = null,
+
   @Schema(example = "0-Any qualifications", description = "")
   @get:JsonProperty("qualifications") val qualifications: String? = null,
 
@@ -46,6 +54,7 @@ data class LearningNeeds(
     workRelatedSkills = oasysLearning?.workRelatedSkills,
     problemsReadWriteNum = oasysLearning?.problemsReadWriteNum,
     learningDifficulties = oasysLearning?.learningDifficulties,
+    problemAreas = oasysLearning?.problemAreas,
     qualifications = oasysLearning?.qualifications,
     basicSkillsScore = oasysLearning?.basicSkillsScore,
     basicSkillsScoreDescription = oasysLearning?.eTEIssuesDetails,
