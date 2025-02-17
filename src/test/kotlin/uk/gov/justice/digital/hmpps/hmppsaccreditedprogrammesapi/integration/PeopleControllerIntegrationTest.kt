@@ -77,6 +77,7 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
     response.first() shouldBeEqual PeopleSearchResponse(
       bookingId = "1202335",
       conditionalReleaseDate = null,
+      prisonId = "MDI",
       prisonName = "Nottingham (HMP)",
       dateOfBirth = LocalDate.of(1975, 1, 1),
       ethnicity = "White: Eng./Welsh/Scot./N.Irish/British",
