@@ -166,9 +166,9 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createBuildingChoicesCourses() {
-    val bc1MainCourseId = UUID.randomUUID()
-    val bc1VariantCourseId = UUID.randomUUID()
+  fun createBuildingChoicesCourses(courseId: UUID = UUID.randomUUID(), variantCourseId: UUID = UUID.randomUUID()) {
+    val bc1MainCourseId = courseId
+    val bc1VariantCourseId = variantCourseId
     val bc1CourseOfferingMainId = UUID.randomUUID()
     val bc1CourseOfferingVariantId = UUID.randomUUID()
 

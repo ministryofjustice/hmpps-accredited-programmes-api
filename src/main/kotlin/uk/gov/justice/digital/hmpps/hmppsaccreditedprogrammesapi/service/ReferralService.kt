@@ -45,7 +45,6 @@ constructor(
   private val referralRepository: ReferralRepository,
   private val referrerUserRepository: ReferrerUserRepository,
   private val offeringRepository: OfferingRepository,
-  private val offeringService: OfferingService,
   private val referralViewRepository: ReferralViewRepository,
   private val referralStatusHistoryService: ReferralStatusHistoryService,
   private val auditService: AuditService,
@@ -415,10 +414,16 @@ constructor(
     log.info("Update successful for ${referrals.size} referrals for prisoner $prisonNumber referralIds ${savedReferrals.map { it.id }} Finished updating referrals with primary pom ${primaryPom?.staffId} and secondary POM ${secondaryPom?.staffId} ")
   }
 
-  fun transferReferralToBuildingChoices(referral: ReferralEntity): ReferralEntity? {
-    validateStatusTransition(referral.id!!, referral.status, ReferralStatus.MOVE_TO_BUILDING_CHOICES.name, true)
+  fun transferReferralToBuildingChoices(referral: ReferralEntity, courseId: UUID): ReferralEntity? {
 
-    val newOffering = findBuildingChoicesOffering(referral)
+    validateStatusTransition(referral.id!!, referral.status, ReferralStatus.MOVE_TO_BUILDING_CHOICES.name, true)
+    val organisationId = referral.offering.organisationId
+    val newOffering = offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(
+      courseId,
+      organisationId
+    ) ?: throw IllegalStateException("Unable to find building choices offering for course: $courseId and organisation: $organisationId")
+      .also { log.warn("Unable to find building choices offering during transfer for course: $courseId and organisation: $organisationId") }
+
     val newReferral = createNewReferral(referral, newOffering)
     referralStatusHistoryService.createReferralHistory(newReferral)
     auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
@@ -426,13 +431,6 @@ constructor(
     updateOriginalReferralStatus(referral)
 
     return newReferral
-  }
-
-  private fun findBuildingChoicesOffering(referral: ReferralEntity): OfferingEntity {
-    val courseIntensity = referral.offering.course.intensity!!
-    val courseAudience = referral.offering.course.audience
-    val organisationId = referral.offering.organisationId
-    return offeringService.findBuildingChoicesOffering(courseIntensity, courseAudience, organisationId)
   }
 
   private fun createNewReferral(referral: ReferralEntity, newOffering: OfferingEntity): ReferralEntity {
@@ -448,8 +446,8 @@ constructor(
         primaryPomStaffId = pomDetails.first,
         secondaryPomStaffId = pomDetails.second,
       ),
-    ) ?: throw IllegalStateException("Referral creation failed for ${referral.prisonNumber}").also {
-      log.warn("Failed to create referral for ${referral.prisonNumber}")
+    ) ?: throw IllegalStateException("New referral creation failed during transfer to building choices for ${referral.prisonNumber}").also {
+      log.warn("Failed to create new referral during transfer to building choices for ${referral.prisonNumber}")
     }
     return newReferral
   }

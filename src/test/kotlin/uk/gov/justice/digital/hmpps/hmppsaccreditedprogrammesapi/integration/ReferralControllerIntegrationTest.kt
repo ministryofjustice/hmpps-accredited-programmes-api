@@ -180,7 +180,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   @Test
   fun `should transfer existing referral to appropriate building choices course`() {
     // Given
-    persistenceHelper.createBuildingChoicesCourses()
+    val buildingChoicesCourseId = UUID.randomUUID()
+    persistenceHelper.createBuildingChoicesCourses(variantCourseId =  buildingChoicesCourseId)
     val course = getAllCourses().first { it.identifier == "RC" }
     val offering = getAllOfferingsForCourse(course.id).first()
     val createdReferral = createReferral(offering.id, PRISON_NUMBER_1, null)
@@ -192,7 +193,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     updateReferralStatus(createdReferral.id, referralStatusUpdate)
 
     // When
-    val newReferral = transferReferralToBuildingChoices(createdReferral.id)
+    val newReferral = transferReferralToBuildingChoices(createdReferral.id, buildingChoicesCourseId)
 
     // Then
     val originalReferral = referralRepository.findById(createdReferral.id).get()
@@ -220,9 +221,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     updateReferralStatus(createdReferral.id, referralStatusUpdate)
 
     // When
+    val unknownCourseId = UUID.randomUUID()
     val errorResponse = performRequestAndExpectStatus(
       HttpMethod.POST,
-      "/referrals/${createdReferral.id}/transfer-to-building-choices",
+      "/referrals/${createdReferral.id}/transfer-to-building-choices/$unknownCourseId",
       object : ParameterizedTypeReference<ErrorResponse>() {},
       HttpStatus.INTERNAL_SERVER_ERROR.value(),
     )
@@ -232,18 +234,19 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     originalReferral.status shouldBeEqual ReferralStatus.REFERRAL_SUBMITTED.name
 
     errorResponse.status shouldBeEqual 500
-    errorResponse.developerMessage?.shouldBeEqual("No courses found for intensity MODERATE and audience General offence")
+    errorResponse.developerMessage?.shouldBeEqual("Unable to find building choices offering for course: $unknownCourseId and organisation: MDI")
   }
 
   @Test
   fun `should return NOT FOUND when attempting to transfer an non existent referral to building choices`() {
     // Given
     val referralId = UUID.randomUUID()
+    val courseId = UUID.randomUUID()
 
     // When
     val errorResponse = performRequestAndExpectStatus(
       HttpMethod.POST,
-      "/referrals/$referralId/transfer-to-building-choices",
+      "/referrals/$referralId/transfer-to-building-choices/$courseId",
       object : ParameterizedTypeReference<ErrorResponse>() {},
       HttpStatus.NOT_FOUND.value(),
     )
@@ -2112,8 +2115,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .exchange().expectStatus().isNoContent
   }
 
-  private fun transferReferralToBuildingChoices(referralId: UUID): Referral {
-    return performRequestAndExpectOk(HttpMethod.POST, "/referrals/$referralId/transfer-to-building-choices", referralTypeReference())
+  private fun transferReferralToBuildingChoices(referralId: UUID, courseId: UUID): Referral {
+    return performRequestAndExpectOk(HttpMethod.POST, "/referrals/$referralId/transfer-to-building-choices/$courseId", referralTypeReference())
   }
 
   private fun paginatedReferralViewTypeReference(): ParameterizedTypeReference<PaginatedReferralView> = object : ParameterizedTypeReference<PaginatedReferralView>() {}

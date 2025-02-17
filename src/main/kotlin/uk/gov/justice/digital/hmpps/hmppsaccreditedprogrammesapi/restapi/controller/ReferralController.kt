@@ -841,19 +841,23 @@ class ReferralController(
   )
   @RequestMapping(
     method = [RequestMethod.POST],
-    value = ["/referrals/{id}/transfer-to-building-choices"],
+    value = ["/referrals/{id}/transfer-to-building-choices/{courseId}"],
     consumes = ["application/json"],
   )
   fun transferReferralToBuildingChoices(
     @Parameter(
-      description = "The id (UUID) of a referral",
+      description = "The id (UUID) of the referral",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<Referral> {
+    @Parameter(
+      description = "The id (UUID) of the course",
+      required = true,
+    ) @PathVariable("courseId") courseId: UUID,
+    ): ResponseEntity<Referral> {
     referralService.getReferralById(id)?.let {
-      val newReferral = referralService.transferReferralToBuildingChoices(it)
+      val newReferral = referralService.transferReferralToBuildingChoices(it, courseId)
       return ResponseEntity.status(HttpStatus.OK).body(newReferral?.toApi())
-    } ?: throw NotFoundException("No referral found at /referrals/$id/transfer-to-building-choices")
+    } ?: throw NotFoundException("No referral found at /referrals/$id/transfer-to-building-choices/$courseId")
   }
 
   @Operation(
