@@ -197,7 +197,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // Then
     val originalReferral = referralRepository.findById(createdReferral.id).get()
-    originalReferral.status shouldBeEqual ReferralStatus.MOVE_TO_BUILDING_CHOICES.name
+    originalReferral.status shouldBeEqual ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
 
     val updatedNewReferral = referralRepository.findById(newReferral.id).get()
     updatedNewReferral.status shouldBeEqual ReferralStatus.REFERRAL_SUBMITTED.name
@@ -253,7 +253,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // Then
     errorResponse.status shouldBeEqual 404
-    errorResponse.developerMessage?.shouldBeEqual("No referral found at /referrals/$referralId/transfer-to-building-choices")
+    errorResponse.developerMessage?.shouldBeEqual("No referral found at /referrals/$referralId/transfer-to-building-choices/$courseId")
   }
 
   @Test

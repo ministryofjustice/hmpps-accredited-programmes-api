@@ -415,7 +415,7 @@ constructor(
   }
 
   fun transferReferralToBuildingChoices(referral: ReferralEntity, courseId: UUID): ReferralEntity? {
-    validateStatusTransition(referral.id!!, referral.status, ReferralStatus.MOVE_TO_BUILDING_CHOICES.name, true)
+    validateStatusTransition(referral.id!!, referral.status, ReferralStatus.MOVED_TO_BUILDING_CHOICES.name, true)
     val organisationId = referral.offering.organisationId
     val newOffering = offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(
       courseId,
@@ -453,7 +453,7 @@ constructor(
 
   private fun updateOriginalReferralStatus(referral: ReferralEntity) {
     val previousStatus = referral.status
-    val newStatus = ReferralStatus.MOVE_TO_BUILDING_CHOICES.name
+    val newStatus = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
 
     referralStatusHistoryService.updateReferralHistory(
       referralId = referral.id!!,
