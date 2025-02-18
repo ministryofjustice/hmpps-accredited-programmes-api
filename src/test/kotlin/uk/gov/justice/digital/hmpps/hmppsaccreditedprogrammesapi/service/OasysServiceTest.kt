@@ -227,6 +227,11 @@ class OasysServiceTest {
       workRelatedSkills = "0",
       problemsReadWriteNum = "1",
       learningDifficulties = "2",
+      problemAreas = listOf(
+        "Numeracy",
+        "Reading",
+        "Writing",
+      ),
       qualifications = "3",
       basicSkillsScore = "4",
       eTEIssuesDetails = "5",
