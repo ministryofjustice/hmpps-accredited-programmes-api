@@ -179,11 +179,6 @@ class ReferralServiceTest {
   fun `createReferral with existing user should create referral successfully`() {
     mockSecurityContext(REFERRER_USERNAME)
 
-//    val referrer = ReferrerUserEntityFactory()
-//      .withUsername(REFERRER_USERNAME)
-//      .produce()
-//    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
-
     val offering = OfferingEntityFactory()
       .withId(UUID.randomUUID())
       .withOrganisationId(ORGANISATION_ID_MDI)
@@ -241,11 +236,6 @@ class ReferralServiceTest {
   @Test
   fun `createReferral with new organisation and existing user should create referral successfully`() {
     mockSecurityContext(REFERRER_USERNAME)
-
-//    val referrer = ReferrerUserEntityFactory()
-//      .withUsername(REFERRER_USERNAME)
-//      .produce()
-//    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
 
     val prisonCode = "XXX"
     val prisonName = "Secret Prison"
