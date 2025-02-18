@@ -36,6 +36,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
@@ -62,6 +63,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralStatusHistoryService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
@@ -153,6 +155,13 @@ class ReferralServiceTest {
     MockKAnnotations.init(this)
     referralEntityCaptor = slot()
     courseParticipationEntityCaptor = slot()
+
+    val referrer = ReferrerUserEntityFactory()
+      .withUsername(REFERRER_USERNAME)
+      .produce()
+    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
+
+    every { staffService.getOffenderAllocation(any()) } returns Pair<StaffEntity?, StaffEntity?>(first = StaffEntityFactory().produce(), second = StaffEntityFactory().produce())
   }
 
   private fun mockSecurityContext(username: String) {
@@ -170,10 +179,10 @@ class ReferralServiceTest {
   fun `createReferral with existing user should create referral successfully`() {
     mockSecurityContext(REFERRER_USERNAME)
 
-    val referrer = ReferrerUserEntityFactory()
-      .withUsername(REFERRER_USERNAME)
-      .produce()
-    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
+//    val referrer = ReferrerUserEntityFactory()
+//      .withUsername(REFERRER_USERNAME)
+//      .produce()
+//    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
 
     val offering = OfferingEntityFactory()
       .withId(UUID.randomUUID())
@@ -233,10 +242,10 @@ class ReferralServiceTest {
   fun `createReferral with new organisation and existing user should create referral successfully`() {
     mockSecurityContext(REFERRER_USERNAME)
 
-    val referrer = ReferrerUserEntityFactory()
-      .withUsername(REFERRER_USERNAME)
-      .produce()
-    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
+//    val referrer = ReferrerUserEntityFactory()
+//      .withUsername(REFERRER_USERNAME)
+//      .produce()
+//    every { referrerUserRepository.findById(REFERRER_USERNAME) } returns Optional.of(referrer)
 
     val prisonCode = "XXX"
     val prisonName = "Secret Prison"
@@ -633,5 +642,64 @@ class ReferralServiceTest {
     assertThat(updatedReferral.submittedOn).isNotNull
     assertThat(updatedReferral.status).isEqualTo(REFERRAL_SUBMITTED)
     verify { courseParticipationService.updateDraftHistoryForSubmittedReferral(referralId) }
+  }
+
+  @Test
+  fun `should transfer existing referral to building choices`() {
+    // Given
+    mockSecurityContext(REFERRER_USERNAME)
+    val referralId = UUID.randomUUID()
+    val existingReferral = ReferralEntityFactory()
+      .withOffering(OfferingEntityFactory().produce())
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withReferrer(ReferrerUserEntityFactory().produce())
+      .withAdditionalInformation("additional info")
+      .withId(referralId)
+      .withStatus(REFERRAL_SUBMITTED)
+      .withOverrideReason("override reason")
+      .produce()
+    val courseId = UUID.randomUUID()
+
+    val referralStatusList =
+      mutableListOf<ReferralStatusRefData>(
+        ReferralStatusRefData(
+          code = "MOVED_TO_BUILDING_CHOICES",
+          description = "MOVED_TO_BUILDING_CHOICES",
+          colour = "MOVED_TO_BUILDING_CHOICES",
+          hintText = "MOVED_TO_BUILDING_CHOICES",
+          hasNotes = true,
+          hasConfirmation = false,
+          closed = true,
+          draft = false,
+          hold = false,
+          release = false,
+          deselectAndKeepOpen = false,
+          notesOptional = false,
+        ),
+      )
+    every { referralReferenceDataService.getNextStatusTransitions(REFERRAL_SUBMITTED, true) } returns referralStatusList
+
+    val buildingChoicesOffering = OfferingEntityFactory().withCourse(
+      CourseEntityFactory().withId(courseId).produce(),
+    ).produce()
+    every { offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(courseId, any()) } returns buildingChoicesOffering
+
+    val newReferralId = UUID.randomUUID()
+    every { referralRepository.save(any<ReferralEntity>()) } answers {
+      firstArg<ReferralEntity>().apply { id = newReferralId }
+    }
+
+    // When
+    val newReferral = referralService.transferReferralToBuildingChoices(existingReferral, courseId = courseId)
+
+    // Then
+    assertThat(newReferral).isNotNull
+    assertThat(newReferral?.id).isEqualTo(newReferralId)
+    assertThat(newReferral?.status).isEqualTo(ReferralStatus.REFERRAL_SUBMITTED.name)
+
+    verify { referralStatusHistoryService.createReferralHistory(newReferral!!) }
+    verify { referralStatusHistoryService.updateReferralHistory(referralId = referralId!!, previousStatusCode = ReferralStatus.REFERRAL_SUBMITTED.name, newStatus = any(), any(), any(), any()) }
+    verify { referralRepository.save(existingReferral.copy(status = "MOVED_TO_BUILDING_CHOICES")) }
+    verify { caseNotesApiService.buildAndCreateCaseNote(existingReferral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name)) }
   }
 }
