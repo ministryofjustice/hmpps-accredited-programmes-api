@@ -427,7 +427,8 @@ constructor(
     referralStatusHistoryService.createReferralHistory(newReferral)
     auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
 
-    updateOriginalReferralStatus(referral)
+    updateOriginalReferralStatusToBuildingChoices(referral)
+    caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name))
 
     return newReferral
   }
@@ -451,7 +452,7 @@ constructor(
     return newReferral
   }
 
-  private fun updateOriginalReferralStatus(referral: ReferralEntity) {
+  private fun updateOriginalReferralStatusToBuildingChoices(referral: ReferralEntity) {
     val previousStatus = referral.status
     val newStatus = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
 
