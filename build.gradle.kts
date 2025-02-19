@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.9"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.2"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.0.21"
-  kotlin("plugin.jpa") version "2.0.21"
+  kotlin("plugin.spring") version "2.1.0"
+  kotlin("plugin.jpa") version "2.1.0"
 }
 
 configurations {
@@ -18,7 +18,7 @@ dependencies {
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.2"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.8")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.1.1")
   // Override netty-common version to address https://osv.dev/vulnerability/GHSA-xq3w-v528-46rv
   implementation("io.netty:netty-common:4.1.116.Final")
 
