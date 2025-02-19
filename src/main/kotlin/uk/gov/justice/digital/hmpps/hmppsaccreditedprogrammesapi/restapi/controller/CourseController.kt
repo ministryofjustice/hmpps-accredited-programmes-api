@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
@@ -148,8 +149,10 @@ class CourseController(
       identifier = identifier,
       description = courseCreateRequest.description,
       alternateName = courseCreateRequest.alternateName,
-      audience = audience.name,
-      audienceColour = audience.colour,
+      audiences = mutableSetOf
+        (AudienceEntity(audience.id, audience.name, audience.colour)),
+//      audience = audience.name,
+//      audienceColour = audience.colour,
       withdrawn = courseCreateRequest.withdrawn,
       displayOnProgrammeDirectory = courseCreateRequest.displayOnProgrammeDirectory,
       intensity = courseCreateRequest.intensity,
@@ -394,8 +397,8 @@ class CourseController(
       val courseName = courseService.getCourseName(id)
         ?: throw NotFoundException("No Course found at /courses/$id")
       courseService.getCoursesByName(courseName)
-        .distinctBy { it.audience }
-        .map { Audience(name = it.audience) }
+        .distinctBy { it.audiences } // TODO below
+        .map { Audience(name = it.audiences.joinToString(", ") { audience -> audience.name }, colour = it.audiences.first().colour) }
     } ?: audienceService.getAllAudiences().map {
       Audience(
         id = it.id,
@@ -524,8 +527,9 @@ class CourseController(
       description = courseUpdateRequest.description ?: existingCourse.description,
       alternateName = courseUpdateRequest.alternateName ?: existingCourse.alternateName,
       listDisplayName = courseUpdateRequest.displayName ?: existingCourse.listDisplayName,
-      audience = courseUpdateRequest.audience ?: existingCourse.audience,
-      audienceColour = courseUpdateRequest.audienceColour ?: existingCourse.audienceColour,
+      // TODO
+//      audience = courseUpdateRequest.audience ?: existingCourse.audience,
+//      audienceColour = courseUpdateRequest.audienceColour ?: existingCourse.audienceColour,
       withdrawn = courseUpdateRequest.withdrawn ?: existingCourse.withdrawn,
     )
 
@@ -723,10 +727,10 @@ class CourseController(
       ).programmePathway
 
     val buildingChoicesCourses = courseService.getBuildingChoicesCourses()
-    val audience = referral.offering.course.audience
+    val audience = referral.offering.course.audiences.first() // TODO
     val buildingChoicesIntensity = courseService.getIntensityOfBuildingChoicesCourse(pniResult)
     val recommendedBuildingChoicesCourse =
-      buildingChoicesCourses.filter { it.audience == audience }
+      buildingChoicesCourses.filter { it.audiences.contains(audience) } // TODO
         .firstOrNull { it.name.contains(buildingChoicesIntensity) }
         ?: throw BusinessException("Building choices course could not be found for audience $audience programmePathway $programmePathway buildingChoicesIntensity $buildingChoicesIntensity")
 

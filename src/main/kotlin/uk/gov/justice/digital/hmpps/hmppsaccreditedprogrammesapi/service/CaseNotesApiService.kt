@@ -119,12 +119,16 @@ class CaseNotesApiService(
     val course = referral.offering.course
     val orgName = organisationService.findOrganisationEntityByCode(referral.offering.organisationId)?.name
 
-    val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
+//    val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
+    // TODO
+    val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audiences.first()} strand at $orgName \n\n"
 
     log.info("programmeDescriptionMessage Course and org name : $programmeDescriptionMessage")
 
     val prisonerName = person?.fullName().orEmpty()
-    val programNameAndStrand = "${course.name}: ${course.audience}"
+//    val programNameAndStrand = "${course.name}: ${course.audience}"
+    // TODO
+    val programNameAndStrand = "${course.name}: ${course.audiences.first()}"
 
     log.info("programNameAndStrand : \n $programNameAndStrand")
 

@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
@@ -164,9 +165,10 @@ constructor(
         description = it.description,
         alternateName = it.alternateName,
         coursePrerequisites = it.prerequisites.map(PrerequisiteEntity::toApi),
-        audience = it.audience,
-        audienceColour = it.audienceColour,
-        displayName = it.name + addAudience(it.name, it.audience),
+//        audience = it.audience,
+//        audienceColour = it.audienceColour, // TODO
+        audiences = listOf(Audience(name = it.audiences.first().name, colour = it.audiences.first().colour)),
+//         displayName = it.name + addAudience(it.name, it.audience), // TODO
         withdrawn = it.withdrawn,
         displayOnProgrammeDirectory = it.displayOnProgrammeDirectory,
         courseOfferings = it.offerings.map { offeringEntity -> offeringEntity.toApi(gender.name) },

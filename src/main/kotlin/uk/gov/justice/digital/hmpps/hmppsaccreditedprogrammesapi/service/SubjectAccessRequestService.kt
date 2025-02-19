@@ -109,7 +109,8 @@ private fun List<ReferralEntity>.toSarReferral(): List<SarReferral> {
       it.transferReason,
       it.referrer.username,
       it.offering.course.name,
-      it.offering.course.audience,
+//      it.offering.course.audience, // TODO
+      it.offering.course.audiences.first().name,
       it.offering.organisationId,
       it.originalReferralId,
     )

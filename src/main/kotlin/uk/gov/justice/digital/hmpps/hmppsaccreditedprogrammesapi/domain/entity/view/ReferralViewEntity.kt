@@ -46,12 +46,28 @@ data class ReferralViewEntity(
 @Repository
 interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
 
+//  @Query(
+//    value = """
+//      SELECT r from ReferralViewEntity r
+//      WHERE r.organisationId = :organisationId
+//        AND (:status IS NULL OR r.status IN :status)
+//        AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
+//        AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
+//        AND (:prisonNumber IS NULL  OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
+//        AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%')
+//            OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
+//        AND (
+//              (:forename IS NULL OR :forename = '' OR r.forename LIKE CONCAT('%', :forename, '%') OR r.surname LIKE CONCAT('%', :forename, '%'))
+//              AND
+//              (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%') OR r.forename LIKE CONCAT('%', :surname, '%'))
+//            )
+//    """,
+//  )  //TODO
   @Query(
     value = """
       SELECT r from ReferralViewEntity r
       WHERE r.organisationId = :organisationId
         AND (:status IS NULL OR r.status IN :status)
-        AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
         AND (:prisonNumber IS NULL  OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
         AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%') 
@@ -63,6 +79,17 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
             )
     """,
   )
+//  fun getReferralsByOrganisationId(
+//    organisationId: String,
+//    prisonNumber: String?,
+//    surnameOnly: String?,
+//    forename: String?,
+//    surname: String?,
+//    pageable: Pageable,
+//    status: List<String>?,
+//    audience: String?,
+//    courseName: String?,
+//  ): Page<ReferralViewEntity> //TODO
   fun getReferralsByOrganisationId(
     organisationId: String,
     prisonNumber: String?,
@@ -71,16 +98,31 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
     surname: String?,
     pageable: Pageable,
     status: List<String>?,
-    audience: String?,
     courseName: String?,
   ): Page<ReferralViewEntity>
 
+//  @Query(
+//    value = """
+//      SELECT r FROM ReferralViewEntity r
+//      WHERE ( r.referrerUsername = :username OR r.primaryPomUsername = :username)
+//        AND (:status IS NULL OR r.status IN :status)
+//        AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
+//        AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
+//        AND (:prisonNumber IS NULL OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
+//        AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%')
+//            OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
+//        AND (
+//             (:forename IS NULL OR :forename = '' OR r.forename LIKE CONCAT('%', :forename, '%') OR r.surname LIKE CONCAT('%', :forename, '%'))
+//             AND
+//             (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%') OR r.forename LIKE CONCAT('%', :surname, '%'))
+//            )
+//    """,
+//  ) //TODO
   @Query(
     value = """
       SELECT r FROM ReferralViewEntity r
       WHERE ( r.referrerUsername = :username OR r.primaryPomUsername = :username)
         AND (:status IS NULL OR r.status IN :status)
-        AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:courseName IS NULL OR :courseName = '' OR LOWER(r.courseName) LIKE LOWER(CONCAT('%', :courseName, '%')))
         AND (:prisonNumber IS NULL OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
         AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%') 
@@ -100,7 +142,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
     username: String,
     pageable: Pageable,
     status: List<String>?,
-    audience: String?,
+//    audience: String?, // TODO
     courseName: String?,
   ): Page<ReferralViewEntity>
 }

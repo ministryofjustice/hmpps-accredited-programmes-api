@@ -30,7 +30,8 @@ data class Course(
   @get:JsonProperty("coursePrerequisites", required = true) val coursePrerequisites: List<CoursePrerequisite>,
 
   @Schema(example = "Gang offence", required = true, description = "")
-  @get:JsonProperty("audience", required = true) val audience: String,
+//  @get:JsonProperty("audience", required = true) val audience: String,
+  @get:JsonProperty("audiences", required = true) val audiences: List<Audience>,
 
   @Schema(example = "BNM-VO", description = "This is an internal identifier for the course (to be removed)")
   @get:JsonProperty("identifier") val identifier: String? = null,

@@ -31,20 +31,45 @@ interface StatisticsRepository : JpaRepository<ReferralEntity, UUID> {
     locationCodes: List<String>?,
   ): String
 
+//  @Query(
+//    """
+//        SELECT json_build_object(
+//        'count', sum(count),
+//        'courseCounts', json_agg(json_build_object(
+//                'name', name,
+//                'audience', audience,
+//                'count', count
+//        ))
+//    ) AS result
+//FROM (
+//    SELECT
+//        c.name as name,
+//        c.audience as audience,
+//        COUNT(*) AS count
+//    FROM referral r
+//    JOIN offering o ON r.offering_id = o.offering_id
+//    JOIN course c ON o.course_id = c.course_id
+//    WHERE r.submitted_on >= :startDate
+//      AND r.submitted_on < :endDate
+//      and ( :locationCodes is null OR o.organisation_id in :locationCodes )
+//      AND r.deleted = FALSE
+//    GROUP BY c.name, c.audience
+//) AS subquery;
+//          """,
+//    nativeQuery = true,
+//  )
   @Query(
     """
         SELECT json_build_object(
         'count', sum(count),
         'courseCounts', json_agg(json_build_object(
                 'name', name,
-                'audience', audience,
                 'count', count
         ))
     ) AS result
 FROM (
     SELECT 
         c.name as name,
-        c.audience as audience,
         COUNT(*) AS count
     FROM referral r
     JOIN offering o ON r.offering_id = o.offering_id
@@ -53,7 +78,7 @@ FROM (
       AND r.submitted_on < :endDate
       and ( :locationCodes is null OR o.organisation_id in :locationCodes )
       AND r.deleted = FALSE
-    GROUP BY c.name, c.audience
+    GROUP BY c.name
 ) AS subquery;
           """,
     nativeQuery = true,
@@ -64,19 +89,45 @@ FROM (
     locationCodes: List<String>?,
   ): String
 
+//  @Query(
+//    """
+//       SELECT json_build_object(
+//              'count', sum(count),
+//              'courseCounts', json_agg(json_build_object(
+//              'name', name,
+//              'audience', audience,
+//              'count', count))
+//       ) AS result
+//        FROM (
+//         SELECT
+//             c.name as name,
+//             c.audience as audience,
+//             COUNT(*) AS count
+//         FROM referral r
+//                  JOIN offering o ON r.offering_id = o.offering_id
+//                  JOIN course c ON o.course_id = c.course_id
+//                  JOIN referral_status_history rsh ON rsh.referral_id = r.referral_id
+//         WHERE r.deleted = FALSE
+//           AND rsh.status = :statusCode
+//           AND rsh.status_start_date >= :startDate
+//           AND rsh.status_start_date < :endDate
+//           AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
+//         GROUP BY c.name, c.audience
+//     ) AS subquery;
+//          """,
+//    nativeQuery = true,
+//  ) //TODO
   @Query(
     """
        SELECT json_build_object(
               'count', sum(count),
               'courseCounts', json_agg(json_build_object(
               'name', name,
-              'audience', audience,
               'count', count))
        ) AS result
         FROM (
          SELECT
              c.name as name,
-             c.audience as audience,
              COUNT(*) AS count
          FROM referral r
                   JOIN offering o ON r.offering_id = o.offering_id
@@ -87,7 +138,7 @@ FROM (
            AND rsh.status_start_date >= :startDate
            AND rsh.status_start_date < :endDate
            AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
-         GROUP BY c.name, c.audience
+         GROUP BY c.name
      ) AS subquery;
           """,
     nativeQuery = true,
@@ -99,12 +150,61 @@ FROM (
     statusCode: String,
   ): String
 
+//  @Query(
+//    """
+//        WITH aggregated_courses AS (
+//    SELECT
+//        c.name AS name,
+//        c.audience AS audience,
+//        r.status AS status,
+//        COUNT(*) AS count,
+//        COUNT(r.referral_id) AS referral_count
+//    FROM
+//        referral r
+//            JOIN offering o ON r.offering_id = o.offering_id
+//            JOIN course c ON o.course_id = c.course_id
+//    WHERE
+//        r.status IN :statusCodes
+//      AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
+//      AND r.deleted = FALSE
+//    GROUP BY
+//        c.name, c.audience, r.status
+//),
+//     aggregated_statuses AS (
+//         SELECT
+//             status,
+//             json_agg(json_build_object(
+//                     'name', name,
+//                     'audience', audience,
+//                     'count', count
+//                      )) AS courseCounts,
+//             SUM(count) AS total_count,
+//             SUM(referral_count) AS referral_count
+//         FROM
+//             aggregated_courses
+//         GROUP BY
+//             status
+//     )
+//SELECT
+//    json_build_object(
+//            'totalCount', SUM(referral_count),
+//            'statusContent', json_agg(json_build_object(
+//            'status', status,
+//            'countAtStatus', referral_count,
+//            'courseCounts', courseCounts
+//             ))
+//    ) AS result
+//FROM
+//    aggregated_statuses;
+//
+//          """,
+//    nativeQuery = true,
+//  ) //TODO
   @Query(
     """
         WITH aggregated_courses AS (
     SELECT
         c.name AS name,
-        c.audience AS audience,
         r.status AS status,
         COUNT(*) AS count,
         COUNT(r.referral_id) AS referral_count
@@ -117,14 +217,13 @@ FROM (
       AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
       AND r.deleted = FALSE
     GROUP BY
-        c.name, c.audience, r.status
+        c.name, r.status
 ),
      aggregated_statuses AS (
          SELECT
              status,
              json_agg(json_build_object(
                      'name', name,
-                     'audience', audience,
                      'count', count
                       )) AS courseCounts,
              SUM(count) AS total_count,

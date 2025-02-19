@@ -30,6 +30,17 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
 
   fun findAllByWithdrawnIsFalse(): List<CourseEntity>
 
+//  @Query(
+//    """
+//    SELECT c FROM CourseEntity c
+//    JOIN FETCH c.offerings o
+//    INNER JOIN OrganisationEntity org ON o.organisationId = org.code
+//    INNER JOIN EnabledOrganisation enOrg ON org.code = enOrg.code
+//    WHERE c.id IN :courseIds
+//    AND (:audience IS NULL OR c.audience = :audience)
+//    AND org.gender = :gender
+//  """,
+//  ) TODO
   @Query(
     """
     SELECT c FROM CourseEntity c 
@@ -37,10 +48,10 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
     INNER JOIN OrganisationEntity org ON o.organisationId = org.code  
     INNER JOIN EnabledOrganisation enOrg ON org.code = enOrg.code  
     WHERE c.id IN :courseIds
-    AND (:audience IS NULL OR c.audience = :audience)
     AND org.gender = :gender
   """,
   )
+
   fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String? = null, gender: String): List<CourseEntity>?
 
   fun findAllByName(name: String): List<CourseEntity>
