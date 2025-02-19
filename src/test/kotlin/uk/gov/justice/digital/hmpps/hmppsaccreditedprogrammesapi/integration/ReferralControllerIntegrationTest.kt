@@ -503,7 +503,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should NOT allow referral status updates to status of MOVE_TO_BUILDING_CHOICES`() {
+  fun `should NOT allow referral status updates to status of MOVED_TO_BUILDING_CHOICES`() {
     // Given
     val createdReferral = createReferral(PRISON_NUMBER_1)
 
