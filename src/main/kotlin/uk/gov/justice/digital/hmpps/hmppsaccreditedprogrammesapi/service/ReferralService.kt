@@ -62,6 +62,7 @@ constructor(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
+  @Transactional
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
@@ -117,8 +118,7 @@ constructor(
     }
   }
 
-  fun getReferralById(referralId: UUID) =
-    referralRepository.findById(referralId).getOrNull()
+  fun getReferralById(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
@@ -386,18 +386,15 @@ constructor(
     )?.filterNot { it.status == ReferralStatus.REFERRAL_STARTED.name }
   }
 
-  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<BigInteger?, BigInteger?> {
-    return try {
-      val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
-      Pair(primaryPom?.staffId, secondaryPom?.staffId)
-    } catch (ex: Exception) {
-      log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}: ${ex.message}", ex)
-      Pair(null, null)
-    }
+  fun fetchAndSavePomDetails(submittedReferral: ReferralEntity): Pair<BigInteger?, BigInteger?> = try {
+    val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(submittedReferral.prisonNumber)
+    Pair(primaryPom?.staffId, secondaryPom?.staffId)
+  } catch (ex: Exception) {
+    log.error("Error fetching POM details for prison number ${submittedReferral.prisonNumber}: ${ex.message}", ex)
+    Pair(null, null)
   }
 
-  fun getPrisonIdsWithNoPrimaryPom() =
-    referralRepository.findAllDistinctPrisonNumbersWithoutPrimaryPom()
+  fun getPrisonIdsWithNoPrimaryPom() = referralRepository.findAllDistinctPrisonNumbersWithoutPrimaryPom()
 
   fun updatePoms(prisonNumber: String, primaryPom: StaffEntity?, secondaryPom: StaffEntity?) {
     val referrals = referralRepository.findAllByPrisonNumber(prisonNumber)

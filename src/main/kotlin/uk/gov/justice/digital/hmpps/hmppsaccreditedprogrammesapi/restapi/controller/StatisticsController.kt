@@ -37,12 +37,11 @@ class StatisticsController(
     @RequestParam startDate: LocalDate,
     @RequestParam endDate: LocalDate? = LocalDate.now().plusDays(1),
     @RequestParam locationCodes: List<String>? = listOf(),
-  ) =
-    statisticsRepository.referralCountByStatus(
-      startDate,
-      endDate!!,
-      locationCodes,
-    ).orEmpty()
+  ) = statisticsRepository.referralCountByStatus(
+    startDate,
+    endDate!!,
+    locationCodes,
+  ).orEmpty()
 
   @GetMapping("/report/count-by-status-for-programme", produces = ["application/json"])
   fun getReportStatusCountsForProgramme(
@@ -50,19 +49,15 @@ class StatisticsController(
     @RequestParam endDate: LocalDate? = LocalDate.now().plusDays(1),
     @RequestParam locationCodes: List<String>? = listOf(),
     @RequestParam courseId: UUID,
-  ): List<ReportStatusCount> {
-    return statisticsService.getReferralStatusCountByProgramme(
-      startDate,
-      endDate!!,
-      locationCodes,
-      courseId,
-    )
-  }
+  ): List<ReportStatusCount> = statisticsService.getReferralStatusCountByProgramme(
+    startDate,
+    endDate!!,
+    locationCodes,
+    courseId,
+  )
 
   @GetMapping("/report-types", produces = ["application/json"])
-  fun getReportTypes(): ReportTypes {
-    return ReportTypes(ReportType.entries.map { it.name })
-  }
+  fun getReportTypes(): ReportTypes = ReportTypes(ReportType.entries.map { it.name })
 
   @GetMapping("/report/{reportType}")
   fun getStatistics(

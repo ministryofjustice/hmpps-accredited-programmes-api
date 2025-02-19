@@ -53,10 +53,9 @@ class OfferingController(
     value = ["/offerings/{id}/course"],
     produces = ["application/json"],
   )
-  fun getCourseByOfferingId(@Parameter(description = "The id (UUID) of an offering.", required = true) @PathVariable("id") id: UUID): ResponseEntity<Course> =
-    courseService.getCourseByOfferingId(id)?.let {
-      ResponseEntity.ok(it.toApi())
-    } ?: throw NotFoundException("No Course found at /offerings/$id/course")
+  fun getCourseByOfferingId(@Parameter(description = "The id (UUID) of an offering.", required = true) @PathVariable("id") id: UUID): ResponseEntity<Course> = courseService.getCourseByOfferingId(id)?.let {
+    ResponseEntity.ok(it.toApi())
+  } ?: throw NotFoundException("No Course found at /offerings/$id/course")
 
   @Operation(
     tags = ["Course Offerings"],
@@ -76,11 +75,9 @@ class OfferingController(
     value = ["/offerings/{id}"],
     produces = ["application/json"],
   )
-  fun getOfferingById(@Parameter(description = "A course offering identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CourseOffering> {
-    return courseService.getOfferingById(id)?.let {
-      val enabledOrg = enabledOrganisationService.getEnabledOrganisation(it.organisationId) != null
-      val genderOfOrganisation = organisationService.findOrganisationEntityByCode(it.organisationId)?.gender!!
-      ResponseEntity.ok(it.toApi(enabledOrg, genderOfOrganisation))
-    } ?: throw NotFoundException("No Offering found at /offerings/$id")
-  }
+  fun getOfferingById(@Parameter(description = "A course offering identifier", required = true) @PathVariable("id") id: UUID): ResponseEntity<CourseOffering> = courseService.getOfferingById(id)?.let {
+    val enabledOrg = enabledOrganisationService.getEnabledOrganisation(it.organisationId) != null
+    val genderOfOrganisation = organisationService.findOrganisationEntityByCode(it.organisationId)?.gender!!
+    ResponseEntity.ok(it.toApi(enabledOrg, genderOfOrganisation))
+  } ?: throw NotFoundException("No Offering found at /offerings/$id")
 }

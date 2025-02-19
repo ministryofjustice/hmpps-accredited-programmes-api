@@ -73,12 +73,11 @@ class AuthAwareTokenConverter : Converter<Jwt, AbstractAuthenticationToken> {
   private val jwtGrantedAuthoritiesConverter: Converter<Jwt, Collection<GrantedAuthority>> =
     JwtGrantedAuthoritiesConverter()
 
-  override fun convert(jwt: Jwt): AbstractAuthenticationToken =
-    AuthAwareAuthenticationToken(
-      jwt,
-      findPrincipal(jwt.claims),
-      extractAuthorities(jwt),
-    )
+  override fun convert(jwt: Jwt): AbstractAuthenticationToken = AuthAwareAuthenticationToken(
+    jwt,
+    findPrincipal(jwt.claims),
+    extractAuthorities(jwt),
+  )
 
   private fun findPrincipal(claims: Map<String, Any?>): String = when {
     claims.containsKey(CLAIM_USERNAME) -> claims[CLAIM_USERNAME]
@@ -112,12 +111,11 @@ class AuthorizedClientServiceConfiguration(
 ) {
 
   @Bean
-  fun inMemoryOAuth2AuthorizedClientService(): OAuth2AuthorizedClientService =
-    if (logClientCredentialsJwtInfo) {
-      LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository, objectMapper)
-    } else {
-      InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
-    }
+  fun inMemoryOAuth2AuthorizedClientService(): OAuth2AuthorizedClientService = if (logClientCredentialsJwtInfo) {
+    LoggingInMemoryOAuth2AuthorizedClientService(clientRegistrationRepository, objectMapper)
+  } else {
+    InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
+  }
 }
 
 class LoggingInMemoryOAuth2AuthorizedClientService(
@@ -156,8 +154,7 @@ class LoggingInMemoryOAuth2AuthorizedClientService(
     val exp: Long,
   )
 
-  override fun removeAuthorizedClient(clientRegistrationId: String?, principalName: String?) =
-    backingImplementation.removeAuthorizedClient(clientRegistrationId, principalName)
+  override fun removeAuthorizedClient(clientRegistrationId: String?, principalName: String?) = backingImplementation.removeAuthorizedClient(clientRegistrationId, principalName)
 }
 
 class AuthAwareAuthenticationToken(

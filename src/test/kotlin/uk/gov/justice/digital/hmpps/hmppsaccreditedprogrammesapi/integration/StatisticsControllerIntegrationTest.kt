@@ -99,23 +99,22 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     )
   }
 
-  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
-    webTestClient
-      .post()
-      .uri("/referrals")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        ReferralCreate(
-          offeringId = offeringId!!,
-          prisonNumber = prisonNumber,
-        ),
-      )
-      .exchange()
-      .expectStatus().isCreated
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) = webTestClient
+    .post()
+    .uri("/referrals")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      ReferralCreate(
+        offeringId = offeringId!!,
+        prisonNumber = prisonNumber,
+      ),
+    )
+    .exchange()
+    .expectStatus().isCreated
+    .expectBody<Referral>()
+    .returnResult().responseBody!!
 
   @Test
   fun `Get referral count statistics should return 200 with correct body`() {
@@ -345,48 +344,42 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     updateReferralStatus(referralId, referralStatusUpdate5)
   }
 
-  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): Referral {
-    return createReferral(offeringId1, prisonNumber)
-  }
+  fun createReferral(prisonNumber: String = PRISON_NUMBER_1): Referral = createReferral(offeringId1, prisonNumber)
 
-  fun getReportStatusesByProgrammeType(courseId: UUID, startDate: LocalDate, endDate: LocalDate, locations: List<String>?) =
-    webTestClient
-      .get()
-      .uri("/statistics/report/count-by-status-for-programme?startDate=$startDate&endDate=$endDate&" + locations?.joinToString("&") { "locationCodes=$it" } + "&courseId=$courseId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectBody<List<ReportStatusCount>>()
-      .returnResult().responseBody!!
+  fun getReportStatusesByProgrammeType(courseId: UUID, startDate: LocalDate, endDate: LocalDate, locations: List<String>?) = webTestClient
+    .get()
+    .uri("/statistics/report/count-by-status-for-programme?startDate=$startDate&endDate=$endDate&" + locations?.joinToString("&") { "locationCodes=$it" } + "&courseId=$courseId")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectBody<List<ReportStatusCount>>()
+    .returnResult().responseBody!!
 
-  fun getReferralById(createdReferralId: UUID) =
-    webTestClient
-      .get()
-      .uri("/referrals/$createdReferralId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+  fun getReferralById(createdReferralId: UUID) = webTestClient
+    .get()
+    .uri("/referrals/$createdReferralId")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Referral>()
+    .returnResult().responseBody!!
 
-  fun getStatistics(reportType: String, locationCodes: String? = null, startDate: String): ReportContent =
-    webTestClient
-      .get()
-      .uri("/statistics/report/$reportType?startDate=$startDate&locationCodes=$locationCodes")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<ReportContent>()
-      .returnResult().responseBody!!
+  fun getStatistics(reportType: String, locationCodes: String? = null, startDate: String): ReportContent = webTestClient
+    .get()
+    .uri("/statistics/report/$reportType?startDate=$startDate&locationCodes=$locationCodes")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<ReportContent>()
+    .returnResult().responseBody!!
 
-  private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) =
-    webTestClient
-      .put()
-      .uri("/referrals/$createdReferralId/status")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(referralStatusUpdate)
-      .exchange().expectStatus().isNoContent
+  private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
+    .put()
+    .uri("/referrals/$createdReferralId/status")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(referralStatusUpdate)
+    .exchange().expectStatus().isNoContent
 }

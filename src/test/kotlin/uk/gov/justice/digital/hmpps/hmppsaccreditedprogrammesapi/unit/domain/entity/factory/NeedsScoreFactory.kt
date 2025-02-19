@@ -36,14 +36,11 @@ class NeedsScoreFactory {
     private var selfManagementDomainScore: SelfManagementDomainScore = SelfManagementDomainScoreFactory().produce()
 
     fun withSexDomainScore(sexDomainScore: SexDomainScore) = apply { this.sexDomainScore = sexDomainScore }
-    fun withThinkingDomainScore(thinkingDomainScore: ThinkingDomainScore) =
-      apply { this.thinkingDomainScore = thinkingDomainScore }
+    fun withThinkingDomainScore(thinkingDomainScore: ThinkingDomainScore) = apply { this.thinkingDomainScore = thinkingDomainScore }
 
-    fun withRelationshipDomainScore(relationshipDomainScore: RelationshipDomainScore) =
-      apply { this.relationshipDomainScore = relationshipDomainScore }
+    fun withRelationshipDomainScore(relationshipDomainScore: RelationshipDomainScore) = apply { this.relationshipDomainScore = relationshipDomainScore }
 
-    fun withSelfManagementDomainScore(selfManagementDomainScore: SelfManagementDomainScore) =
-      apply { this.selfManagementDomainScore = selfManagementDomainScore }
+    fun withSelfManagementDomainScore(selfManagementDomainScore: SelfManagementDomainScore) = apply { this.selfManagementDomainScore = selfManagementDomainScore }
 
     fun produce() = DomainScore(
       sexDomainScore = sexDomainScore,
@@ -56,11 +53,9 @@ class NeedsScoreFactory {
       private var overAllSexDomainScore: Int? = 2
       private var individualSexScores: IndividualSexScores = IndividualSexScores()
 
-      fun withOverAllSexDomainScore(overAllSexDomainScore: Int?) =
-        apply { this.overAllSexDomainScore = overAllSexDomainScore }
+      fun withOverAllSexDomainScore(overAllSexDomainScore: Int?) = apply { this.overAllSexDomainScore = overAllSexDomainScore }
 
-      fun withIndividualSexScores(individualSexScores: IndividualSexScores) =
-        apply { this.individualSexScores = individualSexScores }
+      fun withIndividualSexScores(individualSexScores: IndividualSexScores) = apply { this.individualSexScores = individualSexScores }
 
       fun produce() = SexDomainScore(
         overAllSexDomainScore = overAllSexDomainScore,
@@ -72,11 +67,9 @@ class NeedsScoreFactory {
       private var overallThinkingDomainScore: Int? = 1
       private var individualThinkingScores: IndividualCognitiveScores = IndividualCognitiveScores()
 
-      fun withOverallThinkingDomainScore(overallThinkingDomainScore: Int?) =
-        apply { this.overallThinkingDomainScore = overallThinkingDomainScore }
+      fun withOverallThinkingDomainScore(overallThinkingDomainScore: Int?) = apply { this.overallThinkingDomainScore = overallThinkingDomainScore }
 
-      fun withIndividualThinkingScores(individualThinkingScores: IndividualCognitiveScores) =
-        apply { this.individualThinkingScores = individualThinkingScores }
+      fun withIndividualThinkingScores(individualThinkingScores: IndividualCognitiveScores) = apply { this.individualThinkingScores = individualThinkingScores }
 
       fun produce() = ThinkingDomainScore(
         overallThinkingDomainScore = overallThinkingDomainScore,
@@ -88,11 +81,9 @@ class NeedsScoreFactory {
       private var overallRelationshipDomainScore: Int? = 1
       private var individualRelationshipScores: IndividualRelationshipScores = IndividualRelationshipScores()
 
-      fun withOverallRelationshipDomainScore(overallRelationshipDomainScore: Int?) =
-        apply { this.overallRelationshipDomainScore = overallRelationshipDomainScore }
+      fun withOverallRelationshipDomainScore(overallRelationshipDomainScore: Int?) = apply { this.overallRelationshipDomainScore = overallRelationshipDomainScore }
 
-      fun withIndividualRelationshipScores(individualRelationshipScores: IndividualRelationshipScores) =
-        apply { this.individualRelationshipScores = individualRelationshipScores }
+      fun withIndividualRelationshipScores(individualRelationshipScores: IndividualRelationshipScores) = apply { this.individualRelationshipScores = individualRelationshipScores }
 
       fun produce() = RelationshipDomainScore(
         overallRelationshipDomainScore = overallRelationshipDomainScore,
@@ -104,11 +95,9 @@ class NeedsScoreFactory {
       private var overallSelfManagementDomainScore: Int? = 1
       private var individualSelfManagementScores: IndividualSelfManagementScores = IndividualSelfManagementScores()
 
-      fun withOverallSelfManagementDomainScore(overallSelfManagementDomainScore: Int?) =
-        apply { this.overallSelfManagementDomainScore = overallSelfManagementDomainScore }
+      fun withOverallSelfManagementDomainScore(overallSelfManagementDomainScore: Int?) = apply { this.overallSelfManagementDomainScore = overallSelfManagementDomainScore }
 
-      fun withIndividualSelfManagementScores(individualSelfManagementScores: IndividualSelfManagementScores) =
-        apply { this.individualSelfManagementScores = individualSelfManagementScores }
+      fun withIndividualSelfManagementScores(individualSelfManagementScores: IndividualSelfManagementScores) = apply { this.individualSelfManagementScores = individualSelfManagementScores }
 
       fun produce() = SelfManagementDomainScore(
         overallSelfManagementDomainScore = overallSelfManagementDomainScore,

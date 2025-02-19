@@ -72,20 +72,18 @@ fun OasysLifestyle.toModel() = Lifestyle(
   easilyInfluenced = easilyInfluenced,
 )
 
-fun OasysBehaviour.toModel(): Behaviour {
-  return Behaviour(
-    temperControl = temperControl,
-    problemSolvingSkills = problemSolvingSkills,
-    awarenessOfConsequences = awarenessOfConsequences,
-    achieveGoals = achieveGoals,
-    understandsViewsOfOthers = understandsViewsOfOthers,
-    concreteAbstractThinking = concreteAbstractThinking,
-    sexualPreOccupation = sexualPreOccupation,
-    offenceRelatedSexualInterests = offenceRelatedSexualInterests,
-    aggressiveControllingBehaviour = aggressiveControllingBehavour,
-    impulsivity = impulsivity,
-  )
-}
+fun OasysBehaviour.toModel(): Behaviour = Behaviour(
+  temperControl = temperControl,
+  problemSolvingSkills = problemSolvingSkills,
+  awarenessOfConsequences = awarenessOfConsequences,
+  achieveGoals = achieveGoals,
+  understandsViewsOfOthers = understandsViewsOfOthers,
+  concreteAbstractThinking = concreteAbstractThinking,
+  sexualPreOccupation = sexualPreOccupation,
+  offenceRelatedSexualInterests = offenceRelatedSexualInterests,
+  aggressiveControllingBehaviour = aggressiveControllingBehavour,
+  impulsivity = impulsivity,
+)
 
 fun OasysPsychiatric.toModel() = Psychiatric(
   description = currPsychiatricProblems,

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.9"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.0.0"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.0.21"
   kotlin("plugin.jpa") version "2.0.21"
@@ -40,7 +40,6 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.1.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.3")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
