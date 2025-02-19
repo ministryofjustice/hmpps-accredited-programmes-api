@@ -273,13 +273,14 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
 
     attitude.shouldNotBeNull()
     attitude shouldBeEqual LearningNeeds(
-      true,
-      "0 - No problems",
-      "1 - Some problems",
-      "3 - big problems",
-      "0 - no qualifications",
-      "33",
-      "Some text about how clever or thick this person is",
+      noFixedAbodeOrTransient = true,
+      workRelatedSkills = "0 - No problems",
+      problemsReadWriteNum = "1 - Some problems",
+      learningDifficulties = "3 - big problems",
+      problemAreas = listOf("Numeracy", "Reading", "Writing"),
+      qualifications = "0 - no qualifications",
+      basicSkillsScore = "33",
+      basicSkillsScoreDescription = "Some text about how clever or thick this person is",
     )
   }
 

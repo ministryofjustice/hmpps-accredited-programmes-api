@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
@@ -66,13 +67,9 @@ constructor(
     offeringId: UUID,
     originalReferralId: UUID? = null,
   ): Referral {
-    val username = SecurityContextHolder.getContext().authentication?.name
-      ?: throw SecurityException("Authentication information not found")
-    log.info("STARTING - Request received to create a referral for prisonNumber $prisonNumber from $username")
+    log.info("STARTING - Request received to create a referral for prisonNumber $prisonNumber")
 
-    val referrerUser = referrerUserRepository.findById(username).orElseGet {
-      referrerUserRepository.save(ReferrerUserEntity(username = username))
-    }
+    val referrerUser = getAuthenticatedReferrerUser()
 
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found for $offeringId") }
@@ -98,8 +95,18 @@ constructor(
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
 
-    log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber from $username referralId: ${savedReferral.id}")
+    log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber with referralId: ${savedReferral.id}")
     return savedReferral.toApi()
+  }
+
+  private fun getAuthenticatedReferrerUser(): ReferrerUserEntity {
+    val username = SecurityContextHolder.getContext().authentication?.name
+      ?: throw SecurityException("Authentication information not found")
+
+    val referrerUser = referrerUserRepository.findById(username).orElseGet {
+      referrerUserRepository.save(ReferrerUserEntity(username = username))
+    }
+    return referrerUser
   }
 
   private fun savePNI(savedReferral: ReferralEntity) {
@@ -405,5 +412,56 @@ constructor(
 
     val savedReferrals = referralRepository.saveAll(updatedReferrals)
     log.info("Update successful for ${referrals.size} referrals for prisoner $prisonNumber referralIds ${savedReferrals.map { it.id }} Finished updating referrals with primary pom ${primaryPom?.staffId} and secondary POM ${secondaryPom?.staffId} ")
+  }
+
+  fun transferReferralToBuildingChoices(referral: ReferralEntity, courseId: UUID): ReferralEntity? {
+    validateStatusTransition(referral.id!!, referral.status, ReferralStatus.MOVED_TO_BUILDING_CHOICES.name, true)
+    val organisationId = referral.offering.organisationId
+    val newOffering = offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(
+      courseId,
+      organisationId,
+    ) ?: throw IllegalStateException("Unable to find building choices offering for course: $courseId and organisation: $organisationId")
+      .also { log.warn("Unable to find building choices offering during transfer for course: $courseId and organisation: $organisationId") }
+
+    val newReferral = createNewReferral(referral, newOffering)
+    referralStatusHistoryService.createReferralHistory(newReferral)
+    auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
+
+    updateOriginalReferralStatusToBuildingChoices(referral)
+    caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name))
+
+    return newReferral
+  }
+
+  private fun createNewReferral(referral: ReferralEntity, newOffering: OfferingEntity): ReferralEntity {
+    val pomDetails = fetchAndSavePomDetails(referral)
+    val newReferral = referralRepository.save(
+      ReferralEntity(
+        offering = newOffering,
+        prisonNumber = referral.prisonNumber,
+        referrer = getAuthenticatedReferrerUser(),
+        originalReferralId = referral.id,
+        status = ReferralStatus.REFERRAL_SUBMITTED.name,
+        submittedOn = LocalDateTime.now(),
+        primaryPomStaffId = pomDetails.first,
+        secondaryPomStaffId = pomDetails.second,
+      ),
+    ) ?: throw IllegalStateException("New referral creation failed during transfer to building choices for ${referral.prisonNumber}").also {
+      log.warn("Failed to create new referral during transfer to building choices for ${referral.prisonNumber}")
+    }
+    return newReferral
+  }
+
+  private fun updateOriginalReferralStatusToBuildingChoices(referral: ReferralEntity) {
+    val previousStatus = referral.status
+    val newStatus = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
+
+    referralStatusHistoryService.updateReferralHistory(
+      referralId = referral.id!!,
+      previousStatusCode = previousStatus,
+      newStatus = referralStatusRepository.getByCode(newStatus),
+    )
+    referral.status = newStatus
+    referralRepository.save(referral)
   }
 }
