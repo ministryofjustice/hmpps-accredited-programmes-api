@@ -503,7 +503,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should allow referral status updates to status of MOVE_TO_BUILDING_CHOICES`() {
+  fun `should NOT allow referral status updates to status of MOVE_TO_BUILDING_CHOICES`() {
     // Given
     val createdReferral = createReferral(PRISON_NUMBER_1)
 
@@ -513,15 +513,22 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     )
     updateReferralStatus(createdReferral.id, referralStatusUpdate1)
 
-    // When
     val referralStatusUpdate2 = ReferralStatusUpdate(
       status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name,
       ptUser = true,
     )
-    updateReferralStatus(createdReferral.id, referralStatusUpdate2)
+
+    // When
+    webTestClient
+      .put()
+      .uri("/referrals/${createdReferral.id}/status")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(referralStatusUpdate2)
+      .exchange().expectStatus().isBadRequest
 
     // Then
-    referralRepository.findById(createdReferral.id).get().status shouldBeEqual ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
+    referralRepository.findById(createdReferral.id).get().status shouldBeEqual ReferralStatus.REFERRAL_SUBMITTED.name
   }
 
   @Test
