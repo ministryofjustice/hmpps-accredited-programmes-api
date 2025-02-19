@@ -1,0 +1,1 @@
+DELETE FROM referral_status_transitions where transition_to_status = 'MOVED_TO_BUILDING_CHOICES';
