@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AudienceEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
@@ -15,9 +17,14 @@ fun CourseEntity.toApi(): Course = Course(
   description = description,
   alternateName = alternateName,
   coursePrerequisites = prerequisites.map(PrerequisiteEntity::toApi),
-  audience = audience,
-  audienceColour = audienceColour,
-  displayName = name + addAudience(name, audience),
+  audiences =
+    audiences.map { audience -> Audience(
+      audience.id!!,
+      audience.name,
+      audience.colour,
+    ) },
+  displayName = name,
+//          + addAudience(name, audience),
   withdrawn = withdrawn,
   displayOnProgrammeDirectory = displayOnProgrammeDirectory,
   intensity = intensity,

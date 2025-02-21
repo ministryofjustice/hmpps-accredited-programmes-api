@@ -10,6 +10,8 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
@@ -47,8 +49,20 @@ data class CourseEntity(
   @Fetch(SUBSELECT)
   val offerings: MutableSet<OfferingEntity> = mutableSetOf(),
 
-  var audience: String,
-  var audienceColour: String?,
+//  var audience: String,
+//  var audienceColour: String?,
+
+  @ManyToMany
+  @JoinTable(
+    name = "course_audience",
+    joinColumns = [JoinColumn(name = "course_id")],
+    inverseJoinColumns = [JoinColumn(name = "audience_id")]
+  )
+  val audiences: MutableSet<AudienceEntity> = mutableSetOf(),
+
+
+
+
   var withdrawn: Boolean = false,
   var listDisplayName: String? = null,
   var displayOnProgrammeDirectory: Boolean? = true,

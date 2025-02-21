@@ -73,8 +73,9 @@ class CourseEntityFactory {
     alternateName = this.alternateName,
     prerequisites = this.prerequisites,
     offerings = this.offerings,
-    audience = this.audience,
-    audienceColour = this.audienceColour,
+    // TODO
+//    audience = this.audience,
+//    audienceColour = this.audienceColour,
     withdrawn = this.withdrawn,
     intensity = this.intensity,
   )

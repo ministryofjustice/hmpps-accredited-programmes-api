@@ -1250,7 +1250,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     createdReferral.shouldNotBeNull()
 
     val statusFilter = listOf(createdReferral.status)
-    val audienceFilter = course.audience
+//    val audienceFilter = course.audience // TODO
+    val audienceFilter = course.audiences.first().name
     val courseNameFilter = course.name
 
     val summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
@@ -1261,7 +1262,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         ReferralView(
           id = createdReferral.id,
           courseName = course.name,
-          audience = course.audience,
+//          audience = course.audience, // TODO
+          audience = course.audiences.first().name,
           status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
@@ -1330,7 +1332,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         ReferralView(
           id = createdReferral.id,
           courseName = course.name,
-          audience = course.audience,
+//          audience = course.audience, //TODO
+          audience = course.audiences.first().name,
           status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
@@ -1384,7 +1387,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         ReferralView(
           id = createdReferral.id,
           courseName = course.name,
-          audience = course.audience,
+//          audience = course.audience, //TODO
+          audience = course.audiences.first().name,
           status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
@@ -1430,7 +1434,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         ReferralView(
           id = createdReferral.id,
           courseName = course.name,
-          audience = course.audience,
+//          audience = course.audience, // TODO
+          audience = course.audiences.first().name,
           status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
@@ -1542,7 +1547,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         ReferralView(
           id = createdReferral.id,
           courseName = course.name,
-          audience = course.audience,
+//          audience = course.audience, // TODO
+          audience = course.audiences.first().name,
           status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
@@ -1578,7 +1584,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     createdReferral.shouldNotBeNull()
 
     val statusFilter = listOf(createdReferral.status)
-    val audienceFilter = course.audience
+//    val audienceFilter = course.audience // TODO
+    val audienceFilter = course.audiences.first().name
     val courseNameFilter = course.name + "not a course"
 
     val summary = getReferralViewsByOrganisationId(ORGANISATION_ID_MDI, statusFilter, audienceFilter, courseNameFilter)
@@ -1613,7 +1620,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       "10".toBigInteger(),
     )
     val statusFilter = listOf("REFERRAL_SUBMITTED")
-    val audienceFilter = course.audience
+//    val audienceFilter = course.audience // TODO
+    val audienceFilter = course.audiences.first().name
     val courseNameFilter = course.name
 
     val summary = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter)
@@ -1636,7 +1644,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     createdReferral.shouldNotBeNull()
 
     val statusFilter = listOf(createdReferral.status)
-    val audienceFilter = course.audience
+//    val audienceFilter = course.audience // TODO
+    val audienceFilter = course.audiences.first().name
     val courseNameFilter = course.name
 
     val summary = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter)
@@ -1647,7 +1656,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         ReferralView(
           id = createdReferral.id,
           courseName = course.name,
-          audience = course.audience,
+//          audience = course.audience, // TODO
+          audience = course.audiences.first().name,
           status = createdReferral.status.lowercase(),
           statusDescription = createdReferral.statusDescription,
           statusColour = createdReferral.statusColour,
@@ -1802,7 +1812,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     // Validating the response content
     with(response.content.referrals.first()) {
       courseName shouldBe course.name
-      audience shouldBe course.audience
+//      audience shouldBe course.audience // TODO
+      audience shouldBe course.audiences.first().name
       courseOrganisation shouldBe offering.organisationId
       oasysConfirmed shouldBe referralEntity.oasysConfirmed
       additionalInformation shouldBe referralEntity.additionalInformation

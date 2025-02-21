@@ -559,7 +559,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     createdCourse.name shouldBe courseName
     createdCourse.identifier shouldBe identifier
     createdCourse.description shouldBe description
-    createdCourse.audience shouldBe "Intimate partner violence offence"
+//    createdCourse.audience shouldBe "Intimate partner violence offence" //TODO
+    createdCourse.audiences.first().name shouldBe "Intimate partner violence offence"
     createdCourse.withdrawn shouldBe withdrawn
     createdCourse.alternateName shouldBe alternativeName
     createdCourse.displayName shouldBe "Legacy Course One"

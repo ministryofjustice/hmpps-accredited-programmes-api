@@ -286,17 +286,27 @@ constructor(
     val uppercaseStatuses = getFilterStatuses(status, statusGroup)
 
     val referralViewPage =
-      referralViewRepository.getReferralsByOrganisationId(
-        organisationId,
-        prisonNumber,
-        surnameOnly,
-        forename,
-        surname,
-        pageable,
-        uppercaseStatuses,
-        audience,
-        courseName,
-      )
+//      referralViewRepository.getReferralsByOrganisationId(
+//        organisationId,
+//        prisonNumber,
+//        surnameOnly,
+//        forename,
+//        surname,
+//        pageable,
+//        uppercaseStatuses,
+////        audience,
+//        courseName,
+//      )
+    referralViewRepository.getReferralsByOrganisationId(
+      organisationId,
+      prisonNumber,
+      surnameOnly,
+      forename,
+      surname,
+      pageable,
+      uppercaseStatuses,
+      courseName,
+    )
 
     return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
   }
@@ -345,17 +355,27 @@ constructor(
   ): Page<ReferralViewEntity> {
     val uppercaseStatuses = getFilterStatuses(status, statusGroup)
     val referralViewPage =
-      referralViewRepository.getReferralsByUsername(
-        prisonNumber,
-        surnameOnly,
-        forename,
-        surname,
-        username,
-        pageable,
-        uppercaseStatuses,
-        audience,
-        courseName,
-      )
+//      referralViewRepository.getReferralsByUsername(
+//        prisonNumber,
+//        surnameOnly,
+//        forename,
+//        surname,
+//        username,
+//        pageable,
+//        uppercaseStatuses,
+//        audience,
+//        courseName,
+//      ) //TODO
+    referralViewRepository.getReferralsByUsername(
+      prisonNumber,
+      surnameOnly,
+      forename,
+      surname,
+      username,
+      pageable,
+      uppercaseStatuses,
+      courseName,
+    )
 
     return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
   }
