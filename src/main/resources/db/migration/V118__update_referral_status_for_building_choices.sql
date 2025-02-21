@@ -1,0 +1,1 @@
+UPDATE referral_status SET active = false where code = 'MOVED_TO_BUILDING_CHOICES';
