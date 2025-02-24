@@ -75,7 +75,6 @@ class StatisticsController(
   ): ReportContent {
     val parameters = Parameters(startDate, endDate, locationCodes, courseId)
     val content = when (reportType) {
-
       ReportType.REFERRAL_COUNT_BY_COURSE -> statisticsRepository.referralCountByCourse(
         startDate,
         endDate!!,

@@ -4,8 +4,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.9"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.1.20-RC"
-  kotlin("plugin.jpa") version "2.1.20-RC"
+  kotlin("plugin.spring") version "2.0.21"
+  kotlin("plugin.jpa") version "2.0.21"
 }
 
 configurations {

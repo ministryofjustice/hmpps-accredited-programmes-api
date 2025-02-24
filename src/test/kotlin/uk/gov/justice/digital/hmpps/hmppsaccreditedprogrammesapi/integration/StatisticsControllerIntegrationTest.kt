@@ -172,9 +172,9 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get referral count statistics for on programme report where course is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral1.id)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral2.id)
 
     // When
@@ -223,11 +223,11 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     // create first referral with course 1 and offering 1
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral1.id)
     progressReferralStatusToStatus(createdReferral1.id, PROGRAMME_COMPLETE)
     // create second referral with course 2 and offering 2
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral2.id)
     progressReferralStatusToStatus(createdReferral2.id, PROGRAMME_COMPLETE)
 
@@ -252,10 +252,10 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get withdrawn count statistics for all courses when no course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.WITHDRAWN.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.WITHDRAWN.name)
 
@@ -281,10 +281,10 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get withdrawn count statistics for specific course when course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.WITHDRAWN.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.WITHDRAWN.name)
 
@@ -308,10 +308,10 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get ineligible count statistics for all courses when no course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_ELIGIBLE.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.NOT_ELIGIBLE.name)
 
@@ -337,10 +337,10 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get ineligible count statistics for specific courses when course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_ELIGIBLE.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.NOT_ELIGIBLE.name)
 
@@ -364,12 +364,12 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get not suitable count statistics for all courses when no course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.AWAITING_ASSESSMENT.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.ASSESSMENT_STARTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_SUITABLE.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.AWAITING_ASSESSMENT.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.ASSESSMENT_STARTED.name)
@@ -398,12 +398,12 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get not suitable count statistics for specific course when course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.AWAITING_ASSESSMENT.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.ASSESSMENT_STARTED.name)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_SUITABLE.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.AWAITING_ASSESSMENT.name)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.ASSESSMENT_STARTED.name)
@@ -430,10 +430,10 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get deselected count statistics for all courses when no course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral1.id)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.DESELECTED.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral2.id)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.DESELECTED.name)
 
@@ -460,10 +460,10 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun `should get deselected count statistics for specific course when course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val createdReferral1  = createReferral(offeringId1, PRISON_NUMBER_1)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral1.id)
     progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.DESELECTED.name)
-    val createdReferral2  = createReferral(offeringId2, PRISON_NUMBER_1)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral2.id)
     progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.DESELECTED.name)
 
