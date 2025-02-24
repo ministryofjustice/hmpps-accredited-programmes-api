@@ -87,6 +87,7 @@ FROM (
            AND rsh.status_start_date >= :startDate
            AND rsh.status_start_date < :endDate
            AND ( :locationCodes is null OR o.organisation_id in :locationCodes )
+           AND (:courseId is null OR c.course_id = :courseId)
          GROUP BY c.name, c.audience
      ) AS subquery;
           """,
@@ -97,6 +98,7 @@ FROM (
     endDate: LocalDate,
     locationCodes: List<String>?,
     statusCode: String,
+    courseId: UUID? = null,
   ): String
 
   @Query(

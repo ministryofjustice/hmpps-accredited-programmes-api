@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.time.LocalDate
 import java.util.UUID
 
@@ -44,12 +45,18 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   @Autowired
   lateinit var statisticsRepository: StatisticsRepository
 
-  val courseId1 = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
-  val offeringId1 = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
+  val courseId1 = UUID.randomUUID()
+  val courseId2 = UUID.randomUUID()
+  val offeringId1 = UUID.randomUUID()
+  val offeringId2 = UUID.randomUUID()
 
   @BeforeEach
   fun setUp() {
     persistenceHelper.clearAllTableContent()
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
+    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createCourse(
       courseId1,
@@ -59,10 +66,23 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
       "SC++",
       "General offence",
     )
-    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
-    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
-    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
-    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
+
+    persistenceHelper.createCourse(
+      courseId2,
+      "CC",
+      "Custom Course",
+      "Sample description",
+      "CC",
+      "Custom offence",
+    )
+    persistenceHelper.createCourse(
+      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
+      "RC",
+      "RAPID Course",
+      "Sample description",
+      "RC",
+      "General offence",
+    )
 
     persistenceHelper.createOffering(
       offeringId1,
@@ -73,29 +93,12 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
       true,
     )
     persistenceHelper.createOffering(
-      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
-      courseId1,
-      "BWN",
+      offeringId2,
+      courseId2,
+      "MDI",
       "nobody-bwn@digital.justice.gov.uk",
       "nobody2-bwn@digital.justice.gov.uk",
       true,
-    )
-
-    persistenceHelper.createCourse(
-      UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
-      "CC",
-      "Custom Course",
-      "Sample description",
-      "CC",
-      "General offence",
-    )
-    persistenceHelper.createCourse(
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
-      "RC",
-      "RAPID Course",
-      "Sample description",
-      "RC",
-      "General offence",
     )
   }
 
@@ -145,7 +148,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
     val referral = getReferralById(createdReferral.id)
     referral.shouldNotBeNull()
-    referral.status.shouldBe("on_programme") //
+    referral.status.shouldBe("on_programme")
 
     val statusHistories =
       referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referral.id)
@@ -163,6 +166,322 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     // Then
     reportContent.content.count shouldBe 1
     reportContent.reportType shouldBe ReportType.ON_PROGRAMME_COUNT.toString()
+  }
+
+  @Test
+  fun `should get referral count statistics for on programme report where course is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral1.id)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral2.id)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = "ON_PROGRAMME_COUNT",
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+      courseId = courseId1,
+    )
+
+    // Then
+    reportContent.reportType shouldBe ReportType.ON_PROGRAMME_COUNT.toString()
+    reportContent.content.count shouldBe 1
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "General offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe courseId1
+  }
+
+  @Test
+  fun `should get programme complete count statistics for all courses when no course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
+    createdReferral.shouldNotBeNull()
+    progressReferralStatusToOnProgramme(createdReferral.id)
+    progressReferralStatusToStatus(createdReferral.id, PROGRAMME_COMPLETE)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = "PROGRAMME_COMPLETE_COUNT",
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+    )
+
+    // Then
+    reportContent.content.count shouldBe 1
+    reportContent.content.courseCounts?.first()?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.first()?.audience shouldBe "General offence"
+    reportContent.parameters.courseId shouldBe null
+    reportContent.reportType shouldBe ReportType.PROGRAMME_COMPLETE_COUNT.toString()
+  }
+
+  @Test
+  fun `should get programme complete count statistics for a specific course when course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    // create first referral with course 1 and offering 1
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral1.id)
+    progressReferralStatusToStatus(createdReferral1.id, PROGRAMME_COMPLETE)
+    // create second referral with course 2 and offering 2
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral2.id)
+    progressReferralStatusToStatus(createdReferral2.id, PROGRAMME_COMPLETE)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = "PROGRAMME_COMPLETE_COUNT",
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+      courseId = courseId2,
+    )
+
+    // Then
+    reportContent.content.count shouldBe 1
+    reportContent.content.courseCounts?.first()?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.first()?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.first()?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe courseId2
+    reportContent.reportType shouldBe ReportType.PROGRAMME_COMPLETE_COUNT.toString()
+  }
+
+  @Test
+  fun `should get withdrawn count statistics for all courses when no course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.WITHDRAWN.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.WITHDRAWN.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.WITHDRAWN_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+    )
+    // Then
+    reportContent.content.count shouldBe 2
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
+    reportContent.content.courseCounts?.get(1)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe null
+    reportContent.reportType shouldBe ReportType.WITHDRAWN_COUNT.toString()
+  }
+
+  @Test
+  fun `should get withdrawn count statistics for specific course when course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.WITHDRAWN.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.WITHDRAWN.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.WITHDRAWN_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+      courseId = courseId2,
+    )
+    // Then
+    reportContent.content.count shouldBe 1
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe courseId2
+    reportContent.reportType shouldBe ReportType.WITHDRAWN_COUNT.toString()
+  }
+
+  @Test
+  fun `should get ineligible count statistics for all courses when no course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_ELIGIBLE.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.NOT_ELIGIBLE.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.NOT_ELIGIBLE_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+    )
+    // Then
+    reportContent.content.count shouldBe 2
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
+    reportContent.content.courseCounts?.get(1)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe null
+    reportContent.reportType shouldBe ReportType.NOT_ELIGIBLE_COUNT.toString()
+  }
+
+  @Test
+  fun `should get ineligible count statistics for specific courses when course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_ELIGIBLE.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.NOT_ELIGIBLE.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.NOT_ELIGIBLE_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+      courseId = courseId2,
+    )
+    // Then
+    reportContent.content.count shouldBe 1
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe courseId2
+    reportContent.reportType shouldBe ReportType.NOT_ELIGIBLE_COUNT.toString()
+  }
+
+  @Test
+  fun `should get not suitable count statistics for all courses when no course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.AWAITING_ASSESSMENT.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.ASSESSMENT_STARTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_SUITABLE.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.AWAITING_ASSESSMENT.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.ASSESSMENT_STARTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.NOT_SUITABLE.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.NOT_SUITABLE_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+    )
+
+    // Then
+    reportContent.content.count shouldBe 2
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
+    reportContent.content.courseCounts?.get(1)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe null
+    reportContent.reportType shouldBe ReportType.NOT_SUITABLE_COUNT.toString()
+  }
+
+  @Test
+  fun `should get not suitable count statistics for specific course when course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.AWAITING_ASSESSMENT.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.ASSESSMENT_STARTED.name)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.NOT_SUITABLE.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.REFERRAL_SUBMITTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.AWAITING_ASSESSMENT.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.ASSESSMENT_STARTED.name)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.NOT_SUITABLE.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.NOT_SUITABLE_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+      courseId = courseId2,
+    )
+
+    // Then
+    reportContent.content.count shouldBe 1
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe courseId2
+    reportContent.reportType shouldBe ReportType.NOT_SUITABLE_COUNT.toString()
+  }
+
+  @Test
+  fun `should get deselected count statistics for all courses when no course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral1.id)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.DESELECTED.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral2.id)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.DESELECTED.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.DESELECTED_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+    )
+
+    // Then
+    reportContent.content.count shouldBe 2
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
+    reportContent.content.courseCounts?.get(1)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe null
+    reportContent.reportType shouldBe ReportType.DESELECTED_COUNT.toString()
+  }
+
+  @Test
+  fun `should get deselected count statistics for specific course when course id is provided`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral1.id)
+    progressReferralStatusToStatus(createdReferral1.id, ReferralStatus.DESELECTED.name)
+    val createdReferral2 = createReferral(offeringId2, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral2.id)
+    progressReferralStatusToStatus(createdReferral2.id, ReferralStatus.DESELECTED.name)
+
+    // When
+    val reportContent = getStatistics(
+      reportType = ReportType.DESELECTED_COUNT.toString(),
+      startDate = "2023-06-01",
+      locationCodes = ORGANISATION_ID_MDI,
+      courseId = courseId2,
+    )
+
+    // Then
+    reportContent.content.count shouldBe 1
+    reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
+    reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
+    reportContent.content.courseCounts?.get(0)?.count shouldBe 1
+    reportContent.parameters.courseId shouldBe courseId2
+    reportContent.reportType shouldBe ReportType.DESELECTED_COUNT.toString()
   }
 
   @Test
@@ -278,10 +597,8 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     progressReferralStatusToStatus(createdReferral.id, REFERRAL_SUBMITTED)
     progressReferralStatusToStatus(createdReferral.id, REFERRAL_WITHDRAWN)
 
-    val courseId = UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367")
-
     // When
-    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
 
     // Then
     assertThat(reportStatusesByProgrammeType)
@@ -370,10 +687,10 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
       .expectBody<Referral>()
       .returnResult().responseBody!!
 
-  fun getStatistics(reportType: String, locationCodes: String? = null, startDate: String): ReportContent =
+  fun getStatistics(reportType: String, locationCodes: String? = null, startDate: String, courseId: UUID? = null): ReportContent =
     webTestClient
       .get()
-      .uri("/statistics/report/$reportType?startDate=$startDate&locationCodes=$locationCodes")
+      .uri("/statistics/report/$reportType?startDate=$startDate&locationCodes=$locationCodes" + if (courseId != null) "&courseId=$courseId" else "")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
