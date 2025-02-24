@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StatisticsService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.time.LocalDate
 import java.util.UUID
 
@@ -70,9 +71,11 @@ class StatisticsController(
     @RequestParam startDate: LocalDate,
     @RequestParam endDate: LocalDate? = LocalDate.now().plusDays(1),
     @RequestParam locationCodes: List<String>? = listOf(),
+    @RequestParam courseId: UUID?,
   ): ReportContent {
-    val parameters = Parameters(startDate, endDate, locationCodes)
+    val parameters = Parameters(startDate, endDate, locationCodes, courseId)
     val content = when (reportType) {
+
       ReportType.REFERRAL_COUNT_BY_COURSE -> statisticsRepository.referralCountByCourse(
         startDate,
         endDate!!,
@@ -89,48 +92,54 @@ class StatisticsController(
         startDate,
         endDate!!,
         locationCodes,
-        "PROGRAMME_COMPLETE",
+        ReferralStatus.PROGRAMME_COMPLETE.name,
+        courseId,
       )
 
       ReportType.WITHDRAWN_COUNT -> statisticsRepository.finalStatusCodeCounts(
         startDate,
         endDate!!,
         locationCodes,
-        "WITHDRAWN",
+        ReferralStatus.WITHDRAWN.name,
+        courseId,
       )
 
       ReportType.NOT_ELIGIBLE_COUNT -> statisticsRepository.finalStatusCodeCounts(
         startDate,
         endDate!!,
         locationCodes,
-        "NOT_ELIGIBLE",
+        ReferralStatus.NOT_ELIGIBLE.name,
+        courseId,
       )
 
       ReportType.NOT_SUITABLE_COUNT -> statisticsRepository.finalStatusCodeCounts(
         startDate,
         endDate!!,
         locationCodes,
-        "NOT_SUITABLE",
+        ReferralStatus.NOT_SUITABLE.name,
+        courseId,
       )
 
       ReportType.DESELECTED_COUNT -> statisticsRepository.finalStatusCodeCounts(
         startDate,
         endDate!!,
         locationCodes,
-        "DESELECTED",
-      )
-
-      ReportType.PNI_PATHWAY_COUNT -> statisticsRepository.pniPathwayCounts(
-        startDate,
-        endDate!!,
-        locationCodes,
+        ReferralStatus.DESELECTED.name,
+        courseId,
       )
 
       ReportType.ON_PROGRAMME_COUNT -> statisticsRepository.finalStatusCodeCounts(
         startDate,
         endDate!!,
         locationCodes,
-        "ON_PROGRAMME",
+        ReferralStatus.ON_PROGRAMME.name,
+        courseId,
+      )
+
+      ReportType.PNI_PATHWAY_COUNT -> statisticsRepository.pniPathwayCounts(
+        startDate,
+        endDate!!,
+        locationCodes,
       )
     }
     return ReportContent(
@@ -177,6 +186,7 @@ data class Parameters(
   val startDate: LocalDate,
   val endDate: LocalDate?,
   val locationCodes: List<String>?,
+  val courseId: UUID?,
 )
 
 /**
