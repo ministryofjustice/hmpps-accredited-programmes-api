@@ -117,8 +117,18 @@ constructor(
     }
   }
 
-  fun getReferralById(referralId: UUID) =
+  fun getReferralById(referralId: UUID) {
+
+    referralRepository.findById(referralId).getOrNull()?.let {
+
+      // update ldc
+
+    }
+
+
+
     referralRepository.findById(referralId).getOrNull()
+  }
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
@@ -127,6 +137,7 @@ constructor(
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
     referral.transferReason = update.transferReason
+    referral.hasLdcBeenOverwrittenByProgrammeTeam = update.hasLdcBeenOverwrittenByProgrammeTeam ?: false
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
@@ -221,7 +232,6 @@ constructor(
   fun submitReferralById(referralId: UUID): ReferralEntity {
     val referral = referralRepository.getReferenceById(referralId)
     val existingStatus = referral.status
-
     val requiredFields = listOf(
       referral.offering.id to "offeringId",
       referral.prisonNumber to "prisonNumber",
@@ -242,6 +252,7 @@ constructor(
       ReferralStatus.REFERRAL_STARTED.name -> {
         referral.status = ReferralStatus.REFERRAL_SUBMITTED.name
         referral.submittedOn = LocalDateTime.now()
+        referral.hasLdc =  pniService.getLdc()
         fetchAndSavePomDetails(referral).let {
           referral.primaryPomStaffId = it?.first
           referral.secondaryPomStaffId = it?.second

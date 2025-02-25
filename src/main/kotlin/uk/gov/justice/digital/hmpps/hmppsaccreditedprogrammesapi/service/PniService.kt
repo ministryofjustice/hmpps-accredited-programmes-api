@@ -237,7 +237,8 @@ class PniService(
         personService.getPerson(prisonNumber)?.gender
       } ?: throw BusinessException("Gender information missing for prisonNumber $prisonNumber. PNI could not be determined")
   }
-}
+
+  fun getLdc() = oasysService.getLDCScore() >= BigDecimal("2.99") }
 
 private fun buildNeedsScores(
   behavior: OasysBehaviour?,
