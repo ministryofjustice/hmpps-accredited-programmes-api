@@ -622,7 +622,7 @@ class ReferralServiceTest {
       .withOverrideReason("override reason")
       .produce()
 
-    every { referralRepository.getReferenceById(referralId) } returns referral
+    every { referralRepository.findById(referralId) } returns Optional.of(referral)
 
     // When
     val updatedReferral = referralService.submitReferralById(referralId)

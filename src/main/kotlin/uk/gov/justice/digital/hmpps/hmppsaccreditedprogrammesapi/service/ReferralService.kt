@@ -111,27 +111,32 @@ constructor(
 
   private fun savePNI(savedReferral: ReferralEntity) {
     try {
-      pniService.savePni(prisonNumber = savedReferral.prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
+      pniService.savePni(
+        prisonNumber = savedReferral.prisonNumber,
+        gender = null,
+        savePni = true,
+        referralId = savedReferral.id,
+      )
     } catch (ex: Exception) {
       log.warn("PNI could not be stored ${ex.message} for prisonNumber $savedReferral.prisonNumber")
     }
   }
 
-  fun getReferralById(referralId: UUID) {
+  fun getReferralById(referralId: UUID, updateLdc: Boolean? = false): ReferralEntity? {
+    val referralEntity = referralRepository.findById(referralId).getOrNull()
 
-    referralRepository.findById(referralId).getOrNull()?.let {
-
-      // update ldc
-
+    if (referralEntity != null && updateLdc == true) {
+      if (!referralEntity.hasLdcBeenOverwrittenByProgrammeTeam) {
+        referralEntity.hasLdc = pniService.getLdc()
+        referralRepository.save(referralEntity)
+      }
     }
 
-
-
-    referralRepository.findById(referralId).getOrNull()
+    return referralEntity
   }
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
-    val referral = referralRepository.getReferenceById(referralId)
+    val referral = getReferralById(referralId)!!
     referral.additionalInformation = update.additionalInformation
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
@@ -142,12 +147,12 @@ constructor(
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
     log.info("Request received for update of status for $referralId and $referralStatusUpdate")
-    val referral = referralRepository.getReferenceById(referralId)
+    val referral = getReferralById(referralId)!!
     val statuses = validateStatus(referral, referralStatusUpdate)
     val existingStatus = referral.status
 
     if (isSpecialDeselectedCase(referralId, statuses, existingStatus, referralStatusUpdate)) {
-      val updatedReferral = referralRepository.getReferenceById(referralId)
+      val updatedReferral = getReferralById(referralId)!!
       // create the referral history
       referralStatusHistoryService.updateReferralHistory(
         referralId = referralId,
@@ -230,7 +235,7 @@ constructor(
   }
 
   fun submitReferralById(referralId: UUID): ReferralEntity {
-    val referral = referralRepository.getReferenceById(referralId)
+    val referral = getReferralById(referralId)!!
     val existingStatus = referral.status
     val requiredFields = listOf(
       referral.offering.id to "offeringId",
@@ -252,12 +257,15 @@ constructor(
       ReferralStatus.REFERRAL_STARTED.name -> {
         referral.status = ReferralStatus.REFERRAL_SUBMITTED.name
         referral.submittedOn = LocalDateTime.now()
-        referral.hasLdc =  pniService.getLdc()
+        referral.hasLdc = pniService.getLdc()
         fetchAndSavePomDetails(referral).let {
           referral.primaryPomStaffId = it?.first
           referral.secondaryPomStaffId = it?.second
         }
-        caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.REFERRAL_SUBMITTED.name))
+        caseNotesApiService.buildAndCreateCaseNote(
+          referral,
+          ReferralStatusUpdate(status = ReferralStatus.REFERRAL_SUBMITTED.name),
+        )
         courseParticipationService.updateDraftHistoryForSubmittedReferral(referralId)
       }
 
@@ -324,7 +332,9 @@ constructor(
       when (group) {
         "closed" -> referralStatusRepository.findAllByActiveIsTrueAndClosedIsTrueOrderByDefaultOrder().map { it.code }
         "draft" -> referralStatusRepository.findAllByActiveIsTrueAndDraftIsTrueOrderByDefaultOrder().map { it.code }
-        "open" -> referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
+        "open" -> referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder()
+          .map { it.code }
+
         else -> emptyList()
       }
     } ?: emptyList()
@@ -430,15 +440,19 @@ constructor(
     val newOffering = offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(
       courseId,
       organisationId,
-    ) ?: throw IllegalStateException("Unable to find building choices offering for course: $courseId and organisation: $organisationId")
-      .also { log.warn("Unable to find building choices offering during transfer for course: $courseId and organisation: $organisationId") }
+    )
+      ?: throw IllegalStateException("Unable to find building choices offering for course: $courseId and organisation: $organisationId")
+        .also { log.warn("Unable to find building choices offering during transfer for course: $courseId and organisation: $organisationId") }
 
     val newReferral = createNewReferral(referral, newOffering)
     referralStatusHistoryService.createReferralHistory(newReferral)
     auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
 
     updateOriginalReferralStatusToBuildingChoices(referral)
-    caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name))
+    caseNotesApiService.buildAndCreateCaseNote(
+      referral,
+      ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name),
+    )
 
     return newReferral
   }
@@ -456,9 +470,10 @@ constructor(
         primaryPomStaffId = pomDetails.first,
         secondaryPomStaffId = pomDetails.second,
       ),
-    ) ?: throw IllegalStateException("New referral creation failed during transfer to building choices for ${referral.prisonNumber}").also {
-      log.warn("Failed to create new referral during transfer to building choices for ${referral.prisonNumber}")
-    }
+    )
+      ?: throw IllegalStateException("New referral creation failed during transfer to building choices for ${referral.prisonNumber}").also {
+        log.warn("Failed to create new referral during transfer to building choices for ${referral.prisonNumber}")
+      }
     return newReferral
   }
 
