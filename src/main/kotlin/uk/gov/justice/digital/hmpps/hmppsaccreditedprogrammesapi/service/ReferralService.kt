@@ -125,11 +125,9 @@ constructor(
   fun getReferralById(referralId: UUID, updateLdc: Boolean? = false): ReferralEntity? {
     val referralEntity = referralRepository.findById(referralId).getOrNull()
 
-    if (referralEntity != null && updateLdc == true) {
-      if (!referralEntity.hasLdcBeenOverwrittenByProgrammeTeam) {
-        referralEntity.hasLdc = pniService.getLdc()
-        referralRepository.save(referralEntity)
-      }
+    if (referralEntity != null && updateLdc == true && !referralEntity.hasLdcBeenOverwrittenByProgrammeTeam) {
+      referralEntity.hasLdc = pniService.getLdc()
+      referralRepository.save(referralEntity)
     }
 
     return referralEntity
