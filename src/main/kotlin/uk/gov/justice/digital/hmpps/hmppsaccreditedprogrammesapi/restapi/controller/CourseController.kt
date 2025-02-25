@@ -430,10 +430,9 @@ class CourseController(
       description = "A course identifier",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<Course> =
-    courseService.getCourseById(id)?.let {
-      ResponseEntity.ok(it.toApi())
-    } ?: throw NotFoundException("No Course found at /courses/$id")
+  ): ResponseEntity<Course> = courseService.getCourseById(id)?.let {
+    ResponseEntity.ok(it.toApi())
+  } ?: throw NotFoundException("No Course found at /courses/$id")
 
   @Operation(
     tags = ["Courses"],
@@ -459,18 +458,17 @@ class CourseController(
       description = "A course identifier",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<CoursePrerequisites> =
-    ResponseEntity.ok(
-      CoursePrerequisites(
-        courseService
-          .getCourseById(id)?.prerequisites?.map { prerequisite ->
-            CoursePrerequisite(
-              name = prerequisite.name,
-              description = prerequisite.description,
-            )
-          },
-      ),
-    )
+  ): ResponseEntity<CoursePrerequisites> = ResponseEntity.ok(
+    CoursePrerequisites(
+      courseService
+        .getCourseById(id)?.prerequisites?.map { prerequisite ->
+          CoursePrerequisite(
+            name = prerequisite.name,
+            description = prerequisite.description,
+          )
+        },
+    ),
+  )
 
   @Operation(
     tags = ["Courses"],

@@ -452,89 +452,81 @@ class CourseParticipationControllerIntegrationTest : IntegrationTestBase() {
       .jsonPath("$.userMessage").toString().contains("Invalid UUID string: not-a-uuid")
   }
 
-  private fun createCourseParticipation(courseParticipationToAdd: CourseParticipationCreate): CourseParticipation =
-    webTestClient
-      .post()
-      .uri("/course-participations")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(courseParticipationToAdd)
-      .exchange()
-      .expectStatus().isCreated
-      .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!
+  private fun createCourseParticipation(courseParticipationToAdd: CourseParticipationCreate): CourseParticipation = webTestClient
+    .post()
+    .uri("/course-participations")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(courseParticipationToAdd)
+    .exchange()
+    .expectStatus().isCreated
+    .expectBody<CourseParticipation>()
+    .returnResult().responseBody!!
 
-  private fun updateCourseParticipation(id: UUID, update: CourseParticipationUpdate): CourseParticipation? =
-    webTestClient
-      .put()
-      .uri("/course-participations/$id")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(update)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<CourseParticipation>()
-      .returnResult().responseBody
+  private fun updateCourseParticipation(id: UUID, update: CourseParticipationUpdate): CourseParticipation? = webTestClient
+    .put()
+    .uri("/course-participations/$id")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(update)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<CourseParticipation>()
+    .returnResult().responseBody
 
-  private fun deleteCourseParticipation(id: UUID) =
-    webTestClient
-      .delete()
-      .uri("/course-participations/$id")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
+  private fun deleteCourseParticipation(id: UUID) = webTestClient
+    .delete()
+    .uri("/course-participations/$id")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
 
-  private fun getCourseParticipation(id: UUID): CourseParticipation =
-    webTestClient
-      .get()
-      .uri("/course-participations/$id")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<CourseParticipation>()
-      .returnResult().responseBody!!
+  private fun getCourseParticipation(id: UUID): CourseParticipation = webTestClient
+    .get()
+    .uri("/course-participations/$id")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<CourseParticipation>()
+    .returnResult().responseBody!!
 
-  private fun getCourseParticipationStatusCode(id: UUID): HttpStatusCode =
-    webTestClient
-      .get()
-      .uri("/course-participations/$id")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .returnResult<Any>().status
+  private fun getCourseParticipationStatusCode(id: UUID): HttpStatusCode = webTestClient
+    .get()
+    .uri("/course-participations/$id")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .returnResult<Any>().status
 
-  private fun getCourseParticipationsForPrisonNumber(prisonNumber: String): List<CourseParticipation> =
-    webTestClient
-      .get()
-      .uri("/people/$prisonNumber/course-participations")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseParticipation>>()
-      .returnResult().responseBody!!
+  private fun getCourseParticipationsForPrisonNumber(prisonNumber: String): List<CourseParticipation> = webTestClient
+    .get()
+    .uri("/people/$prisonNumber/course-participations")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<CourseParticipation>>()
+    .returnResult().responseBody!!
 
-  private fun getCourseParticipationsByReferralId(referralId: String): List<CourseParticipation> =
-    webTestClient
-      .get()
-      .uri("/course-participations/referral/$referralId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseParticipation>>()
-      .returnResult().responseBody!!
+  private fun getCourseParticipationsByReferralId(referralId: String): List<CourseParticipation> = webTestClient
+    .get()
+    .uri("/course-participations/referral/$referralId")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<CourseParticipation>>()
+    .returnResult().responseBody!!
 
-  fun getSubjectAccessReport(prisonerId: String) =
-    webTestClient
-      .get()
-      .uri("/subject-access-request?prn=$prisonerId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<HmppsSubjectAccessRequestContent>()
-      .returnResult().responseBody!!
+  fun getSubjectAccessReport(prisonerId: String) = webTestClient
+    .get()
+    .uri("/subject-access-request?prn=$prisonerId")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<HmppsSubjectAccessRequestContent>()
+    .returnResult().responseBody!!
 }

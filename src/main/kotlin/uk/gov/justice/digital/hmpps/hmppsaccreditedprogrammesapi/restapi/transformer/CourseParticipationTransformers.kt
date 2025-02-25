@@ -19,17 +19,16 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 
 val referralProgramStartYear: Year = Year.of(1990)
 
-fun ApiCourseParticipationCreate.toDomain() =
-  CourseParticipationEntity(
-    courseName = courseName,
-    prisonNumber = prisonNumber,
-    source = source,
-    detail = detail,
-    setting = setting?.toDomain(),
-    outcome = outcome?.toDomain(),
-    referralId = referralId,
-    isDraft = isDraft,
-  )
+fun ApiCourseParticipationCreate.toDomain() = CourseParticipationEntity(
+  courseName = courseName,
+  prisonNumber = prisonNumber,
+  source = source,
+  detail = detail,
+  setting = setting?.toDomain(),
+  outcome = outcome?.toDomain(),
+  referralId = referralId,
+  isDraft = isDraft,
+)
 
 fun ApiCourseParticipationUpdate.toDomain() = CourseParticipationUpdate(
   courseName = courseName,
@@ -49,12 +48,11 @@ fun ApiCourseParticipationSetting.toDomain() = CourseParticipationSetting(
   location = location,
 )
 
-fun ApiCourseParticipationOutcome.toDomain() =
-  CourseParticipationOutcome(
-    status = status.toDomain(),
-    yearStarted = yearStarted?.let(Year::of)?.isValidYear("yearStarted"),
-    yearCompleted = yearCompleted?.let(Year::of)?.isValidYear("yearCompleted"),
-  )
+fun ApiCourseParticipationOutcome.toDomain() = CourseParticipationOutcome(
+  status = status.toDomain(),
+  yearStarted = yearStarted?.let(Year::of)?.isValidYear("yearStarted"),
+  yearCompleted = yearCompleted?.let(Year::of)?.isValidYear("yearCompleted"),
+)
 
 fun Year.isValidYear(fieldName: String) = run {
   if (this.value < referralProgramStartYear.value) {

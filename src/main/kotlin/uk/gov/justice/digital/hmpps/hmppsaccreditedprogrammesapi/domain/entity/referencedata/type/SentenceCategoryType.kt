@@ -14,18 +14,16 @@ enum class SentenceCategoryType(val description: String) {
   ;
 
   companion object {
-    fun determineOverallCategory(sentenceCategoryList: List<SentenceCategoryType>): SentenceCategoryType {
-      return when {
-        sentenceCategoryList.containsAll(listOf(DETERMINATE, INDETERMINATE)) -> DETERMINATE_INDETERMINATE
-        sentenceCategoryList.containsAll(listOf(DETERMINATE_RECALL, INDETERMINATE)) -> DETERMINATE_INDETERMINATE_RECALL
-        sentenceCategoryList.containsAll(listOf(DETERMINATE, INDETERMINATE_RECALL)) -> DETERMINATE_INDETERMINATE_RECALL
-        sentenceCategoryList.contains(DETERMINATE_RECALL) -> DETERMINATE_RECALL
-        sentenceCategoryList.contains(INDETERMINATE_RECALL) -> INDETERMINATE_RECALL
-        sentenceCategoryList.contains(DETERMINATE) -> DETERMINATE
-        sentenceCategoryList.contains(INDETERMINATE) -> INDETERMINATE
-        sentenceCategoryList.contains(RECALL) -> RECALL
-        else -> UNKNOWN
-      }
+    fun determineOverallCategory(sentenceCategoryList: List<SentenceCategoryType>): SentenceCategoryType = when {
+      sentenceCategoryList.containsAll(listOf(DETERMINATE, INDETERMINATE)) -> DETERMINATE_INDETERMINATE
+      sentenceCategoryList.containsAll(listOf(DETERMINATE_RECALL, INDETERMINATE)) -> DETERMINATE_INDETERMINATE_RECALL
+      sentenceCategoryList.containsAll(listOf(DETERMINATE, INDETERMINATE_RECALL)) -> DETERMINATE_INDETERMINATE_RECALL
+      sentenceCategoryList.contains(DETERMINATE_RECALL) -> DETERMINATE_RECALL
+      sentenceCategoryList.contains(INDETERMINATE_RECALL) -> INDETERMINATE_RECALL
+      sentenceCategoryList.contains(DETERMINATE) -> DETERMINATE
+      sentenceCategoryList.contains(INDETERMINATE) -> INDETERMINATE
+      sentenceCategoryList.contains(RECALL) -> RECALL
+      else -> UNKNOWN
     }
   }
 }

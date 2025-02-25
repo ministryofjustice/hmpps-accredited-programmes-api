@@ -28,10 +28,9 @@ constructor(
   private val courseParticipationRepository: CourseParticipationRepository,
   private val organisationRepository: OrganisationRepository,
 ) {
-  fun createCourseParticipation(courseParticipation: CourseParticipationEntity): CourseParticipationEntity? =
-    courseParticipation.let {
-      courseParticipationRepository.save(it)
-    }
+  fun createCourseParticipation(courseParticipation: CourseParticipationEntity): CourseParticipationEntity? = courseParticipation.let {
+    courseParticipationRepository.save(it)
+  }
 
   fun createOrUpdateCourseParticipation(referral: ReferralEntity) {
     val courseName = referral.offering.course.name
@@ -83,61 +82,50 @@ constructor(
     courseParticipationRepository.save(existingParticipation)
   }
 
-  private fun buildCourseParticipation(referralEntity: ReferralEntity, organisationEntity: OrganisationEntity): CourseParticipationEntity {
-    return CourseParticipationEntity(
-      referralId = referralEntity.id,
-      prisonNumber = referralEntity.prisonNumber,
-      courseId = referralEntity.offering.course.id,
-      courseName = referralEntity.offering.course.name,
-      source = referralEntity.referrer.username,
-      detail = referralEntity.additionalInformation,
-      createdDateTime = LocalDateTime.now(),
-      setting = CourseParticipationSetting(
-        location = organisationEntity.name,
-        type = CourseSetting.CUSTODY,
-      ),
-      outcome = buildCourseParticipationOutcomeByStatus(referralEntity.status),
+  private fun buildCourseParticipation(referralEntity: ReferralEntity, organisationEntity: OrganisationEntity): CourseParticipationEntity = CourseParticipationEntity(
+    referralId = referralEntity.id,
+    prisonNumber = referralEntity.prisonNumber,
+    courseId = referralEntity.offering.course.id,
+    courseName = referralEntity.offering.course.name,
+    source = referralEntity.referrer.username,
+    detail = referralEntity.additionalInformation,
+    createdDateTime = LocalDateTime.now(),
+    setting = CourseParticipationSetting(
+      location = organisationEntity.name,
+      type = CourseSetting.CUSTODY,
+    ),
+    outcome = buildCourseParticipationOutcomeByStatus(referralEntity.status),
+  )
+
+  private fun buildCourseParticipationOutcomeByStatus(referralStatus: String): CourseParticipationOutcome? = when (referralStatus) {
+    ReferralStatus.PROGRAMME_COMPLETE.name -> CourseParticipationOutcome(
+      CourseStatus.COMPLETE,
+      yearCompleted = Year.now(),
     )
+
+    ReferralStatus.DESELECTED.name -> CourseParticipationOutcome(CourseStatus.INCOMPLETE)
+    else -> null
   }
 
-  private fun buildCourseParticipationOutcomeByStatus(referralStatus: String): CourseParticipationOutcome? {
-    return when (referralStatus) {
-      ReferralStatus.PROGRAMME_COMPLETE.name -> CourseParticipationOutcome(
-        CourseStatus.COMPLETE,
-        yearCompleted = Year.now(),
-      )
-
-      ReferralStatus.DESELECTED.name -> CourseParticipationOutcome(CourseStatus.INCOMPLETE)
-      else -> null
-    }
-  }
-
-  fun getCourseParticipationById(historicCourseParticipationId: UUID): CourseParticipationEntity? =
-    courseParticipationRepository.findById(historicCourseParticipationId).getOrNull()
+  fun getCourseParticipationById(historicCourseParticipationId: UUID): CourseParticipationEntity? = courseParticipationRepository.findById(historicCourseParticipationId).getOrNull()
 
   fun updateCourseParticipationById(
     historicCourseParticipationId: UUID,
     update: CourseParticipationUpdate,
-  ): CourseParticipationEntity =
-    courseParticipationRepository
-      .getReferenceById(historicCourseParticipationId)
-      .applyUpdate(update)
+  ): CourseParticipationEntity = courseParticipationRepository
+    .getReferenceById(historicCourseParticipationId)
+    .applyUpdate(update)
 
-  fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity> =
-    courseParticipationRepository.findByPrisonNumber(prisonNumber)
-      .filterNot { it.isDraft == true }
+  fun getCourseParticipationsByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity> = courseParticipationRepository.findByPrisonNumber(prisonNumber)
+    .filterNot { it.isDraft == true }
 
   fun deleteCourseParticipationById(historicCourseParticipationId: UUID) {
     courseParticipationRepository.deleteById(historicCourseParticipationId)
   }
 
-  fun getCourseParticipationsByPrisonNumberAndStatus(prisonNumber: String, outcomeStatus: List<CourseStatus>): List<CourseParticipationEntity> {
-    return courseParticipationRepository.findByPrisonNumberAndOutcomeStatusIn(prisonNumber, outcomeStatus)
-  }
+  fun getCourseParticipationsByPrisonNumberAndStatus(prisonNumber: String, outcomeStatus: List<CourseStatus>): List<CourseParticipationEntity> = courseParticipationRepository.findByPrisonNumberAndOutcomeStatusIn(prisonNumber, outcomeStatus)
 
-  fun getCourseParticipationHistoryByReferralId(uuid: UUID): List<CourseParticipationProjection> {
-    return courseParticipationRepository.findCourseParticipationByReferralId(uuid)
-  }
+  fun getCourseParticipationHistoryByReferralId(uuid: UUID): List<CourseParticipationProjection> = courseParticipationRepository.findCourseParticipationByReferralId(uuid)
 
   fun updateDraftHistoryForSubmittedReferral(referralId: UUID) {
     // Once a referral has been submitted, course participation records associated with that referral should no
@@ -150,28 +138,27 @@ constructor(
   }
 }
 
-private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity =
-  apply {
-    courseName = update.courseName
-    source = update.source
-    detail = update.detail
+private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity = apply {
+  courseName = update.courseName
+  source = update.source
+  detail = update.detail
 
-    update.setting?.let {
-      if (setting == null) {
-        setting = it
-      } else {
-        setting?.location = it.location
-        setting?.type = it.type
-      }
-    }
-
-    update.outcome?.let {
-      if (outcome == null) {
-        outcome = it
-      } else {
-        outcome?.status = it.status
-        outcome?.yearStarted = it.yearStarted
-        outcome?.yearCompleted = it.yearCompleted
-      }
+  update.setting?.let {
+    if (setting == null) {
+      setting = it
+    } else {
+      setting?.location = it.location
+      setting?.type = it.type
     }
   }
+
+  update.outcome?.let {
+    if (outcome == null) {
+      outcome = it
+    } else {
+      outcome?.status = it.status
+      outcome?.yearStarted = it.yearStarted
+      outcome?.yearCompleted = it.yearCompleted
+    }
+  }
+}

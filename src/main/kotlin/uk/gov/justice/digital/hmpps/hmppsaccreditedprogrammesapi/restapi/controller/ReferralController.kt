@@ -370,16 +370,15 @@ class ReferralController(
       description = "The id (UUID) of a referral",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<Referral> =
-    referralService
-      .getReferralById(id)
-      ?.let {
-        auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
-        val status = referenceDataService.getReferralStatus(it.status)
-        val staffDetail = staffService.getStaffDetail(it.primaryPomStaffId)?.toApi()
-        ResponseEntity.ok(it.toApi(status, staffDetail))
-      }
-      ?: throw NotFoundException("No Referral found at /referrals/$id")
+  ): ResponseEntity<Referral> = referralService
+    .getReferralById(id)
+    ?.let {
+      auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
+      val status = referenceDataService.getReferralStatus(it.status)
+      val staffDetail = staffService.getStaffDetail(it.primaryPomStaffId)?.toApi()
+      ResponseEntity.ok(it.toApi(status, staffDetail))
+    }
+    ?: throw NotFoundException("No Referral found at /referrals/$id")
 
   @Operation(
     tags = ["Referrals"],
@@ -509,12 +508,10 @@ class ReferralController(
     val surname: String = "",
   )
 
-  private fun getSortBy(sortColumn: String, sortDirection: String): Sort {
-    return if (sortDirection == DEFAULT_DIRECTION) {
-      Sort.by(sortColumn).ascending()
-    } else {
-      Sort.by(sortColumn).descending()
-    }
+  private fun getSortBy(sortColumn: String, sortDirection: String): Sort = if (sortDirection == DEFAULT_DIRECTION) {
+    Sort.by(sortColumn).ascending()
+  } else {
+    Sort.by(sortColumn).descending()
   }
 
   @Operation(
@@ -656,11 +653,9 @@ class ReferralController(
       description = "The id (UUID) of a referral",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<List<ReferralStatusHistory>> {
-    return ResponseEntity.ok(
-      referralStatusHistoryService.getReferralStatusHistories(id),
-    )
-  }
+  ): ResponseEntity<List<ReferralStatusHistory>> = ResponseEntity.ok(
+    referralStatusHistoryService.getReferralStatusHistories(id),
+  )
 
   @Operation(
     tags = ["Referrals"],

@@ -18,13 +18,12 @@ class AlertFactory {
   private var isActive: Boolean = true
   private var createdAt: LocalDateTime? = LocalDateTime.now()
 
-  private fun createAlertSummary(): AlertCodeSummary =
-    AlertCodeSummary(
-      alertTypeCode = randomLowercaseString(),
-      alertTypeDescription = randomLowercaseString(),
-      code = randomLowercaseString(),
-      description = randomLowercaseString(),
-    )
+  private fun createAlertSummary(): AlertCodeSummary = AlertCodeSummary(
+    alertTypeCode = randomLowercaseString(),
+    alertTypeDescription = randomLowercaseString(),
+    code = randomLowercaseString(),
+    description = randomLowercaseString(),
+  )
 
   fun withAlertUuid(alertUuid: UUID) = apply { this.alertUuid = alertUuid }
   fun withPrisonNumber(prisonNumber: String) = apply { this.prisonNumber = prisonNumber }

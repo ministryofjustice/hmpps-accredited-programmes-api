@@ -53,13 +53,12 @@ class OrganisationController(
     value = ["/organisations/{organisationId}/courses"],
     produces = ["application/json"],
   )
-  fun getAllCoursesByOrganisationId(@Parameter(description = "A organisation identifier", required = true) @PathVariable("organisationId") organisationId: String): ResponseEntity<List<Course>> =
-    ResponseEntity
-      .ok(
-        courseService.getAllOfferingsByOrganisationId(organisationId)
-          .map { it.course }
-          .map { it.toApi() },
-      )
+  fun getAllCoursesByOrganisationId(@Parameter(description = "A organisation identifier", required = true) @PathVariable("organisationId") organisationId: String): ResponseEntity<List<Course>> = ResponseEntity
+    .ok(
+      courseService.getAllOfferingsByOrganisationId(organisationId)
+        .map { it.course }
+        .map { it.toApi() },
+    )
 
   @Operation(
     tags = ["reference data"],
@@ -78,17 +77,16 @@ class OrganisationController(
     value = ["/organisations/enabled"],
     produces = ["application/json"],
   )
-  fun getEnabledOrganisations(): ResponseEntity<List<EnabledOrganisation>> =
-    ResponseEntity
-      .ok(
-        enabledOrganisationService.getEnabledOrganisations()
-          .map {
-            EnabledOrganisation(
-              it.code,
-              it.description,
-            )
-          },
-      )
+  fun getEnabledOrganisations(): ResponseEntity<List<EnabledOrganisation>> = ResponseEntity
+    .ok(
+      enabledOrganisationService.getEnabledOrganisations()
+        .map {
+          EnabledOrganisation(
+            it.code,
+            it.description,
+          )
+        },
+    )
 
   @Operation(
     tags = ["Organisation"],
@@ -108,16 +106,15 @@ class OrganisationController(
     value = ["/organisations"],
     produces = ["application/json"],
   )
-  fun getOrganisations(): ResponseEntity<List<Organisation>> =
-    ResponseEntity
-      .ok(
-        prisonRegisterApiService.getPrisons().map {
-          Organisation(
-            code = it.prisonId,
-            prisonName = it.prisonName,
-          )
-        },
-      )
+  fun getOrganisations(): ResponseEntity<List<Organisation>> = ResponseEntity
+    .ok(
+      prisonRegisterApiService.getPrisons().map {
+        Organisation(
+          code = it.prisonId,
+          prisonName = it.prisonName,
+        )
+      },
+    )
 
   @Operation(
     tags = ["Organisation"],
@@ -137,15 +134,13 @@ class OrganisationController(
     value = ["/organisation/{code}"],
     produces = ["application/json"],
   )
-  fun getOrganisation(@Parameter(description = "The organisation identifier code", required = true) @PathVariable("code") code: String): ResponseEntity<Organisation> {
-    return organisationService.findOrganisationEntityByCode(code)?.let {
-      ResponseEntity.ok(
-        Organisation(
-          code = it.code,
-          prisonName = it.name,
-          gender = it.gender,
-        ),
-      )
-    } ?: throw NotFoundException("No Organisation found at /organisation/$code")
-  }
+  fun getOrganisation(@Parameter(description = "The organisation identifier code", required = true) @PathVariable("code") code: String): ResponseEntity<Organisation> = organisationService.findOrganisationEntityByCode(code)?.let {
+    ResponseEntity.ok(
+      Organisation(
+        code = it.code,
+        prisonName = it.name,
+        gender = it.gender,
+      ),
+    )
+  } ?: throw NotFoundException("No Organisation found at /organisation/$code")
 }

@@ -83,26 +83,24 @@ class PrisonSearchIntegrationTest : IntegrationTestBase() {
     )
   }
 
-  fun searchPrisons(prisonSearchRequest: PrisonSearchRequest) =
-    webTestClient
-      .post()
-      .uri("/prison-search")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(prisonSearchRequest)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<PrisonSearchResponse>>()
-      .returnResult().responseBody!!
+  fun searchPrisons(prisonSearchRequest: PrisonSearchRequest) = webTestClient
+    .post()
+    .uri("/prison-search")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(prisonSearchRequest)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<PrisonSearchResponse>>()
+    .returnResult().responseBody!!
 
-  private fun getPrison(prisonNumber: String): PrisonSearchResponse =
-    webTestClient
-      .get()
-      .uri("/prison-search/$prisonNumber")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<PrisonSearchResponse>()
-      .returnResult().responseBody!!
+  private fun getPrison(prisonNumber: String): PrisonSearchResponse = webTestClient
+    .get()
+    .uri("/prison-search/$prisonNumber")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<PrisonSearchResponse>()
+    .returnResult().responseBody!!
 }

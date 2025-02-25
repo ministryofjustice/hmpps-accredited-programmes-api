@@ -210,43 +210,37 @@ abstract class IntegrationTestBase {
     val iss: String,
   )
 
-  fun getAllCourses(): List<Course> =
-    performRequestAndExpectOk(
-      HttpMethod.GET,
-      "/courses",
-      object : ParameterizedTypeReference<List<Course>>() {},
-    )
+  fun getAllCourses(): List<Course> = performRequestAndExpectOk(
+    HttpMethod.GET,
+    "/courses",
+    object : ParameterizedTypeReference<List<Course>>() {},
+  )
 
-  fun getAllOfferingsForCourse(courseId: UUID): List<CourseOffering> =
-    performRequestAndExpectOk(
-      HttpMethod.GET,
-      "/courses/$courseId/offerings",
-      object : ParameterizedTypeReference<List<CourseOffering>>() {},
-    )
+  fun getAllOfferingsForCourse(courseId: UUID): List<CourseOffering> = performRequestAndExpectOk(
+    HttpMethod.GET,
+    "/courses/$courseId/offerings",
+    object : ParameterizedTypeReference<List<CourseOffering>>() {},
+  )
 
   fun <T> performRequestAndExpectOk(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,
-  ): T {
-    return performRequestAndExpectStatus(httpMethod, uri, returnType, HttpStatus.OK.value())
-  }
+  ): T = performRequestAndExpectStatus(httpMethod, uri, returnType, HttpStatus.OK.value())
 
   fun <T> performRequestAndExpectStatus(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,
     expectedResponseStatus: Int,
-  ): T {
-    return webTestClient
-      .method(httpMethod)
-      .uri(uri)
-      .contentType(MediaType.APPLICATION_JSON)
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isEqualTo(expectedResponseStatus)
-      .expectBody(returnType)
-      .returnResult().responseBody!!
-  }
+  ): T = webTestClient
+    .method(httpMethod)
+    .uri(uri)
+    .contentType(MediaType.APPLICATION_JSON)
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isEqualTo(expectedResponseStatus)
+    .expectBody(returnType)
+    .returnResult().responseBody!!
 }

@@ -59,15 +59,14 @@ class PrisonerSearchIntegrationTest : IntegrationTestBase() {
     auditEntity shouldNotBe null
   }
 
-  fun searchPrisoners(prisonerSearchRequest: PrisonerSearchRequest) =
-    webTestClient
-      .post()
-      .uri("/prisoner-search")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(prisonerSearchRequest)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<PrisonerSearchResponse>>()
-      .returnResult().responseBody!!
+  fun searchPrisoners(prisonerSearchRequest: PrisonerSearchRequest) = webTestClient
+    .post()
+    .uri("/prisoner-search")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(prisonerSearchRequest)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<PrisonerSearchResponse>>()
+    .returnResult().responseBody!!
 }

@@ -69,12 +69,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<Attitude> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getAttitude(prisonNumber),
-      )
+  ): ResponseEntity<Attitude> = ResponseEntity
+    .ok(
+      oasysService
+        .getAttitude(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -107,12 +106,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<Behaviour> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getBehaviour(prisonNumber),
-      )
+  ): ResponseEntity<Behaviour> = ResponseEntity
+    .ok(
+      oasysService
+        .getBehaviour(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -145,12 +143,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<DrugAlcoholDetail> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getDrugAndAlcoholDetail(prisonNumber),
-      )
+  ): ResponseEntity<DrugAlcoholDetail> = ResponseEntity
+    .ok(
+      oasysService
+        .getDrugAndAlcoholDetail(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -183,12 +180,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<Health> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getHealth(prisonNumber),
-      )
+  ): ResponseEntity<Health> = ResponseEntity
+    .ok(
+      oasysService
+        .getHealth(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -221,12 +217,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<OasysAssessmentDateInfo> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getAssessmentDateInfo(prisonNumber),
-      )
+  ): ResponseEntity<OasysAssessmentDateInfo> = ResponseEntity
+    .ok(
+      oasysService
+        .getAssessmentDateInfo(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -259,12 +254,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<LearningNeeds> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getLearningNeeds(prisonNumber),
-      )
+  ): ResponseEntity<LearningNeeds> = ResponseEntity
+    .ok(
+      oasysService
+        .getLearningNeeds(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -297,12 +291,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<Lifestyle> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getLifestyle(prisonNumber),
-      )
+  ): ResponseEntity<Lifestyle> = ResponseEntity
+    .ok(
+      oasysService
+        .getLifestyle(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -335,12 +328,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<OffenceDetail> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getOffenceDetail(prisonNumber),
-      )
+  ): ResponseEntity<OffenceDetail> = ResponseEntity
+    .ok(
+      oasysService
+        .getOffenceDetail(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -373,12 +365,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<Psychiatric> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getPsychiatric(prisonNumber),
-      )
+  ): ResponseEntity<Psychiatric> = ResponseEntity
+    .ok(
+      oasysService
+        .getPsychiatric(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -411,12 +402,11 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<Relationships> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getRelationships(prisonNumber),
-      )
+  ): ResponseEntity<Relationships> = ResponseEntity
+    .ok(
+      oasysService
+        .getRelationships(prisonNumber),
+    )
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -449,8 +439,7 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<Risks> =
-    ResponseEntity.ok(oasysService.getRisks(prisonNumber))
+  ): ResponseEntity<Risks> = ResponseEntity.ok(oasysService.getRisks(prisonNumber))
 
   @Operation(
     tags = ["Oasys Integration"],
@@ -483,10 +472,9 @@ class OasysController(val oasysService: OasysService) {
       description = "Prison nomis identifier",
       required = true,
     ) @PathVariable("prisonNumber") prisonNumber: String,
-  ): ResponseEntity<RoshAnalysis> =
-    ResponseEntity
-      .ok(
-        oasysService
-          .getRoshFull(prisonNumber),
-      )
+  ): ResponseEntity<RoshAnalysis> = ResponseEntity
+    .ok(
+      oasysService
+        .getRoshFull(prisonNumber),
+    )
 }

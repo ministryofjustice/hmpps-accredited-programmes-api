@@ -75,14 +75,12 @@ class PniNeedsEngine {
   }
 }
 
-private fun getClassification(overallNeedsScore: Int?): String {
-  return when (overallNeedsScore) {
-    null -> NeedsClassification.INFORMATION_MISSING.name
-    in 0..2 -> NeedsClassification.LOW_NEED.name
-    in 3..5 -> NeedsClassification.MEDIUM_NEED.name
-    in 6..8 -> NeedsClassification.HIGH_NEED.name
-    else -> throw BusinessException("Unable to compute classification. Overall needs score is $overallNeedsScore")
-  }
+private fun getClassification(overallNeedsScore: Int?): String = when (overallNeedsScore) {
+  null -> NeedsClassification.INFORMATION_MISSING.name
+  in 0..2 -> NeedsClassification.LOW_NEED.name
+  in 3..5 -> NeedsClassification.MEDIUM_NEED.name
+  in 6..8 -> NeedsClassification.HIGH_NEED.name
+  else -> throw BusinessException("Unable to compute classification. Overall needs score is $overallNeedsScore")
 }
 
 enum class NeedsClassification {

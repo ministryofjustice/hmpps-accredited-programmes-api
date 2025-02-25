@@ -63,10 +63,9 @@ class CourseParticipationController(private val courseParticipationService: Cour
       description = "",
       required = true,
     ) @RequestBody courseParticipationCreate: CourseParticipationCreate,
-  ): ResponseEntity<CourseParticipation> =
-    courseParticipationService.createCourseParticipation(courseParticipationCreate.toDomain())?.let {
-      ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
-    } ?: throw Exception("Unable to add to course participation")
+  ): ResponseEntity<CourseParticipation> = courseParticipationService.createCourseParticipation(courseParticipationCreate.toDomain())?.let {
+    ResponseEntity.status(HttpStatus.CREATED).body(it.toApi())
+  } ?: throw Exception("Unable to add to course participation")
 
   @Operation(
     tags = ["Course Participations"],
@@ -132,10 +131,9 @@ class CourseParticipationController(private val courseParticipationService: Cour
       description = "The unique identifier assigned to this record when it was created.",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<CourseParticipation> =
-    courseParticipationService.getCourseParticipationById(id)?.let {
-      ResponseEntity.ok(it.toApi())
-    } ?: throw NotFoundException("No course participation found for id $id")
+  ): ResponseEntity<CourseParticipation> = courseParticipationService.getCourseParticipationById(id)?.let {
+    ResponseEntity.ok(it.toApi())
+  } ?: throw NotFoundException("No course participation found for id $id")
 
   @Operation(
     tags = ["Course Participations"],
@@ -166,12 +164,11 @@ class CourseParticipationController(private val courseParticipationService: Cour
       description = "The unique referral identifier assigned to this record when it was created.",
       required = true,
     ) @PathVariable("id") referralId: UUID,
-  ): ResponseEntity<List<CourseParticipation>> =
-    ResponseEntity.ok(
-      courseParticipationService
-        .getCourseParticipationHistoryByReferralId(referralId)
-        .map(CourseParticipationProjection::toApi),
-    )
+  ): ResponseEntity<List<CourseParticipation>> = ResponseEntity.ok(
+    courseParticipationService
+      .getCourseParticipationHistoryByReferralId(referralId)
+      .map(CourseParticipationProjection::toApi),
+  )
 
   @Operation(
     tags = ["Course Participations"],
@@ -212,8 +209,7 @@ class CourseParticipationController(private val courseParticipationService: Cour
       description = "",
       required = true,
     ) @RequestBody courseParticipationUpdate: CourseParticipationUpdate,
-  ): ResponseEntity<CourseParticipation> =
-    courseParticipationService.updateCourseParticipationById(id, courseParticipationUpdate.toDomain()).let {
-      ResponseEntity.ok(it.toApi())
-    } ?: throw NotFoundException("No course participation found for id $id")
+  ): ResponseEntity<CourseParticipation> = courseParticipationService.updateCourseParticipationById(id, courseParticipationUpdate.toDomain()).let {
+    ResponseEntity.ok(it.toApi())
+  } ?: throw NotFoundException("No course participation found for id $id")
 }

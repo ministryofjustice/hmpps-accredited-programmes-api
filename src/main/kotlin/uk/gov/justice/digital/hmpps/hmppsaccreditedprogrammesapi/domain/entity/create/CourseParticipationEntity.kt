@@ -84,16 +84,12 @@ enum class CourseSetting {
   COMMUNITY,
   ;
 
-  override fun toString(): String {
-    return this.name.lowercase()
-  }
+  override fun toString(): String = this.name.lowercase()
 }
 enum class CourseStatus {
   INCOMPLETE,
   COMPLETE,
   ;
 
-  override fun toString(): String {
-    return this.name.lowercase()
-  }
+  override fun toString(): String = this.name.lowercase()
 }

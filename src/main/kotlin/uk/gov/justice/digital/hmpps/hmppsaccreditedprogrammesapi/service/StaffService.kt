@@ -48,16 +48,14 @@ class StaffService(
 
   fun getStaffDetail(staffId: BigInteger?): StaffEntity? = staffId?.let { staffRepository.findByStaffId(it) }
 
-  fun buildStaffEntity(staffDetailResponse: StaffDetailResponse?): StaffEntity {
-    return StaffEntity(
-      staffId = staffDetailResponse?.staffId,
-      firstName = staffDetailResponse?.firstName.orEmpty(),
-      lastName = staffDetailResponse?.lastName.orEmpty(),
-      primaryEmail = staffDetailResponse?.primaryEmail,
-      username = staffDetailResponse?.generalAccount?.username ?: staffDetailResponse?.adminAccount?.username.orEmpty(),
-      accountType = staffDetailResponse?.generalAccount?.let { AccountType.GENERAL.name } ?: AccountType.ADMIN.name,
-    )
-  }
+  fun buildStaffEntity(staffDetailResponse: StaffDetailResponse?): StaffEntity = StaffEntity(
+    staffId = staffDetailResponse?.staffId,
+    firstName = staffDetailResponse?.firstName.orEmpty(),
+    lastName = staffDetailResponse?.lastName.orEmpty(),
+    primaryEmail = staffDetailResponse?.primaryEmail,
+    username = staffDetailResponse?.generalAccount?.username ?: staffDetailResponse?.adminAccount?.username.orEmpty(),
+    accountType = staffDetailResponse?.generalAccount?.let { AccountType.GENERAL.name } ?: AccountType.ADMIN.name,
+  )
 }
 
 enum class PomType {

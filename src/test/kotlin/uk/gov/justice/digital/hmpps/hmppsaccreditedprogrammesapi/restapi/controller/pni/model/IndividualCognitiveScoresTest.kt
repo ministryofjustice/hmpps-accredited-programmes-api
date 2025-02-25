@@ -11,29 +11,25 @@ class IndividualCognitiveScoresTest {
 
   companion object {
     @JvmStatic
-    fun scoresForTotalScore(): Stream<Arguments> {
-      return Stream.of(
-        Arguments.of(IndividualCognitiveScores(1, 1), 2),
-        Arguments.of(IndividualCognitiveScores(null, 1), 1),
-        Arguments.of(IndividualCognitiveScores(1, null), 1),
-        Arguments.of(IndividualCognitiveScores(null, null), 0),
-        Arguments.of(IndividualCognitiveScores(2, 2), 4),
-      )
-    }
+    fun scoresForTotalScore(): Stream<Arguments> = Stream.of(
+      Arguments.of(IndividualCognitiveScores(1, 1), 2),
+      Arguments.of(IndividualCognitiveScores(null, 1), 1),
+      Arguments.of(IndividualCognitiveScores(1, null), 1),
+      Arguments.of(IndividualCognitiveScores(null, null), 0),
+      Arguments.of(IndividualCognitiveScores(2, 2), 4),
+    )
 
     @JvmStatic
-    fun scoresForOverallCognitiveDomainScore(): Stream<Arguments> {
-      return Stream.of(
-        Arguments.of(IndividualCognitiveScores(0, 0), 0),
-        Arguments.of(IndividualCognitiveScores(1, null), 1),
-        Arguments.of(IndividualCognitiveScores(null, 2), 1),
-        Arguments.of(IndividualCognitiveScores(1, 0), 1),
-        Arguments.of(IndividualCognitiveScores(1, 1), 1),
-        Arguments.of(IndividualCognitiveScores(2, 1), 2),
-        Arguments.of(IndividualCognitiveScores(2, 2), 2),
-        Arguments.of(IndividualCognitiveScores(2, 0), 2),
-      )
-    }
+    fun scoresForOverallCognitiveDomainScore(): Stream<Arguments> = Stream.of(
+      Arguments.of(IndividualCognitiveScores(0, 0), 0),
+      Arguments.of(IndividualCognitiveScores(1, null), 1),
+      Arguments.of(IndividualCognitiveScores(null, 2), 1),
+      Arguments.of(IndividualCognitiveScores(1, 0), 1),
+      Arguments.of(IndividualCognitiveScores(1, 1), 1),
+      Arguments.of(IndividualCognitiveScores(2, 1), 2),
+      Arguments.of(IndividualCognitiveScores(2, 2), 2),
+      Arguments.of(IndividualCognitiveScores(2, 0), 2),
+    )
   }
 
   @ParameterizedTest

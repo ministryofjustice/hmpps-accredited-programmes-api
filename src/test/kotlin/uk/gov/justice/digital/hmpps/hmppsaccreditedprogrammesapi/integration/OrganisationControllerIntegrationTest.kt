@@ -119,25 +119,23 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
     assertThat(errorResponse.developerMessage).isEqualTo("No Organisation found at /organisation/UNKNOWN_ORGANISATION_CODE")
   }
 
-  fun getAllCoursesForOrganisation(organisationId: String): List<CourseEntity> =
-    webTestClient
-      .get()
-      .uri("/organisations/$organisationId/courses")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseEntity>>()
-      .returnResult().responseBody!!
+  fun getAllCoursesForOrganisation(organisationId: String): List<CourseEntity> = webTestClient
+    .get()
+    .uri("/organisations/$organisationId/courses")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<CourseEntity>>()
+    .returnResult().responseBody!!
 
-  fun getOrganisation(organisationCode: String): Organisation =
-    webTestClient
-      .get()
-      .uri("/organisation/$organisationCode")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Organisation>()
-      .returnResult().responseBody!!
+  fun getOrganisation(organisationCode: String): Organisation = webTestClient
+    .get()
+    .uri("/organisation/$organisationCode")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Organisation>()
+    .returnResult().responseBody!!
 }

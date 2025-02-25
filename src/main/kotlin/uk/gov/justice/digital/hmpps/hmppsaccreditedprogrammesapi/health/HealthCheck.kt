@@ -6,15 +6,13 @@ import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.hmpps.kotlin.health.HealthPingCheck
 
 @Component
-class PrisonerSearchApiHealthCheck(@Qualifier("prisonerSearchApiWebClient") webClient: WebClient) :
-  HealthPingCheck(webClient)
+class PrisonerSearchApiHealthCheck(@Qualifier("prisonerSearchApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
 
 @Component
 class PrisonApiHealthCheck(@Qualifier("prisonApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
 
 @Component("prisonRegisterApi")
-class PrisonRegisterApiHealthCheck(@Qualifier("prisonRegisterWebClient") webClient: WebClient) :
-  HealthPingCheck(webClient)
+class PrisonRegisterApiHealthCheck(@Qualifier("prisonRegisterWebClient") webClient: WebClient) : HealthPingCheck(webClient)
 
 @Component
 class OasysApiWebClientHealthCheck(@Qualifier("oasysApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)

@@ -15,8 +15,6 @@ class StatisticsService(
     endDate: LocalDate,
     locations: List<String>?,
     courseId: UUID,
-  ): List<ReportStatusCount> {
-    return statisticsRepository.findReferralCountByCourseId(startDate, endDate, locations, courseId)
-      ?.map(ReportStatusCount::from) ?: emptyList()
-  }
+  ): List<ReportStatusCount> = statisticsRepository.findReferralCountByCourseId(startDate, endDate, locations, courseId)
+    ?.map(ReportStatusCount::from) ?: emptyList()
 }

@@ -31,24 +31,20 @@ class ReferenceDataController(
 ) {
 
   @GetMapping("/referral-statuses", produces = ["application/json"])
-  fun getReferralStatuses(): List<ReferralStatusRefData> =
-    referenceDataService
-      .getReferralStatuses()
+  fun getReferralStatuses(): List<ReferralStatusRefData> = referenceDataService
+    .getReferralStatuses()
 
   @GetMapping("/referral-statuses/{code}", produces = ["application/json"])
-  fun getReferralStatus(@PathVariable code: String): ReferralStatusRefData =
-    referenceDataService
-      .getReferralStatus(code)
+  fun getReferralStatus(@PathVariable code: String): ReferralStatusRefData = referenceDataService
+    .getReferralStatus(code)
 
   @GetMapping("/referral-statuses/{code}/categories", produces = ["application/json"])
-  fun getReferralStatusCategories(@PathVariable code: String): List<ReferralStatusCategory> =
-    referenceDataService
-      .getReferralStatusCategories(code)
+  fun getReferralStatusCategories(@PathVariable code: String): List<ReferralStatusCategory> = referenceDataService
+    .getReferralStatusCategories(code)
 
   @GetMapping("/referral-statuses/categories/{code}", produces = ["application/json"])
-  fun getReferralStatusCategory(@PathVariable code: String): ReferralStatusCategory =
-    referenceDataService
-      .getReferralStatusCategory(code)
+  fun getReferralStatusCategory(@PathVariable code: String): ReferralStatusCategory = referenceDataService
+    .getReferralStatusCategory(code)
 
   @GetMapping(
     "/referral-statuses/{referralStatusCode}/categories/{categoryCode}/reasons",
@@ -58,14 +54,12 @@ class ReferenceDataController(
     @PathVariable referralStatusCode: String,
     @PathVariable categoryCode: String,
     @RequestParam(defaultValue = "false") deselectAndKeepOpen: Boolean = false,
-  ): List<ReferralStatusReason> =
-    referenceDataService
-      .getReferralStatusReasons(referralStatusCode, categoryCode, deselectAndKeepOpen)
+  ): List<ReferralStatusReason> = referenceDataService
+    .getReferralStatusReasons(referralStatusCode, categoryCode, deselectAndKeepOpen)
 
   @GetMapping("/referral-statuses/categories/reasons/{code}", produces = ["application/json"])
-  fun getReferralStatusReason(@PathVariable code: String): ReferralStatusReason =
-    referenceDataService
-      .getReferralStatusReason(code)
+  fun getReferralStatusReason(@PathVariable code: String): ReferralStatusReason = referenceDataService
+    .getReferralStatusReason(code)
 
   @Operation(
     summary = "Gets a full list of Referral Status Reasons for a status type (WITHDRAWN or DESELECTED)",

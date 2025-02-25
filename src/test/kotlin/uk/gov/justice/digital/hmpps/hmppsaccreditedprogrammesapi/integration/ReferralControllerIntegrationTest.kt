@@ -1172,71 +1172,63 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     return createReferral(offering.id, prisonNumber, originalReferralId)
   }
 
-  fun createDuplicateReferralResultsInConflict(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
-    webTestClient
-      .post()
-      .uri("/referrals")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        ReferralCreate(
-          offeringId = offeringId!!,
-          prisonNumber = prisonNumber,
-        ),
-      )
-      .exchange()
-      .expectStatus().is4xxClientError
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+  fun createDuplicateReferralResultsInConflict(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) = webTestClient
+    .post()
+    .uri("/referrals")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      ReferralCreate(
+        offeringId = offeringId!!,
+        prisonNumber = prisonNumber,
+      ),
+    )
+    .exchange()
+    .expectStatus().is4xxClientError
+    .expectBody<Referral>()
+    .returnResult().responseBody!!
 
-  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1, originalReferralId: UUID? = null) =
-    webTestClient
-      .post()
-      .uri("/referrals")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        ReferralCreate(
-          offeringId = offeringId!!,
-          prisonNumber = prisonNumber,
-          originalReferralId = originalReferralId,
-        ),
-      )
-      .exchange()
-      .expectStatus().isCreated
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1, originalReferralId: UUID? = null) = webTestClient
+    .post()
+    .uri("/referrals")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      ReferralCreate(
+        offeringId = offeringId!!,
+        prisonNumber = prisonNumber,
+        originalReferralId = originalReferralId,
+      ),
+    )
+    .exchange()
+    .expectStatus().isCreated
+    .expectBody<Referral>()
+    .returnResult().responseBody!!
 
-  fun getReferralById(createdReferralId: UUID) =
-    performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
+  fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
 
-  fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate): Any =
-    webTestClient
-      .put()
-      .uri("/referrals/$referralId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(referralUpdate)
-      .exchange()
-      .expectStatus().isNoContent
+  fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate): Any = webTestClient
+    .put()
+    .uri("/referrals/$referralId")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(referralUpdate)
+    .exchange()
+    .expectStatus().isNoContent
 
-  private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) =
-    webTestClient
-      .put()
-      .uri("/referrals/$createdReferralId/status")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(referralStatusUpdate)
-      .exchange().expectStatus().isNoContent
+  private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
+    .put()
+    .uri("/referrals/$createdReferralId/status")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .bodyValue(referralStatusUpdate)
+    .exchange().expectStatus().isNoContent
 
-  fun submitReferral(createdReferralId: UUID) =
-    performRequestAndExpectOk(HttpMethod.POST, "/referrals/$createdReferralId/submit", referralTypeReference())
+  fun submitReferral(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.POST, "/referrals/$createdReferralId/submit", referralTypeReference())
 
-  private fun encodeValue(value: String): String {
-    return URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
-  }
+  private fun encodeValue(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
 
   @Test
   fun `Retrieving a list of filtered referral views for an organisation should return 200 with correct body`() {
@@ -1289,24 +1281,22 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     }
   }
 
-  fun getReferralTransitions(referralId: UUID, ptUser: Boolean = false, deselectAndKeepOpen: Boolean = false) =
-    performRequestAndExpectOk(
-      HttpMethod.GET,
-      "/referrals/$referralId/status-transitions?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen",
-      object : ParameterizedTypeReference<List<ReferralStatusRefData>>() {},
-    )
+  fun getReferralTransitions(referralId: UUID, ptUser: Boolean = false, deselectAndKeepOpen: Boolean = false) = performRequestAndExpectOk(
+    HttpMethod.GET,
+    "/referrals/$referralId/status-transitions?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen",
+    object : ParameterizedTypeReference<List<ReferralStatusRefData>>() {},
+  )
 
   fun getConfirmationText(
     referralId: UUID,
     chosenStatusCode: String,
     ptUser: Boolean = false,
     deselectAndKeepOpen: Boolean = false,
-  ) =
-    performRequestAndExpectOk(
-      HttpMethod.GET,
-      "/referrals/$referralId/confirmation-text/$chosenStatusCode?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen",
-      object : ParameterizedTypeReference<ConfirmationFields>() {},
-    )
+  ) = performRequestAndExpectOk(
+    HttpMethod.GET,
+    "/referrals/$referralId/confirmation-text/$chosenStatusCode?ptUser=$ptUser&deselectAndKeepOpen=$deselectAndKeepOpen",
+    object : ParameterizedTypeReference<ConfirmationFields>() {},
+  )
 
   @Test
   fun `Retrieving a list of draft referral views for an organisation using referral group should return 200 with correct body`() {
@@ -2060,14 +2050,13 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     responseBody.first().prisonNumber shouldBe PRISON_NUMBER_1
   }
 
-  fun updateAllPeople() =
-    webTestClient
-      .post()
-      .uri("/admin/person/updateAll")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
+  fun updateAllPeople() = webTestClient
+    .post()
+    .uri("/admin/person/updateAll")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
 
   fun deleteReferral(referralId: UUID) {
     webTestClient
@@ -2122,9 +2111,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .exchange().expectStatus().isNoContent
   }
 
-  private fun transferReferralToBuildingChoices(referralId: UUID, courseId: UUID): Referral {
-    return performRequestAndExpectOk(HttpMethod.POST, "/referrals/$referralId/transfer-to-building-choices/$courseId", referralTypeReference())
-  }
+  private fun transferReferralToBuildingChoices(referralId: UUID, courseId: UUID): Referral = performRequestAndExpectOk(HttpMethod.POST, "/referrals/$referralId/transfer-to-building-choices/$courseId", referralTypeReference())
 
   private fun paginatedReferralViewTypeReference(): ParameterizedTypeReference<PaginatedReferralView> = object : ParameterizedTypeReference<PaginatedReferralView>() {}
   private fun referralTypeReference(): ParameterizedTypeReference<Referral> = object : ParameterizedTypeReference<Referral>() {}

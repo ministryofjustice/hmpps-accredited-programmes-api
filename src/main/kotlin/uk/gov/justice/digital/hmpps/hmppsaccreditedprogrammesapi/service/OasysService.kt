@@ -167,9 +167,7 @@ class OasysService(
     )
   }
 
-  fun getAssessmentId(prisonNumber: String): Long? {
-    return getAssessmentIdDate(prisonNumber)?.first
-  }
+  fun getAssessmentId(prisonNumber: String): Long? = getAssessmentIdDate(prisonNumber)?.first
 
   fun getAssessmentIdDate(prisonNumber: String): Pair<Long, LocalDateTime?>? {
     val assessmentTimeline = getAssessments(prisonNumber)
@@ -209,12 +207,10 @@ class OasysService(
       .firstOrNull()
   }
 
-  private fun getAllCompletedLayerThreeAssessments(assessment: OasysAssessmentTimeline): List<Timeline> {
-    return assessment
-      .timeline
-      .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
-      .sortedByDescending { it.completedAt }
-  }
+  private fun getAllCompletedLayerThreeAssessments(assessment: OasysAssessmentTimeline): List<Timeline> = assessment
+    .timeline
+    .filter { it.status == "COMPLETE" && it.type == "LAYER3" }
+    .sortedByDescending { it.completedAt }
 
   fun getAssessmentIdWithCompletedSara(oasysAssessmentTimeline: OasysAssessmentTimeline): Long? {
     val completedLayerThreeAssessments = getAllCompletedLayerThreeAssessments(oasysAssessmentTimeline)
@@ -283,48 +279,33 @@ class OasysService(
     return prisonerAlerts.entity?.content?.filter { it.isActive }?.sortedByDescending { it.createdAt }
   }
 
-  fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? =
-    fetchDetail(assessmentId, oasysApiClient::getOffenceDetail, "Offence detail")
+  fun getOffenceDetail(assessmentId: Long): OasysOffenceDetail? = fetchDetail(assessmentId, oasysApiClient::getOffenceDetail, "Offence detail")
 
-  fun getRoshFull(assessmentId: Long): OasysRoshFull? =
-    fetchDetail(assessmentId, oasysApiClient::getRoshFull, "RoshFull")
+  fun getRoshFull(assessmentId: Long): OasysRoshFull? = fetchDetail(assessmentId, oasysApiClient::getRoshFull, "RoshFull")
 
-  fun getRelationships(assessmentId: Long): OasysRelationships? =
-    fetchDetail(assessmentId, oasysApiClient::getRelationships, "Relationships")
+  fun getRelationships(assessmentId: Long): OasysRelationships? = fetchDetail(assessmentId, oasysApiClient::getRelationships, "Relationships")
 
-  fun getLifestyle(assessmentId: Long): OasysLifestyle? =
-    fetchDetail(assessmentId, oasysApiClient::getLifestyle, "Lifestyle")
-  fun getPsychiatric(assessmentId: Long): OasysPsychiatric? =
-    fetchDetail(assessmentId, oasysApiClient::getPsychiatric, "Psychiatric")
+  fun getLifestyle(assessmentId: Long): OasysLifestyle? = fetchDetail(assessmentId, oasysApiClient::getLifestyle, "Lifestyle")
+  fun getPsychiatric(assessmentId: Long): OasysPsychiatric? = fetchDetail(assessmentId, oasysApiClient::getPsychiatric, "Psychiatric")
 
-  fun getBehaviour(assessmentId: Long): OasysBehaviour? =
-    fetchDetail(assessmentId, oasysApiClient::getBehaviour, "Behaviour")
+  fun getBehaviour(assessmentId: Long): OasysBehaviour? = fetchDetail(assessmentId, oasysApiClient::getBehaviour, "Behaviour")
 
-  fun getHealth(assessmentId: Long): OasysHealth? =
-    fetchDetail(assessmentId, oasysApiClient::getHealth, "Health")
+  fun getHealth(assessmentId: Long): OasysHealth? = fetchDetail(assessmentId, oasysApiClient::getHealth, "Health")
 
-  fun getAttitude(assessmentId: Long): OasysAttitude? =
-    fetchDetail(assessmentId, oasysApiClient::getAttitude, "Attitude")
+  fun getAttitude(assessmentId: Long): OasysAttitude? = fetchDetail(assessmentId, oasysApiClient::getAttitude, "Attitude")
 
-  fun getLearning(assessmentId: Long): OasysLearning? =
-    fetchDetail(assessmentId, oasysApiClient::getLearning, "Learning")
+  fun getLearning(assessmentId: Long): OasysLearning? = fetchDetail(assessmentId, oasysApiClient::getLearning, "Learning")
 
-  fun getAccommodation(assessmentId: Long): OasysAccommodation? =
-    fetchDetail(assessmentId, oasysApiClient::getAccommodation, "Accomodation")
+  fun getAccommodation(assessmentId: Long): OasysAccommodation? = fetchDetail(assessmentId, oasysApiClient::getAccommodation, "Accomodation")
 
-  fun getOffendingInfo(assessmentId: Long): OasysOffendingInfo? =
-    fetchDetail(assessmentId, oasysApiClient::getOffendingInfo, "OffendingInfo")
-  fun getRoshSummary(assessmentId: Long): OasysRoshSummary? =
-    fetchDetail(assessmentId, oasysApiClient::getRoshSummary, "RoshSummary")
+  fun getOffendingInfo(assessmentId: Long): OasysOffendingInfo? = fetchDetail(assessmentId, oasysApiClient::getOffendingInfo, "OffendingInfo")
+  fun getRoshSummary(assessmentId: Long): OasysRoshSummary? = fetchDetail(assessmentId, oasysApiClient::getRoshSummary, "RoshSummary")
 
-  fun getRiskPredictors(assessmentId: Long): OasysRiskPredictorScores? =
-    fetchDetail(assessmentId, oasysApiClient::getRiskPredictors, "RiskPredictors")
+  fun getRiskPredictors(assessmentId: Long): OasysRiskPredictorScores? = fetchDetail(assessmentId, oasysApiClient::getRiskPredictors, "RiskPredictors")
 
-  fun getDrugDetail(assessmentId: Long): OasysDrugDetail? =
-    fetchDetail(assessmentId, oasysApiClient::getDrugDetail, "DrugDetail")
+  fun getDrugDetail(assessmentId: Long): OasysDrugDetail? = fetchDetail(assessmentId, oasysApiClient::getDrugDetail, "DrugDetail")
 
-  fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? =
-    fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
+  fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? = fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
 
   private inline fun <T> fetchDetail(
     assessmentId: Long,

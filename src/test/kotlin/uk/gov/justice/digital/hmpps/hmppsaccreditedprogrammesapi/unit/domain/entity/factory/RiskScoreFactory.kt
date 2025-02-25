@@ -42,11 +42,9 @@ class RiskScoreFactory {
     private var saraAssessmentId: Long? = 2512235167
 
     fun withOverallResult(overallResult: SaraRisk?) = apply { this.overallResult = overallResult }
-    fun withSaraRiskOfViolenceTowardsPartner(saraRiskOfViolenceTowardsPartner: String?) =
-      apply { this.saraRiskOfViolenceTowardsPartner = saraRiskOfViolenceTowardsPartner }
+    fun withSaraRiskOfViolenceTowardsPartner(saraRiskOfViolenceTowardsPartner: String?) = apply { this.saraRiskOfViolenceTowardsPartner = saraRiskOfViolenceTowardsPartner }
 
-    fun withSaraRiskOfViolenceTowardsOthers(saraRiskOfViolenceTowardsOthers: String?) =
-      apply { this.saraRiskOfViolenceTowardsOthers = saraRiskOfViolenceTowardsOthers }
+    fun withSaraRiskOfViolenceTowardsOthers(saraRiskOfViolenceTowardsOthers: String?) = apply { this.saraRiskOfViolenceTowardsOthers = saraRiskOfViolenceTowardsOthers }
 
     fun withSaraAssessmentId(saraAssessmentId: Long?) = apply { this.saraAssessmentId = saraAssessmentId }
 

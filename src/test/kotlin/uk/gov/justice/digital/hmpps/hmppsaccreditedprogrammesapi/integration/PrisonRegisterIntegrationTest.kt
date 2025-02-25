@@ -30,14 +30,13 @@ class PrisonRegisterIntegrationTest : IntegrationTestBase() {
     prisons[1].prisonName shouldBe "Brixton (HMP)"
   }
 
-  private fun getPrisons() =
-    webTestClient
-      .get()
-      .uri("/organisations")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<Organisation>>()
-      .returnResult().responseBody!!
+  private fun getPrisons() = webTestClient
+    .get()
+    .uri("/organisations")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<Organisation>>()
+    .returnResult().responseBody!!
 }

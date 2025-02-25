@@ -146,53 +146,49 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
     courseParticipations.map { it.referralId } shouldContainOnly listOf(null)
   }
 
-  fun searchPrisoners(peopleSearchRequest: PeopleSearchRequest) =
-    webTestClient
-      .post()
-      .uri("/prisoner-search")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(peopleSearchRequest)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<PeopleSearchResponse>>()
-      .returnResult().responseBody!!
+  fun searchPrisoners(peopleSearchRequest: PeopleSearchRequest) = webTestClient
+    .post()
+    .uri("/prisoner-search")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(peopleSearchRequest)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<PeopleSearchResponse>>()
+    .returnResult().responseBody!!
 
-  private fun getSentences(prisonNumber: String): SentenceDetails =
-    webTestClient
-      .get()
-      .uri("/people/$prisonNumber/sentences")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<SentenceDetails>()
-      .returnResult().responseBody!!
+  private fun getSentences(prisonNumber: String): SentenceDetails = webTestClient
+    .get()
+    .uri("/people/$prisonNumber/sentences")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<SentenceDetails>()
+    .returnResult().responseBody!!
 
-  private fun getOffences(prisonNumber: String): List<Offence> =
-    webTestClient
-      .get()
-      .uri("/people/offences/$prisonNumber")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<Offence>>()
-      .returnResult().responseBody!!
+  private fun getOffences(prisonNumber: String): List<Offence> = webTestClient
+    .get()
+    .uri("/people/offences/$prisonNumber")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<Offence>>()
+    .returnResult().responseBody!!
 
-  private fun getCourseParticipations(prisonNumber: String, outcomeStatus: List<Status>): List<CourseParticipation> =
-    webTestClient
-      .get()
-      .uri { builder ->
-        builder
-          .path("/people/$prisonNumber/course-participation-history")
-          .queryParam("outcomeStatus", outcomeStatus.joinToString(","))
-          .build()
-      }
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CourseParticipation>>()
-      .returnResult().responseBody!!
+  private fun getCourseParticipations(prisonNumber: String, outcomeStatus: List<Status>): List<CourseParticipation> = webTestClient
+    .get()
+    .uri { builder ->
+      builder
+        .path("/people/$prisonNumber/course-participation-history")
+        .queryParam("outcomeStatus", outcomeStatus.joinToString(","))
+        .build()
+    }
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<CourseParticipation>>()
+    .returnResult().responseBody!!
 }

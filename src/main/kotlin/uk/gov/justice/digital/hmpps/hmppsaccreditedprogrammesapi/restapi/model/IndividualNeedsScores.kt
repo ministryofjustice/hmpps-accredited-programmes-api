@@ -6,10 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import kotlin.reflect.full.memberProperties
 
 // Extension function to check if all properties of a data class are non-null
-fun <T : Any> T.areAllValuesPresent(): Boolean {
-  return this::class.memberProperties
-    .all { property -> property.call(this) != null }
-}
+fun <T : Any> T.areAllValuesPresent(): Boolean = this::class.memberProperties
+  .all { property -> property.call(this) != null }
 
 /**
  *
@@ -49,11 +47,9 @@ data class IndividualSexScores(
   ).any { it != null }
 
   @JsonIgnore
-  fun totalScore(): Int {
-    return (sexualPreOccupation ?: 0) +
-      (offenceRelatedSexualInterests ?: 0) +
-      (emotionalCongruence ?: 0)
-  }
+  fun totalScore(): Int = (sexualPreOccupation ?: 0) +
+    (offenceRelatedSexualInterests ?: 0) +
+    (emotionalCongruence ?: 0)
 
   @JsonIgnore
   fun overallSexDomainScore(totalScore: Int?) = when {
@@ -72,10 +68,8 @@ data class IndividualCognitiveScores(
   @Schema(example = "2", description = "")
   @get:JsonProperty("hostileOrientation") val hostileOrientation: Int? = null,
 ) {
-  fun totalScore(): Int {
-    return (proCriminalAttitudes ?: 0) +
-      (hostileOrientation ?: 0)
-  }
+  fun totalScore(): Int = (proCriminalAttitudes ?: 0) +
+    (hostileOrientation ?: 0)
 
   fun overallCognitiveDomainScore(): Int {
     val totalScore = totalScore()
@@ -102,20 +96,16 @@ data class IndividualSelfManagementScores(
   @Schema(example = "", description = "")
   @get:JsonProperty("difficultiesCoping") val difficultiesCoping: Int? = null,
 ) {
-  fun totalScore(): Int {
-    return (impulsivity ?: 0) +
-      (temperControl ?: 0) +
-      (problemSolvingSkills ?: 0) +
-      (difficultiesCoping ?: 0)
-  }
+  fun totalScore(): Int = (impulsivity ?: 0) +
+    (temperControl ?: 0) +
+    (problemSolvingSkills ?: 0) +
+    (difficultiesCoping ?: 0)
 
-  fun overallSelfManagementScore(): Int {
-    return when (totalScore()) {
-      in 0..1 -> 0
-      in 2..4 -> 1
-      in 5..8 -> 2
-      else -> 0
-    }
+  fun overallSelfManagementScore(): Int = when (totalScore()) {
+    in 0..1 -> 0
+    in 2..4 -> 1
+    in 5..8 -> 2
+    else -> 0
   }
 }
 
@@ -134,19 +124,15 @@ data class IndividualRelationshipScores(
   @get:JsonProperty("aggressiveControllingBehaviour") val aggressiveControllingBehaviour: Int? = null,
 ) {
 
-  fun totalScore(): Int {
-    return (curRelCloseFamily ?: 0) +
-      (prevExpCloseRel ?: 0) +
-      (easilyInfluenced ?: 0) +
-      (aggressiveControllingBehaviour ?: 0)
-  }
+  fun totalScore(): Int = (curRelCloseFamily ?: 0) +
+    (prevExpCloseRel ?: 0) +
+    (easilyInfluenced ?: 0) +
+    (aggressiveControllingBehaviour ?: 0)
 
-  fun overallRelationshipScore(): Int {
-    return when (totalScore()) {
-      in 0..1 -> 0
-      in 2..4 -> 1
-      in 5..8 -> 2
-      else -> 0
-    }
+  fun overallRelationshipScore(): Int = when (totalScore()) {
+    in 0..1 -> 0
+    in 2..4 -> 1
+    in 5..8 -> 2
+    else -> 0
   }
 }

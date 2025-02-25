@@ -56,20 +56,17 @@ class CsvHttpMessageConverter : AbstractGenericHttpMessageConverter<Iterable<Any
     private fun isSupported(type: Type) = TypeToken.of(type).isSubtypeOf(supportedSupertype)
 
     @Suppress("UNCHECKED_CAST")
-    private fun getElementType(type: Type) =
-      (TypeToken.of(type).getSupertype(supportedSupertype as Class<Any>).type as ParameterizedType)
-        .let { TypeToken.of(it.actualTypeArguments[0]).rawType }
+    private fun getElementType(type: Type) = (TypeToken.of(type).getSupertype(supportedSupertype as Class<Any>).type as ParameterizedType)
+      .let { TypeToken.of(it.actualTypeArguments[0]).rawType }
 
-    private fun getInputReader(inputMessage: HttpInputMessage): Reader =
-      InputStreamReader(
-        inputMessage.body,
-        inputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
-      )
+    private fun getInputReader(inputMessage: HttpInputMessage): Reader = InputStreamReader(
+      inputMessage.body,
+      inputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
+    )
 
-    private fun getOutputWriter(outputMessage: HttpOutputMessage): Writer =
-      OutputStreamWriter(
-        outputMessage.body,
-        outputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
-      )
+    private fun getOutputWriter(outputMessage: HttpOutputMessage): Writer = OutputStreamWriter(
+      outputMessage.body,
+      outputMessage.headers.contentType?.charset ?: StandardCharsets.UTF_8,
+    )
   }
 }
