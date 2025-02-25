@@ -126,6 +126,7 @@ constructor(
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
     referral.transferReason = update.transferReason
+    referral.hasLdcBeenOverwrittenByProgrammeTeam = update.hasLdcBeenOverwrittenByProgrammeTeam ?: false
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
@@ -241,6 +242,7 @@ constructor(
       ReferralStatus.REFERRAL_STARTED.name -> {
         referral.status = ReferralStatus.REFERRAL_SUBMITTED.name
         referral.submittedOn = LocalDateTime.now()
+        referral.hasLdc = pniService.getLDC()
         fetchAndSavePomDetails(referral).let {
           referral.primaryPomStaffId = it?.first
           referral.secondaryPomStaffId = it?.second
@@ -427,6 +429,8 @@ constructor(
 
     return newReferral
   }
+
+  fun getLdc() = pniService.getLDC()
 
   private fun createNewReferral(referral: ReferralEntity, newOffering: OfferingEntity): ReferralEntity {
     val pomDetails = fetchAndSavePomDetails(referral)

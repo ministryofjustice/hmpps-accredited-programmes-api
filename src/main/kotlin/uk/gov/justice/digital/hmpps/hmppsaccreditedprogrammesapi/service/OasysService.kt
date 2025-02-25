@@ -307,6 +307,8 @@ class OasysService(
 
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? = fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
 
+  fun getLDCScore() = (3..5).random().toBigDecimal()
+
   private inline fun <T> fetchDetail(
     assessmentId: Long,
     fetchFunction: (Long) -> ClientResult<T>,

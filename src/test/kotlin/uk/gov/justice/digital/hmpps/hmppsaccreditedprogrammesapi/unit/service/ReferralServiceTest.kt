@@ -620,6 +620,9 @@ class ReferralServiceTest {
       .withId(referralId)
       .withStatus(REFERRAL_STARTED)
       .withOverrideReason("override reason")
+      .withTransferReason("Transfer reason")
+      .withLdc(false)
+      .withHasLdcBeenOverwrittenByProgrammeTeam(false)
       .produce()
 
     every { referralRepository.getReferenceById(referralId) } returns referral

@@ -291,6 +291,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       overrideReason = null,
       transferReason = null,
       originalReferralId = originalReferralId,
+      hasLdc = true,
+      hasLdcBeenOverwrittenByProgrammeTeam = false,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -389,6 +391,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
       overrideReason = null,
+      transferReason = null,
+      hasLdc = true,
+      hasLdcBeenOverwrittenByProgrammeTeam = false,
+      primaryPrisonOffenderManager = null,
     )
 
     val auditEntity = auditRepository.findAll()
@@ -410,6 +416,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = true,
       overrideReason = "Override reason",
       transferReason = "Transfer reason",
+      hasLdcBeenOverwrittenByProgrammeTeam = true,
     )
 
     updateReferral(referralCreated.id, referralUpdate)
@@ -431,6 +438,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       overrideReason = "Override reason",
       transferReason = "Transfer reason",
+      hasLdc = false,
+      hasLdcBeenOverwrittenByProgrammeTeam = true,
+      primaryPrisonOffenderManager = null,
     )
   }
 
@@ -447,6 +457,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
           oasysConfirmed = true,
           hasReviewedProgrammeHistory = true,
           overrideReason = "Override reason",
+          hasLdcBeenOverwrittenByProgrammeTeam = true,
         ),
       )
       .exchange().expectStatus().isNotFound
@@ -499,6 +510,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = null,
       submittedOn = null,
       overrideReason = null,
+      transferReason = null,
+      hasLdc = true,
+      hasLdcBeenOverwrittenByProgrammeTeam = false,
+      primaryPrisonOffenderManager = null,
     )
   }
 

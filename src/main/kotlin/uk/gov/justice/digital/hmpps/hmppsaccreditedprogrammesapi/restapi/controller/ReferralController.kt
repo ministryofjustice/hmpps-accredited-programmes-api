@@ -371,11 +371,14 @@ class ReferralController(
       required = true,
     ) @PathVariable("id") id: UUID,
   ): ResponseEntity<Referral> = referralService
-    .getReferralById(id)
+    .getReferralById(referralId = id)
     ?.let {
       auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
       val status = referenceDataService.getReferralStatus(it.status)
       val staffDetail = staffService.getStaffDetail(it.primaryPomStaffId)?.toApi()
+      if (!it.hasLdcBeenOverwrittenByProgrammeTeam) {
+        it.hasLdc = referralService.getLdc()
+      }
       ResponseEntity.ok(it.toApi(status, staffDetail))
     }
     ?: throw NotFoundException("No Referral found at /referrals/$id")

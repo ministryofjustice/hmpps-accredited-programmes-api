@@ -200,6 +200,8 @@ class PniService(
     else -> null
   }
 
+  fun getLDC() = oasysService.getLDCScore() >= BigDecimal("2.99")
+
   private fun buildRiskScores(
     oasysRiskPredictorScores: OasysRiskPredictorScores?,
     oasysOffendingInfo: OasysOffendingInfo?,
