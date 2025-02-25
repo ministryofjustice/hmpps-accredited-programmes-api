@@ -20,35 +20,16 @@ class ReferralReferenceDataService(
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralStatusTransitionRepository: ReferralStatusTransitionRepository,
 ) {
-  fun getReferralStatuses() =
-    referralStatusRepository.findAllByActiveIsTrueOrderByDefaultOrder()
-      .map {
-        ReferralStatusRefData(
-          code = it.code,
-          description = it.description,
-          hintText = it.hintText,
-          hasNotes = it.hasNotes,
-          hasConfirmation = it.hasConfirmation,
-          confirmationText = it.confirmationText,
-          colour = it.colour,
-          closed = it.closed,
-          draft = it.draft,
-          hold = it.hold,
-          release = it.release,
-          notesOptional = it.notesOptional,
-        )
-      }
-
-  fun getReferralStatus(code: String) =
-    referralStatusRepository.getByCode(code).let {
+  fun getReferralStatuses() = referralStatusRepository.findAllByActiveIsTrueOrderByDefaultOrder()
+    .map {
       ReferralStatusRefData(
         code = it.code,
         description = it.description,
-        colour = it.colour,
         hintText = it.hintText,
         hasNotes = it.hasNotes,
         hasConfirmation = it.hasConfirmation,
         confirmationText = it.confirmationText,
+        colour = it.colour,
         closed = it.closed,
         draft = it.draft,
         hold = it.hold,
@@ -57,73 +38,80 @@ class ReferralReferenceDataService(
       )
     }
 
-  fun getReferralStatusCategories(statusCode: String) =
-    referralStatusCategoryRepository.getAllByReferralStatusCodeAndActiveIsTrue(statusCode).map {
-      ReferralStatusCategory(
-        code = it.code,
-        description = it.description,
-        referralStatusCode = it.referralStatusCode,
-      )
-    }
+  fun getReferralStatus(code: String) = referralStatusRepository.getByCode(code).let {
+    ReferralStatusRefData(
+      code = it.code,
+      description = it.description,
+      colour = it.colour,
+      hintText = it.hintText,
+      hasNotes = it.hasNotes,
+      hasConfirmation = it.hasConfirmation,
+      confirmationText = it.confirmationText,
+      closed = it.closed,
+      draft = it.draft,
+      hold = it.hold,
+      release = it.release,
+      notesOptional = it.notesOptional,
+    )
+  }
 
-  fun getReferralStatusCategory(code: String) =
-    referralStatusCategoryRepository.getByCode(code).let {
-      ReferralStatusCategory(
-        code = it.code,
-        description = it.description,
-        referralStatusCode = it.referralStatusCode,
-      )
-    }
+  fun getReferralStatusCategories(statusCode: String) = referralStatusCategoryRepository.getAllByReferralStatusCodeAndActiveIsTrue(statusCode).map {
+    ReferralStatusCategory(
+      code = it.code,
+      description = it.description,
+      referralStatusCode = it.referralStatusCode,
+    )
+  }
+
+  fun getReferralStatusCategory(code: String) = referralStatusCategoryRepository.getByCode(code).let {
+    ReferralStatusCategory(
+      code = it.code,
+      description = it.description,
+      referralStatusCode = it.referralStatusCode,
+    )
+  }
 
   fun getReferralStatusReasons(
     referralStatusCode: String,
     referralCategoryCode: String,
     deselectAndKeepOpen: Boolean = false,
-  ) =
-    referralStatusReasonRepository.getAllByReferralStatusCategoryCodeAndActiveIsTrue(
-      referralCategoryCode,
-      deselectAndKeepOpen,
-    ).map {
-      ReferralStatusReason(
-        code = it.code,
-        description = it.description,
-        referralCategoryCode = it.referralStatusCategoryCode,
-      )
-    }
+  ) = referralStatusReasonRepository.getAllByReferralStatusCategoryCodeAndActiveIsTrue(
+    referralCategoryCode,
+    deselectAndKeepOpen,
+  ).map {
+    ReferralStatusReason(
+      code = it.code,
+      description = it.description,
+      referralCategoryCode = it.referralStatusCategoryCode,
+    )
+  }
 
-  fun getReferralStatusReason(code: String) =
-    referralStatusReasonRepository.getByCode(code).let {
-      ReferralStatusReason(
-        code = it.code,
-        description = it.description,
-        referralCategoryCode = it.referralStatusCategoryCode,
-      )
-    }
+  fun getReferralStatusReason(code: String) = referralStatusReasonRepository.getByCode(code).let {
+    ReferralStatusReason(
+      code = it.code,
+      description = it.description,
+      referralCategoryCode = it.referralStatusCategoryCode,
+    )
+  }
 
-  fun getNextStatusTransitions(currentStatus: String, ptRole: Boolean = false): List<ReferralStatusRefData> {
-    return if (ptRole) {
-      referralStatusTransitionRepository.getNextPTTransitions(currentStatus)
-        .map { it.toStatus.toModel(it.description, it.hintText) }
-    } else {
-      referralStatusTransitionRepository.getNextPOMTransitions(currentStatus)
-        .map { it.toStatus.toModel(it.description, it.hintText) }
-    }
+  fun getNextStatusTransitions(currentStatus: String, ptRole: Boolean = false): List<ReferralStatusRefData> = if (ptRole) {
+    referralStatusTransitionRepository.getNextPTTransitions(currentStatus)
+      .map { it.toStatus.toModel(it.description, it.hintText) }
+  } else {
+    referralStatusTransitionRepository.getNextPOMTransitions(currentStatus)
+      .map { it.toStatus.toModel(it.description, it.hintText) }
   }
 
   fun getStatusTransition(
     currentStatus: String,
     chosenStatus: String,
     ptRole: Boolean = false,
-  ): ReferralStatusTransitionEntity? {
-    return if (ptRole) {
-      referralStatusTransitionRepository.getPTTransition(currentStatus, chosenStatus)
-    } else {
-      referralStatusTransitionRepository.getPOMTransition(currentStatus, chosenStatus)
-    }
+  ): ReferralStatusTransitionEntity? = if (ptRole) {
+    referralStatusTransitionRepository.getPTTransition(currentStatus, chosenStatus)
+  } else {
+    referralStatusTransitionRepository.getPOMTransition(currentStatus, chosenStatus)
   }
 
-  fun getAllReferralStatusReasonsForType(referralStatusType: ReferralStatusType): List<ReferralStatusReason> {
-    return referralStatusReasonRepository.findReferralStatusReasonsByStatusCode(referralStatusType.name)
-      .map { it.toModel() }
-  }
+  fun getAllReferralStatusReasonsForType(referralStatusType: ReferralStatusType): List<ReferralStatusReason> = referralStatusReasonRepository.findReferralStatusReasonsByStatusCode(referralStatusType.name)
+    .map { it.toModel() }
 }

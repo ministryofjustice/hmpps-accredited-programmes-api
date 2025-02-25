@@ -49,26 +49,23 @@ class JwtAuthHelper {
   fun getClaims(
     auth: Authentication?,
     authorities: List<String>,
-  ) =
-    mutableMapOf<String, Any>().apply {
-      put("user_name", auth?.name ?: REFERRER_USERNAME)
-      put("authorities", authorities)
-      put("scope", listOf<String>())
-      put("client_id", "hmpps-accredited-programmes-ui")
-    }
+  ) = mutableMapOf<String, Any>().apply {
+    put("user_name", auth?.name ?: REFERRER_USERNAME)
+    put("authorities", authorities)
+    put("scope", listOf<String>())
+    put("client_id", "hmpps-accredited-programmes-ui")
+  }
 
-  private fun getAuthorities(auth: Authentication?) =
-    auth?.authorities?.map { it.authority }?.let {
-      listOf("ROLE_ACCREDITED_PROGRAMMES_API") + it
-    } ?: listOf("ROLE_ACCREDITED_PROGRAMMES_API")
+  private fun getAuthorities(auth: Authentication?) = auth?.authorities?.map { it.authority }?.let {
+    listOf("ROLE_ACCREDITED_PROGRAMMES_API") + it
+  } ?: listOf("ROLE_ACCREDITED_PROGRAMMES_API")
 
-  private fun buildJwt(username: String, claims: MutableMap<String, Any>) =
-    Jwts.builder()
-      .id(UUID.randomUUID().toString())
-      .subject(username)
-      .claims(claims)
-      .expiration(Date(System.currentTimeMillis() + Duration.ofHours(1).toMillis()))
-      .signWith(keyPair.private, RS256)
-      .compact()
-      .let { "Bearer $it" }
+  private fun buildJwt(username: String, claims: MutableMap<String, Any>) = Jwts.builder()
+    .id(UUID.randomUUID().toString())
+    .subject(username)
+    .claims(claims)
+    .expiration(Date(System.currentTimeMillis() + Duration.ofHours(1).toMillis()))
+    .signWith(keyPair.private, RS256)
+    .compact()
+    .let { "Bearer $it" }
 }

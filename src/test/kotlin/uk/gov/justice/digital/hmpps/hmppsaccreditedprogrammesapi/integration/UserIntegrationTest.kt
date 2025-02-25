@@ -47,14 +47,13 @@ class UserIntegrationTest : IntegrationTestBase() {
     )
   }
 
-  private fun getCurrentUserCaseload(caseLoad: Boolean): List<CaseLoad> =
-    webTestClient
-      .get()
-      .uri("/user/me/caseload?allCaseloads=$caseLoad")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<CaseLoad>>()
-      .returnResult().responseBody!!
+  private fun getCurrentUserCaseload(caseLoad: Boolean): List<CaseLoad> = webTestClient
+    .get()
+    .uri("/user/me/caseload?allCaseloads=$caseLoad")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<CaseLoad>>()
+    .returnResult().responseBody!!
 }

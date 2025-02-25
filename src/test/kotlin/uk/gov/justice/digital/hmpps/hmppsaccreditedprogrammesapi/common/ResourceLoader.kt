@@ -15,8 +15,7 @@ object ResourceLoader {
     .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-  inline fun <reified T> file(filename: String): T =
-    MAPPER.readValue(
-      ResourceUtils.getFile("classpath:simulations/__files/$filename.json"),
-    )
+  inline fun <reified T> file(filename: String): T = MAPPER.readValue(
+    ResourceUtils.getFile("classpath:simulations/__files/$filename.json"),
+  )
 }

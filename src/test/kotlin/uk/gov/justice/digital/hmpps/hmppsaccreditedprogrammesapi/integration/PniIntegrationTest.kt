@@ -128,25 +128,23 @@ class PniIntegrationTest : IntegrationTestBase() {
     pniResults[0].basicSkillsScore shouldBe 33
   }
 
-  fun getPniInfoByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/PNI/$prisonNumber?gender=Male")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<PniScore>()
-      .returnResult().responseBody!!
+  fun getPniInfoByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/PNI/$prisonNumber?gender=Male")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<PniScore>()
+    .returnResult().responseBody!!
 
-  fun getPniInfoByPrisonNumberAndSave(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/PNI/$prisonNumber?gender=Male&savePNI=true")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<PniScore>()
-      .returnResult().responseBody!!
+  fun getPniInfoByPrisonNumberAndSave(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/PNI/$prisonNumber?gender=Male&savePNI=true")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<PniScore>()
+    .returnResult().responseBody!!
 }

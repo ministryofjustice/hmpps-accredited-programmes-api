@@ -147,32 +147,30 @@ class StatusHistoryIntegrationTest : IntegrationTestBase() {
     statusHistoryOne.reasonDescription?.shouldBeEqual("Duplicate referral")
   }
 
-  fun getStatusHistories(id: UUID?) =
-    webTestClient
-      .get()
-      .uri("/referrals/$id/status-history")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<List<ReferralStatusHistory>>()
-      .returnResult().responseBody!!
+  fun getStatusHistories(id: UUID?) = webTestClient
+    .get()
+    .uri("/referrals/$id/status-history")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<List<ReferralStatusHistory>>()
+    .returnResult().responseBody!!
 
-  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) =
-    webTestClient
-      .post()
-      .uri("/referrals")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        ReferralCreate(
-          offeringId = offeringId!!,
-          prisonNumber = prisonNumber,
-        ),
-      )
-      .exchange()
-      .expectStatus().isCreated
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1) = webTestClient
+    .post()
+    .uri("/referrals")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      ReferralCreate(
+        offeringId = offeringId!!,
+        prisonNumber = prisonNumber,
+      ),
+    )
+    .exchange()
+    .expectStatus().isCreated
+    .expectBody<Referral>()
+    .returnResult().responseBody!!
 }

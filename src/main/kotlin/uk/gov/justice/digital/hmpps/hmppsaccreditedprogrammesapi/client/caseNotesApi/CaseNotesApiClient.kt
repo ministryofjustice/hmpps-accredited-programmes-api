@@ -16,9 +16,8 @@ class CaseNotesApiClient(
   private val webClient: WebClient,
 ) : BaseHMPPSClient(webClient, jacksonObjectMapper()) {
 
-  fun createCaseNote(caseNoteRequest: CaseNoteRequest, offenderIdentifier: String) =
-    postRequest<CaseNoteCreatedResponse>(CASE_NOTES_API) {
-      path = "/system-generated/case-notes/$offenderIdentifier"
-      body = caseNoteRequest
-    }
+  fun createCaseNote(caseNoteRequest: CaseNoteRequest, offenderIdentifier: String) = postRequest<CaseNoteCreatedResponse>(CASE_NOTES_API) {
+    path = "/system-generated/case-notes/$offenderIdentifier"
+    body = caseNoteRequest
+  }
 }

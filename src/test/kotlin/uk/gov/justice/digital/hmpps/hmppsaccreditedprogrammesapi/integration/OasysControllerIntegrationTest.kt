@@ -316,148 +316,135 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
     oasysAssessmentDateInfo.recentCompletedAssessmentDate shouldBe LocalDate.of(2023, Month.DECEMBER, 19)
   }
 
-  fun getDrugAndAlcoholDetail(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/drug-and-alcohol-details")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<DrugAlcoholDetail>()
-      .returnResult().responseBody!!
+  fun getDrugAndAlcoholDetail(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/drug-and-alcohol-details")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<DrugAlcoholDetail>()
+    .returnResult().responseBody!!
 
-  fun getRoshAnalysisByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/rosh-analysis")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<RoshAnalysis>()
-      .returnResult().responseBody!!
+  fun getRoshAnalysisByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/rosh-analysis")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<RoshAnalysis>()
+    .returnResult().responseBody!!
 
-  fun getRelationshipsByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/relationships")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Relationships>()
-      .returnResult().responseBody!!
+  fun getRelationshipsByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/relationships")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Relationships>()
+    .returnResult().responseBody!!
 
-  fun getRisksByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/risks-and-alerts")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Risks>()
-      .returnResult().responseBody!!
+  fun getRisksByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/risks-and-alerts")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Risks>()
+    .returnResult().responseBody!!
 
-  fun getLifestyleByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/lifestyle")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Lifestyle>()
-      .returnResult().responseBody!!
+  fun getLifestyleByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/lifestyle")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Lifestyle>()
+    .returnResult().responseBody!!
 
-  fun getPsychiatricByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/psychiatric")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Psychiatric>()
-      .returnResult().responseBody!!
+  fun getPsychiatricByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/psychiatric")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Psychiatric>()
+    .returnResult().responseBody!!
 
-  fun getBehaviourByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/behaviour")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Behaviour>()
-      .returnResult().responseBody!!
+  fun getBehaviourByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/behaviour")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Behaviour>()
+    .returnResult().responseBody!!
 
-  fun getHealthByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/health")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Health>()
-      .returnResult().responseBody!!
+  fun getHealthByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/health")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Health>()
+    .returnResult().responseBody!!
 
-  fun getAttitudeByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/attitude")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Attitude>()
-      .returnResult().responseBody!!
+  fun getAttitudeByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/attitude")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Attitude>()
+    .returnResult().responseBody!!
 
-  fun getLearningNeedsByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/learning-needs")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<LearningNeeds>()
-      .returnResult().responseBody!!
+  fun getLearningNeedsByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/learning-needs")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<LearningNeeds>()
+    .returnResult().responseBody!!
 
-  fun getOffenceDetailsByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/offence-details")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<OffenceDetail>()
-      .returnResult().responseBody!!
+  fun getOffenceDetailsByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/offence-details")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<OffenceDetail>()
+    .returnResult().responseBody!!
 
-  fun getOffenceDetailsByPrisonNumber404(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/offence-details")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().is4xxClientError
-      .expectBody<ErrorResponse>()
-      .returnResult().responseBody!!
+  fun getOffenceDetailsByPrisonNumber404(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/offence-details")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().is4xxClientError
+    .expectBody<ErrorResponse>()
+    .returnResult().responseBody!!
 
-  fun getLatestAssessmentDateByPrisonNumber(prisonNumber: String) =
-    webTestClient
-      .get()
-      .uri("/oasys/$prisonNumber/assessment_date")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<OasysAssessmentDateInfo>()
-      .returnResult().responseBody!!
+  fun getLatestAssessmentDateByPrisonNumber(prisonNumber: String) = webTestClient
+    .get()
+    .uri("/oasys/$prisonNumber/assessment_date")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<OasysAssessmentDateInfo>()
+    .returnResult().responseBody!!
 
   companion object {
     private const val LOW = "Low"

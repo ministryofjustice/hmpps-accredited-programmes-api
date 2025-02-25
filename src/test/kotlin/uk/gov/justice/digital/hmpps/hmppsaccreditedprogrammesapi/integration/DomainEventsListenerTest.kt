@@ -200,21 +200,20 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     } matches { it?.primaryPomStaffId == "487577".toBigInteger() }
   }
 
-  fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) =
-    webTestClient
-      .post()
-      .uri("/referrals")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        ReferralCreate(
-          offeringId = offeringId,
-          prisonNumber = prisonNumber,
-        ),
-      )
-      .exchange()
-      .expectStatus().isCreated
-      .expectBody<Referral>()
-      .returnResult().responseBody!!
+  fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) = webTestClient
+    .post()
+    .uri("/referrals")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      ReferralCreate(
+        offeringId = offeringId,
+        prisonNumber = prisonNumber,
+      ),
+    )
+    .exchange()
+    .expectStatus().isCreated
+    .expectBody<Referral>()
+    .returnResult().responseBody!!
 }

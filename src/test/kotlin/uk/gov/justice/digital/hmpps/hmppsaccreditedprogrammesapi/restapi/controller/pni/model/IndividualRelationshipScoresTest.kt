@@ -11,34 +11,30 @@ class IndividualRelationshipScoresTest {
 
   companion object {
     @JvmStatic
-    fun scoresForTotalScore(): Stream<Arguments> {
-      return Stream.of(
-        Arguments.of(IndividualRelationshipScores(1, 1, 1, 1), 4),
-        Arguments.of(IndividualRelationshipScores(null, 1, 1, 1), 3),
-        Arguments.of(IndividualRelationshipScores(1, null, 1, 1), 3),
-        Arguments.of(IndividualRelationshipScores(1, 1, null, 1), 3),
-        Arguments.of(IndividualRelationshipScores(1, 1, 1, null), 3),
-        Arguments.of(IndividualRelationshipScores(null, null, null, null), 0),
-        Arguments.of(IndividualRelationshipScores(2, 2, 2, 2), 8),
-      )
-    }
+    fun scoresForTotalScore(): Stream<Arguments> = Stream.of(
+      Arguments.of(IndividualRelationshipScores(1, 1, 1, 1), 4),
+      Arguments.of(IndividualRelationshipScores(null, 1, 1, 1), 3),
+      Arguments.of(IndividualRelationshipScores(1, null, 1, 1), 3),
+      Arguments.of(IndividualRelationshipScores(1, 1, null, 1), 3),
+      Arguments.of(IndividualRelationshipScores(1, 1, 1, null), 3),
+      Arguments.of(IndividualRelationshipScores(null, null, null, null), 0),
+      Arguments.of(IndividualRelationshipScores(2, 2, 2, 2), 8),
+    )
 
     @JvmStatic
-    fun scoresForOverallRelationshipScore(): Stream<Arguments> {
-      return Stream.of(
-        Arguments.of(IndividualRelationshipScores(0, 0, 0, 0), 0),
-        Arguments.of(IndividualRelationshipScores(1, 0, 0, 0), 0),
-        Arguments.of(IndividualRelationshipScores(null, 1, 2, 3), 2),
-        Arguments.of(IndividualRelationshipScores(1, null, 3, 4), 2),
-        Arguments.of(IndividualRelationshipScores(1, 2, null, 4), 2),
-        Arguments.of(IndividualRelationshipScores(1, 2, 3, null), 2),
-        Arguments.of(IndividualRelationshipScores(1, 1, 0, 0), 1),
-        Arguments.of(IndividualRelationshipScores(1, 1, 1, 0), 1),
-        Arguments.of(IndividualRelationshipScores(1, 1, 1, 1), 1),
-        Arguments.of(IndividualRelationshipScores(2, 1, 1, 1), 2),
-        Arguments.of(IndividualRelationshipScores(2, 2, 2, 2), 2),
-      )
-    }
+    fun scoresForOverallRelationshipScore(): Stream<Arguments> = Stream.of(
+      Arguments.of(IndividualRelationshipScores(0, 0, 0, 0), 0),
+      Arguments.of(IndividualRelationshipScores(1, 0, 0, 0), 0),
+      Arguments.of(IndividualRelationshipScores(null, 1, 2, 3), 2),
+      Arguments.of(IndividualRelationshipScores(1, null, 3, 4), 2),
+      Arguments.of(IndividualRelationshipScores(1, 2, null, 4), 2),
+      Arguments.of(IndividualRelationshipScores(1, 2, 3, null), 2),
+      Arguments.of(IndividualRelationshipScores(1, 1, 0, 0), 1),
+      Arguments.of(IndividualRelationshipScores(1, 1, 1, 0), 1),
+      Arguments.of(IndividualRelationshipScores(1, 1, 1, 1), 1),
+      Arguments.of(IndividualRelationshipScores(2, 1, 1, 1), 2),
+      Arguments.of(IndividualRelationshipScores(2, 2, 2, 2), 2),
+    )
   }
 
   @ParameterizedTest

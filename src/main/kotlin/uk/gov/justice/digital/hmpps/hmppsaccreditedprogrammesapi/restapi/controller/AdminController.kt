@@ -44,8 +44,7 @@ class AdminController(
     summary = "Update prisoners by their prison numbers",
     tags = ["Admin"],
   )
-  fun updateByNumbers(@Parameter(required = true) @Valid @RequestBody prisonNumbers: List<String>) =
-    personService.updatePeople(prisonNumbers)
+  fun updateByNumbers(@Parameter(required = true) @Valid @RequestBody prisonNumbers: List<String>) = personService.updatePeople(prisonNumbers)
 
   @PutMapping("/referrals/updatePom")
   @Operation(

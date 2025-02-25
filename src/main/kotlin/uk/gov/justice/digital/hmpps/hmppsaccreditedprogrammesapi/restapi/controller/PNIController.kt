@@ -45,14 +45,12 @@ class PNIController(
     @Parameter(description = "Gender of the prisoner", required = false) @RequestParam("gender", required = false) gender: String?,
     @Parameter(description = "save pni result to DB", required = false) @RequestParam("savePNI", required = false) savePNI: Boolean = false,
     @Parameter(description = "referral id", required = false) @RequestParam("referralId", required = false) referralId: UUID?,
-  ): ResponseEntity<PniScore> {
-    return ResponseEntity.ok(
-      pniService.getPniScore(
-        prisonNumber = prisonNumber,
-        gender = gender,
-        savePni = savePNI,
-        referralId = referralId,
-      ),
-    )
-  }
+  ): ResponseEntity<PniScore> = ResponseEntity.ok(
+    pniService.getPniScore(
+      prisonNumber = prisonNumber,
+      gender = gender,
+      savePni = savePNI,
+      referralId = referralId,
+    ),
+  )
 }
