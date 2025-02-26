@@ -2,28 +2,28 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.9"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.2"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.0.21"
-  kotlin("plugin.jpa") version "2.0.21"
+  kotlin("plugin.spring") version "2.1.10"
+  kotlin("plugin.jpa") version "2.1.10"
 }
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
+ext["hibernate.version"] = "6.5.3.Final"
+
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.6.0"
+  val springdocVersion = "2.7.0"
   val sentryVersion = "8.0.0"
   val jsonWebtokenVersion = "0.12.6"
-  val springSecurityVersion = "6.4.2"
+  val springSecurityVersion = "6.4.3"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.8")
-  // Override netty-common version to address https://osv.dev/vulnerability/GHSA-xq3w-v528-46rv
-  implementation("io.netty:netty-common:4.1.116.Final")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.1.1")
 
-  runtimeOnly("org.postgresql:postgresql:42.7.4")
+  runtimeOnly("org.postgresql:postgresql:42.7.5")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
@@ -38,7 +38,7 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.1.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.2.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.3")
   implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
@@ -53,7 +53,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.16")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
-  testImplementation("org.wiremock:wiremock-standalone:3.10.0")
+  testImplementation("org.wiremock:wiremock-standalone:3.11.0")
 
   testImplementation("org.awaitility:awaitility-kotlin")
 

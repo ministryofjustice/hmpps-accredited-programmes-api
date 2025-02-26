@@ -23,26 +23,25 @@ class ReferralStatusHistoryService(
   private val referralStatusRepository: ReferralStatusRepository,
 ) {
 
-  fun getReferralStatusHistories(referralId: UUID) =
-    referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralId)
-      .filterNot { it.status.draft }
-      .map {
-        ReferralStatusHistory(
-          id = it.id,
-          referralId = it.referralId,
-          status = it.status.code,
-          statusDescription = it.status.description,
-          statusColour = it.status.colour,
-          previousStatus = it.previousStatus?.code,
-          previousStatusDescription = it.previousStatus?.description,
-          previousStatusColour = it.previousStatus?.colour,
-          notes = it.notes,
-          statusStartDate = it.statusStartDate.toInstant(ZoneOffset.UTC),
-          username = it.username,
-          categoryDescription = it.category?.description,
-          reasonDescription = it.reason?.description,
-        )
-      }
+  fun getReferralStatusHistories(referralId: UUID) = referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralId)
+    .filterNot { it.status.draft }
+    .map {
+      ReferralStatusHistory(
+        id = it.id,
+        referralId = it.referralId,
+        status = it.status.code,
+        statusDescription = it.status.description,
+        statusColour = it.status.colour,
+        previousStatus = it.previousStatus?.code,
+        previousStatusDescription = it.previousStatus?.description,
+        previousStatusColour = it.previousStatus?.colour,
+        notes = it.notes,
+        statusStartDate = it.statusStartDate.toInstant(ZoneOffset.UTC),
+        username = it.username,
+        categoryDescription = it.category?.description,
+        reasonDescription = it.reason?.description,
+      )
+    }
 
   fun createReferralHistory(referral: ReferralEntity) {
     val status = referralStatusRepository.getByCode(referral.status)

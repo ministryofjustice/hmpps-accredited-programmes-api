@@ -11,34 +11,30 @@ class IndividualSelfManagementScoresTest {
 
   companion object {
     @JvmStatic
-    fun scoresForTotalScore(): Stream<Arguments> {
-      return Stream.of(
-        Arguments.of(IndividualSelfManagementScores(1, 1, 1, 1), 4),
-        Arguments.of(IndividualSelfManagementScores(null, 1, 1, 1), 3),
-        Arguments.of(IndividualSelfManagementScores(1, null, 1, 1), 3),
-        Arguments.of(IndividualSelfManagementScores(1, 1, null, 1), 3),
-        Arguments.of(IndividualSelfManagementScores(1, 1, 1, null), 3),
-        Arguments.of(IndividualSelfManagementScores(null, null, null, null), 0),
-        Arguments.of(IndividualSelfManagementScores(2, 2, 2, 2), 8),
-      )
-    }
+    fun scoresForTotalScore(): Stream<Arguments> = Stream.of(
+      Arguments.of(IndividualSelfManagementScores(1, 1, 1, 1), 4),
+      Arguments.of(IndividualSelfManagementScores(null, 1, 1, 1), 3),
+      Arguments.of(IndividualSelfManagementScores(1, null, 1, 1), 3),
+      Arguments.of(IndividualSelfManagementScores(1, 1, null, 1), 3),
+      Arguments.of(IndividualSelfManagementScores(1, 1, 1, null), 3),
+      Arguments.of(IndividualSelfManagementScores(null, null, null, null), 0),
+      Arguments.of(IndividualSelfManagementScores(2, 2, 2, 2), 8),
+    )
 
     @JvmStatic
-    fun scoresForOverallSelfManagementScore(): Stream<Arguments> {
-      return Stream.of(
-        Arguments.of(IndividualSelfManagementScores(0, 0, 0, 0), 0),
-        Arguments.of(IndividualSelfManagementScores(null, 1, 2, 3), 2),
-        Arguments.of(IndividualSelfManagementScores(1, null, 3, 4), 2),
-        Arguments.of(IndividualSelfManagementScores(1, 2, null, 4), 2),
-        Arguments.of(IndividualSelfManagementScores(1, 2, 3, null), 2),
-        Arguments.of(IndividualSelfManagementScores(1, 0, 0, 0), 0),
-        Arguments.of(IndividualSelfManagementScores(1, 1, 0, 0), 1),
-        Arguments.of(IndividualSelfManagementScores(1, 1, 1, 0), 1),
-        Arguments.of(IndividualSelfManagementScores(1, 1, 1, 1), 1),
-        Arguments.of(IndividualSelfManagementScores(2, 1, 1, 1), 2),
-        Arguments.of(IndividualSelfManagementScores(2, 2, 2, 2), 2),
-      )
-    }
+    fun scoresForOverallSelfManagementScore(): Stream<Arguments> = Stream.of(
+      Arguments.of(IndividualSelfManagementScores(0, 0, 0, 0), 0),
+      Arguments.of(IndividualSelfManagementScores(null, 1, 2, 3), 2),
+      Arguments.of(IndividualSelfManagementScores(1, null, 3, 4), 2),
+      Arguments.of(IndividualSelfManagementScores(1, 2, null, 4), 2),
+      Arguments.of(IndividualSelfManagementScores(1, 2, 3, null), 2),
+      Arguments.of(IndividualSelfManagementScores(1, 0, 0, 0), 0),
+      Arguments.of(IndividualSelfManagementScores(1, 1, 0, 0), 1),
+      Arguments.of(IndividualSelfManagementScores(1, 1, 1, 0), 1),
+      Arguments.of(IndividualSelfManagementScores(1, 1, 1, 1), 1),
+      Arguments.of(IndividualSelfManagementScores(2, 1, 1, 1), 2),
+      Arguments.of(IndividualSelfManagementScores(2, 2, 2, 2), 2),
+    )
   }
 
   @ParameterizedTest

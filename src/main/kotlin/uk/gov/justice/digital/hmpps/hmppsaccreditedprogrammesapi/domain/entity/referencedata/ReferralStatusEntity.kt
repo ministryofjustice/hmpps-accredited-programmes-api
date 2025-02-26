@@ -67,8 +67,7 @@ interface ReferralStatusRepository : JpaRepository<ReferralStatusEntity, UUID> {
   fun findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder(): List<ReferralStatusEntity>
 }
 
-fun ReferralStatusRepository.getByCode(code: String) =
-  findByCode(code) ?: throw NotFoundException("No Referral status found with id=$code")
+fun ReferralStatusRepository.getByCode(code: String) = findByCode(code) ?: throw NotFoundException("No Referral status found with id=$code")
 
 @Repository
 interface ReferralStatusCategoryRepository : JpaRepository<ReferralStatusCategoryEntity, UUID> {
@@ -76,8 +75,7 @@ interface ReferralStatusCategoryRepository : JpaRepository<ReferralStatusCategor
   fun findByCode(code: String): ReferralStatusCategoryEntity?
 }
 
-fun ReferralStatusCategoryRepository.getByCode(code: String) =
-  findByCode(code) ?: throw NotFoundException("No Referral status category found with id=$code")
+fun ReferralStatusCategoryRepository.getByCode(code: String) = findByCode(code) ?: throw NotFoundException("No Referral status category found with id=$code")
 
 @Repository
 interface ReferralStatusReasonRepository : JpaRepository<ReferralStatusReasonEntity, UUID> {
@@ -112,5 +110,4 @@ interface ReferralStatusReasonRepository : JpaRepository<ReferralStatusReasonEnt
   fun findReferralStatusReasonsByStatusCode(statusCode: String): List<ReferralStatusReasonEntity>
 }
 
-fun ReferralStatusReasonRepository.getByCode(code: String) =
-  findByCode(code) ?: throw NotFoundException("No Referral status reason found with id=$code")
+fun ReferralStatusReasonRepository.getByCode(code: String) = findByCode(code) ?: throw NotFoundException("No Referral status reason found with id=$code")

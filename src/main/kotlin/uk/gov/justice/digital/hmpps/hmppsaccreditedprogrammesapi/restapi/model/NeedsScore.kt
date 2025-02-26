@@ -14,12 +14,11 @@ data class NeedsScore(
   @Schema(example = "5", required = true)
   @get:JsonProperty("DomainScore") val domainScore: DomainScore,
 ) {
-  fun validate() =
-    listOf(
-      domainScore.thinkingDomainScore.isAllValuesPresent(),
-      domainScore.relationshipDomainScore.isAllValuesPresent(),
-      domainScore.selfManagementDomainScore.isAllValuesPresent(),
-    ).flatten()
+  fun validate() = listOf(
+    domainScore.thinkingDomainScore.isAllValuesPresent(),
+    domainScore.relationshipDomainScore.isAllValuesPresent(),
+    domainScore.selfManagementDomainScore.isAllValuesPresent(),
+  ).flatten()
 }
 
 data class DomainScore(
@@ -44,15 +43,14 @@ data class ThinkingDomainScore(
   @get:JsonProperty("individualThinkingScores") val individualThinkingScores: IndividualCognitiveScores,
 ) {
   @JsonIgnore
-  fun isAllValuesPresent() =
-    mutableListOf<String>().apply {
-      if (individualThinkingScores.proCriminalAttitudes == null) {
-        add("proCriminalAttitudes in ThinkingDomainScore is null")
-      }
-      if (individualThinkingScores.hostileOrientation == null) {
-        add("hostileOrientation in ThinkingDomainScore is null")
-      }
+  fun isAllValuesPresent() = mutableListOf<String>().apply {
+    if (individualThinkingScores.proCriminalAttitudes == null) {
+      add("proCriminalAttitudes in ThinkingDomainScore is null")
     }
+    if (individualThinkingScores.hostileOrientation == null) {
+      add("hostileOrientation in ThinkingDomainScore is null")
+    }
+  }
 }
 
 data class RelationshipDomainScore(

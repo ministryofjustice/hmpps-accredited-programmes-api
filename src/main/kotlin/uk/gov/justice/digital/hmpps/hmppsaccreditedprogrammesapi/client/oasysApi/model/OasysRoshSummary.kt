@@ -26,26 +26,20 @@ enum class ScoreLevel(val type: String, val priority: Int) {
   ;
 
   @JsonCreator
-  fun fromString(value: String): ScoreLevel? {
-    return entries.find { it.type.equals(value, ignoreCase = true) }
-  }
+  fun fromString(value: String): ScoreLevel? = entries.find { it.type.equals(value, ignoreCase = true) }
 
   @JsonValue
-  fun toValue(): String {
-    return this.type
-  }
+  fun toValue(): String = this.type
 }
 
-fun OasysRoshSummary.getHighestPriorityScore(): ScoreLevel? {
-  return listOfNotNull(
-    riskPrisonersCustody,
-    riskStaffCustody,
-    riskStaffCommunity,
-    riskKnownAdultCustody,
-    riskKnownAdultCommunity,
-    riskPublicCustody,
-    riskPublicCommunity,
-    riskChildrenCustody,
-    riskChildrenCommunity,
-  ).maxByOrNull { it.priority }
-}
+fun OasysRoshSummary.getHighestPriorityScore(): ScoreLevel? = listOfNotNull(
+  riskPrisonersCustody,
+  riskStaffCustody,
+  riskStaffCommunity,
+  riskKnownAdultCustody,
+  riskKnownAdultCommunity,
+  riskPublicCustody,
+  riskPublicCommunity,
+  riskChildrenCustody,
+  riskChildrenCommunity,
+).maxByOrNull { it.priority }

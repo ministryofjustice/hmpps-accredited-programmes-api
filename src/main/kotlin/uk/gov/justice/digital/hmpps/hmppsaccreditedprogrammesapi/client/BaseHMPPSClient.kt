@@ -23,32 +23,27 @@ abstract class BaseHMPPSClient(
   protected inline fun <reified ResponseType : Any> getRequest(
     serviceName: String,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
-  ): ClientResult<ResponseType> =
-    request(HttpMethod.GET, requestBuilderConfiguration, serviceName)
+  ): ClientResult<ResponseType> = request(HttpMethod.GET, requestBuilderConfiguration, serviceName)
 
   protected inline fun <reified ResponseType : Any> postRequest(
     serviceName: String,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
-  ): ClientResult<ResponseType> =
-    request(HttpMethod.POST, requestBuilderConfiguration, serviceName)
+  ): ClientResult<ResponseType> = request(HttpMethod.POST, requestBuilderConfiguration, serviceName)
 
   protected inline fun <reified ResponseType : Any> putRequest(
     serviceName: String,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
-  ): ClientResult<ResponseType> =
-    request(HttpMethod.PUT, requestBuilderConfiguration, serviceName)
+  ): ClientResult<ResponseType> = request(HttpMethod.PUT, requestBuilderConfiguration, serviceName)
 
   protected inline fun <reified ResponseType : Any> deleteRequest(
     serviceName: String,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
-  ): ClientResult<ResponseType> =
-    request(HttpMethod.DELETE, requestBuilderConfiguration, serviceName)
+  ): ClientResult<ResponseType> = request(HttpMethod.DELETE, requestBuilderConfiguration, serviceName)
 
   protected inline fun <reified ResponseType : Any> patchRequest(
     serviceName: String,
     noinline requestBuilderConfiguration: HMPPSRequestConfiguration.() -> Unit,
-  ): ClientResult<ResponseType> =
-    request(HttpMethod.PATCH, requestBuilderConfiguration, serviceName)
+  ): ClientResult<ResponseType> = request(HttpMethod.PATCH, requestBuilderConfiguration, serviceName)
 
   protected inline fun <reified ResponseType : Any> request(
     method: HttpMethod,
@@ -126,8 +121,7 @@ sealed interface ClientResult<ResponseType> {
     ) : Failure<ResponseType> {
       override fun toException(): Throwable = RuntimeException("Unable to complete $method request to $path: $status")
 
-      inline fun <reified ResponseType> deserializeTo(): ResponseType =
-        jacksonObjectMapper().readValue(body, ResponseType::class.java)
+      inline fun <reified ResponseType> deserializeTo(): ResponseType = jacksonObjectMapper().readValue(body, ResponseType::class.java)
     }
 
     class Other<ResponseType>(
@@ -135,10 +129,8 @@ sealed interface ClientResult<ResponseType> {
       val path: String,
       val exception: Exception,
       val serviceName: String,
-    ) :
-      Failure<ResponseType> {
-      override fun toException(): Throwable =
-        RuntimeException("Unable to complete request. Service $serviceName for $method request to $path", exception)
+    ) : Failure<ResponseType> {
+      override fun toException(): Throwable = RuntimeException("Unable to complete request. Service $serviceName for $method request to $path", exception)
     }
   }
 }

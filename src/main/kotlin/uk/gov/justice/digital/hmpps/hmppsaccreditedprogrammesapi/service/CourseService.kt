@@ -40,11 +40,9 @@ constructor(
     return courseRepository.findAllByWithdrawnIsFalse()
   }
 
-  fun getCourseNames(includeWithdrawn: Boolean = false) =
-    courseRepository.getCourseNames(includeWithdrawn)
+  fun getCourseNames(includeWithdrawn: Boolean = false) = courseRepository.getCourseNames(includeWithdrawn)
 
-  fun getNotWithdrawnCourseById(courseId: UUID): CourseEntity? =
-    courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
+  fun getNotWithdrawnCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)?.takeIf { !it.withdrawn }
 
   fun getCourseById(courseId: UUID): CourseEntity? = courseRepository.findByIdOrNull(courseId)
   fun getCourseByIdentifier(identifier: String): CourseEntity? = courseRepository.findByIdentifier(identifier)
@@ -60,20 +58,15 @@ constructor(
 
   fun getCourseByOfferingId(offeringId: UUID): CourseEntity? = courseRepository.findByOfferingId(offeringId)
 
-  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> {
-    return offeringRepository.findOfferingsByOrganisationIdWithActiveReferrals(organisationId)
+  fun getAllOfferingsByOrganisationId(organisationId: String): List<OfferingEntity> = offeringRepository.findOfferingsByOrganisationIdWithActiveReferrals(organisationId)
+
+  fun getAllOfferings(courseId: UUID, includeWithdrawn: Boolean = false): List<OfferingEntity> = if (includeWithdrawn) {
+    offeringRepository.findAllByCourseId(courseId)
+  } else {
+    offeringRepository.findAllByCourseIdAndWithdrawnIsFalse(courseId)
   }
 
-  fun getAllOfferings(courseId: UUID, includeWithdrawn: Boolean = false): List<OfferingEntity> {
-    return if (includeWithdrawn) {
-      offeringRepository.findAllByCourseId(courseId)
-    } else {
-      offeringRepository.findAllByCourseIdAndWithdrawnIsFalse(courseId)
-    }
-  }
-
-  fun getOfferingById(offeringId: UUID): OfferingEntity? =
-    offeringRepository.findByIdOrNull(offeringId)
+  fun getOfferingById(offeringId: UUID): OfferingEntity? = offeringRepository.findByIdOrNull(offeringId)
 
   fun updateCoursePrerequisites(
     course: CourseEntity,
@@ -155,23 +148,21 @@ constructor(
   }
 
   fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String?, gender: String) = courseRepository.findBuildingChoicesCourses(courseIds, audience, gender)
-  fun mapCourses(findBuildingChoicesCourses: List<CourseEntity>?, gender: Gender): List<Course>? {
-    return findBuildingChoicesCourses?.map {
-      Course(
-        id = it.id!!,
-        identifier = it.identifier,
-        name = it.name,
-        description = it.description,
-        alternateName = it.alternateName,
-        coursePrerequisites = it.prerequisites.map(PrerequisiteEntity::toApi),
-        audience = it.audience,
-        audienceColour = it.audienceColour,
-        displayName = it.name + addAudience(it.name, it.audience),
-        withdrawn = it.withdrawn,
-        displayOnProgrammeDirectory = it.displayOnProgrammeDirectory,
-        courseOfferings = it.offerings.map { offeringEntity -> offeringEntity.toApi(gender.name) },
-      )
-    }
+  fun mapCourses(findBuildingChoicesCourses: List<CourseEntity>?, gender: Gender): List<Course>? = findBuildingChoicesCourses?.map {
+    Course(
+      id = it.id!!,
+      identifier = it.identifier,
+      name = it.name,
+      description = it.description,
+      alternateName = it.alternateName,
+      coursePrerequisites = it.prerequisites.map(PrerequisiteEntity::toApi),
+      audience = it.audience,
+      audienceColour = it.audienceColour,
+      displayName = it.name + addAudience(it.name, it.audience),
+      withdrawn = it.withdrawn,
+      displayOnProgrammeDirectory = it.displayOnProgrammeDirectory,
+      courseOfferings = it.offerings.map { offeringEntity -> offeringEntity.toApi(gender.name) },
+    )
   }
 
   fun getCourseName(courseId: UUID): String? = courseRepository.findById(courseId).get().name
@@ -198,10 +189,6 @@ constructor(
   }
 }
 
-fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> {
-  return this.map { PrerequisiteEntity(it.name, it.description) }.toMutableSet()
-}
+fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> = this.map { PrerequisiteEntity(it.name, it.description) }.toMutableSet()
 
-fun CoursePrerequisite.toApi(): CoursePrerequisite {
-  return CoursePrerequisite(name, description)
-}
+fun CoursePrerequisite.toApi(): CoursePrerequisite = CoursePrerequisite(name, description)

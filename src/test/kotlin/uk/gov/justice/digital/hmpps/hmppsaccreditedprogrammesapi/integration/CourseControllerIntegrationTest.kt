@@ -575,46 +575,44 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     withdrawn: Boolean,
     alternativeName: String,
     intensity: CourseIntensity,
-  ) =
-    webTestClient
-      .post()
-      .uri("/courses")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        CourseCreateRequest(
-          name = courseName,
-          identifier = identifier,
-          description = description,
-          audienceId = audienceId,
-          withdrawn = withdrawn,
-          alternateName = alternativeName,
-          intensity = intensity.name,
-        ),
-      )
-      .exchange()
-      .expectStatus().isCreated()
-      .expectBody<Course>()
-      .returnResult().responseBody!!
+  ) = webTestClient
+    .post()
+    .uri("/courses")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      CourseCreateRequest(
+        name = courseName,
+        identifier = identifier,
+        description = description,
+        audienceId = audienceId,
+        withdrawn = withdrawn,
+        alternateName = alternativeName,
+        intensity = intensity.name,
+      ),
+    )
+    .exchange()
+    .expectStatus().isCreated()
+    .expectBody<Course>()
+    .returnResult().responseBody!!
 
-  fun updateCourse(courseId: UUID, withdrawn: Boolean, courseName: String) =
-    webTestClient
-      .put()
-      .uri("/courses/$courseId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        CourseUpdateRequest(
-          name = courseName,
-          withdrawn = withdrawn,
-        ),
-      )
-      .exchange()
-      .expectStatus().isOk
-      .expectBody<Course>()
-      .returnResult().responseBody!!
+  fun updateCourse(courseId: UUID, withdrawn: Boolean, courseName: String) = webTestClient
+    .put()
+    .uri("/courses/$courseId")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      CourseUpdateRequest(
+        name = courseName,
+        withdrawn = withdrawn,
+      ),
+    )
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<Course>()
+    .returnResult().responseBody!!
 
   @Test
   fun `Delete a course offering that is in use returns 400`() {
@@ -827,40 +825,36 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     buildingChoicesCourseForReferral.id shouldBe bc1MainCourseId
   }
 
-  fun getBuildingChoicesCourseForReferral(referralId: UUID): Course {
-    return webTestClient
-      .get()
-      .uri("/courses/building-choices/referral/$referralId?programmePathway=HIGH_INTENSITY_BC")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBody<Course>()
-      .returnResult().responseBody!!
-  }
+  fun getBuildingChoicesCourseForReferral(referralId: UUID): Course = webTestClient
+    .get()
+    .uri("/courses/building-choices/referral/$referralId?programmePathway=HIGH_INTENSITY_BC")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectHeader().contentType(MediaType.APPLICATION_JSON)
+    .expectBody<Course>()
+    .returnResult().responseBody!!
 
   fun getCourseVariants(
     mainCourseId: UUID,
     isConvictedOfSexualOffence: Boolean,
     isInAWomensPrison: Boolean,
-  ): List<Course> {
-    return webTestClient
-      .post()
-      .uri("/courses/building-choices/$mainCourseId")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        BuildingChoicesSearchRequest(
-          isConvictedOfSexualOffence = isConvictedOfSexualOffence,
-          isInAWomensPrison = isInAWomensPrison,
-        ),
-      ).exchange()
-      .expectStatus().isOk
-      .expectBody<List<Course>>()
-      .returnResult().responseBody!!
-  }
+  ): List<Course> = webTestClient
+    .post()
+    .uri("/courses/building-choices/$mainCourseId")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(
+      BuildingChoicesSearchRequest(
+        isConvictedOfSexualOffence = isConvictedOfSexualOffence,
+        isInAWomensPrison = isInAWomensPrison,
+      ),
+    ).exchange()
+    .expectStatus().isOk
+    .expectBody<List<Course>>()
+    .returnResult().responseBody!!
 
   @Test
   fun `should return courses matching intensity`() {
@@ -943,16 +937,14 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     courses.map { it.id }.containsAll(listOf(bc1MainCourseId, bc1VariantCourseId))
   }
 
-  fun getOfferingsById(id: UUID): CourseOffering {
-    return webTestClient
-      .get()
-      .uri("/offerings/$id")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON)
-      .expectBody<CourseOffering>()
-      .returnResult().responseBody!!
-  }
+  fun getOfferingsById(id: UUID): CourseOffering = webTestClient
+    .get()
+    .uri("/offerings/$id")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectHeader().contentType(MediaType.APPLICATION_JSON)
+    .expectBody<CourseOffering>()
+    .returnResult().responseBody!!
 }

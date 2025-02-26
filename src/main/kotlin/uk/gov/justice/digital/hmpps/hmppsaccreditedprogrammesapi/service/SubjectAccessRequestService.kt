@@ -17,22 +17,21 @@ class SubjectAccessRequestService(
   private val courseParticipationRepository: CourseParticipationRepository,
 ) {
 
-  fun getPrisonContentFor(prisonerNumber: String, fromDate: LocalDate?, toDate: LocalDate?) =
-    HmppsSubjectAccessRequestContent(
-      Content(
-        repository.getSarReferrals(prisonerNumber).filter { referral ->
-          val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it.atStartOfDay()) } ?: true
-          val beforeToDate = toDate?.let { referral.submittedOn?.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
-          afterFromDate && beforeToDate
-        }.toSarReferral(),
-        courseParticipationRepository.getSarParticipations(prisonerNumber).filter { referral ->
-          val afterFromDate = fromDate?.let { referral.createdDateTime.isAfter(it.atStartOfDay()) } ?: true
-          val beforeToDate = toDate?.let { referral.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
-          afterFromDate && beforeToDate
-        }
-          .toSarParticipation(),
-      ),
-    )
+  fun getPrisonContentFor(prisonerNumber: String, fromDate: LocalDate?, toDate: LocalDate?) = HmppsSubjectAccessRequestContent(
+    Content(
+      repository.getSarReferrals(prisonerNumber).filter { referral ->
+        val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it.atStartOfDay()) } ?: true
+        val beforeToDate = toDate?.let { referral.submittedOn?.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
+        afterFromDate && beforeToDate
+      }.toSarReferral(),
+      courseParticipationRepository.getSarParticipations(prisonerNumber).filter { referral ->
+        val afterFromDate = fromDate?.let { referral.createdDateTime.isAfter(it.atStartOfDay()) } ?: true
+        val beforeToDate = toDate?.let { referral.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
+        afterFromDate && beforeToDate
+      }
+        .toSarParticipation(),
+    ),
+  )
 }
 
 data class HmppsSubjectAccessRequestContent(
@@ -76,42 +75,38 @@ data class SarCourseParticipation(
   val updatedDateTime: LocalDateTime?,
 )
 
-private fun List<CourseParticipationEntity>.toSarParticipation(): List<SarCourseParticipation> {
-  return map {
-    SarCourseParticipation(
-      prisonNumber = it.prisonNumber,
-      source = it.source,
-      type = it.setting?.type?.name,
-      outcomeStatus = it.outcome?.status?.name,
-      yearStarted = it.outcome?.yearStarted?.value,
-      yearCompleted = it.outcome?.yearCompleted?.value,
-      location = it.setting?.location,
-      detail = it.detail,
-      courseName = it.courseName,
-      createdByUser = it.createdByUsername,
-      createdDateTime = it.createdDateTime,
-      updatedByUser = it.lastModifiedByUsername,
-      updatedDateTime = it.lastModifiedDateTime,
-    )
-  }
+private fun List<CourseParticipationEntity>.toSarParticipation(): List<SarCourseParticipation> = map {
+  SarCourseParticipation(
+    prisonNumber = it.prisonNumber,
+    source = it.source,
+    type = it.setting?.type?.name,
+    outcomeStatus = it.outcome?.status?.name,
+    yearStarted = it.outcome?.yearStarted?.value,
+    yearCompleted = it.outcome?.yearCompleted?.value,
+    location = it.setting?.location,
+    detail = it.detail,
+    courseName = it.courseName,
+    createdByUser = it.createdByUsername,
+    createdDateTime = it.createdDateTime,
+    updatedByUser = it.lastModifiedByUsername,
+    updatedDateTime = it.lastModifiedDateTime,
+  )
 }
 
-private fun List<ReferralEntity>.toSarReferral(): List<SarReferral> {
-  return map {
-    SarReferral(
-      it.prisonNumber,
-      it.oasysConfirmed,
-      it.status,
-      it.hasReviewedProgrammeHistory,
-      it.additionalInformation,
-      it.submittedOn,
-      it.overrideReason,
-      it.transferReason,
-      it.referrer.username,
-      it.offering.course.name,
-      it.offering.course.audience,
-      it.offering.organisationId,
-      it.originalReferralId,
-    )
-  }
+private fun List<ReferralEntity>.toSarReferral(): List<SarReferral> = map {
+  SarReferral(
+    it.prisonNumber,
+    it.oasysConfirmed,
+    it.status,
+    it.hasReviewedProgrammeHistory,
+    it.additionalInformation,
+    it.submittedOn,
+    it.overrideReason,
+    it.transferReason,
+    it.referrer.username,
+    it.offering.course.name,
+    it.offering.course.audience,
+    it.offering.organisationId,
+    it.originalReferralId,
+  )
 }
