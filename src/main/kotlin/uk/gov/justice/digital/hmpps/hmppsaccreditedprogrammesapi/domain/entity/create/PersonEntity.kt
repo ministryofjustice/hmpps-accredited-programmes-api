@@ -24,7 +24,7 @@ data class PersonEntity(
   var indeterminateSentence: Boolean?,
   var nonDtoReleaseDateType: String?,
   var sentenceType: String?,
-  //  var id: UUID = UUID.randomUUID(),
+
   @Id
   @GeneratedValue
   @Column(name = "person_id")
