@@ -45,6 +45,7 @@ class CourseParticipationRepositoryTest {
       .withYearCompleted(Year.parse("2022"))
       .produce()
     var courseParticipation = CourseParticipationEntityFactory()
+      .withId(null)
       .withCourseName("Course name")
       .withPrisonNumber(PRISON_NUMBER_1)
       .withSource("Source of information")
@@ -70,6 +71,7 @@ class CourseParticipationRepositoryTest {
   @Test
   fun `CourseParticipationRepository should save and retrieve CourseParticipationEntity objects, having all nullable fields set to null`() {
     var courseParticipation = CourseParticipationEntityFactory()
+      .withId(null)
       .withCourseName(null)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withSource(null)
@@ -107,6 +109,7 @@ class CourseParticipationRepositoryTest {
       .withYearCompleted(Year.parse("2022"))
       .produce()
     var courseParticipation = CourseParticipationEntityFactory()
+      .withId(null)
       .withCourseName(null)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withSource(null)

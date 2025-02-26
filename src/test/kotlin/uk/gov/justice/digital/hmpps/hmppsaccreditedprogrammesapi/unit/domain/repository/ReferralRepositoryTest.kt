@@ -28,10 +28,10 @@ class ReferralRepositoryTest {
 
   @Test
   fun `ReferralRepository should save and retrieve ReferralEntity objects`() {
-    var course = CourseEntityFactory().produce()
+    var course = CourseEntityFactory().withId(null).produce()
     course = entityManager.merge(course)
 
-    var offering = OfferingEntityFactory().produce()
+    var offering = OfferingEntityFactory().withId(null).produce()
     offering.course = course
     offering = entityManager.merge(offering)
 
@@ -41,6 +41,7 @@ class ReferralRepositoryTest {
     referrer = entityManager.merge(referrer)
 
     var referral = ReferralEntityFactory()
+      .withId(null)
       .withReferrer(referrer)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withOffering(offering)
@@ -61,10 +62,10 @@ class ReferralRepositoryTest {
 
   @Test
   fun `ReferralRepository should update and retrieve ReferralEntity objects`() {
-    var course = CourseEntityFactory().produce()
+    var course = CourseEntityFactory().withId(null).produce()
     course = entityManager.merge(course)
 
-    var offering = OfferingEntityFactory().produce()
+    var offering = OfferingEntityFactory().withId(null).produce()
     offering.course = course
     offering = entityManager.merge(offering)
 
@@ -74,6 +75,7 @@ class ReferralRepositoryTest {
     referrer = entityManager.merge(referrer)
 
     var referral = ReferralEntityFactory()
+      .withId(null)
       .withReferrer(referrer)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withOffering(offering)

@@ -565,6 +565,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val createdReferral = createReferral(PRISON_NUMBER_1)
 
     val existCourseParticipation = CourseParticipationEntityFactory()
+      .withId(null)
       .withCourseName(COURSE_NAME)
       .withPrisonNumber(PRISON_NUMBER_1)
       .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).withLocation("Location").produce())

@@ -11,7 +11,7 @@ import java.util.*
 class CourseVariantEntity(
 
   @Id
-  val id: UUID = UUID.randomUUID(),
+  val id: UUID? = null,
 
   @Column
   val courseId: UUID,
