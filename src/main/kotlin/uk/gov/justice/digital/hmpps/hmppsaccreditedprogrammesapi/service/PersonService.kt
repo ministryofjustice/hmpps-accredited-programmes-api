@@ -60,13 +60,11 @@ class PersonService(
 
   fun getPerson(prisonNumber: String) = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
 
-  private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> {
-    return getSentenceDetails(prisoner.prisonerNumber)
-      ?.keyDates
-      ?.firstOrNull { it.earliestReleaseDate == true }
-      ?.let { Pair(it.date, it.description) }
-      ?: Pair(null, null)
-  }
+  private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> = getSentenceDetails(prisoner.prisonerNumber)
+    ?.keyDates
+    ?.firstOrNull { it.earliestReleaseDate == true }
+    ?.let { Pair(it.date, it.description) }
+    ?: Pair(null, null)
 
   private fun updatePerson(
     prisoner: Prisoner,
@@ -137,14 +135,12 @@ class PersonService(
     }
   }
 
-  fun getOffenceDetails(prisonNumber: String): List<Pair<String?, LocalDate?>> {
-    return getSentenceInformation(prisonNumber)?.latestPrisonTerm?.courtSentences
-      ?.flatMap { it.sentences }
-      ?.flatMap { it.offences.orEmpty() }
-      ?.map { Pair(it.offenceCode, it.offenceStartDate) }
-      ?.distinct()
-      .orEmpty()
-  }
+  fun getOffenceDetails(prisonNumber: String): List<Pair<String?, LocalDate?>> = getSentenceInformation(prisonNumber)?.latestPrisonTerm?.courtSentences
+    ?.flatMap { it.sentences }
+    ?.flatMap { it.offences.orEmpty() }
+    ?.map { Pair(it.offenceCode, it.offenceStartDate) }
+    ?.distinct()
+    .orEmpty()
 
   fun getSentenceDetails(prisonNumber: String): SentenceDetails? {
     val sentenceInformation = getSentenceInformation(prisonNumber)
@@ -215,16 +211,14 @@ class PersonService(
     }
   }
 
-  fun createKeyDate(releaseDateType: KeyDateType, date: LocalDate?): KeyDate {
-    return KeyDate(
-      type = releaseDateType.mapping,
-      code = releaseDateType.code,
-      description = releaseDateType.description,
-      earliestReleaseDate = false,
-      date = date,
-      order = releaseDateType.order,
-    )
-  }
+  fun createKeyDate(releaseDateType: KeyDateType, date: LocalDate?): KeyDate = KeyDate(
+    type = releaseDateType.mapping,
+    code = releaseDateType.code,
+    description = releaseDateType.description,
+    earliestReleaseDate = false,
+    date = date,
+    order = releaseDateType.order,
+  )
 
   enum class KeyDateType(val mapping: String, val code: String, val description: String, val order: Int = 1) {
     ACTUAL_PAROLE_DATE("actualParoleDate", "APD", "Approved parole date", 10),
@@ -267,9 +261,7 @@ class PersonService(
     companion object {
       private val mappingToEnum: Map<String, KeyDateType> = entries.associateBy { it.mapping }
 
-      fun fromMapping(mapping: String): KeyDateType? {
-        return mappingToEnum[mapping]
-      }
+      fun fromMapping(mapping: String): KeyDateType? = mappingToEnum[mapping]
     }
   }
 
