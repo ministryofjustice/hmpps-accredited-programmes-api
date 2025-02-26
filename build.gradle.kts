@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -12,7 +15,7 @@ configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
- ext["hibernate.version"] = "6.6.9.Final"
+ext["hibernate.version"] = "6.6.9.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
