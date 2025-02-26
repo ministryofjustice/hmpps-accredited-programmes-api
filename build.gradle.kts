@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -12,7 +15,7 @@ configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
-ext["hibernate.version"] = "6.5.3.Final"
+ext["hibernate.version"] = "6.6.9.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
@@ -22,7 +25,6 @@ dependencies {
   val springSecurityVersion = "6.4.3"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.3.0")
-
   runtimeOnly("org.postgresql:postgresql:42.7.5")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")

@@ -494,7 +494,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
     val referral = getReferralById(createdReferral.id)
     referral.shouldNotBeNull()
-    referral.status.shouldBe("on_programme") //
+    referral.status.shouldBe("on_programme")
 
     val referralCountByStatus =
       statisticsRepository.referralCountByStatus(

@@ -24,10 +24,11 @@ data class PersonEntity(
   var indeterminateSentence: Boolean?,
   var nonDtoReleaseDateType: String?,
   var sentenceType: String?,
+
   @Id
   @GeneratedValue
   @Column(name = "person_id")
-  var id: UUID = UUID.randomUUID(),
+  var id: UUID? = null,
 
   @Version
   @Column(name = "version", nullable = false)

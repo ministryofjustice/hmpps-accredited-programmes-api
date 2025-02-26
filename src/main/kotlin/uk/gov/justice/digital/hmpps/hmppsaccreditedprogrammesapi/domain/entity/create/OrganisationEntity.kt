@@ -11,10 +11,11 @@ import java.util.UUID
 @Table(name = "organisation")
 data class OrganisationEntity(
 
+  //  var id: UUID = UUID.randomUUID(),
   @Id
   @GeneratedValue
   @Column(name = "organisation_id")
-  var id: UUID = UUID.randomUUID(),
+  var id: UUID? = null,
 
   @Column
   var code: String,

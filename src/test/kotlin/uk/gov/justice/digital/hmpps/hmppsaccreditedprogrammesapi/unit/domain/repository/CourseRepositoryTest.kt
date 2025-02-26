@@ -28,7 +28,7 @@ class CourseRepositoryTest {
 
   @Test
   fun `CourseRepository should save and retrieve CourseEntity objects`() {
-    var courseEntity = CourseEntityFactory().produce()
+    var courseEntity = CourseEntityFactory().withId(null).produce()
     courseEntity = entityManager.merge(courseEntity)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, courseEntity.id)
@@ -43,6 +43,7 @@ class CourseRepositoryTest {
       PrerequisiteEntityFactory().withName("PR2").withDescription("PR2 D1").produce(),
     )
     var course = CourseEntityFactory()
+      .withId(null)
       .withPrerequisites(prerequisites)
       .produce()
     course = entityManager.merge(course)
@@ -53,12 +54,12 @@ class CourseRepositoryTest {
 
   @Test
   fun `CourseRepository should persist multiple OfferingEntity objects for multiple CourseEntity objects and verify ids`() {
-    var course = CourseEntityFactory().produce()
+    var course = CourseEntityFactory().withId(null).produce()
     course = entityManager.merge(course)
 
-    val offering1 = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
-    val offering2 = OfferingEntityFactory().withOrganisationId("MDI").withContactEmail("mdi@a.com").produce()
-    val offering3 = OfferingEntityFactory().withOrganisationId("BXI").withContactEmail("bxi@a.com").produce()
+    val offering1 = OfferingEntityFactory().withId(null).withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
+    val offering2 = OfferingEntityFactory().withId(null).withOrganisationId("MDI").withContactEmail("mdi@a.com").produce()
+    val offering3 = OfferingEntityFactory().withId(null).withOrganisationId("BXI").withContactEmail("bxi@a.com").produce()
 
     offering1.course = course
     offering2.course = course
@@ -77,10 +78,10 @@ class CourseRepositoryTest {
 
   @Test
   fun `CourseRepository should retrieve CourseEntity objects by their associated offering id`() {
-    var course = CourseEntityFactory().produce()
+    var course = CourseEntityFactory().withId(null).produce()
     course = entityManager.merge(course)
 
-    var offering = OfferingEntityFactory().withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
+    var offering = OfferingEntityFactory().withId(null).withOrganisationId("BWI").withContactEmail("bwi@a.com").produce()
     offering.course = course
     offering = entityManager.merge(offering)
 
