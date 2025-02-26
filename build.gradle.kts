@@ -16,12 +16,12 @@ ext["hibernate.version"] = "6.5.3.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.7.0"
-  val sentryVersion = "8.0.0"
+  val springdocVersion = "2.8.5"
+  val sentryVersion = "8.2.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.3"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.1.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.3.0")
 
   runtimeOnly("org.postgresql:postgresql:42.7.5")
 
@@ -38,10 +38,10 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.2.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.3.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
-  implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.3")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
+  implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.4")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.36")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
@@ -51,15 +51,15 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.16")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
-  testImplementation("org.wiremock:wiremock-standalone:3.11.0")
+  testImplementation("org.wiremock:wiremock-standalone:3.12.0")
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:1.20.4")
-  testImplementation("org.testcontainers:postgresql:1.20.4")
-  testImplementation("org.testcontainers:junit-jupiter:1.20.4")
+  testImplementation("org.testcontainers:testcontainers:1.20.5")
+  testImplementation("org.testcontainers:postgresql:1.20.5")
+  testImplementation("org.testcontainers:junit-jupiter:1.20.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
