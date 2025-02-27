@@ -307,6 +307,7 @@ class OasysService(
 
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? = fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
 
+  // TODO: Remove this method once the LDC score is available from the OASys API
   fun getLDCScore() = (3..5).random().toBigDecimal()
 
   private inline fun <T> fetchDetail(
