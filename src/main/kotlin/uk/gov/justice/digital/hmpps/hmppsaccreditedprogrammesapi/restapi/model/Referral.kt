@@ -71,10 +71,10 @@ data class Referral(
   @get:JsonProperty("originalReferralId") val originalReferralId: UUID? = null,
 
   @Schema(example = "true", description = "Flag to indicate learning difficulties and challenges")
-  @get:JsonProperty("hasLdc") val hasLdc: Boolean = false,
+  @get:JsonProperty("hasLdc") val hasLdc: Boolean? = null,
 
-  @Schema(example = "true", description = "Flag to indicate if the ldc field was overwritten by the programme team")
-  @get:JsonProperty("hasLdcBeenOverwrittenByProgrammeTeam") val hasLdcBeenOverwrittenByProgrammeTeam: Boolean = false,
+  @Schema(example = "true", description = "Flag to indicate if the ldc field was overridden by the programme team")
+  @get:JsonProperty("hasLdcBeenOverriddenByProgrammeTeam") val hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("primaryPrisonOffenderManager") val primaryPrisonOffenderManager: PrisonOffenderManager? = null,

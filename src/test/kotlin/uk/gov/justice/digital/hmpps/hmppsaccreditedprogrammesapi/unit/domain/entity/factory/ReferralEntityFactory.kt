@@ -48,6 +48,6 @@ class ReferralEntityFactory {
     overrideReason = this.overrideReason,
     transferReason = this.transferReason,
     hasLdc = this.hasLdc,
-    hasLdcBeenOverwrittenByProgrammeTeam = this.hasLdcBeenOverwrittenByProgrammeTeam,
+    hasLdcBeenOverriddenByProgrammeTeam = this.hasLdcBeenOverwrittenByProgrammeTeam,
   )
 }

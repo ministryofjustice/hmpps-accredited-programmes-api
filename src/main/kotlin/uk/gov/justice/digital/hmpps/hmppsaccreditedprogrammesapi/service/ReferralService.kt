@@ -126,7 +126,7 @@ constructor(
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
     referral.transferReason = update.transferReason
-    referral.hasLdcBeenOverwrittenByProgrammeTeam = update.hasLdcBeenOverwrittenByProgrammeTeam ?: false
+    referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {

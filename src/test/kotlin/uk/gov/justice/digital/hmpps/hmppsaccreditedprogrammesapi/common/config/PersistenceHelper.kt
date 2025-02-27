@@ -90,8 +90,8 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?, primaryPomStaffId: BigInteger = "1".toBigInteger(), secondaryPomStaffId: BigInteger = "2".toBigInteger(), overrideReason: String? = null, transferReason: String? = null, originalReferralId: UUID? = null, hasLdc: Boolean = false, hasLdcBeenOverwrittenByProgrammeTeam: Boolean = false) {
-    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on, primary_pom_staff_id, secondary_pom_staff_id, override_reason, transfer_reason, original_referral_id, has_ldc, has_ldc_been_overwritten_by_programme_team) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn, :primaryPomStaffId, :secondaryPomStaffId, :overrideReason, :transferReason, :originalReferralId, :hasLdc, :hasLdcBeenOverwrittenByProgrammeTeam)")
+  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?, primaryPomStaffId: BigInteger = "1".toBigInteger(), secondaryPomStaffId: BigInteger = "2".toBigInteger(), overrideReason: String? = null, transferReason: String? = null, originalReferralId: UUID? = null, hasLdc: Boolean = false, hasLdcBeenOverriddenByProgrammeTeam: Boolean = false) {
+    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on, primary_pom_staff_id, secondary_pom_staff_id, override_reason, transfer_reason, original_referral_id, has_ldc, has_ldc_been_overridden_by_programme_team) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn, :primaryPomStaffId, :secondaryPomStaffId, :overrideReason, :transferReason, :originalReferralId, :hasLdc, :hasLdcBeenOverriddenByProgrammeTeam)")
       .setParameter("id", referralId)
       .setParameter("offeringId", offeringId)
       .setParameter("prisonNumber", prisonNumber)
@@ -107,7 +107,7 @@ class PersistenceHelper {
       .setParameter("transferReason", transferReason)
       .setParameter("originalReferralId", originalReferralId)
       .setParameter("hasLdc", hasLdc)
-      .setParameter("hasLdcBeenOverwrittenByProgrammeTeam", hasLdcBeenOverwrittenByProgrammeTeam)
+      .setParameter("hasLdcBeenOverriddenByProgrammeTeam", hasLdcBeenOverriddenByProgrammeTeam)
       .executeUpdate()
   }
 

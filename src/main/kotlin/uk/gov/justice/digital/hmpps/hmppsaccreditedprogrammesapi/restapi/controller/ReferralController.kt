@@ -376,7 +376,7 @@ class ReferralController(
       auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
       val status = referenceDataService.getReferralStatus(it.status)
       val staffDetail = staffService.getStaffDetail(it.primaryPomStaffId)?.toApi()
-      if (!it.hasLdcBeenOverwrittenByProgrammeTeam) {
+      if (!it.hasLdcBeenOverriddenByProgrammeTeam) {
         it.hasLdc = referralService.getLdc()
       }
       ResponseEntity.ok(it.toApi(status, staffDetail))

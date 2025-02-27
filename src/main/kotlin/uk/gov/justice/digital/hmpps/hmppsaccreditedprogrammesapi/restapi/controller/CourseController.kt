@@ -354,7 +354,7 @@ class CourseController(
     tags = ["Courses"],
     summary = "Get all audiences",
     operationId = "getAudiences",
-    description = """Returns a list of audiences with their name and colour. If a courseId is provided, it will returl all audiences matching the course name""",
+    description = """Returns a list of audiences with their name and colour. If a courseId is provided, it will return all audiences matching the course name""",
     responses = [
       ApiResponse(
         responseCode = "200",
