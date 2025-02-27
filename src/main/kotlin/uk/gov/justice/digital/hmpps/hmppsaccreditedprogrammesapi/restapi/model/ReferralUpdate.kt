@@ -28,4 +28,7 @@ data class ReferralUpdate(
   @Schema(example = "The reason for transfer to building choices is...", description = "Reason for transfer to building choices")
   @get:JsonProperty("transferReason") val transferReason: String? = null,
 
+  @Schema(example = "true", description = "Flag to indicate if the ldc field was overriden by the programme team")
+  @get:JsonProperty("hasLdcBeenOverriddenByProgrammeTeam") val hasLdcBeenOverriddenByProgrammeTeam: Boolean? = null,
+
 )

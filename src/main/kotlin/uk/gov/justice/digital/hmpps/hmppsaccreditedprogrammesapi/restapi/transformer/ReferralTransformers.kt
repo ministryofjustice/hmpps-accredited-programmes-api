@@ -29,6 +29,8 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData, staffDetail: StaffDetail
   overrideReason = overrideReason,
   transferReason = transferReason,
   originalReferralId = originalReferralId,
+  hasLdc = hasLdc,
+  hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam,
 )
 
 fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
@@ -43,6 +45,8 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   overrideReason = overrideReason,
   transferReason = transferReason,
   originalReferralId = originalReferralId,
+  hasLdc = hasLdc,
+  hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam,
 )
 
 fun StaffEntity.toApi() = StaffDetail(
@@ -60,6 +64,7 @@ fun ApiReferralUpdate.toDomain() = ReferralUpdate(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   overrideReason = overrideReason,
   transferReason = transferReason,
+  hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )
 
 fun ReferralUpdate.toApi() = ApiReferralUpdate(
@@ -68,6 +73,7 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   overrideReason = overrideReason,
   transferReason = transferReason,
+  hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )
 
 fun ReferralViewEntity.toApi() = ReferralView(

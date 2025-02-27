@@ -57,4 +57,6 @@ data class ReferralEntity(
   var overrideReason: String? = null,
   var transferReason: String? = null,
   var originalReferralId: UUID? = null,
+  var hasLdc: Boolean? = null,
+  var hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,
 )

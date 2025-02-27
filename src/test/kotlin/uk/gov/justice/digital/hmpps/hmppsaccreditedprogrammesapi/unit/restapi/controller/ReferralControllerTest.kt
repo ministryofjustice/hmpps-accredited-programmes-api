@@ -190,6 +190,7 @@ constructor(
       .produce()
 
     every { referralService.getReferralById(any()) } returns referral
+    every { referralService.getLdc() } returns true
     val referralStatus = ReferralStatusRefDataFactory()
       .withCode(REFERRAL_STARTED)
       .produce()
