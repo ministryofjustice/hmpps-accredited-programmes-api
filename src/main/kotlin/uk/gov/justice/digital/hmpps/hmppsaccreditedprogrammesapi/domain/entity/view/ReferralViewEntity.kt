@@ -41,6 +41,7 @@ data class ReferralViewEntity(
   val listDisplayName: String?,
   val location: String?,
   val primaryPomUsername: String?,
+  val hasLdc: Boolean?,
 )
 
 @Repository
@@ -61,6 +62,11 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
               AND 
               (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%') OR r.forename LIKE CONCAT('%', :surname, '%'))
             )
+        AND (:hasLdc IS NULL OR 
+     (:hasLdc = true AND r.hasLdc = true) OR 
+     (:hasLdc = false AND (r.hasLdc = false OR r.hasLdc IS NULL))
+    )
+
     """,
   )
   fun getReferralsByOrganisationId(
@@ -73,6 +79,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
     status: List<String>?,
     audience: String?,
     courseName: String?,
+    hasLdc: Boolean?,
   ): Page<ReferralViewEntity>
 
   @Query(
@@ -90,6 +97,11 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
              AND 
              (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%') OR r.forename LIKE CONCAT('%', :surname, '%'))
             )
+             AND (:hasLdc IS NULL OR 
+     (:hasLdc = true AND r.hasLdc = true) OR 
+     (:hasLdc = false AND (r.hasLdc = false OR r.hasLdc IS NULL))
+    )
+
     """,
   )
   fun getReferralsByUsername(
@@ -102,5 +114,6 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
     status: List<String>?,
     audience: String?,
     courseName: String?,
+    hasLdc: Boolean?,
   ): Page<ReferralViewEntity>
 }
