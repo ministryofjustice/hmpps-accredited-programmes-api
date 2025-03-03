@@ -283,6 +283,7 @@ constructor(
     audience: String?,
     courseName: String?,
     statusGroup: String?,
+    hasLdc: Boolean?,
   ): Page<ReferralViewEntity> {
     val uppercaseStatuses = getFilterStatuses(status, statusGroup)
 
@@ -297,6 +298,7 @@ constructor(
         uppercaseStatuses,
         audience,
         courseName,
+        hasLdc,
       )
 
     return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
@@ -343,6 +345,7 @@ constructor(
     surnameOnly: String?,
     forename: String?,
     surname: String?,
+    hasLdc: Boolean?,
   ): Page<ReferralViewEntity> {
     val uppercaseStatuses = getFilterStatuses(status, statusGroup)
     val referralViewPage =
@@ -356,6 +359,7 @@ constructor(
         uppercaseStatuses,
         audience,
         courseName,
+        hasLdc,
       )
 
     return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
