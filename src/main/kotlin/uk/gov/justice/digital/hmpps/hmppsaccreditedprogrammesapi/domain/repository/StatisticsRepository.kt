@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import java.math.BigInteger
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Repository
 interface StatisticsRepository : JpaRepository<ReferralEntity, UUID> {
