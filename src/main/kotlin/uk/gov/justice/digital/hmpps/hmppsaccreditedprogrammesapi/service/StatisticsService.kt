@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatistics
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
 import java.time.LocalDate
 import java.util.UUID
@@ -17,4 +18,6 @@ class StatisticsService(
     courseId: UUID,
   ): List<ReportStatusCount> = statisticsRepository.findReferralCountByCourseId(startDate, endDate, locations, courseId)
     ?.map(ReportStatusCount::from) ?: emptyList()
+
+  fun getReferralStatistics(): ReferralStatistics = ReferralStatistics.from(statisticsRepository.getReferralStatistics())
 }

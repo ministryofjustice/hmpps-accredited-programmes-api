@@ -4,6 +4,7 @@ import au.com.dius.pact.core.support.isNotEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.BeforeEach
@@ -28,7 +29,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReportType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatistics
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.time.LocalDate
@@ -426,6 +429,32 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should get show and tell referral statistics`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    updateReferral(
+      createdReferral1.id,
+      ReferralUpdate(
+        oasysConfirmed = true,
+        hasReviewedProgrammeHistory = true,
+        additionalInformation = "test",
+      ),
+    )
+    submitReferral(createdReferral1.id)
+    createReferral(offeringId2, PRISON_NUMBER_1)
+
+    // When
+    val reportContent = getReferralStatistics()
+
+    // Then
+    reportContent shouldNotBe null
+    reportContent.submittedReferralCount shouldBe 1
+    reportContent.draftReferralCount shouldBe 1
+    reportContent.averageDuration shouldNotBe null
+  }
+
+  @Test
   fun `should get deselected count statistics for all courses when no course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
@@ -631,31 +660,31 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
   private fun progressReferralStatusToOnProgramme(referralId: UUID) {
     val referralStatusUpdate1 = ReferralStatusUpdate(
-      status = REFERRAL_SUBMITTED,
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate1)
 
     val referralStatusUpdate2 = ReferralStatusUpdate(
-      status = "AWAITING_ASSESSMENT",
+      status = ReferralStatus.AWAITING_ASSESSMENT.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate2)
 
     val referralStatusUpdate3 = ReferralStatusUpdate(
-      status = "ASSESSMENT_STARTED",
+      status = ReferralStatus.ASSESSMENT_STARTED.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate3)
 
     val referralStatusUpdate4 = ReferralStatusUpdate(
-      status = "ASSESSED_SUITABLE",
+      status = ReferralStatus.ASSESSED_SUITABLE.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate4)
 
     val referralStatusUpdate5 = ReferralStatusUpdate(
-      status = "ON_PROGRAMME",
+      status = ReferralStatus.ON_PROGRAMME.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate5)
@@ -690,6 +719,16 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     .exchange()
     .expectStatus().isOk
     .expectBody<ReportContent>()
+    .returnResult().responseBody!!
+
+  fun getReferralStatistics() = webTestClient
+    .get()
+    .uri("/statistics/report/referral-statistics")
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody<ReferralStatistics>()
     .returnResult().responseBody!!
 
   private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient

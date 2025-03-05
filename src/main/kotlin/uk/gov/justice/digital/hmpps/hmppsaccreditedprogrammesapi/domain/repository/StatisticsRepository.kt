@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import java.math.BigInteger
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Repository
 interface StatisticsRepository : JpaRepository<ReferralEntity, UUID> {
@@ -294,4 +294,43 @@ FROM (
     fun getStatus(): String
     fun getOrgId(): String
   }
+
+  interface ReferralStatisticsProjection {
+    fun getSubmittedReferrals(): BigInteger
+    fun getDraftReferrals(): BigInteger
+    fun getAverageDuration(): String
+  }
+
+  @Query(
+    """
+        WITH 
+        submitted_referrals AS (
+            SELECT COUNT(*) AS count
+            FROM referral
+            WHERE referral.submitted_on IS NOT NULL
+        ),
+        draft_referrals AS (
+            SELECT COUNT(*) AS count
+            FROM referral
+            WHERE referral.submitted_on IS NULL
+        ),
+        average_duration AS (
+            SELECT CONCAT(
+                    FLOOR(AVG(duration_at_this_status / 1000) / 60), ' minutes ',
+                    FLOOR((AVG(duration_at_this_status / 1000) % 60)), ' seconds'
+                ) AS avg_duration
+            FROM referral_status_history
+            WHERE status = 'REFERRAL_STARTED'
+              AND duration_at_this_status IS NOT NULL
+              AND duration_at_this_status <= 3600000
+        )
+    
+        SELECT sr.count AS submittedReferrals, 
+               dr.count AS draftReferrals, 
+               ad.avg_duration AS averageDuration
+        FROM submitted_referrals sr, draft_referrals dr, average_duration ad
+    """,
+    nativeQuery = true,
+  )
+  fun getReferralStatistics(): ReferralStatisticsProjection
 }
