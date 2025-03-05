@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatistics
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StatisticsService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
@@ -56,6 +57,9 @@ class StatisticsController(
     locationCodes,
     courseId,
   )
+
+  @GetMapping("/report/referral-statistics", produces = ["application/json"])
+  fun getReferralStatistics(): ReferralStatistics = statisticsService.getReferralStatistics()
 
   @GetMapping("/report-types", produces = ["application/json"])
   fun getReportTypes(): ReportTypes = ReportTypes(ReportType.entries.map { it.name })

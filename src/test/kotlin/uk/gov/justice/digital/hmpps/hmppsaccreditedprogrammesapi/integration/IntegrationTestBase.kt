@@ -33,6 +33,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.PersistenceHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
 import java.nio.channels.FileChannel
@@ -243,4 +245,24 @@ abstract class IntegrationTestBase {
     .expectStatus().isEqualTo(expectedResponseStatus)
     .expectBody(returnType)
     .returnResult().responseBody!!
+
+  fun performRequestAndExpectStatusWithBody(
+    httpMethod: HttpMethod,
+    uri: String,
+    body: Any,
+    expectedResponseStatus: Int,
+  ): WebTestClient.ResponseSpec? = webTestClient
+    .method(httpMethod)
+    .uri(uri)
+    .contentType(MediaType.APPLICATION_JSON)
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus().isEqualTo(expectedResponseStatus)
+
+  fun submitReferral(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.POST, "/referrals/$createdReferralId/submit", referralTypeReference())
+  fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate) = performRequestAndExpectStatusWithBody(HttpMethod.PUT, "/referrals/$referralId", referralUpdate, 204)
+
+  fun referralTypeReference(): ParameterizedTypeReference<Referral> = object : ParameterizedTypeReference<Referral>() {}
 }
