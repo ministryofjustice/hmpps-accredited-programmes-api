@@ -99,4 +99,5 @@ fun ReferralViewEntity.toApi() = ReferralView(
   sentenceType = sentenceType,
   listDisplayName = listDisplayName,
   location = location,
+  hasLdc = hasLdc,
 )

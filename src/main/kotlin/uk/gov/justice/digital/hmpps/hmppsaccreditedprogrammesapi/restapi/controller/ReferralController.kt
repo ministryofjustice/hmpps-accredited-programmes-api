@@ -455,6 +455,10 @@ class ReferralController(
       value = "sortDirection",
       required = false,
     ) sortDirection: String?,
+    @Parameter(description = "When flag is true, then only ldc referrals are returned. If false of null is passed in all non ldc referrals are returned") @RequestParam(
+      value = "hasLdc",
+      required = false,
+    ) hasLdc: Boolean?,
   ): ResponseEntity<PaginatedReferralView> {
     SecurityContextHolder.getContext().authentication?.authorities
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
@@ -469,6 +473,7 @@ class ReferralController(
         nameOrIdSearch.surnameOnly,
         nameOrIdSearch.forename,
         nameOrIdSearch.surname,
+        hasLdc,
       )
 
     return ResponseEntity.ok(
@@ -593,6 +598,10 @@ class ReferralController(
       value = "sortDirection",
       required = false,
     ) sortDirection: String?,
+    @Parameter(description = "When flag is true, then only ldc referrals are returned. If false of null is passed in all non ldc referrals are returned") @RequestParam(
+      value = "hasLdc",
+      required = false,
+    ) hasLdc: Boolean?,
   ): ResponseEntity<PaginatedReferralView> {
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val nameOrIdSearch = parseNameOrId(nameOrId)
@@ -608,6 +617,7 @@ class ReferralController(
         audience,
         courseName,
         statusGroup,
+        hasLdc,
       )
 
     return ResponseEntity.ok(

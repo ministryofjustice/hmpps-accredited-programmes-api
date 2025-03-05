@@ -96,4 +96,7 @@ data class ReferralView(
 
   @Schema(example = "null", description = "location of person")
   @get:JsonProperty("location") val location: String? = null,
+
+  @Schema(example = "true", description = "Flag to indicate learning difficulties and challenges")
+  @get:JsonProperty("hasLdc") val hasLdc: Boolean? = null,
 )

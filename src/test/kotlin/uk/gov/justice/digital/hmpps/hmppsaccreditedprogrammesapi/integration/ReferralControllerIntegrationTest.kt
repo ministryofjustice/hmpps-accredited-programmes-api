@@ -1596,26 +1596,32 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     )
     persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
     persistenceHelper.createReferral(
-      referralId,
-      offering.id!!,
-      PRISON_NUMBER_1,
-      "TEST_REFERRER_USER_1",
-      "more information",
-      true,
-      true,
-      "REFERRAL_SUBMITTED",
-      LocalDateTime.parse("2023-11-13T19:11:00"),
-      "10".toBigInteger(),
+      referralId = referralId,
+      offeringId = offering.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = "TEST_REFERRER_USER_1",
+      additionalInformation = "more information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "REFERRAL_SUBMITTED",
+      submittedOn = LocalDateTime.parse("2023-11-13T19:11:00"),
+      primaryPomStaffId = "10".toBigInteger(),
+      hasLdc = true,
     )
     val statusFilter = listOf("REFERRAL_SUBMITTED")
     val audienceFilter = course.audience
     val courseNameFilter = course.name
 
-    val summary = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter)
+    val summary = getReferralViewsByUsername(
+      statusFilter = statusFilter,
+      audienceFilter = audienceFilter,
+      courseNameFilter = courseNameFilter,
+      hasLdc = true,
+    )
     summary.content.shouldNotBeEmpty()
 
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken("JOHN_DOE"))
-    val summary1 = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter, jwtAuthHelper.bearerToken("JOHN_DOE"))
+    val summary1 = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter, jwtAuthHelper.bearerToken("JOHN_DOE"), hasLdc = true)
     summary1.content.shouldNotBeEmpty()
   }
 
@@ -1634,7 +1640,12 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val audienceFilter = course.audience
     val courseNameFilter = course.name
 
-    val summary = getReferralViewsByUsername(statusFilter, audienceFilter, courseNameFilter)
+    val summary = getReferralViewsByUsername(
+      statusFilter = statusFilter,
+      audienceFilter = audienceFilter,
+      courseNameFilter = courseNameFilter,
+      hasLdc = true,
+    )
     summary.content.shouldNotBeEmpty()
 
     summary.content?.forEach { actualSummary ->
@@ -1650,6 +1661,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
           referrerUsername = REFERRER_USERNAME,
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
+          hasLdc = true,
         ),
       ).forEach { referralView ->
         actualSummary.id shouldBe referralView.id
@@ -1662,6 +1674,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         actualSummary.referrerUsername shouldBe referralView.referrerUsername
         actualSummary.forename shouldBe referralView.forename
         actualSummary.surname shouldBe referralView.surname
+        actualSummary.hasLdc shouldBe referralView.hasLdc
       }
     }
   }
@@ -1676,6 +1689,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     sortColumn: String? = null,
     sortDirection: String? = null,
     nameOrId: String? = null,
+    hasLdc: Boolean? = null,
   ): PaginatedReferralView {
     val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/organisation/$organisationId/dashboard")
     statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
@@ -1686,7 +1700,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     sortColumn?.let { uriBuilder.queryParam("sortColumn", encodeValue(it)) }
     sortDirection?.let { uriBuilder.queryParam("sortDirection", encodeValue(it)) }
     nameOrId?.let { uriBuilder.queryParam("nameOrId", encodeValue(it)) }
-
+    hasLdc?.let { uriBuilder.queryParam("hasLdc", it) }
     return performRequestAndExpectOk(HttpMethod.GET, uriBuilder.toUriString(), paginatedReferralViewTypeReference())
   }
 
@@ -1695,12 +1709,13 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     audienceFilter: String? = null,
     courseNameFilter: String? = null,
     token: String? = null,
+    hasLdc: Boolean? = null,
   ): PaginatedReferralView {
     val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/me/dashboard")
     statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
     audienceFilter?.let { uriBuilder.queryParam("audience", encodeValue(it)) }
     courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
-
+    hasLdc?.let { uriBuilder.queryParam("hasLdc", it) }
     return webTestClient
       .get()
       .uri(uriBuilder.toUriString())
