@@ -4,6 +4,7 @@ import au.com.dius.pact.core.support.isNotEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.BeforeEach
@@ -11,7 +12,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
@@ -28,9 +31,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.control
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReportType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatistics
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
+import java.math.BigInteger
 import java.time.LocalDate
 import java.util.UUID
 
@@ -426,6 +432,32 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should get show and tell referral statistics`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    updateReferral(
+      createdReferral1.id,
+      ReferralUpdate(
+        oasysConfirmed = true,
+        hasReviewedProgrammeHistory = true,
+        additionalInformation = "test",
+      ),
+    )
+    submitReferral(createdReferral1.id)
+    createReferral(offeringId2, PRISON_NUMBER_1)
+
+    // When
+    val reportContent = getReferralStatistics()
+
+    // Then
+    reportContent shouldNotBe null
+    reportContent.submittedReferralCount shouldBe BigInteger.ONE
+    reportContent.draftReferralCount shouldBe BigInteger.ONE
+    reportContent.averageDuration shouldBe "0 minutes 0 seconds"
+  }
+
+  @Test
   fun `should get deselected count statistics for all courses when no course id is provided`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
@@ -631,31 +663,31 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
   private fun progressReferralStatusToOnProgramme(referralId: UUID) {
     val referralStatusUpdate1 = ReferralStatusUpdate(
-      status = REFERRAL_SUBMITTED,
+      status = ReferralStatus.REFERRAL_SUBMITTED.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate1)
 
     val referralStatusUpdate2 = ReferralStatusUpdate(
-      status = "AWAITING_ASSESSMENT",
+      status = ReferralStatus.AWAITING_ASSESSMENT.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate2)
 
     val referralStatusUpdate3 = ReferralStatusUpdate(
-      status = "ASSESSMENT_STARTED",
+      status = ReferralStatus.ASSESSMENT_STARTED.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate3)
 
     val referralStatusUpdate4 = ReferralStatusUpdate(
-      status = "ASSESSED_SUITABLE",
+      status = ReferralStatus.ASSESSED_SUITABLE.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate4)
 
     val referralStatusUpdate5 = ReferralStatusUpdate(
-      status = "ON_PROGRAMME",
+      status = ReferralStatus.ON_PROGRAMME.name,
       ptUser = true,
     )
     updateReferralStatus(referralId, referralStatusUpdate5)
@@ -663,40 +695,17 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
   fun createReferral(prisonNumber: String = PRISON_NUMBER_1): Referral = createReferral(offeringId1, prisonNumber)
 
-  fun getReportStatusesByProgrammeType(courseId: UUID, startDate: LocalDate, endDate: LocalDate, locations: List<String>?) = webTestClient
-    .get()
-    .uri("/statistics/report/count-by-status-for-programme?startDate=$startDate&endDate=$endDate&" + locations?.joinToString("&") { "locationCodes=$it" } + "&courseId=$courseId")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectBody<List<ReportStatusCount>>()
-    .returnResult().responseBody!!
+  fun getReportStatusesByProgrammeType(courseId: UUID, startDate: LocalDate, endDate: LocalDate, locations: List<String>?) = performRequestAndExpectOk(HttpMethod.GET, "/statistics/report/count-by-status-for-programme?startDate=$startDate&endDate=$endDate&" + locations?.joinToString("&") { "locationCodes=$it" } + "&courseId=$courseId", listReportStatusCountTypeReference())
 
-  fun getReferralById(createdReferralId: UUID) = webTestClient
-    .get()
-    .uri("/referrals/$createdReferralId")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<Referral>()
-    .returnResult().responseBody!!
+  fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
 
-  fun getStatistics(reportType: String, locationCodes: String? = null, startDate: String, courseId: UUID? = null): ReportContent = webTestClient
-    .get()
-    .uri("/statistics/report/$reportType?startDate=$startDate&locationCodes=$locationCodes" + if (courseId != null) "&courseId=$courseId" else "")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<ReportContent>()
-    .returnResult().responseBody!!
+  fun getStatistics(reportType: String, locationCodes: String? = null, startDate: String, courseId: UUID? = null): ReportContent = performRequestAndExpectOk(HttpMethod.GET, "/statistics/report/$reportType?startDate=$startDate&locationCodes=$locationCodes" + if (courseId != null) "&courseId=$courseId" else "", reportContentTypeReference())
 
-  private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
-    .put()
-    .uri("/referrals/$createdReferralId/status")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .contentType(MediaType.APPLICATION_JSON)
-    .bodyValue(referralStatusUpdate)
-    .exchange().expectStatus().isNoContent
+  fun getReferralStatistics() = performRequestAndExpectOk(HttpMethod.GET, "/statistics/report/referral-statistics", referralStatisticsTypeReference())
+
+  fun updateReferralStatus(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = performRequestAndExpectStatusWithBody(HttpMethod.PUT, "/referrals/$referralId/status", referralStatusUpdate, 204)
+
+  fun referralStatisticsTypeReference(): ParameterizedTypeReference<ReferralStatistics> = object : ParameterizedTypeReference<ReferralStatistics>() {}
+  fun reportContentTypeReference(): ParameterizedTypeReference<ReportContent> = object : ParameterizedTypeReference<ReportContent>() {}
+  fun listReportStatusCountTypeReference(): ParameterizedTypeReference<List<ReportStatusCount>> = object : ParameterizedTypeReference<List<ReportStatusCount>>() {}
 }

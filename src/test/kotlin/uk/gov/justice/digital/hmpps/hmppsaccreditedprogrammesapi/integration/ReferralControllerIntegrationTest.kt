@@ -1225,15 +1225,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
 
-  fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate): Any = webTestClient
-    .put()
-    .uri("/referrals/$referralId")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .contentType(MediaType.APPLICATION_JSON)
-    .bodyValue(referralUpdate)
-    .exchange()
-    .expectStatus().isNoContent
-
   private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
     .put()
     .uri("/referrals/$createdReferralId/status")
@@ -1241,8 +1232,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     .contentType(MediaType.APPLICATION_JSON)
     .bodyValue(referralStatusUpdate)
     .exchange().expectStatus().isNoContent
-
-  fun submitReferral(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.POST, "/referrals/$createdReferralId/submit", referralTypeReference())
 
   private fun encodeValue(value: String): String = URLEncoder.encode(value, StandardCharsets.UTF_8.toString())
 
@@ -2145,6 +2134,5 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   private fun transferReferralToBuildingChoices(referralId: UUID, courseId: UUID): Referral = performRequestAndExpectOk(HttpMethod.POST, "/referrals/$referralId/transfer-to-building-choices/$courseId", referralTypeReference())
 
   private fun paginatedReferralViewTypeReference(): ParameterizedTypeReference<PaginatedReferralView> = object : ParameterizedTypeReference<PaginatedReferralView>() {}
-  private fun referralTypeReference(): ParameterizedTypeReference<Referral> = object : ParameterizedTypeReference<Referral>() {}
   private fun referralListTypeReference(): ParameterizedTypeReference<List<Referral>> = object : ParameterizedTypeReference<List<Referral>>() {}
 }
