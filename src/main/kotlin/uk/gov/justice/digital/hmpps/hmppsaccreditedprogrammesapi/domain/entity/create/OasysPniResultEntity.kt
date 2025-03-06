@@ -7,7 +7,7 @@ import jakarta.persistence.Table
 import java.util.UUID
 
 @Entity
-@Table(name = "oasys_pni_result_temp")
+@Table(name = "oasys_pni_result")
 data class OasysPniResultEntity(
   @Id
   val pniResultId: UUID,
