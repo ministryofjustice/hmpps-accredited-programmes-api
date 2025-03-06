@@ -377,7 +377,7 @@ class ReferralController(
       val status = referenceDataService.getReferralStatus(it.status)
       val staffDetail = staffService.getStaffDetail(it.primaryPomStaffId)?.toApi()
       if (!it.hasLdcBeenOverriddenByProgrammeTeam) {
-        it.hasLdc = referralService.getLdc()
+        it.hasLdc = referralService.getLdc(it.prisonNumber)
       }
       ResponseEntity.ok(it.toApi(status, staffDetail))
     }
