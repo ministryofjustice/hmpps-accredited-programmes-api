@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
