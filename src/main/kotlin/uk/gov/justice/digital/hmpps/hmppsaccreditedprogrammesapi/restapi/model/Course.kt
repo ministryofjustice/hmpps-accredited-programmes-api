@@ -57,7 +57,7 @@ data class Course(
   @get:JsonProperty("intensity") val intensity: String? = null,
 
   @Schema(example = "null", description = "List of offerings for the course")
-  @get:JsonProperty("courseOfferings") val courseOfferings: List<CourseOffering> = emptyList(),
+  @get:JsonProperty("courseOfferings") var courseOfferings: List<CourseOffering> = emptyList(),
 )
 
 enum class CourseIntensity {

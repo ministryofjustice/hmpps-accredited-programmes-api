@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
@@ -728,13 +730,19 @@ class CourseController(
         .firstOrNull { it.name.contains(buildingChoicesIntensity) }
         ?: throw BusinessException("Building choices course could not be found for audience $audience programmePathway $programmePathway buildingChoicesIntensity $buildingChoicesIntensity")
 
-    val organisation =
-      organisationService.findOrganisationEntityByCode(referral.offering.organisationId)
+    val organisation: OrganisationEntity =
+      organisationService.findOrganisationEntityByCode(referral.offering.organisationId) ?: throw NotFoundException("No organisation found for ${referral.offering.organisationId} referral $referral")
 
-    recommendedBuildingChoicesCourse.offerings.firstOrNull { it.organisationId == referral.offering.organisationId }
-      ?: throw BusinessException("Building choices course ${recommendedBuildingChoicesCourse.name} not offered at ${organisation?.name ?: referral.offering.organisationId}")
+    val bcOfferingMatchingWithReferralOrg: OfferingEntity =
+      (
+        recommendedBuildingChoicesCourse.offerings.firstOrNull { (it.organisationId == referral.offering.organisationId) && it.referable && !it.withdrawn }
+          ?: throw BusinessException("Building choices course ${recommendedBuildingChoicesCourse.name} not offered at ${organisation.name}")
+        )
 
-    return ResponseEntity.ok(recommendedBuildingChoicesCourse.toApi())
+    val recommendedBuildingChoicesCourseModel = recommendedBuildingChoicesCourse.toApi()
+    recommendedBuildingChoicesCourseModel.courseOfferings = listOf(bcOfferingMatchingWithReferralOrg.toApi(organisation.gender))
+
+    return ResponseEntity.ok(recommendedBuildingChoicesCourseModel)
   }
 
   fun generateRandom10AlphaString(): String {
