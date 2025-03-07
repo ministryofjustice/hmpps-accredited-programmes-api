@@ -6,7 +6,9 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -15,6 +17,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.OasysApiClient
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Ldc
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Level
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.LevelScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAccommodation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAlcoholDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
@@ -27,8 +32,17 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Osp
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniAssessment
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniCalculation
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Questions
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Sara
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.SaraRiskLevel
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ScoreLevel
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ScoredAnswer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Type
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.PrisonerAlertsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.AlertsResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AlertFactory
@@ -572,5 +586,64 @@ class OasysServiceTest {
     val oasysAssessmentTimeline =
       OasysAssessmentTimeline("A9999BB", null, listOf(assessment1, assessment2, assessment3))
     return oasysAssessmentTimeline
+  }
+
+  @Test
+  fun `should return PNI calculation for known prisoner number`() {
+    // Given
+    val prisonNumber = "A9999BB"
+    val pniResponse = PniResponse(
+      pniCalculation = PniCalculation(
+        sexDomain = LevelScore(Level.H, 10),
+        thinkingDomain = LevelScore(Level.H, 10),
+        relationshipDomain = LevelScore(Level.H, 10),
+        selfManagementDomain = LevelScore(Level.H, 10),
+        riskLevel = Level.H,
+        needLevel = Level.H,
+        totalDomainScore = 5,
+        pni = Type.H,
+        saraRiskLevel = SaraRiskLevel(10, 2),
+      ),
+      assessment = PniAssessment(
+        id = 10082385,
+        ldc = Ldc(10, 10),
+        ldcMessage = "LDC message",
+        ogrs3Risk = ScoreLevel.HIGH,
+        ovpRisk = ScoreLevel.MEDIUM,
+        osp = Osp(ScoreLevel.LOW, ScoreLevel.LOW),
+        rsrPercentage = 3.5,
+        offenderAge = 32,
+        questions = Questions(
+          everCommittedSexualOffence = ScoredAnswer.YesNo.Unknown,
+          openSexualOffendingQuestions = ScoredAnswer.YesNo.NO,
+          sexualPreOccupation = ScoredAnswer.Problem.SIGNIFICANT,
+          offenceRelatedSexualInterests = ScoredAnswer.Problem.SOME,
+          emotionalCongruence = ScoredAnswer.Problem.SOME,
+          proCriminalAttitudes = ScoredAnswer.Problem.SOME,
+          hostileOrientation = ScoredAnswer.Problem.SOME,
+          relCloseFamily = ScoredAnswer.Problem.NONE,
+          prevCloseRelationships = ScoredAnswer.Problem.NONE,
+          easilyInfluenced = ScoredAnswer.Problem.NONE,
+          aggressiveControllingBehaviour = ScoredAnswer.Problem.NONE,
+          impulsivity = ScoredAnswer.Problem.NONE,
+          temperControl = ScoredAnswer.Problem.NONE,
+          problemSolvingSkills = ScoredAnswer.Problem.NONE,
+          difficultiesCoping = ScoredAnswer.Problem.MISSING,
+        ),
+      ),
+    )
+
+    every { oasysApiClient.getPniCalculation(prisonNumber) } returns ClientResult.Success(HttpStatus.OK, pniResponse)
+    every { auditService.audit("A9999BB", "OASYS_PNI_SEARCH") } just runs
+
+    // When
+    val pniResult = service.getPniCalculation(prisonNumber)
+
+    // Then
+    assertThat(pniResult?.pniCalculation?.sexDomain).isEqualTo(LevelScore(Level.H, 10))
+    assertThat(pniResult?.pniCalculation?.pni).isEqualTo(Type.H)
+    assertThat(pniResult?.assessment?.id).isEqualTo(10082385)
+    assertThat(pniResult?.assessment?.questions?.everCommittedSexualOffence).isEqualTo(ScoredAnswer.YesNo.Unknown)
+    assertThat(pniResult?.assessment?.questions?.difficultiesCoping).isEqualTo(ScoredAnswer.Problem.MISSING)
   }
 }
