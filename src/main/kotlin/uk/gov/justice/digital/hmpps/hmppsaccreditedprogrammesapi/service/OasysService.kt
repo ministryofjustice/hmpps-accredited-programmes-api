@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.getHighestPriorityScore
@@ -133,6 +134,22 @@ class OasysService(
       ?: throw NotFoundException("No psychiatric information found for prison number $prisonNumber")
 
     return oasysPsychiatric.toModel()
+  }
+
+  fun getPniCalculation(prisonNumber: String): PniResponse? {
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.OASYS_PNI_SEARCH.name)
+
+    val pniCalculation = when (val response = oasysApiClient.getPniCalculation(prisonNumber)) {
+      is ClientResult.Failure -> {
+        log.warn("Failure to retrieve PNI calculation for prisonNumber $prisonNumber reason ${response.toException().cause}")
+        AuthorisableActionResult.Success(null)
+      }
+
+      is ClientResult.Success -> {
+        AuthorisableActionResult.Success(response.body)
+      }
+    }
+    return pniCalculation.entity
   }
 
   fun getLearningNeeds(prisonNumber: String): LearningNeeds {

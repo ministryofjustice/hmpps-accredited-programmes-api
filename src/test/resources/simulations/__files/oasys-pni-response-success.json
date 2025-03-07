@@ -1,0 +1,62 @@
+{
+  "pniCalculation" : {
+    "sexDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "thinkingDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "relationshipDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "selfManagementDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "riskLevel" : "H",
+    "needLevel" : "H",
+    "totalDomainScore" : 5,
+    "pni" : "H",
+    "saraRiskLevel" : {
+      "toPartner" : 10,
+      "toOther" : 2
+    },
+    "missingFields" : [ ]
+  },
+  "assessment" : {
+    "id" : 10082385,
+    "ldc" : {
+      "score" : 10,
+      "subTotal" : 10
+    },
+    "ldcMessage" : "LDC message",
+    "ogrs3Risk" : "High",
+    "ovpRisk" : "Medium",
+    "osp" : {
+      "cdc" : "Low",
+      "iiic" : "Low"
+    },
+    "rsrPercentage" : 3.5,
+    "offenderAge" : 32,
+    "questions" : {
+      "everCommittedSexualOffence" : "Unknown",
+      "openSexualOffendingQuestions" : "NO",
+      "sexualPreOccupation" : "SIGNIFICANT",
+      "offenceRelatedSexualInterests" : "SOME",
+      "emotionalCongruence" : "SOME",
+      "proCriminalAttitudes" : "SOME",
+      "hostileOrientation" : "SOME",
+      "relCloseFamily" : "NONE",
+      "prevCloseRelationships" : "NONE",
+      "easilyInfluenced" : "NONE",
+      "aggressiveControllingBehaviour" : "NONE",
+      "impulsivity" : "NONE",
+      "temperControl" : "NONE",
+      "problemSolvingSkills" : "NONE",
+      "difficultiesCoping" : "MISSING"
+    }
+  }
+}

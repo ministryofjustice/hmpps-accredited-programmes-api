@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
 
 private const val OASYS_API = "Oasys API"
 
@@ -92,5 +93,9 @@ class OasysApiClient(
 
   fun getRiskPredictors(assessmentPk: Long) = getRequest<OasysRiskPredictorScores>(OASYS_API) {
     path = "/assessments/$assessmentPk/risk-predictors"
+  }
+
+  fun getPniCalculation(prisonNumber: String, withinCommunity: Boolean = false) = getRequest<PniResponse>(OASYS_API) {
+    path = "/assessments/pni/$prisonNumber?community=$withinCommunity"
   }
 }
