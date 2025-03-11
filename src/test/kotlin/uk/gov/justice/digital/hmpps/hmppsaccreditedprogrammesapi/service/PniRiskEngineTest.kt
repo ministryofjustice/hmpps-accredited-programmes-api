@@ -566,6 +566,4 @@ class PniRiskEngineTest {
     )
     assertEquals(RiskClassification.LOW_RISK.name, riskEngine.getRiskClassification(riskScores, gender))
   }
-
-
 }
