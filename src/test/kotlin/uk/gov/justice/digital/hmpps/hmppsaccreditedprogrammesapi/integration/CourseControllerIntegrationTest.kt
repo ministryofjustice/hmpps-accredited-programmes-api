@@ -823,6 +823,9 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     val buildingChoicesCourseForReferral = getBuildingChoicesCourseForReferral(referralId)
 
     buildingChoicesCourseForReferral.id shouldBe bc1MainCourseId
+    buildingChoicesCourseForReferral.courseOfferings.size shouldBe 1
+    buildingChoicesCourseForReferral.courseOfferings.first().id shouldBe bc1CourseOfferingVariantId
+    buildingChoicesCourseForReferral.courseOfferings.first().organisationId shouldBe "ESI"
   }
 
   fun getBuildingChoicesCourseForReferral(referralId: UUID): Course = webTestClient
