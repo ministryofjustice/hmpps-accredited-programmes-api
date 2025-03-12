@@ -46,6 +46,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.PrisonerAlertsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.AlertsResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AlertFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniCalculationFactory
 import java.time.LocalDateTime
 
 class OasysServiceTest {
@@ -645,5 +646,79 @@ class OasysServiceTest {
     assertThat(pniResult?.assessment?.id).isEqualTo(10082385)
     assertThat(pniResult?.assessment?.questions?.everCommittedSexualOffence).isEqualTo(ScoredAnswer.YesNo.Unknown)
     assertThat(pniResult?.assessment?.questions?.difficultiesCoping).isEqualTo(ScoredAnswer.Problem.MISSING)
+  }
+
+  @Test
+  fun `should return HIGH_INTENSITY_BC for Type H`() {
+    // Given
+    val prisonId = "A1234BC"
+    val pniResponse = PniResponse(
+      pniCalculation = PniCalculationFactory().withPni(Type.H).produce(),
+      assessment = null,
+    )
+    every { auditService.audit(prisonId, any()) } just runs
+    every { oasysApiClient.getPniCalculation(prisonId) } returns ClientResult.Success(HttpStatus.OK, pniResponse)
+
+    // When
+    val result = service.getOasysPniProgrammePathway(prisonId)
+
+    // Then
+    assertThat(result).isEqualTo("HIGH_INTENSITY_BC")
+  }
+
+  @Test
+  fun `should return MODERATE_INTENSITY_BC for Type M`() {
+    // Given
+    val prisonId = "A1234BC"
+
+    val pniResponse = PniResponse(
+      pniCalculation = PniCalculationFactory().withPni(Type.M).produce(),
+      assessment = null,
+    )
+    every { auditService.audit(prisonId, any()) } just runs
+    every { oasysApiClient.getPniCalculation(prisonId) } returns ClientResult.Success(HttpStatus.OK, pniResponse)
+
+    // When
+    val result = service.getOasysPniProgrammePathway(prisonId)
+
+    // Then
+    assertThat(result).isEqualTo("MODERATE_INTENSITY_BC")
+  }
+
+  @Test
+  fun `should return ALTERNATIVE_PATHWAY for Type A`() {
+    // Given
+    val prisonId = "A1234BC"
+    val pniResponse =
+      PniResponse(
+        pniCalculation = PniCalculationFactory().withPni(Type.A).produce(),
+        assessment = null,
+      )
+    every { auditService.audit(prisonId, any()) } just runs
+    every { oasysApiClient.getPniCalculation(prisonId) } returns ClientResult.Success(HttpStatus.OK, pniResponse)
+
+    // When
+    val result = service.getOasysPniProgrammePathway(prisonId)
+
+    // Then
+    assertThat(result).isEqualTo("ALTERNATIVE_PATHWAY")
+  }
+
+  @Test
+  fun `should return MISSING_INFORMATION for Type O`() {
+    // Given
+    val prisonId = "A1234BC"
+    val pniResponse = PniResponse(
+      pniCalculation = PniCalculationFactory().withPni(Type.O).produce(),
+      assessment = null,
+    )
+    every { auditService.audit(prisonId, any()) } just runs
+    every { oasysApiClient.getPniCalculation(prisonId) } returns ClientResult.Success(HttpStatus.OK, pniResponse)
+
+    // When
+    val result = service.getOasysPniProgrammePathway(prisonId)
+
+    // Then
+    assertThat(result).isEqualTo("MISSING_INFORMATION")
   }
 }

@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Type
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.getHighestPriorityScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.PrisonerAlertsApiClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.Alert
@@ -43,6 +44,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.buildRisks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
@@ -325,7 +327,15 @@ class OasysService(
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? = fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
 
   // TODO: Remove this method once the LDC score is available from the OASys API
-  fun getLDCScore() = (3..5).random().toBigDecimal()
+  fun getLDCScore(prisonNumber: String): BigDecimal? = (3..5).random().toBigDecimal()
+
+  fun getOasysPniProgrammePathway(prisonId: String): String = when (getPniCalculation(prisonId)?.pniCalculation?.pni) {
+    Type.H -> "HIGH_INTENSITY_BC"
+    Type.M -> "MODERATE_INTENSITY_BC"
+    Type.A -> "ALTERNATIVE_PATHWAY"
+    Type.O -> "MISSING_INFORMATION"
+    else -> throw NotFoundException("No PNI data found for prison number $prisonId")
+  }
 
   private inline fun <T> fetchDetail(
     assessmentId: Long,
