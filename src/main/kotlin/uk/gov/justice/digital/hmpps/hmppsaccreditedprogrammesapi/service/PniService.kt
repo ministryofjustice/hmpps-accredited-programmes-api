@@ -113,7 +113,8 @@ class PniService(
     )
 
     val oasysAssessmentTimeline = oasysService.getAssessments(prisonNumber)
-    val completedAssessment = oasysService.getLatestCompletedLayerThreeAssessment(oasysAssessmentTimeline) ?: throw NotFoundException("No completed assessments found for $prisonNumber")
+    val completedAssessment = oasysService.getLatestCompletedLayerThreeAssessment(oasysAssessmentTimeline)
+      ?: throw NotFoundException("No completed assessments found for $prisonNumber")
 
     val assessmentId = completedAssessment.id
 
@@ -175,7 +176,11 @@ class PniService(
     return pniScore
   }
 
-  private fun buildSaraResult(timeline: OasysAssessmentTimeline, oasysRelationships: OasysRelationships?, assessmentId: Long): Sara = if (oasysRelationships?.sara == null) {
+  private fun buildSaraResult(
+    timeline: OasysAssessmentTimeline,
+    oasysRelationships: OasysRelationships?,
+    assessmentId: Long,
+  ): Sara = if (oasysRelationships?.sara == null) {
     val completedAssessmentIdWithSara = oasysService.getAssessmentIdWithCompletedSara(timeline)
     val relationshipsWithSara = completedAssessmentIdWithSara?.let { oasysService.getRelationships(it) }
     Sara(
@@ -246,7 +251,7 @@ class PniService(
     else -> null
   }
 
-  fun getLDC() = oasysService.getLDCScore() > BigDecimal("2.99")
+  fun hasLDC(prisonNumber: String) = oasysService.getLDCScore(prisonNumber)?.let { it > BigDecimal("2.99") }
 
   private fun buildRiskScores(
     oasysRiskPredictorScores: OasysRiskPredictorScores?,
@@ -272,7 +277,24 @@ class PniService(
       log.info("Prisoner $prisonNumber is not available in our db, fetching from external service.")
       personService.createOrUpdatePerson(prisonNumber)
       personService.getPerson(prisonNumber)?.gender
-    } ?: throw BusinessException("Gender information missing for prisonNumber $prisonNumber. PNI could not be determined")
+    }
+    ?: throw BusinessException("Gender information missing for prisonNumber $prisonNumber. PNI could not be determined")
+
+  fun fetchAndStoreOasysPni(prisonId: String): String {
+    try {
+      val acpPniResult = pniResultEntityRepository.findAllByPrisonNumber(prisonId).first().programmePathway!!
+      val oasysPniResult = oasysService.getOasysPniProgrammePathway(prisonId)
+
+      if (acpPniResult != oasysPniResult) {
+        return "Pni calculation mismatch for prisonNumber $prisonId. ACP: $acpPniResult, OASYS: $oasysPniResult \n"
+      }
+      log.info("No mismatch in PNI for $prisonId: $acpPniResult")
+    } catch (e: Exception) {
+      log.error("Error while fetching PNI for $prisonId", e)
+      return "Error while fetching PNI for $prisonId"
+    }
+    return ""
+  }
 }
 
 private fun buildNeedsScores(
