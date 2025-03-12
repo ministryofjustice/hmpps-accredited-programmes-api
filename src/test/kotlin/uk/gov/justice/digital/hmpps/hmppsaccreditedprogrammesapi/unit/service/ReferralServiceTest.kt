@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.service
 
 import io.kotest.matchers.shouldBe
 import io.mockk.CapturingSlot
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
@@ -13,6 +13,7 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Captor
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
@@ -73,6 +74,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.util.*
 
+@ExtendWith(MockKExtension::class)
 class ReferralServiceTest {
 
   @MockK(relaxed = true)
@@ -152,7 +154,6 @@ class ReferralServiceTest {
 
   @BeforeEach
   fun setup() {
-    MockKAnnotations.init(this)
     referralEntityCaptor = slot()
     courseParticipationEntityCaptor = slot()
 

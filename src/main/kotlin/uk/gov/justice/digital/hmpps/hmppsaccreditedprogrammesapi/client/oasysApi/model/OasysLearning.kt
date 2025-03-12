@@ -11,4 +11,5 @@ data class OasysLearning(
   val qualifications: String?,
   val basicSkillsScore: String?,
   val eTEIssuesDetails: String?,
+  val crn: String?,
 )

@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.SaraRiskLevel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
 
 data class Sara(
@@ -16,4 +18,17 @@ data class Sara(
 
   @Schema(example = "2512235167", description = "Assessment ID relevant to the SARA version of the assessment")
   @get:JsonProperty("saraAssessmentId") val saraAssessmentId: Long? = null,
-)
+) {
+  companion object {
+    fun from(pniResponse: PniResponse): Sara {
+      val saraRiskOfViolenceTowardsPartner = SaraRiskLevel.getRiskForPartner(pniResponse.pniCalculation?.saraRiskLevel?.toPartner)
+      val saraRiskOfViolenceTowardsOthers = SaraRiskLevel.getRiskToOthers(pniResponse.pniCalculation?.saraRiskLevel?.toOther)
+      return Sara(
+        overallResult = SaraRisk.highestRisk(saraRiskOfViolenceTowardsPartner, saraRiskOfViolenceTowardsOthers),
+        saraRiskOfViolenceTowardsPartner = saraRiskOfViolenceTowardsPartner.toString(),
+        saraRiskOfViolenceTowardsOthers = saraRiskOfViolenceTowardsOthers.toString(),
+        saraAssessmentId = pniResponse.assessment?.id,
+      )
+    }
+  }
+}
