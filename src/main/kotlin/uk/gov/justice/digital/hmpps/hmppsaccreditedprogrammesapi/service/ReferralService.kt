@@ -242,7 +242,7 @@ constructor(
       ReferralStatus.REFERRAL_STARTED.name -> {
         referral.status = ReferralStatus.REFERRAL_SUBMITTED.name
         referral.submittedOn = LocalDateTime.now()
-        referral.hasLdc = pniService.getLDC()
+        referral.hasLdc = pniService.hasLDC(referral.prisonNumber)
         fetchAndSavePomDetails(referral).let {
           referral.primaryPomStaffId = it?.first
           referral.secondaryPomStaffId = it?.second
@@ -434,7 +434,7 @@ constructor(
     return newReferral
   }
 
-  fun getLdc() = pniService.getLDC()
+  fun getLdc(prisonNumber: String): Boolean? = pniService.hasLDC(prisonNumber)
 
   private fun createNewReferral(referral: ReferralEntity, newOffering: OfferingEntity): ReferralEntity {
     val pomDetails = fetchAndSavePomDetails(referral)
