@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
 
 data class NeedsScore(
   @Schema(example = "5", required = true)
@@ -30,7 +31,45 @@ data class DomainScore(
   @get:JsonProperty("RelationshipDomainScore") val relationshipDomainScore: RelationshipDomainScore,
   @Schema(example = "1", required = true)
   @get:JsonProperty("SelfManagementDomainScore") val selfManagementDomainScore: SelfManagementDomainScore,
-)
+) {
+  companion object {
+    fun from(pniResponse: PniResponse): DomainScore = DomainScore(
+      sexDomainScore = SexDomainScore(
+        overAllSexDomainScore = pniResponse.pniCalculation?.sexDomain?.score,
+        individualSexScores = IndividualSexScores(
+          sexualPreOccupation = pniResponse.assessment?.questions?.sexualPreOccupation?.score,
+          offenceRelatedSexualInterests = pniResponse.assessment?.questions?.offenceRelatedSexualInterests?.score,
+          emotionalCongruence = pniResponse.assessment?.questions?.emotionalCongruence?.score,
+        ),
+      ),
+      thinkingDomainScore = ThinkingDomainScore(
+        overallThinkingDomainScore = pniResponse.pniCalculation?.thinkingDomain?.score,
+        individualThinkingScores = IndividualCognitiveScores(
+          proCriminalAttitudes = pniResponse.assessment?.questions?.proCriminalAttitudes?.score,
+          hostileOrientation = pniResponse.assessment?.questions?.hostileOrientation?.score,
+        ),
+      ),
+      relationshipDomainScore = RelationshipDomainScore(
+        overallRelationshipDomainScore = pniResponse.pniCalculation?.relationshipDomain?.score,
+        individualRelationshipScores = IndividualRelationshipScores(
+          curRelCloseFamily = pniResponse.assessment?.questions?.relCloseFamily?.score,
+          prevExpCloseRel = pniResponse.assessment?.questions?.prevCloseRelationships?.score,
+          easilyInfluenced = pniResponse.assessment?.questions?.easilyInfluenced?.score,
+          aggressiveControllingBehaviour = pniResponse.assessment?.questions?.aggressiveControllingBehaviour?.score,
+        ),
+      ),
+      selfManagementDomainScore = SelfManagementDomainScore(
+        overallSelfManagementDomainScore = pniResponse.pniCalculation?.selfManagementDomain?.score,
+        individualSelfManagementScores = IndividualSelfManagementScores(
+          impulsivity = pniResponse.assessment?.questions?.impulsivity?.score,
+          temperControl = pniResponse.assessment?.questions?.temperControl?.score,
+          problemSolvingSkills = pniResponse.assessment?.questions?.problemSolvingSkills?.score,
+          difficultiesCoping = pniResponse.assessment?.questions?.difficultiesCoping?.score,
+        ),
+      ),
+    )
+  }
+}
 
 data class SexDomainScore(
   @Schema(example = "2", required = true)
