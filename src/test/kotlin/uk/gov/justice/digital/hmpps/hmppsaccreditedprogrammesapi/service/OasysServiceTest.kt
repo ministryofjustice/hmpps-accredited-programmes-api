@@ -37,9 +37,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniCalculation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Questions
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskScoreLevel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Sara
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.SaraRiskLevel
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ScoreLevel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ScoredAnswer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Type
@@ -610,9 +610,9 @@ class OasysServiceTest {
         id = 10082385,
         ldc = Ldc(10, 10),
         ldcMessage = "LDC message",
-        ogrs3Risk = ScoreLevel.HIGH,
-        ovpRisk = ScoreLevel.MEDIUM,
-        osp = Osp(ScoreLevel.LOW, ScoreLevel.LOW),
+        ogrs3Risk = RiskScoreLevel.HIGH,
+        ovpRisk = RiskScoreLevel.MEDIUM,
+        osp = Osp(RiskScoreLevel.LOW, RiskScoreLevel.LOW),
         rsrPercentage = 3.5,
         offenderAge = 32,
         questions = Questions(
