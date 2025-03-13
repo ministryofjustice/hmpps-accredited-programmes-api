@@ -49,6 +49,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
@@ -642,18 +643,6 @@ class ReferralServiceTest {
   fun `should transfer existing referral to building choices`() {
     // Given
     mockSecurityContext(REFERRER_USERNAME)
-    val referralId = UUID.randomUUID()
-    val existingReferral = ReferralEntityFactory()
-      .withOffering(OfferingEntityFactory().produce())
-      .withPrisonNumber(PRISON_NUMBER_1)
-      .withReferrer(ReferrerUserEntityFactory().produce())
-      .withAdditionalInformation("additional info")
-      .withId(referralId)
-      .withStatus(REFERRAL_SUBMITTED)
-      .withOverrideReason("override reason")
-      .produce()
-    val courseId = UUID.randomUUID()
-
     val referralStatusList =
       mutableListOf<ReferralStatusRefData>(
         ReferralStatusRefData(
@@ -671,12 +660,29 @@ class ReferralServiceTest {
           notesOptional = false,
         ),
       )
-    every { referralReferenceDataService.getNextStatusTransitions(REFERRAL_SUBMITTED, true) } returns referralStatusList
 
-    val buildingChoicesOffering = OfferingEntityFactory().withCourse(
-      CourseEntityFactory().withId(courseId).produce(),
-    ).produce()
-    every { offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(courseId, any()) } returns buildingChoicesOffering
+    val referralId = UUID.randomUUID()
+    val existingReferral = ReferralEntityFactory()
+      .withOffering(OfferingEntityFactory().produce())
+      .withPrisonNumber(PRISON_NUMBER_1)
+      .withReferrer(ReferrerUserEntityFactory().produce())
+      .withAdditionalInformation("additional info")
+      .withId(referralId)
+      .withStatus(REFERRAL_SUBMITTED)
+      .withOverrideReason("override reason")
+      .produce()
+
+    val courseId = UUID.randomUUID()
+    val bcOfferingId = UUID.randomUUID()
+    val buildingChoicesOffering = OfferingEntityFactory()
+      .withId(bcOfferingId)
+      .withCourse(CourseEntityFactory().withId(courseId).produce())
+      .produce()
+
+    every { referralService.getReferralById(referralId) } returns existingReferral
+    every { offeringRepository.findById(buildingChoicesOffering.id!!) } returns Optional.of(buildingChoicesOffering)
+
+    every { referralReferenceDataService.getNextStatusTransitions(REFERRAL_SUBMITTED, true) } returns referralStatusList
 
     val newReferralId = UUID.randomUUID()
     every { referralRepository.save(any<ReferralEntity>()) } answers {
@@ -684,7 +690,13 @@ class ReferralServiceTest {
     }
 
     // When
-    val newReferral = referralService.transferReferralToBuildingChoices(existingReferral, courseId = courseId)
+    val newReferral = referralService.transferReferralToBuildingChoices(
+      TransferReferralRequest(
+        referralId = referralId,
+        offeringId = buildingChoicesOffering.id!!,
+        transferReason = "Reason for transfer",
+      ),
+    )
 
     // Then
     assertThat(newReferral).isNotNull
