@@ -856,7 +856,7 @@ class ReferralController(
   )
   fun transferReferralToBuildingChoices(
     @Parameter(
-      description = "",
+      description = "Details needed to transfer a referral to Building Choices",
       required = true,
     ) @RequestBody transferReferralRequest: TransferReferralRequest,
   ): ResponseEntity<Referral> {

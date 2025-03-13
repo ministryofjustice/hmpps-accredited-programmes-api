@@ -12,7 +12,7 @@ data class TransferReferralRequest(
   )
   @get:JsonProperty("referralId") val referralId: UUID,
 
-  @Schema(example = "null", required = true, description = "The id (UUID) of an active offering")
+  @Schema(example = "44e3cdab-c996-4234-afe5-a9d8ddb13be9", required = true, description = "The id (UUID) of an active offering")
   @get:JsonProperty("offeringId", required = true) val offeringId: UUID,
 
   @Schema(example = "The reason for tranferring the referal is", required = true, description = "Reason for transfer of referral to building choices")

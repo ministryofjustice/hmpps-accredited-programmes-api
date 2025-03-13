@@ -14,17 +14,21 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.CourseVariantEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.*
 
 class CourseServiceTest {
@@ -217,5 +221,106 @@ class CourseServiceTest {
 
     result.size shouldBe 4
     result.map { it.id } shouldContainOnly listOf(courseId1, courseId2, variantCourseId1, variantCourseId2)
+  }
+
+  @Test
+  fun `get building choices course for transferring a given referral returns course with the appropriate audience`() {
+    val courseId1 = UUID.randomUUID()
+    val courseId2 = UUID.randomUUID()
+    val variantCourseId1 = UUID.randomUUID()
+    val variantCourseId2 = UUID.randomUUID()
+
+    val courseVariantEntities = listOf(
+      CourseVariantEntity(courseId = courseId1, variantCourseId = variantCourseId1),
+      CourseVariantEntity(courseId = courseId2, variantCourseId = variantCourseId2),
+    )
+
+    val organisationId = "WTI"
+    val courseEntities = listOf(
+      CourseEntityFactory().withId(courseId1).withName("Building Choices: high intensity").withAudience("General offence").produce(),
+      CourseEntityFactory().withId(courseId2).withName("Building Choices: moderate intensity").withAudience("Sexual offence").withOfferings(
+        mutableSetOf(OfferingEntityFactory().withWithdrawn(false).withOrganisationId(organisationId).produce()),
+      ).produce(),
+      CourseEntityFactory().withId(variantCourseId1).produce(),
+      CourseEntityFactory().withId(variantCourseId2).produce(),
+    )
+
+    val referral = ReferralEntityFactory().withOffering(OfferingEntityFactory().withOrganisationId(organisationId).withCourse(CourseEntityFactory().withWithdrawn(false).withAudience("Sexual offence").produce()).produce()).produce()
+    every { courseVariantRepository.findAll() } returns courseVariantEntities
+    every { courseRepository.findAllById(any()) } returns courseEntities
+    every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory().withCode(
+      organisationId,
+    ).withName("Whatton").withGender("MALE").produce()
+    val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral, "MODERATE_INTENSITY_BC")
+
+    recommendedBuildingChoicesCourse.id shouldBe courseId2
+    recommendedBuildingChoicesCourse.name shouldBe "Building Choices: moderate intensity"
+    recommendedBuildingChoicesCourse.audience shouldBe "Sexual offence"
+    recommendedBuildingChoicesCourse.courseOfferings.size shouldBe 1
+    recommendedBuildingChoicesCourse.courseOfferings.first().organisationId shouldBe organisationId
+  }
+
+  @Test
+  fun `should return building choices course with general offence as audience when offence is differnt to sexual offence`() {
+    val courseId1 = UUID.randomUUID()
+    val courseId2 = UUID.randomUUID()
+    val variantCourseId1 = UUID.randomUUID()
+    val variantCourseId2 = UUID.randomUUID()
+
+    val courseVariantEntities = listOf(
+      CourseVariantEntity(courseId = courseId1, variantCourseId = variantCourseId1),
+      CourseVariantEntity(courseId = courseId2, variantCourseId = variantCourseId2),
+    )
+
+    val organisationId = "WTI"
+    val courseEntities = listOf(
+      CourseEntityFactory().withId(courseId1).withName("Building Choices: high intensity").withAudience("General offence").withOfferings(
+        mutableSetOf(OfferingEntityFactory().withWithdrawn(false).withOrganisationId(organisationId).produce()),
+      ).produce(),
+      CourseEntityFactory().withId(courseId2).withName("Building Choices: moderate intensity").withAudience("Sexual offence").produce(),
+      CourseEntityFactory().withId(variantCourseId1).produce(),
+      CourseEntityFactory().withId(variantCourseId2).produce(),
+    )
+
+    val referral = ReferralEntityFactory().withOffering(OfferingEntityFactory().withOrganisationId(organisationId).withCourse(CourseEntityFactory().withWithdrawn(false).withAudience("Initmate partner violence offence").produce()).produce()).produce()
+    every { courseVariantRepository.findAll() } returns courseVariantEntities
+    every { courseRepository.findAllById(any()) } returns courseEntities
+    every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory().withCode(
+      organisationId,
+    ).withName("Whatton").withGender("MALE").produce()
+    val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral, "HIGH_INTENSITY_BC")
+
+    recommendedBuildingChoicesCourse.id shouldBe courseId1
+    recommendedBuildingChoicesCourse.name shouldBe "Building Choices: high intensity"
+    recommendedBuildingChoicesCourse.audience shouldBe "General offence"
+    recommendedBuildingChoicesCourse.courseOfferings.size shouldBe 1
+    recommendedBuildingChoicesCourse.courseOfferings.first().organisationId shouldBe organisationId
+  }
+
+  @Test
+  fun `should return building choices course variants successful`() {
+    val courseId1 = UUID.randomUUID()
+    val courseId2 = UUID.randomUUID()
+    val variantCourseId1 = UUID.randomUUID()
+    val variantCourseId2 = UUID.randomUUID()
+
+    val courseVariantEntities = listOf(
+      CourseVariantEntity(courseId = courseId1, variantCourseId = variantCourseId1),
+      CourseVariantEntity(courseId = courseId2, variantCourseId = variantCourseId2),
+    )
+
+    every { courseVariantRepository.findAllByCourseId(courseId1) } returns courseVariantEntities.find { it.courseId == courseId1 }
+    every { courseRepository.findBuildingChoicesCourses(any(), any(), any()) } returns listOf(CourseEntityFactory().withName("Building Choices: high intensity").produce())
+
+    val buildingChoicesCourseVariants = courseService.getBuildingChoicesCourseVariants(
+      BuildingChoicesSearchRequest(
+        isConvictedOfSexualOffence = false,
+        isInAWomensPrison = false,
+      ),
+      courseId1,
+    )
+
+    buildingChoicesCourseVariants?.size shouldBe 1
+    buildingChoicesCourseVariants?.first()?.name shouldBe "Building Choices: high intensity"
   }
 }

@@ -291,7 +291,7 @@ class PniService(
       log.info("No mismatch in PNI for $prisonId: $acpPniResult")
     } catch (e: Exception) {
       log.error("Error while fetching PNI for $prisonId", e)
-      return "Error while fetching PNI for $prisonId"
+      return "Error while fetching PNI for $prisonId  \n"
     }
     return ""
   }
