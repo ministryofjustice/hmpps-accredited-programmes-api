@@ -4,16 +4,24 @@ data class PniAssessment(
   val id: Long,
   val ldc: Ldc?,
   val ldcMessage: String?,
-  val ogrs3Risk: ScoreLevel?,
-  val ovpRisk: ScoreLevel?,
+  val ogrs3Risk: RiskScoreLevel?,
+  val ovpRisk: RiskScoreLevel?,
   val osp: Osp,
   val rsrPercentage: Double?,
   val offenderAge: Int,
   val questions: Questions,
 )
 
+enum class RiskScoreLevel(val type: String) {
+  LOW("Low"),
+  MEDIUM("Medium"),
+  HIGH("High"),
+  VERY_HIGH("Very High"),
+  NOT_APPLICABLE("Not Applicable"),
+}
+
 data class Ldc(val score: Int, val subTotal: Int)
-data class Osp(val cdc: ScoreLevel?, val iiic: ScoreLevel?)
+data class Osp(val cdc: RiskScoreLevel?, val iiic: RiskScoreLevel?)
 
 data class Questions(
   val everCommittedSexualOffence: ScoredAnswer.YesNo,
