@@ -64,7 +64,8 @@ class PniService(
     log.info("Saving PNI score for prisonNumber: $pniScore.prisonNumber")
 
     val oasysAssessmentTimeline = oasysService.getAssessments(pniScore.prisonNumber)
-    val completedAssessment = oasysService.getLatestCompletedLayerThreeAssessment(oasysAssessmentTimeline) ?: throw NotFoundException("No completed assessments found for $pniScore.prisonNumber")
+    val completedAssessment = oasysService.getLatestCompletedLayerThreeAssessment(oasysAssessmentTimeline)
+      ?: throw NotFoundException("No completed assessments found for $pniScore.prisonNumber")
 
     pniResultEntityRepository.save(buildEntity(pniScore, completedAssessment, referralId))
   }
@@ -74,7 +75,8 @@ class PniService(
 
     auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.PNI.name)
 
-    val pniResponse = oasysService.getPniCalculation(prisonNumber) ?: throw NotFoundException("No PNI information found for $prisonNumber")
+    val pniResponse = oasysService.getPniCalculation(prisonNumber)
+      ?: throw NotFoundException("No PNI information found for $prisonNumber")
     val learning = oasysService.getLearning(pniResponse.assessment?.id!!)
 
     // needs
@@ -104,7 +106,12 @@ class PniService(
   }
 
   @Deprecated("Use getOasysPniScore(..) method instead")
-  fun getPniScore(prisonNumber: String, gender: String? = null, savePni: Boolean = false, referralId: UUID? = null): PniScore {
+  fun getPniScore(
+    prisonNumber: String,
+    gender: String? = null,
+    savePni: Boolean = false,
+    referralId: UUID? = null,
+  ): PniScore {
     log.info("Request received to process PNI for prisonNumber $prisonNumber")
 
     auditService.audit(
@@ -295,39 +302,38 @@ class PniService(
     }
     return ""
   }
+
+  private fun buildNeedsScores(
+    behavior: OasysBehaviour?,
+    relationships: OasysRelationships?,
+    attitude: OasysAttitude?,
+    lifestyle: OasysLifestyle?,
+    psychiatric: OasysPsychiatric?,
+  ) = IndividualNeedsScores(
+    individualSexScores = IndividualSexScores(
+      sexualPreOccupation = behavior?.sexualPreOccupation.getScore(),
+      offenceRelatedSexualInterests = behavior?.offenceRelatedSexualInterests.getScore(),
+      emotionalCongruence = relationships?.emotionalCongruence.getScore(),
+    ),
+
+    individualCognitiveScores = IndividualCognitiveScores(
+      proCriminalAttitudes = attitude?.proCriminalAttitudes.getScore(),
+      hostileOrientation = attitude?.hostileOrientation.getScore(),
+    ),
+    individualRelationshipScores = IndividualRelationshipScores(
+      curRelCloseFamily = relationships?.relCloseFamily.getScore(),
+      prevExpCloseRel = relationships?.prevCloseRelationships.getScore(),
+      easilyInfluenced = lifestyle?.easilyInfluenced.getScore(),
+      aggressiveControllingBehaviour = behavior?.aggressiveControllingBehavour.getScore(),
+    ),
+    individualSelfManagementScores = IndividualSelfManagementScores(
+      impulsivity = behavior?.impulsivity.getScore(),
+      temperControl = behavior?.temperControl.getScore(),
+      problemSolvingSkills = behavior?.problemSolvingSkills.getScore(),
+      difficultiesCoping = psychiatric?.difficultiesCoping.getScore(),
+    ),
+  )
 }
-
-private fun buildNeedsScores(
-  behavior: OasysBehaviour?,
-  relationships: OasysRelationships?,
-  attitude: OasysAttitude?,
-  lifestyle: OasysLifestyle?,
-  psychiatric: OasysPsychiatric?,
-) = IndividualNeedsScores(
-  individualSexScores = IndividualSexScores(
-    sexualPreOccupation = behavior?.sexualPreOccupation.getScore(),
-    offenceRelatedSexualInterests = behavior?.offenceRelatedSexualInterests.getScore(),
-    emotionalCongruence = relationships?.emotionalCongruence.getScore(),
-  ),
-
-  individualCognitiveScores = IndividualCognitiveScores(
-    proCriminalAttitudes = attitude?.proCriminalAttitudes.getScore(),
-    hostileOrientation = attitude?.hostileOrientation.getScore(),
-  ),
-  individualRelationshipScores = IndividualRelationshipScores(
-    curRelCloseFamily = relationships?.relCloseFamily.getScore(),
-    prevExpCloseRel = relationships?.prevCloseRelationships.getScore(),
-    easilyInfluenced = lifestyle?.easilyInfluenced.getScore(),
-    aggressiveControllingBehaviour = behavior?.aggressiveControllingBehavour.getScore(),
-  ),
-  individualSelfManagementScores = IndividualSelfManagementScores(
-    impulsivity = behavior?.impulsivity.getScore(),
-    temperControl = behavior?.temperControl.getScore(),
-    problemSolvingSkills = behavior?.problemSolvingSkills.getScore(),
-    difficultiesCoping = psychiatric?.difficultiesCoping.getScore(),
-  ),
-
-)
 
 private fun String?.getScore() = this?.trim()?.split("-")?.firstOrNull()?.trim()?.toIntOrNull()
 
