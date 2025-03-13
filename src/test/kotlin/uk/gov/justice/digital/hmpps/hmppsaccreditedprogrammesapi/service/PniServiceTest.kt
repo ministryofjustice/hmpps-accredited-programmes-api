@@ -1,9 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniRuleRepository
@@ -47,10 +48,7 @@ class PniServiceTest {
     val result = pniService.fetchAndStoreOasysPni(prisonId)
 
     // Then
-    assertEquals(
-      "Pni calculation mismatch for prisonNumber $prisonId. ACP: $acpPniResult, OASYS: $oasysPniResult \n",
-      result,
-    )
+    result shouldBe "Pni calculation mismatch for prisonNumber $prisonId. ACP: $acpPniResult, OASYS: $oasysPniResult \n"
   }
 
   @Test
@@ -68,7 +66,7 @@ class PniServiceTest {
     val result = pniService.fetchAndStoreOasysPni(prisonId)
 
     // Then
-    assertEquals("", result)
+    result shouldBe ""
   }
 
   @Test
@@ -82,6 +80,6 @@ class PniServiceTest {
     val result = pniService.fetchAndStoreOasysPni(prisonId)
 
     // Then
-    assertEquals("Error while fetching PNI for $prisonId", result)
+    result shouldContain "Error while fetching PNI for $prisonId"
   }
 }
