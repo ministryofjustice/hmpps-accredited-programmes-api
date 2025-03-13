@@ -50,11 +50,11 @@
       "proCriminalAttitudes" : "SOME",
       "hostileOrientation" : "SOME",
       "relCloseFamily" : "NONE",
-      "prevCloseRelationships" : "NONE",
+      "prevCloseRelationships" : "SOME",
       "easilyInfluenced" : "NONE",
       "aggressiveControllingBehaviour" : "NONE",
       "impulsivity" : "NONE",
-      "temperControl" : "NONE",
+      "temperControl" : "SIGNIFICANT",
       "problemSolvingSkills" : "NONE",
       "difficultiesCoping" : "MISSING"
     }

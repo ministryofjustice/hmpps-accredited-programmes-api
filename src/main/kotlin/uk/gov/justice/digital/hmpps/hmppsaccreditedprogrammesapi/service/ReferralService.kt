@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
@@ -30,11 +31,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.jvm.optionals.getOrElse
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -125,7 +128,6 @@ constructor(
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
-    referral.transferReason = update.transferReason
     referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
   }
 
@@ -416,15 +418,15 @@ constructor(
     log.info("Update successful for ${referrals.size} referrals for prisoner $prisonNumber referralIds ${savedReferrals.map { it.id }} Finished updating referrals with primary pom ${primaryPom?.staffId} and secondary POM ${secondaryPom?.staffId} ")
   }
 
-  fun transferReferralToBuildingChoices(referral: ReferralEntity, courseId: UUID): ReferralEntity? {
-    val organisationId = referral.offering.organisationId
-    val newOffering = offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(
-      courseId,
-      organisationId,
-    ) ?: throw IllegalStateException("Unable to find building choices offering for course: $courseId and organisation: $organisationId")
-      .also { log.warn("Unable to find building choices offering during transfer for course: $courseId and organisation: $organisationId") }
+  fun transferReferralToBuildingChoices(transferReferralRequest: TransferReferralRequest): ReferralEntity? {
+    val referral = getReferralById(transferReferralRequest.referralId) ?: throw NotFoundException("No referral found at /referrals/${transferReferralRequest.referralId}/transfer-to-building-choices")
+    referral.transferReason = transferReferralRequest.transferReason
 
-    val newReferral = createNewReferral(referral, newOffering)
+    val newOffering = offeringRepository.findById(transferReferralRequest.offeringId).getOrElse { throw NotFoundException("Referral ${transferReferralRequest.referralId} cannot be transferred, as offeringId ${transferReferralRequest.offeringId} does not exist") }
+    val newReferral = createNewReferral(
+      referral = referral,
+      newOffering = newOffering,
+    )
     referralStatusHistoryService.createReferralHistory(newReferral)
     auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
 

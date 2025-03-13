@@ -250,6 +250,7 @@ class OasysServiceTest {
       qualifications = "3",
       basicSkillsScore = "4",
       eTEIssuesDetails = "5",
+      crn = "A12345",
     )
     val oasysAccommodation = OasysAccommodation(
       "Yes",
