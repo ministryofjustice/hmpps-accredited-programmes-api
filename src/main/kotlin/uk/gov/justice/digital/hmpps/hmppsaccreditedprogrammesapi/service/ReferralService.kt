@@ -419,7 +419,7 @@ constructor(
   }
 
   fun transferReferralToBuildingChoices(transferReferralRequest: TransferReferralRequest): ReferralEntity? {
-    val referral = getReferralById(transferReferralRequest.referralId) ?: throw NotFoundException("No referral found at /referrals/${transferReferralRequest.referralId}/transfer-to-building-choices")
+    val referral = getReferralById(transferReferralRequest.referralId) ?: throw NotFoundException("No referral found with id ${transferReferralRequest.referralId}")
     referral.transferReason = transferReferralRequest.transferReason
 
     val newOffering = offeringRepository.findById(transferReferralRequest.offeringId).getOrElse { throw NotFoundException("Referral ${transferReferralRequest.referralId} cannot be transferred, as offeringId ${transferReferralRequest.offeringId} does not exist") }
