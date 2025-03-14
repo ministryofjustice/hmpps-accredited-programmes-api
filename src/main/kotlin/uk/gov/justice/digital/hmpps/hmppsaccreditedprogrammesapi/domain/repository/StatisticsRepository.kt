@@ -295,11 +295,48 @@ FROM (
     fun getOrgId(): String
   }
 
+  interface StatusCountByProgrammeProjection {
+    fun getCourseName(): String
+    fun getAudience(): String
+    fun getCount(): BigInteger
+    fun getStatus(): String
+    fun getOrgId(): String
+  }
+
   interface ReferralStatisticsProjection {
     fun getSubmittedReferrals(): BigInteger
     fun getDraftReferrals(): BigInteger
     fun getAverageDuration(): String
   }
+
+  @Query(
+    """
+       SELECT
+         c.name AS courseName,
+         c.audience AS audience,
+         COUNT(*) AS count,
+         rsh.status AS status,
+         o.organisation_id AS orgId
+       FROM referral r
+       JOIN offering o ON r.offering_id = o.offering_id
+       JOIN course c ON o.course_id = c.course_id
+       JOIN referral_status_history rsh ON rsh.referral_id = r.referral_id
+       WHERE r.deleted = FALSE
+         AND rsh.status_start_date >= :startDate
+         AND rsh.status_start_date < :endDate
+         AND (:locations is null OR o.organisation_id in :locations)
+         AND (:courseName is null OR c.name = :courseName)
+       GROUP BY c.name, c.audience, rsh.status, o.organisation_id
+       ORDER BY o.organisation_id, rsh.status
+          """,
+    nativeQuery = true,
+  )
+  fun findReferralCountByCourseName(
+    startDate: LocalDate,
+    endDate: LocalDate,
+    locations: List<String>?,
+    courseName: String?,
+  ): List<StatusCountByProgrammeProjection>?
 
   @Query(
     """
