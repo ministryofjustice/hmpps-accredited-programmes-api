@@ -326,8 +326,7 @@ class OasysService(
 
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? = fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
 
-  // TODO: Remove this method once the LDC score is available from the OASys API
-  fun getLDCScore(prisonNumber: String): BigDecimal? = (3..5).random().toBigDecimal()
+  fun getLDCScore(prisonNumber: String): BigDecimal? = getPniCalculation(prisonNumber)?.assessment?.ldc?.subTotal?.toBigDecimal()
 
   fun getOasysPniProgrammePathway(prisonId: String): String = when (getPniCalculation(prisonId)?.pniCalculation?.pni) {
     Type.H -> "HIGH_INTENSITY_BC"

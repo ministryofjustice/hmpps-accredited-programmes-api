@@ -47,6 +47,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.AlertsResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AlertFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniCalculationFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResponseFactory
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 class OasysServiceTest {
@@ -312,7 +314,10 @@ class OasysServiceTest {
     // Given
     val oasysAssessmentTimeline = createAssessmentTimelineWithSaraOlderThanSixWeeks()
 
-    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
+    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysAssessmentTimeline,
+    )
 
     val oasysRelationShips1 = OasysRelationships(
       sara = null,
@@ -362,7 +367,10 @@ class OasysServiceTest {
     // Given
     val oasysAssessmentTimeline = createAssessmentTimeline()
 
-    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
+    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysAssessmentTimeline,
+    )
 
     val oasysRelationShips1 = OasysRelationships(
       sara = null,
@@ -413,7 +421,10 @@ class OasysServiceTest {
     // Given
     val oasysAssessmentTimeline = createAssessmentTimelineWithSaraOnTheSameDay()
 
-    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(HttpStatus.OK, oasysAssessmentTimeline)
+    every { oasysApiClient.getAssessments("A9999BB") } returns ClientResult.Success(
+      HttpStatus.OK,
+      oasysAssessmentTimeline,
+    )
 
     val oasysRelationShips1 = OasysRelationships(
       sara = null,
@@ -472,7 +483,10 @@ class OasysServiceTest {
         AlertFactory().withPrisonNumber(prisonNumber).withIsActive(false).build(),
       ),
     )
-    every { prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber) } returns ClientResult.Success(HttpStatus.OK, alertsResponse)
+    every { prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber) } returns ClientResult.Success(
+      HttpStatus.OK,
+      alertsResponse,
+    )
 
     // When
     val activeAlerts = service.getActiveAlerts(prisonNumber)
@@ -494,7 +508,10 @@ class OasysServiceTest {
         AlertFactory().withPrisonNumber(prisonNumber).withIsActive(false).build(),
       ),
     )
-    every { prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber) } returns ClientResult.Success(HttpStatus.OK, alertsResponse)
+    every { prisonerAlertsApiClient.getPrisonerAlertsByPrisonNumber(prisonNumber) } returns ClientResult.Success(
+      HttpStatus.OK,
+      alertsResponse,
+    )
 
     // When
     val activeAlerts = service.getActiveAlerts(prisonNumber)
@@ -721,5 +738,22 @@ class OasysServiceTest {
 
     // Then
     assertThat(result).isEqualTo("MISSING_INFORMATION")
+  }
+
+  @Test
+  fun `should return LDC score for given prisoner number`() {
+    // Given
+    val prisonNumber = "A1234BC"
+    val ldcSubTotal = 10
+    val pniResponse = PniResponseFactory().withAssessment(PniResponseFactory.PniAssessmentFactory().withLdc(Ldc(3, ldcSubTotal)).produce()).produce()
+
+    every { oasysApiClient.getPniCalculation(prisonNumber) } returns ClientResult.Success(HttpStatus.OK, pniResponse)
+    every { auditService.audit(prisonNumber, "OASYS_PNI_SEARCH") } just runs
+
+    // When
+    val result = service.getLDCScore(prisonNumber)
+
+    // Then
+    assertThat(result).isEqualTo(BigDecimal(ldcSubTotal))
   }
 }
