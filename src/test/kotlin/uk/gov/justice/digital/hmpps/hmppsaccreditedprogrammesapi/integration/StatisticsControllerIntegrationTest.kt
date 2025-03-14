@@ -34,7 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatistics
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StatusCountByProgramme
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.math.BigInteger
 import java.time.LocalDate
@@ -51,10 +51,13 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   @Autowired
   lateinit var statisticsRepository: StatisticsRepository
 
+  val courseName1 = "Super Course"
   val courseId1 = UUID.randomUUID()
   val courseId2 = UUID.randomUUID()
+  val courseId3 = UUID.randomUUID()
   val offeringId1 = UUID.randomUUID()
   val offeringId2 = UUID.randomUUID()
+  val offeringId3 = UUID.randomUUID()
 
   @BeforeEach
   fun setUp() {
@@ -67,7 +70,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     persistenceHelper.createCourse(
       courseId1,
       "SC",
-      "Super Course",
+      courseName1,
       "Sample description",
       "SC++",
       "General offence",
@@ -82,12 +85,12 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
       "Custom offence",
     )
     persistenceHelper.createCourse(
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
+      courseId3,
       "RC",
-      "RAPID Course",
+      courseName1,
       "Sample description",
       "RC",
-      "General offence",
+      "Sexual offence",
     )
 
     persistenceHelper.createOffering(
@@ -101,6 +104,14 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     persistenceHelper.createOffering(
       offeringId2,
       courseId2,
+      "MDI",
+      "nobody-bwn@digital.justice.gov.uk",
+      "nobody2-bwn@digital.justice.gov.uk",
+      true,
+    )
+    persistenceHelper.createOffering(
+      offeringId3,
+      courseId3,
       "MDI",
       "nobody-bwn@digital.justice.gov.uk",
       "nobody2-bwn@digital.justice.gov.uk",
@@ -193,7 +204,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     // Then
     reportContent.reportType shouldBe ReportType.ON_PROGRAMME_COUNT.toString()
     reportContent.content.count shouldBe 1
-    reportContent.content.courseCounts?.get(0)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(0)?.name shouldBe courseName1
     reportContent.content.courseCounts?.get(0)?.audience shouldBe "General offence"
     reportContent.content.courseCounts?.get(0)?.count shouldBe 1
     reportContent.parameters.courseId shouldBe courseId1
@@ -217,7 +228,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
     // Then
     reportContent.content.count shouldBe 1
-    reportContent.content.courseCounts?.first()?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.first()?.name shouldBe courseName1
     reportContent.content.courseCounts?.first()?.audience shouldBe "General offence"
     reportContent.parameters.courseId shouldBe null
     reportContent.reportType shouldBe ReportType.PROGRAMME_COMPLETE_COUNT.toString()
@@ -275,7 +286,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
     reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
     reportContent.content.courseCounts?.get(0)?.count shouldBe 1
-    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.name shouldBe courseName1
     reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
     reportContent.content.courseCounts?.get(1)?.count shouldBe 1
     reportContent.parameters.courseId shouldBe null
@@ -331,7 +342,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
     reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
     reportContent.content.courseCounts?.get(0)?.count shouldBe 1
-    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.name shouldBe courseName1
     reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
     reportContent.content.courseCounts?.get(1)?.count shouldBe 1
     reportContent.parameters.courseId shouldBe null
@@ -392,7 +403,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
     reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
     reportContent.content.courseCounts?.get(0)?.count shouldBe 1
-    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.name shouldBe courseName1
     reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
     reportContent.content.courseCounts?.get(1)?.count shouldBe 1
     reportContent.parameters.courseId shouldBe null
@@ -480,7 +491,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     reportContent.content.courseCounts?.get(0)?.name shouldBe "Custom Course"
     reportContent.content.courseCounts?.get(0)?.audience shouldBe "Custom offence"
     reportContent.content.courseCounts?.get(0)?.count shouldBe 1
-    reportContent.content.courseCounts?.get(1)?.name shouldBe "Super Course"
+    reportContent.content.courseCounts?.get(1)?.name shouldBe courseName1
     reportContent.content.courseCounts?.get(1)?.audience shouldBe "General offence"
     reportContent.content.courseCounts?.get(1)?.count shouldBe 1
     reportContent.parameters.courseId shouldBe null
@@ -539,48 +550,56 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return referral status statistics for a given course id and location`() {
+  fun `should return referral status statistics for a given course name and location`() {
     // Given
-    val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
-    progressReferralStatusToOnProgramme(createdReferral.id)
+    val createdReferral1 = createReferral(offeringId1, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral1.id)
+    val createdReferral2 = createReferral(offeringId3, PRISON_NUMBER_1)
+    progressReferralStatusToOnProgramme(createdReferral2.id)
 
     // When
-    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseName1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
 
     // Then
     assertThat(reportStatusesByProgrammeType).isNotNull
-      .hasSize(6)
-      .extracting("count", "status", "organisationCode")
+      .hasSize(12)
+      .extracting("courseName", "audience", "count", "status", "organisationCode")
       .containsExactly(
-        tuple(1L, "ASSESSED_SUITABLE", ORGANISATION_ID_MDI),
-        tuple(1L, "ASSESSMENT_STARTED", ORGANISATION_ID_MDI),
-        tuple(1L, "AWAITING_ASSESSMENT", ORGANISATION_ID_MDI),
-        tuple(1L, "ON_PROGRAMME", ORGANISATION_ID_MDI),
-        tuple(1L, "REFERRAL_STARTED", ORGANISATION_ID_MDI),
-        tuple(1L, "REFERRAL_SUBMITTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "ASSESSED_SUITABLE", ORGANISATION_ID_MDI),
+        tuple(courseName1, "Sexual offence", BigInteger.ONE, "ASSESSED_SUITABLE", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "ASSESSMENT_STARTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "Sexual offence", BigInteger.ONE, "ASSESSMENT_STARTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "AWAITING_ASSESSMENT", ORGANISATION_ID_MDI),
+        tuple(courseName1, "Sexual offence", BigInteger.ONE, "AWAITING_ASSESSMENT", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "ON_PROGRAMME", ORGANISATION_ID_MDI),
+        tuple(courseName1, "Sexual offence", BigInteger.ONE, "ON_PROGRAMME", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "REFERRAL_STARTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "Sexual offence", BigInteger.ONE, "REFERRAL_STARTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "REFERRAL_SUBMITTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "Sexual offence", BigInteger.ONE, "REFERRAL_SUBMITTED", ORGANISATION_ID_MDI),
       )
   }
 
   @Test
-  fun `should return referral status statistics for a given course id and ALL locations`() {
+  fun `should return referral status statistics for a given course name and ALL locations`() {
     // Given
     val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral.id)
 
     // When
-    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = null)
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseName1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = null)
 
     // Then
     assertThat(reportStatusesByProgrammeType).isNotNull
       .hasSize(6)
-      .extracting("count", "status", "organisationCode")
+      .extracting("courseName", "audience", "count", "status", "organisationCode")
       .containsExactly(
-        tuple(1L, "ASSESSED_SUITABLE", ORGANISATION_ID_MDI),
-        tuple(1L, "ASSESSMENT_STARTED", ORGANISATION_ID_MDI),
-        tuple(1L, "AWAITING_ASSESSMENT", ORGANISATION_ID_MDI),
-        tuple(1L, "ON_PROGRAMME", ORGANISATION_ID_MDI),
-        tuple(1L, "REFERRAL_STARTED", ORGANISATION_ID_MDI),
-        tuple(1L, "REFERRAL_SUBMITTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "ASSESSED_SUITABLE", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "ASSESSMENT_STARTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "AWAITING_ASSESSMENT", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "ON_PROGRAMME", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "REFERRAL_STARTED", ORGANISATION_ID_MDI),
+        tuple(courseName1, "General offence", BigInteger.ONE, "REFERRAL_SUBMITTED", ORGANISATION_ID_MDI),
       )
   }
 
@@ -592,30 +611,30 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     progressReferralStatusToStatus(createdReferral.id, DESELECTED)
 
     // When
-    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseName1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
 
     // Then
     assertThat(reportStatusesByProgrammeType)
       .hasSize(7)
-      .extracting("count", "status", "organisationCode")
-      .contains(tuple(1L, DESELECTED, ORGANISATION_ID_MDI))
+      .extracting("courseName", "audience", "count", "status", "organisationCode")
+      .contains(tuple(courseName1, "General offence", BigInteger.ONE, DESELECTED, ORGANISATION_ID_MDI))
   }
 
   @Test
-  fun `should return PROGRAMME_COMPLETE referral count for a given course id`() {
+  fun `should return PROGRAMME_COMPLETE referral count for a given course name and location`() {
     // Given
     val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
     progressReferralStatusToOnProgramme(createdReferral.id)
     progressReferralStatusToStatus(createdReferral.id, PROGRAMME_COMPLETE)
 
     // When
-    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseName1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
 
     // Then
     assertThat(reportStatusesByProgrammeType)
       .hasSize(7)
-      .extracting("count", "status", "organisationCode")
-      .contains(tuple(1L, PROGRAMME_COMPLETE, ORGANISATION_ID_MDI))
+      .extracting("courseName", "audience", "count", "status", "organisationCode")
+      .contains(tuple(courseName1, "General offence", BigInteger.ONE, PROGRAMME_COMPLETE, ORGANISATION_ID_MDI))
   }
 
   @Test
@@ -629,25 +648,24 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
     progressReferralStatusToStatus(createdReferral.id, REFERRAL_WITHDRAWN)
 
     // When
-    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseName1, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
 
     // Then
     assertThat(reportStatusesByProgrammeType)
       .hasSize(3)
-      .extracting("count", "status", "organisationCode")
-      .contains(tuple(1L, REFERRAL_WITHDRAWN, ORGANISATION_ID_MDI))
+      .extracting("courseName", "audience", "count", "status", "organisationCode")
+      .contains(tuple(courseName1, "General offence", BigInteger.ONE, REFERRAL_WITHDRAWN, ORGANISATION_ID_MDI))
   }
 
   @Test
-  fun `should return an empty list of referral statistics for an unknown course id`() {
+  fun `should return an empty list of referral statistics for an unknown course name`() {
     // Given
     val createdReferral = createReferral(prisonNumber = PRISON_NUMBER_1)
 
     progressReferralStatusToOnProgramme(createdReferral.id)
-    val courseId = UUID.randomUUID()
 
     // When
-    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType(courseId, startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
+    val reportStatusesByProgrammeType = getReportStatusesByProgrammeType("unknown course", startDate = LocalDate.now(), endDate = LocalDate.now().plusDays(1), locations = listOf(ORGANISATION_ID_MDI))
 
     // Then
     assertThat(reportStatusesByProgrammeType).isEmpty()
@@ -695,7 +713,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
   fun createReferral(prisonNumber: String = PRISON_NUMBER_1): Referral = createReferral(offeringId1, prisonNumber)
 
-  fun getReportStatusesByProgrammeType(courseId: UUID, startDate: LocalDate, endDate: LocalDate, locations: List<String>?) = performRequestAndExpectOk(HttpMethod.GET, "/statistics/report/count-by-status-for-programme?startDate=$startDate&endDate=$endDate&" + locations?.joinToString("&") { "locationCodes=$it" } + "&courseId=$courseId", listReportStatusCountTypeReference())
+  fun getReportStatusesByProgrammeType(courseName: String?, startDate: LocalDate, endDate: LocalDate, locations: List<String>?) = performRequestAndExpectOk(HttpMethod.GET, "/statistics/report/count-by-status-for-programme?startDate=$startDate&endDate=$endDate&" + locations?.joinToString("&") { "locationCodes=$it" } + if (courseName != null) "&courseName=$courseName" else "", listStatusCountByProgrammeTypeReference())
 
   fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
 
@@ -707,5 +725,5 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
 
   fun referralStatisticsTypeReference(): ParameterizedTypeReference<ReferralStatistics> = object : ParameterizedTypeReference<ReferralStatistics>() {}
   fun reportContentTypeReference(): ParameterizedTypeReference<ReportContent> = object : ParameterizedTypeReference<ReportContent>() {}
-  fun listReportStatusCountTypeReference(): ParameterizedTypeReference<List<ReportStatusCount>> = object : ParameterizedTypeReference<List<ReportStatusCount>>() {}
+  fun listStatusCountByProgrammeTypeReference(): ParameterizedTypeReference<List<StatusCountByProgramme>> = object : ParameterizedTypeReference<List<StatusCountByProgramme>>() {}
 }

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StatisticsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatistics
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReportStatusCount
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StatusCountByProgramme
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StatisticsService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import java.time.LocalDate
@@ -50,12 +49,12 @@ class StatisticsController(
     @RequestParam startDate: LocalDate,
     @RequestParam endDate: LocalDate? = LocalDate.now().plusDays(1),
     @RequestParam locationCodes: List<String>? = listOf(),
-    @RequestParam courseId: UUID,
-  ): List<ReportStatusCount> = statisticsService.getReferralStatusCountByProgramme(
+    @RequestParam courseName: String? = null,
+  ): List<StatusCountByProgramme> = statisticsService.getReferralStatusCountByProgramme(
     startDate,
     endDate!!,
     locationCodes,
-    courseId,
+    courseName,
   )
 
   @GetMapping("/report/referral-statistics", produces = ["application/json"])
