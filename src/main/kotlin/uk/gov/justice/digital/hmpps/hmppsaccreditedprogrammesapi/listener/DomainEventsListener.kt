@@ -33,6 +33,7 @@ class DomainEventsListener(
     when (message.eventType) {
       "prisoner-offender-search.prisoner.updated" -> handlePrisonerUpdatedMessage(message)
       "offender-management.allocation.changed" -> handlePomAllocationChangedMessage(message)
+      "probation-case.requirement.created" -> log.info("Ignoring probation-case.requirement.created event \n $message")
       else -> log.error("Unknown event type: ${message.eventType}")
     }
   }
