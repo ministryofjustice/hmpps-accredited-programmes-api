@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Level
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.LevelScore
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ScoreLevel
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskScoreLevel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Type
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
@@ -41,7 +41,7 @@ class OasysApiClientIntegrationTest : IntegrationTestBase() {
         assertThat(pniResponse.pniCalculation?.riskLevel).isEqualTo(Level.H)
         assertThat(pniResponse.pniCalculation?.totalDomainScore).isEqualTo(5)
         assertThat(pniResponse.assessment?.id).isEqualTo(10082385)
-        assertThat(pniResponse.assessment?.ovpRisk).isEqualTo(ScoreLevel.MEDIUM)
+        assertThat(pniResponse.assessment?.ovpRisk).isEqualTo(RiskScoreLevel.MEDIUM)
       }
       is ClientResult.Failure.Other<*> -> fail("Unexpected client result: ${response::class.simpleName}")
       is ClientResult.Failure.StatusCode<*> -> {

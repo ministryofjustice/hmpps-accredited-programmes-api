@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
@@ -37,6 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toDomain
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
@@ -849,23 +851,17 @@ class ReferralController(
   )
   @RequestMapping(
     method = [RequestMethod.POST],
-    value = ["/referrals/{id}/transfer-to-building-choices/{courseId}"],
+    value = ["/referrals/transfer-to-building-choices"],
     consumes = ["application/json"],
   )
   fun transferReferralToBuildingChoices(
     @Parameter(
-      description = "The id (UUID) of the referral",
+      description = "Details needed to transfer a referral to Building Choices",
       required = true,
-    ) @PathVariable("id") id: UUID,
-    @Parameter(
-      description = "The id (UUID) of the course",
-      required = true,
-    ) @PathVariable("courseId") courseId: UUID,
+    ) @RequestBody transferReferralRequest: TransferReferralRequest,
   ): ResponseEntity<Referral> {
-    referralService.getReferralById(id)?.let {
-      val newReferral = referralService.transferReferralToBuildingChoices(it, courseId)
-      return ResponseEntity.status(HttpStatus.OK).body(newReferral?.toApi())
-    } ?: throw NotFoundException("No referral found at /referrals/$id/transfer-to-building-choices/$courseId")
+    val newReferral = referralService.transferReferralToBuildingChoices(transferReferralRequest)
+    return ResponseEntity.status(HttpStatus.OK).body(newReferral?.toApi())
   }
 
   @Operation(

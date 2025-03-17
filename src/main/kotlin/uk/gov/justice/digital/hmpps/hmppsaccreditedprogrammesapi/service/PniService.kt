@@ -3,22 +3,24 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Level
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLearning
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysLifestyle
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Type
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniRuleRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualCognitiveScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualNeedsAndRiskScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualNeedsScores
@@ -53,16 +55,56 @@ class PniService(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
+  @Deprecated("Use savPni(pniScore: PniScore, referralId: UUID? = null) method instead")
   fun savePni(prisonNumber: String, gender: String?, savePni: Boolean = false, referralId: UUID? = null) {
     getPniScore(prisonNumber, gender, savePni, referralId)
   }
 
-  fun getPniScore(
-    prisonNumber: String,
-    gender: String? = null,
-    savePni: Boolean = false,
-    referralId: UUID? = null,
-  ): PniScore {
+  fun savePni(pniScore: PniScore, referralId: UUID? = null) {
+    log.info("Saving PNI score for prisonNumber: $pniScore.prisonNumber")
+
+    val oasysAssessmentTimeline = oasysService.getAssessments(pniScore.prisonNumber)
+    val completedAssessment = oasysService.getLatestCompletedLayerThreeAssessment(oasysAssessmentTimeline) ?: throw NotFoundException("No completed assessments found for $pniScore.prisonNumber")
+
+    pniResultEntityRepository.save(buildEntity(pniScore, completedAssessment, referralId))
+  }
+
+  fun getOasysPniScore(prisonNumber: String): PniScore {
+    log.info("Request received to process Oasys PNI for prisonNumber $prisonNumber")
+
+    auditService.audit(prisonNumber = prisonNumber, auditAction = AuditAction.PNI.name)
+
+    val pniResponse = oasysService.getPniCalculation(prisonNumber) ?: throw NotFoundException("No PNI information found for $prisonNumber")
+    val learning = oasysService.getLearning(pniResponse.assessment?.id!!)
+
+    // needs
+    val needsScore = NeedsScore(
+      overallNeedsScore = pniResponse.pniCalculation?.totalDomainScore,
+      basicSkillsScore = learning?.basicSkillsScore?.toInt(),
+      classification = Level.toText(pniResponse.pniCalculation?.needLevel),
+      domainScore = DomainScore.from(pniResponse),
+    )
+
+    // risk
+    val riskScore = RiskScore(
+      classification = Level.toText(pniResponse.pniCalculation?.riskLevel),
+      individualRiskScores = IndividualRiskScores.from(pniResponse),
+    )
+
+    val pniScore = PniScore(
+      prisonNumber = prisonNumber,
+      crn = learning?.crn,
+      assessmentId = pniResponse.assessment.id,
+      programmePathway = Type.toText(pniResponse.pniCalculation?.pni),
+      needsScore = needsScore,
+      riskScore = riskScore,
+      validationErrors = pniResponse.pniCalculation?.missingFields.orEmpty(),
+    )
+    return pniScore
+  }
+
+  @Deprecated("Use getOasysPniScore(..) method instead")
+  fun getPniScore(prisonNumber: String, gender: String? = null, savePni: Boolean = false, referralId: UUID? = null): PniScore {
     log.info("Request received to process PNI for prisonNumber $prisonNumber")
 
     auditService.audit(
@@ -129,7 +171,7 @@ class PniService(
     )
 
     if (savePni) {
-      pniResultEntityRepository.save(buildEntity(pniScore, completedAssessment, referralId, learning))
+      pniResultEntityRepository.save(buildEntity(pniScore, completedAssessment, referralId))
     }
     return pniScore
   }
@@ -160,7 +202,6 @@ class PniService(
     pniScore: PniScore,
     completedAssessment: Timeline?,
     referralId: UUID?,
-    learning: OasysLearning?,
   ): PniResultEntity = PniResultEntity(
     crn = pniScore.crn,
     prisonNumber = pniScore.prisonNumber,
@@ -174,7 +215,7 @@ class PniService(
     pniValid = pniScore.validationErrors.isEmpty(),
     pniResultJson = objectMapper.writeValueAsString(pniScore),
     pniAssessmentDate = LocalDateTime.now(),
-    basicSkillsScore = learning?.basicSkillsScore?.toInt(),
+    basicSkillsScore = pniScore.needsScore.basicSkillsScore,
   )
 
   private fun getProgramPathway(
@@ -241,16 +282,16 @@ class PniService(
 
   fun fetchAndStoreOasysPni(prisonId: String): String {
     try {
-      val acpPniResult = pniResultEntityRepository.findAllByPrisonNumber(prisonId).first().programmePathway!!
+      val acpPniResult = getPniScore(prisonId, savePni = false).programmePathway
       val oasysPniResult = oasysService.getOasysPniProgrammePathway(prisonId)
 
       if (acpPniResult != oasysPniResult) {
-        return "Pni calculation mismatch for prisonNumber $prisonId. ACP: $acpPniResult, OASYS: $oasysPniResult \n"
+        return "$prisonId,$acpPniResult,$oasysPniResult\n"
       }
       log.info("No mismatch in PNI for $prisonId: $acpPniResult")
     } catch (e: Exception) {
       log.error("Error while fetching PNI for $prisonId", e)
-      return "Error while fetching PNI for $prisonId"
+      return "Error while fetching PNI for $prisonId  \n"
     }
     return ""
   }

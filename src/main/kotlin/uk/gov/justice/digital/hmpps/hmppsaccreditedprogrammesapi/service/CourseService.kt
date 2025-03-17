@@ -8,11 +8,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
@@ -180,12 +183,55 @@ constructor(
     return getCourses(buildingChoicesCourseIds)
   }
 
-  fun getCourseVariantsById(courseId: UUID) = courseVariantRepository.findAllByCourseId(courseId)
-
   fun getIntensityOfBuildingChoicesCourse(programmePathway: String): String = when (programmePathway) {
     "HIGH_INTENSITY_BC" -> "high intensity"
     "MODERATE_INTENSITY_BC" -> "moderate intensity"
     else -> throw BusinessException("Building choices course could not be found for programmePathway $programmePathway")
+  }
+
+  fun getBuildingChoicesCourseForTransferringReferral(referral: ReferralEntity, programmePathway: String): Course {
+    val buildingChoicesCourses = getBuildingChoicesCourses()
+    val audience = referral.offering.course.audience.takeIf { it == "Sexual offence" } ?: "General offence"
+    val buildingChoicesIntensity = getIntensityOfBuildingChoicesCourse(programmePathway)
+    val recommendedBuildingChoicesCourse =
+      buildingChoicesCourses.filter { it.audience == audience }
+        .firstOrNull { it.name.contains(buildingChoicesIntensity) }
+        ?: throw BusinessException("Building choices course could not be found for audience $audience programmePathway $programmePathway buildingChoicesIntensity $buildingChoicesIntensity")
+
+    val organisation: OrganisationEntity =
+      organisationService.findOrganisationEntityByCode(referral.offering.organisationId) ?: throw NotFoundException("No organisation found for ${referral.offering.organisationId} referral $referral")
+
+    val bcOfferingMatchingWithReferralOrg: OfferingEntity =
+      (
+        recommendedBuildingChoicesCourse.offerings.firstOrNull { (it.organisationId == referral.offering.organisationId) && it.referable && !it.withdrawn }
+          ?: throw BusinessException("Building choices course ${recommendedBuildingChoicesCourse.name} not offered at ${organisation.name}")
+        )
+
+    val recommendedBuildingChoicesCourseModel = recommendedBuildingChoicesCourse.toApi()
+    recommendedBuildingChoicesCourseModel.courseOfferings = listOf(bcOfferingMatchingWithReferralOrg.toApi(organisation.gender))
+
+    return recommendedBuildingChoicesCourseModel
+  }
+
+  fun getBuildingChoicesCourseVariants(buildingChoicesSearchRequest: BuildingChoicesSearchRequest, courseId: UUID): List<Course>? {
+    val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
+      ?: throw BusinessException("$courseId is not a Building choices course")
+
+    val listOfBuildingCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
+    val audience = if (buildingChoicesSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
+    val genderToWhichCourseIsOffered =
+      if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE else Gender.MALE
+
+    val audienceBasedOnGender = if (genderToWhichCourseIsOffered == Gender.FEMALE) null else audience
+
+    val buildingChoicesCourses =
+      findBuildingChoicesCourses(
+        listOfBuildingCourseIds,
+        audienceBasedOnGender,
+        genderToWhichCourseIsOffered.name,
+      )
+
+    return mapCourses(buildingChoicesCourses, genderToWhichCourseIsOffered)
   }
 }
 

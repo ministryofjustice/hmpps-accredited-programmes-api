@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
@@ -24,9 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniScoreFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PrerequisiteEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -260,50 +257,6 @@ constructor(
             contentType(MediaType.APPLICATION_JSON)
             jsonPath("$.status") { value(404) }
             jsonPath("$.developerMessage") { prefix("No Referral found at /referrals/$randomId") }
-          }
-        }
-      }
-
-      @Test
-      fun `for a referral with no matching course returns an error`() {
-        val referralId = UUID.randomUUID()
-
-        every { referralService.getReferralById(referralId) } returns ReferralEntityFactory().withId(referralId).produce()
-        every { pniService.getPniScore(any(), any(), any(), any()) } returns PniScoreFactory().withProgrammePathway("HIGH_INTENSITY_BC").produce()
-        every { courseService.getBuildingChoicesCourses() } returns emptyList()
-        every { courseService.getIntensityOfBuildingChoicesCourse("HIGH_INTENSITY_BC") } returns "high intensity"
-
-        mockMvc.get("/courses/building-choices/referral/$referralId") {
-          accept = MediaType.APPLICATION_JSON
-          header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        }.andExpect {
-          status { isBadRequest() }
-          content {
-            contentType(MediaType.APPLICATION_JSON)
-            jsonPath("$.status") { value(400) }
-            jsonPath("$.userMessage") { prefix("Building choices course could not be found for audience") }
-          }
-        }
-      }
-
-      @Test
-      fun `for a referral with no matching intensity returns an error`() {
-        val referralId = UUID.randomUUID()
-
-        every { referralService.getReferralById(referralId) } returns ReferralEntityFactory().withId(referralId).produce()
-        every { pniService.getPniScore(any(), any(), any(), any()) } returns PniScoreFactory().withProgrammePathway("INTENSITY_BC").produce()
-        every { courseService.getBuildingChoicesCourses() } returns emptyList()
-        every { courseService.getIntensityOfBuildingChoicesCourse("INTENSITY_BC") } throws BusinessException("Building choices course could not be found for programmePathway INTENSITY_BC")
-
-        mockMvc.get("/courses/building-choices/referral/$referralId") {
-          accept = MediaType.APPLICATION_JSON
-          header(AUTHORIZATION, jwtAuthHelper.bearerToken())
-        }.andExpect {
-          status { isBadRequest() }
-          content {
-            contentType(MediaType.APPLICATION_JSON)
-            jsonPath("$.status") { value(400) }
-            jsonPath("$.userMessage") { prefix("Building choices course could not be found for programmePathway") }
           }
         }
       }

@@ -33,11 +33,11 @@
       "subTotal" : 10
     },
     "ldcMessage" : "LDC message",
-    "ogrs3Risk" : "High",
-    "ovpRisk" : "Medium",
+    "ogrs3Risk" : "HIGH",
+    "ovpRisk" : "MEDIUM",
     "osp" : {
-      "cdc" : "Low",
-      "iiic" : "Low"
+      "cdc" : "LOW",
+      "iiic" : "LOW"
     },
     "rsrPercentage" : 3.5,
     "offenderAge" : 32,
@@ -50,11 +50,11 @@
       "proCriminalAttitudes" : "SOME",
       "hostileOrientation" : "SOME",
       "relCloseFamily" : "NONE",
-      "prevCloseRelationships" : "NONE",
+      "prevCloseRelationships" : "SOME",
       "easilyInfluenced" : "NONE",
       "aggressiveControllingBehaviour" : "NONE",
       "impulsivity" : "NONE",
-      "temperControl" : "NONE",
+      "temperControl" : "SIGNIFICANT",
       "problemSolvingSkills" : "NONE",
       "difficultiesCoping" : "MISSING"
     }
