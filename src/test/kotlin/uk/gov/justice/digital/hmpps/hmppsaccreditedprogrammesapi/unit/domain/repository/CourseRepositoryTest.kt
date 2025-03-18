@@ -52,7 +52,7 @@ class CourseRepositoryTest {
 
     // Then
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
-    assertThat( persistedCourse.prerequisites)
+    assertThat(persistedCourse.prerequisites)
       .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
       .containsExactlyInAnyOrderElementsOf(prerequisites)
   }

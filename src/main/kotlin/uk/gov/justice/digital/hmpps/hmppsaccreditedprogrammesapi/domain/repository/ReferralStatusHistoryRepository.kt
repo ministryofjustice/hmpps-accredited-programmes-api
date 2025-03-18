@@ -9,6 +9,6 @@ import java.util.UUID
 @Repository
 interface ReferralStatusHistoryRepository : JpaRepository<ReferralStatusHistoryEntity, UUID> {
 
-    @EntityGraph(attributePaths = ["previousStatus", "status", "category", "reason"])
-    fun getAllByReferralIdOrderByStatusStartDateDesc(referralId: UUID): List<ReferralStatusHistoryEntity>
+  @EntityGraph(attributePaths = ["previousStatus", "status", "category", "reason"])
+  fun getAllByReferralIdOrderByStatusStartDateDesc(referralId: UUID): List<ReferralStatusHistoryEntity>
 }

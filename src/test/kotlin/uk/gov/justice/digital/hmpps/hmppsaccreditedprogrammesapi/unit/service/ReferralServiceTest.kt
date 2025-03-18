@@ -705,7 +705,7 @@ class ReferralServiceTest {
 
     verify { referralStatusHistoryService.createReferralHistory(newReferral!!) }
     verify { referralStatusHistoryService.updateReferralHistory(referralId = referralId!!, previousStatusCode = ReferralStatus.REFERRAL_SUBMITTED.name, newStatus = any(), any(), any(), any()) }
-    verify { referralRepository.save(existingReferral.apply { status = "MOVED_TO_BUILDING_CHOICES" })}
+    verify { referralRepository.save(existingReferral.apply { status = "MOVED_TO_BUILDING_CHOICES" }) }
     verify { caseNotesApiService.buildAndCreateCaseNote(existingReferral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name)) }
   }
 }
