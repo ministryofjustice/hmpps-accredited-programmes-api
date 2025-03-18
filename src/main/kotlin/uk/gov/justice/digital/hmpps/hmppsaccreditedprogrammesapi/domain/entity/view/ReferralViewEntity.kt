@@ -15,7 +15,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "referral_view")
-data class ReferralViewEntity(
+class ReferralViewEntity(
   @Id
   @Column(name = "referral_id")
   var id: UUID? = null,

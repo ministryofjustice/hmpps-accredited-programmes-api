@@ -75,7 +75,8 @@ constructor(
     course: CourseEntity,
     coursePrerequisites: Set<CoursePrerequisite>,
   ): List<CoursePrerequisite>? {
-    val courseSaved = courseRepository.save(course.copy(prerequisites = coursePrerequisites.toEntity()))
+    course.prerequisites = coursePrerequisites.toEntity()
+    val courseSaved = courseRepository.save(course)
     return courseSaved.prerequisites.map { it.toApi() }
   }
 
@@ -122,15 +123,13 @@ constructor(
         )
 
     // validate that there isn't already an offering for this course/organisation
-
-    val updatedOfferingEntity = course.offerings.find { it.id == courseOffering.id }?.copy(
-      id = courseOffering.id,
-      organisationId = courseOffering.organisationId,
-      contactEmail = courseOffering.contactEmail,
-      secondaryContactEmail = courseOffering.secondaryContactEmail,
-      withdrawn = courseOffering.withdrawn ?: false,
-      referable = courseOffering.referable,
-    )!!
+    val updatedOfferingEntity = course.offerings.find { it.id == courseOffering.id }?.apply {
+      organisationId = courseOffering.organisationId
+      contactEmail = courseOffering.contactEmail
+      secondaryContactEmail = courseOffering.secondaryContactEmail
+      withdrawn = courseOffering.withdrawn == true
+      referable = courseOffering.referable
+    }!!
 
     updatedOfferingEntity.course = course
 

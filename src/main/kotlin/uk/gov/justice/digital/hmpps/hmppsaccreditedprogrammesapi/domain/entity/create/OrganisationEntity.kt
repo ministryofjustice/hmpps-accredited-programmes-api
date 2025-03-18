@@ -9,9 +9,8 @@ import java.util.UUID
 
 @Entity
 @Table(name = "organisation")
-data class OrganisationEntity(
+class OrganisationEntity(
 
-  //  var id: UUID = UUID.randomUUID(),
   @Id
   @GeneratedValue
   @Column(name = "organisation_id")

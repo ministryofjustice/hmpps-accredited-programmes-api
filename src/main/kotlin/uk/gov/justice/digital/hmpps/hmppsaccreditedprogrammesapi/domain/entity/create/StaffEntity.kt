@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "staff")
-data class StaffEntity(
+class StaffEntity(
   @Id
   @GeneratedValue
   @Column(name = "id")
