@@ -282,11 +282,11 @@ class PniService(
 
   fun fetchAndStoreOasysPni(prisonId: String): String {
     try {
-      val acpPniResult = pniResultEntityRepository.findAllByPrisonNumber(prisonId).first().programmePathway!!
+      val acpPniResult = getPniScore(prisonId, savePni = false).programmePathway
       val oasysPniResult = oasysService.getOasysPniProgrammePathway(prisonId)
 
       if (acpPniResult != oasysPniResult) {
-        return "Pni calculation mismatch for prisonNumber $prisonId. ACP: $acpPniResult, OASYS: $oasysPniResult \n"
+        return "$prisonId,$acpPniResult,$oasysPniResult\n"
       }
       log.info("No mismatch in PNI for $prisonId: $acpPniResult")
     } catch (e: Exception) {
