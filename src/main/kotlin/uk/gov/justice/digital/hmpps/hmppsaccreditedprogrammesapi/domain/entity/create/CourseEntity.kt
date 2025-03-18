@@ -21,15 +21,15 @@ import java.util.UUID
 
 @Entity
 @Table(name = "course")
-data class CourseEntity(
+class CourseEntity(
   @Id
   @GeneratedValue
   @Column(name = "course_id")
-  val id: UUID? = null,
+  var id: UUID? = null,
 
   @Version
   @Column(name = "version", nullable = false)
-  val version: Long = 0,
+  var version: Long = 0,
 
   var name: String,
   var identifier: String,
@@ -40,12 +40,12 @@ data class CourseEntity(
   @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   @OrderBy("description DESC")
-  val prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
+  var prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
   @Column(name = "offerings")
   @Fetch(SUBSELECT)
-  val offerings: MutableSet<OfferingEntity> = mutableSetOf(),
+  var offerings: MutableSet<OfferingEntity> = mutableSetOf(),
 
   var audience: String,
   var audienceColour: String?,
@@ -62,7 +62,7 @@ data class CourseEntity(
 
 @Embeddable
 @Immutable
-data class PrerequisiteEntity(
+class PrerequisiteEntity(
   val name: String,
   val description: String,
 )

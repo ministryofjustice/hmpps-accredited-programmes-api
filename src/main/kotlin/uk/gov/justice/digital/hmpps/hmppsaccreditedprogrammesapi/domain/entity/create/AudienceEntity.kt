@@ -9,7 +9,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "audience")
-data class AudienceEntity(
+class AudienceEntity(
   @Id
   @GeneratedValue
   @Column(name = "audience_id")

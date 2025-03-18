@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.repository
 
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import jakarta.persistence.EntityManager
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -37,19 +37,24 @@ class CourseRepositoryTest {
 
   @Test
   fun `CourseRepository should persist a CourseEntity object with prerequisites`() {
+    // Given
     val prerequisites = mutableSetOf(
       PrerequisiteEntityFactory().withName("PR1").withDescription("PR1 D1").produce(),
-      PrerequisiteEntityFactory().withName("PR1").withDescription("PR1 D2").produce(),
-      PrerequisiteEntityFactory().withName("PR2").withDescription("PR2 D1").produce(),
+      PrerequisiteEntityFactory().withName("PR2").withDescription("PR1 D2").produce(),
+      PrerequisiteEntityFactory().withName("PR3").withDescription("PR1 D3").produce(),
     )
     var course = CourseEntityFactory()
       .withId(null)
       .withPrerequisites(prerequisites)
       .produce()
+    // When
     course = entityManager.merge(course)
 
+    // Then
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
-    persistedCourse.prerequisites shouldContainExactly prerequisites
+    assertThat(persistedCourse.prerequisites)
+      .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+      .containsExactlyInAnyOrderElementsOf(prerequisites)
   }
 
   @Test

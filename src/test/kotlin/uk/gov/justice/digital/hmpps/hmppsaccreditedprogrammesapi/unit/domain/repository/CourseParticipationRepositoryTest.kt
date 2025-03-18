@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.repository
 
 import io.kotest.matchers.date.shouldBeWithin
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import jakarta.persistence.EntityManager
@@ -61,8 +62,8 @@ class CourseParticipationRepositoryTest {
     persistedCourseParticipation shouldNotBe null
     persistedCourseParticipation.run {
       this.prisonNumber shouldBe PRISON_NUMBER_1
-      this.outcome shouldBe courseParticipationOutcome
-      this.setting shouldBe courseParticipationSetting
+      this.setting?.shouldBeEqualToIgnoringFields(courseParticipationSetting, CourseParticipationEntity::id)
+      this.outcome?.shouldBeEqualToIgnoringFields(courseParticipationOutcome, CourseParticipationEntity::id)
       this.createdByUsername shouldBe REFERRER_USERNAME
     }
     persistedCourseParticipation?.createdDateTime?.shouldBeWithin(Duration.ofSeconds(1), transactionStartTime)
@@ -127,8 +128,8 @@ class CourseParticipationRepositoryTest {
       this.prisonNumber shouldBe PRISON_NUMBER_1
       this.source shouldBe null
       this.detail shouldBe null
-      this.setting shouldBe courseParticipationSetting
-      this.outcome shouldBe courseParticipationOutcome
+      this.setting?.shouldBeEqualToIgnoringFields(courseParticipationSetting, CourseParticipationEntity::id)
+      this.outcome?.shouldBeEqualToIgnoringFields(courseParticipationOutcome, CourseParticipationEntity::id)
       this.createdByUsername shouldBe REFERRER_USERNAME
       this.lastModifiedByUsername shouldBe null
     }

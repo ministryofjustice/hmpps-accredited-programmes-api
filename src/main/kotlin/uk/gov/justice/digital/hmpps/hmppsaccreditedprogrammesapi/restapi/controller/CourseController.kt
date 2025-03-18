@@ -513,20 +513,18 @@ class CourseController(
     @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
     @Parameter(description = "", required = true) @RequestBody courseUpdateRequest: CourseUpdateRequest,
   ): ResponseEntity<Course> {
-    val existingCourse = courseService.getCourseById(id)
+    var existingCourse = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")
 
-    val updatedCourse = existingCourse.copy(
-      name = courseUpdateRequest.name ?: existingCourse.name,
-      description = courseUpdateRequest.description ?: existingCourse.description,
-      alternateName = courseUpdateRequest.alternateName ?: existingCourse.alternateName,
-      listDisplayName = courseUpdateRequest.displayName ?: existingCourse.listDisplayName,
-      audience = courseUpdateRequest.audience ?: existingCourse.audience,
-      audienceColour = courseUpdateRequest.audienceColour ?: existingCourse.audienceColour,
-      withdrawn = courseUpdateRequest.withdrawn ?: existingCourse.withdrawn,
-    )
+    existingCourse.name = courseUpdateRequest.name ?: existingCourse.name
+    existingCourse.description = courseUpdateRequest.description ?: existingCourse.description
+    existingCourse.alternateName = courseUpdateRequest.alternateName ?: existingCourse.alternateName
+    existingCourse.listDisplayName = courseUpdateRequest.displayName ?: existingCourse.listDisplayName
+    existingCourse.audience = courseUpdateRequest.audience ?: existingCourse.audience
+    existingCourse.audienceColour = courseUpdateRequest.audienceColour ?: existingCourse.audienceColour
+    existingCourse.withdrawn = courseUpdateRequest.withdrawn ?: existingCourse.withdrawn
 
-    val savedCourse = courseService.save(updatedCourse)
+    val savedCourse = courseService.save(existingCourse)
 
     return ResponseEntity.ok(savedCourse.toApi())
   }
