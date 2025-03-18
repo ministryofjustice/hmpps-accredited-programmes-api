@@ -28,6 +28,6 @@ class OfferingEntityFactory {
     secondaryContactEmail = this.secondaryContactEmail,
     withdrawn = this.withdrawn,
     referable = this.referable,
-
-  ).apply { course = this@OfferingEntityFactory.course }
+    course = this.course,
+  )
 }
