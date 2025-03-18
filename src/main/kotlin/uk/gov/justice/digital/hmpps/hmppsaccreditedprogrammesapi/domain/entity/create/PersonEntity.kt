@@ -11,7 +11,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "person")
-data class PersonEntity(
+class PersonEntity(
   var surname: String,
   var forename: String,
   @Column(unique = true)

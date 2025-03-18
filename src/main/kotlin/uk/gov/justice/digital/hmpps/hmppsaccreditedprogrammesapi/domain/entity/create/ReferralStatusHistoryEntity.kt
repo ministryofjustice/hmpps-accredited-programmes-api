@@ -21,40 +21,35 @@ import java.util.UUID
 
 @Entity
 @Table(name = "referral_status_history")
-data class ReferralStatusHistoryEntity(
+class ReferralStatusHistoryEntity(
 
   @Id
   @Column(name = "statusHistoryId")
   @GeneratedValue(strategy = GenerationType.AUTO)
-  val id: UUID? = null,
+  var id: UUID? = null,
 
   @Version
   @Column(name = "version", nullable = false)
-  val version: Long = 0,
+  var version: Long = 0,
 
-  val referralId: UUID,
-  val statusStartDate: LocalDateTime = LocalDateTime.now(),
-  val username: String = SecurityContextHolder.getContext().authentication?.name ?: "UNKNOWN_USER",
+  var referralId: UUID,
+  var statusStartDate: LocalDateTime = LocalDateTime.now(),
+  var username: String = SecurityContextHolder.getContext().authentication?.name ?: "UNKNOWN_USER",
   @ManyToOne
   @JoinColumn(name = "status")
-  val status: ReferralStatusEntity,
+  var status: ReferralStatusEntity,
   @ManyToOne
   @JoinColumn(name = "previousStatus")
-  val previousStatus: ReferralStatusEntity? = null,
+  var previousStatus: ReferralStatusEntity? = null,
   @ManyToOne
   @JoinColumn(name = "category")
-  val category: ReferralStatusCategoryEntity? = null,
+  var category: ReferralStatusCategoryEntity? = null,
   @ManyToOne
   @JoinColumn(name = "reason")
-  val reason: ReferralStatusReasonEntity? = null,
-  val notes: String? = null,
+  var reason: ReferralStatusReasonEntity? = null,
+  var notes: String? = null,
   var statusEndDate: LocalDateTime? = null,
   var durationAtThisStatus: Long? = null,
 )
 
-@Repository
-interface ReferralStatusHistoryRepository : JpaRepository<ReferralStatusHistoryEntity, UUID> {
 
-  @EntityGraph(attributePaths = ["previousStatus", "status", "category", "reason"])
-  fun getAllByReferralIdOrderByStatusStartDateDesc(referralId: UUID): List<ReferralStatusHistoryEntity>
-}

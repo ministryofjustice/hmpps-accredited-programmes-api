@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 
 @Entity
 @Table(name = "sentence_category")
-data class SentenceCategoryEntity(
+class SentenceCategoryEntity(
   @Id
   val description: String,
   @Enumerated(EnumType.STRING)

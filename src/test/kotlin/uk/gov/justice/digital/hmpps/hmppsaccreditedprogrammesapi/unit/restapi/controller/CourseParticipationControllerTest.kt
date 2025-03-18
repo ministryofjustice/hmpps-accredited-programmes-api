@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
+import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.slot
@@ -60,6 +61,7 @@ constructor(
   inner class AddCourseParticipationTests {
     @Test
     fun `createCourseParticipation with JWT and valid payload with valid id returns 201 with correct body`() {
+      // Given
       val courseParticipationId = UUID.randomUUID()
       val courseParticipationSlot = slot<CourseParticipationEntity>()
       val courseParticipation = CourseParticipationEntityFactory()
@@ -72,6 +74,7 @@ constructor(
 
       every { courseParticipationService.createCourseParticipation(capture(courseParticipationSlot)) } returns courseParticipation
 
+      // When
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
@@ -83,9 +86,14 @@ constructor(
         jsonPath("$.id") { value(courseParticipationId.toString()) }
       }
 
+      // Then
       verify { courseParticipationService.createCourseParticipation(any()) }
-
-      courseParticipationSlot.captured.shouldBeEqualToIgnoringFields(courseParticipation, CourseParticipationEntity::id)
+      val courseParticipationEntity = courseParticipationSlot.captured
+      courseParticipationEntity.id?.shouldBeEqual(courseParticipationId)
+      courseParticipationEntity.courseName?.shouldBeEqual(courseParticipation.courseName!!)
+      courseParticipationEntity.prisonNumber.shouldBeEqual(courseParticipation.prisonNumber)
+      courseParticipationEntity.setting?.shouldBeEqualToIgnoringFields(courseParticipation.setting!!, CourseParticipationEntity::id)
+      courseParticipationEntity.outcome?.shouldBeEqualToIgnoringFields(courseParticipation.outcome!!, CourseParticipationEntity::id)
     }
 
     @Test
@@ -142,18 +150,23 @@ constructor(
         .withOutcome(CourseParticipationOutcomeFactory().withStatus(CourseStatus.COMPLETE).produce())
         .produce()
 
-      val modifiedOutcome = when (field) {
-        "yearStarted" -> courseParticipation.outcome!!.copy(yearStarted = Year.of(invalidYear))
-        "yearCompleted" -> courseParticipation.outcome!!.copy(yearCompleted = Year.of(invalidYear))
+      when (field) {
+        "yearStarted" -> {
+          courseParticipation.outcome!!.yearStarted = Year.of(invalidYear)
+          courseParticipation.outcome
+        }
+        "yearCompleted" -> {
+          courseParticipation.outcome!!.yearCompleted = Year.of(invalidYear)
+          courseParticipation.outcome
+        }
         else -> courseParticipation.outcome
       }
-      val modifiedCourseParticipation = courseParticipation.copy(outcome = modifiedOutcome)
 
       mockMvc.post("/course-participations") {
         accept = MediaType.APPLICATION_JSON
         contentType = MediaType.APPLICATION_JSON
         header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-        content = objectMapper.writeValueAsString(modifiedCourseParticipation)
+        content = objectMapper.writeValueAsString(courseParticipation)
       }.andExpect {
         status { isBadRequest() }
         content {

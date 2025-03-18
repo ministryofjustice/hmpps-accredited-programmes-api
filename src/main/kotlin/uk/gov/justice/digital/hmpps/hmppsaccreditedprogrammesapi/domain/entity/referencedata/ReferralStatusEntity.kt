@@ -11,7 +11,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "referral_status")
-data class ReferralStatusEntity(
+class ReferralStatusEntity(
   @Id
   val code: String,
   val description: String,
@@ -33,7 +33,7 @@ data class ReferralStatusEntity(
 
 @Entity
 @Table(name = "referral_status_category")
-data class ReferralStatusCategoryEntity(
+class ReferralStatusCategoryEntity(
   @Id
   val code: String,
   val description: String,
@@ -43,7 +43,7 @@ data class ReferralStatusCategoryEntity(
 
 @Entity
 @Table(name = "referral_status_reason")
-data class ReferralStatusReasonEntity(
+class ReferralStatusReasonEntity(
   @Id
   val code: String,
   val description: String,

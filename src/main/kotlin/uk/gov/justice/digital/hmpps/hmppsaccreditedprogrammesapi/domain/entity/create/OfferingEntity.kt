@@ -13,7 +13,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "offering")
-data class OfferingEntity(
+class OfferingEntity(
   @Id
   @GeneratedValue
   @Column(name = "offering_id")
@@ -21,9 +21,9 @@ data class OfferingEntity(
 
   @Version
   @Column(name = "version", nullable = false)
-  val version: Long = 0,
+  var version: Long = 0,
 
-  val organisationId: String,
+  var organisationId: String,
   var contactEmail: String,
   var secondaryContactEmail: String? = null,
   var withdrawn: Boolean = false,

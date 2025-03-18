@@ -7,7 +7,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "referrer_user")
-data class ReferrerUserEntity(
+class ReferrerUserEntity(
   @Id
   @Column(name = "referrer_username", nullable = false)
   var username: String,

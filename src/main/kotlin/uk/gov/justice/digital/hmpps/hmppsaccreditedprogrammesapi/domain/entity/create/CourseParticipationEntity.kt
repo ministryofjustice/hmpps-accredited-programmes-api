@@ -23,17 +23,17 @@ import java.util.UUID
 @Entity
 @EntityListeners(AuditingEntityListener::class)
 @Table(name = "course_participation")
-data class CourseParticipationEntity(
+class CourseParticipationEntity(
   @Id
   @GeneratedValue
   @Column(name = "course_participation_id")
-  val id: UUID? = null,
+  var id: UUID? = null,
 
   var referralId: UUID? = null,
 
   var courseId: UUID? = null,
 
-  val prisonNumber: String,
+  var prisonNumber: String,
   var courseName: String?,
 
   var source: String?,
@@ -62,7 +62,7 @@ data class CourseParticipationEntity(
 )
 
 @Embeddable
-data class CourseParticipationSetting(
+class CourseParticipationSetting(
   var location: String? = null,
 
   @Enumerated(EnumType.STRING)
@@ -70,7 +70,7 @@ data class CourseParticipationSetting(
 )
 
 @Embeddable
-data class CourseParticipationOutcome(
+class CourseParticipationOutcome(
   @Enumerated(EnumType.STRING)
   @Column(name = "outcome_status")
   var status: CourseStatus,

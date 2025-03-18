@@ -17,7 +17,7 @@ import java.util.UUID
 @Entity
 @Table(name = "referral")
 @SQLRestriction(value = "deleted = false")
-data class ReferralEntity(
+class ReferralEntity(
   @Id
   @GeneratedValue
   @Column(name = "referral_id")
@@ -25,13 +25,13 @@ data class ReferralEntity(
 
   @Version
   @Column(name = "version", nullable = false)
-  val version: Long = 0,
+  var version: Long = 0,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "offering_id", referencedColumnName = "offering_id")
   var offering: OfferingEntity,
 
-  val prisonNumber: String,
+  var prisonNumber: String,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "referrer_username", referencedColumnName = "referrer_username")

@@ -514,7 +514,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .expectBody<CoursePrerequisites>()
 
-    val getResponse = webTestClient
+    val response = webTestClient
       .get()
       .uri("/courses/${COURSE_ID}/prerequisites")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
@@ -524,10 +524,10 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       .expectBody<CoursePrerequisites>()
       .returnResult().responseBody!!
 
-    getResponse.prerequisites!!.size shouldBeEqual 1
+    response.prerequisites!!.size shouldBeEqual 1
 
-    getResponse.prerequisites!![0].name shouldBeEqual "new pr name1"
-    getResponse.prerequisites!![0].description shouldBeEqual "new pr description1"
+    response.prerequisites!![0].name shouldBeEqual "new pr name1"
+    response.prerequisites!![0].description shouldBeEqual "new pr description1"
   }
 
   @Test
