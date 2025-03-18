@@ -9,7 +9,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "pni_rule")
-data class PniRuleEntity(
+class PniRuleEntity(
 
   @Id
   @GeneratedValue

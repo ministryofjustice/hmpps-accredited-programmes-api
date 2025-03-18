@@ -8,7 +8,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "oasys_pni_result")
-data class OasysPniResultEntity(
+class OasysPniResultEntity(
   @Id
   val pniResultId: UUID,
   @Column

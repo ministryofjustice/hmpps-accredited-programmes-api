@@ -377,8 +377,8 @@ constructor(
 
   fun deleteReferral(referralId: UUID) {
     referralRepository.findById(referralId).ifPresent { referral ->
-      val updatedReferral = referral.copy(deleted = true)
-      referralRepository.save(updatedReferral)
+      referral.deleted = true
+      referralRepository.save(referral)
     }
   }
 

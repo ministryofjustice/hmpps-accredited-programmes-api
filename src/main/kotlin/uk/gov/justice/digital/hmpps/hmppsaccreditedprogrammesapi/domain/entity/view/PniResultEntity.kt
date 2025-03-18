@@ -9,7 +9,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "pni_result")
-data class PniResultEntity(
+class PniResultEntity(
   @Id
   val pniResultId: UUID = UUID.randomUUID(),
   @Column
