@@ -31,6 +31,5 @@ class OfferingEntity(
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")
-  var course: CourseEntity
+  var course: CourseEntity,
 )
-
