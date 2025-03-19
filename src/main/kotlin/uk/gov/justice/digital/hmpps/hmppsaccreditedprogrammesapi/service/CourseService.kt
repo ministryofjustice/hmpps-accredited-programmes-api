@@ -101,8 +101,8 @@ constructor(
       secondaryContactEmail = courseOffering.secondaryContactEmail,
       withdrawn = courseOffering.withdrawn ?: false,
       referable = courseOffering.referable,
+      course = course,
     )
-    offering.course = course
 
     organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
 
