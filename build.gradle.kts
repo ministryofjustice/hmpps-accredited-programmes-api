@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.3"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.1.10"
   kotlin("plugin.jpa") version "2.1.10"
@@ -24,7 +24,7 @@ dependencies {
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.3"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.3.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.3.1")
   runtimeOnly("org.postgresql:postgresql:42.7.5")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -40,7 +40,7 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.3.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.3.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.4")
   implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.36")
@@ -55,7 +55,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
-  testImplementation("org.wiremock:wiremock-standalone:3.12.0")
+  testImplementation("org.wiremock:wiremock-standalone:3.12.1")
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
