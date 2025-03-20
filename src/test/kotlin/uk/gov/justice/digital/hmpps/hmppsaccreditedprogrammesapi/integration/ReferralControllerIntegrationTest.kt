@@ -286,7 +286,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       overrideReason = null,
       transferReason = null,
       originalReferralId = originalReferralId,
-      hasLdc = true,
+      hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
     )
 
@@ -387,7 +387,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       overrideReason = null,
       transferReason = null,
-      hasLdc = true,
+      hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
     )
@@ -504,7 +504,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       overrideReason = null,
       transferReason = null,
-      hasLdc = true,
+      hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
     )
@@ -1637,7 +1637,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       statusFilter = statusFilter,
       audienceFilter = audienceFilter,
       courseNameFilter = courseNameFilter,
-      hasLdc = true,
+      hasLdc = null,
     )
     summary.content.shouldNotBeEmpty()
 
@@ -1654,7 +1654,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
           referrerUsername = REFERRER_USERNAME,
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
-          hasLdc = true,
+          hasLdc = null,
         ),
       ).forEach { referralView ->
         actualSummary.id shouldBe referralView.id
