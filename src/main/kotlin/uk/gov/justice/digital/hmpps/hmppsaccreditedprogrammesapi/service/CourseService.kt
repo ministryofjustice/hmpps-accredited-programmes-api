@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
@@ -19,10 +18,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.B
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseUpdateRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.addAudience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.util.UUID
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
@@ -34,6 +35,7 @@ constructor(
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val referralRepository: ReferralRepository,
   private val organisationService: OrganisationService,
+  private val pniService: PniService,
   private val courseVariantRepository: CourseVariantRepository,
 ) {
   fun getAllCourses(includeWithdrawn: Boolean = false): List<CourseEntity> {
@@ -110,32 +112,33 @@ constructor(
     return offeringRepository.save(offering).toApi(genderForWhichCourseIsOffered)
   }
 
-  fun updateOffering(course: CourseEntity, courseOffering: CourseOffering): CourseOffering {
+  fun updateOffering(courseId: UUID, courseOffering: CourseOffering): CourseOffering {
+    val course = getCourseById(courseId)
+      ?: throw NotFoundException("No Course found with id: $courseId")
+
+    offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
+      ?: throw BusinessException("Offering does not exist for course ${course.name}")
+
     val validPrisons = prisonRegisterApiService.getPrisons()
 
     val prison = validPrisons.firstOrNull { prison -> prison.prisonId == courseOffering.organisationId }
       ?: throw NotFoundException("No prison found with code ${courseOffering.organisationId}")
 
-    val offeringEntity =
-      (
-        offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
-          ?: throw BusinessException("Offering does not exist for course ${course.name}")
-        )
+    val matchedOffering = course.offerings.find { it.id == courseOffering.id }
 
-    // validate that there isn't already an offering for this course/organisation
-    val updatedOfferingEntity = course.offerings.find { it.id == courseOffering.id }?.apply {
-      organisationId = courseOffering.organisationId
-      contactEmail = courseOffering.contactEmail
-      secondaryContactEmail = courseOffering.secondaryContactEmail
-      withdrawn = courseOffering.withdrawn == true
-      referable = courseOffering.referable
-    }!!
+    matchedOffering?.let {
+      it.organisationId = courseOffering.organisationId
+      it.contactEmail = courseOffering.contactEmail
+      it.secondaryContactEmail = courseOffering.secondaryContactEmail
+      it.withdrawn = courseOffering.withdrawn ?: it.withdrawn
+      it.referable = courseOffering.referable
+    } ?: throw BusinessException("Offering does not exist for course ${course.name}")
 
-    updatedOfferingEntity.course = course
+    matchedOffering.course = course
 
     organisationService.createOrganisationIfNotPresent(courseOffering.organisationId, prison)
     val genderForWhichCourseIsOffered = organisationService.findOrganisationEntityByCode(courseOffering.organisationId)?.gender!!
-    return offeringRepository.save(updatedOfferingEntity).toApi(genderForWhichCourseIsOffered)
+    return offeringRepository.save(matchedOffering).toApi(genderForWhichCourseIsOffered)
   }
 
   fun deleteCourseOffering(id: UUID, offeringId: UUID) {
@@ -188,10 +191,13 @@ constructor(
     else -> throw BusinessException("Building choices course could not be found for programmePathway $programmePathway")
   }
 
-  fun getBuildingChoicesCourseForTransferringReferral(referral: ReferralEntity, programmePathway: String): Course {
+  fun getBuildingChoicesCourseForTransferringReferral(referralId: UUID, programmePathway: String?): Course {
+    val referral = referralRepository.findById(referralId).getOrNull() ?: throw NotFoundException("No referral found for id: $referralId")
+    val pniResult = programmePathway ?: pniService.getPniScore(prisonNumber = referral.prisonNumber, referralId = referral.id).programmePathway
+
     val buildingChoicesCourses = getBuildingChoicesCourses()
     val audience = referral.offering.course.audience.takeIf { it == "Sexual offence" } ?: "General offence"
-    val buildingChoicesIntensity = getIntensityOfBuildingChoicesCourse(programmePathway)
+    val buildingChoicesIntensity = getIntensityOfBuildingChoicesCourse(pniResult)
     val recommendedBuildingChoicesCourse =
       buildingChoicesCourses.filter { it.audience == audience }
         .firstOrNull { it.name.contains(buildingChoicesIntensity) }
@@ -232,6 +238,17 @@ constructor(
 
     return mapCourses(buildingChoicesCourses, genderToWhichCourseIsOffered)
   }
+
+  fun updateCourse(courseId: UUID, courseUpdateRequest: CourseUpdateRequest): Course = getCourseById(courseId)?.let { existingCourse ->
+    existingCourse.name = courseUpdateRequest.name ?: existingCourse.name
+    existingCourse.description = courseUpdateRequest.description ?: existingCourse.description
+    existingCourse.alternateName = courseUpdateRequest.alternateName ?: existingCourse.alternateName
+    existingCourse.listDisplayName = courseUpdateRequest.displayName ?: existingCourse.listDisplayName
+    existingCourse.audience = courseUpdateRequest.audience ?: existingCourse.audience
+    existingCourse.audienceColour = courseUpdateRequest.audienceColour ?: existingCourse.audienceColour
+    existingCourse.withdrawn = courseUpdateRequest.withdrawn ?: existingCourse.withdrawn
+    existingCourse.toApi()
+  } ?: throw NotFoundException("No Course found with id: $courseId")
 }
 
 fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> = this.map { PrerequisiteEntity(it.name, it.description) }.toMutableSet()

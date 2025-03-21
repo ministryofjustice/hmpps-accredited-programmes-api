@@ -12,12 +12,14 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_OFFERING_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Audience
@@ -35,14 +37,16 @@ import java.util.Optional
 import java.util.UUID
 import kotlin.test.assertTrue
 
-val COURSE_ID: UUID = UUID.fromString("790a2dfe-8df1-4504-bb9c-83e6e53a6537")
-val NEW_COURSE_ID: UUID = UUID.fromString("790a2dfe-ddd1-4504-bb9c-83e6e53a6537")
-val UNUSED_COURSE_ID: UUID = UUID.fromString("891a2dfe-ddd1-4801-ab9b-94e6f53a6537")
-val WITHDRAWN_COURSE_ID: UUID = UUID.fromString("44e3cdab-c996-4234-afe5-a9d8ddb13be8")
-val WITHDRAWN_OFFERING_ID: UUID = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee518")
-
-private const val OFFERING_ID = "7fffcc6a-11f8-4713-be35-cf5ff1aee517"
-private const val UNUSED_OFFERING_ID = "7fffbb9a-11f8-9743-be35-cf5881aee517"
+val COURSE_ID1: UUID = UUID.randomUUID()
+val COURSE_ID2: UUID = UUID.randomUUID()
+val LEGACY_COURSE_ID: UUID = UUID.randomUUID()
+val UNUSED_COURSE_ID: UUID = UUID.randomUUID()
+val WITHDRAWN_COURSE_ID: UUID = UUID.randomUUID()
+val WITHDRAWN_OFFERING_ID: UUID = UUID.randomUUID()
+val OFFERING_ID1: UUID = UUID.randomUUID()
+val OFFERING_ID2: UUID = UUID.randomUUID()
+val OFFERING_ID3: UUID = UUID.randomUUID()
+val UNUSED_OFFERING_ID: UUID = UUID.randomUUID()
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -60,7 +64,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     persistenceHelper.clearAllTableContent()
 
     persistenceHelper.createCourse(
-      COURSE_ID,
+      COURSE_ID1,
       "SC",
       "Super Course",
       "Sample description",
@@ -69,7 +73,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     )
 
     persistenceHelper.createCourse(
-      NEW_COURSE_ID,
+      COURSE_ID2,
       "NEWSC",
       "A new Course",
       "Sample description",
@@ -97,47 +101,54 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     )
 
     persistenceHelper.createPrerequisite(
-      COURSE_ID,
+      COURSE_ID1,
       "pr name1",
       "pr description1",
     )
 
     persistenceHelper.createPrerequisite(
-      COURSE_ID,
+      COURSE_ID1,
       "pr name2",
       "pr description2",
     )
 
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
+    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
+    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
+    persistenceHelper.createOrganisation(code = "SKI", name = "SKI org")
+    persistenceHelper.createEnabledOrganisation("SKI", "SKI org")
 
     persistenceHelper.createOffering(
-      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
-      COURSE_ID,
+      UUID.randomUUID(),
+      COURSE_ID1,
       "BWN",
       "nobody-bwn@digital.justice.gov.uk",
       "nobody2-bwn@digital.justice.gov.uk",
       true,
     )
 
-    persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
-    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
-
     persistenceHelper.createOffering(
-      UUID.fromString(OFFERING_ID),
-      COURSE_ID,
+      OFFERING_ID1,
+      COURSE_ID1,
       "MDI",
       "nobody-mdi@digital.justice.gov.uk",
       "nobody2-mdi@digital.justice.gov.uk",
       true,
     )
 
-    persistenceHelper.createOrganisation(code = "SKI", name = "SKI org")
-    persistenceHelper.createEnabledOrganisation("SKI", "SKI org")
+    persistenceHelper.createOffering(
+      OFFERING_ID2,
+      COURSE_ID2,
+      "MDI",
+      "nobody-ski@digital.justice.gov.uk",
+      "nobody2-ski@digital.justice.gov.uk",
+      true,
+    )
 
     persistenceHelper.createOffering(
-      WITHDRAWN_OFFERING_ID,
-      COURSE_ID,
+      OFFERING_ID3,
+      COURSE_ID2,
       "SKI",
       "nobody-ski@digital.justice.gov.uk",
       "nobody2-ski@digital.justice.gov.uk",
@@ -145,19 +156,27 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       withdrawn = true,
     )
 
-    persistenceHelper.createOrganisation(code = "SKN", name = "SKN org")
-    persistenceHelper.createEnabledOrganisation("SKN", "SKN org")
     persistenceHelper.createOffering(
-      UUID.fromString(UNUSED_OFFERING_ID),
-      NEW_COURSE_ID,
-      "SKN",
-      "nobody-mdi@digital.justice.gov.uk",
-      "nobody2-mdi@digital.justice.gov.uk",
+      WITHDRAWN_OFFERING_ID,
+      COURSE_ID1,
+      "SKI",
+      "nobody-ski@digital.justice.gov.uk",
+      "nobody2-ski@digital.justice.gov.uk",
+      true,
+      withdrawn = true,
+    )
+
+    persistenceHelper.createOffering(
+      UNUSED_OFFERING_ID,
+      COURSE_ID2,
+      "BXI",
+      "nobody-ski@digital.justice.gov.uk",
+      "nobody2-ski@digital.justice.gov.uk",
       true,
     )
 
     persistenceHelper.createCourse(
-      UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
+      UUID.randomUUID(),
       "CC",
       "Custom Course",
       "Sample description",
@@ -165,7 +184,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       "General offence",
     )
     persistenceHelper.createCourse(
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
+      UUID.randomUUID(),
       "RC",
       "RAPID Course",
       "Sample description",
@@ -173,7 +192,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       "General offence",
     )
     persistenceHelper.createCourse(
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41111230242e"),
+      UUID.randomUUID(),
       "LEG",
       "Legacy Course",
       "Sample description",
@@ -183,7 +202,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     )
 
     persistenceHelper.createCourse(
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41111230242f"),
+      LEGACY_COURSE_ID,
       "LEGTEST",
       "Legacy Course test",
       "Sample description test",
@@ -206,8 +225,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     persistenceHelper.createReferrerUser("TEST_REFERRER_USER_2")
 
     persistenceHelper.createReferral(
-      UUID.fromString("0c46ed09-170b-4c0f-aee8-a24eeaeeddaa"),
-      UUID.fromString(OFFERING_ID),
+      UUID.randomUUID(),
+      OFFERING_ID1,
       "B2345BB",
       "TEST_REFERRER_USER_1",
       "This referral will be updated",
@@ -217,8 +236,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       null,
     )
     persistenceHelper.createReferral(
-      UUID.fromString("fae2ed00-057e-4179-9e55-f6a4f4874cf0"),
-      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
+      UUID.randomUUID(),
+      OFFERING_ID3,
       "C3456CC",
       "TEST_REFERRER_USER_2",
       "more information",
@@ -228,8 +247,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       LocalDateTime.parse("2023-11-12T19:11:00"),
     )
     persistenceHelper.createReferral(
-      UUID.fromString("153383a4-b250-46a8-9950-43eb358c2805"),
-      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
+      UUID.randomUUID(),
+      OFFERING_ID2,
       "D3456DD",
       "TEST_REFERRER_USER_2",
       "more information",
@@ -297,14 +316,14 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   fun `Searching for a course with JWT and valid id returns 200 with correct body`() {
     webTestClient
       .get()
-      .uri("/courses/$COURSE_ID")
+      .uri("/courses/$COURSE_ID1")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
       .expectBody()
-      .jsonPath("$.id").isEqualTo(COURSE_ID.toString())
+      .jsonPath("$.id").isEqualTo(COURSE_ID1.toString())
   }
 
   @Test
@@ -345,21 +364,21 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   fun `Searching for a course by offering id with JWT returns 200 and correct body`() {
     webTestClient
       .get()
-      .uri("/offerings/$COURSE_OFFERING_ID/course")
+      .uri("/offerings/$OFFERING_ID1/course")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
       .expectBody()
-      .jsonPath("$.id").isEqualTo(COURSE_ID.toString())
+      .jsonPath("$.id").isEqualTo(COURSE_ID1.toString())
   }
 
   @Test
   fun `Searching for all offerings for a course with JWT and valid id returns 200 and correct body`() {
     webTestClient
       .get()
-      .uri("/courses/$COURSE_ID/offerings?includeWithdrawn=false")
+      .uri("/courses/$COURSE_ID1/offerings?includeWithdrawn=false")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -380,7 +399,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   fun `Searching for all offerings including withdrawn for a course with JWT and valid id returns 200 and correct body`() {
     webTestClient
       .get()
-      .uri("/courses/$COURSE_ID/offerings?includeWithdrawn=true")
+      .uri("/courses/$COURSE_ID1/offerings?includeWithdrawn=true")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -401,9 +420,9 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Searching for all offerings with JWT and correct course offering id returns 200 and correct body`() {
     // Given & When
-    val offering = getOfferingsById(COURSE_OFFERING_ID)
+    val offering = getOfferingsById(OFFERING_ID1)
     // Then
-    assertThat(offering.id).isEqualTo(COURSE_OFFERING_ID)
+    assertThat(offering.id).isEqualTo(OFFERING_ID1)
     assertThat(offering.organisationId).isNotEmpty()
     assertThat(offering.contactEmail).isNotEmpty()
   }
@@ -462,10 +481,9 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Should return audiences as expected for a given courseId`() {
-    val courseId = UUID.fromString("1811faa6-d568-4fc4-83ce-41111230242f")
     val audiences = webTestClient
       .get()
-      .uri("/courses/audiences?courseId=$courseId")
+      .uri("/courses/audiences?courseId=$LEGACY_COURSE_ID")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -480,7 +498,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   fun `Retrieve course prerequisites returns 200 with correct body`() {
     val response = webTestClient
       .get()
-      .uri("/courses/${COURSE_ID}/prerequisites")
+      .uri("/courses/${COURSE_ID1}/prerequisites")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -504,7 +522,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
 
     webTestClient
       .put()
-      .uri("/courses/${COURSE_ID}/prerequisites")
+      .uri("/courses/${COURSE_ID1}/prerequisites")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(
@@ -516,7 +534,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
 
     val response = webTestClient
       .get()
-      .uri("/courses/${COURSE_ID}/prerequisites")
+      .uri("/courses/${COURSE_ID1}/prerequisites")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -532,14 +550,17 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Update course is successful`() {
+    // Given
     val updatedCourseName = "Legacy Course 456"
-    val courseIdToUpdate = "1811faa6-d568-4fc4-83ce-41111230242f"
-    val updatedCourse = updateCourse(UUID.fromString(courseIdToUpdate), true, updatedCourseName)
 
-    updatedCourse.id shouldBe UUID.fromString(courseIdToUpdate)
+    // When
+    val updatedCourse = updateCourse(COURSE_ID2, true, updatedCourseName)
+
+    // Then
+    updatedCourse.id shouldBe COURSE_ID2
     updatedCourse.name shouldBe updatedCourseName
-    updatedCourse.alternateName shouldBe "LC test"
-    updatedCourse.description shouldBe "Sample description test"
+    updatedCourse.alternateName shouldBe "SC++"
+    updatedCourse.description shouldBe "Sample description"
     updatedCourse.withdrawn shouldBe true
   }
 
@@ -618,7 +639,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   fun `Delete a course offering that is in use returns 400`() {
     webTestClient
       .delete()
-      .uri("/courses/$COURSE_ID/offerings/$OFFERING_ID")
+      .uri("/courses/$COURSE_ID1/offerings/$OFFERING_ID1")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -632,7 +653,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   fun `Delete a course that is in use returns 400`() {
     webTestClient
       .delete()
-      .uri("/courses/$COURSE_ID")
+      .uri("/courses/$COURSE_ID1")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
@@ -658,20 +679,62 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   fun `Delete a course offering that is not in use returns 200`() {
     webTestClient
       .delete()
-      .uri("/courses/$NEW_COURSE_ID/offerings/$UNUSED_OFFERING_ID")
+      .uri("/courses/$COURSE_ID2/offerings/$UNUSED_OFFERING_ID")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
 
-    offeringRepository.findById(UUID.fromString(UNUSED_OFFERING_ID)) shouldBe Optional.empty()
+    offeringRepository.findById(UNUSED_OFFERING_ID) shouldBe Optional.empty()
   }
+
+  @Test
+  fun `should update a course offering and return 200`() {
+    // Given
+    val newCourseId = COURSE_ID2
+    val courseOffering = CourseOffering(
+      id = UNUSED_OFFERING_ID,
+      organisationId = "BXI",
+      contactEmail = "awi1@whatton.com",
+      referable = true,
+      organisationEnabled = true,
+      secondaryContactEmail = "awi2@whatton.com",
+      withdrawn = false,
+      gender = Gender.MALE,
+    )
+
+    // When
+    val updatedCourseOffering = updateCourseOffering(newCourseId, courseOffering)
+
+    // Then
+    assertThat(updatedCourseOffering.id).isEqualTo(courseOffering.id)
+    assertThat(updatedCourseOffering.organisationId).isEqualTo("BXI")
+    assertThat(updatedCourseOffering.contactEmail).isEqualTo("awi1@whatton.com")
+    assertThat(updatedCourseOffering.secondaryContactEmail).isEqualTo("awi2@whatton.com")
+    assertThat(updatedCourseOffering.referable).isTrue
+    assertThat(updatedCourseOffering.withdrawn).isFalse
+    assertThat(updatedCourseOffering.organisationEnabled).isTrue
+    assertThat(updatedCourseOffering.gender).isEqualTo(Gender.MALE)
+  }
+
+  private fun updateCourseOffering(
+    courseId: UUID,
+    courseOffering: CourseOffering,
+  ): CourseOffering = performRequestAndExpectStatusWithBody(
+    HttpMethod.PUT,
+    uri = "/courses/$courseId/offerings",
+    body = courseOffering,
+    returnType = courseOfferingTypeReference(),
+    expectedResponseStatus = HttpStatus.OK.value(),
+  )
+
+  fun courseOfferingTypeReference(): ParameterizedTypeReference<CourseOffering> = object : ParameterizedTypeReference<CourseOffering>() {}
 
   @Test
   fun `Create offerings returns 200`() {
     webTestClient
       .post()
-      .uri("/courses/$NEW_COURSE_ID/offerings")
+      .uri("/courses/$COURSE_ID2/offerings")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -828,36 +891,23 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     buildingChoicesCourseForReferral.courseOfferings.first().organisationId shouldBe "ESI"
   }
 
-  fun getBuildingChoicesCourseForReferral(referralId: UUID): Course = webTestClient
-    .get()
-    .uri("/courses/building-choices/referral/$referralId?programmePathway=HIGH_INTENSITY_BC")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectHeader().contentType(MediaType.APPLICATION_JSON)
-    .expectBody<Course>()
-    .returnResult().responseBody!!
+  fun getBuildingChoicesCourseForReferral(referralId: UUID): Course = performRequestAndExpectOk(
+    HttpMethod.GET,
+    "/courses/building-choices/referral/$referralId?programmePathway=HIGH_INTENSITY_BC",
+    object : ParameterizedTypeReference<Course>() {},
+  )
 
   fun getCourseVariants(
     mainCourseId: UUID,
     isConvictedOfSexualOffence: Boolean,
     isInAWomensPrison: Boolean,
-  ): List<Course> = webTestClient
-    .post()
-    .uri("/courses/building-choices/$mainCourseId")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .contentType(MediaType.APPLICATION_JSON)
-    .accept(MediaType.APPLICATION_JSON)
-    .bodyValue(
-      BuildingChoicesSearchRequest(
-        isConvictedOfSexualOffence = isConvictedOfSexualOffence,
-        isInAWomensPrison = isInAWomensPrison,
-      ),
-    ).exchange()
-    .expectStatus().isOk
-    .expectBody<List<Course>>()
-    .returnResult().responseBody!!
+  ): List<Course> = performRequestAndExpectStatusWithBody(
+    HttpMethod.POST,
+    "/courses/building-choices/$mainCourseId",
+    object : ParameterizedTypeReference<List<Course>>() {},
+    BuildingChoicesSearchRequest(isConvictedOfSexualOffence = isConvictedOfSexualOffence, isInAWomensPrison = isInAWomensPrison),
+    HttpStatus.OK.value(),
+  )
 
   @Test
   fun `should return courses matching intensity`() {

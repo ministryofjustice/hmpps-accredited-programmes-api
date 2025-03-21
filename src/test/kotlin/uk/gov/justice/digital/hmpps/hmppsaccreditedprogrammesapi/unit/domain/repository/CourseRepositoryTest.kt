@@ -69,11 +69,11 @@ class CourseRepositoryTest {
     offering1.course = course
     offering2.course = course
     offering3.course = course
-    entityManager.merge(offering1)
-    entityManager.merge(offering2)
-    entityManager.merge(offering3)
+    val persistedOffering1 = entityManager.merge(offering1)
+    val persistedOffering2 = entityManager.merge(offering2)
+    val persistedOffering3 = entityManager.merge(offering3)
 
-    course.offerings.addAll(listOf(offering1, offering2, offering3))
+    course.offerings.addAll(listOf(persistedOffering1, persistedOffering2, persistedOffering3))
     course = entityManager.merge(course)
 
     val persistedCourse = entityManager.find(CourseEntity::class.java, course.id)
