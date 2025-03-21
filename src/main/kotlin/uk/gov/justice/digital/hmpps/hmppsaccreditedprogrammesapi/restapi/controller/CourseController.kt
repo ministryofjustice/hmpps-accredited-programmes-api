@@ -38,7 +38,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Enabled
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
-import java.util.UUID
+import java.util.*
 import kotlin.random.Random
 
 @RestController
@@ -512,22 +512,7 @@ class CourseController(
   fun updateCourse(
     @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
     @Parameter(description = "", required = true) @RequestBody courseUpdateRequest: CourseUpdateRequest,
-  ): ResponseEntity<Course> {
-    var existingCourse = courseService.getCourseById(id)
-      ?: throw NotFoundException("No Course found at /courses/$id")
-
-    existingCourse.name = courseUpdateRequest.name ?: existingCourse.name
-    existingCourse.description = courseUpdateRequest.description ?: existingCourse.description
-    existingCourse.alternateName = courseUpdateRequest.alternateName ?: existingCourse.alternateName
-    existingCourse.listDisplayName = courseUpdateRequest.displayName ?: existingCourse.listDisplayName
-    existingCourse.audience = courseUpdateRequest.audience ?: existingCourse.audience
-    existingCourse.audienceColour = courseUpdateRequest.audienceColour ?: existingCourse.audienceColour
-    existingCourse.withdrawn = courseUpdateRequest.withdrawn ?: existingCourse.withdrawn
-
-    val savedCourse = courseService.save(existingCourse)
-
-    return ResponseEntity.ok(savedCourse.toApi())
-  }
+  ): ResponseEntity<Course> = ResponseEntity.ok(courseService.updateCourse(id, courseUpdateRequest))
 
   @Operation(
     tags = ["Course Offerings"],
@@ -550,13 +535,9 @@ class CourseController(
     consumes = ["application/json"],
   )
   fun updateCourseOffering(
-    @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
+    @Parameter(description = "A course identifier", required = true) @PathVariable("id") courseId: UUID,
     @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering,
-  ): ResponseEntity<CourseOffering> {
-    val course = courseService.getCourseById(id)
-      ?: throw NotFoundException("No Course found at /courses/$id")
-    return ResponseEntity.ok(courseService.updateOffering(course, courseOffering))
-  }
+  ): ResponseEntity<CourseOffering> = ResponseEntity.ok(courseService.updateOffering(courseId, courseOffering))
 
   @Operation(
     tags = ["Courses"],
@@ -684,22 +665,12 @@ class CourseController(
     @Parameter(
       description = "The id (UUID) of a referral",
       required = true,
-    ) @PathVariable("id") id: UUID,
+    ) @PathVariable("id") referralId: UUID,
     @Parameter(description = "result of PNI calculation") @RequestParam(
       value = "programmePathway",
       required = false,
     ) programmePathway: String?,
-  ): ResponseEntity<Course> {
-    val referral = referralService.getReferralById(id) ?: throw NotFoundException("No Referral found at /referrals/$id")
-
-    val pniResult = programmePathway
-      ?: pniService.getPniScore(
-        prisonNumber = referral.prisonNumber,
-        referralId = referral.id,
-      ).programmePathway
-
-    return ResponseEntity.ok(courseService.getBuildingChoicesCourseForTransferringReferral(referral, pniResult))
-  }
+  ): ResponseEntity<Course> = ResponseEntity.ok(courseService.getBuildingChoicesCourseForTransferringReferral(referralId, programmePathway))
 
   fun generateRandom10AlphaString(): String {
     val chars = ('A'..'Z')

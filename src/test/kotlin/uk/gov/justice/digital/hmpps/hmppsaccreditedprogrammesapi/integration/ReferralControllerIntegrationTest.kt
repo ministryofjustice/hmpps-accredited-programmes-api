@@ -223,7 +223,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // When
     val unknownOfferingId = UUID.randomUUID()
-    val errorResponse = performRequestAndExpectStatusWithBody(
+    performRequestAndExpectStatusWithBody(
       httpMethod = HttpMethod.POST,
       uri = "/referrals/transfer-to-building-choices",
       body = TransferReferralRequest(createdReferral.id, unknownOfferingId, "Transfer reason"),

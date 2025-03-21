@@ -59,4 +59,13 @@ class ReferralEntity(
   var originalReferralId: UUID? = null,
   var hasLdc: Boolean? = null,
   var hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || this::class != other::class) return false
+    other as ReferralEntity
+    return this.id == other.id
+  }
+
+  override fun hashCode(): Int = id.hashCode()
+}

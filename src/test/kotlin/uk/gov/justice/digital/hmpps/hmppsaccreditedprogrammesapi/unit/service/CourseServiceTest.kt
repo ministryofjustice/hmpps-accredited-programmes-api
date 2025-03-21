@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
@@ -51,6 +52,9 @@ class CourseServiceTest {
   @MockK(relaxed = true)
   private lateinit var courseVariantRepository: CourseVariantRepository
 
+  @MockK(relaxed = true)
+  private lateinit var pniService: PniService
+
   private lateinit var courseService: CourseService
 
   @BeforeEach
@@ -62,6 +66,7 @@ class CourseServiceTest {
       prisonRegisterApiService,
       referralRepository,
       organisationService,
+      pniService,
       courseVariantRepository,
     )
   }
@@ -225,6 +230,7 @@ class CourseServiceTest {
 
   @Test
   fun `get building choices course for transferring a given referral returns course with the appropriate audience`() {
+    // Given
     val courseId1 = UUID.randomUUID()
     val courseId2 = UUID.randomUUID()
     val variantCourseId1 = UUID.randomUUID()
@@ -246,13 +252,17 @@ class CourseServiceTest {
     )
 
     val referral = ReferralEntityFactory().withOffering(OfferingEntityFactory().withOrganisationId(organisationId).withCourse(CourseEntityFactory().withWithdrawn(false).withAudience("Sexual offence").produce()).produce()).produce()
+    every { referralRepository.findById(referral.id!!) } returns Optional.of(referral)
     every { courseVariantRepository.findAll() } returns courseVariantEntities
     every { courseRepository.findAllById(any()) } returns courseEntities
-    every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory().withCode(
-      organisationId,
-    ).withName("Whatton").withGender("MALE").produce()
-    val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral, "MODERATE_INTENSITY_BC")
+    every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory()
+      .withCode(organisationId)
+      .withName("Whatton")
+      .withGender("MALE").produce()
+    // When
+    val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral.id!!, "MODERATE_INTENSITY_BC")
 
+    // Then
     recommendedBuildingChoicesCourse.id shouldBe courseId2
     recommendedBuildingChoicesCourse.name shouldBe "Building Choices: moderate intensity"
     recommendedBuildingChoicesCourse.audience shouldBe "Sexual offence"
@@ -282,13 +292,14 @@ class CourseServiceTest {
       CourseEntityFactory().withId(variantCourseId2).produce(),
     )
 
-    val referral = ReferralEntityFactory().withOffering(OfferingEntityFactory().withOrganisationId(organisationId).withCourse(CourseEntityFactory().withWithdrawn(false).withAudience("Initmate partner violence offence").produce()).produce()).produce()
+    val referral = ReferralEntityFactory().withOffering(OfferingEntityFactory().withOrganisationId(organisationId).withCourse(CourseEntityFactory().withWithdrawn(false).withAudience("Intimate partner violence offence").produce()).produce()).produce()
+    every { referralRepository.findById(referral.id!!) } returns Optional.of(referral)
     every { courseVariantRepository.findAll() } returns courseVariantEntities
     every { courseRepository.findAllById(any()) } returns courseEntities
     every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory().withCode(
       organisationId,
     ).withName("Whatton").withGender("MALE").produce()
-    val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral, "HIGH_INTENSITY_BC")
+    val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral.id!!, "HIGH_INTENSITY_BC")
 
     recommendedBuildingChoicesCourse.id shouldBe courseId1
     recommendedBuildingChoicesCourse.name shouldBe "Building Choices: high intensity"

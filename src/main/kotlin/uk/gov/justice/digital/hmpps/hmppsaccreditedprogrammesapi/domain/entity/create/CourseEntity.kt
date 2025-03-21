@@ -43,8 +43,6 @@ class CourseEntity(
   var prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-  @Column(name = "offerings")
-  @Fetch(SUBSELECT)
   var offerings: MutableSet<OfferingEntity> = mutableSetOf(),
 
   var audience: String,
@@ -54,10 +52,14 @@ class CourseEntity(
   var displayOnProgrammeDirectory: Boolean? = true,
   var intensity: String? = null,
 ) {
-  fun addOffering(offering: OfferingEntity) {
-    offering.course = this
-    offerings += offering
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || this::class != other::class) return false
+    other as CourseEntity
+    return this.id == other.id
   }
+
+  override fun hashCode(): Int = id.hashCode()
 }
 
 @Embeddable
