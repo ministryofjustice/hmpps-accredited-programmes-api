@@ -29,7 +29,7 @@ class OfferingEntity(
   var withdrawn: Boolean = false,
   var referable: Boolean = true,
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")
   var course: CourseEntity,
 )

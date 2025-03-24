@@ -40,7 +40,7 @@ class CourseEntity(
   @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   @OrderBy("description DESC")
-  val prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
+  var prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
   @Fetch(SUBSELECT)
