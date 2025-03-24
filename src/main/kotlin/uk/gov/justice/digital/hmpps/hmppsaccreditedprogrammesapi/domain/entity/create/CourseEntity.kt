@@ -25,11 +25,11 @@ class CourseEntity(
   @Id
   @GeneratedValue
   @Column(name = "course_id")
-  var id: UUID? = null,
+  val id: UUID? = null,
 
   @Version
   @Column(name = "version", nullable = false)
-  var version: Long = 0,
+  val version: Long = 0,
 
   var name: String,
   var identifier: String,
@@ -40,10 +40,11 @@ class CourseEntity(
   @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   @OrderBy("description DESC")
-  var prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
+  val prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-  var offerings: MutableSet<OfferingEntity> = mutableSetOf(),
+  @Fetch(SUBSELECT)
+  val offerings: MutableSet<OfferingEntity> = mutableSetOf(),
 
   var audience: String,
   var audienceColour: String?,
@@ -51,16 +52,7 @@ class CourseEntity(
   var listDisplayName: String? = null,
   var displayOnProgrammeDirectory: Boolean? = true,
   var intensity: String? = null,
-) {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || this::class != other::class) return false
-    other as CourseEntity
-    return this.id == other.id
-  }
-
-  override fun hashCode(): Int = id.hashCode()
-}
+)
 
 @Embeddable
 @Immutable
