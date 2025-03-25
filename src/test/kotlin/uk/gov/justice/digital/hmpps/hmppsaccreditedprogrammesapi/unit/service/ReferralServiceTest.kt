@@ -622,7 +622,6 @@ class ReferralServiceTest {
       .withId(referralId)
       .withStatus(REFERRAL_STARTED)
       .withOverrideReason("override reason")
-      .withTransferReason("Transfer reason")
       .withLdc(false)
       .withHasLdcBeenOverwrittenByProgrammeTeam(false)
       .produce()
@@ -689,13 +688,14 @@ class ReferralServiceTest {
       firstArg<ReferralEntity>().apply { id = newReferralId }
     }
 
+    val transferReferralRequest = TransferReferralRequest(
+      referralId = referralId,
+      offeringId = buildingChoicesOffering.id!!,
+      transferReason = "Reason for transfer",
+    )
     // When
     val newReferral = referralService.transferReferralToBuildingChoices(
-      TransferReferralRequest(
-        referralId = referralId,
-        offeringId = buildingChoicesOffering.id!!,
-        transferReason = "Reason for transfer",
-      ),
+      transferReferralRequest,
     )
 
     // Then
@@ -706,6 +706,6 @@ class ReferralServiceTest {
     verify { referralStatusHistoryService.createReferralHistory(newReferral!!) }
     verify { referralStatusHistoryService.updateReferralHistory(referralId = referralId!!, previousStatusCode = ReferralStatus.REFERRAL_SUBMITTED.name, newStatus = any(), any(), any(), any()) }
     verify { referralRepository.save(existingReferral.apply { status = "MOVED_TO_BUILDING_CHOICES" }) }
-    verify { caseNotesApiService.buildAndCreateCaseNote(existingReferral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name)) }
+    verify { caseNotesApiService.buildAndCreateCaseNote(existingReferral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name, notes = transferReferralRequest.transferReason)) }
   }
 }

@@ -128,6 +128,7 @@ constructor(
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
+    referral.hasLdc = update.hasLdc
     referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
   }
 
@@ -420,7 +421,6 @@ constructor(
 
   fun transferReferralToBuildingChoices(transferReferralRequest: TransferReferralRequest): ReferralEntity? {
     val referral = getReferralById(transferReferralRequest.referralId) ?: throw NotFoundException("No referral found with id ${transferReferralRequest.referralId}")
-    referral.transferReason = transferReferralRequest.transferReason
 
     val newOffering = offeringRepository.findById(transferReferralRequest.offeringId).getOrElse { throw NotFoundException("Referral ${transferReferralRequest.referralId} cannot be transferred, as offeringId ${transferReferralRequest.offeringId} does not exist") }
     val newReferral = createNewReferral(
@@ -430,8 +430,14 @@ constructor(
     referralStatusHistoryService.createReferralHistory(newReferral)
     auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
 
-    updateOriginalReferralStatusToBuildingChoices(referral)
-    caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name))
+    updateOriginalReferralStatusToBuildingChoices(referral, transferReferralRequest)
+    caseNotesApiService.buildAndCreateCaseNote(
+      referral,
+      ReferralStatusUpdate(
+        status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name,
+        notes = transferReferralRequest.transferReason,
+      ),
+    )
 
     return newReferral
   }
@@ -457,7 +463,7 @@ constructor(
     return newReferral
   }
 
-  private fun updateOriginalReferralStatusToBuildingChoices(referral: ReferralEntity) {
+  private fun updateOriginalReferralStatusToBuildingChoices(referral: ReferralEntity, transferReferralRequest: TransferReferralRequest) {
     val previousStatus = referral.status
     val newStatus = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
 
@@ -465,6 +471,7 @@ constructor(
       referralId = referral.id!!,
       previousStatusCode = previousStatus,
       newStatus = referralStatusRepository.getByCode(newStatus),
+      newNotes = transferReferralRequest.transferReason,
     )
     referral.status = newStatus
     referralRepository.save(referral)
