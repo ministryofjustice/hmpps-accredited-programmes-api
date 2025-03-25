@@ -1217,6 +1217,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     .returnResult().responseBody!!
 
   fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
+  fun getOtherOpenReferrals(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/other/$createdReferralId", referralsListTypeReference())
 
   private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
     .put()
@@ -1670,6 +1671,51 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         actualSummary.hasLdc shouldBe referralView.hasLdc
       }
     }
+  }
+
+  @Test
+  fun `should return other open referrals`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+
+    val offering1 = getAllOfferingsForCourse(course.id).first()
+    val offering2 = getAllOfferingsForCourse(course.id).last()
+    val referralId1 = UUID.randomUUID()
+    val referralId2 = UUID.randomUUID()
+
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    persistenceHelper.createReferral(
+      referralId = referralId1,
+      offeringId = offering1.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = "TEST_REFERRER_USER_1",
+      additionalInformation = "more information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "ASSESSED_SUITABLE",
+      submittedOn = LocalDateTime.parse("2023-11-13T19:11:00"),
+      primaryPomStaffId = "10".toBigInteger(),
+      hasLdc = true,
+    )
+    persistenceHelper.createReferral(
+      referralId = referralId2,
+      offeringId = offering2.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = "TEST_REFERRER_USER_1",
+      additionalInformation = "more information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "ASSESSMENT_STARTED",
+      submittedOn = LocalDateTime.parse("2025-01-13T19:11:00"),
+      primaryPomStaffId = "10".toBigInteger(),
+      hasLdc = true,
+    )
+
+    val otherOpenReferrals = getOtherOpenReferrals(referralId1)
+
+    otherOpenReferrals.size shouldBe 1
+    otherOpenReferrals.first().id shouldBe referralId2
+    otherOpenReferrals.first().status shouldBe "ASSESSMENT_STARTED"
   }
 
   fun getReferralViewsByOrganisationId(
