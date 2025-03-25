@@ -62,11 +62,9 @@ class ReferralRepositoryTest {
 
   @Test
   fun `ReferralRepository should update and retrieve ReferralEntity objects`() {
-//    var course = CourseEntityFactory().withId(null).produce()
     var course = CourseEntityFactory().produce()
     course = entityManager.merge(course)
 
-//    var offering = OfferingEntityFactory().withId(null).produce()
     var offering = OfferingEntityFactory().produce()
     offering.course = course
     offering = entityManager.merge(offering)
