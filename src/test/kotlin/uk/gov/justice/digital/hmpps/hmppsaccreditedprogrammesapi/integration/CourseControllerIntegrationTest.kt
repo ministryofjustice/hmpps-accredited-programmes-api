@@ -740,7 +740,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .bodyValue(
         CourseOffering(
-          id = null,
+          id = UUID.randomUUID(),
           organisationId = "AWI",
           contactEmail = "awi1@whatton.com",
           secondaryContactEmail = "awi2@whatton.com",
