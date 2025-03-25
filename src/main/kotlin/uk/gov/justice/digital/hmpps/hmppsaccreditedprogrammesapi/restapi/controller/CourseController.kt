@@ -143,6 +143,7 @@ class CourseController(
       ?: throw BusinessException("Audience with id ${courseCreateRequest.audienceId} does not exist")
 
     val course = CourseEntity(
+      id = UUID.randomUUID(),
       name = courseCreateRequest.name,
       identifier = identifier,
       description = courseCreateRequest.description,

@@ -25,10 +25,10 @@ class OfferingRepositoryTest {
   @ParameterizedTest
   @ValueSource(booleans = [true, false])
   fun `OfferingRepository should retrieve the correct offering for a CourseEntity object given a valid offeringId`(isWithdrawn: Boolean) {
-    var course = CourseEntityFactory().withId(null).produce()
+    var course = CourseEntityFactory().produce()
     course = entityManager.merge(course)
 
-    var offering = OfferingEntityFactory().withId(null).withWithdrawn(isWithdrawn).withOrganisationId("MDI").produce()
+    var offering = OfferingEntityFactory().withWithdrawn(isWithdrawn).withOrganisationId("MDI").produce()
     offering.course = course
     entityManager.merge(offering)
 

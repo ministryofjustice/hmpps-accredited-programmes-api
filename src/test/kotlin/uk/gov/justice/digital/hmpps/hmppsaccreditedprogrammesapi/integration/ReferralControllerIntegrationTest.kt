@@ -306,6 +306,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Creating a referral which already exists results in conflict 409 response`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val course = getAllCourses().first()
@@ -322,8 +323,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         overrideReason = "Scored higher in OSP, should go onto Kaizen",
       ),
     )
+    // When
     submitReferral(referralCreated.id)
 
+    // Then
     val staffEntity = staffRepository.findAll()
     staffEntity.shouldNotBeEmpty()
 
