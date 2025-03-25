@@ -284,7 +284,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       primaryPrisonOffenderManager = null,
       overrideReason = null,
-      transferReason = null,
       originalReferralId = originalReferralId,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
@@ -389,7 +388,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
       overrideReason = null,
-      transferReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -506,7 +504,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = null,
       submittedOn = null,
       overrideReason = null,
-      transferReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -1813,7 +1810,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed shouldBe referralEntity.oasysConfirmed
       additionalInformation shouldBe referralEntity.additionalInformation
       overrideReason shouldBe referralEntity.overrideReason
-      transferReason shouldBe referralEntity.transferReason
       originalReferralId shouldBe referralEntity.originalReferralId
       hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
       statusCode shouldBe referralEntity.status
