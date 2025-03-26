@@ -449,15 +449,15 @@ constructor(
     try {
       return referralEntity.run {
         auditService.audit(referralEntity = this, auditAction = AuditAction.VIEW_REFERRAL.name)
-        log.info("Audit was successful")
+        log.info("Audit was successful for referral with id: $referralId")
         val status = referenceDataService.getReferralStatus(this.status)
-        log.info("Referral status is: $status")
+        log.info("Referral status is: $status for id: $referralId")
         val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
-        log.info("Staff detail retrieved has ID: ${staffDetail?.staffId} ")
+        log.info("Staff detail retrieved has ID: ${staffDetail?.staffId} for referral with id: $referralId")
         var hasLdc: Boolean? = null
         if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
           hasLdc = getLdc(this.prisonNumber)
-          log.info("LDC status is: $hasLdc")
+          log.info("LDC status is: $hasLdc for referral with id: $referralId")
         }
         toApi(status, staffDetail, hasLdc)
       }
