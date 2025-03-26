@@ -187,17 +187,8 @@ constructor(
       .withOasysConfirmed(true)
       .withHasReviewedProgrammeHistory(true)
       .produce()
-//    val referral =
 
     every { referralService.fetchCompleteReferralDataSetForId(any()) } returns referral.toApi()
-//    every { referralService.getReferralById(any()) } returns referral
-//    every { referralService.getLdc(any()) } returns true
-//    val referralStatus = ReferralStatusRefDataFactory()
-//      .withCode(REFERRAL_STARTED)
-//      .produce()
-//    every { referralReferenceDataService.getReferralStatus(REFERRAL_STARTED) } returns referralStatus
-//    every { staffService.getStaffDetail(any()) } returns StaffEntityFactory().produce()
-//    every { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.VIEW_REFERRAL.name)) } returns Unit
 
     mockMvc.get("/referrals/${referral.id}?updatePerson=false") {
       accept = MediaType.APPLICATION_JSON
@@ -217,7 +208,6 @@ constructor(
     }
 
     verify { referralService.fetchCompleteReferralDataSetForId(any()) }
-//    verify { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.VIEW_REFERRAL.name)) }
   }
 
   @Test
