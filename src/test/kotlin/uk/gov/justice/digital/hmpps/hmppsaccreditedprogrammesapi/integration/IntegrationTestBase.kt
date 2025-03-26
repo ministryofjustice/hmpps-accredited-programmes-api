@@ -283,4 +283,5 @@ abstract class IntegrationTestBase {
   fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate) = performRequestAndExpectStatusWithBody(HttpMethod.PUT, "/referrals/$referralId", referralUpdate, 204)
 
   fun referralTypeReference(): ParameterizedTypeReference<Referral> = object : ParameterizedTypeReference<Referral>() {}
+  fun referralsListTypeReference(): ParameterizedTypeReference<List<Referral>> = object : ParameterizedTypeReference<List<Referral>>() {}
 }
