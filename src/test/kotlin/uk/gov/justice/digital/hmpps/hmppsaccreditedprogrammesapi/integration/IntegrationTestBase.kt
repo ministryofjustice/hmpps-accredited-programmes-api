@@ -246,6 +246,24 @@ abstract class IntegrationTestBase {
     .expectBody(returnType)
     .returnResult().responseBody!!
 
+  fun <T> performRequestAndExpectStatusWithBody(
+    httpMethod: HttpMethod,
+    uri: String,
+    returnType: ParameterizedTypeReference<T>,
+    body: Any,
+    expectedResponseStatus: Int,
+  ): T = webTestClient
+    .method(httpMethod)
+    .uri(uri)
+    .contentType(MediaType.APPLICATION_JSON)
+    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+    .exchange()
+    .expectStatus().isEqualTo(expectedResponseStatus)
+    .expectBody(returnType)
+    .returnResult().responseBody!!
+
   fun performRequestAndExpectStatusWithBody(
     httpMethod: HttpMethod,
     uri: String,
@@ -265,4 +283,5 @@ abstract class IntegrationTestBase {
   fun updateReferral(referralId: UUID, referralUpdate: ReferralUpdate) = performRequestAndExpectStatusWithBody(HttpMethod.PUT, "/referrals/$referralId", referralUpdate, 204)
 
   fun referralTypeReference(): ParameterizedTypeReference<Referral> = object : ParameterizedTypeReference<Referral>() {}
+  fun referralsListTypeReference(): ParameterizedTypeReference<List<Referral>> = object : ParameterizedTypeReference<List<Referral>>() {}
 }

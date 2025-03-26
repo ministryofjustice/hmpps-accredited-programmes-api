@@ -223,7 +223,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // When
     val unknownOfferingId = UUID.randomUUID()
-    val errorResponse = performRequestAndExpectStatusWithBody(
+    performRequestAndExpectStatusWithBody(
       httpMethod = HttpMethod.POST,
       uri = "/referrals/transfer-to-building-choices",
       body = TransferReferralRequest(createdReferral.id, unknownOfferingId, "Transfer reason"),
@@ -284,7 +284,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       primaryPrisonOffenderManager = null,
       overrideReason = null,
-      transferReason = null,
       originalReferralId = originalReferralId,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
@@ -306,6 +305,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Creating a referral which already exists results in conflict 409 response`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val course = getAllCourses().first()
@@ -322,8 +322,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         overrideReason = "Scored higher in OSP, should go onto Kaizen",
       ),
     )
+    // When
     submitReferral(referralCreated.id)
 
+    // Then
     val staffEntity = staffRepository.findAll()
     staffEntity.shouldNotBeEmpty()
 
@@ -386,7 +388,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
       overrideReason = null,
-      transferReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -503,7 +504,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = null,
       submittedOn = null,
       overrideReason = null,
-      transferReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -1217,6 +1217,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     .returnResult().responseBody!!
 
   fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
+  fun getOtherOpenReferrals(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/others/$createdReferralId", referralsListTypeReference())
 
   private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
     .put()
@@ -1672,6 +1673,51 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     }
   }
 
+  @Test
+  fun `should return other open referrals`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+
+    val offering1 = getAllOfferingsForCourse(course.id).first()
+    val offering2 = getAllOfferingsForCourse(course.id).last()
+    val referralId1 = UUID.randomUUID()
+    val referralId2 = UUID.randomUUID()
+
+    persistenceHelper.createReferrerUser("TEST_REFERRER_USER_1")
+    persistenceHelper.createReferral(
+      referralId = referralId1,
+      offeringId = offering1.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = "TEST_REFERRER_USER_1",
+      additionalInformation = "more information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "ASSESSED_SUITABLE",
+      submittedOn = LocalDateTime.parse("2023-11-13T19:11:00"),
+      primaryPomStaffId = "10".toBigInteger(),
+      hasLdc = true,
+    )
+    persistenceHelper.createReferral(
+      referralId = referralId2,
+      offeringId = offering2.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = "TEST_REFERRER_USER_1",
+      additionalInformation = "more information",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "ASSESSMENT_STARTED",
+      submittedOn = LocalDateTime.parse("2025-01-13T19:11:00"),
+      primaryPomStaffId = "10".toBigInteger(),
+      hasLdc = true,
+    )
+
+    val otherOpenReferrals = getOtherOpenReferrals(referralId1)
+
+    otherOpenReferrals.size shouldBe 1
+    otherOpenReferrals.first().id shouldBe referralId2
+    otherOpenReferrals.first().status shouldBe "ASSESSMENT_STARTED"
+  }
+
   fun getReferralViewsByOrganisationId(
     organisationId: String,
     statusFilter: List<String>? = null,
@@ -1810,7 +1856,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed shouldBe referralEntity.oasysConfirmed
       additionalInformation shouldBe referralEntity.additionalInformation
       overrideReason shouldBe referralEntity.overrideReason
-      transferReason shouldBe referralEntity.transferReason
       originalReferralId shouldBe referralEntity.originalReferralId
       hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
       statusCode shouldBe referralEntity.status

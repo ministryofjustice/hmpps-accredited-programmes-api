@@ -372,18 +372,7 @@ class ReferralController(
       description = "The id (UUID) of a referral",
       required = true,
     ) @PathVariable("id") id: UUID,
-  ): ResponseEntity<Referral> = referralService
-    .getReferralById(referralId = id)
-    ?.let {
-      auditService.audit(referralEntity = it, auditAction = AuditAction.VIEW_REFERRAL.name)
-      val status = referenceDataService.getReferralStatus(it.status)
-      val staffDetail = staffService.getStaffDetail(it.primaryPomStaffId)?.toApi()
-      if (!it.hasLdcBeenOverriddenByProgrammeTeam) {
-        it.hasLdc = referralService.getLdc(it.prisonNumber)
-      }
-      ResponseEntity.ok(it.toApi(status, staffDetail))
-    }
-    ?: throw NotFoundException("No Referral found at /referrals/$id")
+  ): ResponseEntity<Referral> = ResponseEntity.ok(referralService.fetchCompleteReferralDataSetForId(id))
 
   @Operation(
     tags = ["Referrals"],
@@ -914,4 +903,48 @@ class ReferralController(
     }
     return ResponseEntity.ok(duplicateReferrals.map { referral -> referral.toApi() })
   }
+
+  @Operation(
+    tags = ["Referrals"],
+    summary = "Retrieve other open referrals for a person",
+    operationId = "getOtherOpenReferrals",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Information about the referral",
+        content = [Content(array = ArraySchema(schema = Schema(implementation = Referral::class)))],
+      ),
+      ApiResponse(responseCode = "401", description = "The request was unauthorised"),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden.  The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The referral does not exist",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/referrals/others/{id}"],
+    produces = ["application/json"],
+  )
+  fun getOtherOpenReferrals(
+    @Parameter(
+      description = "The id (UUID) of a referral",
+      required = true,
+    ) @PathVariable("id") id: UUID,
+  ): ResponseEntity<List<Referral>> = referralService.getReferralById(referralId = id)
+    ?.let { it ->
+      ResponseEntity.ok(
+        referralService.getOpenReferralsForPerson(it.prisonNumber)
+          .filterNot { referral -> referral.id == id }
+          .map { it.toApi() },
+      )
+    } ?: throw NotFoundException("No Referral found for referralId $id")
 }

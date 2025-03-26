@@ -27,7 +27,6 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData, staffDetail: StaffDetail
   submittedOn = submittedOn?.toString(),
   primaryPrisonOffenderManager = staffDetail,
   overrideReason = overrideReason,
-  transferReason = transferReason,
   originalReferralId = originalReferralId,
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam,
@@ -43,7 +42,6 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   additionalInformation = additionalInformation,
   status = status,
   overrideReason = overrideReason,
-  transferReason = transferReason,
   originalReferralId = originalReferralId,
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam,
@@ -63,6 +61,7 @@ fun ApiReferralUpdate.toDomain() = ReferralUpdate(
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   overrideReason = overrideReason,
+  hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )
 
@@ -71,6 +70,7 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   overrideReason = overrideReason,
+  hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )
 

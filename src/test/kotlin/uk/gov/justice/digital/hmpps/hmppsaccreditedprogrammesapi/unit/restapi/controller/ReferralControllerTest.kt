@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_STARTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
@@ -48,8 +49,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralStatusRefDataFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
-import java.util.UUID
+import java.util.*
 
 private const val MY_REFERRALS_ENDPOINT = "/referrals/me/dashboard"
 
@@ -188,14 +188,7 @@ constructor(
       .withHasReviewedProgrammeHistory(true)
       .produce()
 
-    every { referralService.getReferralById(any()) } returns referral
-    every { referralService.getLdc(any()) } returns true
-    val referralStatus = ReferralStatusRefDataFactory()
-      .withCode(REFERRAL_STARTED)
-      .produce()
-    every { referralReferenceDataService.getReferralStatus(REFERRAL_STARTED) } returns referralStatus
-    every { staffService.getStaffDetail(any()) } returns StaffEntityFactory().produce()
-    every { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.VIEW_REFERRAL.name)) } returns Unit
+    every { referralService.fetchCompleteReferralDataSetForId(any()) } returns referral.toApi()
 
     mockMvc.get("/referrals/${referral.id}?updatePerson=false") {
       accept = MediaType.APPLICATION_JSON
@@ -214,8 +207,7 @@ constructor(
       }
     }
 
-    verify { referralService.getReferralById(any()) }
-    verify { auditService.audit(any(), any(), org.mockito.kotlin.eq(AuditAction.VIEW_REFERRAL.name)) }
+    verify { referralService.fetchCompleteReferralDataSetForId(any()) }
   }
 
   @Test
@@ -231,9 +223,9 @@ constructor(
   fun `getReferralById with random UUID returns 404 with error body`() {
     val referralId = UUID.randomUUID()
 
-    every { referralService.getReferralById(any()) } returns null
+    every { referralService.fetchCompleteReferralDataSetForId(referralId) } throws NotFoundException("No referral found with id $referralId")
 
-    mockMvc.get("/referrals/$referralId?updatePerson=false") {
+    mockMvc.get("/referrals/$referralId") {
       accept = MediaType.APPLICATION_JSON
       header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     }.andExpect {
@@ -242,13 +234,12 @@ constructor(
         contentType(MediaType.APPLICATION_JSON)
         jsonPath("$.status") { value(404) }
         jsonPath("$.errorCode") { isEmpty() }
-        jsonPath("$.userMessage") { prefix("Not Found: No Referral found at /referrals/$referralId") }
-        jsonPath("$.developerMessage") { prefix("No referral found at /courses/$referralId") }
+        jsonPath("$.userMessage") { prefix("Not Found: No referral found with id $referralId") }
         jsonPath("$.moreInfo") { isEmpty() }
       }
     }
 
-    verify { referralService.getReferralById(referralId) }
+    verify { referralService.fetchCompleteReferralDataSetForId(referralId) }
   }
 
   @Test

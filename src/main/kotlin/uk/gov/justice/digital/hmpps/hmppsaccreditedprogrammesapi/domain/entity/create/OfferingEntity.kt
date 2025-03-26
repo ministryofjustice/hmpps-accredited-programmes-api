@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
@@ -15,13 +14,12 @@ import java.util.UUID
 @Table(name = "offering")
 class OfferingEntity(
   @Id
-  @GeneratedValue
   @Column(name = "offering_id")
   val id: UUID? = null,
 
   @Version
   @Column(name = "version", nullable = false)
-  var version: Long = 0,
+  val version: Long = 0,
 
   var organisationId: String,
   var contactEmail: String,

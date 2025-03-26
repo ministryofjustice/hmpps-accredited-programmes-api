@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
@@ -246,7 +247,7 @@ constructor(
       fun `for a non existent referral returns not found error`() {
         val randomId = UUID.randomUUID()
 
-        every { referralService.getReferralById(randomId) } returns null
+        every { courseService.getBuildingChoicesCourseForTransferringReferral(randomId, null) } throws NotFoundException("No referral found for id: $randomId")
 
         mockMvc.get("/courses/building-choices/referral/$randomId") {
           accept = MediaType.APPLICATION_JSON
@@ -256,7 +257,7 @@ constructor(
           content {
             contentType(MediaType.APPLICATION_JSON)
             jsonPath("$.status") { value(404) }
-            jsonPath("$.developerMessage") { prefix("No Referral found at /referrals/$randomId") }
+            jsonPath("$.developerMessage") { prefix("No referral found for id: $randomId") }
           }
         }
       }
