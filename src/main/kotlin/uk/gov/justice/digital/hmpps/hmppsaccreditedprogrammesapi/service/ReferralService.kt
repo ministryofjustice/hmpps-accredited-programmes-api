@@ -62,6 +62,7 @@ constructor(
   private val organisationService: OrganisationService,
   private val staffService: StaffService,
   private val courseParticipationService: CourseParticipationService,
+  private val referenceDataService: ReferralReferenceDataService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -440,6 +441,22 @@ constructor(
     )
 
     return newReferral
+  }
+
+  fun fetchCompleteReferralDataSetForId(referralId: UUID): Referral {
+    val referralEntity = getReferralById(referralId) ?: throw NotFoundException("No referral found with id $referralId")
+
+    return referralEntity.run {
+      auditService.audit(referralEntity = this, auditAction = AuditAction.VIEW_REFERRAL.name)
+      val status = referenceDataService.getReferralStatus(this.status)
+      val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
+
+      var hasLdc: Boolean? = null
+      if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
+        hasLdc = getLdc(this.prisonNumber)
+      }
+      toApi(status, staffDetail, hasLdc)
+    }
   }
 
   fun getLdc(prisonNumber: String): Boolean? = pniService.hasLDC(prisonNumber)
