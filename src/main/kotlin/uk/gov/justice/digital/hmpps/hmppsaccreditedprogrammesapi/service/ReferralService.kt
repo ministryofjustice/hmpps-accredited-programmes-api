@@ -445,17 +445,25 @@ constructor(
 
   fun fetchCompleteReferralDataSetForId(referralId: UUID): Referral {
     val referralEntity = getReferralById(referralId) ?: throw NotFoundException("No referral found with id $referralId")
-
-    return referralEntity.run {
-      auditService.audit(referralEntity = this, auditAction = AuditAction.VIEW_REFERRAL.name)
-      val status = referenceDataService.getReferralStatus(this.status)
-      val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
-
-      var hasLdc: Boolean? = null
-      if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
-        hasLdc = getLdc(this.prisonNumber)
+    log.info("Found referral with id: $referralId")
+    try {
+      return referralEntity.run {
+        auditService.audit(referralEntity = this, auditAction = AuditAction.VIEW_REFERRAL.name)
+        log.info("Audit was successful")
+        val status = referenceDataService.getReferralStatus(this.status)
+        log.info("Referral status is: $status")
+        val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
+        log.info("Staff detail retrieved has ID: ${staffDetail?.staffId} ")
+        var hasLdc: Boolean? = null
+        if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
+          hasLdc = getLdc(this.prisonNumber)
+          log.info("LDC status is: $hasLdc")
+        }
+        toApi(status, staffDetail, hasLdc)
       }
-      toApi(status, staffDetail, hasLdc)
+    } catch (ex: Exception) {
+      log.error("Failed to fetch referral data for id: $referralId", ex)
+      throw ex
     }
   }
 
