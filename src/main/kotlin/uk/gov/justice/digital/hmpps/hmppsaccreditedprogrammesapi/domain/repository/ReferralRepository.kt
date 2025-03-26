@@ -30,4 +30,5 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
   fun findAllDistinctPrisonNumbersWithoutPrimaryPom(): List<String>
 
   fun findAllByPrisonNumber(prisonNumber: String): List<ReferralEntity>
+  fun findAllByPrisonNumberAndStatusIn(prisonNumber: String, openReferralStatus: List<String>): List<ReferralEntity>
 }

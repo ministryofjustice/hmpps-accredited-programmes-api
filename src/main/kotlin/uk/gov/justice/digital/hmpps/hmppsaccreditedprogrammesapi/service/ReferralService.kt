@@ -503,4 +503,7 @@ constructor(
     referral.status = newStatus
     referralRepository.save(referral)
   }
+
+  private fun getOpenReferralStatuses() = referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
+  fun getOpenReferralsForPerson(prisonNumber: String): List<ReferralEntity> = referralRepository.findAllByPrisonNumberAndStatusIn(prisonNumber, getOpenReferralStatuses())
 }
