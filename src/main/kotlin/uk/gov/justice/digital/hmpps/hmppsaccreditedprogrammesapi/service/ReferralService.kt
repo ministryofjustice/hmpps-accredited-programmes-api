@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -443,6 +444,7 @@ constructor(
     return newReferral
   }
 
+  @Transactional(isolation = Isolation.REPEATABLE_READ)
   fun fetchCompleteReferralDataSetForId(referralId: UUID): Referral {
     val referralEntity = getReferralById(referralId) ?: throw NotFoundException("No referral found with id $referralId")
     log.info("Found referral with id: $referralId")
