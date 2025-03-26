@@ -931,7 +931,7 @@ class ReferralController(
   )
   @RequestMapping(
     method = [RequestMethod.GET],
-    value = ["/referrals/other/{id}"],
+    value = ["/referrals/others/{id}"],
     produces = ["application/json"],
   )
   fun getOtherOpenReferrals(

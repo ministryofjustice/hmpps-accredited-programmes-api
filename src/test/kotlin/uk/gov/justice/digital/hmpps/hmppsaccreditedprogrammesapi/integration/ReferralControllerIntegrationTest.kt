@@ -1217,7 +1217,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     .returnResult().responseBody!!
 
   fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
-  fun getOtherOpenReferrals(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/other/$createdReferralId", referralsListTypeReference())
+  fun getOtherOpenReferrals(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/others/$createdReferralId", referralsListTypeReference())
 
   private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
     .put()
