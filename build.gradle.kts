@@ -15,7 +15,7 @@ configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
-ext["hibernate.version"] = "6.6.9.Final"
+ext["hibernate.version"] = "6.6.11.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
@@ -24,7 +24,7 @@ dependencies {
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.3"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.3.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.2")
   runtimeOnly("org.postgresql:postgresql:42.7.5")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")

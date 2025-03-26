@@ -22,7 +22,7 @@ import java.util.UUID
 @Table(name = "course")
 class CourseEntity(
   @Id
-  @Column(name = "course_id")
+  @Column(name = "course_id", nullable = true)
   val id: UUID? = null,
 
   @Version

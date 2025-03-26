@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -444,28 +443,19 @@ constructor(
     return newReferral
   }
 
-  @Transactional(isolation = Isolation.SERIALIZABLE)
   fun fetchCompleteReferralDataSetForId(referralId: UUID): Referral {
+    log.info("Entered fetchCompleteReferralDataSetForId with referralId: $referralId")
     val referralEntity = getReferralById(referralId) ?: throw NotFoundException("No referral found with id $referralId")
-    log.info("Found referral with id: $referralId")
-    try {
-      return referralEntity.run {
-        auditService.audit(referralEntity = this, auditAction = AuditAction.VIEW_REFERRAL.name)
-        log.info("Audit was successful for referral with id: $referralId")
-        val status = referenceDataService.getReferralStatus(this.status)
-        log.info("Referral status is: $status for id: $referralId")
-        val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
-        log.info("Staff detail retrieved has ID: ${staffDetail?.staffId} for referral with id: $referralId")
 
-        if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
-          this.hasLdc = getLdc(this.prisonNumber)
-          log.info("LDC status is: $hasLdc for referral with id: $referralId")
-        }
-        toApi(status, staffDetail)
+    return referralEntity.run {
+      auditService.audit(referralEntity = this, auditAction = AuditAction.VIEW_REFERRAL.name)
+      val status = referenceDataService.getReferralStatus(this.status)
+      val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
+
+      if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
+        this.hasLdc = getLdc(this.prisonNumber)
       }
-    } catch (ex: Exception) {
-      log.error("Failed to fetch referral data for id: $referralId", ex)
-      throw ex
+      toApi(status, staffDetail)
     }
   }
 
