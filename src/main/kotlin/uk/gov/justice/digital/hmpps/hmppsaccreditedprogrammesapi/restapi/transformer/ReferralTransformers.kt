@@ -12,7 +12,7 @@ import java.time.ZoneOffset
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral as ApiReferral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralUpdate as ApiReferralUpdate
 
-fun ReferralEntity.toApi(status: ReferralStatusRefData, staffDetail: StaffDetail?): ApiReferral = ApiReferral(
+fun ReferralEntity.toApi(status: ReferralStatusRefData, staffDetail: StaffDetail?, hasLearningDifficulties: Boolean?): ApiReferral = ApiReferral(
   id = id!!,
   offeringId = offering.id!!,
   prisonNumber = prisonNumber,
@@ -27,9 +27,8 @@ fun ReferralEntity.toApi(status: ReferralStatusRefData, staffDetail: StaffDetail
   submittedOn = submittedOn?.toString(),
   primaryPrisonOffenderManager = staffDetail,
   overrideReason = overrideReason,
-  transferReason = transferReason,
   originalReferralId = originalReferralId,
-  hasLdc = hasLdc,
+  hasLdc = hasLearningDifficulties,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam,
 )
 
@@ -43,7 +42,6 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   additionalInformation = additionalInformation,
   status = status,
   overrideReason = overrideReason,
-  transferReason = transferReason,
   originalReferralId = originalReferralId,
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam,
@@ -63,6 +61,7 @@ fun ApiReferralUpdate.toDomain() = ReferralUpdate(
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   overrideReason = overrideReason,
+  hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )
 
@@ -71,6 +70,7 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
   overrideReason = overrideReason,
+  hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )
 

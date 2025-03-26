@@ -5,5 +5,6 @@ data class ReferralUpdate(
   val oasysConfirmed: Boolean,
   val hasReviewedProgrammeHistory: Boolean,
   val overrideReason: String? = null,
+  val hasLdc: Boolean? = null,
   val hasLdcBeenOverriddenByProgrammeTeam: Boolean? = null,
 )

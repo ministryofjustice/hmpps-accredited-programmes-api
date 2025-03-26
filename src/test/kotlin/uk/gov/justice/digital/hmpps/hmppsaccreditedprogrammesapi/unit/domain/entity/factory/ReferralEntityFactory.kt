@@ -18,7 +18,6 @@ class ReferralEntityFactory {
   private var status: String = REFERRAL_STARTED
   private var submittedOn: LocalDateTime? = null
   private var overrideReason: String? = null
-  private var transferReason: String? = null
   private var hasLdc: Boolean = false
   private var hasLdcBeenOverwrittenByProgrammeTeam: Boolean = false
 
@@ -31,7 +30,6 @@ class ReferralEntityFactory {
   fun withHasReviewedProgrammeHistory(hasReviewedProgrammeHistory: Boolean) = apply { this.hasReviewedProgrammeHistory = hasReviewedProgrammeHistory }
   fun withStatus(status: String) = apply { this.status = status }
   fun withOverrideReason(overrideReason: String?) = apply { this.overrideReason = overrideReason }
-  fun withTransferReason(transferReason: String?) = apply { this.transferReason = transferReason }
   fun withLdc(hasLdc: Boolean) = apply { this.hasLdc = hasLdc }
   fun withHasLdcBeenOverwrittenByProgrammeTeam(hasLdcBeenOverwrittenByProgrammeTeam: Boolean) = apply { this.hasLdcBeenOverwrittenByProgrammeTeam = hasLdcBeenOverwrittenByProgrammeTeam }
 
@@ -46,7 +44,6 @@ class ReferralEntityFactory {
     status = this.status,
     submittedOn = this.submittedOn,
     overrideReason = this.overrideReason,
-    transferReason = this.transferReason,
     hasLdc = this.hasLdc,
     hasLdcBeenOverriddenByProgrammeTeam = this.hasLdcBeenOverwrittenByProgrammeTeam,
   )

@@ -223,7 +223,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
     // When
     val unknownOfferingId = UUID.randomUUID()
-    val errorResponse = performRequestAndExpectStatusWithBody(
+    performRequestAndExpectStatusWithBody(
       httpMethod = HttpMethod.POST,
       uri = "/referrals/transfer-to-building-choices",
       body = TransferReferralRequest(createdReferral.id, unknownOfferingId, "Transfer reason"),
@@ -284,7 +284,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       submittedOn = null,
       primaryPrisonOffenderManager = null,
       overrideReason = null,
-      transferReason = null,
       originalReferralId = originalReferralId,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
@@ -306,6 +305,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Creating a referral which already exists results in conflict 409 response`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val course = getAllCourses().first()
@@ -322,8 +322,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         overrideReason = "Scored higher in OSP, should go onto Kaizen",
       ),
     )
+    // When
     submitReferral(referralCreated.id)
 
+    // Then
     val staffEntity = staffRepository.findAll()
     staffEntity.shouldNotBeEmpty()
 
@@ -386,7 +388,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
       overrideReason = null,
-      transferReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -503,7 +504,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       additionalInformation = null,
       submittedOn = null,
       overrideReason = null,
-      transferReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -1810,7 +1810,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed shouldBe referralEntity.oasysConfirmed
       additionalInformation shouldBe referralEntity.additionalInformation
       overrideReason shouldBe referralEntity.overrideReason
-      transferReason shouldBe referralEntity.transferReason
       originalReferralId shouldBe referralEntity.originalReferralId
       hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
       statusCode shouldBe referralEntity.status

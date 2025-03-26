@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -62,6 +63,7 @@ constructor(
   private val organisationService: OrganisationService,
   private val staffService: StaffService,
   private val courseParticipationService: CourseParticipationService,
+  private val referenceDataService: ReferralReferenceDataService,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -128,6 +130,7 @@ constructor(
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.overrideReason = update.overrideReason
+    referral.hasLdc = update.hasLdc
     referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
   }
 
@@ -420,7 +423,6 @@ constructor(
 
   fun transferReferralToBuildingChoices(transferReferralRequest: TransferReferralRequest): ReferralEntity? {
     val referral = getReferralById(transferReferralRequest.referralId) ?: throw NotFoundException("No referral found with id ${transferReferralRequest.referralId}")
-    referral.transferReason = transferReferralRequest.transferReason
 
     val newOffering = offeringRepository.findById(transferReferralRequest.offeringId).getOrElse { throw NotFoundException("Referral ${transferReferralRequest.referralId} cannot be transferred, as offeringId ${transferReferralRequest.offeringId} does not exist") }
     val newReferral = createNewReferral(
@@ -430,10 +432,41 @@ constructor(
     referralStatusHistoryService.createReferralHistory(newReferral)
     auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
 
-    updateOriginalReferralStatusToBuildingChoices(referral)
-    caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name))
+    updateOriginalReferralStatusToBuildingChoices(referral, transferReferralRequest)
+    caseNotesApiService.buildAndCreateCaseNote(
+      referral,
+      ReferralStatusUpdate(
+        status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name,
+        notes = transferReferralRequest.transferReason,
+      ),
+    )
 
     return newReferral
+  }
+
+  @Transactional(isolation = Isolation.REPEATABLE_READ)
+  fun fetchCompleteReferralDataSetForId(referralId: UUID): Referral {
+    val referralEntity = getReferralById(referralId) ?: throw NotFoundException("No referral found with id $referralId")
+    log.info("Found referral with id: $referralId")
+    try {
+      return referralEntity.run {
+        auditService.audit(referralEntity = this, auditAction = AuditAction.VIEW_REFERRAL.name)
+        log.info("Audit was successful for referral with id: $referralId")
+        val status = referenceDataService.getReferralStatus(this.status)
+        log.info("Referral status is: $status for id: $referralId")
+        val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
+        log.info("Staff detail retrieved has ID: ${staffDetail?.staffId} for referral with id: $referralId")
+        var hasLdc: Boolean? = null
+        if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
+          hasLdc = getLdc(this.prisonNumber)
+          log.info("LDC status is: $hasLdc for referral with id: $referralId")
+        }
+        toApi(status, staffDetail, hasLdc)
+      }
+    } catch (ex: Exception) {
+      log.error("Failed to fetch referral data for id: $referralId", ex)
+      throw ex
+    }
   }
 
   fun getLdc(prisonNumber: String): Boolean? = pniService.hasLDC(prisonNumber)
@@ -457,7 +490,7 @@ constructor(
     return newReferral
   }
 
-  private fun updateOriginalReferralStatusToBuildingChoices(referral: ReferralEntity) {
+  private fun updateOriginalReferralStatusToBuildingChoices(referral: ReferralEntity, transferReferralRequest: TransferReferralRequest) {
     val previousStatus = referral.status
     val newStatus = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name
 
@@ -465,6 +498,7 @@ constructor(
       referralId = referral.id!!,
       previousStatusCode = previousStatus,
       newStatus = referralStatusRepository.getByCode(newStatus),
+      newNotes = transferReferralRequest.transferReason,
     )
     referral.status = newStatus
     referralRepository.save(referral)
