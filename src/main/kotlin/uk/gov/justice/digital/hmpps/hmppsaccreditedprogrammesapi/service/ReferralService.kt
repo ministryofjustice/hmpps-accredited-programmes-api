@@ -444,7 +444,7 @@ constructor(
     return newReferral
   }
 
-  @Transactional(isolation = Isolation.REPEATABLE_READ)
+  @Transactional(isolation = Isolation.SERIALIZABLE)
   fun fetchCompleteReferralDataSetForId(referralId: UUID): Referral {
     val referralEntity = getReferralById(referralId) ?: throw NotFoundException("No referral found with id $referralId")
     log.info("Found referral with id: $referralId")
@@ -456,12 +456,12 @@ constructor(
         log.info("Referral status is: $status for id: $referralId")
         val staffDetail = staffService.getStaffDetail(this.primaryPomStaffId)?.toApi()
         log.info("Staff detail retrieved has ID: ${staffDetail?.staffId} for referral with id: $referralId")
-        var hasLdc: Boolean? = null
+
         if (!this.hasLdcBeenOverriddenByProgrammeTeam) {
-          hasLdc = getLdc(this.prisonNumber)
+          this.hasLdc = getLdc(this.prisonNumber)
           log.info("LDC status is: $hasLdc for referral with id: $referralId")
         }
-        toApi(status, staffDetail, hasLdc)
+        toApi(status, staffDetail)
       }
     } catch (ex: Exception) {
       log.error("Failed to fetch referral data for id: $referralId", ex)
