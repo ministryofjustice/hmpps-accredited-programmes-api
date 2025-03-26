@@ -404,6 +404,7 @@ constructor(
   }
 
   fun getPrisonIdsWithNoPrimaryPom() = referralRepository.findAllDistinctPrisonNumbersWithoutPrimaryPom()
+  fun getPrisonIdsWithoutLdc() = referralRepository.findAllDistinctPrisonNumbersWithoutLdc()
 
   fun updatePoms(prisonNumber: String, primaryPom: StaffEntity?, secondaryPom: StaffEntity?) {
     val referrals = referralRepository.findAllByPrisonNumber(prisonNumber)
@@ -496,4 +497,16 @@ constructor(
 
   private fun getOpenReferralStatuses() = referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
   fun getOpenReferralsForPerson(prisonNumber: String): List<ReferralEntity> = referralRepository.findAllByPrisonNumberAndStatusIn(prisonNumber, getOpenReferralStatuses())
+  fun updateLdc(prisonNumber: String, hasLDC: Boolean?) {
+    val referrals = referralRepository.findAllByPrisonNumber(prisonNumber)
+    val updatedReferrals = mutableListOf<ReferralEntity>()
+
+    referrals.forEach { referral ->
+      referral.hasLdc = hasLDC
+      log.info("Referral ${referral.id} for prisoner $prisonNumber marked for ldc update")
+    }
+
+    val savedReferrals = referralRepository.saveAll(updatedReferrals)
+    log.info("Update successful for ${referrals.size} referrals for prisoner $prisonNumber referralIds ${savedReferrals.map { it.id }} Finished updating referrals with ldc $hasLDC ")
+  }
 }
