@@ -15,7 +15,7 @@ configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
-ext["hibernate.version"] = "6.6.9.Final"
+ext["hibernate.version"] = "6.6.11.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
