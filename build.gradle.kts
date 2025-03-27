@@ -7,8 +7,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.0.0"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.1.10"
-  kotlin("plugin.jpa") version "2.1.10"
+  kotlin("plugin.spring") version "2.1.20"
+  kotlin("plugin.jpa") version "2.1.20"
 }
 
 configurations {
@@ -19,10 +19,10 @@ ext["hibernate.version"] = "6.6.11.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.8.5"
-  val sentryVersion = "8.3.0"
+  val springdocVersion = "2.8.6"
+  val sentryVersion = "8.5.0"
   val jsonWebtokenVersion = "0.12.6"
-  val springSecurityVersion = "6.4.3"
+  val springSecurityVersion = "6.4.4"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.2")
   runtimeOnly("org.postgresql:postgresql:42.7.5")
@@ -33,17 +33,17 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
-  implementation("com.google.guava:guava:33.4.0-jre")
+  implementation("com.google.guava:guava:33.4.6-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.3.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.0.4")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.36")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.39")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
@@ -59,9 +59,9 @@ dependencies {
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:1.20.5")
-  testImplementation("org.testcontainers:postgresql:1.20.5")
-  testImplementation("org.testcontainers:junit-jupiter:1.20.5")
+  testImplementation("org.testcontainers:testcontainers:1.20.6")
+  testImplementation("org.testcontainers:postgresql:1.20.6")
+  testImplementation("org.testcontainers:junit-jupiter:1.20.6")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
