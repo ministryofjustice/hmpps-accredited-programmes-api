@@ -77,7 +77,7 @@ constructor(
     course: CourseEntity,
     coursePrerequisites: Set<CoursePrerequisite>,
   ): List<CoursePrerequisite>? {
-    course.prerequisites = coursePrerequisites.toEntity()
+    course.updatePrerequisites(coursePrerequisites.toEntity())
     val courseSaved = courseRepository.save(course)
     return courseSaved.prerequisites.map { it.toApi() }
   }

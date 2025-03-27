@@ -33,7 +33,7 @@ class CourseEntity(
   @Fetch(SUBSELECT)
   @CollectionTable(name = "prerequisite", joinColumns = [JoinColumn(name = "course_id")])
   @OrderBy("description DESC")
-  var prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
+  val prerequisites: MutableSet<PrerequisiteEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
   @Fetch(SUBSELECT)
@@ -45,11 +45,16 @@ class CourseEntity(
   var listDisplayName: String? = null,
   var displayOnProgrammeDirectory: Boolean? = true,
   var intensity: String? = null,
-)
+) {
+  fun updatePrerequisites(newPrerequisites: Set<PrerequisiteEntity>) {
+    this.prerequisites.clear()
+    this.prerequisites.addAll(newPrerequisites)
+  }
+}
 
 @Embeddable
 @Immutable
-class PrerequisiteEntity(
+data class PrerequisiteEntity(
   val name: String,
   val description: String,
 )
