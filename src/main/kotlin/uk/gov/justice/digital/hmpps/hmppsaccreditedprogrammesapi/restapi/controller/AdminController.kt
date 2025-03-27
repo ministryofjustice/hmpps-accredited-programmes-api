@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 
@@ -28,6 +29,7 @@ class AdminController(
   private val personService: PersonService,
   private val referralService: ReferralService,
   private val staffService: StaffService,
+  private val pniService: PniService,
 ) {
   @Operation(
     tags = ["Admin"],
@@ -64,6 +66,27 @@ class AdminController(
     }
 
     return ResponseEntity.status(HttpStatus.OK).body("POMs updated")
+  }
+
+  @PutMapping("/referrals/updateLdc")
+  @Operation(
+    summary = "Update referrals to have hasLdc flag",
+    tags = ["Admin"],
+  )
+  fun updateLdc(): ResponseEntity<String> {
+    referralService.getPrisonIdsWithoutLdc().forEach {
+      log.info("**** START: Updating LDC for prisoner $it")
+      try {
+        val hasLDC = pniService.hasLDC(it)
+
+        referralService.updateLdc(it, hasLDC)
+        log.info("**** FINISH: Updating LDC for prisoner $it")
+      } catch (ex: Exception) {
+        log.warn("**** ERROR: Updating LDC for prisoner $it - ${ex.message}", ex)
+      }
+    }
+
+    return ResponseEntity.status(HttpStatus.OK).body("LDCs updated")
   }
 
   companion object {
