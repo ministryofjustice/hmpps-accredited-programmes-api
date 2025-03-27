@@ -26,7 +26,7 @@ class OfferingEntity(
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")
   var course: CourseEntity,
-){
+) {
   @PrePersist
   fun generateId() {
     if (id == null) {
@@ -34,4 +34,3 @@ class OfferingEntity(
     }
   }
 }
-
