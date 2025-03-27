@@ -283,7 +283,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
       primaryPrisonOffenderManager = null,
-      overrideReason = null,
+      referrerOverrideReason = null,
       originalReferralId = originalReferralId,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
@@ -387,7 +387,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       hasReviewedProgrammeHistory = false,
       submittedOn = null,
-      overrideReason = null,
+      referrerOverrideReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -431,7 +431,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
       submittedOn = null,
-      overrideReason = "Override reason",
+      referrerOverrideReason = "Override reason",
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = true,
       primaryPrisonOffenderManager = null,
@@ -503,7 +503,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       oasysConfirmed = false,
       additionalInformation = null,
       submittedOn = null,
-      overrideReason = null,
+      referrerOverrideReason = null,
       hasLdc = null,
       hasLdcBeenOverriddenByProgrammeTeam = false,
       primaryPrisonOffenderManager = null,
@@ -1855,7 +1855,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       courseOrganisation shouldBe offering.organisationId
       oasysConfirmed shouldBe referralEntity.oasysConfirmed
       additionalInformation shouldBe referralEntity.additionalInformation
-      overrideReason shouldBe referralEntity.overrideReason
+      overrideReason shouldBe referralEntity.referrerOverrideReason
       originalReferralId shouldBe referralEntity.originalReferralId
       hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
       statusCode shouldBe referralEntity.status

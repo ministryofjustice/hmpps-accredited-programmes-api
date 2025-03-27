@@ -100,7 +100,7 @@ private fun List<ReferralEntity>.toSarReferral(): List<SarReferral> = map {
     it.hasReviewedProgrammeHistory,
     it.additionalInformation,
     it.submittedOn,
-    it.overrideReason,
+    it.referrerOverrideReason,
     it.referrer.username,
     it.offering.course.name,
     it.offering.course.audience,
