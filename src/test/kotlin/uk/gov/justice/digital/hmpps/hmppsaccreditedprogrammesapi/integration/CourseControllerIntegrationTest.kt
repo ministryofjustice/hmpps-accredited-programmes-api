@@ -757,6 +757,32 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should create offering when offering id is not provided`() {
+    webTestClient
+      .post()
+      .uri("/courses/$COURSE_ID2/offerings")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        CourseOffering(
+          id = null,
+          organisationId = "AWI",
+          contactEmail = "awi1@whatton.com",
+          secondaryContactEmail = "awi2@whatton.com",
+          referable = true,
+          withdrawn = false,
+          organisationEnabled = true,
+          gender = Gender.MALE,
+        ),
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectBody<CourseOffering>()
+      .returnResult().responseBody!!
+  }
+
+  @Test
   fun `Building choices courses are returned as expected`() {
     val bc1MainCourseId = UUID.randomUUID()
     val bc1VariantCourseId = UUID.randomUUID()

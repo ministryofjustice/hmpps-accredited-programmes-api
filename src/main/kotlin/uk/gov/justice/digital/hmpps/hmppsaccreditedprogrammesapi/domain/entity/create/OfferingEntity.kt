@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.PrePersist
 import jakarta.persistence.Table
 import java.util.UUID
 
@@ -14,7 +15,7 @@ import java.util.UUID
 class OfferingEntity(
   @Id
   @Column(name = "offering_id")
-  val id: UUID? = null,
+  var id: UUID? = null,
 
   var organisationId: String,
   var contactEmail: String,
@@ -25,4 +26,12 @@ class OfferingEntity(
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "course_id")
   var course: CourseEntity,
-)
+){
+  @PrePersist
+  fun generateId() {
+    if (id == null) {
+      id = UUID.randomUUID()
+    }
+  }
+}
+
