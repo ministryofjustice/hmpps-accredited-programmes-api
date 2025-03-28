@@ -43,7 +43,7 @@ class ReferralEntityFactory {
     hasReviewedProgrammeHistory = this.hasReviewedProgrammeHistory,
     status = this.status,
     submittedOn = this.submittedOn,
-    overrideReason = this.overrideReason,
+    referrerOverrideReason = this.overrideReason,
     hasLdc = this.hasLdc,
     hasLdcBeenOverriddenByProgrammeTeam = this.hasLdcBeenOverwrittenByProgrammeTeam,
   )

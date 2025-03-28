@@ -54,7 +54,7 @@ class ReferralEntity(
   @Column(name = "secondary_pom_staff_id")
   var secondaryPomStaffId: BigInteger? = null,
 
-  var overrideReason: String? = null,
+  var referrerOverrideReason: String? = null,
   var originalReferralId: UUID? = null,
   var hasLdc: Boolean? = null,
   var hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,

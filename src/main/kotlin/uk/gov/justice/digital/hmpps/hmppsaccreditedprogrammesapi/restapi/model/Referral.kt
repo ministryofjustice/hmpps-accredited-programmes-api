@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.S
  * @param statusDescription The status description.
  * @param statusColour The colour to display status description.
  * @param submittedOn
- * @param overrideReason
+ * @param referrerOverrideReason
  * @param transferReason
  * @param originalReferralId
  */
@@ -61,8 +61,8 @@ data class Referral(
   @Schema(example = "null", description = "")
   @get:JsonProperty("submittedOn") val submittedOn: String? = null,
 
-  @Schema(example = "The reason for going with the recommended course is...", description = "Reason for overriding the recommended course")
-  @get:JsonProperty("overrideReason") val overrideReason: String? = null,
+  @Schema(example = "The reason for NOT going with the recommended programme is...", description = "Reason for overriding the recommended course by the referrer")
+  @get:JsonProperty("referrerOverrideReason") val referrerOverrideReason: String? = null,
 
   @Schema(example = "44e3cdab-c996-4234-afe5-a9d8ddb13be8", description = "Referral ID of the original referral from which transfer was initiated")
   @get:JsonProperty("originalReferralId") val originalReferralId: UUID? = null,
