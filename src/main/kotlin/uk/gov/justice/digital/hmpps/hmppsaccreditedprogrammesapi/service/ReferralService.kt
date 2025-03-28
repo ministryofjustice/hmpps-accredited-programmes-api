@@ -497,13 +497,15 @@ constructor(
 
   private fun getOpenReferralStatuses() = referralStatusRepository.findAllByActiveIsTrueAndClosedIsFalseAndDraftIsFalseOrderByDefaultOrder().map { it.code }
   fun getOpenReferralsForPerson(prisonNumber: String): List<ReferralEntity> = referralRepository.findAllByPrisonNumberAndStatusIn(prisonNumber, getOpenReferralStatuses())
-  fun updateLdc(prisonNumber: String, hasLDC: Boolean?) {
+  fun updateLdc(prisonNumber: String) {
+    val hasLDC = pniService.hasLDC(prisonNumber)
     val referrals = referralRepository.findAllByPrisonNumber(prisonNumber)
     val updatedReferrals = mutableListOf<ReferralEntity>()
 
     referrals.forEach { referral ->
       referral.hasLdc = hasLDC
-      log.info("Referral ${referral.id} for prisoner $prisonNumber marked for ldc update")
+      updatedReferrals.add(referral)
+      log.info("Referral ${referral.id} for prisoner $prisonNumber marked for ldc update $hasLDC")
     }
 
     val savedReferrals = referralRepository.saveAll(updatedReferrals)
