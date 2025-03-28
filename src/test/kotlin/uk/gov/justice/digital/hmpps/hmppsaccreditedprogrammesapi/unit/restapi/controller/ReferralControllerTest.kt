@@ -300,7 +300,7 @@ constructor(
       .withAdditionalInformation("Additional Info")
       .withOasysConfirmed(true)
       .withHasReviewedProgrammeHistory(true)
-      .withOverrideReason("Override Reason")
+      .withReferrerOverrideReason("Override Reason")
       .produce()
 
     every { referralService.getReferralById(referral.id!!) } returns referral

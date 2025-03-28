@@ -128,7 +128,7 @@ constructor(
     referral.additionalInformation = update.additionalInformation
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
-    referral.referrerOverrideReason = update.overrideReason
+    referral.referrerOverrideReason = update.referrerOverrideReason
     referral.hasLdc = update.hasLdc
     referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
   }
