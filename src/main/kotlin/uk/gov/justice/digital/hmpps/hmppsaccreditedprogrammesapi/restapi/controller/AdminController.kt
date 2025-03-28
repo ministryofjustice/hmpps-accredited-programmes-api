@@ -77,9 +77,7 @@ class AdminController(
     referralService.getPrisonIdsWithoutLdc().forEach {
       log.info("**** START: Updating LDC for prisoner $it")
       try {
-        val hasLDC = pniService.hasLDC(it)
-
-        referralService.updateLdc(it, hasLDC)
+        referralService.updateLdc(it)
         log.info("**** FINISH: Updating LDC for prisoner $it")
       } catch (ex: Exception) {
         log.warn("**** ERROR: Updating LDC for prisoner $it - ${ex.message}", ex)
