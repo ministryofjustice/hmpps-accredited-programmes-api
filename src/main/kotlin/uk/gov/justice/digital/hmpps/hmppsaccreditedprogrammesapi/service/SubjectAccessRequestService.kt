@@ -50,7 +50,7 @@ data class SarReferral(
   val hasReviewedProgrammeHistory: Boolean?,
   val additionalInformation: String?,
   val submittedOn: LocalDateTime?,
-  val overrideReason: String?,
+  val referrerOverrideReason: String?,
   val referrerUsername: String?,
   val courseName: String?,
   val audience: String?,

@@ -60,7 +60,7 @@ fun ApiReferralUpdate.toDomain() = ReferralUpdate(
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
-  overrideReason = overrideReason,
+  referrerOverrideReason = referrerOverrideReason,
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )
@@ -69,7 +69,7 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   additionalInformation = additionalInformation,
   oasysConfirmed = oasysConfirmed,
   hasReviewedProgrammeHistory = hasReviewedProgrammeHistory,
-  overrideReason = overrideReason,
+  referrerOverrideReason = referrerOverrideReason,
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
 )

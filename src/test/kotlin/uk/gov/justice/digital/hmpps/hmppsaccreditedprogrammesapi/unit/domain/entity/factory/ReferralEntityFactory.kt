@@ -17,7 +17,7 @@ class ReferralEntityFactory {
   private var hasReviewedProgrammeHistory: Boolean = false
   private var status: String = REFERRAL_STARTED
   private var submittedOn: LocalDateTime? = null
-  private var overrideReason: String? = null
+  private var referrerOverrideReason: String? = null
   private var hasLdc: Boolean = false
   private var hasLdcBeenOverwrittenByProgrammeTeam: Boolean = false
 
@@ -29,7 +29,7 @@ class ReferralEntityFactory {
   fun withOasysConfirmed(oasysConfirmed: Boolean) = apply { this.oasysConfirmed = oasysConfirmed }
   fun withHasReviewedProgrammeHistory(hasReviewedProgrammeHistory: Boolean) = apply { this.hasReviewedProgrammeHistory = hasReviewedProgrammeHistory }
   fun withStatus(status: String) = apply { this.status = status }
-  fun withOverrideReason(overrideReason: String?) = apply { this.overrideReason = overrideReason }
+  fun withReferrerOverrideReason(referrerOverrideReason: String?) = apply { this.referrerOverrideReason = referrerOverrideReason }
   fun withLdc(hasLdc: Boolean) = apply { this.hasLdc = hasLdc }
   fun withHasLdcBeenOverwrittenByProgrammeTeam(hasLdcBeenOverwrittenByProgrammeTeam: Boolean) = apply { this.hasLdcBeenOverwrittenByProgrammeTeam = hasLdcBeenOverwrittenByProgrammeTeam }
 
@@ -43,7 +43,7 @@ class ReferralEntityFactory {
     hasReviewedProgrammeHistory = this.hasReviewedProgrammeHistory,
     status = this.status,
     submittedOn = this.submittedOn,
-    referrerOverrideReason = this.overrideReason,
+    referrerOverrideReason = this.referrerOverrideReason,
     hasLdc = this.hasLdc,
     hasLdcBeenOverriddenByProgrammeTeam = this.hasLdcBeenOverwrittenByProgrammeTeam,
   )

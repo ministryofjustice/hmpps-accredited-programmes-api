@@ -621,7 +621,7 @@ class ReferralServiceTest {
       .withAdditionalInformation("additional info")
       .withId(referralId)
       .withStatus(REFERRAL_STARTED)
-      .withOverrideReason("override reason")
+      .withReferrerOverrideReason("override reason")
       .withLdc(false)
       .withHasLdcBeenOverwrittenByProgrammeTeam(false)
       .produce()
@@ -668,7 +668,7 @@ class ReferralServiceTest {
       .withAdditionalInformation("additional info")
       .withId(referralId)
       .withStatus(REFERRAL_SUBMITTED)
-      .withOverrideReason("override reason")
+      .withReferrerOverrideReason("override reason")
       .produce()
 
     val courseId = UUID.randomUUID()
