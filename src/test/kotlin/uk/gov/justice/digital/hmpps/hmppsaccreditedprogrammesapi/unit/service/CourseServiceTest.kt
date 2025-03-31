@@ -13,8 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.CourseVariantEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
@@ -222,7 +220,7 @@ class CourseServiceTest {
     every { courseVariantRepository.findAll() } returns courseVariantEntities
     every { courseRepository.findAllById(any()) } returns courseEntities
 
-    val result = courseService.getBuildingChoicesCourses()
+    val result = courseService.getAllBuildingChoicesCourses()
 
     result.size shouldBe 4
     result.map { it.id } shouldContainOnly listOf(courseId1, courseId2, variantCourseId1, variantCourseId2)
@@ -271,7 +269,7 @@ class CourseServiceTest {
   }
 
   @Test
-  fun `should return building choices course with general offence as audience when offence is differnt to sexual offence`() {
+  fun `should return building choices course with general offence as audience when offence is different to sexual offence`() {
     val courseId1 = UUID.randomUUID()
     val courseId2 = UUID.randomUUID()
     val variantCourseId1 = UUID.randomUUID()

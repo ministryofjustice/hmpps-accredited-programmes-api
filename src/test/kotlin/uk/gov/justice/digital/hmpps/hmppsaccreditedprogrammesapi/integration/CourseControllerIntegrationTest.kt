@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisites
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseUpdateRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import java.time.LocalDateTime
 import java.util.Optional
@@ -847,6 +848,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Building choices course fetched for matching intensity and audience`() {
+    // Given
     val bc1MainCourseId = UUID.randomUUID()
     val bc1VariantCourseId = UUID.randomUUID()
     val bc1CourseOfferingMainId = UUID.randomUUID()
@@ -882,7 +884,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       "ESI",
       "nobody-wsi@digital.justice.gov.uk",
       "nobody2-wsi@digital.justice.gov.uk",
-      true,
+      referable = true,
+      withdrawn = false,
     )
 
     persistenceHelper.createOffering(
@@ -891,7 +894,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       "WSI",
       "nobody-esi@digital.justice.gov.uk",
       "nobody2-esi@digital.justice.gov.uk",
-      true,
+      referable = true,
+      withdrawn = false,
     )
 
     val referralId = UUID.randomUUID()
@@ -909,12 +913,94 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
 
     persistenceHelper.createCourseVariant(courseId = bc1MainCourseId, variantCourseId = bc1VariantCourseId)
 
+    // When
     val buildingChoicesCourseForReferral = getBuildingChoicesCourseForReferral(referralId)
 
+    // Then
     buildingChoicesCourseForReferral.id shouldBe bc1MainCourseId
     buildingChoicesCourseForReferral.courseOfferings.size shouldBe 1
     buildingChoicesCourseForReferral.courseOfferings.first().id shouldBe bc1CourseOfferingVariantId
     buildingChoicesCourseForReferral.courseOfferings.first().organisationId shouldBe "ESI"
+  }
+
+  @Test
+  fun `should return 404 not found when no matching Building choices courses are found for intensity and audience`() {
+    // Given
+    val bc1MainCourseId = UUID.randomUUID()
+    val bc1VariantCourseId = UUID.randomUUID()
+    val bc1CourseOfferingMainId = UUID.randomUUID()
+    val bc1CourseOfferingVariantId = UUID.randomUUID()
+
+    persistenceHelper.createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
+    persistenceHelper.createEnabledOrganisation("WSI", "WSI org")
+
+    persistenceHelper.createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
+    persistenceHelper.createEnabledOrganisation("ESI", "ESI org")
+
+    persistenceHelper.createCourse(
+      bc1MainCourseId,
+      "BCH-1",
+      "Building Choices: high intensity",
+      "Building Choices helps people to develop high...",
+      "BCH-1",
+      "Sexual offence",
+    )
+
+    persistenceHelper.createCourse(
+      bc1VariantCourseId,
+      "BCH-2",
+      "Building Choices: medium intensity",
+      "Building Choices helps people to develop medium...",
+      "BCH-2",
+      "General offence",
+    )
+
+    persistenceHelper.createOffering(
+      bc1CourseOfferingVariantId,
+      bc1MainCourseId,
+      "ESI",
+      "nobody-wsi@digital.justice.gov.uk",
+      "nobody2-wsi@digital.justice.gov.uk",
+      referable = false,
+      withdrawn = false,
+    )
+
+    persistenceHelper.createOffering(
+      bc1CourseOfferingMainId,
+      bc1VariantCourseId,
+      "WSI",
+      "nobody-esi@digital.justice.gov.uk",
+      "nobody2-esi@digital.justice.gov.uk",
+      referable = true,
+      withdrawn = false,
+    )
+
+    val referralId = UUID.randomUUID()
+    persistenceHelper.createReferral(
+      referralId,
+      bc1CourseOfferingVariantId,
+      "B2345BB",
+      "TEST_REFERRER_USER_1",
+      "This referral will be updated",
+      false,
+      false,
+      "REFERRAL_SUBMITTED",
+      null,
+    )
+
+    persistenceHelper.createCourseVariant(courseId = bc1MainCourseId, variantCourseId = bc1VariantCourseId)
+
+    // When
+    val errorResponse = performRequestAndExpectStatus(
+      HttpMethod.GET,
+      "/courses/building-choices/referral/$referralId?programmePathway=HIGH_INTENSITY_BC",
+      object : ParameterizedTypeReference<ErrorResponse>() {},
+      HttpStatus.NOT_FOUND.value(),
+    )
+
+    // Then
+    errorResponse.userMessage shouldBe "Not Found: Building choices course Building Choices: high intensity not offered at ESI org for audience Sexual offence"
+    errorResponse.status shouldBe 404
   }
 
   fun getBuildingChoicesCourseForReferral(referralId: UUID): Course = performRequestAndExpectOk(

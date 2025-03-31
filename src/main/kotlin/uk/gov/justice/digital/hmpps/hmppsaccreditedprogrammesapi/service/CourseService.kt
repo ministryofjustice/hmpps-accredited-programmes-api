@@ -174,7 +174,7 @@ constructor(
 
   fun getCoursesByName(name: String): List<CourseEntity> = courseRepository.findAllByName(name)
   fun getCourses(courseIds: List<UUID>): List<CourseEntity> = courseRepository.findAllById(courseIds)
-  fun getBuildingChoicesCourses(): List<CourseEntity> {
+  fun getAllBuildingChoicesCourses(): List<CourseEntity> {
     val findAllByCourseId = courseVariantRepository.findAll()
 
     val bcParentCourseIds = findAllByCourseId.map { it.courseId }
@@ -195,7 +195,7 @@ constructor(
     val referral = referralRepository.findById(referralId).getOrNull() ?: throw NotFoundException("No referral found for id: $referralId")
     val pniResult = programmePathway ?: pniService.getPniScore(prisonNumber = referral.prisonNumber, referralId = referral.id).programmePathway
 
-    val buildingChoicesCourses = getBuildingChoicesCourses()
+    val buildingChoicesCourses = getAllBuildingChoicesCourses()
     val audience = referral.offering.course.audience.takeIf { it == "Sexual offence" } ?: "General offence"
     val buildingChoicesIntensity = getIntensityOfBuildingChoicesCourse(pniResult)
     val recommendedBuildingChoicesCourse =
@@ -209,7 +209,7 @@ constructor(
     val bcOfferingMatchingWithReferralOrg: OfferingEntity =
       (
         recommendedBuildingChoicesCourse.offerings.firstOrNull { (it.organisationId == referral.offering.organisationId) && it.referable && !it.withdrawn }
-          ?: throw BusinessException("Building choices course ${recommendedBuildingChoicesCourse.name} not offered at ${organisation.name}")
+          ?: throw NotFoundException("Building choices course ${recommendedBuildingChoicesCourse.name} not offered at ${organisation.name} for audience $audience")
         )
 
     val recommendedBuildingChoicesCourseModel = recommendedBuildingChoicesCourse.toApi()

@@ -296,7 +296,7 @@ class CourseController(
     ) buildingChoicesOnly: Boolean?,
   ): ResponseEntity<List<Course>> {
     if (buildingChoicesOnly == true) {
-      courseService.getBuildingChoicesCourses().let { courseEntities ->
+      courseService.getAllBuildingChoicesCourses().let { courseEntities ->
         return ResponseEntity.ok(courseEntities.map { it.toApi() })
       }
     }
