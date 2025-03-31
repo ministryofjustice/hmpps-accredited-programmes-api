@@ -1,0 +1,1 @@
+ALTER table referral add column has_reviewed_additional_information boolean null;

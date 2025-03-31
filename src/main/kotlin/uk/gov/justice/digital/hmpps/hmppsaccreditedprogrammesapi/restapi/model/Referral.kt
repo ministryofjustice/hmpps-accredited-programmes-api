@@ -75,4 +75,7 @@ data class Referral(
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("primaryPrisonOffenderManager") val primaryPrisonOffenderManager: PrisonOffenderManager? = null,
+
+  @Schema(example = "true", description = "Flag to indicate if the user had reviewed the additional information")
+  @get:JsonProperty("hasReviewedAdditionalInformation") val hasReviewedAdditionalInformation: Boolean? = null,
 )

@@ -439,6 +439,47 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should return 204 when updating a referral without additional information present`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralCreated = createReferral(offering.id!!)
+
+    val referralUpdate = ReferralUpdate(
+      additionalInformation = null,
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      hasReviewedAdditionalInformation = true,
+      referrerOverrideReason = "Override reason",
+      hasLdcBeenOverriddenByProgrammeTeam = true,
+    )
+
+    updateReferral(referralCreated.id, referralUpdate)
+
+    val referralById = getReferralById(referralCreated.id)
+
+    referralById shouldBeEqual Referral(
+      id = referralCreated.id,
+      offeringId = offering.id!!,
+      referrerUsername = REFERRER_USERNAME,
+      prisonNumber = PRISON_NUMBER_1,
+      status = REFERRAL_STARTED.lowercase(),
+      statusDescription = REFERRAL_STARTED_DESCRIPTION,
+      statusColour = REFERRAL_STARTED_COLOUR,
+      closed = false,
+      additionalInformation = null,
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      submittedOn = null,
+      referrerOverrideReason = "Override reason",
+      hasLdc = null,
+      hasLdcBeenOverriddenByProgrammeTeam = true,
+      primaryPrisonOffenderManager = null,
+      hasReviewedAdditionalInformation = true,
+    )
+  }
+
+  @Test
   fun `Updating a nonexistent referral should return 404 with error body`() {
     webTestClient
       .put()
