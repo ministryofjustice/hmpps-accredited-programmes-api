@@ -31,32 +31,50 @@ class ReferralEntity(
   @JoinColumn(name = "offering_id", referencedColumnName = "offering_id")
   var offering: OfferingEntity,
 
+  @Column(name = "prison_number")
   var prisonNumber: String,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "referrer_username", referencedColumnName = "referrer_username")
   var referrer: ReferrerUserEntity,
 
+  @Column(name = "additional_information")
   var additionalInformation: String? = null,
 
+  @Column(name = "oasys_confirmed")
   var oasysConfirmed: Boolean = false,
 
+  @Column(name = "has_reviewed_programme_history")
   var hasReviewedProgrammeHistory: Boolean = false,
 
+  @Column(name = "has_reviewed_additional_information")
+  var hasReviewedAdditionalInformation: Boolean? = null,
+
+  @Column(name = "status")
   var status: String = "REFERRAL_STARTED",
 
+  @Column(name = "submitted_on")
   var submittedOn: LocalDateTime? = null,
 
+  @Column(name = "deleted")
   var deleted: Boolean = false,
 
   @Column(name = "primary_pom_staff_id")
   var primaryPomStaffId: BigInteger? = null,
+
   @Column(name = "secondary_pom_staff_id")
   var secondaryPomStaffId: BigInteger? = null,
 
+  @Column(name = "referrer_override_reason")
   var referrerOverrideReason: String? = null,
+
+  @Column(name = "original_referral_id")
   var originalReferralId: UUID? = null,
+
+  @Column(name = "has_ldc")
   var hasLdc: Boolean? = null,
+
+  @Column(name = "has_ldc_been_overridden_by_programme_team")
   var hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,
 ) {
   override fun equals(other: Any?): Boolean {
