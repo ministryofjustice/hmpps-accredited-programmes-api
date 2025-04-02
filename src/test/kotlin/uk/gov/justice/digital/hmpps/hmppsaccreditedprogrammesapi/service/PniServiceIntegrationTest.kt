@@ -50,6 +50,21 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should handle PNI Response when no OSP score is present`() {
+    // Given
+    val prisonNumber = "A4321AA"
+
+    // When
+    val pniScore = pniService.getOasysPniScore(prisonNumber)
+
+    // Then
+    assertThat(pniScore).isNotNull
+    assertThat(pniScore.needsScore.classification).isEqualTo("High")
+    assertThat(pniScore.riskScore.individualRiskScores.ospDc).isNull()
+    assertThat(pniScore.riskScore.individualRiskScores.ospIic).isNull()
+  }
+
+  @Test
   fun `should calculate PNI score for known prisoner number`() {
     // Given
     val prisonNumber = "A1234AA"

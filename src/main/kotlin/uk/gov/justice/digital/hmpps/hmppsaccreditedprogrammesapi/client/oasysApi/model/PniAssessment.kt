@@ -6,7 +6,7 @@ data class PniAssessment(
   val ldcMessage: String?,
   val ogrs3Risk: RiskScoreLevel?,
   val ovpRisk: RiskScoreLevel?,
-  val osp: Osp,
+  val osp: Osp?,
   val rsrPercentage: Double?,
   val offenderAge: Int,
   val questions: Questions,
