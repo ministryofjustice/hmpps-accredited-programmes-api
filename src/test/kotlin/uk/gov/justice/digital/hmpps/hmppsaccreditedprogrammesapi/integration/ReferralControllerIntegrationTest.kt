@@ -1078,10 +1078,11 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val referralCreated = createReferral(PRISON_NUMBER_1)
 
     val referralUpdate = ReferralUpdate(
-      additionalInformation = "Additional information",
+      additionalInformation = null,
       oasysConfirmed = true,
       hasReviewedProgrammeHistory = true,
       referrerOverrideReason = "Override reason",
+      hasReviewedAdditionalInformation = true,
     )
 
     updateReferral(referralCreated.id, referralUpdate)
