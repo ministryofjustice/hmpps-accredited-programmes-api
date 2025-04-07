@@ -131,6 +131,7 @@ constructor(
     referral.referrerOverrideReason = update.referrerOverrideReason
     referral.hasLdc = update.hasLdc
     referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
+    referral.hasReviewedAdditionalInformation = update.hasReviewedAdditionalInformation
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {
@@ -230,7 +231,6 @@ constructor(
       referral.offering.id to "offeringId",
       referral.prisonNumber to "prisonNumber",
       referral.referrer to "referrer",
-      referral.additionalInformation to "additionalInformation",
       referral.oasysConfirmed to "oasysConfirmed",
       referral.hasReviewedProgrammeHistory to "hasReviewedProgrammeHistory",
     )

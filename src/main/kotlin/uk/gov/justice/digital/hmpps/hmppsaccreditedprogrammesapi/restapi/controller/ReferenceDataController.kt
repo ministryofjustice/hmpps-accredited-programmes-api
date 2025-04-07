@@ -62,7 +62,7 @@ class ReferenceDataController(
     .getReferralStatusReason(code)
 
   @Operation(
-    summary = "Gets a full list of Referral Status Reasons for a status type (WITHDRAWN or DESELECTED)",
+    summary = "Gets a full list of Referral Status Reasons for a status type (WITHDRAWN, DESELECTED or ASSESSED_SUITABLE)",
     operationId = "getReferralStatusReasonsForReferralStatusType",
     description = """Get all Referral Status Reasons (code, description, referralCategoryCode) for the provided type""",
     responses = [
@@ -74,6 +74,6 @@ class ReferenceDataController(
   )
   @GetMapping("/referral-statuses/{referralStatusType}/categories/reasons", produces = ["application/json"])
   fun getReferralStatusReasonsForReferralStatusType(
-    @Parameter(description = "The referral status type (WITHDRAWN or DESELECTED)", required = true) @PathVariable referralStatusType: ReferralStatusType,
+    @Parameter(description = "The referral status type (WITHDRAWN, DESELECTED or ASSESSED_SUITABLE)", required = true) @PathVariable referralStatusType: ReferralStatusType,
   ): List<ReferralStatusReason> = referenceDataService.getAllReferralStatusReasonsForType(referralStatusType)
 }
