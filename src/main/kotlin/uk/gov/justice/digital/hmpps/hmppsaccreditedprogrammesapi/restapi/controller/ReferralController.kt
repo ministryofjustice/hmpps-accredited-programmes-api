@@ -710,7 +710,7 @@ class ReferralController(
 
       val submittedReferral = referralService.submitReferralById(id)
       return ResponseEntity.status(HttpStatus.OK).body(submittedReferral.toApi())
-    } ?: throw NotFoundException("No referral found at /referral/$id")
+    } ?: throw NotFoundException("No referral found for referral: $id")
   }
 
   @Operation(
