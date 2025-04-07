@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OverrideDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
@@ -123,15 +124,30 @@ constructor(
 
   fun getReferralById(referralId: UUID) = referralRepository.findById(referralId).getOrNull()
 
-  fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
+  fun updateReferralById(referralId: UUID, referralUpdate: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
-    referral.additionalInformation = update.additionalInformation
-    referral.oasysConfirmed = update.oasysConfirmed
-    referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
-    referral.referrerOverrideReason = update.referrerOverrideReason
-    referral.hasLdc = update.hasLdc
-    referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
-    referral.hasReviewedAdditionalInformation = update.hasReviewedAdditionalInformation
+    referral.additionalInformation = referralUpdate.additionalInformation
+    referral.oasysConfirmed = referralUpdate.oasysConfirmed
+    referral.hasReviewedProgrammeHistory = referralUpdate.hasReviewedProgrammeHistory
+//    referral.referrerOverrideReason = referralUpdate.referrerOverrideReason
+    referral.hasLdc = referralUpdate.hasLdc
+    referral.hasLdcBeenOverriddenByProgrammeTeam = referralUpdate.hasLdcBeenOverriddenByProgrammeTeam ?: false
+    referral.hasReviewedAdditionalInformation = referralUpdate.hasReviewedAdditionalInformation
+
+    // Check if any of the specified fields are not null and handle accordingly
+    if (referralUpdate.referrerOverrideReason != null ||
+      referralUpdate.recommendedPathway != null ||
+      referralUpdate.requestedPathway != null
+    ) {
+      val overrideDetails = OverrideDetailsEntity(
+        recommendedPathway = referralUpdate.recommendedPathway,
+        requestedPathway = referralUpdate.requestedPathway,
+        referrerOverrideReason = referralUpdate.referrerOverrideReason,
+        referral = referral,
+      )
+      referral.overrideDetails = overrideDetails
+      referralRepository.save(referral)
+    }
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {

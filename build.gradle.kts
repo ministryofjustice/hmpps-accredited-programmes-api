@@ -24,6 +24,10 @@ dependencies {
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.4"
 
+  compileOnly("org.projectlombok:lombok:1.18.38")
+
+  compileOnly("org.projectlombok:lombok:1.18.38")
+
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.2")
   runtimeOnly("org.postgresql:postgresql:42.7.5")
 

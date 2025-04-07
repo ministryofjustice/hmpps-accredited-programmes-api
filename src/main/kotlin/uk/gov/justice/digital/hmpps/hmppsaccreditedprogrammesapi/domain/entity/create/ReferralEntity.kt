@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -7,8 +8,10 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import jakarta.persistence.Version
+import lombok.EqualsAndHashCode
 import org.hibernate.annotations.SQLRestriction
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -17,6 +20,7 @@ import java.util.UUID
 @Entity
 @Table(name = "referral")
 @SQLRestriction(value = "deleted = false")
+@EqualsAndHashCode(of = ["id", "version", "prisonNumber", "status"])
 class ReferralEntity(
   @Id
   @GeneratedValue
@@ -65,6 +69,8 @@ class ReferralEntity(
   @Column(name = "secondary_pom_staff_id")
   var secondaryPomStaffId: BigInteger? = null,
 
+  @Deprecated("This field is no longer used and will be removed in a future release.")
+  // todo remove  - count is zero in prod
   @Column(name = "referrer_override_reason")
   var referrerOverrideReason: String? = null,
 
@@ -76,13 +82,9 @@ class ReferralEntity(
 
   @Column(name = "has_ldc_been_overridden_by_programme_team")
   var hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,
-) {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other == null || this::class != other::class) return false
-    other as ReferralEntity
-    return this.id == other.id
-  }
 
-  override fun hashCode(): Int = id.hashCode()
-}
+  @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+  @JoinColumn(name = "override_details_id")
+  var overrideDetails: OverrideDetailsEntity? = null,
+
+)

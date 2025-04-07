@@ -65,6 +65,8 @@ fun ApiReferralUpdate.toDomain() = ReferralUpdate(
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
   hasReviewedAdditionalInformation = hasReviewedAdditionalInformation,
+  requestedPathway = requestedPathway,
+  recommendedPathway = requestedPathway
 )
 
 fun ReferralUpdate.toApi() = ApiReferralUpdate(
@@ -74,6 +76,9 @@ fun ReferralUpdate.toApi() = ApiReferralUpdate(
   referrerOverrideReason = referrerOverrideReason,
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam ?: false,
+  hasReviewedAdditionalInformation = hasReviewedAdditionalInformation,
+  recommendedPathway = requestedPathway,
+  requestedPathway = requestedPathway,
 )
 
 fun ReferralViewEntity.toApi() = ReferralView(

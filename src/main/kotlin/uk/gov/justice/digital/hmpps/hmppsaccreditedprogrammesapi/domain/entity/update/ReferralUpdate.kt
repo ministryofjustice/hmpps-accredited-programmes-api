@@ -6,6 +6,8 @@ data class ReferralUpdate(
   val hasReviewedProgrammeHistory: Boolean,
   val hasReviewedAdditionalInformation: Boolean? = null,
   val referrerOverrideReason: String? = null,
+  val recommendedPathway: String? = null,
+  val requestedPathway: String? = null,
   val hasLdc: Boolean? = null,
   val hasLdcBeenOverriddenByProgrammeTeam: Boolean? = null,
 )

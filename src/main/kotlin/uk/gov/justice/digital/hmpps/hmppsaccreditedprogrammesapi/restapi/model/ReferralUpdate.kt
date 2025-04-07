@@ -32,4 +32,10 @@ data class ReferralUpdate(
 
   @Schema(example = "true", description = "Flag to indicate if the user has reviewed the additional information")
   @get:JsonProperty("hasReviewedAdditionalInformation") val hasReviewedAdditionalInformation: Boolean? = null,
+
+  @Schema(example = "Moderate Intensity", description = "The recommended pathway based on PNI scores")
+  @get:JsonProperty("recommendedPathway") val recommendedPathway: String? = null,
+
+  @Schema(example = "High Intensity", description = "The requested pathway which overrides the recommended pathway")
+  @get:JsonProperty("requestedPathway") val requestedPathway: String? = null,
 )
