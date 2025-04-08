@@ -83,6 +83,7 @@ class ReferralReferenceDataService(
       code = it.code,
       description = it.description,
       referralCategoryCode = it.referralStatusCategoryCode,
+      categoryDescription = null,
     )
   }
 
@@ -91,6 +92,7 @@ class ReferralReferenceDataService(
       code = it.code,
       description = it.description,
       referralCategoryCode = it.referralStatusCategoryCode,
+      categoryDescription = null,
     )
   }
 

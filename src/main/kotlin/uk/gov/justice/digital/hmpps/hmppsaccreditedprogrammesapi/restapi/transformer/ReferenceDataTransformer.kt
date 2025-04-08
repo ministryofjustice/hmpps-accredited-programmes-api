@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonProjection
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 
@@ -21,8 +21,9 @@ fun ReferralStatusEntity.toModel(altDescription: String?, altHintText: String?) 
   notesOptional = notesOptional,
 )
 
-fun ReferralStatusReasonEntity.toModel() = ReferralStatusReason(
-  code = code,
-  description = description,
-  referralCategoryCode = referralStatusCategoryCode,
+fun ReferralStatusReasonProjection.toModel() = ReferralStatusReason(
+  code = getCode(),
+  description = getDescription(),
+  referralCategoryCode = getReferralCategoryCode(),
+  categoryDescription = getCategoryDescription(),
 )
