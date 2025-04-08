@@ -98,7 +98,10 @@ interface ReferralStatusReasonRepository : JpaRepository<ReferralStatusReasonEnt
 
   @Query(
     """
-    SELECT r.*
+    SELECT r.code as code,
+     r.description as description, 
+     r.referral_status_category_code as referralCategoryCode, 
+     c.description as categoryDescription
     FROM referral_status_reason r
     JOIN referral_status_category c 
     ON r.referral_status_category_code = c.code
@@ -107,7 +110,14 @@ interface ReferralStatusReasonRepository : JpaRepository<ReferralStatusReasonEnt
   """,
     nativeQuery = true,
   )
-  fun findReferralStatusReasonsByStatusCode(statusCode: String): List<ReferralStatusReasonEntity>
+  fun findReferralStatusReasonsByStatusCode(statusCode: String): List<ReferralStatusReasonProjection>
+}
+
+interface ReferralStatusReasonProjection {
+  fun getCode(): String
+  fun getDescription(): String
+  fun getReferralCategoryCode(): String
+  fun getCategoryDescription(): String
 }
 
 fun ReferralStatusReasonRepository.getByCode(code: String) = findByCode(code) ?: throw NotFoundException("No Referral status reason found with id=$code")

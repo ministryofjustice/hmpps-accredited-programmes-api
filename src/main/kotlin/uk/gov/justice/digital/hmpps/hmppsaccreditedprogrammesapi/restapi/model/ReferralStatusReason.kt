@@ -19,4 +19,7 @@ data class ReferralStatusReason(
 
   @Schema(example = "ADMIN", required = true, description = "")
   @get:JsonProperty("referralCategoryCode", required = true) val referralCategoryCode: String,
+
+  @Schema(example = "Risk and need", required = true, description = "")
+  @get:JsonProperty("categoryDescription", required = false) val categoryDescription: String?,
 )

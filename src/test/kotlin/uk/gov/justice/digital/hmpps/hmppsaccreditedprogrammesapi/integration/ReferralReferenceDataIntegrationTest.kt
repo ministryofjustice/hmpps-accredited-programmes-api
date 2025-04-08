@@ -5,6 +5,7 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -53,6 +54,7 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     code = REASON_DUPLICATE,
     description = "Duplicate referral",
     referralCategoryCode = CATEGORY_ADMIN,
+    categoryDescription = null,
   )
 
   @Test
@@ -181,18 +183,25 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     response.shouldNotBeNull()
     response.size.shouldBeEqual(9)
     response.filter { it.referralCategoryCode == "AS_RISK" }.size.shouldBeEqual(5)
+    assertThat(response.filter { it.referralCategoryCode == "AS_RISK" }).allMatch { it.categoryDescription == "Risk and need" }
     response.filter { it.referralCategoryCode == "AS_RISK" && it.code == "AS_REOFFENDING_RISK" }.getOrNull(0)?.description?.shouldBeEqual(
       "The person's psychological risk assessment shows high risk of reoffending",
     )
+
     response.filter { it.referralCategoryCode == "AS_INCOMPLETE" }.size.shouldBeEqual(2)
+    assertThat(response.filter { it.referralCategoryCode == "AS_INCOMPLETE" }).allMatch { it.categoryDescription == "Incomplete assessment" }
     response.filter { it.referralCategoryCode == "AS_INCOMPLETE" && it.code == "AS_OUTDATED" }.getOrNull(0)?.description?.shouldBeEqual(
       "The risk and need assessment is outdated",
     )
+
     response.filter { it.referralCategoryCode == "AS_SENTENCE" }.size.shouldBeEqual(1)
+    assertThat(response.filter { it.referralCategoryCode == "AS_SENTENCE" }).allMatch { it.categoryDescription == "Sentence type" }
     response.filter { it.referralCategoryCode == "AS_SENTENCE" && it.code == "AS_HIGH_ROSH" }.getOrNull(0)?.description?.shouldBeEqual(
       "The person has an Indefinite Sentence for the Public Protection and high ROSH (Risk of Serious Harm)",
     )
+
     response.filter { it.referralCategoryCode == "AS_OPERATIONAL" }.size.shouldBeEqual(1)
+    assertThat(response.filter { it.referralCategoryCode == "AS_OPERATIONAL" }).allMatch { it.categoryDescription == "Operational" }
     response.filter { it.referralCategoryCode == "AS_OPERATIONAL" && it.code == "AS_NOT_ENOUGH_TIME" }.getOrNull(0)?.description?.shouldBeEqual(
       "There is not enough time to complete a high intensity programme so the person should complete a moderate intensity programme",
     )
