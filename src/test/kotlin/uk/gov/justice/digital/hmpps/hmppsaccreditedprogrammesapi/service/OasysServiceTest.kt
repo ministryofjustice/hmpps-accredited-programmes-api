@@ -48,7 +48,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AlertFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniCalculationFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResponseFactory
-import java.math.BigDecimal
 import java.time.LocalDateTime
 
 class OasysServiceTest {
@@ -754,6 +753,6 @@ class OasysServiceTest {
     val result = service.getLDCScore(prisonNumber)
 
     // Then
-    assertThat(result).isEqualTo(BigDecimal(ldcSubTotal))
+    assertThat(result).isEqualTo(ldcSubTotal)
   }
 }
