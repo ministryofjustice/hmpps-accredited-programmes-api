@@ -279,7 +279,7 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
       learningDifficulties = "3 - big problems",
       problemAreas = listOf("Numeracy", "Reading", "Writing"),
       qualifications = "0 - no qualifications",
-      basicSkillsScore = "33",
+      basicSkillsScore = "10",
       basicSkillsScoreDescription = "Some text about how clever or thick this person is",
     )
   }
