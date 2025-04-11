@@ -1,5 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -7,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Ldc
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
@@ -23,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.S
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResponseFactory
 import java.math.BigDecimal
 import java.util.UUID
 
@@ -80,7 +85,7 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
     assertThat(pniScore.programmePathway).isEqualTo("High Intensity")
     assertThat(pniScore.needsScore).isNotNull
     assertThat(pniScore.needsScore.overallNeedsScore).isEqualTo(5)
-    assertThat(pniScore.needsScore.basicSkillsScore).isEqualTo(33)
+    assertThat(pniScore.needsScore.basicSkillsScore).isEqualTo(10)
     assertThat(pniScore.needsScore.classification).isEqualTo("High")
     assertThat(pniScore.needsScore.domainScore).isEqualTo(
       DomainScore(
@@ -195,6 +200,52 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
     assertThat(pniResults[0].programmePathway).isEqualTo("High Intensity")
     assertThat(pniResults[0].needsClassification).isEqualTo("High")
     assertThat(pniResults[0].riskClassification).isEqualTo("High")
-    assertThat(pniResults[0].basicSkillsScore).isEqualTo(33)
+    assertThat(pniResults[0].basicSkillsScore).isEqualTo(10)
+  }
+
+  @Test
+  fun `should return true when hasLdc is called for a prison number whose ldc score is above than the LDC threshold`() {
+    // Given
+    val prisonNumber = "A77777AA"
+    val pniResponse = PniResponseFactory()
+      .withAssessment(
+        PniResponseFactory.PniAssessmentFactory()
+          .withLdc(Ldc(3, 3)).produce(),
+      ).produce()
+
+    wiremockServer.stubFor(
+      get(urlEqualTo("/assessments/pni/$prisonNumber?community=false"))
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(pniResponse)),
+        ),
+    )
+
+    // When & Then
+    assertThat(pniService.hasLDC(prisonNumber)).isTrue
+  }
+
+  @Test
+  fun `should return false when hasLdc is called for a prison number whose ldc score is below the LDC threshold`() {
+    // Given
+    val prisonNumber = "A98765BB"
+    val pniResponse = PniResponseFactory()
+      .withAssessment(
+        PniResponseFactory.PniAssessmentFactory()
+          .withLdc(Ldc(2, 2)).produce(),
+      ).produce()
+
+    wiremockServer.stubFor(
+      get(urlEqualTo("/assessments/pni/$prisonNumber?community=false"))
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(pniResponse)),
+        ),
+    )
+
+    // When & Then
+    assertThat(pniService.hasLDC(prisonNumber)).isFalse
   }
 }

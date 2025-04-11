@@ -42,6 +42,8 @@ private const val HIGH_INTENSITY_BC = "HIGH_INTENSITY_BC"
 
 private const val MODERATE_INTENSITY_BC = "MODERATE_INTENSITY_BC"
 
+private const val LEARNING_DISABILITIES_AND_CHALLENGES_THRESHOLD = 3
+
 @Service
 class PniService(
   private val oasysService: OasysService,
@@ -55,7 +57,7 @@ class PniService(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  @Deprecated("Use savPni(pniScore: PniScore, referralId: UUID? = null) method instead")
+  @Deprecated("Use savePni(pniScore: PniScore, referralId: UUID? = null) method instead")
   fun savePni(prisonNumber: String, gender: String?, savePni: Boolean = false, referralId: UUID? = null) {
     getPniScore(prisonNumber, gender, savePni, referralId)
   }
@@ -82,7 +84,7 @@ class PniService(
     // needs
     val needsScore = NeedsScore(
       overallNeedsScore = pniResponse.pniCalculation?.totalDomainScore,
-      basicSkillsScore = learning?.basicSkillsScore?.toInt(),
+      basicSkillsScore = pniResponse.assessment.ldc?.subTotal,
       classification = Level.toText(pniResponse.pniCalculation?.needLevel),
       domainScore = DomainScore.from(pniResponse),
     )
@@ -151,11 +153,12 @@ class PniService(
     )
 
     val genderOfPerson = getGenderOfPerson(prisonNumber, gender)
+    val ldcScore = oasysService.getLDCScore(prisonNumber)
     val overallNeedsScore = pniNeedsEngine.getOverallNeedsScore(
       individualNeedsAndRiskScores,
       prisonNumber,
       genderOfPerson,
-      learning?.basicSkillsScore?.toInt(),
+      ldcScore,
     )
 
     log.info("Overall needs score for prisonNumber $prisonNumber is ${overallNeedsScore.overallNeedsScore} classification ${overallNeedsScore.classification} ")
@@ -258,7 +261,7 @@ class PniService(
     else -> null
   }
 
-  fun hasLDC(prisonNumber: String) = oasysService.getLDCScore(prisonNumber)?.let { it > BigDecimal("2.99") }
+  fun hasLDC(prisonNumber: String) = oasysService.getLDCScore(prisonNumber)?.let { it >= LEARNING_DISABILITIES_AND_CHALLENGES_THRESHOLD }
 
   private fun buildRiskScores(
     oasysRiskPredictorScores: OasysRiskPredictorScores?,

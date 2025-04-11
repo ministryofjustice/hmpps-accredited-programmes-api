@@ -44,7 +44,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.buildRisks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
-import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
@@ -326,7 +325,7 @@ class OasysService(
 
   fun getAlcoholDetail(assessmentId: Long): OasysAlcoholDetail? = fetchDetail(assessmentId, oasysApiClient::getAlcoholDetail, "AlcoholDetail")
 
-  fun getLDCScore(prisonNumber: String): BigDecimal? = getPniCalculation(prisonNumber)?.assessment?.ldc?.subTotal?.toBigDecimal()
+  fun getLDCScore(prisonNumber: String): Int? = getPniCalculation(prisonNumber)?.assessment?.ldc?.subTotal
 
   fun getOasysPniProgrammePathway(prisonId: String): String = when (getPniCalculation(prisonId)?.pniCalculation?.pni) {
     Type.H -> "HIGH_INTENSITY_BC"
