@@ -314,6 +314,19 @@
     },
     {
       "request": {
+        "url": "/assessments/pni/A9999BB?community=false",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "oasys-pni-response-success.json"
+      }
+    },
+    {
+      "request": {
         "url": "/assessments/pni/A9876BB?community=false",
         "method": "GET"
       },

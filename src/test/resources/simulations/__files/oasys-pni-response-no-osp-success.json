@@ -1,4 +1,4 @@
-{
+ {
   "pniCalculation" : {
     "sexDomain" : {
       "level" : "H",
@@ -29,8 +29,8 @@
   "assessment" : {
     "id" : 10082385,
     "ldc" : {
-      "score" : 10,
-      "subTotal" : 10
+      "score" : 2,
+      "subTotal" : 2
     },
     "ldcMessage" : "LDC message",
     "ogrs3Risk" : "HIGH",

@@ -30,16 +30,18 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.Sa
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class PniIntegrationTest : IntegrationTestBase() {
+class PNIControllerIntegrationTest : IntegrationTestBase() {
   @Autowired
   lateinit var pniResultEntityRepository: PNIResultEntityRepository
 
   @Test
   fun `Get pni info for prisoner successful`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
+    // When
     val pniScore = getPniInfoByPrisonNumber(prisonNumber)
-
+    // Then
     pniScore shouldBe buildPniScore(prisonNumber)
   }
 
@@ -50,7 +52,7 @@ class PniIntegrationTest : IntegrationTestBase() {
     programmePathway = "MISSING_INFORMATION",
     needsScore = NeedsScore(
       overallNeedsScore = 6,
-      basicSkillsScore = 33,
+      basicSkillsScore = 10,
       classification = "HIGH_NEED",
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(
@@ -125,7 +127,7 @@ class PniIntegrationTest : IntegrationTestBase() {
     pniResults[0].riskClassification shouldBe pniScore.riskScore.classification
     pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore)
     pniResults[0].pniValid shouldBe false
-    pniResults[0].basicSkillsScore shouldBe 33
+    pniResults[0].basicSkillsScore shouldBe 10
   }
 
   fun getPniInfoByPrisonNumber(prisonNumber: String) = webTestClient
