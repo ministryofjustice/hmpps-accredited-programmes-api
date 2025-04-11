@@ -49,6 +49,7 @@ data class LearningNeeds(
   constructor(
     oasysAccommodation: OasysAccommodation?,
     oasysLearning: OasysLearning?,
+    ldcScore: Int?,
   ) : this(
     noFixedAbodeOrTransient = oasysAccommodation?.noFixedAbodeOrTransient == YES,
     workRelatedSkills = oasysLearning?.workRelatedSkills,
@@ -56,7 +57,7 @@ data class LearningNeeds(
     learningDifficulties = oasysLearning?.learningDifficulties,
     problemAreas = oasysLearning?.problemAreas,
     qualifications = oasysLearning?.qualifications,
-    basicSkillsScore = oasysLearning?.basicSkillsScore,
+    basicSkillsScore = ldcScore?.toString(),
     basicSkillsScoreDescription = oasysLearning?.eTEIssuesDetails,
   )
 }
