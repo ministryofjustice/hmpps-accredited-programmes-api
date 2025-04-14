@@ -160,7 +160,8 @@ class OasysService(
 
     val oasysLearning = getLearning(assessmentId)
     val oasysAccommodation = getAccommodation(assessmentId)
-    return LearningNeeds(oasysAccommodation, oasysLearning)
+    val ldcScore = getLDCScore(prisonNumber)
+    return LearningNeeds(oasysAccommodation, oasysLearning, ldcScore)
   }
 
   fun getRisks(prisonNumber: String): Risks {
