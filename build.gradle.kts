@@ -20,7 +20,7 @@ ext["hibernate.version"] = "6.6.11.Final"
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "2.8.6"
-  val sentryVersion = "8.7.0"
+  val sentryVersion = "8.8.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.4.4"
 
@@ -33,7 +33,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
-  implementation("com.google.guava:guava:33.4.7-jre")
+  implementation("com.google.guava:guava:33.4.8-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
