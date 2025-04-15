@@ -63,9 +63,7 @@ class StatisticsControllerIntegrationTest : IntegrationTestBase() {
   fun setUp() {
     persistenceHelper.clearAllTableContent()
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
-    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
-    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createCourse(
       courseId1,
