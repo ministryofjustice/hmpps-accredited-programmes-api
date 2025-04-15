@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -29,6 +30,7 @@ class CaseNotesApiServiceTest {
 
   private val organisationService: OrganisationService = mockk()
   private val referralStatusReasonRepository: ReferralStatusReasonRepository = mockk()
+  private val nomisUserRolesService: NomisUserRolesService = mockk()
   private val caseNotesApiService: CaseNotesApiService = CaseNotesApiService(
     mockk(),
     mockk(),
@@ -36,7 +38,7 @@ class CaseNotesApiServiceTest {
     organisationService,
     mockk(),
     referralStatusReasonRepository,
-    mockk(),
+    nomisUserRolesService,
   )
 
   @BeforeEach
@@ -88,6 +90,7 @@ class CaseNotesApiServiceTest {
     assertThat(caseNoteMessage).contains("The referral for John Doe has been moved from Super course: Super audience to Building Choices: high intensity.")
     assertThat(caseNoteMessage).contains("Details: Some additional notes")
     assertThat(caseNoteMessage).contains("Updated by: Test User")
+    verify { nomisUserRolesService.getUserDetail(any()) }
   }
 
   private fun mockSecurityContext() {
@@ -148,6 +151,7 @@ Updated by: Test User
 
     // Assert
     assertEquals(expectedMessage, result)
+    verify { nomisUserRolesService.getUserDetail(any()) }
   }
 
   @Test
@@ -187,5 +191,6 @@ Updated by: Test User
     )
 
     assertEquals(expectedMessage, result)
+    verify { nomisUserRolesService.getUserDetail(any()) }
   }
 }
