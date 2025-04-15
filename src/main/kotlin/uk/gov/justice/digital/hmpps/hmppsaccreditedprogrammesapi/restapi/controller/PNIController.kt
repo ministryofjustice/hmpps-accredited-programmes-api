@@ -81,11 +81,8 @@ class PNIController(
       required = false,
     ) referralId: UUID?,
   ): ResponseEntity<PniScore> = ResponseEntity.ok(
-    pniService.getPniScore(
+    pniService.getOasysPniScore(
       prisonNumber = prisonNumber,
-      gender = gender,
-      savePni = savePNI,
-      referralId = referralId,
     ),
   )
 
