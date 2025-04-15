@@ -115,7 +115,8 @@ constructor(
 
   private fun savePNI(savedReferral: ReferralEntity) {
     try {
-      pniService.savePni(prisonNumber = savedReferral.prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
+      val oasysPniScore = pniService.getOasysPniScore(savedReferral.prisonNumber)
+      pniService.savePni(pniScore = oasysPniScore, referralId = savedReferral.id)
     } catch (ex: Exception) {
       log.warn("PNI could not be stored ${ex.message} for prisonNumber $savedReferral.prisonNumber")
     }
