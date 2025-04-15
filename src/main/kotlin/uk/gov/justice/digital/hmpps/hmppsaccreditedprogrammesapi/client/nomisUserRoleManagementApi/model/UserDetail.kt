@@ -9,4 +9,6 @@ data class UserDetail(
   val firstName: String,
   val lastName: String,
   val primaryEmail: String,
-)
+) {
+  fun fullName() = "$firstName $lastName"
+}

@@ -29,7 +29,7 @@ class CaseNotesApiService(
   private val organisationService: OrganisationService,
   private val referralStatusRepository: ReferralStatusRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
-  private val manageUsersService: ManageUsersService,
+  private val nomisUserRolesService: NomisUserRolesService,
 ) {
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -160,7 +160,8 @@ class CaseNotesApiService(
   fun getFullName(): String? {
     val username = SecurityContextHolder.getContext().authentication?.name.orEmpty()
     return try {
-      manageUsersService.getUserDetail(username)?.name ?: username
+      val userDetail = nomisUserRolesService.getUserDetail(username)
+      userDetail?.fullName() ?: username
     } catch (ex: Exception) {
       log.warn("Error getting full name for username $username. Will write case-notes with username instead. $ex")
       username
