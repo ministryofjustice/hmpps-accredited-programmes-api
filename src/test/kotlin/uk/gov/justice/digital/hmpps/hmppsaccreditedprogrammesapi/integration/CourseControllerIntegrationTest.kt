@@ -114,11 +114,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     )
 
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
-    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
-    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
     persistenceHelper.createOrganisation(code = "SKI", name = "SKI org")
-    persistenceHelper.createEnabledOrganisation("SKI", "SKI org")
 
     persistenceHelper.createOffering(
       UUID.randomUUID(),
@@ -791,10 +788,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     val bc1CourseOfferingVariantId = UUID.randomUUID()
 
     persistenceHelper.createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
-    persistenceHelper.createEnabledOrganisation("WSI", "WSI org")
-
     persistenceHelper.createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
-    persistenceHelper.createEnabledOrganisation("ESI", "ESI org")
 
     persistenceHelper.createCourse(
       bc1MainCourseId,
@@ -855,10 +849,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     val bc1CourseOfferingVariantId = UUID.randomUUID()
 
     persistenceHelper.createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
-    persistenceHelper.createEnabledOrganisation("WSI", "WSI org")
-
     persistenceHelper.createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
-    persistenceHelper.createEnabledOrganisation("ESI", "ESI org")
 
     persistenceHelper.createCourse(
       bc1MainCourseId,
@@ -932,10 +923,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     val bc1CourseOfferingVariantId = UUID.randomUUID()
 
     persistenceHelper.createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
-    persistenceHelper.createEnabledOrganisation("WSI", "WSI org")
-
     persistenceHelper.createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
-    persistenceHelper.createEnabledOrganisation("ESI", "ESI org")
 
     persistenceHelper.createCourse(
       bc1MainCourseId,

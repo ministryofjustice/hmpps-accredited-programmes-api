@@ -55,7 +55,6 @@ constructor(
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralReferenceDataService: ReferralReferenceDataService,
-  private val enabledOrganisationService: EnabledOrganisationService,
   private val personService: PersonService,
   private val pniService: PniService,
   private val caseNotesApiService: CaseNotesApiService,
@@ -77,10 +76,6 @@ constructor(
 
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found for $offeringId") }
-
-    if (enabledOrganisationService.getEnabledOrganisation(offering.organisationId) == null) {
-      throw BusinessException("Organisation ${offering.organisationId} not enabled for referrals")
-    }
 
     personService.createOrUpdatePerson(prisonNumber)
 
