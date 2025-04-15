@@ -29,7 +29,6 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM referrer_user").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audit_record").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM organisation").executeUpdate()
-    entityManager.createNativeQuery("DELETE FROM enabled_organisation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audience").executeUpdate()
   }
 
@@ -74,13 +73,6 @@ class PersistenceHelper {
       .setParameter("code", code)
       .setParameter("name", name)
       .setParameter("gender", gender)
-      .executeUpdate()
-  }
-
-  fun createEnabledOrganisation(code: String, description: String) {
-    entityManager.createNativeQuery("INSERT INTO enabled_organisation (code, description) VALUES (:code, :description)")
-      .setParameter("code", code)
-      .setParameter("description", description)
       .executeUpdate()
   }
 
@@ -174,10 +166,8 @@ class PersistenceHelper {
     val bc1CourseOfferingVariantId = UUID.randomUUID()
 
     createOrganisation(code = "WSI", name = "WSI org", gender = "MALE")
-    createEnabledOrganisation("WSI", "WSI org")
 
     createOrganisation(code = "ESI", name = "ESI org", gender = "FEMALE")
-    createEnabledOrganisation("ESI", "ESI org")
 
     createCourse(
       bc1MainCourseId,

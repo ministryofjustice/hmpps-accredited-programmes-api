@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.EnabledOrganisation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Organisation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
 
@@ -33,7 +31,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonR
 )
 class OrganisationController(
   private val courseService: CourseService,
-  private val enabledOrganisationService: EnabledOrganisationService,
   private val prisonRegisterApiService: PrisonRegisterApiService,
   private val organisationService: OrganisationService,
 ) {
@@ -58,34 +55,6 @@ class OrganisationController(
       courseService.getAllOfferingsByOrganisationId(organisationId)
         .map { it.course }
         .map { it.toApi() },
-    )
-
-  @Operation(
-    tags = ["reference data"],
-    summary = "Get list of enabled organisations",
-    operationId = "getEnabledOrganisations",
-    description = """""",
-    responses = [
-      ApiResponse(responseCode = "200", description = "List of enabled organisations", content = [Content(array = ArraySchema(schema = Schema(implementation = EnabledOrganisation::class)))]),
-      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-    ],
-    security = [ SecurityRequirement(name = "bearerAuth") ],
-  )
-  @RequestMapping(
-    method = [RequestMethod.GET],
-    value = ["/organisations/enabled"],
-    produces = ["application/json"],
-  )
-  fun getEnabledOrganisations(): ResponseEntity<List<EnabledOrganisation>> = ResponseEntity
-    .ok(
-      enabledOrganisationService.getEnabledOrganisations()
-        .map {
-          EnabledOrganisation(
-            it.code,
-            it.description,
-          )
-        },
     )
 
   @Operation(
