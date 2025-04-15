@@ -93,7 +93,7 @@ abstract class IntegrationTestBase {
   companion object {
 
     @JvmStatic
-    private val postgresContainer = PostgreSQLContainer<Nothing>("postgres:15.1")
+    private val postgresContainer = PostgreSQLContainer<Nothing>("postgres:16.4")
       .apply {
         withReuse(true)
       }
