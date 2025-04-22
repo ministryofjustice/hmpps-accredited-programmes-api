@@ -12,12 +12,10 @@ import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -72,25 +70,50 @@ class ReferralController(
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  @GetMapping("/referrals/{id}/status-transitions", produces = ["application/json"])
+  @Operation(
+    tags = ["Referral"],
+    summary = "Get the status transitions for a Referral",
+    operationId = "getStatusTransitions",
+    description = "Returns a list of status transitions for a Referral",
+    security = [SecurityRequirement(name = "bearerAuth")],
+    responses = [
+      ApiResponse(
+        responseCode = "404",
+        description = "No Referral with ID",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "200",
+        description = "Status transitions for a referral",
+        content = [Content(schema = Schema(implementation = ReferralStatusRefData::class))],
+      ),
+    ],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/referrals/{id}/status-transitions"],
+    produces = ["application/json"],
+  )
   fun getNextStatusTransitions(
     @PathVariable id: UUID,
     @RequestParam(defaultValue = "false") ptUser: Boolean = false,
     @RequestParam(defaultValue = "false") deselectAndKeepOpen: Boolean = false,
   ): ResponseEntity<List<ReferralStatusRefData>> {
-    val referral = referralService.getReferralById(id)
-    var statuses = referenceDataService.getNextStatusTransitions(referral!!.status, ptUser)
-    // bespoke logic for deselect and keep open
-    if (statuses.any { it.code == "DESELECTED" } && !deselectAndKeepOpen) {
+    val referral = referralService.getReferralById(id) ?: throw NotFoundException("Referral with id $id not found")
+
+    var statuses = referenceDataService.getNextStatusTransitions(referral.status, ptUser)
+    val deselectedStatus = statuses.find { it.code == "DESELECTED" }
+
+    if (deselectedStatus != null && !deselectAndKeepOpen) {
       // rebuild the status list with a bespoke set of statuses
       val newStatusList = mutableListOf<ReferralStatusRefData>()
       newStatusList.addAll(statuses.filter { it.code == "PROGRAMME_COMPLETE" })
       newStatusList.add(
-        statuses.first { it.code == "DESELECTED" }
+        deselectedStatus
           .copy(description = "Deselect and close referral", deselectAndKeepOpen = false),
       )
       newStatusList.add(
-        statuses.first { it.code == "DESELECTED" }
+        deselectedStatus
           .copy(
             description = "Deselect and keep referral open",
             hintText = "This person cannot continue the programme now but may be able to in future.",
@@ -99,6 +122,7 @@ class ReferralController(
       )
       statuses = newStatusList
     }
+
     if (deselectAndKeepOpen) {
       // rebuild the status list with a bespoke set of statuses
       val newStatusList = mutableListOf<ReferralStatusRefData>()
