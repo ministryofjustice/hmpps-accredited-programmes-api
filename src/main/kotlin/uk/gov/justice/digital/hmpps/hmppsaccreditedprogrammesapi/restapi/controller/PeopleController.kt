@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -47,6 +48,9 @@ class PeopleController(
   private val peopleSearchApiService: PeopleSearchApiService,
   private val auditService: AuditService,
 ) {
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
 
   @Deprecated(
     "This endpoint is deprecated",
@@ -134,6 +138,7 @@ class PeopleController(
     )
   }
 
+  @Deprecated("This endpoint is deprecated and may be removed in the future")
   @Operation(
     tags = ["Person"],
     summary = "Get details of an offence by prison number",
@@ -170,6 +175,7 @@ class PeopleController(
       prisonNumber = prisonNumber,
       auditAction = AuditAction.OFFENCE_DETAILS.name,
     )
+    log.warn("Deprecated endpoint /people/offences/prisonNumber was called")
     val offenceMap = personService.getOffenceDetails(prisonNumber).associateBy({ it.first }, { it.second })
     val offences = manageOffencesService.getOffences(offenceMap.keys.toList())
 
