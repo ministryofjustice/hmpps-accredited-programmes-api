@@ -53,7 +53,7 @@ data class Course(
   @Schema(example = "true", description = "")
   @get:JsonProperty("displayOnProgrammeDirectory") val displayOnProgrammeDirectory: Boolean? = null,
 
-  @Schema(example = "true", description = "Intensity of the course")
+  @Schema(example = "HIGH", description = "Intensity of the course", allowableValues = ["HIGH", "MODERATE", "HIGH_MODERATE"])
   @get:JsonProperty("intensity") val intensity: String? = null,
 
   @Schema(example = "null", description = "List of offerings for the course")
