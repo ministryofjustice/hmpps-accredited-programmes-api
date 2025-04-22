@@ -72,9 +72,9 @@ class ReferralController(
 
   @Operation(
     tags = ["Referral"],
-    summary = "Get the status transitions for a referral",
+    summary = "Get the status transitions for a Referral",
     operationId = "getStatusTransitions",
-    description = "Returns a status transition for a referral",
+    description = "Returns a list of status transitions for a Referral",
     security = [SecurityRequirement(name = "bearerAuth")],
     responses = [
       ApiResponse(
@@ -93,7 +93,6 @@ class ReferralController(
     method = [RequestMethod.GET],
     value = ["/referrals/{id}/status-transitions"],
     produces = ["application/json"],
-    consumes = ["application/json"],
   )
   fun getNextStatusTransitions(
     @PathVariable id: UUID,
