@@ -121,7 +121,9 @@ class ReferralController(
           ),
       )
       statuses = newStatusList
-    } else if (deselectAndKeepOpen) {
+    }
+
+    if (deselectAndKeepOpen) {
       // rebuild the status list with a bespoke set of statuses
       val newStatusList = mutableListOf<ReferralStatusRefData>()
       newStatusList.addAll(statuses.filter { it.code != "DESELECTED" && it.code != "PROGRAMME_COMPLETE" })
