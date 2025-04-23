@@ -17,13 +17,16 @@ class NomisUserRolesService(val nomisUserRolesApiClient: NomisUserRolesApiClient
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
   }
-
-  fun getStaffDetail(staffId: String): StaffDetailResponse? {
-    val staffDetail = when (val response = nomisUserRolesApiClient.getStaffDetail(staffId)) {
+  private fun <T> getDetail(
+    id: String,
+    idType: String,
+    apiCall: (String) -> ClientResult<T>,
+  ): T? {
+    val detail = when (val response = apiCall(id)) {
       is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
 
       is ClientResult.Failure.Other -> {
-        log.warn("Failure to for get staff details for staffId $staffId Reason ${response.toException().message} ")
+        log.warn("Failure to get $idType details for $idType $id Reason ${response.toException().message}")
         throw ServiceUnavailableException(
           "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
           response.toException(),
@@ -31,30 +34,14 @@ class NomisUserRolesService(val nomisUserRolesApiClient: NomisUserRolesApiClient
       }
 
       is ClientResult.Failure -> {
-        log.warn("Failure to for get staff details for staffId $staffId Reason ${response.toException().message} ")
+        log.warn("Failure to get $idType details for $idType $id Reason ${response.toException().message}")
         AuthorisableActionResult.Success(null)
       }
     }
-    return staffDetail.entity
+    return detail.entity
   }
 
-  fun getUserDetail(username: String): UserDetail? {
-    val userDetail = when (val response = nomisUserRolesApiClient.getUserDetail(username)) {
-      is ClientResult.Success -> AuthorisableActionResult.Success(response.body)
+  fun getStaffDetail(staffId: String): StaffDetailResponse? = getDetail(staffId, "staffId") { nomisUserRolesApiClient.getStaffDetail(it) }
 
-      is ClientResult.Failure.Other -> {
-        log.warn("Failure to for get user details for username $username Reason ${response.toException().message} ")
-        throw ServiceUnavailableException(
-          "Request to ${response.serviceName} failed. Reason ${response.toException().message} method ${response.method} path ${response.path}",
-          response.toException(),
-        )
-      }
-
-      is ClientResult.Failure -> {
-        log.warn("Failure to for get staff details for username $username Reason ${response.toException().message} ")
-        AuthorisableActionResult.Success(null)
-      }
-    }
-    return userDetail.entity
-  }
+  fun getUserDetail(username: String): UserDetail? = getDetail(username, "username") { nomisUserRolesApiClient.getUserDetail(it) }
 }
