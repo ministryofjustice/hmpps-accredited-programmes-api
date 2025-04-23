@@ -24,9 +24,6 @@ class ManageOffencesApiWebClientHealthCheck(@Qualifier("manageOffencesApiWebClie
 class CaseNotesApiWebClientHealthCheck(@Qualifier("caseNotesApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
 
 @Component
-class ManageUsersApiWebClientHealthCheck(@Qualifier("manageUsersApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
-
-@Component
 class AllocationManagerApiWebClientHealthCheck(@Qualifier("allocationManagerApiWebClient") webClient: WebClient) : HealthPingCheck(webClient)
 
 @Component
