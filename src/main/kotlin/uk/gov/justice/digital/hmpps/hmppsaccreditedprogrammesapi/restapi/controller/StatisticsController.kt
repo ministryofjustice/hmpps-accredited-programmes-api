@@ -177,7 +177,6 @@ class StatisticsController(
     return objectMapper.readValue(content, CurrentCount::class.java)
   }
 
-  @Deprecated("This endpoint is deprecated and may be removed in the future")
   @GetMapping("/performance/status-duration")
   fun getAverageTimeSpentAtStatus(
     @RequestParam startDate: LocalDate,
@@ -188,7 +187,6 @@ class StatisticsController(
     if (statuses.isEmpty()) {
       throw BusinessException("This end point requires at least one status")
     }
-    log.warn("Deprecated endpoint /performance/status-duration was called")
     val content = statisticsRepository.averageTime(startDate, endDate!!, statuses, locationCodes)
     return objectMapper.readValue(content, Performance::class.java)
   }
