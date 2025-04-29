@@ -31,6 +31,13 @@ data class SaraRiskLevel(val toPartner: Int, val toOther: Int) {
   }
 }
 
+enum class ProgrammePathway {
+  HIGH_INTENSITY_BC,
+  MODERATE_INTENSITY_BC,
+  ALTERNATIVE_PATHWAY,
+  MISSING_INFORMATION,
+}
+
 enum class Type {
   H,
   M,
@@ -39,27 +46,52 @@ enum class Type {
   ;
 
   companion object {
-    fun toText(type: Type?): String = when (type) {
-      H -> "High Intensity"
-      M -> "Moderate Intensity"
-      A -> "Alternative Pathway"
-      O -> "Other"
-      else -> "MISSING INFORMATION"
+    fun toPathway(type: Type?): ProgrammePathway = when (type) {
+      H -> ProgrammePathway.HIGH_INTENSITY_BC
+      M -> ProgrammePathway.MODERATE_INTENSITY_BC
+      A -> ProgrammePathway.ALTERNATIVE_PATHWAY
+      O -> ProgrammePathway.MISSING_INFORMATION
+      else -> ProgrammePathway.MISSING_INFORMATION
     }
   }
 }
+
+enum class NeedLevel {
+  HIGH_NEED,
+  MEDIUM_NEED,
+  LOW_NEED,
+  UNKNOWN,
+  ;
+
+  companion object {
+    fun fromLevel(level: Level?): NeedLevel = when (level) {
+      Level.H -> HIGH_NEED
+      Level.M -> MEDIUM_NEED
+      Level.L -> LOW_NEED
+      else -> UNKNOWN
+    }
+  }
+}
+
 enum class Level {
   H,
   M,
   L,
+}
+
+enum class RiskLevel {
+  HIGH_RISK,
+  MEDIUM_RISK,
+  LOW_RISK,
+  UNKNOWN,
   ;
 
   companion object {
-    fun toText(level: Level?): String = when (level) {
-      H -> "High"
-      M -> "Medium"
-      L -> "Low"
-      else -> "Unknown"
+    fun fromLevel(level: Level?): RiskLevel = when (level) {
+      Level.H -> HIGH_RISK
+      Level.M -> MEDIUM_RISK
+      Level.L -> LOW_RISK
+      else -> UNKNOWN
     }
   }
 }

@@ -25,8 +25,8 @@ data class Sara(
       val saraRiskOfViolenceTowardsOthers = SaraRiskLevel.getRiskToOthers(pniResponse.pniCalculation?.saraRiskLevel?.toOther)
       return Sara(
         overallResult = SaraRisk.highestRisk(saraRiskOfViolenceTowardsPartner, saraRiskOfViolenceTowardsOthers),
-        saraRiskOfViolenceTowardsPartner = saraRiskOfViolenceTowardsPartner.toString(),
-        saraRiskOfViolenceTowardsOthers = saraRiskOfViolenceTowardsOthers.toString(),
+        saraRiskOfViolenceTowardsPartner = saraRiskOfViolenceTowardsPartner.description,
+        saraRiskOfViolenceTowardsOthers = saraRiskOfViolenceTowardsOthers.description,
         saraAssessmentId = pniResponse.assessment?.id,
       )
     }
