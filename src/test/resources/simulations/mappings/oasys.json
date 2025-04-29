@@ -327,6 +327,19 @@
     },
     {
       "request": {
+        "url": "/assessments/pni/A7777BB?community=false",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "oasys-pni-response-with-missing-fields-success.json"
+      }
+    },
+    {
+      "request": {
         "url": "/assessments/pni/A9876BB?community=false",
         "method": "GET"
       },

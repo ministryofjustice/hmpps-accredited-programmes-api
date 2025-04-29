@@ -17,7 +17,7 @@ import java.math.BigDecimal
 data class IndividualRiskScores(
 
   @Schema(example = "1", description = "")
-  @Deprecated("ogrs3 is deprecated and will be removed in a future release - use ogrs3Risk instead")
+  @Deprecated("ogrs3 is deprecated and will be removed in a future release", replaceWith = ReplaceWith("ogrs3Risk"))
   @get:JsonProperty("ogrs3") val ogrs3: BigDecimal? = null,
 
   @Schema(example = "Medium", description = "The OGRS risk level")
@@ -27,7 +27,7 @@ data class IndividualRiskScores(
   @get:JsonProperty("ovpRisk") val ovpRisk: String? = null,
 
   @Schema(example = "2", description = "")
-  @Deprecated("ovp is deprecated and will be removed in a future release - use ovpRisk instead")
+  @Deprecated("ovp is deprecated and will be removed in a future release", replaceWith = ReplaceWith("ovpRisk"))
   @get:JsonProperty("ovp") val ovp: BigDecimal? = null,
 
   @Schema(example = "0", description = "")

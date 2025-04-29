@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Level
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.NeedLevel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAssessmentTimeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
@@ -12,6 +12,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ProgrammePathway
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskLevel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Timeline
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Type
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
@@ -37,10 +39,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.util.UUID
-
-private const val HIGH_INTENSITY_BC = "HIGH_INTENSITY_BC"
-
-private const val MODERATE_INTENSITY_BC = "MODERATE_INTENSITY_BC"
 
 private const val LEARNING_DISABILITIES_AND_CHALLENGES_THRESHOLD = 3
 
@@ -85,13 +83,13 @@ class PniService(
     val needsScore = NeedsScore(
       overallNeedsScore = pniResponse.pniCalculation?.totalDomainScore,
       basicSkillsScore = pniResponse.assessment.ldc?.subTotal,
-      classification = Level.toNeedLevel(pniResponse.pniCalculation?.needLevel),
+      classification = NeedLevel.fromLevel(pniResponse.pniCalculation?.needLevel).name,
       domainScore = DomainScore.from(pniResponse),
     )
 
     // risk
     val riskScore = RiskScore(
-      classification = Level.toRiskLevel(pniResponse.pniCalculation?.riskLevel),
+      classification = RiskLevel.fromLevel(pniResponse.pniCalculation?.riskLevel).name,
       individualRiskScores = IndividualRiskScores.from(pniResponse),
     )
 
@@ -99,7 +97,7 @@ class PniService(
       prisonNumber = prisonNumber,
       crn = learning?.crn,
       assessmentId = pniResponse.assessment.id,
-      programmePathway = Type.toText(pniResponse.pniCalculation?.pni),
+      programmePathway = Type.toPathway(pniResponse.pniCalculation?.pni).name,
       needsScore = needsScore,
       riskScore = riskScore,
       validationErrors = pniResponse.pniCalculation?.missingFields.orEmpty(),
@@ -254,9 +252,9 @@ class PniService(
     needsClassification: String,
     individualRiskScores: IndividualRiskScores,
   ): String? = when {
-    pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> HIGH_INTENSITY_BC
+    pniRiskEngine.isHighIntensityBasedOnRiskScores(individualRiskScores) -> ProgrammePathway.HIGH_INTENSITY_BC.name
     needsClassification == NeedsClassification.LOW_NEED.name &&
-      (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> MODERATE_INTENSITY_BC
+      (pniRiskEngine.isHighSara(individualRiskScores) || pniRiskEngine.isMediumSara(individualRiskScores)) -> ProgrammePathway.MODERATE_INTENSITY_BC.name
 
     else -> null
   }

@@ -39,10 +39,27 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
+
     // When
     val pniScore = getPniInfoByPrisonNumber(prisonNumber)
+
     // Then
     pniScore shouldBe buildPniScore(prisonNumber)
+  }
+
+  @Test
+  fun `should return pni with missing info pathway when mandatory fields are absent`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A7777BB"
+
+    // When
+    val pniScore = getPniInfoByPrisonNumber(prisonNumber)
+
+    // Then
+    pniScore.programmePathway shouldBe "MISSING_INFORMATION"
+    pniScore.validationErrors.size shouldBe 1
+    pniScore.validationErrors[0] shouldBe "difficultiesCoping"
   }
 
   fun buildPniScore(prisonNumber: String) = PniScore(
