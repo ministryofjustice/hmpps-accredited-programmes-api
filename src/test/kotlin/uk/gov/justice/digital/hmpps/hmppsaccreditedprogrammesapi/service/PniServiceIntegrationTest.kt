@@ -165,7 +165,6 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
     )
     persistenceHelper.createPrerequisite(courseId, "pr name1", "pr description1")
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
-    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
     persistenceHelper.createOffering(
       UUID.fromString(offeringId),
       courseId,
