@@ -37,17 +37,6 @@ fun PrerequisiteEntity.toApi(): CoursePrerequisite = CoursePrerequisite(
   description = description,
 )
 
-fun OfferingEntity.toApi(orgEnabled: Boolean, genderForWhichCourseIsOffered: String): CourseOffering = CourseOffering(
-  id = id!!,
-  organisationId = organisationId,
-  organisationEnabled = orgEnabled,
-  contactEmail = contactEmail,
-  secondaryContactEmail = secondaryContactEmail,
-  referable = referable,
-  withdrawn = withdrawn,
-  gender = Gender.valueOf(genderForWhichCourseIsOffered),
-)
-
 fun OfferingEntity.toApi(genderForWhichCourseIsOffered: String): CourseOffering = CourseOffering(
   id = id!!,
   organisationId = organisationId,

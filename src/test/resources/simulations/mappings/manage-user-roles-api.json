@@ -64,6 +64,19 @@
         },
         "bodyFileName": "staffDetail_general_487691.json"
       }
+    },
+    {
+      "request": {
+        "url": "/users/TEST_REFERRER_USER_1",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "userDetail.json"
+      }
     }
   ]
 }

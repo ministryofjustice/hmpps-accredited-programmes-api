@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.contro
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,6 +34,10 @@ class StatisticsController(
   private val objectMapper: ObjectMapper,
   private val statisticsService: StatisticsService,
 ) {
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
+
   @GetMapping("/report/countByStatus", produces = ["application/json"])
   fun getReportTypes(
     @RequestParam startDate: LocalDate,
@@ -57,11 +62,19 @@ class StatisticsController(
     courseName,
   )
 
+  @Deprecated("This endpoint is deprecated and may be removed in the future")
   @GetMapping("/report/referral-statistics", produces = ["application/json"])
-  fun getReferralStatistics(): ReferralStatistics = statisticsService.getReferralStatistics()
+  fun getReferralStatistics(): ReferralStatistics {
+    log.warn("Deprecated endpoint /report/referral-statistics was called")
+    return statisticsService.getReferralStatistics()
+  }
 
+  @Deprecated("This endpoint is deprecated and may be removed in the future")
   @GetMapping("/report-types", produces = ["application/json"])
-  fun getReportTypes(): ReportTypes = ReportTypes(ReportType.entries.map { it.name })
+  fun getReportTypes(): ReportTypes {
+    log.warn("Deprecated endpoint /report-types was called")
+    return ReportTypes(ReportType.entries.map { it.name })
+  }
 
   @GetMapping("/report/{reportType}")
   fun getStatistics(
@@ -152,11 +165,13 @@ class StatisticsController(
    * supplied status.
    *
    */
+  @Deprecated("This endpoint is deprecated and may be removed in the future")
   @GetMapping("/current/status-counts")
   fun getCurrentStatusCounts(
     @RequestParam statuses: List<String> = listOf(),
     @RequestParam locationCodes: List<String>? = listOf(),
   ): CurrentCount {
+    log.warn("Deprecated endpoint /current/status-counts was called")
     val content = statisticsRepository.currentCountsByStatus(statuses, locationCodes)
 
     return objectMapper.readValue(content, CurrentCount::class.java)

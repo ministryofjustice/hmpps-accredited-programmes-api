@@ -128,9 +128,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       "General offence",
     )
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
-    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
-    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
 
     persistenceHelper.createOffering(
       UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
@@ -508,7 +506,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val offeringId = UUID.randomUUID()
 
     persistenceHelper.createOrganisation(code = "XXX", name = "XXX org")
-    persistenceHelper.createEnabledOrganisation("XXX", "XXX org")
 
     createCourse(
       courseId = courseId,
@@ -1259,7 +1256,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     .returnResult().responseBody!!
 
   fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
-  fun getOtherOpenReferrals(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/others/$createdReferralId", referralsListTypeReference())
+  fun getOtherOpenReferrals(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId/others", referralsListTypeReference())
 
   private fun updateReferralStatus(createdReferralId: UUID, referralStatusUpdate: ReferralStatusUpdate) = webTestClient
     .put()
@@ -1494,7 +1491,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val offeringId = UUID.randomUUID()
 
     persistenceHelper.createOrganisation(code = "XXX", name = "XXX org")
-    persistenceHelper.createEnabledOrganisation("XXX", "XXX org")
 
     createCourse(
       courseId = courseId,

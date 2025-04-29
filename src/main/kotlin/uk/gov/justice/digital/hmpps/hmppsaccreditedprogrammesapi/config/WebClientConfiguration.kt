@@ -119,18 +119,6 @@ class WebClientConfiguration(
     return buildWebClient(caseNotesApiBaseUrl, oauth2Client)
   }
 
-  @Bean(name = ["manageUsersApiWebClient"])
-  fun manageUsersApiWebClient(
-    clientRegistrations: ClientRegistrationRepository,
-    authorizedClients: OAuth2AuthorizedClientRepository,
-    authorizedClientManager: OAuth2AuthorizedClientManager,
-    @Value("\${services.manage-users-api.base-url}") manageUsersApiBaseUrl: String,
-  ): WebClient {
-    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
-    oauth2Client.setDefaultClientRegistrationId("manage-users-api")
-    return buildWebClient(manageUsersApiBaseUrl, oauth2Client)
-  }
-
   @Bean(name = ["allocationManagerApiWebClient"])
   fun allocationManagerApiWebClient(
     clientRegistrations: ClientRegistrationRepository,

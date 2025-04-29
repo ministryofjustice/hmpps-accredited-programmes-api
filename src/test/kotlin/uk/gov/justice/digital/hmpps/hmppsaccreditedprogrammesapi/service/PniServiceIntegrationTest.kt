@@ -64,7 +64,7 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
 
     // Then
     assertThat(pniScore).isNotNull
-    assertThat(pniScore.needsScore.classification).isEqualTo("High")
+    assertThat(pniScore.needsScore.classification).isEqualTo("HIGH_NEED")
     assertThat(pniScore.riskScore.individualRiskScores.ospDc).isNull()
     assertThat(pniScore.riskScore.individualRiskScores.ospIic).isNull()
   }
@@ -82,11 +82,11 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
     assertThat(pniScore.prisonNumber).isEqualTo(prisonNumber)
     assertThat(pniScore.crn).isEqualTo("D006518")
     assertThat(pniScore.assessmentId).isEqualTo(10082385)
-    assertThat(pniScore.programmePathway).isEqualTo("High Intensity")
+    assertThat(pniScore.programmePathway).isEqualTo("HIGH_INTENSITY_BC")
     assertThat(pniScore.needsScore).isNotNull
     assertThat(pniScore.needsScore.overallNeedsScore).isEqualTo(5)
     assertThat(pniScore.needsScore.basicSkillsScore).isEqualTo(10)
-    assertThat(pniScore.needsScore.classification).isEqualTo("High")
+    assertThat(pniScore.needsScore.classification).isEqualTo("HIGH_NEED")
     assertThat(pniScore.needsScore.domainScore).isEqualTo(
       DomainScore(
         SexDomainScore(
@@ -125,7 +125,7 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
       ),
     )
     assertThat(pniScore.riskScore).isNotNull
-    assertThat(pniScore.riskScore.classification).isEqualTo("High")
+    assertThat(pniScore.riskScore.classification).isEqualTo("HIGH_RISK")
     assertThat(pniScore.riskScore.individualRiskScores).isEqualTo(
       IndividualRiskScores(
         ogrs3 = null,
@@ -137,8 +137,8 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
         rsr = BigDecimal("3.5"),
         sara = Sara(
           overallResult = SaraRisk.MEDIUM,
-          saraRiskOfViolenceTowardsPartner = SaraRisk.NOT_APPLICABLE.name,
-          saraRiskOfViolenceTowardsOthers = SaraRisk.MEDIUM.name,
+          saraRiskOfViolenceTowardsPartner = SaraRisk.NOT_APPLICABLE.description,
+          saraRiskOfViolenceTowardsOthers = SaraRisk.MEDIUM.description,
           saraAssessmentId = 10082385,
         ),
       ),
@@ -165,7 +165,6 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
     )
     persistenceHelper.createPrerequisite(courseId, "pr name1", "pr description1")
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
-    persistenceHelper.createEnabledOrganisation("MDI", "MDI org")
     persistenceHelper.createOffering(
       UUID.fromString(offeringId),
       courseId,
@@ -197,9 +196,9 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
     assertThat(pniResults[0].prisonNumber).isEqualTo(prisonNumber)
     assertThat(pniResults[0].crn).isEqualTo("D006518")
     assertThat(pniResults[0].referralId).isEqualTo(referralId)
-    assertThat(pniResults[0].programmePathway).isEqualTo("High Intensity")
-    assertThat(pniResults[0].needsClassification).isEqualTo("High")
-    assertThat(pniResults[0].riskClassification).isEqualTo("High")
+    assertThat(pniResults[0].programmePathway).isEqualTo("HIGH_INTENSITY_BC")
+    assertThat(pniResults[0].needsClassification).isEqualTo("HIGH_NEED")
+    assertThat(pniResults[0].riskClassification).isEqualTo("HIGH_RISK")
     assertThat(pniResults[0].basicSkillsScore).isEqualTo(10)
   }
 

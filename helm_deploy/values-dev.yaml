@@ -17,7 +17,6 @@ generic-service:
     SERVICES_OASYS-API_BASE-URL: https://accredited-programmes-and-oasys-dev.hmpps.service.justice.gov.uk
     SERVICES_MANAGE-OFFENCES-API_BASE-URL: https://manage-offences-api-dev.hmpps.service.justice.gov.uk
     SERVICES_CASE-NOTES-API_BASE-URL: https://dev.offender-case-notes.service.justice.gov.uk
-    SERVICES_MANAGE-USERS-API_BASE-URL: https://manage-users-api-dev.hmpps.service.justice.gov.uk
     SERVICES_ALLOCATION-MANAGER-API_BASE-URL: https://dev.moic.service.justice.gov.uk
     SERVICES_NOMIS-USER-ROLES-API_BASE-URL: https://nomis-user-roles-api-dev.prison.service.justice.gov.uk
     SERVICES_PRISONER-ALERTS-API_BASE-URL: https://alerts-api-dev.hmpps.service.justice.gov.uk

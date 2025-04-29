@@ -39,71 +39,90 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
+
     // When
     val pniScore = getPniInfoByPrisonNumber(prisonNumber)
+
     // Then
     pniScore shouldBe buildPniScore(prisonNumber)
   }
 
+  @Test
+  fun `should return pni with missing info pathway when mandatory fields are absent`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A7777BB"
+
+    // When
+    val pniScore = getPniInfoByPrisonNumber(prisonNumber)
+
+    // Then
+    pniScore.programmePathway shouldBe "MISSING_INFORMATION"
+    pniScore.validationErrors.size shouldBe 1
+    pniScore.validationErrors[0] shouldBe "difficultiesCoping"
+  }
+
   fun buildPniScore(prisonNumber: String) = PniScore(
     prisonNumber = prisonNumber,
-    crn = "X739590",
-    assessmentId = 2114584,
-    programmePathway = "MISSING_INFORMATION",
+    crn = "D006518",
+    assessmentId = 10082385,
+    programmePathway = "HIGH_INTENSITY_BC",
     needsScore = NeedsScore(
-      overallNeedsScore = 6,
+      overallNeedsScore = 5,
       basicSkillsScore = 10,
       classification = "HIGH_NEED",
       domainScore = DomainScore(
         sexDomainScore = SexDomainScore(
-          overAllSexDomainScore = 2,
+          overAllSexDomainScore = 10,
           individualSexScores = IndividualSexScores(
             sexualPreOccupation = 2,
-            offenceRelatedSexualInterests = 2,
-            emotionalCongruence = 0,
+            offenceRelatedSexualInterests = 1,
+            emotionalCongruence = 1,
           ),
         ),
         thinkingDomainScore = ThinkingDomainScore(
-          overallThinkingDomainScore = 1,
+          overallThinkingDomainScore = 10,
           individualThinkingScores = IndividualCognitiveScores(
             proCriminalAttitudes = 1,
             hostileOrientation = 1,
           ),
         ),
         relationshipDomainScore = RelationshipDomainScore(
-          overallRelationshipDomainScore = 1,
+          overallRelationshipDomainScore = 10,
           individualRelationshipScores = IndividualRelationshipScores(
             curRelCloseFamily = 0,
-            prevExpCloseRel = 2,
-            easilyInfluenced = 1,
-            aggressiveControllingBehaviour = 1,
+            prevExpCloseRel = 1,
+            easilyInfluenced = 0,
+            aggressiveControllingBehaviour = 0,
           ),
         ),
         selfManagementDomainScore = SelfManagementDomainScore(
-          overallSelfManagementDomainScore = 2,
+          overallSelfManagementDomainScore = 10,
           individualSelfManagementScores = IndividualSelfManagementScores(
-            impulsivity = 1,
-            temperControl = 4,
-            problemSolvingSkills = 2,
-            difficultiesCoping = null,
+            impulsivity = 0,
+            temperControl = 2,
+            problemSolvingSkills = 0,
+            difficultiesCoping = 0,
           ),
         ),
       ),
     ),
-    validationErrors = listOf("difficultiesCoping in SelfManagementScores is null"),
+    validationErrors = emptyList(),
     riskScore = RiskScore(
       classification = "HIGH_RISK",
       individualRiskScores = IndividualRiskScores(
-        ogrs3 = "15.00".toBigDecimal(),
-        ovp = "15.00".toBigDecimal(),
-        ospDc = "High",
-        ospIic = "Medium",
-        rsr = 1.46.toBigDecimal(),
+        ogrs3 = null, // deprecated - always null
+        ovp = null, // deprecated - always null
+        ospDc = "Low",
+        ospIic = "Low",
+        ogrs3Risk = "High",
+        ovpRisk = "Medium",
+        rsr = 3.5.toBigDecimal(),
         sara = Sara(
-          overallResult = SaraRisk.HIGH,
-          saraRiskOfViolenceTowardsOthers = "High",
-          saraRiskOfViolenceTowardsPartner = "High",
-          saraAssessmentId = 2114999,
+          overallResult = SaraRisk.MEDIUM,
+          saraRiskOfViolenceTowardsOthers = SaraRisk.MEDIUM.description,
+          saraRiskOfViolenceTowardsPartner = SaraRisk.NOT_APPLICABLE.description,
+          saraAssessmentId = 10082385L,
         ),
       ),
     ),
@@ -126,7 +145,7 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
     pniResults[0].programmePathway shouldBe pniScore.programmePathway
     pniResults[0].riskClassification shouldBe pniScore.riskScore.classification
     pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore)
-    pniResults[0].pniValid shouldBe false
+    pniResults[0].pniValid shouldBe true
     pniResults[0].basicSkillsScore shouldBe 10
   }
 
