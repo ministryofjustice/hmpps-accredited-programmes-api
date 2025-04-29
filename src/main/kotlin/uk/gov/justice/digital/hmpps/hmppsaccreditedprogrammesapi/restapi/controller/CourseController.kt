@@ -34,10 +34,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.E
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AudienceService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import java.util.*
 import kotlin.random.Random
 
@@ -51,11 +48,8 @@ import kotlin.random.Random
 @Transactional
 class CourseController(
   private val courseService: CourseService,
-  private val enabledOrganisationService: EnabledOrganisationService,
   private val audienceService: AudienceService,
   private val organisationService: OrganisationService,
-  private val referralService: ReferralService,
-  private val pniService: PniService,
 ) {
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -338,14 +332,13 @@ class CourseController(
   ): ResponseEntity<List<CourseOffering>> {
     val offerings = courseService.getAllOfferings(id, includeWithdrawn ?: false)
     val mappedOfferings = offerings.map { offeringEntity ->
-      val enabledOrg = enabledOrganisationService.getEnabledOrganisation(offeringEntity.organisationId) != null
       val organisation = organisationService.findOrganisationEntityByCode(offeringEntity.organisationId)
       if (organisation == null) {
         log.warn("Organisation does not exist for id ${offeringEntity.organisationId}")
         throw BusinessException("Organisation does not exist for id ${offeringEntity.organisationId}")
       }
 
-      offeringEntity.toApi(enabledOrg, organisation.gender)
+      offeringEntity.toApi(organisation.gender)
     }
     return ResponseEntity.ok(mappedOfferings)
   }

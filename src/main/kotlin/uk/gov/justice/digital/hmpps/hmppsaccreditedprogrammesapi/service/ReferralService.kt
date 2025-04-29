@@ -55,7 +55,6 @@ constructor(
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralReferenceDataService: ReferralReferenceDataService,
-  private val enabledOrganisationService: EnabledOrganisationService,
   private val personService: PersonService,
   private val pniService: PniService,
   private val caseNotesApiService: CaseNotesApiService,
@@ -77,10 +76,6 @@ constructor(
 
     val offering = offeringRepository.findById(offeringId)
       .orElseThrow { Exception("Offering not found for $offeringId") }
-
-    if (enabledOrganisationService.getEnabledOrganisation(offering.organisationId) == null) {
-      throw BusinessException("Organisation ${offering.organisationId} not enabled for referrals")
-    }
 
     personService.createOrUpdatePerson(prisonNumber)
 
@@ -125,13 +120,13 @@ constructor(
 
   fun updateReferralById(referralId: UUID, update: ReferralUpdate) {
     val referral = referralRepository.getReferenceById(referralId)
-    referral.additionalInformation = update.additionalInformation
+    referral.additionalInformation = update.additionalInformation ?: referral.additionalInformation
     referral.oasysConfirmed = update.oasysConfirmed
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
-    referral.referrerOverrideReason = update.referrerOverrideReason
-    referral.hasLdc = update.hasLdc
+    referral.referrerOverrideReason = update.referrerOverrideReason ?: referral.referrerOverrideReason
+    referral.hasLdc = update.hasLdc ?: referral.hasLdc
     referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
-    referral.hasReviewedAdditionalInformation = update.hasReviewedAdditionalInformation
+    referral.hasReviewedAdditionalInformation = update.hasReviewedAdditionalInformation ?: referral.hasReviewedAdditionalInformation
   }
 
   fun updateReferralStatusById(referralId: UUID, referralStatusUpdate: ReferralStatusUpdate) {

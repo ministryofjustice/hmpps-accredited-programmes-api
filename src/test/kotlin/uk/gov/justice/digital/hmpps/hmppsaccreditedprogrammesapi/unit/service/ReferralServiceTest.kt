@@ -41,6 +41,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
@@ -53,7 +54,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.T
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.EnabledOrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.FeatureSwitchService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
@@ -66,7 +66,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.Referra
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EnabledOrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PersonEntityFactory
@@ -119,9 +118,6 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var referralReferenceDataService: ReferralReferenceDataService
-
-  @MockK(relaxed = true)
-  private lateinit var enabledOrganisationService: EnabledOrganisationService
 
   @MockK(relaxed = true)
   private lateinit var personService: PersonService
@@ -187,8 +183,6 @@ class ReferralServiceTest {
       .produce()
     every { offeringRepository.findById(any()) } returns Optional.of(offering)
 
-    every { enabledOrganisationService.getEnabledOrganisation(any()) } returns EnabledOrganisationEntityFactory().produce()
-
     val person = PersonEntityFactory()
       .produce()
     every { personRepository.findPersonEntityByPrisonNumber(any()) } returns person
@@ -247,7 +241,6 @@ class ReferralServiceTest {
       .withOrganisationId(prisonCode)
       .produce()
     every { offeringRepository.findById(any()) } returns Optional.of(offering)
-    every { enabledOrganisationService.getEnabledOrganisation(any()) } returns EnabledOrganisationEntityFactory().produce()
     val person = PersonEntityFactory()
       .produce()
     every { personRepository.findPersonEntityByPrisonNumber(any()) } returns person
@@ -444,6 +437,32 @@ class ReferralServiceTest {
     // Then
     assertThat(referral.status).isEqualTo(newStatus)
     verify { auditService.audit(referral, ReferralStatus.REFERRAL_STARTED.name, AuditAction.UPDATE_REFERRAL.name) }
+  }
+
+  @Test
+  fun `should treat missing override and information fields as optional`() {
+    // Given
+    val referral = ReferralEntityFactory()
+      .withOasysConfirmed(false)
+      .withReferrerOverrideReason("The override reason")
+      .withAdditionalInformation("The additional information")
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+
+    // When
+    referralService.updateReferralById(
+      UUID.randomUUID(),
+      ReferralUpdate(
+        additionalInformation = null,
+        hasReviewedProgrammeHistory = true,
+        oasysConfirmed = true,
+      ),
+    )
+
+    // Then
+    assertThat(referral.referrerOverrideReason).isEqualTo("The override reason")
+    assertThat(referral.additionalInformation).isEqualTo("The additional information")
   }
 
   @Test
