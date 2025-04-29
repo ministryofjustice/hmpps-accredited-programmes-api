@@ -193,7 +193,7 @@ constructor(
 
   fun getBuildingChoicesCourseForTransferringReferral(referralId: UUID, programmePathway: String?): Course {
     val referral = referralRepository.findById(referralId).getOrNull() ?: throw NotFoundException("No referral found for id: $referralId")
-    val pniResult = programmePathway ?: pniService.getPniScore(prisonNumber = referral.prisonNumber, referralId = referral.id).programmePathway
+    val pniResult = programmePathway ?: pniService.getOasysPniScore(prisonNumber = referral.prisonNumber).programmePathway
 
     val buildingChoicesCourses = getAllBuildingChoicesCourses()
     val audience = referral.offering.course.audience.takeIf { it == "Sexual offence" } ?: "General offence"

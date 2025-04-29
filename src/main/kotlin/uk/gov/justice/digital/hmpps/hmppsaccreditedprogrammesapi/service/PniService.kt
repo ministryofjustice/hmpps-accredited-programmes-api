@@ -85,13 +85,13 @@ class PniService(
     val needsScore = NeedsScore(
       overallNeedsScore = pniResponse.pniCalculation?.totalDomainScore,
       basicSkillsScore = pniResponse.assessment.ldc?.subTotal,
-      classification = Level.toText(pniResponse.pniCalculation?.needLevel),
+      classification = Level.toNeedLevel(pniResponse.pniCalculation?.needLevel),
       domainScore = DomainScore.from(pniResponse),
     )
 
     // risk
     val riskScore = RiskScore(
-      classification = Level.toText(pniResponse.pniCalculation?.riskLevel),
+      classification = Level.toRiskLevel(pniResponse.pniCalculation?.riskLevel),
       individualRiskScores = IndividualRiskScores.from(pniResponse),
     )
 

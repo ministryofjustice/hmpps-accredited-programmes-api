@@ -80,18 +80,17 @@ class PNIController(
       "referralId",
       required = false,
     ) referralId: UUID?,
-  ): ResponseEntity<PniScore> = ResponseEntity.ok(
-    pniService.getPniScore(
-      prisonNumber = prisonNumber,
-      gender = gender,
-      savePni = savePNI,
-      referralId = referralId,
-    ),
-  )
+  ): ResponseEntity<PniScore> {
+    val pniScore = pniService.getOasysPniScore(prisonNumber)
+    if (savePNI) {
+      pniService.savePni(pniScore, referralId)
+    }
+    return ResponseEntity.ok(pniScore)
+  }
 
   @Operation(
     tags = ["PNI"],
-    summary = "Get oays PNI data for prisoner",
+    summary = "Get Oasys PNI data for prisoner",
     operationId = "getOasysPNIByPrisonNumbers",
     description = """Get comparison of PNI data for given prisoners""",
     responses = [

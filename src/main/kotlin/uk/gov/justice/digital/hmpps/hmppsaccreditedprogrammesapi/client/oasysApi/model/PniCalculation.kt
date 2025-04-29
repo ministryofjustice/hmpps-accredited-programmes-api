@@ -40,11 +40,11 @@ enum class Type {
 
   companion object {
     fun toText(type: Type?): String = when (type) {
-      H -> "High Intensity"
-      M -> "Moderate Intensity"
-      A -> "Alternative Pathway"
-      O -> "Other"
-      else -> "MISSING INFORMATION"
+      H -> "HIGH_INTENSITY_BC"
+      M -> "MODERATE_INTENSITY_BC"
+      A -> "ALTERNATIVE_PATHWAY"
+      O -> "MISSING_INFORMATION"
+      else -> "MISSING_INFORMATION"
     }
   }
 }
@@ -55,10 +55,18 @@ enum class Level {
   ;
 
   companion object {
-    fun toText(level: Level?): String = when (level) {
-      H -> "High"
-      M -> "Medium"
-      L -> "Low"
+
+    fun toNeedLevel(level: Level?): String = when (level) {
+      H -> "HIGH_NEED"
+      M -> "MEDIUM_NEED"
+      L -> "LOW_NEED"
+      else -> "Unknown"
+    }
+
+    fun toRiskLevel(level: Level?): String = when (level) {
+      H -> "HIGH_RISK"
+      M -> "MEDIUM_RISK"
+      L -> "LOW_RISK"
       else -> "Unknown"
     }
   }
