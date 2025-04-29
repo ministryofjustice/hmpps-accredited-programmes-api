@@ -51,7 +51,7 @@ enum class Type {
       M -> ProgrammePathway.MODERATE_INTENSITY_BC
       A -> ProgrammePathway.ALTERNATIVE_PATHWAY
       O -> ProgrammePathway.MISSING_INFORMATION
-      else -> ProgrammePathway.MISSING_INFORMATION
+      else -> throw IllegalArgumentException("Unknown Programme Pathway type: $type")
     }
   }
 }
@@ -60,7 +60,6 @@ enum class NeedLevel {
   HIGH_NEED,
   MEDIUM_NEED,
   LOW_NEED,
-  UNKNOWN,
   ;
 
   companion object {
@@ -68,7 +67,7 @@ enum class NeedLevel {
       Level.H -> HIGH_NEED
       Level.M -> MEDIUM_NEED
       Level.L -> LOW_NEED
-      else -> UNKNOWN
+      else -> throw IllegalArgumentException("Unknown Need Level: $level")
     }
   }
 }
@@ -83,7 +82,6 @@ enum class RiskLevel {
   HIGH_RISK,
   MEDIUM_RISK,
   LOW_RISK,
-  UNKNOWN,
   ;
 
   companion object {
@@ -91,7 +89,7 @@ enum class RiskLevel {
       Level.H -> HIGH_RISK
       Level.M -> MEDIUM_RISK
       Level.L -> LOW_RISK
-      else -> UNKNOWN
+      else -> throw IllegalArgumentException("Unknown Risk Level: $level")
     }
   }
 }

@@ -328,13 +328,7 @@ class OasysService(
 
   fun getLDCScore(prisonNumber: String): Int? = getPniCalculation(prisonNumber)?.assessment?.ldc?.subTotal
 
-  fun getOasysPniProgrammePathway(prisonId: String): String = when (getPniCalculation(prisonId)?.pniCalculation?.pni) {
-    Type.H -> "HIGH_INTENSITY_BC"
-    Type.M -> "MODERATE_INTENSITY_BC"
-    Type.A -> "ALTERNATIVE_PATHWAY"
-    Type.O -> "MISSING_INFORMATION"
-    else -> throw NotFoundException("No PNI data found for prison number $prisonId")
-  }
+  fun getOasysPniProgrammePathway(prisonId: String): String = Type.toPathway(getPniCalculation(prisonId)?.pniCalculation?.pni).name
 
   private inline fun <T> fetchDetail(
     assessmentId: Long,
