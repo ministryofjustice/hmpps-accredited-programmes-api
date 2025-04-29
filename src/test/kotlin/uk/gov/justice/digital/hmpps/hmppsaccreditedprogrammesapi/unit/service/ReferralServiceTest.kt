@@ -41,6 +41,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
@@ -436,6 +437,32 @@ class ReferralServiceTest {
     // Then
     assertThat(referral.status).isEqualTo(newStatus)
     verify { auditService.audit(referral, ReferralStatus.REFERRAL_STARTED.name, AuditAction.UPDATE_REFERRAL.name) }
+  }
+
+  @Test
+  fun `should treat missing override and information fields as optional`() {
+    // Given
+    val referral = ReferralEntityFactory()
+      .withOasysConfirmed(false)
+      .withReferrerOverrideReason("The override reason")
+      .withAdditionalInformation("The additional information")
+      .produce()
+
+    every { referralRepository.getReferenceById(any()) } returns referral
+
+    // When
+    referralService.updateReferralById(
+      UUID.randomUUID(),
+      ReferralUpdate(
+        additionalInformation = null,
+        hasReviewedProgrammeHistory = true,
+        oasysConfirmed = true,
+      ),
+    )
+
+    // Then
+    assertThat(referral.referrerOverrideReason).isEqualTo("The override reason")
+    assertThat(referral.additionalInformation).isEqualTo("The additional information")
   }
 
   @Test
