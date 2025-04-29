@@ -46,6 +46,7 @@ fun ReferralEntity.toApi(): ApiReferral = ApiReferral(
   originalReferralId = originalReferralId,
   hasLdc = hasLdc,
   hasLdcBeenOverriddenByProgrammeTeam = hasLdcBeenOverriddenByProgrammeTeam,
+  submittedOn = submittedOn?.toString(),
 )
 
 fun StaffEntity.toApi() = StaffDetail(
