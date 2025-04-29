@@ -29,7 +29,6 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
   fun `should return all courses for a given organisation code which are not withdrawn`() {
     // Given
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
-    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     val course1Uuid = UUID.randomUUID()
     persistenceHelper.createCourse(course1Uuid, "SC1", "Course Numero Uno", "Sample description", "SC++", "General offence")
     persistenceHelper.createOffering(UUID.randomUUID(), course1Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, false)
@@ -57,7 +56,6 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
   fun `should only return withdrawn course offerings for a given organisation code for which referrals exist`() {
     // Given
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
-    persistenceHelper.createEnabledOrganisation("BWN", "BWN org")
     val course1Uuid = UUID.randomUUID()
     persistenceHelper.createCourse(course1Uuid, "SC1", "Course Numero Uno", "Sample description", "SC++", "General offence", withdrawn = true)
     persistenceHelper.createOffering(UUID.randomUUID(), course1Uuid, "BWN", "nobody-bwn@digital.justice.gov.uk", "nobody2-bwn@digital.justice.gov.uk", true, true)
