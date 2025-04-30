@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.ProgrammePathway
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
@@ -186,8 +187,8 @@ constructor(
   }
 
   fun getIntensityOfBuildingChoicesCourse(programmePathway: String): String = when (programmePathway) {
-    "HIGH_INTENSITY_BC" -> "high intensity"
-    "MODERATE_INTENSITY_BC" -> "moderate intensity"
+    ProgrammePathway.HIGH_INTENSITY_BC.name -> "high intensity"
+    ProgrammePathway.MODERATE_INTENSITY_BC.name -> "moderate intensity"
     else -> throw BusinessException("Building choices course could not be found for programmePathway $programmePathway")
   }
 
