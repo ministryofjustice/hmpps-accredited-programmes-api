@@ -1163,7 +1163,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   fun `should persist PNI when referral status is updated to On Programme`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val referralCreated = createReferral(PRISON_NUMBER_1)
+    val prisonNumber = "A9999BB"
+    val referralCreated = createReferral(prisonNumber)
 
     val referralStatusUpdate1 = ReferralStatusUpdate(
       status = REFERRAL_SUBMITTED,
@@ -1196,10 +1197,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     updateReferralStatus(referralCreated.id, referralStatusUpdate5)
 
     // Then
-    val pniResult = pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1)
+    val pniResult = pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, prisonNumber)
     pniResult shouldNotBe null
-    pniResult?.prisonNumber?.shouldBeEqual(PRISON_NUMBER_1)
-    pniResult?.crn?.shouldBeEqual("X739590")
+    pniResult?.prisonNumber?.shouldBeEqual(prisonNumber)
+    pniResult?.crn?.shouldBeEqual("D006518")
     pniResult?.oasysAssessmentId?.shouldBeEqual(2114584)
   }
 

@@ -41,6 +41,19 @@
     },
     {
       "request": {
+        "urlPattern": "/api/offenders/A9999BB/booking/latest/sentence-summary",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "sentence-info.json"
+      }
+    },
+    {
+      "request": {
         "url": "/api/users/me/caseloads?allCaseloads=false",
         "method": "GET"
       },
