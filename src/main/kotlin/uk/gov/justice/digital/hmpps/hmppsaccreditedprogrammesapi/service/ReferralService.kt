@@ -108,11 +108,12 @@ constructor(
     return referrerUser
   }
 
-  private fun savePNI(savedReferral: ReferralEntity) {
+  private fun retrieveAndStorePNI(referralId: UUID, prisonNumber: String) {
     try {
-      pniService.savePni(prisonNumber = savedReferral.prisonNumber, gender = null, savePni = true, referralId = savedReferral.id)
+      val pniScore = pniService.getOasysPniScore(prisonNumber)
+      pniService.savePni(pniScore, referralId)
     } catch (ex: Exception) {
-      log.warn("PNI could not be stored ${ex.message} for prisonNumber $savedReferral.prisonNumber")
+      log.warn("PNI could not be stored ${ex.message} for prisonNumber $prisonNumber")
     }
   }
 
@@ -166,7 +167,7 @@ constructor(
 
     // save PNI when referral is updated to "On Programme" status
     if (referral.status == ReferralStatus.ON_PROGRAMME.name) {
-      savePNI(referral)
+      retrieveAndStorePNI(referralId, referral.prisonNumber)
     }
 
     // audit the interaction

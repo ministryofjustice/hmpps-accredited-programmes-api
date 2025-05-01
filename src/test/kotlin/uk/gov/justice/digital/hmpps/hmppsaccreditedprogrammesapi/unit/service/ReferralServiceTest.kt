@@ -48,6 +48,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PniScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
@@ -391,7 +392,8 @@ class ReferralServiceTest {
     referralService.updateReferralStatusById(referralId, referralStatusUpdate)
 
     // Then
-    verify { pniService.savePni(referral.prisonNumber, gender = null, savePni = true, referral.id) }
+    verify { pniService.getOasysPniScore(referral.prisonNumber) }
+    verify { pniService.savePni(any<PniScore>(), referral.id) }
     verify { auditService.audit(capture(referralEntityCaptor), any(), any()) }
 
     val capturedReferralEntity = referralEntityCaptor.captured
