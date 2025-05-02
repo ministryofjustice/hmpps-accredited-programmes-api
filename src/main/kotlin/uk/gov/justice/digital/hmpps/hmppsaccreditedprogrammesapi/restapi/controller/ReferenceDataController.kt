@@ -75,5 +75,6 @@ class ReferenceDataController(
   @GetMapping("/referral-statuses/{referralStatusType}/categories/reasons", produces = ["application/json"])
   fun getReferralStatusReasonsForReferralStatusType(
     @Parameter(description = "The referral status type (WITHDRAWN, DESELECTED or ASSESSED_SUITABLE)", required = true) @PathVariable referralStatusType: ReferralStatusType,
-  ): List<ReferralStatusReason> = referenceDataService.getAllReferralStatusReasonsForType(referralStatusType)
+    @Parameter(description = "Whether the status transition is for keep open or not for the DESELECTED status", required = false) @RequestParam(defaultValue = "false") deselectAndKeepOpen: Boolean = false,
+  ): List<ReferralStatusReason> = referenceDataService.getAllReferralStatusReasonsForType(referralStatusType, deselectAndKeepOpen)
 }
