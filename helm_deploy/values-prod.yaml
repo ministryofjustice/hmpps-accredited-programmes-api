@@ -42,3 +42,7 @@ rdsAlertsDatabases:
 
 dataExtractorEnabled: true
 dataRefreshEnabled: true
+
+spring:
+  application:
+    environment: prod

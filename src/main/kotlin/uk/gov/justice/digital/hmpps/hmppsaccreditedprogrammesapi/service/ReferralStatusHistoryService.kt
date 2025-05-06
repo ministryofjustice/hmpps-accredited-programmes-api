@@ -81,4 +81,8 @@ class ReferralStatusHistoryService(
       ),
     )
   }
+
+  fun deleteReferralHistory(referralIds: List<UUID>) {
+    referralStatusHistoryRepository.deleteAllByReferralIdIsIn(referralIds)
+  }
 }

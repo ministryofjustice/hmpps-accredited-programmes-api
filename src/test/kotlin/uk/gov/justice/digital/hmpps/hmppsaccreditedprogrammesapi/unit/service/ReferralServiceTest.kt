@@ -13,6 +13,7 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Captor
 import org.springframework.security.core.Authentication
@@ -42,6 +43,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
@@ -74,6 +76,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.util.*
+import kotlin.String
 
 @ExtendWith(MockKExtension::class)
 class ReferralServiceTest {
@@ -140,6 +143,8 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var courseParticipationService: CourseParticipationService
+
+  private var environment: String = "dev"
 
   @Captor
   private lateinit var referralEntityCaptor: CapturingSlot<ReferralEntity>
@@ -728,5 +733,80 @@ class ReferralServiceTest {
     verify { referralStatusHistoryService.updateReferralHistory(referralId = referralId!!, previousStatusCode = ReferralStatus.REFERRAL_SUBMITTED.name, newStatus = any(), any(), any(), any()) }
     verify { referralRepository.save(existingReferral.apply { status = "MOVED_TO_BUILDING_CHOICES" }) }
     verify { caseNotesApiService.buildAndCreateCaseNote(existingReferral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name, notes = transferReferralRequest.transferReason)) }
+  }
+
+  @Test
+  fun `should throw exception if environment is not dev, local or test`() {
+    val service = ReferralService(
+      referralRepository = referralRepository,
+      referrerUserRepository = referrerUserRepository,
+      offeringRepository = offeringRepository,
+      referralViewRepository = referralViewRepository,
+      referralStatusHistoryService = referralStatusHistoryService,
+      auditService = auditService,
+      referralStatusRepository = referralStatusRepository,
+      referralStatusCategoryRepository = referralStatusCategoryRepository,
+      referralStatusReasonRepository = referralStatusReasonRepository,
+      referralReferenceDataService = referralReferenceDataService,
+      personService = personService,
+      pniService = pniService,
+      caseNotesApiService = caseNotesApiService,
+      organisationService = organisationService,
+      staffService = staffService,
+      courseParticipationService = courseParticipationService,
+      referenceDataService = referralReferenceDataService,
+      environment = "preprod",
+    )
+
+    val exception = assertThrows<IllegalStateException> {
+      service.deleteReferralsForUser()
+    }
+
+    exception.message shouldBe "Delete referrals for user is not allowed in preprod environment"
+    verify(exactly = 0) { referralRepository.findAllByReferrerUsername(any()) }
+  }
+
+  @Test
+  fun `should log and rethrow exception if any error occurs`() {
+    val testIds = listOf(UUID.randomUUID())
+
+    every { referralViewRepository.findAllByReferralsByUsername(any()) } returns testIds.map {
+      ReferralViewEntity(
+        id = it,
+        prisonNumber = PRISON_NUMBER_1,
+        forename = "John",
+        surname = "Doe",
+        conditionalReleaseDate = null,
+        paroleEligibilityDate = null,
+        tariffExpiryDate = null,
+        earliestReleaseDate = null,
+        earliestReleaseDateType = "CRD",
+        nonDtoReleaseDateType = "Standard",
+        organisationId = "ORG123",
+        organisationName = "HMP Example Prison",
+        status = "SUBMITTED",
+        statusDescription = "Referral has been submitted",
+        statusColour = "blue",
+        referrerUsername = "referrer.user",
+        courseName = "Thinking Skills Programme",
+        audience = "Men aged 18+",
+        submittedOn = null,
+        sentenceType = "Determinate",
+        listDisplayName = "ACP_TEST",
+        location = "HMP Example",
+        primaryPomUsername = "pom.user",
+        hasLdc = true,
+      )
+    }
+    every { referralStatusHistoryService.deleteReferralHistory(testIds) } throws RuntimeException("Something failed")
+
+    val exception = assertThrows<RuntimeException> {
+      referralService.deleteReferralsForUser()
+    }
+
+    exception.message shouldBe "Something failed"
+
+    verify { referralViewRepository.findAllByReferralsByUsername(any()) }
+    verify { referralStatusHistoryService.deleteReferralHistory(testIds) }
   }
 }

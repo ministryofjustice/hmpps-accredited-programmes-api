@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -62,6 +63,7 @@ constructor(
   private val staffService: StaffService,
   private val courseParticipationService: CourseParticipationService,
   private val referenceDataService: ReferralReferenceDataService,
+  @Value("\${spring.application.environment}") val environment: String,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -506,5 +508,32 @@ constructor(
 
     val savedReferrals = referralRepository.saveAll(updatedReferrals)
     log.info("Update successful for ${referrals.size} referrals for prisoner $prisonNumber referralIds ${savedReferrals.map { it.id }} Finished updating referrals with ldc $hasLDC ")
+  }
+
+  @Transactional
+  fun deleteReferralsForUser() {
+    val e2eTestUsername = "ACP_TEST"
+    log.warn("********************* DELETING ALL REFERRALS FOR USER in $environment **************")
+    try {
+      if (environment == "dev" || environment == "local" || environment == "test") {
+        val referralIds = referralViewRepository.findAllByReferralsByUsername(e2eTestUsername).map { it.id!! }
+
+        log.info("Deleting referrals for user $e2eTestUsername with ids $referralIds")
+
+        referralStatusHistoryService.deleteReferralHistory(referralIds)
+        log.info("Deleted referrals status history user $e2eTestUsername with ids $referralIds")
+        pniService.deletePniData(referralIds)
+        log.info("Deleted PNI for user $e2eTestUsername with ids $referralIds")
+        courseParticipationService.deleteAllCourseParticipationsForReferralIds(referralIds)
+        log.info("Deleted course participations for user $e2eTestUsername with ids $referralIds")
+        referralRepository.deleteAllById(referralIds)
+        log.info("Deleted referrals for user $e2eTestUsername with ids $referralIds")
+      } else {
+        throw IllegalStateException("Delete referrals for user is not allowed in $environment environment")
+      }
+    } catch (e: Exception) {
+      log.error("Error deleting referrals for user $e2eTestUsername", e)
+      throw e
+    }
   }
 }

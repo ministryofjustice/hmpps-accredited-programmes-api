@@ -116,4 +116,10 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
     courseName: String?,
     hasLdc: Boolean?,
   ): Page<ReferralViewEntity>
+
+  @Query(
+    value = """
+      SELECT r FROM ReferralViewEntity r WHERE r.referrerUsername = :username """,
+  )
+  fun findAllByReferralsByUsername(username: String): List<ReferralViewEntity>
 }

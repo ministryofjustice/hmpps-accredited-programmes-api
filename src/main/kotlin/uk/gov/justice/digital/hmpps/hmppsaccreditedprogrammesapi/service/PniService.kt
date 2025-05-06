@@ -334,6 +334,10 @@ class PniService(
       difficultiesCoping = psychiatric?.difficultiesCoping.getScore(),
     ),
   )
+
+  fun deletePniData(referralIds: List<UUID>) {
+    pniResultEntityRepository.deleteAllById(referralIds)
+  }
 }
 
 private fun String?.getScore() = this?.trim()?.split("-")?.firstOrNull()?.trim()?.toIntOrNull()

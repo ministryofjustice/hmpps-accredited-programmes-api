@@ -7,13 +7,13 @@ import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
 
@@ -29,7 +29,6 @@ class AdminController(
   private val personService: PersonService,
   private val referralService: ReferralService,
   private val staffService: StaffService,
-  private val pniService: PniService,
 ) {
   @Operation(
     tags = ["Admin"],
@@ -85,6 +84,16 @@ class AdminController(
     }
 
     return ResponseEntity.status(HttpStatus.OK).body("LDCs updated")
+  }
+
+  @DeleteMapping("/cleanUpTestReferrals")
+  @Operation(
+    summary = "Delete referrals and related entries for ACP_TEST user",
+    tags = ["Admin"],
+  )
+  fun deleteReferrals(): ResponseEntity<String> {
+    referralService.deleteReferralsForUser()
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Referrals deleted")
   }
 
   companion object {

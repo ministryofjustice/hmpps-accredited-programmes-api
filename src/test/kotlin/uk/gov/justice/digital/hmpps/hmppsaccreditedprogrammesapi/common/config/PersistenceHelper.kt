@@ -209,4 +209,18 @@ class PersistenceHelper {
 
     createCourseVariant(courseId = bc1MainCourseId, variantCourseId = bc1VariantCourseId)
   }
+
+  fun updateReferralWithUsername(referralId: UUID, userName: String) {
+    entityManager.createNativeQuery("UPDATE referral SET referrer_username = :username WHERE referral_id = :referralId")
+      .setParameter("referralId", referralId)
+      .setParameter("username", userName)
+      .executeUpdate()
+  }
+
+  fun getReferralById(referralId: UUID): Int = (
+    entityManager
+      .createNativeQuery("SELECT count(*) FROM referral WHERE referral_id = :referralId")
+      .setParameter("referralId", referralId)
+      .singleResult as Number
+    ).toInt()
 }

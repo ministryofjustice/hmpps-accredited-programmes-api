@@ -25,6 +25,8 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
 
   fun deleteByReferralId(referralId: UUID)
 
+  fun deleteCourseParticipationEntitiesByReferralIdIsIn(referralIds: List<UUID>)
+
   fun findByPrisonNumber(prisonNumber: String): List<CourseParticipationEntity>
 
   fun findByPrisonNumberAndOutcomeStatusIn(prisonNumber: String, outcomes: List<CourseStatus>): List<CourseParticipationEntity>
