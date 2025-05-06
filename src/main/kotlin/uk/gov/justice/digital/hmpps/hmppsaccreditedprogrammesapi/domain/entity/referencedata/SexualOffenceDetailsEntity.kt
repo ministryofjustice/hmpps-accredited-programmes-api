@@ -10,8 +10,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import java.util.*
 
 @Entity
-@Table(name = "sexual_offence")
-class SexualOffenceEntity(
+@Table(name = "sexual_offence_details")
+class SexualOffenceDetailsEntity(
 
   @Id
   @Column(name = "id")
