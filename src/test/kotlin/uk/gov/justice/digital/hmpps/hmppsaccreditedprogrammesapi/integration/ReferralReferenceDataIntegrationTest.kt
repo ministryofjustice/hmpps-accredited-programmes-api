@@ -160,7 +160,7 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `should return all deselected referral status reasons`() {
+  fun `should return all deselected referral status reasons when keep open is false`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     // When
@@ -168,6 +168,20 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     // Then
     response.shouldNotBeNull()
     response.size.shouldBeEqual(21)
+    response[0].code shouldBeEqual "D_ATTITUDE"
+    response[0].description shouldBeEqual "Attitude to group facilitators or others"
+    response[0].referralCategoryCode shouldBe "D_MOTIVATION"
+  }
+
+  @Test
+  fun `should return filtered deselected referral status reasons when keep open is true`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    // When
+    val response = getAllReferralStatusReasonsForType(ReferralStatusType.DESELECTED.name, true)
+    // Then
+    response.shouldNotBeNull()
+    response.size.shouldBeEqual(16)
     response[0].code shouldBeEqual "D_ATTITUDE"
     response[0].description shouldBeEqual "Attitude to group facilitators or others"
     response[0].referralCategoryCode shouldBe "D_MOTIVATION"
@@ -309,9 +323,9 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     .expectBody<ReferralStatusReason>()
     .returnResult().responseBody!!
 
-  fun getAllReferralStatusReasonsForType(referralStatusType: String) = webTestClient
+  fun getAllReferralStatusReasonsForType(referralStatusType: String, deselectAndKeepOpen: Boolean = false) = webTestClient
     .get()
-    .uri("/reference-data/referral-statuses/$referralStatusType/categories/reasons")
+    .uri("/reference-data/referral-statuses/$referralStatusType/categories/reasons?deselectAndKeepOpen=$deselectAndKeepOpen")
     .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
     .accept(MediaType.APPLICATION_JSON)
     .exchange()

@@ -114,6 +114,6 @@ class ReferralReferenceDataService(
     referralStatusTransitionRepository.getPOMTransition(currentStatus, chosenStatus)
   }
 
-  fun getAllReferralStatusReasonsForType(referralStatusType: ReferralStatusType): List<ReferralStatusReason> = referralStatusReasonRepository.findReferralStatusReasonsByStatusCode(referralStatusType.name)
+  fun getAllReferralStatusReasonsForType(referralStatusType: ReferralStatusType, deselectAndKeepOpen: Boolean): List<ReferralStatusReason> = referralStatusReasonRepository.findReferralStatusReasonsByStatusCode(referralStatusType.name, deselectAndKeepOpen)
     .map { it.toModel() }
 }

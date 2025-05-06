@@ -105,12 +105,13 @@ interface ReferralStatusReasonRepository : JpaRepository<ReferralStatusReasonEnt
     FROM referral_status_reason r
     JOIN referral_status_category c 
     ON r.referral_status_category_code = c.code
-    WHERE c.referral_status_code = :statusCode
+    WHERE (:deselectOpen = FALSE OR r.deselect_open = TRUE)
+    AND c.referral_status_code = :statusCode
     AND c.active = true
   """,
     nativeQuery = true,
   )
-  fun findReferralStatusReasonsByStatusCode(statusCode: String): List<ReferralStatusReasonProjection>
+  fun findReferralStatusReasonsByStatusCode(statusCode: String, deselectOpen: Boolean): List<ReferralStatusReasonProjection>
 }
 
 interface ReferralStatusReasonProjection {
