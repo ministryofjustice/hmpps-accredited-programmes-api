@@ -13,20 +13,20 @@ import java.util.*
 @Table(name = "sexual_offence")
 class SexualOffenceEntity(
 
-    @Id
-    @Column(name = "id")
-    var id: UUID? = null,
+  @Id
+  @Column(name = "id")
+  var id: UUID? = null,
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category")
-    val category: SexualOffenceCategoryType,
+  @Enumerated(EnumType.STRING)
+  @Column(name = "category")
+  val category: SexualOffenceCategoryType,
 
-    @Column(name = "description")
-    val description: String,
+  @Column(name = "description")
+  val description: String,
 
-    @Column(name = "hint_text")
-    val hintText: String,
+  @Column(name = "hint_text")
+  val hintText: String,
 
-    @Column(name = "score")
-    val score: Int
+  @Column(name = "score")
+  val score: Int,
 )
