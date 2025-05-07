@@ -9,10 +9,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_DESCRIPTION
@@ -22,6 +22,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexualOffenceDetails
+import java.util.UUID
 
 private const val WITHDRAWN = "WITHDRAWN"
 private const val CATEGORY_ADMIN = "W_ADMIN"
@@ -33,7 +35,7 @@ private const val PERSONAL = "D_PERSONAL"
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
+class ReferenceDataControllerIntegrationTest : IntegrationTestBase() {
 
   val withdrawnStatusExpected = ReferralStatusRefData(
     code = WITHDRAWN,
@@ -222,20 +224,42 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should return all sexual offence details`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    // When
+    val response = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/sexual-offence-details", object : ParameterizedTypeReference<List<SexualOffenceDetails>>() {})
+
+    // Then
+    response.shouldNotBeNull()
+    response.size.shouldBeEqual(23)
+
+    response.filter { it.categoryCode == "AGAINST_MINORS" }.size.shouldBeEqual(6)
+    assertThat(response.filter { it.categoryCode == "AGAINST_MINORS" }).allMatch { it.categoryDescription == "Sexual offence against somebody aged under 18" }
+    response.filter { it.categoryCode == "AGAINST_MINORS" && it.id == UUID.fromString("f5afed62-0747-432e-97b4-19b255e72b52") }.getOrNull(0)?.score?.shouldBeEqual(3)
+
+    response.filter { it.categoryCode == "INCLUDES_VIOLENCE_FORCE_HUMILIATION" }.size.shouldBeEqual(11)
+    assertThat(response.filter { it.categoryCode == "INCLUDES_VIOLENCE_FORCE_HUMILIATION" }).allMatch { it.categoryDescription == "Sexual offences that include violence, force or humiliation" }
+    response.filter { it.categoryCode == "INCLUDES_VIOLENCE_FORCE_HUMILIATION" && it.id == UUID.fromString("eca2a59e-9917-4e98-81df-a430649742b9") }.getOrNull(0)?.score?.shouldBeEqual(1)
+
+    response.filter { it.categoryCode == "OTHER" }.size.shouldBeEqual(6)
+    assertThat(response.filter { it.categoryCode == "OTHER" }).allMatch { it.categoryDescription == "Other types of sexual offending" }
+    response.filter { it.categoryCode == "OTHER" && it.id == UUID.fromString("70813fb3-33c8-4812-94cd-201eff0cdd6e") }.getOrNull(0)?.score?.shouldBeEqual(2)
+  }
+
+  @Test
   fun `should return bad request and error response when referral status type is not a permitted ReferralStatusType`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     // When
-    val response = webTestClient
-      .get()
-      .uri("/reference-data/referral-statuses/invalid-request/categories/reasons")
-      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-      .accept(MediaType.APPLICATION_JSON)
-      .exchange()
-      .expectStatus().isBadRequest
-      .expectBody<ErrorResponse>()
-      .returnResult().responseBody!!
+    val response = performRequestAndExpectStatus(
+      HttpMethod.GET,
+      "/reference-data/referral-statuses/invalid-request/categories/reasons",
+      object : ParameterizedTypeReference<ErrorResponse>() {},
+      HttpStatus.BAD_REQUEST.value(),
+    )
 
     // Then
     response.shouldNotBeNull()
@@ -243,93 +267,13 @@ class ReferralReferenceDataIntegrationTest : IntegrationTestBase() {
     response.userMessage shouldStartWith "Request not readable: Method parameter 'referralStatusType': Failed to convert value of type 'java.lang.String' to required type"
   }
 
-  fun getReferralStatuses() = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<List<ReferralStatusRefData>>()
-    .returnResult().responseBody!!
-
-  fun getReferralStatus(code: String) = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses/$code")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<ReferralStatusRefData>()
-    .returnResult().responseBody!!
-
-  fun getStatusTransitionDiagram() = webTestClient
-    .get()
-    .uri("/status-transition-diagram")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<String>()
-    .returnResult().responseBody!!
-
-  fun getReferralStatusCategories(statusCode: String) = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses/$statusCode/categories")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<List<ReferralStatusCategory>>()
-    .returnResult().responseBody!!
-
-  fun getReferralStatusCategory(code: String) = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses/categories/$code")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<ReferralStatusCategory>()
-    .returnResult().responseBody!!
-
-  fun getReferralStatusReasons(statusCode: String, categoryCode: String) = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses/$statusCode/categories/$categoryCode/reasons")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<List<ReferralStatusReason>>()
-    .returnResult().responseBody!!
-
-  fun getReferralStatusReasonsDeselectedFlag(statusCode: String, categoryCode: String, deselectAndKeepOpen: Boolean) = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses/$statusCode/categories/$categoryCode/reasons?deselectAndKeepOpen=$deselectAndKeepOpen")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<List<ReferralStatusReason>>()
-    .returnResult().responseBody!!
-
-  fun getReferralStatusReason(code: String) = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses/categories/reasons/$code")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<ReferralStatusReason>()
-    .returnResult().responseBody!!
-
-  fun getAllReferralStatusReasonsForType(referralStatusType: String, deselectAndKeepOpen: Boolean = false) = webTestClient
-    .get()
-    .uri("/reference-data/referral-statuses/$referralStatusType/categories/reasons?deselectAndKeepOpen=$deselectAndKeepOpen")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .accept(MediaType.APPLICATION_JSON)
-    .exchange()
-    .expectStatus().isOk
-    .expectBody<List<ReferralStatusReason>>()
-    .returnResult().responseBody!!
+  fun getReferralStatuses() = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses", object : ParameterizedTypeReference<List<ReferralStatusRefData>>() {})
+  fun getReferralStatus(code: String) = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses/$code", object : ParameterizedTypeReference<ReferralStatusRefData>() {})
+  fun getStatusTransitionDiagram() = performRequestAndExpectOk(HttpMethod.GET, "/status-transition-diagram", object : ParameterizedTypeReference<String>() {})
+  fun getReferralStatusCategories(statusCode: String) = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses/$statusCode/categories", object : ParameterizedTypeReference<List<ReferralStatusCategory>>() {})
+  fun getReferralStatusCategory(code: String) = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses/categories/$code", object : ParameterizedTypeReference<ReferralStatusCategory>() {})
+  fun getReferralStatusReasons(statusCode: String, categoryCode: String) = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses/$statusCode/categories/$categoryCode/reasons", object : ParameterizedTypeReference<List<ReferralStatusReason>>() {})
+  fun getReferralStatusReasonsDeselectedFlag(statusCode: String, categoryCode: String, deselectAndKeepOpen: Boolean) = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses/$statusCode/categories/$categoryCode/reasons?deselectAndKeepOpen=$deselectAndKeepOpen", object : ParameterizedTypeReference<List<ReferralStatusReason>>() {})
+  fun getReferralStatusReason(code: String) = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses/categories/reasons/$code", object : ParameterizedTypeReference<ReferralStatusReason>() {})
+  fun getAllReferralStatusReasonsForType(referralStatusType: String, deselectAndKeepOpen: Boolean = false) = performRequestAndExpectOk(HttpMethod.GET, "/reference-data/referral-statuses/$referralStatusType/categories/reasons?deselectAndKeepOpen=$deselectAndKeepOpen", object : ParameterizedTypeReference<List<ReferralStatusReason>>() {})
 }

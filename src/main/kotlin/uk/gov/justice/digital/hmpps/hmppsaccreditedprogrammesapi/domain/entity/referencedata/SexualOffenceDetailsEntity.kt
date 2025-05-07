@@ -25,7 +25,7 @@ class SexualOffenceDetailsEntity(
   val description: String,
 
   @Column(name = "hint_text")
-  val hintText: String,
+  val hintText: String? = null,
 
   @Column(name = "score")
   val score: Int,

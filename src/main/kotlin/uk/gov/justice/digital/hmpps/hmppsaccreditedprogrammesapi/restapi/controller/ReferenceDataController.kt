@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexualOffenceDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralReferenceDataService
 
 @RestController
@@ -77,4 +78,17 @@ class ReferenceDataController(
     @Parameter(description = "The referral status type (WITHDRAWN, DESELECTED or ASSESSED_SUITABLE)", required = true) @PathVariable referralStatusType: ReferralStatusType,
     @Parameter(description = "Whether the status transition is for keep open or not for the DESELECTED status", required = false) @RequestParam(defaultValue = "false") deselectAndKeepOpen: Boolean = false,
   ): List<ReferralStatusReason> = referenceDataService.getAllReferralStatusReasonsForType(referralStatusType, deselectAndKeepOpen)
+
+  @Operation(
+    summary = "Retrieves the full list of known sexual offence details",
+    operationId = "getAllSexualOffenceDetails",
+    description = """Get all Sexual Offence Details records""",
+    responses = [
+      ApiResponse(responseCode = "200", description = "Successful operation", content = [Content(schema = Schema(implementation = SexualOffenceDetails::class))]),
+      ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access person.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    ],
+  )
+  @GetMapping("/sexual-offence-details", produces = ["application/json"])
+  fun getAllSexualOffenceDetails(): List<SexualOffenceDetails> = referenceDataService.getAllSexualOffenceDetails()
 }
