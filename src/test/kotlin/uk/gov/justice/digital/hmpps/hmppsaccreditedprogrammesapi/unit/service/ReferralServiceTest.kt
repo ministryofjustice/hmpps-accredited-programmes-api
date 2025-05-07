@@ -763,7 +763,7 @@ class ReferralServiceTest {
     }
 
     exception.message shouldBe "Delete referrals for user is not allowed in preprod environment"
-    verify(exactly = 0) { referralRepository.findAllByReferrerUsername(any()) }
+    verify(exactly = 0) { referralViewRepository.findAllByReferralsByUsername(any()) }
   }
 
   @Test
