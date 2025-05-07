@@ -2,8 +2,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonProjection
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexualOffenceDetails
 
 fun ReferralStatusEntity.toModel(altDescription: String?, altHintText: String?) = ReferralStatusRefData(
   code = code,
@@ -26,4 +28,13 @@ fun ReferralStatusReasonProjection.toModel() = ReferralStatusReason(
   description = getDescription(),
   referralCategoryCode = getReferralCategoryCode(),
   categoryDescription = getCategoryDescription(),
+)
+
+fun SexualOffenceDetailsEntity.toModel() = SexualOffenceDetails(
+  id = id!!,
+  description = description,
+  categoryCode = category.name,
+  categoryDescription = category.description,
+  hintText = hintText,
+  score = score,
 )

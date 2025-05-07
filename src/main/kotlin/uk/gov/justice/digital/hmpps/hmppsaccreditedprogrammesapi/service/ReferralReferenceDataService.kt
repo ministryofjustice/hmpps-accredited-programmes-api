@@ -7,10 +7,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusTransitionEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusTransitionRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.getByCode
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SexualOffenceDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusCategory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexualOffenceDetails
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toModel
 
 @Service
@@ -19,6 +21,7 @@ class ReferralReferenceDataService(
   private val referralStatusCategoryRepository: ReferralStatusCategoryRepository,
   private val referralStatusReasonRepository: ReferralStatusReasonRepository,
   private val referralStatusTransitionRepository: ReferralStatusTransitionRepository,
+  private val sexualOffenceDetailsRepository: SexualOffenceDetailsRepository,
 ) {
   fun getReferralStatuses() = referralStatusRepository.findAllByActiveIsTrueOrderByDefaultOrder()
     .map {
@@ -116,4 +119,6 @@ class ReferralReferenceDataService(
 
   fun getAllReferralStatusReasonsForType(referralStatusType: ReferralStatusType, deselectAndKeepOpen: Boolean): List<ReferralStatusReason> = referralStatusReasonRepository.findReferralStatusReasonsByStatusCode(referralStatusType.name, deselectAndKeepOpen)
     .map { it.toModel() }
+
+  fun getAllSexualOffenceDetails(): List<SexualOffenceDetails> = sexualOffenceDetailsRepository.findAll().map { it.toModel() }
 }
