@@ -695,7 +695,6 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       organisationId = "BXI",
       contactEmail = "awi1@whatton.com",
       referable = true,
-      organisationEnabled = true,
       secondaryContactEmail = "awi2@whatton.com",
       withdrawn = false,
       gender = Gender.MALE,
@@ -711,7 +710,6 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     assertThat(updatedCourseOffering.secondaryContactEmail).isEqualTo("awi2@whatton.com")
     assertThat(updatedCourseOffering.referable).isTrue
     assertThat(updatedCourseOffering.withdrawn).isFalse
-    assertThat(updatedCourseOffering.organisationEnabled).isTrue
     assertThat(updatedCourseOffering.gender).isEqualTo(Gender.MALE)
   }
 
@@ -744,7 +742,6 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
           secondaryContactEmail = "awi2@whatton.com",
           referable = true,
           withdrawn = false,
-          organisationEnabled = true,
           gender = Gender.MALE,
         ),
       )
@@ -770,7 +767,6 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
           secondaryContactEmail = "awi2@whatton.com",
           referable = true,
           withdrawn = false,
-          organisationEnabled = true,
           gender = Gender.MALE,
         ),
       )

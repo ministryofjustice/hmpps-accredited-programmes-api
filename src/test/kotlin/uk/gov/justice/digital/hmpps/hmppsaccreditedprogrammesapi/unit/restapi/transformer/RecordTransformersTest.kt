@@ -74,7 +74,6 @@ class RecordTransformersTest {
     with(offering.toApi("MALE")) {
       id shouldBe offering.id
       organisationId shouldBe offering.organisationId
-      organisationEnabled shouldBe true
       contactEmail shouldBe offering.contactEmail
       secondaryContactEmail shouldBe offering.secondaryContactEmail
       referable shouldBe true

@@ -10,7 +10,6 @@ import java.util.UUID
  * @param contactEmail The email address of a contact for this offering
  * @param referable
  * @param id
- * @param organisationEnabled Describes if a referral can be created with an organisation
  * @param secondaryContactEmail An optional secondary email address of a contact for this offering.
  * @param withdrawn
  */
@@ -27,10 +26,6 @@ data class CourseOffering(
 
   @Schema(example = "null", description = "")
   @get:JsonProperty("id") val id: UUID? = null,
-
-  @Deprecated("No longer needed as all sites can make referrals")
-  @Schema(example = "true", description = "Describes if a referral can be created with an organisation")
-  @get:JsonProperty("organisationEnabled") val organisationEnabled: Boolean = true,
 
   @Schema(example = "ap-admin-2@digital.justice.gov.uk", description = "An optional secondary email address of a contact for this offering.")
   @get:JsonProperty("secondaryContactEmail") val secondaryContactEmail: String? = null,
