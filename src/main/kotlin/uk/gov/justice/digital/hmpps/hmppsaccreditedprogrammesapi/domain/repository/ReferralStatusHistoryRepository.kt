@@ -11,4 +11,6 @@ interface ReferralStatusHistoryRepository : JpaRepository<ReferralStatusHistoryE
 
   @EntityGraph(attributePaths = ["previousStatus", "status", "category", "reason"])
   fun getAllByReferralIdOrderByStatusStartDateDesc(referralId: UUID): List<ReferralStatusHistoryEntity>
+
+  fun deleteAllByReferralIdIsIn(referralIds: List<UUID>)
 }

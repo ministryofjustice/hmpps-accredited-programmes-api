@@ -136,6 +136,10 @@ constructor(
   fun deleteAllCourseParticipationsForReferral(referralId: UUID) {
     courseParticipationRepository.deleteByReferralId(referralId)
   }
+
+  fun deleteAllCourseParticipationsForReferralIds(referralIds: List<UUID>) {
+    courseParticipationRepository.deleteCourseParticipationEntitiesByReferralIdIsIn(referralIds)
+  }
 }
 
 private fun CourseParticipationEntity.applyUpdate(update: CourseParticipationUpdate): CourseParticipationEntity = apply {

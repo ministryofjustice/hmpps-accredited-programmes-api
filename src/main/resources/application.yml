@@ -9,6 +9,7 @@ logging:
 spring:
   application:
     name: hmpps-accredited-programmes-api
+    environment: dev
   codec:
     max-in-memory-size: 10MB
 

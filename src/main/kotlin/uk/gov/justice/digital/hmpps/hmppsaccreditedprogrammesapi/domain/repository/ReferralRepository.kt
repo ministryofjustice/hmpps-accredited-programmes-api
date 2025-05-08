@@ -23,7 +23,6 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
   ): List<ReferralEntity>
 
   fun countAllByOfferingId(id: UUID): Long
-
   fun getReferralEntitiesByOfferingIdAndPrisonNumberAndStatusIn(offeringId: UUID, prisonerNumber: String, status: List<String>): List<ReferralEntity>?
 
   @Query("SELECT DISTINCT r.prisonNumber FROM ReferralEntity r where r.primaryPomStaffId is null")

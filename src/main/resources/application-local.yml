@@ -3,6 +3,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: admin
     password: admin_password
+  application:
+    environment: local
 
 hmpps.sqs:
   provider: localstack
