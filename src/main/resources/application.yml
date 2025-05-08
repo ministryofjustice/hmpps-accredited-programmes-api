@@ -9,7 +9,7 @@ logging:
 spring:
   application:
     name: hmpps-accredited-programmes-api
-    environment: dev
+    environment: ${environment-name}
   codec:
     max-in-memory-size: 10MB
 
@@ -164,4 +164,6 @@ log-client-credentials-jwt-info: false
 upstream-timeout-ms: 10000
 case-notes-service-upstream-timeout-ms: 30000
 max-response-in-memory-size-bytes: 750000
+
+environment-name: local
 

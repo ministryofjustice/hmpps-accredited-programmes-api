@@ -21,6 +21,7 @@ generic-service:
     SENTRY_ENVIRONMENT: prod
     HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-prod-hmpps_audit_queue"
     FEATURESWITCH_CASE-NOTES-ENABLED: true
+    ENVIRONMENT-NAME: prod
 
   allowlist:
     groups:

@@ -22,6 +22,8 @@ spring:
   datasource:
     url: 'jdbc:h2:mem:postgres;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH'
     username: sa
+  application:
+    environment: test
 
   sql:
     init:
