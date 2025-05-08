@@ -510,15 +510,14 @@ constructor(
     log.info("Update successful for ${referrals.size} referrals for prisoner $prisonNumber referralIds ${savedReferrals.map { it.id }} Finished updating referrals with ldc $hasLDC ")
   }
 
-  @Transactional
-  fun deleteReferralsForUser() {
+  fun deleteReferralsForAcpTestUser() {
     val e2eTestUsername = "ACP_TEST"
     log.warn("********************* DELETING ALL REFERRALS FOR USER in $environment **************")
     try {
       if (environment == "dev" || environment == "local" || environment == "test") {
         val referralIds = referralViewRepository.findAllByReferralsByUsername(e2eTestUsername).map { it.id!! }
 
-        log.info("Deleting referrals for user $e2eTestUsername with ids $referralIds")
+        log.info("Deleting ${referralIds.size} referrals for user $e2eTestUsername with ids $referralIds")
 
         referralStatusHistoryService.deleteReferralHistory(referralIds)
         log.info("Deleted referrals status history user $e2eTestUsername with ids $referralIds")

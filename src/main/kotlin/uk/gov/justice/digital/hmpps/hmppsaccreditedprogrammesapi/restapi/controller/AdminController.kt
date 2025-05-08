@@ -86,13 +86,13 @@ class AdminController(
     return ResponseEntity.status(HttpStatus.OK).body("LDCs updated")
   }
 
-  @DeleteMapping("/cleanUpTestReferrals")
+  @DeleteMapping("/clean-up-test-referrals")
   @Operation(
     summary = "Delete referrals and related entries for ACP_TEST user",
     tags = ["Admin"],
   )
-  fun deleteReferrals(): ResponseEntity<String> {
-    referralService.deleteReferralsForUser()
+  fun deleteAcpTestReferrals(): ResponseEntity<String> {
+    referralService.deleteReferralsForAcpTestUser()
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Referrals deleted")
   }
 

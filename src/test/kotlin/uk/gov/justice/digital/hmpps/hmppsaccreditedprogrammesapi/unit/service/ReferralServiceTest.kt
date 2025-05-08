@@ -759,7 +759,7 @@ class ReferralServiceTest {
     )
 
     val exception = assertThrows<IllegalStateException> {
-      service.deleteReferralsForUser()
+      service.deleteReferralsForAcpTestUser()
     }
 
     exception.message shouldBe "Delete referrals for user is not allowed in preprod environment"
@@ -801,7 +801,7 @@ class ReferralServiceTest {
     every { referralStatusHistoryService.deleteReferralHistory(testIds) } throws RuntimeException("Something failed")
 
     val exception = assertThrows<RuntimeException> {
-      referralService.deleteReferralsForUser()
+      referralService.deleteReferralsForAcpTestUser()
     }
 
     exception.message shouldBe "Something failed"

@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_NAME
@@ -77,9 +77,9 @@ class AdminControllerIntegrationTest : IntegrationTestBase() {
   @Test
   fun `delete all ACP test referrals successful`() {
     val referralCreated1 = createReferral(offeringId1)
-    persistenceHelper.updateReferralWithUsername(referralCreated1.id, "ACP_TEST")
-
     val referralCreated2 = createReferral(offeringId2)
+
+    persistenceHelper.updateReferralWithUsername(referralCreated1.id, "ACP_TEST")
     persistenceHelper.updateReferralWithUsername(referralCreated2.id, "ACP_TEST")
 
     deleteTestReferrals()
@@ -88,32 +88,24 @@ class AdminControllerIntegrationTest : IntegrationTestBase() {
     persistenceHelper.getReferralById(referralCreated2.id) shouldBe 0
   }
 
-  fun getReferralById(createdReferralId: UUID) = performRequestAndExpectOk(HttpMethod.GET, "/referrals/$createdReferralId", referralTypeReference())
-
   fun deleteTestReferrals() {
     webTestClient
       .delete()
-      .uri("/admin/cleanUpTestReferrals")
+      .uri("/admin/clean-up-test-referrals")
       .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
       .exchange()
       .expectStatus().isNoContent
   }
 
-  fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1, originalReferralId: UUID? = null) = webTestClient
-    .post()
-    .uri("/referrals")
-    .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
-    .contentType(MediaType.APPLICATION_JSON)
-    .accept(MediaType.APPLICATION_JSON)
-    .bodyValue(
-      ReferralCreate(
-        offeringId = offeringId!!,
-        prisonNumber = prisonNumber,
-        originalReferralId = originalReferralId,
-      ),
-    )
-    .exchange()
-    .expectStatus().isCreated
-    .expectBody<Referral>()
-    .returnResult().responseBody!!
+  fun createReferral(offeringId: UUID) = performRequestAndExpectStatusWithBody(
+    httpMethod = HttpMethod.POST,
+    uri = "/referrals",
+    returnType = object : ParameterizedTypeReference<Referral>() {},
+    body = ReferralCreate(
+      offeringId = offeringId,
+      prisonNumber = PRISON_NUMBER_1,
+      originalReferralId = null,
+    ),
+    expectedResponseStatus = HttpStatus.CREATED.value(),
+  )
 }
