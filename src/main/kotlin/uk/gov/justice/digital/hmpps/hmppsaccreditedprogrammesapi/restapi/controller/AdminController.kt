@@ -2,6 +2,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.contro
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
@@ -88,8 +93,17 @@ class AdminController(
 
   @DeleteMapping("/clean-up-test-referrals")
   @Operation(
-    summary = "Delete referrals and related entries for ACP_TEST user",
+    summary = "Delete referrals and related entries for only ACP_TEST user",
     tags = ["Admin"],
+    responses = [
+      ApiResponse(responseCode = "204", description = "No Content - The referral was successfully deleted"),
+      ApiResponse(
+        responseCode = "401",
+        description = "The request was unauthorised",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   fun deleteAcpTestReferrals(): ResponseEntity<String> {
     referralService.deleteReferralsForAcpTestUser()

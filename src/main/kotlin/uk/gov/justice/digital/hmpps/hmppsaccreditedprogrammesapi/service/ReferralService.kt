@@ -512,24 +512,20 @@ constructor(
 
   fun deleteReferralsForAcpTestUser() {
     val e2eTestUsername = "ACP_TEST"
-    log.warn("********************* DELETING ALL REFERRALS FOR USER in $environment **************")
+    log.info("START: Deleting all referrals for user $e2eTestUsername in $environment")
     try {
       if (environment == "dev" || environment == "local" || environment == "test") {
         val referralIds = referralViewRepository.findAllByReferralsByUsername(e2eTestUsername).map { it.id!! }
-
-        log.info("Deleting ${referralIds.size} referrals for user $e2eTestUsername with ids $referralIds")
-
         referralStatusHistoryService.deleteReferralHistory(referralIds)
-        log.info("Deleted referrals status history user $e2eTestUsername with ids $referralIds")
         pniService.deletePniData(referralIds)
-        log.info("Deleted PNI for user $e2eTestUsername with ids $referralIds")
         courseParticipationService.deleteAllCourseParticipationsForReferralIds(referralIds)
-        log.info("Deleted course participations for user $e2eTestUsername with ids $referralIds")
         referralRepository.deleteAllById(referralIds)
-        log.info("Deleted referrals for user $e2eTestUsername with ids $referralIds")
+
+        log.info("Deleted ${referralIds.size} referrals for user $e2eTestUsername with ids $referralIds")
       } else {
-        throw IllegalStateException("Delete referrals for user is not allowed in $environment environment")
+        throw IllegalStateException("Delete referrals for user $e2eTestUsername is not allowed in $environment environment")
       }
+      log.info("FINISH: Deleting referrals for user $e2eTestUsername in $environment successful")
     } catch (e: Exception) {
       log.error("Error deleting referrals for user $e2eTestUsername", e)
       throw e

@@ -762,7 +762,7 @@ class ReferralServiceTest {
       service.deleteReferralsForAcpTestUser()
     }
 
-    exception.message shouldBe "Delete referrals for user is not allowed in preprod environment"
+    exception.message shouldBe "Delete referrals for user ACP_TEST is not allowed in preprod environment"
     verify(exactly = 0) { referralViewRepository.findAllByReferralsByUsername(any()) }
   }
 
