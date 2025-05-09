@@ -27,6 +27,8 @@ spring:
       idle-timeout: 300000
       max-lifetime: 1800000
       connection-timeout: 30000
+  application:
+    environment: dev
 
   sql:
     init:
@@ -70,9 +72,6 @@ services:
     base-url: http://localhost:#WIREMOCK_PORT
   prisoner-alerts-api:
     base-url: http://localhost:#WIREMOCK_PORT
-
-
-
 
 feature-switch:
   case-notes-enabled: true

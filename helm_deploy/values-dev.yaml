@@ -24,7 +24,7 @@ generic-service:
     HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-dev-hmpps_audit_queue"
     LOGGING_LEVEL_UK_GOV_JUSTICE_DIGITAL_HMPPS_HMPPSACCREDITEDPROGRAMMESAPI_SERVICE: DEBUG
     FEATURESWITCH_CASE-NOTES-ENABLED: true
-
+    ENVIRONMENT-NAME: dev
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
