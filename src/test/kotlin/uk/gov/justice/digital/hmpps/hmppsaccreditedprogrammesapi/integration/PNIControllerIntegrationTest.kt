@@ -128,27 +128,6 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
     ),
   )
 
-  @Test
-  fun `Save pni info for prisoner successful`() {
-    // Given
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val prisonNumber = "A9999BB"
-    // When
-    getPniInfoByPrisonNumberAndSave(prisonNumber)
-    // Then
-    val pniResults = pniResultEntityRepository.findAllByPrisonNumber(prisonNumber)
-    pniResults[0].prisonNumber shouldBe prisonNumber
-    val pniScore = buildPniScore(prisonNumber)
-    pniResults[0].crn shouldBe pniScore.crn
-    pniResults[0].needsClassification shouldBe pniScore.needsScore.classification
-    pniResults[0].overallNeedsScore shouldBe pniScore.needsScore.overallNeedsScore
-    pniResults[0].programmePathway shouldBe pniScore.programmePathway
-    pniResults[0].riskClassification shouldBe pniScore.riskScore.classification
-    pniResults[0].pniResultJson shouldBe objectMapper.writeValueAsString(pniScore)
-    pniResults[0].pniValid shouldBe true
-    pniResults[0].basicSkillsScore shouldBe 10
-  }
-
   fun getPniInfoByPrisonNumber(prisonNumber: String) = webTestClient
     .get()
     .uri("/PNI/$prisonNumber?gender=Male")

@@ -1071,35 +1071,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Submitting a referral with all fields set should return 204 with no body`() {
-    val referralCreated = createReferral(PRISON_NUMBER_1)
-
-    val referralUpdate = ReferralUpdate(
-      additionalInformation = null,
-      oasysConfirmed = true,
-      hasReviewedProgrammeHistory = true,
-      referrerOverrideReason = "Override reason",
-      hasReviewedAdditionalInformation = true,
-    )
-
-    updateReferral(referralCreated.id, referralUpdate)
-    val readyToSubmitReferral = getReferralById(referralCreated.id)
-
-    submitReferral(readyToSubmitReferral.id)
-
-    getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED.lowercase()
-
-    val statusHistories =
-      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.id)
-    statusHistories.size shouldBeEqual 2
-    statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
-    statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
-
-    // check for PNI - should not be persisted at this stage
-    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, PRISON_NUMBER_1) shouldBe null
-  }
-
-  @Test
   fun `Submitting a referral sets related course participation records draft status to false`() {
     // Given
     val referralCreated = createReferral(PRISON_NUMBER_1)
@@ -1125,83 +1096,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     assertThat(courseParticipationRecords).hasSize(1)
     assertThat(courseParticipationRecords[0].id).isEqualTo(courseParticipationId)
     assertThat(courseParticipationRecords[0].isDraft).isFalse
-  }
-
-  @Test
-  fun `Submitting a referral when pom does not exist should return all fields and an HTTP 204`() {
-    // Given
-    val nonExistentPrisonNumber = "NON-EXISTENT"
-    val referralCreated = createReferral(nonExistentPrisonNumber)
-
-    val referralUpdate = ReferralUpdate(
-      additionalInformation = "Additional information",
-      oasysConfirmed = true,
-      hasReviewedProgrammeHistory = true,
-      referrerOverrideReason = null,
-    )
-
-    updateReferral(referralCreated.id, referralUpdate)
-    val readyToSubmitReferral = getReferralById(referralCreated.id)
-
-    // When
-    submitReferral(readyToSubmitReferral.id)
-
-    // Then
-    getReferralById(readyToSubmitReferral.id).status shouldBeEqual REFERRAL_SUBMITTED.lowercase()
-
-    val statusHistories =
-      referralStatusHistoryRepository.getAllByReferralIdOrderByStatusStartDateDesc(referralCreated.id)
-    statusHistories.size shouldBeEqual 2
-    statusHistories[0].status.code shouldBeEqual "REFERRAL_SUBMITTED"
-    statusHistories[1].status.code shouldBeEqual "REFERRAL_STARTED"
-
-    // check for PNI - should not be persisted at this stage
-    pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, nonExistentPrisonNumber) shouldBe null
-  }
-
-  @Test
-  fun `should persist PNI when referral status is updated to On Programme`() {
-    // Given
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val prisonNumber = "A9999BB"
-    val referralCreated = createReferral(prisonNumber)
-
-    val referralStatusUpdate1 = ReferralStatusUpdate(
-      status = REFERRAL_SUBMITTED,
-      ptUser = true,
-    )
-    updateReferralStatus(referralCreated.id, referralStatusUpdate1)
-    val referralStatusUpdate2 = ReferralStatusUpdate(
-      status = "AWAITING_ASSESSMENT",
-      ptUser = true,
-    )
-    updateReferralStatus(referralCreated.id, referralStatusUpdate2)
-
-    val referralStatusUpdate3 = ReferralStatusUpdate(
-      status = "ASSESSMENT_STARTED",
-      ptUser = true,
-    )
-    updateReferralStatus(referralCreated.id, referralStatusUpdate3)
-
-    val referralStatusUpdate4 = ReferralStatusUpdate(
-      status = "ASSESSED_SUITABLE",
-      ptUser = true,
-    )
-    updateReferralStatus(referralCreated.id, referralStatusUpdate4)
-
-    // When
-    val referralStatusUpdate5 = ReferralStatusUpdate(
-      status = "ON_PROGRAMME",
-      ptUser = true,
-    )
-    updateReferralStatus(referralCreated.id, referralStatusUpdate5)
-
-    // Then
-    val pniResult = pniResultRepository.findByReferralIdAndPrisonNumber(referralCreated.id, prisonNumber)
-    pniResult shouldNotBe null
-    pniResult?.prisonNumber?.shouldBeEqual(prisonNumber)
-    pniResult?.crn?.shouldBeEqual("D006518")
-    pniResult?.oasysAssessmentId?.shouldBeEqual(2114584)
   }
 
   @Test

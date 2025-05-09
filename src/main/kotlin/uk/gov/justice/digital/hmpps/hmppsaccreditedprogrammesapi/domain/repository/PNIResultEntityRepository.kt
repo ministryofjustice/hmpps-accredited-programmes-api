@@ -9,5 +9,4 @@ import java.util.*
 interface PNIResultEntityRepository : JpaRepository<PniResultEntity, UUID> {
   fun findAllByPrisonNumber(prisonNumber: String): List<PniResultEntity>
 
-  fun findByReferralIdAndPrisonNumber(referralId: UUID, prisonNumber: String): PniResultEntity?
 }

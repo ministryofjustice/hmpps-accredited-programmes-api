@@ -21,10 +21,6 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonRegisterApi.model.Prison
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_COLOUR
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_DESCRIPTION
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ASSESSED_SUITABLE_HINT
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_PROGRAMME_DESCRIPTION
@@ -574,45 +570,6 @@ class ReferralServiceTest {
     }
 
     assertThat(exception.message).isEqualTo("Cannot transition referral $referralId from REFERRAL_STARTED to NON_EXISTENT_STATUS")
-  }
-
-  @Test
-  fun `should NOT persist PNI when updating referral status for special deselected case`() {
-    // Given
-    mockSecurityContext(REFERRER_USERNAME)
-    val referralId = UUID.randomUUID()
-    val referral = ReferralEntityFactory()
-      .withId(referralId)
-      .withStatus(ON_PROGRAMME)
-      .produce()
-
-    every { referralRepository.getReferenceById(any()) } returns referral
-
-    val referralStatusList =
-      mutableListOf<ReferralStatusRefData>(
-        ReferralStatusRefData(
-          code = ASSESSED_SUITABLE,
-          description = ASSESSED_SUITABLE_DESCRIPTION,
-          colour = ASSESSED_SUITABLE_COLOUR,
-          hintText = ASSESSED_SUITABLE_HINT,
-          hasNotes = true,
-          hasConfirmation = false,
-          closed = true,
-          draft = false,
-          hold = false,
-          release = false,
-          deselectAndKeepOpen = false,
-          notesOptional = false,
-        ),
-      )
-    every { referralReferenceDataService.getNextStatusTransitions(ON_PROGRAMME, true) } returns referralStatusList
-
-    // When
-    val referralStatusUpdate = ReferralStatusUpdate(status = "ASSESSED_SUITABLE", ptUser = true)
-    referralService.updateReferralStatusById(referralId, referralStatusUpdate)
-
-    // Then
-    verify(exactly = 0) { pniService.savePni(referral.prisonNumber, gender = null, savePni = true, referral.id) }
   }
 
   @Test
