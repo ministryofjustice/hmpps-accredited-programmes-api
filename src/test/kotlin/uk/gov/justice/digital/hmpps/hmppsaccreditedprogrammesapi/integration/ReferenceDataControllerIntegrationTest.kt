@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_COLOUR
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_DESCRIPTION
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRAL_WITHDRAWN_HINT
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SexualOffenceCategoryType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusCategory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusReason
@@ -235,17 +236,17 @@ class ReferenceDataControllerIntegrationTest : IntegrationTestBase() {
     response.shouldNotBeNull()
     response.size.shouldBeEqual(23)
 
-    response.filter { it.categoryCode == "AGAINST_MINORS" }.size.shouldBeEqual(6)
-    assertThat(response.filter { it.categoryCode == "AGAINST_MINORS" }).allMatch { it.categoryDescription == "Sexual offence against somebody aged under 18" }
-    response.filter { it.categoryCode == "AGAINST_MINORS" && it.id == UUID.fromString("f5afed62-0747-432e-97b4-19b255e72b52") }.getOrNull(0)?.score?.shouldBeEqual(3)
+    response.filter { it.categoryCode == SexualOffenceCategoryType.AGAINST_MINORS }.size.shouldBeEqual(6)
+    assertThat(response.filter { it.categoryCode == SexualOffenceCategoryType.AGAINST_MINORS }).allMatch { it.categoryDescription == "Sexual offence against somebody aged under 18" }
+    response.filter { it.categoryCode == SexualOffenceCategoryType.AGAINST_MINORS && it.id == UUID.fromString("f5afed62-0747-432e-97b4-19b255e72b52") }.getOrNull(0)?.score?.shouldBeEqual(3)
 
-    response.filter { it.categoryCode == "INCLUDES_VIOLENCE_FORCE_HUMILIATION" }.size.shouldBeEqual(11)
-    assertThat(response.filter { it.categoryCode == "INCLUDES_VIOLENCE_FORCE_HUMILIATION" }).allMatch { it.categoryDescription == "Sexual offences that include violence, force or humiliation" }
-    response.filter { it.categoryCode == "INCLUDES_VIOLENCE_FORCE_HUMILIATION" && it.id == UUID.fromString("eca2a59e-9917-4e98-81df-a430649742b9") }.getOrNull(0)?.score?.shouldBeEqual(1)
+    response.filter { it.categoryCode == SexualOffenceCategoryType.INCLUDES_VIOLENCE_FORCE_HUMILIATION }.size.shouldBeEqual(11)
+    assertThat(response.filter { it.categoryCode == SexualOffenceCategoryType.INCLUDES_VIOLENCE_FORCE_HUMILIATION }).allMatch { it.categoryDescription == "Sexual offences that include violence, force or humiliation" }
+    response.filter { it.categoryCode == SexualOffenceCategoryType.INCLUDES_VIOLENCE_FORCE_HUMILIATION && it.id == UUID.fromString("eca2a59e-9917-4e98-81df-a430649742b9") }.getOrNull(0)?.score?.shouldBeEqual(1)
 
-    response.filter { it.categoryCode == "OTHER" }.size.shouldBeEqual(6)
-    assertThat(response.filter { it.categoryCode == "OTHER" }).allMatch { it.categoryDescription == "Other types of sexual offending" }
-    response.filter { it.categoryCode == "OTHER" && it.id == UUID.fromString("70813fb3-33c8-4812-94cd-201eff0cdd6e") }.getOrNull(0)?.score?.shouldBeEqual(2)
+    response.filter { it.categoryCode == SexualOffenceCategoryType.OTHER }.size.shouldBeEqual(6)
+    assertThat(response.filter { it.categoryCode == SexualOffenceCategoryType.OTHER }).allMatch { it.categoryDescription == "Other types of sexual offending" }
+    response.filter { it.categoryCode == SexualOffenceCategoryType.OTHER && it.id == UUID.fromString("70813fb3-33c8-4812-94cd-201eff0cdd6e") }.getOrNull(0)?.score?.shouldBeEqual(2)
   }
 
   @Test
