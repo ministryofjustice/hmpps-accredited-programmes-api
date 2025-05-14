@@ -94,7 +94,8 @@ class StaffServiceTest {
     val exception = assertThrows<BusinessException> {
       service.getOffenderAllocation(prisonNumber)
     }
-    assertEquals("No POM details found for $prisonNumber", exception.message)
+
+    assertEquals("No POM details found for A1234BC", exception.message)
 
     verify { allocationManagerService.getOffenderAllocation(prisonNumber) }
   }
