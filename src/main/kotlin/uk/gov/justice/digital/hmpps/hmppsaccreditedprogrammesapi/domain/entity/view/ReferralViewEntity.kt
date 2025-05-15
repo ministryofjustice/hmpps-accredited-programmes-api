@@ -122,4 +122,34 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
       SELECT r FROM ReferralViewEntity r WHERE r.referrerUsername = :username """,
   )
   fun findAllByReferralsByUsername(username: String): List<ReferralViewEntity>
+
+  @Query(
+    value = """
+      SELECT r FROM ReferralViewEntity r
+      WHERE ( r.courseName = 'Healthy Sex Programme')
+        AND (:status IS NULL OR r.status IN :status)
+        AND (:prisonNumber IS NULL OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
+        AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%') 
+            OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
+        AND (
+             (:forename IS NULL OR :forename = '' OR r.forename LIKE CONCAT('%', :forename, '%') OR r.surname LIKE CONCAT('%', :forename, '%'))
+             AND 
+             (:surname IS NULL OR :surname = '' OR r.surname LIKE CONCAT('%', :surname, '%') OR r.forename LIKE CONCAT('%', :surname, '%'))
+            )
+             AND (:hasLdc IS NULL OR 
+     (:hasLdc = true AND r.hasLdc = true) OR 
+     (:hasLdc = false AND (r.hasLdc = false OR r.hasLdc IS NULL))
+    )
+
+    """,
+  )
+  fun getHspReferrals(
+    prisonNumber: String?,
+    surnameOnly: String?,
+    forename: String?,
+    surname: String?,
+    pageable: Pageable,
+    status: List<String>?,
+    hasLdc: Boolean?,
+  ): Page<ReferralViewEntity>
 }

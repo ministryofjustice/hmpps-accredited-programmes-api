@@ -1805,6 +1805,28 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .returnResult().responseBody!!
   }
 
+  fun getHspReferralViews(
+    statusFilter: List<String>? = null,
+    courseNameFilter: String? = null,
+    statusGroupFilter: String? = null,
+    pageNumber: Number = 0,
+    sortColumn: String? = null,
+    sortDirection: String? = null,
+    nameOrId: String? = null,
+    hasLdc: Boolean? = null,
+  ): PaginatedReferralView {
+    val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/hsp/dashboard")
+    statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
+    courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
+    statusGroupFilter?.let { uriBuilder.queryParam("statusGroup", encodeValue(it)) }
+    uriBuilder.queryParam("page", pageNumber)
+    sortColumn?.let { uriBuilder.queryParam("sortColumn", encodeValue(it)) }
+    sortDirection?.let { uriBuilder.queryParam("sortDirection", encodeValue(it)) }
+    nameOrId?.let { uriBuilder.queryParam("nameOrId", encodeValue(it)) }
+    hasLdc?.let { uriBuilder.queryParam("hasLdc", it) }
+    return performRequestAndExpectOk(HttpMethod.GET, uriBuilder.toUriString(), paginatedReferralViewTypeReference())
+  }
+
   @Test
   fun `Retrieving a list of referral views for an organisation should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
@@ -2145,6 +2167,135 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     responseBody.first().id shouldBe referralId
     responseBody.first().offeringId shouldBe offering.id!!
     responseBody.first().prisonNumber shouldBe PRISON_NUMBER_1
+  }
+
+  @Test
+  fun `Retrieving hsp referral views for a prisonerId return 200 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val hspCourseId = UUID.randomUUID()
+    val hspOfferingId = UUID.randomUUID()
+    val hspCourseName = "Healthy Sex Programme"
+    persistenceHelper.createOrganisation(code = "WSI", name = "WSI org")
+    persistenceHelper.createCourse(
+      hspCourseId,
+      "HSP",
+      "Healthy Sex Programme",
+      "Healthy Sex Programme description",
+      "RC",
+      "Sexual offence",
+      intensity = CourseIntensity.HIGH.name,
+    )
+    persistenceHelper.createOffering(
+      hspOfferingId,
+      hspCourseId,
+      "WSI",
+      "nobody-bwn@digital.justice.gov.uk",
+      "nobody2-bwn@digital.justice.gov.uk",
+      true,
+    )
+
+    val referralCreated = createReferral(hspOfferingId, PRISON_NUMBER_1)
+    val createdReferral = getReferralById(referralCreated.id)
+
+    referralCreated.id.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
+
+    var summary = getHspReferralViews(nameOrId = PRISON_NUMBER_1)
+    summary.content.shouldNotBeEmpty()
+
+    summary.content?.forEach { actualSummary ->
+      listOf(
+        ReferralView(
+          id = createdReferral.id,
+          courseName = hspCourseName,
+          audience = "Sexual offence",
+          status = createdReferral.status.lowercase(),
+          statusDescription = createdReferral.statusDescription,
+          statusColour = createdReferral.statusColour,
+          prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = REFERRER_USERNAME,
+          forename = PRISONER_1.firstName,
+          surname = PRISONER_1.lastName,
+        ),
+      ).forEach { referralView ->
+        actualSummary.id shouldBe referralView.id
+        actualSummary.courseName shouldBe referralView.courseName
+        actualSummary.audience shouldBe "Sexual offence"
+        actualSummary.status shouldBe referralView.status
+        actualSummary.statusDescription shouldBe referralView.statusDescription
+        actualSummary.statusColour shouldBe referralView.statusColour
+        actualSummary.prisonNumber shouldBe referralView.prisonNumber
+        actualSummary.referrerUsername shouldBe referralView.referrerUsername
+        actualSummary.forename shouldBe referralView.forename
+        actualSummary.surname shouldBe referralView.surname
+      }
+    }
+  }
+
+  @Test
+  fun `Retrieving a list of draft HSP referral views using referral group should return 200 with correct body`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val hspCourseId = UUID.randomUUID()
+    val hspOfferingId = UUID.randomUUID()
+    val hspCourseName = "Healthy Sex Programme"
+    persistenceHelper.createOrganisation(code = "WSI", name = "WSI org")
+    persistenceHelper.createCourse(
+      hspCourseId,
+      "HSP",
+      hspCourseName,
+      "Healthy Sex Programme description",
+      "RC",
+      "Sexual offence",
+      intensity = CourseIntensity.HIGH.name,
+    )
+    persistenceHelper.createOffering(
+      hspOfferingId,
+      hspCourseId,
+      "WSI",
+      "nobody-bwn@digital.justice.gov.uk",
+      "nobody2-bwn@digital.justice.gov.uk",
+      true,
+    )
+
+    val referralCreated = createReferral(hspOfferingId, PRISON_NUMBER_1)
+    val createdReferral = getReferralById(referralCreated.id)
+
+    referralCreated.id.shouldNotBeNull()
+    createdReferral.shouldNotBeNull()
+
+    var summary = getHspReferralViews(statusGroupFilter = "open")
+    summary.content.shouldBeEmpty()
+
+    summary = getHspReferralViews(statusGroupFilter = "draft")
+    summary.content.shouldNotBeEmpty()
+
+    summary.content?.forEach { actualSummary ->
+      listOf(
+        ReferralView(
+          id = createdReferral.id,
+          courseName = hspCourseName,
+          audience = "Sexual offence",
+          status = createdReferral.status.lowercase(),
+          statusDescription = createdReferral.statusDescription,
+          statusColour = createdReferral.statusColour,
+          prisonNumber = createdReferral.prisonNumber,
+          referrerUsername = REFERRER_USERNAME,
+          forename = PRISONER_1.firstName,
+          surname = PRISONER_1.lastName,
+        ),
+      ).forEach { referralView ->
+        actualSummary.id shouldBe referralView.id
+        actualSummary.courseName shouldBe referralView.courseName
+        actualSummary.audience shouldBe referralView.audience
+        actualSummary.status shouldBe referralView.status
+        actualSummary.statusDescription shouldBe referralView.statusDescription
+        actualSummary.statusColour shouldBe referralView.statusColour
+        actualSummary.prisonNumber shouldBe referralView.prisonNumber
+        actualSummary.referrerUsername shouldBe referralView.referrerUsername
+        actualSummary.forename shouldBe referralView.forename
+        actualSummary.surname shouldBe referralView.surname
+      }
+    }
   }
 
   fun updateAllPeople() = webTestClient
