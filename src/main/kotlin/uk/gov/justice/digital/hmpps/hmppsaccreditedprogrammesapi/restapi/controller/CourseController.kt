@@ -580,6 +580,7 @@ class CourseController(
     )
   }
 
+  @Deprecated("Please use the GET endpoint /courses/building-choices/{courseId}/course-variants/")
   @Operation(
     tags = ["Courses"],
     summary = "Building choices",
@@ -619,7 +620,51 @@ class CourseController(
       description = "",
       required = true,
     ) @RequestBody buildingChoicesSearchRequest: BuildingChoicesSearchRequest,
-  ): ResponseEntity<List<Course>>? = ResponseEntity.ok(courseService.getBuildingChoicesCourseVariants(buildingChoicesSearchRequest, courseId))
+  ): ResponseEntity<List<Course>>? = ResponseEntity.ok(courseService.getBuildingChoicesCourseVariants(courseId, buildingChoicesSearchRequest.isInAWomensPrison, buildingChoicesSearchRequest.isConvictedOfSexualOffence))
+
+  @Operation(
+    tags = ["Courses"],
+    summary = "Building choices",
+    operationId = "getBuildingChoicesCourseVariants",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Return a JSON representation of the created course",
+        content = [Content(schema = Schema(implementation = Course::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "You are not authorized to view the resource",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Accessing the resource you were trying to reach is forbidden",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/courses/building-choices/{courseId}/course-variants"],
+    produces = ["application/json"],
+  )
+  fun getBuildingChoicesCourseVariants(
+    @Parameter(
+      description = "A course identifier which has variants",
+      required = true,
+    ) @PathVariable("courseId") courseId: UUID,
+    @Parameter(
+      description = "Has the person been convicted of a sexual offence",
+      required = true,
+    ) @RequestParam("isConvictedOfASexualOffence") isConvictedOfSexualOffence: String,
+    @Parameter(
+      description = "Is the person in a women's prison",
+      required = true,
+    ) @RequestParam("isInAWomensPrison") isInAWomensPrison: String,
+  ): ResponseEntity<List<Course>>? = ResponseEntity.ok(courseService.getBuildingChoicesCourseVariants(courseId, isInAWomensPrison == "true", isConvictedOfSexualOffence == "true"))
 
   @Operation(
     tags = ["Courses"],
