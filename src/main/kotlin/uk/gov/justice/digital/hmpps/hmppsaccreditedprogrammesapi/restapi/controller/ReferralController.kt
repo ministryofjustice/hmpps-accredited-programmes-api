@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -475,7 +474,6 @@ class ReferralController(
       required = false,
     ) hasLdc: Boolean?,
   ): ResponseEntity<PaginatedReferralView> {
-    SecurityContextHolder.getContext().authentication?.authorities
     val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
     val username: String =
       securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
@@ -971,4 +969,101 @@ class ReferralController(
           .map { it.toApi() },
       )
     } ?: throw NotFoundException("No Referral found for referralId $id")
+
+  @Operation(
+    tags = ["Referrals"],
+    summary = "Get paginated Healthy Sex Programmes(HSP) referrals ",
+    operationId = "getReferralViewsByCurrentUser",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Paginated summary of HSP referrals",
+        content = [Content(schema = Schema(implementation = PaginatedReferralView::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "The request was unauthorised",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Not authorised to access this endpoint/these referrals",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "No HSP referrals found (Not Found).",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.GET],
+    value = ["/referrals/view/hsp/dashboard"],
+    produces = ["application/json"],
+  )
+  fun getHspReferrals(
+    @Parameter(description = "Page number of the requested page", schema = Schema(defaultValue = "0")) @RequestParam(
+      value = "page",
+      required = false,
+      defaultValue = "0",
+    ) page: Int,
+    @Parameter(
+      description = "Number of items per page",
+      schema = Schema(defaultValue = "10"),
+    ) @RequestParam(value = "size", required = false, defaultValue = "10") size: Int,
+    @Parameter(description = "The persons name: forename surname or surname or prison number. Name wll be a case insensitive like search. For example entering John will return people with the forename or surname containing the name john like johnathan. If two names are given then the assumption is that they are forename and surname.Forename and surname could include a comma between them (John,Smith) And if there is a single term that matches the regex for a prison number then only an exact prison number match will be carried out") @RequestParam(
+      value = "nameOrId",
+      required = false,
+    ) nameOrId: String?,
+    @Parameter(description = "Filter by the status of the referral") @RequestParam(
+      value = "status",
+      required = false,
+    ) status: List<String>?,
+    @Parameter(description = "Additional filter to only show \"open\", \"closed\" or \"draft\" referrals") @RequestParam(
+      value = "statusGroup",
+      required = false,
+    ) statusGroup: String?,
+    @Parameter(description = "Column to sort by default \"surname\"") @RequestParam(
+      value = "sortColumn",
+      required = false,
+    ) sortColumn: String?,
+    @Parameter(description = "Direction to sort by [ascending/descending] default \"ascending\"") @RequestParam(
+      value = "sortDirection",
+      required = false,
+    ) sortDirection: String?,
+    @Parameter(description = "When flag is true, then only ldc referrals are returned. If false of null is passed in all non ldc referrals are returned") @RequestParam(
+      value = "hasLdc",
+      required = false,
+    ) hasLdc: Boolean?,
+  ): ResponseEntity<PaginatedReferralView> {
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
+
+    val nameOrIdSearch = parseNameOrId(nameOrId)
+
+    val apiReferralSummaryPage =
+      referralService.getHspReferralsView(
+        pageable = pageable,
+        status = status,
+        statusGroup = statusGroup,
+        prisonNumber = nameOrIdSearch.prisonNumber,
+        surnameOnly = nameOrIdSearch.surnameOnly,
+        forename = nameOrIdSearch.forename,
+        surname = nameOrIdSearch.surname,
+        hasLdc = hasLdc,
+      )
+
+    return ResponseEntity.ok(
+      PaginatedReferralView(
+        content = apiReferralSummaryPage.content.map { it.toApi() },
+        totalPages = apiReferralSummaryPage.totalPages,
+        totalElements = apiReferralSummaryPage.totalElements.toInt(),
+        pageSize = apiReferralSummaryPage.size,
+        pageNumber = apiReferralSummaryPage.number,
+        pageIsEmpty = apiReferralSummaryPage.isEmpty,
+      ),
+    )
+  }
 }

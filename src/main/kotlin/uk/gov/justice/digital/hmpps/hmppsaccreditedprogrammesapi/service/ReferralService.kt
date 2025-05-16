@@ -367,6 +367,31 @@ constructor(
     return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
   }
 
+  fun getHspReferralsView(
+    pageable: Pageable,
+    status: List<String>?,
+    statusGroup: String?,
+    prisonNumber: String?,
+    surnameOnly: String?,
+    forename: String?,
+    surname: String?,
+    hasLdc: Boolean?,
+  ): Page<ReferralViewEntity> {
+    val uppercaseStatuses = getFilterStatuses(status, statusGroup)
+    val referralViewPage =
+      referralViewRepository.getHspReferrals(
+        prisonNumber = prisonNumber,
+        surnameOnly = surnameOnly,
+        forename = forename,
+        surname = surname,
+        pageable = pageable,
+        status = uppercaseStatuses,
+        hasLdc = hasLdc,
+      )
+
+    return PageImpl(referralViewPage.content, pageable, referralViewPage.totalElements)
+  }
+
   fun validateStatusTransition(referralId: UUID, currentStatus: String, newStatus: String, ptUser: Boolean) {
     val validTransitions = referralReferenceDataService.getNextStatusTransitions(currentStatus, ptUser)
     if (validTransitions.none { it.code == newStatus }) {
