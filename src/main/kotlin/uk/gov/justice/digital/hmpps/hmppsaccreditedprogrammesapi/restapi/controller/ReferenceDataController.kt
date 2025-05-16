@@ -86,7 +86,6 @@ class ReferenceDataController(
     responses = [
       ApiResponse(responseCode = "200", description = "Successful operation", content = [Content(schema = Schema(implementation = SexualOffenceDetails::class))]),
       ApiResponse(responseCode = "401", description = "Unauthorised. The request was unauthorised.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-      ApiResponse(responseCode = "403", description = "Forbidden.  The client is not authorised to access person.", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
     ],
   )
   @GetMapping("/sexual-offence-details", produces = ["application/json"])

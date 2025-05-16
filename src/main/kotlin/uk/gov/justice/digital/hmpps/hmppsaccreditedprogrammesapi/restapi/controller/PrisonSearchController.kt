@@ -34,6 +34,7 @@ class PrisonSearchController(private val prisonRegisterApiService: PrisonRegiste
   @Deprecated("This endpoint is deprecated and may be removed in the future")
   @Operation(
     tags = ["Prison"],
+    deprecated = true,
     summary = "Details for a single prison",
     operationId = "getPrisonById",
     description = """""",
@@ -76,6 +77,7 @@ class PrisonSearchController(private val prisonRegisterApiService: PrisonRegiste
   @Deprecated("This endpoint is deprecated and may be removed in the future")
   @Operation(
     tags = ["Prison"],
+    deprecated = true,
     summary = "Search for prisons via prison register api by prison id.",
     operationId = "getPrisons",
     description = """""",
