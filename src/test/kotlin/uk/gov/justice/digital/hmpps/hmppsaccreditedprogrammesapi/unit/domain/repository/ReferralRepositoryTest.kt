@@ -11,8 +11,10 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OverrideType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.EligibilityOverrideReasonEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
@@ -101,5 +103,39 @@ class ReferralRepositoryTest {
     updatedReferral.run {
       this.oasysConfirmed shouldBe true
     }
+  }
+
+  @Test
+  fun `A referral should be able to access its eligibility override reasons`() {
+    // Given
+    var course = CourseEntityFactory().produce()
+    course = entityManager.merge(course)
+
+    var offering = OfferingEntityFactory().produce()
+    offering.course = course
+    offering = entityManager.merge(offering)
+
+    var referrer = ReferrerUserEntityFactory().produce()
+    referrer = entityManager.merge(referrer)
+
+    var referral = ReferralEntityFactory()
+      .withId(null)
+      .withReferrer(referrer)
+      .withOffering(offering)
+      .produce()
+    referral = entityManager.merge(referral)
+
+    // When
+    var eligibilityOverrideReasonEntity = EligibilityOverrideReasonEntityFactory().withId(null).withReferral(referral).produce()
+    eligibilityOverrideReasonEntity = entityManager.merge(eligibilityOverrideReasonEntity)
+    entityManager.flush()
+    entityManager.clear()
+
+    // Then
+    val referralEntity = entityManager.find(ReferralEntity::class.java, referral.id)
+    referralEntity.eligibilityOverrideReasons.size shouldBe 1
+    referralEntity.eligibilityOverrideReasons[0].id shouldBe eligibilityOverrideReasonEntity.id
+    referralEntity.eligibilityOverrideReasons[0].reason shouldBe "Test override reason"
+    referralEntity.eligibilityOverrideReasons[0].overrideType shouldBe OverrideType.HEALTHY_SEX_PROGRAMME
   }
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.persistence.Version
 import org.hibernate.annotations.SQLRestriction
@@ -76,6 +77,13 @@ class ReferralEntity(
 
   @Column(name = "has_ldc_been_overridden_by_programme_team")
   var hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,
+
+  @OneToMany(mappedBy = "referral", fetch = FetchType.LAZY)
+  var selectedSexualOffenceDetails: MutableList<SelectedSexualOffenceDetailsEntity> = mutableListOf(),
+
+  @OneToMany(mappedBy = "referral", fetch = FetchType.LAZY)
+  var eligibilityOverrideReasons: MutableList<EligibilityOverrideReasonEntity> = mutableListOf(),
+
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
