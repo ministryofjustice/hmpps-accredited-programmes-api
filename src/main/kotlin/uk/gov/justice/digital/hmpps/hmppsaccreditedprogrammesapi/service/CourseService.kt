@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
@@ -219,14 +218,15 @@ constructor(
     return recommendedBuildingChoicesCourseModel
   }
 
-  fun getBuildingChoicesCourseVariants(buildingChoicesSearchRequest: BuildingChoicesSearchRequest, courseId: UUID): List<Course>? {
+  fun getBuildingChoicesCourseVariants(courseId: UUID, isInAWomensPrison: Boolean, isConvictedOfASexualOffence: Boolean): List<Course>? {
+    log.info("getBuildingChoicesCourseVariants")
     val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
       ?: throw BusinessException("$courseId is not a Building choices course")
 
     val listOfBuildingCourseIds: List<UUID> = listOf(findAllByCourseId.variantCourseId, courseId)
-    val audience = if (buildingChoicesSearchRequest.isConvictedOfSexualOffence) "Sexual offence" else "General offence"
+    val audience = if (isConvictedOfASexualOffence) "Sexual offence" else "General offence"
     val genderToWhichCourseIsOffered =
-      if (buildingChoicesSearchRequest.isInAWomensPrison) Gender.FEMALE else Gender.MALE
+      if (isInAWomensPrison) Gender.FEMALE else Gender.MALE
 
     val audienceBasedOnGender = if (genderToWhichCourseIsOffered == Gender.FEMALE) null else audience
 
