@@ -219,7 +219,6 @@ constructor(
   }
 
   fun getBuildingChoicesCourseVariants(courseId: UUID, isInAWomensPrison: Boolean, isConvictedOfASexualOffence: Boolean): List<Course>? {
-    log.info("getBuildingChoicesCourseVariants")
     val findAllByCourseId = courseVariantRepository.findAllByCourseId(courseId)
       ?: throw BusinessException("$courseId is not a Building choices course")
 
