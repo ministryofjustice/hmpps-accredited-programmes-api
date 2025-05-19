@@ -79,10 +79,10 @@ class ReferralEntity(
   var hasLdcBeenOverriddenByProgrammeTeam: Boolean = false,
 
   @OneToMany(mappedBy = "referral", fetch = FetchType.LAZY)
-  var selectedSexualOffenceDetails: MutableList<SelectedSexualOffenceDetailsEntity> = mutableListOf(),
+  var selectedSexualOffenceDetails: MutableSet<SelectedSexualOffenceDetailsEntity> = mutableSetOf(),
 
   @OneToMany(mappedBy = "referral", fetch = FetchType.LAZY)
-  var eligibilityOverrideReasons: MutableList<EligibilityOverrideReasonEntity> = mutableListOf(),
+  var eligibilityOverrideReasons: MutableSet<EligibilityOverrideReasonEntity> = mutableSetOf(),
 
 ) {
   override fun equals(other: Any?): Boolean {

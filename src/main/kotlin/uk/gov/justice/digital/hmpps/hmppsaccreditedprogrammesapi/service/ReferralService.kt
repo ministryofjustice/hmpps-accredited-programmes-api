@@ -13,9 +13,12 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.EligibilityOverrideReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OverrideType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.SelectedSexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusCategoryRepository
@@ -27,9 +30,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.EligibilityOverrideReasonEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SelectedSexualOffenceDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SexualOffenceDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
@@ -64,14 +70,54 @@ constructor(
   private val courseParticipationService: CourseParticipationService,
   private val referenceDataService: ReferralReferenceDataService,
   @Value("\${spring.application.environment}") val environment: String,
+  private val selectedSexualOffenceDetailsRepository: SelectedSexualOffenceDetailsRepository,
+  private val sexualOffenceDetailsRepository: SexualOffenceDetailsRepository,
+  private val eligibilityOverrideReasonEntityRepository: EligibilityOverrideReasonEntityRepository,
 ) {
   private val log = LoggerFactory.getLogger(this::class.java)
+
+  fun createHspReferral(
+    prisonNumber: String,
+    offeringId: UUID,
+    selectedOffenceIds: List<UUID>,
+    eligibilityOverrideReason: String? = null,
+  ): Referral {
+    log.info("STARTING - Request received to create an HSP referral for prisonNumber $prisonNumber")
+    val savedReferral = createReferral(prisonNumber, offeringId)
+
+    // persist selected offence details and associate with referral
+    val savedSelectedOffences = selectedOffenceIds
+      .map { createSelectedSexualOffenceDetailsEntity(savedReferral, it) }
+      .map { selectedSexualOffenceDetailsRepository.save(it) }
+    savedReferral.selectedSexualOffenceDetails = savedSelectedOffences.toMutableSet()
+
+    // persist override reasons if present, and associate with referral
+    eligibilityOverrideReason?.let { reasonText ->
+      val savedOverrideReason = eligibilityOverrideReasonEntityRepository.save(
+        EligibilityOverrideReasonEntity(
+          referral = savedReferral,
+          reason = reasonText,
+          overrideType = OverrideType.HEALTHY_SEX_PROGRAMME,
+        ),
+      )
+      savedReferral.eligibilityOverrideReasons = mutableSetOf(savedOverrideReason)
+    }
+    log.info("FINISHED - Request processed successfully to create an HSP referral for prisonNumber $prisonNumber with referralId: ${savedReferral.id}")
+    return savedReferral.toApi()
+  }
+
+  private fun createSelectedSexualOffenceDetailsEntity(referralEntity: ReferralEntity, sexualOffenceDetailsId: UUID): SelectedSexualOffenceDetailsEntity = SelectedSexualOffenceDetailsEntity(
+    referral = referralEntity,
+    sexualOffenceDetails = sexualOffenceDetailsRepository.findById(sexualOffenceDetailsId)
+      .getOrElse { throw IllegalArgumentException("Unknown sexual offence UUID provided") }
+      .also { log.warn("Could not retrieve SexualOffenceDetailsEntity with ID: $sexualOffenceDetailsId") },
+  )
 
   fun createReferral(
     prisonNumber: String,
     offeringId: UUID,
     originalReferralId: UUID? = null,
-  ): Referral {
+  ): ReferralEntity {
     log.info("STARTING - Request received to create a referral for prisonNumber $prisonNumber")
 
     val referrerUser = getAuthenticatedReferrerUser()
@@ -90,14 +136,13 @@ constructor(
         referrer = referrerUser,
         originalReferralId = originalReferralId,
       ),
-    )
-      ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
+    ) ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
 
     log.info("FINISHED - Request processed successfully to create a referral for prisonNumber $prisonNumber with referralId: ${savedReferral.id}")
-    return savedReferral.toApi()
+    return savedReferral
   }
 
   private fun getAuthenticatedReferrerUser(): ReferrerUserEntity {

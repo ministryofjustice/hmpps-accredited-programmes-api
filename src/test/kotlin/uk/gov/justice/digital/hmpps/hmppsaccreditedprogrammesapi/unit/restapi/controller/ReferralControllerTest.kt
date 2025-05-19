@@ -33,8 +33,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REFERRER_USERNAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.randomPrisonNumber
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
@@ -87,7 +87,7 @@ constructor(
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {
-    val referral: Referral = ReferralEntityFactory()
+    val referral: ReferralEntity = ReferralEntityFactory()
       .withOffering(
         OfferingEntityFactory()
           .withId(UUID.randomUUID())
@@ -99,15 +99,15 @@ constructor(
           .withUsername(REFERRER_USERNAME)
           .produce(),
       )
-      .produce().toApi()
+      .produce()
 
     val payload = mapOf(
-      "offeringId" to referral.offeringId,
+      "offeringId" to referral.offering.id,
       "prisonNumber" to referral.prisonNumber,
     )
 
-    every { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offeringId) } returns null
-    every { referralService.createReferral(referral.prisonNumber, referral.offeringId) } returns referral
+    every { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offering.id!!) } returns null
+    every { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) } returns referral
 
     mockMvc.post("/referrals") {
       contentType = MediaType.APPLICATION_JSON
@@ -121,8 +121,8 @@ constructor(
       }
     }
 
-    verify { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offeringId) }
-    verify { referralService.createReferral(referral.prisonNumber, referral.offeringId) }
+    verify { referralService.getDuplicateReferrals(referral.prisonNumber, referral.offering.id!!) }
+    verify { referralService.createReferral(referral.prisonNumber, referral.offering.id!!) }
   }
 
   @Test
@@ -150,7 +150,7 @@ constructor(
     )
 
     every { referralService.getDuplicateReferrals(any(), any()) } returns null
-    every { referralService.createReferral(any(), any()) } returns referral.toApi()
+    every { referralService.createReferral(any(), any()) } returns referral
 
     mockMvc.post("/referrals") {
       contentType = MediaType.APPLICATION_JSON
