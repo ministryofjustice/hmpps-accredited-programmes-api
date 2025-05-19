@@ -319,10 +319,12 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     )
 
     // When & Then
-    performRequestAndExpectStatusWithBody(HttpMethod.POST,
+    performRequestAndExpectStatusWithBody(
+      HttpMethod.POST,
       "/referral/hsp",
       body = hspReferralCreate,
-      expectedResponseStatus = HttpStatus.BAD_REQUEST.value())
+      expectedResponseStatus = HttpStatus.BAD_REQUEST.value(),
+    )
   }
 
   @Test
