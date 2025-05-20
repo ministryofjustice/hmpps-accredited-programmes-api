@@ -273,10 +273,10 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val offeringEntity = OfferingEntityFactory().withCourse(courseEntity).withOrganisationId("MDI").produce()
     persistenceHelper.createOffering(offeringEntity)
 
-    val sexualOffenceDetailsEntity1 = SexualOffenceDetailsEntityFactory().produce()
+    val sexualOffenceDetailsEntity1 = SexualOffenceDetailsEntityFactory().withScore(2).produce()
     persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity1)
 
-    val sexualOffenceDetailsEntity2 = SexualOffenceDetailsEntityFactory().produce()
+    val sexualOffenceDetailsEntity2 = SexualOffenceDetailsEntityFactory().withScore(2).produce()
     persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity2)
 
     val hspReferralCreate = HspReferralCreate(
@@ -316,6 +316,35 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       offeringEntity.id!!,
       PRISON_NUMBER_1,
       emptyList(),
+    )
+
+    // When & Then
+    performRequestAndExpectStatusWithBody(
+      HttpMethod.POST,
+      "/referral/hsp",
+      body = hspReferralCreate,
+      expectedResponseStatus = HttpStatus.BAD_REQUEST.value(),
+    )
+  }
+
+  @Test
+  fun `should return Http BAD REQUEST when creating an HSP referral with offence details scoring below HSP threshold`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val courseEntity = CourseEntityFactory().produce()
+    persistenceHelper.createCourse(courseEntity)
+
+    val offeringEntity = OfferingEntityFactory().withCourse(courseEntity).withOrganisationId("MDI").produce()
+    persistenceHelper.createOffering(offeringEntity)
+
+    val sexualOffenceDetailsEntity = SexualOffenceDetailsEntityFactory().withScore(2).produce()
+    persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity)
+
+    val hspReferralCreate = HspReferralCreate(
+      offeringEntity.id!!,
+      PRISON_NUMBER_1,
+      listOf(sexualOffenceDetailsEntity.id!!),
     )
 
     // When & Then

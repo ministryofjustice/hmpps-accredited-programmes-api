@@ -47,6 +47,8 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
 import kotlin.jvm.optionals.getOrNull
 
+private const val MINIMUM_HSP_OFFENCE_SCORE_TOTAL = 3
+
 @Service
 @Transactional
 class ReferralService
@@ -83,6 +85,14 @@ constructor(
     eligibilityOverrideReason: String? = null,
   ): Referral {
     log.info("STARTING - Request received to create an HSP referral for prisonNumber $prisonNumber")
+
+    // validate that the sum of selected offence scores meets the HSP eligibility threshold
+    val sumOfSelectedOffenceScores = calculateTotalOffenceScore(selectedOffenceIds)
+    if (sumOfSelectedOffenceScores < MINIMUM_HSP_OFFENCE_SCORE_TOTAL) {
+      log.warn("Request received to create an HSP referral for prisonNumber $prisonNumber but the sum of selected offence scores is $sumOfSelectedOffenceScores which is less than the minimum threshold of $MINIMUM_HSP_OFFENCE_SCORE_TOTAL")
+      throw ValidationException("The sum of selected offence scores is less than the minimum threshold of $MINIMUM_HSP_OFFENCE_SCORE_TOTAL")
+    }
+
     val savedReferral = createReferral(prisonNumber, offeringId)
 
     // persist selected offence details and associate with referral
@@ -105,6 +115,11 @@ constructor(
     log.info("FINISHED - Request processed successfully to create an HSP referral for prisonNumber $prisonNumber with referralId: ${savedReferral.id}")
     return savedReferral.toApi()
   }
+
+  fun calculateTotalOffenceScore(selectedOffenceIds: List<UUID>): Int = selectedOffenceIds
+    .mapNotNull { offenceId ->
+      sexualOffenceDetailsRepository.findById(offenceId).getOrNull()?.score
+    }.sum()
 
   private fun createSelectedSexualOffenceDetailsEntity(referralEntity: ReferralEntity, sexualOffenceDetailsId: UUID): SelectedSexualOffenceDetailsEntity = SelectedSexualOffenceDetailsEntity(
     referral = referralEntity,
