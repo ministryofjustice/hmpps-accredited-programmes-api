@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.BuildingChoicesSearchRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PniService
@@ -322,11 +321,9 @@ class CourseServiceTest {
     every { courseRepository.findBuildingChoicesCourses(any(), any(), any()) } returns listOf(CourseEntityFactory().withName("Building Choices: high intensity").produce())
 
     val buildingChoicesCourseVariants = courseService.getBuildingChoicesCourseVariants(
-      BuildingChoicesSearchRequest(
-        isConvictedOfSexualOffence = false,
-        isInAWomensPrison = false,
-      ),
       courseId1,
+      isInAWomensPrison = false,
+      isConvictedOfASexualOffence = false,
     )
 
     buildingChoicesCourseVariants?.size shouldBe 1
