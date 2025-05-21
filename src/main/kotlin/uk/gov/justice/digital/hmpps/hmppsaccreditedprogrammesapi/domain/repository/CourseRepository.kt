@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.Gender
 import java.util.UUID
 
 @Repository
@@ -40,7 +41,7 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
     AND org.gender = :gender
   """,
   )
-  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String? = null, gender: String): List<CourseEntity>?
+  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String? = null, gender: Gender): List<CourseEntity>?
 
   fun findAllByName(name: String): List<CourseEntity>
 }
