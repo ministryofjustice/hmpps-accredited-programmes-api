@@ -134,8 +134,8 @@ class ReferralRepositoryTest {
     // Then
     val referralEntity = entityManager.find(ReferralEntity::class.java, referral.id)
     referralEntity.eligibilityOverrideReasons.size shouldBe 1
-    referralEntity.eligibilityOverrideReasons[0].id shouldBe eligibilityOverrideReasonEntity.id
-    referralEntity.eligibilityOverrideReasons[0].reason shouldBe "Test override reason"
-    referralEntity.eligibilityOverrideReasons[0].overrideType shouldBe OverrideType.HEALTHY_SEX_PROGRAMME
+    referralEntity.eligibilityOverrideReasons.first().id shouldBe eligibilityOverrideReasonEntity.id
+    referralEntity.eligibilityOverrideReasons.first().reason shouldBe "Test override reason"
+    referralEntity.eligibilityOverrideReasons.first().overrideType shouldBe OverrideType.HEALTHY_SEX_PROGRAMME
   }
 }

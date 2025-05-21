@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
+import java.util.Optional
 import java.util.UUID
 
 @Repository
@@ -33,4 +34,15 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
 
   fun findAllByPrisonNumber(prisonNumber: String): List<ReferralEntity>
   fun findAllByPrisonNumberAndStatusIn(prisonNumber: String, openReferralStatus: List<String>): List<ReferralEntity>
+
+  @Query(
+    """
+    SELECT r FROM ReferralEntity r 
+    LEFT JOIN FETCH r.selectedSexualOffenceDetails ssod 
+    LEFT JOIN FETCH ssod.sexualOffenceDetails
+    LEFT JOIN FETCH r.eligibilityOverrideReasons eor 
+    WHERE r.id = :id
+    """,
+  )
+  fun findByIdWithHspDetails(@Param("id") id: UUID): Optional<ReferralEntity>
 }
