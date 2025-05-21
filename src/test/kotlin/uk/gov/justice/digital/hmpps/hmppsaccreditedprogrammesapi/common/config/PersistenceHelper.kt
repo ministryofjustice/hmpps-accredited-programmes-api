@@ -4,6 +4,9 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -22,6 +25,8 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM course_participation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM pni_result").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM staff").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM selected_sexual_offence_details").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM eligibility_override_reason").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM referral").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM offering").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course_variant").executeUpdate()
@@ -30,6 +35,14 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM audit_record").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM organisation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM audience").executeUpdate()
+  }
+
+  fun createCourse(courseEntity: CourseEntity) {
+    entityManager.persist(courseEntity)
+  }
+
+  fun createOffering(offeringEntity: OfferingEntity) {
+    entityManager.persist(offeringEntity)
   }
 
   fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue", displayOnProgrammeDirectory: Boolean = true, intensity: String? = CourseIntensity.MODERATE.name) {
@@ -129,6 +142,10 @@ class PersistenceHelper {
       .setParameter("name", name)
       .setParameter("colour", colour)
       .executeUpdate()
+  }
+
+  fun createSexualOffenceDetails(sexualOffenceDetailsEntity: SexualOffenceDetailsEntity) {
+    entityManager.persist(sexualOffenceDetailsEntity)
   }
 
   fun createCourseVariant(id: UUID = UUID.randomUUID(), courseId: UUID, variantCourseId: UUID = UUID.randomUUID()) {

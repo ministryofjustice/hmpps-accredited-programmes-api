@@ -45,11 +45,14 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.update.ReferralUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.EligibilityOverrideReasonEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SelectedSexualOffenceDetailsRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SexualOffenceDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PniScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
@@ -76,7 +79,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferrerUserEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.util.*
-import kotlin.String
 
 @ExtendWith(MockKExtension::class)
 class ReferralServiceTest {
@@ -143,6 +145,15 @@ class ReferralServiceTest {
 
   @MockK(relaxed = true)
   private lateinit var courseParticipationService: CourseParticipationService
+
+  @MockK(relaxed = true)
+  private lateinit var sexualOffenceDetailsRepository: SexualOffenceDetailsRepository
+
+  @MockK(relaxed = true)
+  private lateinit var eligibilityOverrideReasonEntityRepository: EligibilityOverrideReasonEntityRepository
+
+  @MockK(relaxed = true)
+  private lateinit var selectedSexualOffenceDetailsRepository: SelectedSexualOffenceDetailsRepository
 
   private var environment: String = "dev"
 
@@ -756,6 +767,9 @@ class ReferralServiceTest {
       courseParticipationService = courseParticipationService,
       referenceDataService = referralReferenceDataService,
       environment = "preprod",
+      sexualOffenceDetailsRepository = sexualOffenceDetailsRepository,
+      selectedSexualOffenceDetailsRepository = selectedSexualOffenceDetailsRepository,
+      eligibilityOverrideReasonEntityRepository = eligibilityOverrideReasonEntityRepository,
     )
 
     val exception = assertThrows<IllegalStateException> {

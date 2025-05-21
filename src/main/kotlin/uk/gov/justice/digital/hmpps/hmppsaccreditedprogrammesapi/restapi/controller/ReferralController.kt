@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.HspReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
@@ -187,6 +188,69 @@ class ReferralController(
       prisonNumber = referralCreate.prisonNumber,
       offeringId = referralCreate.offeringId,
       originalReferralId = referralCreate.originalReferralId,
+    )
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdReferral.toApi())
+  }
+
+  @Operation(
+    tags = ["Referrals"],
+    summary = "Create an HSP referral",
+    operationId = "createHealthySexProgrammeReferral",
+    description = "Create a Healthy Sex Programme referral",
+    responses = [
+      ApiResponse(
+        responseCode = "201",
+        description = "Created HSP referral",
+        content = [Content(schema = Schema(implementation = Referral::class))],
+      ),
+      ApiResponse(
+        responseCode = "400",
+        description = "Bad input",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorised. The request was unauthorised.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "409",
+        description = "Conflict - Duplicate referral",
+        content = [Content(schema = Schema(implementation = ReferralEntity::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.POST],
+    value = ["/referral/hsp"],
+    produces = ["application/json"],
+    consumes = ["application/json"],
+  )
+  fun createHealthySexProgrammeReferral(
+    @Parameter(
+      description = "",
+      required = true,
+    ) @RequestBody hspReferralCreate: HspReferralCreate,
+  ): ResponseEntity<Referral> {
+    if (hspReferralCreate.selectedOffences.isEmpty()) {
+      log.info("No selected offences supplied in request body")
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null)
+    }
+
+    val duplicateReferrals =
+      referralService.getDuplicateReferrals(hspReferralCreate.prisonNumber, hspReferralCreate.offeringId)
+
+    if (!duplicateReferrals.isNullOrEmpty()) {
+      log.info("Referral already exists for prisonNumber ${hspReferralCreate.prisonNumber} and offering ${hspReferralCreate.offeringId}")
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(duplicateReferrals.first().toApi())
+    }
+
+    val createdReferral = referralService.createHspReferral(
+      prisonNumber = hspReferralCreate.prisonNumber,
+      offeringId = hspReferralCreate.offeringId,
+      selectedOffenceIds = hspReferralCreate.selectedOffences,
+      eligibilityOverrideReason = hspReferralCreate.eligibilityOverrideReason,
     )
     return ResponseEntity.status(HttpStatus.CREATED).body(createdReferral)
   }
