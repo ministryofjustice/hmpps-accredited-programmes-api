@@ -302,6 +302,36 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should create an HSP referral when total offence score is below HSP but an override reason has been provided `() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val courseEntity = CourseEntityFactory().produce()
+    persistenceHelper.createCourse(courseEntity)
+
+    val offeringEntity = OfferingEntityFactory().withCourse(courseEntity).withOrganisationId("MDI").produce()
+    persistenceHelper.createOffering(offeringEntity)
+
+    val sexualOffenceDetailsEntity1 = SexualOffenceDetailsEntityFactory().withScore(1).produce()
+    persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity1)
+
+    val hspReferralCreate = HspReferralCreate(
+      offeringEntity.id!!,
+      PRISON_NUMBER_1,
+      listOf(sexualOffenceDetailsEntity1.id!!),
+      "Is definitely eligible for HSP",
+    )
+
+    // When
+    val createdHspReferral = createHSPReferral(hspReferralCreate)
+
+    // Then
+    val savedReferral = referralRepository.findByIdWithHspDetails(createdHspReferral.id).get()
+    savedReferral.selectedSexualOffenceDetails.first().sexualOffenceDetails?.description?.shouldBeEqual(sexualOffenceDetailsEntity1.description)
+    savedReferral.eligibilityOverrideReasons.first().reason.shouldBeEqual("Is definitely eligible for HSP")
+  }
+
+  @Test
   fun `should return Http BAD REQUEST when creating an HSP referral without selected offence details`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
@@ -345,6 +375,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       offeringEntity.id!!,
       PRISON_NUMBER_1,
       listOf(sexualOffenceDetailsEntity.id!!),
+      eligibilityOverrideReason = null,
     )
 
     // When & Then

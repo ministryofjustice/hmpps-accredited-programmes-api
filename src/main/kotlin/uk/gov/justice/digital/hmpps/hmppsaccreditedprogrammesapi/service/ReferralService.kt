@@ -88,9 +88,9 @@ constructor(
 
     // validate that the sum of selected offence scores meets the HSP eligibility threshold
     val sumOfSelectedOffenceScores = calculateTotalOffenceScore(selectedOffenceIds)
-    if (sumOfSelectedOffenceScores < MINIMUM_HSP_OFFENCE_SCORE_TOTAL) {
-      log.warn("Request received to create an HSP referral for prisonNumber $prisonNumber but the sum of selected offence scores is $sumOfSelectedOffenceScores which is less than the minimum threshold of $MINIMUM_HSP_OFFENCE_SCORE_TOTAL")
-      throw ValidationException("The sum of selected offence scores is less than the minimum threshold of $MINIMUM_HSP_OFFENCE_SCORE_TOTAL")
+    if (sumOfSelectedOffenceScores < MINIMUM_HSP_OFFENCE_SCORE_TOTAL && eligibilityOverrideReason == null) {
+      log.warn("Request received to create an HSP referral for prisonNumber $prisonNumber but the sum of selected offence scores is $sumOfSelectedOffenceScores which is less than the minimum threshold of $MINIMUM_HSP_OFFENCE_SCORE_TOTAL and no override reason has been provided.")
+      throw ValidationException("The sum of selected offence scores is less than the minimum threshold of $MINIMUM_HSP_OFFENCE_SCORE_TOTAL and no override reason has been provided.")
     }
 
     val savedReferral = createReferral(prisonNumber, offeringId)
