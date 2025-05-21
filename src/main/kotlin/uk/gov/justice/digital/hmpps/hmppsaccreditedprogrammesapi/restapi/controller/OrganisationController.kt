@@ -108,7 +108,7 @@ class OrganisationController(
       Organisation(
         code = it.code,
         prisonName = it.name,
-        gender = it.gender,
+        gender = it.gender.name,
       ),
     )
   } ?: throw NotFoundException("No Organisation found at /organisation/$code")

@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
@@ -19,7 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseUpdateRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.addAudience
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import java.util.UUID
@@ -152,7 +152,7 @@ constructor(
     offeringRepository.delete(existingOffering.id!!)
   }
 
-  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String?, gender: String) = courseRepository.findBuildingChoicesCourses(courseIds, audience, gender)
+  fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String?, gender: Gender) = courseRepository.findBuildingChoicesCourses(courseIds, audience, gender)
   fun mapCourses(findBuildingChoicesCourses: List<CourseEntity>?, gender: Gender): List<Course>? = findBuildingChoicesCourses?.map {
     Course(
       id = it.id!!,
@@ -166,7 +166,7 @@ constructor(
       displayName = it.name + addAudience(it.name, it.audience),
       withdrawn = it.withdrawn,
       displayOnProgrammeDirectory = it.displayOnProgrammeDirectory,
-      courseOfferings = it.offerings.map { offeringEntity -> offeringEntity.toApi(gender.name) },
+      courseOfferings = it.offerings.map { offeringEntity -> offeringEntity.toApi(gender) },
     )
   }
 
@@ -233,7 +233,7 @@ constructor(
       findBuildingChoicesCourses(
         listOfBuildingCourseIds,
         audienceBasedOnGender,
-        genderToWhichCourseIsOffered.name,
+        genderToWhichCourseIsOffered,
       )
 
     return mapCourses(buildingChoicesCourses, genderToWhichCourseIsOffered)

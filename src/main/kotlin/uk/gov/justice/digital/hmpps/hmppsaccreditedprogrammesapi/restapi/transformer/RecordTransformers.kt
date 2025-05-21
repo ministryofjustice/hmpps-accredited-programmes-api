@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transf
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Gender
 
 fun CourseEntity.toApi(): Course = Course(
   id = id!!,
@@ -37,12 +37,12 @@ fun PrerequisiteEntity.toApi(): CoursePrerequisite = CoursePrerequisite(
   description = description,
 )
 
-fun OfferingEntity.toApi(genderForWhichCourseIsOffered: String): CourseOffering = CourseOffering(
+fun OfferingEntity.toApi(genderForWhichCourseIsOffered: Gender): CourseOffering = CourseOffering(
   id = id!!,
   organisationId = organisationId,
   contactEmail = contactEmail,
   secondaryContactEmail = secondaryContactEmail,
   referable = referable,
   withdrawn = withdrawn,
-  gender = Gender.valueOf(genderForWhichCourseIsOffered),
+  gender = genderForWhichCourseIsOffered,
 )

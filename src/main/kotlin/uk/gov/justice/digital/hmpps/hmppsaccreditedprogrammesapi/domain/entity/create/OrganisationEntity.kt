@@ -2,8 +2,11 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.Gender
 import java.util.UUID
 
 @Entity
@@ -14,13 +17,13 @@ class OrganisationEntity(
   @Column(name = "organisation_id")
   var id: UUID? = null,
 
-  @Column
+  @Column(name = "code")
   var code: String,
 
-  @Column
+  @Column(name = "name")
   var name: String,
 
-  @Column
-  var gender: String,
-
+  @Enumerated(EnumType.STRING)
+  @Column(name = "gender")
+  var gender: Gender,
 )

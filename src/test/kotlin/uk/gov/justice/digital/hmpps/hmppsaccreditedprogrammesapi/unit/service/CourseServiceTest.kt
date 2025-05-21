@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.CourseVariantEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseVariantRepository
@@ -255,7 +256,7 @@ class CourseServiceTest {
     every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory()
       .withCode(organisationId)
       .withName("Whatton")
-      .withGender("MALE").produce()
+      .withGender(Gender.MALE).produce()
     // When
     val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral.id!!, "MODERATE_INTENSITY_BC")
 
@@ -295,7 +296,7 @@ class CourseServiceTest {
     every { courseRepository.findAllById(any()) } returns courseEntities
     every { organisationService.findOrganisationEntityByCode(any()) } returns OrganisationEntityFactory().withCode(
       organisationId,
-    ).withName("Whatton").withGender("MALE").produce()
+    ).withName("Whatton").withGender(Gender.MALE).produce()
     val recommendedBuildingChoicesCourse = courseService.getBuildingChoicesCourseForTransferringReferral(referral.id!!, "HIGH_INTENSITY_BC")
 
     recommendedBuildingChoicesCourse.id shouldBe courseId1
