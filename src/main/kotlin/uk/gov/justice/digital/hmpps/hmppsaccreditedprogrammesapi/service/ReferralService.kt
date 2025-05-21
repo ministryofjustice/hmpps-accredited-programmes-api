@@ -370,6 +370,7 @@ constructor(
   fun getHspReferralsView(
     pageable: Pageable,
     status: List<String>?,
+    audience: String?,
     statusGroup: String?,
     prisonNumber: String?,
     surnameOnly: String?,
@@ -386,6 +387,7 @@ constructor(
         surname = surname,
         pageable = pageable,
         status = uppercaseStatuses,
+        audience = audience,
         hasLdc = hasLdc,
       )
 

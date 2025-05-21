@@ -1807,6 +1807,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   fun getHspReferralViews(
     statusFilter: List<String>? = null,
+    audienceFilter: String? = null,
     courseNameFilter: String? = null,
     statusGroupFilter: String? = null,
     pageNumber: Number = 0,
@@ -1817,6 +1818,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   ): PaginatedReferralView {
     val uriBuilder = UriComponentsBuilder.fromUriString("/referrals/view/hsp/dashboard")
     statusFilter?.let { uriBuilder.queryParam("status", it.joinToString(",")) }
+    audienceFilter?.let { uriBuilder.queryParam("audience", encodeValue(it)) }
     courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
     statusGroupFilter?.let { uriBuilder.queryParam("statusGroup", encodeValue(it)) }
     uriBuilder.queryParam("page", pageNumber)

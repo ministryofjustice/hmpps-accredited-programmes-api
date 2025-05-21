@@ -1022,6 +1022,10 @@ class ReferralController(
       value = "status",
       required = false,
     ) status: List<String>?,
+    @Parameter(description = "Filter by the audience of the referral") @RequestParam(
+      value = "audience",
+      required = false,
+    ) audience: String?,
     @Parameter(description = "Additional filter to only show \"open\", \"closed\" or \"draft\" referrals") @RequestParam(
       value = "statusGroup",
       required = false,
@@ -1047,6 +1051,7 @@ class ReferralController(
       referralService.getHspReferralsView(
         pageable = pageable,
         status = status,
+        audience = audience,
         statusGroup = statusGroup,
         prisonNumber = nameOrIdSearch.prisonNumber,
         surnameOnly = nameOrIdSearch.surnameOnly,

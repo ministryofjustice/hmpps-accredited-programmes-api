@@ -128,6 +128,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
       SELECT r FROM ReferralViewEntity r
       WHERE ( r.courseName = 'Healthy Sex Programme')
         AND (:status IS NULL OR r.status IN :status)
+        AND (:audience IS NULL OR :audience = '' OR r.audience = :audience)
         AND (:prisonNumber IS NULL OR :prisonNumber = '' OR r.prisonNumber = :prisonNumber)
         AND (:surnameOnly IS NULL OR :surnameOnly = '' OR (r.surname LIKE CONCAT('%', :surnameOnly, '%') 
             OR r.forename LIKE CONCAT('%', :surnameOnly, '%')))
@@ -150,6 +151,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
     surname: String?,
     pageable: Pageable,
     status: List<String>?,
+    audience: String?,
     hasLdc: Boolean?,
   ): Page<ReferralViewEntity>
 }
