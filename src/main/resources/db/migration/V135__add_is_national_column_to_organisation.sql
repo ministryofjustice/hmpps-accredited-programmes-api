@@ -1,0 +1,2 @@
+ALTER TABLE organisation
+ADD COLUMN is_national BOOLEAN DEFAULT NULL;

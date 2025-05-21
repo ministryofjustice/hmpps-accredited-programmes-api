@@ -26,4 +26,7 @@ class OrganisationEntity(
   @Enumerated(EnumType.STRING)
   @Column(name = "gender")
   var gender: Gender,
+
+  @Column(name = "is_national")
+  var isNational: Boolean? = null,
 )
