@@ -1,0 +1,1 @@
+DELETE from offering where course_id = (SELECT course_id FROM course where identifier = 'HSP-SO') AND organisation_id != 'NAT';
