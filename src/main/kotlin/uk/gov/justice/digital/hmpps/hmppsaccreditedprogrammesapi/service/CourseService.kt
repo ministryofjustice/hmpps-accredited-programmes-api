@@ -141,13 +141,13 @@ constructor(
     return offeringRepository.save(matchedOffering).toApi(genderForWhichCourseIsOffered)
   }
 
-  fun deleteCourseOffering(id: UUID, offeringId: UUID) {
+  fun deleteCourseOffering(courseId: UUID, offeringId: UUID) {
     val existingOffering =
-      offeringRepository.findByCourseIdAndIdAndWithdrawnIsFalse(id, offeringId)
-        ?: throw BusinessException("Offering does not exist")
+      offeringRepository.findByCourseIdAndIdAndWithdrawnIsFalse(courseId, offeringId)
+        ?: throw BusinessException("Offering $offeringId does not exist")
     // check that the offering isn't being used
     if (referralRepository.countAllByOfferingId(offeringId) > 0) {
-      throw BusinessException("Offering is in use and cannot be deleted. This offering should be withdrawn")
+      throw BusinessException("Offering is in use and cannot be deleted. This offering should be withdrawn. OfferingId $offeringId CourseId $courseId")
     }
     offeringRepository.delete(existingOffering.id!!)
   }
