@@ -222,7 +222,7 @@ class CourseController(
       required = true,
     ) @PathVariable("offeringId") offeringId: UUID,
   ): ResponseEntity<Unit> {
-    courseService.deleteCourseOffering(id, offeringId)
+    courseService.deleteCourseOffering(courseId = id, offeringId = offeringId)
     return ResponseEntity.ok(null)
   }
 
