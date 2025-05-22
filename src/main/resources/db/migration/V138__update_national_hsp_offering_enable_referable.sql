@@ -1,0 +1,1 @@
+update offering set referable = true where organisation_id = 'NAT';
