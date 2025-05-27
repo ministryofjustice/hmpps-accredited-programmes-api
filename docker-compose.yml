@@ -24,7 +24,7 @@ services:
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://hmpps-auth:8080/auth/.well-known/jwks.json
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
-    image: quay.io/hmpps/prison-api:latest
+    image: ghcr.io/ministryofjustice/prison-api:latest
     networks:
       - hmpps
     ports:
