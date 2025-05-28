@@ -644,7 +644,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       .expectStatus().is4xxClientError
       .expectBody()
       .jsonPath("$.userMessage")
-      .isEqualTo("Business rule violation: Offering is in use and cannot be deleted. This offering should be withdrawn")
+      .isEqualTo("Business rule violation: Offering is in use and cannot be deleted. This offering should be withdrawn. OfferingId $OFFERING_ID1 CourseId $COURSE_ID1")
   }
 
   @Test
