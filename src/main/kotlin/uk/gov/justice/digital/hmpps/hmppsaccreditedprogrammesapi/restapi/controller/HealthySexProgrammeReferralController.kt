@@ -48,7 +48,7 @@ class HealthySexProgrammeReferralController(
   private val log = LoggerFactory.getLogger(this::class.java)
 
   @Operation(
-    tags = ["Referrals"],
+    tags = ["HSP Referrals"],
     summary = "Create an HSP referral",
     operationId = "createHealthySexProgrammeReferral",
     description = "Create a Healthy Sex Programme referral",
@@ -111,7 +111,7 @@ class HealthySexProgrammeReferralController(
   }
 
   @Operation(
-    tags = ["Referrals"],
+    tags = ["HSP Referrals"],
     summary = "Get paginated Healthy Sex Programmes(HSP) referrals ",
     operationId = "getReferralViewsByCurrentUser",
     description = """""",
@@ -207,6 +207,35 @@ class HealthySexProgrammeReferralController(
     )
   }
 
+  @Operation(
+    tags = ["HSP Referrals"],
+    summary = "Retrieve the Healthy Sex Programmes(HSP) specific details associated with the referral",
+    operationId = "getHealthySexProgrammeReferralDetails",
+    description = """""",
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "The HSP details associated with the referral",
+        content = [Content(schema = Schema(implementation = HspReferralDetails::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "The request was unauthorised",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Not authorised to access this endpoint",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The HSP referrals was not found.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
   @RequestMapping(
     method = [RequestMethod.GET],
     value = ["/referrals/{id}/hsp-details"],
