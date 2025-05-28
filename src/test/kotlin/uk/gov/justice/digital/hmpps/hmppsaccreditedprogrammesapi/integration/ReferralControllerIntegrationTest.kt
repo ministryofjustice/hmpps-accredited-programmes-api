@@ -56,7 +56,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OverrideType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
@@ -69,7 +68,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.HspReferralCreate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PaginatedReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
@@ -81,12 +79,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.S
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationSettingFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.SexualOffenceDetailsEntityFactory
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
@@ -260,131 +255,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
       .bodyValue(TransferReferralRequest(referralId, offeringId, "Transfer reason"))
       .exchange()
       .expectStatus().isNotFound
-  }
-
-  @Test
-  fun `should create an HSP referral with associated HSP offence details`() {
-    // Given
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
-    val courseEntity = CourseEntityFactory().produce()
-    persistenceHelper.createCourse(courseEntity)
-
-    val offeringEntity = OfferingEntityFactory().withCourse(courseEntity).withOrganisationId("MDI").produce()
-    persistenceHelper.createOffering(offeringEntity)
-
-    val sexualOffenceDetailsEntity1 = SexualOffenceDetailsEntityFactory().withScore(2).produce()
-    persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity1)
-
-    val sexualOffenceDetailsEntity2 = SexualOffenceDetailsEntityFactory().withScore(2).produce()
-    persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity2)
-
-    val hspReferralCreate = HspReferralCreate(
-      offeringEntity.id!!,
-      PRISON_NUMBER_1,
-      listOf(sexualOffenceDetailsEntity1.id!!, sexualOffenceDetailsEntity2.id!!),
-      "Is definitely eligible for HSP",
-    )
-
-    // When
-    val createdHspReferral = createHSPReferral(hspReferralCreate)
-
-    // Then
-    createdHspReferral.prisonNumber shouldBeEqual PRISON_NUMBER_1
-    val savedReferral = referralRepository.findByIdWithHspDetails(createdHspReferral.id).get()
-    savedReferral.status shouldBeEqual ReferralStatus.REFERRAL_STARTED.name
-    savedReferral.selectedSexualOffenceDetails.size shouldBeEqual 2
-    savedReferral.selectedSexualOffenceDetails.first().sexualOffenceDetails?.description?.shouldBeEqual(sexualOffenceDetailsEntity1.description)
-    savedReferral.selectedSexualOffenceDetails.elementAt(1).sexualOffenceDetails?.description?.shouldBeEqual(sexualOffenceDetailsEntity2.description)
-    savedReferral.eligibilityOverrideReasons.size shouldBeEqual 1
-    savedReferral.eligibilityOverrideReasons.first().reason.shouldBeEqual("Is definitely eligible for HSP")
-    savedReferral.eligibilityOverrideReasons.first().overrideType.shouldBeEqual(OverrideType.HEALTHY_SEX_PROGRAMME)
-  }
-
-  @Test
-  fun `should create an HSP referral when total offence score is below HSP but an override reason has been provided `() {
-    // Given
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
-    val courseEntity = CourseEntityFactory().produce()
-    persistenceHelper.createCourse(courseEntity)
-
-    val offeringEntity = OfferingEntityFactory().withCourse(courseEntity).withOrganisationId("MDI").produce()
-    persistenceHelper.createOffering(offeringEntity)
-
-    val sexualOffenceDetailsEntity1 = SexualOffenceDetailsEntityFactory().withScore(1).produce()
-    persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity1)
-
-    val hspReferralCreate = HspReferralCreate(
-      offeringEntity.id!!,
-      PRISON_NUMBER_1,
-      listOf(sexualOffenceDetailsEntity1.id!!),
-      "Is definitely eligible for HSP",
-    )
-
-    // When
-    val createdHspReferral = createHSPReferral(hspReferralCreate)
-
-    // Then
-    val savedReferral = referralRepository.findByIdWithHspDetails(createdHspReferral.id).get()
-    savedReferral.selectedSexualOffenceDetails.first().sexualOffenceDetails?.description?.shouldBeEqual(sexualOffenceDetailsEntity1.description)
-    savedReferral.eligibilityOverrideReasons.first().reason.shouldBeEqual("Is definitely eligible for HSP")
-  }
-
-  @Test
-  fun `should return Http BAD REQUEST when creating an HSP referral without selected offence details`() {
-    // Given
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
-    val courseEntity = CourseEntityFactory().produce()
-    persistenceHelper.createCourse(courseEntity)
-
-    val offeringEntity = OfferingEntityFactory().withCourse(courseEntity).withOrganisationId("MDI").produce()
-    persistenceHelper.createOffering(offeringEntity)
-
-    val hspReferralCreate = HspReferralCreate(
-      offeringEntity.id!!,
-      PRISON_NUMBER_1,
-      emptyList(),
-    )
-
-    // When & Then
-    performRequestAndExpectStatusWithBody(
-      HttpMethod.POST,
-      "/referral/hsp",
-      body = hspReferralCreate,
-      expectedResponseStatus = HttpStatus.BAD_REQUEST.value(),
-    )
-  }
-
-  @Test
-  fun `should return Http BAD REQUEST when creating an HSP referral with offence details scoring below HSP threshold`() {
-    // Given
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
-    val courseEntity = CourseEntityFactory().produce()
-    persistenceHelper.createCourse(courseEntity)
-
-    val offeringEntity = OfferingEntityFactory().withCourse(courseEntity).withOrganisationId("MDI").produce()
-    persistenceHelper.createOffering(offeringEntity)
-
-    val sexualOffenceDetailsEntity = SexualOffenceDetailsEntityFactory().withScore(2).produce()
-    persistenceHelper.createSexualOffenceDetails(sexualOffenceDetailsEntity)
-
-    val hspReferralCreate = HspReferralCreate(
-      offeringEntity.id!!,
-      PRISON_NUMBER_1,
-      listOf(sexualOffenceDetailsEntity.id!!),
-      eligibilityOverrideReason = null,
-    )
-
-    // When & Then
-    performRequestAndExpectStatusWithBody(
-      HttpMethod.POST,
-      "/referral/hsp",
-      body = hspReferralCreate,
-      expectedResponseStatus = HttpStatus.BAD_REQUEST.value(),
-    )
   }
 
   @Test
@@ -1378,8 +1248,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     .expectStatus().is4xxClientError
     .expectBody<Referral>()
     .returnResult().responseBody!!
-
-  fun createHSPReferral(hspReferralCreate: HspReferralCreate) = performRequestAndExpectStatusWithBody(HttpMethod.POST, "/referral/hsp", body = hspReferralCreate, expectedResponseStatus = HttpStatus.CREATED.value(), returnType = referralTypeReference())
 
   fun createReferral(offeringId: UUID?, prisonNumber: String = PRISON_NUMBER_1, originalReferralId: UUID? = null) = webTestClient
     .post()

@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SexualOffenceCategoryType
 import java.util.*
 
@@ -22,5 +23,16 @@ data class SexualOffenceDetails(
   @get:JsonProperty("categoryDescription") val categoryDescription: String,
 
   @Schema(example = "1", description = "The score associated with the offence, between 1 and 3.")
-  @get:JsonProperty("score") val score: Int,
-)
+  @get:JsonProperty("score") var score: Int,
+) {
+  companion object {
+    fun from(entity: SexualOffenceDetailsEntity): SexualOffenceDetails = SexualOffenceDetails(
+      id = entity.id!!,
+      description = entity.description,
+      hintText = entity.hintText,
+      categoryCode = entity.category,
+      categoryDescription = entity.description,
+      score = entity.score,
+    )
+  }
+}
