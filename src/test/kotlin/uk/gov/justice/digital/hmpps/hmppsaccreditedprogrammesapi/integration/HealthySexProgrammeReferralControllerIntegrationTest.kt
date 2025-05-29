@@ -154,8 +154,13 @@ class HealthySexProgrammeReferralControllerIntegrationTest : IntegrationTestBase
     val savedReferral = referralRepository.findByIdWithHspDetails(createdHspReferral.id).get()
     savedReferral.status shouldBeEqual ReferralStatus.REFERRAL_STARTED.name
     savedReferral.selectedSexualOffenceDetails.size shouldBeEqual 2
-    savedReferral.selectedSexualOffenceDetails.first().sexualOffenceDetails?.description?.shouldBeEqual(sexualOffenceDetailsEntity1.description)
-    savedReferral.selectedSexualOffenceDetails.elementAt(1).sexualOffenceDetails?.description?.shouldBeEqual(sexualOffenceDetailsEntity2.description)
+
+    assertThat(savedReferral.selectedSexualOffenceDetails.map { it.sexualOffenceDetails?.description })
+      .containsExactlyInAnyOrder(
+        sexualOffenceDetailsEntity1.description,
+        sexualOffenceDetailsEntity2.description,
+      )
+
     savedReferral.eligibilityOverrideReasons.size shouldBeEqual 1
     savedReferral.eligibilityOverrideReasons.first().reason.shouldBeEqual("Is definitely eligible for HSP")
     savedReferral.eligibilityOverrideReasons.first().overrideType.shouldBeEqual(OverrideType.HEALTHY_SEX_PROGRAMME)
