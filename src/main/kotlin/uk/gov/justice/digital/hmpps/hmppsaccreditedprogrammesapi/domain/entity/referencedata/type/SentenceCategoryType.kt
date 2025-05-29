@@ -18,6 +18,8 @@ enum class SentenceCategoryType(val description: String) {
       sentenceCategoryList.containsAll(listOf(DETERMINATE, INDETERMINATE)) -> DETERMINATE_INDETERMINATE
       sentenceCategoryList.containsAll(listOf(DETERMINATE_RECALL, INDETERMINATE)) -> DETERMINATE_INDETERMINATE_RECALL
       sentenceCategoryList.containsAll(listOf(DETERMINATE, INDETERMINATE_RECALL)) -> DETERMINATE_INDETERMINATE_RECALL
+      sentenceCategoryList.containsAll(listOf(DETERMINATE, RECALL)) -> DETERMINATE_RECALL
+      sentenceCategoryList.containsAll(listOf(INDETERMINATE, RECALL)) -> INDETERMINATE_RECALL
       sentenceCategoryList.contains(DETERMINATE_RECALL) -> DETERMINATE_RECALL
       sentenceCategoryList.contains(INDETERMINATE_RECALL) -> INDETERMINATE_RECALL
       sentenceCategoryList.contains(DETERMINATE) -> DETERMINATE

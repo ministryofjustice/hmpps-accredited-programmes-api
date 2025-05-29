@@ -35,6 +35,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ran
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController.Companion.parseNameOrId
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusUpdate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer.toApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
@@ -371,12 +372,11 @@ constructor(
     val referenceDataService: ReferralReferenceDataService = mockk()
     val referralStatusHistoryService: ReferralStatusHistoryService = mockk()
     val auditService: AuditService = mockk()
-    val staffService: StaffService = mockk()
     val courseParticipationService: CourseParticipationService = mockk()
 
-    val referralController = ReferralController(referralService, securityService, referenceDataService, referralStatusHistoryService, auditService, staffService, courseParticipationService)
+    val referralController = ReferralController(referralService, securityService, referenceDataService, referralStatusHistoryService, auditService, courseParticipationService)
 
-    val parseNameOrId = referralController.parseNameOrId(nameSearch)
+    val parseNameOrId = parseNameOrId(nameSearch)
     parseNameOrId.forename shouldBe "DEL"
     parseNameOrId.surname shouldBe "HATTON"
     parseNameOrId.surnameOnly shouldBe ""

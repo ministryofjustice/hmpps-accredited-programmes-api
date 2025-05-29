@@ -78,17 +78,25 @@ class SentenceCategoryTypeTest {
   }
 
   @Test
-  fun `Should return INDETERMINATE if all other sentence categories are UNKNOWN or RECALL`() {
+  fun `Should return INDETERMINATE_RECALL if all other sentence categories are UNKNOWN or RECALL`() {
     // Given
     val list = listOf(SentenceCategoryType.INDETERMINATE, SentenceCategoryType.UNKNOWN, SentenceCategoryType.RECALL)
     // When & Then
-    assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.INDETERMINATE)
+    assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.INDETERMINATE_RECALL)
   }
 
   @Test
   fun `Should return DETERMINATE_RECALL if it's the only category in the list`() {
     // Given
     val list = listOf(SentenceCategoryType.DETERMINATE_RECALL)
+    // When & Then
+    assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.DETERMINATE_RECALL)
+  }
+
+  @Test
+  fun `Should return DETERMINATE_RECALL if it's the list contains both RECALL and DETERMINATE sentence categories`() {
+    // Given
+    val list = listOf(SentenceCategoryType.DETERMINATE, SentenceCategoryType.RECALL)
     // When & Then
     assertThat(SentenceCategoryType.determineOverallCategory(list)).isEqualTo(SentenceCategoryType.DETERMINATE_RECALL)
   }
