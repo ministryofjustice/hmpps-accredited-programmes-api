@@ -157,7 +157,8 @@ class HealthySexProgrammeReferralControllerIntegrationTest : IntegrationTestBase
 
     savedReferral.selectedSexualOffenceDetails.map { it.sexualOffenceDetails?.description } shouldBeEqual listOf(
       sexualOffenceDetailsEntity1.description,
-      sexualOffenceDetailsEntity2.description)
+      sexualOffenceDetailsEntity2.description,
+    )
 
     savedReferral.eligibilityOverrideReasons.size shouldBeEqual 1
     savedReferral.eligibilityOverrideReasons.first().reason.shouldBeEqual("Is definitely eligible for HSP")
