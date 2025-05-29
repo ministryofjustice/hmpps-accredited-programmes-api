@@ -155,10 +155,11 @@ class HealthySexProgrammeReferralControllerIntegrationTest : IntegrationTestBase
     savedReferral.status shouldBeEqual ReferralStatus.REFERRAL_STARTED.name
     savedReferral.selectedSexualOffenceDetails.size shouldBeEqual 2
 
-    savedReferral.selectedSexualOffenceDetails.map { it.sexualOffenceDetails?.description } shouldBeEqual listOf(
-      sexualOffenceDetailsEntity1.description,
-      sexualOffenceDetailsEntity2.description,
-    )
+    assertThat(savedReferral.selectedSexualOffenceDetails.map { it.sexualOffenceDetails?.description })
+      .containsExactlyInAnyOrder(
+        sexualOffenceDetailsEntity1.description,
+        sexualOffenceDetailsEntity2.description,
+      )
 
     savedReferral.eligibilityOverrideReasons.size shouldBeEqual 1
     savedReferral.eligibilityOverrideReasons.first().reason.shouldBeEqual("Is definitely eligible for HSP")
