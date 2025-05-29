@@ -59,9 +59,9 @@ dependencies {
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:1.21.0")
-  testImplementation("org.testcontainers:postgresql:1.21.0")
-  testImplementation("org.testcontainers:junit-jupiter:1.21.0")
+  testImplementation("org.testcontainers:testcontainers:1.21.1")
+  testImplementation("org.testcontainers:postgresql:1.21.1")
+  testImplementation("org.testcontainers:junit-jupiter:1.21.1")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
