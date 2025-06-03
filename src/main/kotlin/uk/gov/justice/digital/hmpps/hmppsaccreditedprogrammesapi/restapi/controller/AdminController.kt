@@ -58,14 +58,14 @@ class AdminController(
     tags = ["Admin"],
   )
   fun updatePoms(): ResponseEntity<String> {
-    referralService.getPrisonIdsWithNoPrimaryPom().forEach {
-      log.info("**** START: Updating POMs for prisoner $it")
+    referralService.getDistinctPrisonNumbers().forEach {
+      log.info("START: Updating POMs for prisoner $it")
       try {
         val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(it)
         referralService.updatePoms(it, primaryPom, secondaryPom)
-        log.info("**** FINISH: Updating POMs for prisoner $it")
+        log.info("FINISH: Updating POMs for prisoner $it")
       } catch (ex: Exception) {
-        log.warn("**** ERROR: Updating POMs for prisoner $it - ${ex.message}", ex)
+        log.warn("ERROR: Updating POMs for prisoner $it - ${ex.message}", ex)
       }
     }
 
