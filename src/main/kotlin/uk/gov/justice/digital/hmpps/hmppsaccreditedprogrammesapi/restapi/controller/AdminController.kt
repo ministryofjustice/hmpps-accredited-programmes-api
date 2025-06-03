@@ -58,7 +58,7 @@ class AdminController(
     tags = ["Admin"],
   )
   fun updatePoms(): ResponseEntity<String> {
-    referralService.getDistinctPrisonNumbers().forEach {
+    referralService.getPrisonIdsWithNoPrimaryPom().forEach {
       log.info("START: Updating POMs for prisoner $it")
       try {
         val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(it)
