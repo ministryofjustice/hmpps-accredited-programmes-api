@@ -487,6 +487,7 @@ constructor(
   }
 
   fun getPrisonIdsWithNoPrimaryPom() = referralRepository.findAllDistinctPrisonNumbersWithoutPrimaryPom()
+  fun getDistinctPrisonNumbers() = referralRepository.findAllDistinctPrisonNumbersWithoutPrimaryPom()
   fun getPrisonIdsWithoutLdc() = referralRepository.findAllDistinctPrisonNumbersWithoutLdc()
 
   fun updatePoms(prisonNumber: String, primaryPom: StaffEntity?, secondaryPom: StaffEntity?) {
