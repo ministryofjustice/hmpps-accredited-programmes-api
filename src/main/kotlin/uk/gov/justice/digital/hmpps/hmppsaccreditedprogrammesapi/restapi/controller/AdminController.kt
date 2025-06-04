@@ -16,8 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.UpdateAuditCaseNotesRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.AuditService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CaseNotesApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
@@ -34,6 +40,8 @@ class AdminController(
   private val personService: PersonService,
   private val referralService: ReferralService,
   private val staffService: StaffService,
+  private val caseNotesApiService: CaseNotesApiService,
+  private val auditService: AuditService,
 ) {
   @Operation(
     tags = ["Admin"],
@@ -108,6 +116,61 @@ class AdminController(
   fun deleteAcpTestReferrals(): ResponseEntity<String> {
     referralService.deleteReferralsForAcpTestUser()
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Referrals deleted")
+  }
+
+  @Operation(
+    tags = ["Admin"],
+    summary = "Update audit and case notes to fix an incorrect status change",
+    operationId = "updateAuditAndCaseNotes",
+    description = """""",
+    responses = [
+      ApiResponse(responseCode = "200", description = "Audit and case notes creation successful"),
+      ApiResponse(
+        responseCode = "401",
+        description = "The request was unauthorised.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden.  The client is not authorised to access this referral.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "The referral does not exist.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "500",
+        description = "An error occurred when attempting to perform this operation.",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
+  )
+  @RequestMapping(
+    method = [RequestMethod.POST],
+    value = ["/referrals/update-audit-casenotes"],
+    consumes = ["application/json"],
+  )
+  fun updateAuditAndCaseNotes(
+    @Parameter(
+      description = "Details needed to transfer a referral to Building Choices",
+      required = true,
+    ) @RequestBody updateAuditCaseNotesRequest: UpdateAuditCaseNotesRequest,
+  ): ResponseEntity<String> {
+    log.info("********* START: Request received to write case notes and audit log for referralId ${updateAuditCaseNotesRequest.referralId}")
+
+    val referral = referralService.getReferralById(updateAuditCaseNotesRequest.referralId) ?: throw NotFoundException("No Referral found for referralId ${updateAuditCaseNotesRequest.referralId}")
+    log.info("********* Fetched referral $referral")
+    caseNotesApiService.createCustomCaseNote(referral, updateAuditCaseNotesRequest.referrerUsername)
+    log.info("********* Case notes created for referralId ${referral.id}")
+    auditService.createInternalAuditRecord(referralId = referral.id, prisonNumber = referral.prisonNumber, auditAction = AuditAction.UPDATE_REFERRAL.name)
+    log.info("********* Internal audit record created for referralId ${referral.id}")
+    auditService.publishAuditEvent(auditAction = AuditAction.UPDATE_REFERRAL.name, prisonNumber = referral.prisonNumber, referralId = referral.id.toString())
+    log.info("********* Audit event published for referralId ${referral.id}")
+
+    return ResponseEntity.status(HttpStatus.OK).body("Case notes and audit updated successful")
   }
 
   companion object {
