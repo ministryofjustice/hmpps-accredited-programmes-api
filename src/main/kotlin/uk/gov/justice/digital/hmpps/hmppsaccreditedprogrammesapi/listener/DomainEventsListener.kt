@@ -38,7 +38,7 @@ class DomainEventsListener(
 
   private fun handlePomAllocationChangedMessage(message: DomainEventsMessage) {
     message.personReference.findNomsNumber()?.let {
-      pomAllocationChangedMessageHandlerService.process(it)
+      pomAllocationChangedMessageHandlerService.updatePrisonerPOMAllocation(it)
     } ?: log.error("Pom allocation message did not contain prisoner number. " + message.additionalInformation)
   }
 

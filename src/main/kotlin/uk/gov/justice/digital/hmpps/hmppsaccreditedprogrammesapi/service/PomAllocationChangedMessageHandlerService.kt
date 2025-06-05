@@ -12,7 +12,7 @@ class PomAllocationChangedMessageHandlerService(
 
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  fun process(prisonNumber: String) {
+  fun updatePrisonerPOMAllocation(prisonNumber: String) {
     log.info("START: Started processing PomAllocationChangedMessage for prisoner $prisonNumber")
     val person = personService.getPerson(prisonNumber)
 

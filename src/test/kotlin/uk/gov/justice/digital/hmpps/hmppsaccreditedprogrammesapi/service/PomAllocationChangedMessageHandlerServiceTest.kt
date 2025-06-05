@@ -31,7 +31,7 @@ class PomAllocationChangedMessageHandlerServiceTest {
     every { staffService.getOffenderAllocation(prisonNumber) } returns Pair(primaryPom, secondaryPom)
 
     // When
-    handler.process(prisonNumber)
+    handler.updatePrisonerPOMAllocation(prisonNumber)
 
     // Then
     verify { personService.getPerson(prisonNumber) }
@@ -46,7 +46,7 @@ class PomAllocationChangedMessageHandlerServiceTest {
     every { personService.getPerson(prisonNumber) } returns null
 
     // When
-    handler.process(prisonNumber)
+    handler.updatePrisonerPOMAllocation(prisonNumber)
 
     // Then
     verify(exactly = 1) { personService.getPerson(prisonNumber) }
@@ -67,7 +67,7 @@ class PomAllocationChangedMessageHandlerServiceTest {
     every { referralService.updatePoms(prisonNumber, primaryPom, secondaryPom) } throws RuntimeException("Service failure")
 
     // When
-    handler.process(prisonNumber)
+    handler.updatePrisonerPOMAllocation(prisonNumber)
 
     // Then
     verify { personService.getPerson(prisonNumber) }
