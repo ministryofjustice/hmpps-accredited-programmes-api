@@ -7,15 +7,13 @@ import io.awspring.cloud.sqs.annotation.SqsListener
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PomAllocationChangedMessageHandlerService
 
 @Service
 class DomainEventsListener(
   private val personService: PersonService,
-  private val staffService: StaffService,
-  private val referralService: ReferralService,
   private val objectMapper: ObjectMapper,
+  private val pomAllocationChangedMessageHandlerService: PomAllocationChangedMessageHandlerService,
 ) {
 
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -39,12 +37,9 @@ class DomainEventsListener(
   }
 
   private fun handlePomAllocationChangedMessage(message: DomainEventsMessage) {
-    val prisonNumber = message.personReference.findNomsNumber()
-
-    prisonNumber?.let {
-      val (primaryPom, secondaryPom) = staffService.getOffenderAllocation(it)
-      referralService.updatePoms(it, primaryPom, secondaryPom)
-    } ?: log.error("POM allocation message did not contain prisoner number. " + message.personReference)
+    message.personReference.findNomsNumber()?.let {
+      pomAllocationChangedMessageHandlerService.process(it)
+    } ?: log.error("Pom allocation message did not contain prisoner number. " + message.additionalInformation)
   }
 
   private fun handlePrisonerUpdatedMessage(message: DomainEventsMessage) {
