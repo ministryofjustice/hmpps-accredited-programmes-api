@@ -155,7 +155,7 @@ class AdminController(
   )
   fun updateAuditAndCaseNotes(
     @Parameter(
-      description = "Details needed to transfer a referral to Building Choices",
+      description = "Endpoint to write case notes and audit for a referral",
       required = true,
     ) @RequestBody updateAuditCaseNotesRequest: UpdateAuditCaseNotesRequest,
   ): ResponseEntity<String> {
