@@ -24,7 +24,7 @@ dependencies {
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.5.0"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.5")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.6")
   runtimeOnly("org.postgresql:postgresql:42.7.6")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
