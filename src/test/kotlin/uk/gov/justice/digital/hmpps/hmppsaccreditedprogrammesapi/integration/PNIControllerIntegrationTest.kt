@@ -77,7 +77,7 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
           individualSexScores = IndividualSexScores(
             sexualPreOccupation = 2,
             offenceRelatedSexualInterests = 1,
-            emotionalCongruence = 1,
+            emotionalCongruence = null,
           ),
         ),
         thinkingDomainScore = ThinkingDomainScore(
@@ -102,7 +102,7 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
             impulsivity = 0,
             temperControl = 2,
             problemSolvingSkills = 0,
-            difficultiesCoping = 0,
+            difficultiesCoping = null,
           ),
         ),
       ),
