@@ -167,4 +167,35 @@ class CaseNotesApiService(
       username
     }
   }
+
+  private fun buildCustomCaseNoteMessage(referral: ReferralEntity, personEntity: PersonEntity, usernameOfReferrer: String): String {
+    val programmeDescriptionMessage = "Referral to Kaizen: Intimate partner violence offence strand at Stocken (HMP) \n\n"
+
+    val message = "This programme was mistakenly marked as complete.\n\n${personEntity.fullName()} is still on the Kaizen: intimate partner violence programme started on 24 February 2025."
+
+    val userDetail = nomisUserRolesService.getUserDetail(usernameOfReferrer)
+
+    val statusUpdatedBy = "\n\n Updated by: Accredited Programmes digital team\n"
+
+    return programmeDescriptionMessage + message + statusUpdatedBy
+  }
+
+  fun createCustomCaseNote(referral: ReferralEntity, usernameOfReferrer: String) {
+    val person = personService.getPerson(referral.prisonNumber)!!
+    val message = buildCustomCaseNoteMessage(referral, person, usernameOfReferrer)
+    val caseNoteRequest = CaseNoteRequest(
+      type = ACP_TYPE,
+      subType = "PGM_STD",
+      occurrenceDateTime = LocalDateTime.now().toString(),
+      authorName = ACP_USER,
+      text = message,
+      locationId = getLocationId(person),
+    )
+
+    val createdCaseNote = createCaseNote(
+      caseNoteRequest,
+      referral.prisonNumber,
+    )
+    log.info("Automatic case note with id ${createdCaseNote?.caseNoteId} created for ${referral.prisonNumber} ")
+  }
 }
