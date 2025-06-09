@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model
 
 interface ScoredAnswer {
-  val score: Int
+  val score: Int?
 
-  enum class YesNo(override val score: Int) : ScoredAnswer {
+  enum class YesNo(override val score: Int?) : ScoredAnswer {
     YES(2),
     NO(0),
-    Unknown(0),
+    Unknown(null),
     ;
 
     companion object {
@@ -14,11 +14,11 @@ interface ScoredAnswer {
     }
   }
 
-  enum class Problem(override val score: Int) : ScoredAnswer {
+  enum class Problem(override val score: Int?) : ScoredAnswer {
     NONE(0),
     SOME(1),
     SIGNIFICANT(2),
-    MISSING(0),
+    MISSING(null),
     ;
 
     companion object {
