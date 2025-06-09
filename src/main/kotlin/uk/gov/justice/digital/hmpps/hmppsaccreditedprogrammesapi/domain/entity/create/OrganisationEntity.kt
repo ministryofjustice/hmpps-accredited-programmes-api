@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
-import jakarta.persistence.Table
-import jakarta.persistence.OneToOne
-import jakarta.persistence.CascadeType
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToOne
+import jakarta.persistence.Table
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.Gender
 import java.util.UUID
 
