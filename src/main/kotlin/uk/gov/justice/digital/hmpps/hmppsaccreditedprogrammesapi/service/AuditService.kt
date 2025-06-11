@@ -23,7 +23,7 @@ class AuditService(
   private val auditRepository: AuditRepository,
   private val hmppsAuditService: HmppsAuditService?,
 ) {
-  fun createInternalAuditRecord(
+  private fun createInternalAuditRecord(
     referralId: UUID? = null,
     prisonNumber: String,
     referrerUsername: String? = null,
@@ -77,7 +77,7 @@ class AuditService(
   }
 
   private val scope = CoroutineScope(Dispatchers.IO)
-  fun publishAuditEvent(
+  private fun publishAuditEvent(
     auditAction: String,
     prisonNumber: String?,
     subjectType: String? = "PRISON_NUMBER",
