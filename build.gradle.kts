@@ -25,7 +25,7 @@ dependencies {
   val springSecurityVersion = "6.5.0"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.6")
-  runtimeOnly("org.postgresql:postgresql:42.7.6")
+  runtimeOnly("org.postgresql:postgresql:42.7.7")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
@@ -55,7 +55,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
   testImplementation("au.com.dius.pact.provider:junit5spring:4.6.17")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
-  testImplementation("org.wiremock:wiremock-standalone:3.13.0")
+  testImplementation("org.wiremock:wiremock-standalone:3.13.1")
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
