@@ -19,12 +19,12 @@ ext["hibernate.version"] = "6.6.11.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.8.8"
+  val springdocVersion = "2.8.9"
   val sentryVersion = "8.13.2"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.5.0"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.5")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.6")
   runtimeOnly("org.postgresql:postgresql:42.7.6")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -43,7 +43,7 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.5")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.1.1")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.7")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.8")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 

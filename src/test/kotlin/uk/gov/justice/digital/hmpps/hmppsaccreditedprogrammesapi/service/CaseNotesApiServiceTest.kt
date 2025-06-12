@@ -105,7 +105,7 @@ class CaseNotesApiServiceTest {
   }
 
   @Test
-  fun `should build case note message correctly`() {
+  fun `should build case note message as expected`() {
     val person = PersonEntityFactory().withForename("John").withSurname("Doe").withPrisonNumber("A1234BC").produce()
 
     val course =
