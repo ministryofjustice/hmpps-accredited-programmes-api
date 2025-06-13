@@ -34,6 +34,6 @@ class OrganisationEntity(
   var isNational: Boolean? = null,
 
   @OneToOne(cascade = [CascadeType.ALL])
-  @JoinColumn(name = "address")
+  @JoinColumn(name = "address_id")
   var address: AddressEntity? = null,
 )

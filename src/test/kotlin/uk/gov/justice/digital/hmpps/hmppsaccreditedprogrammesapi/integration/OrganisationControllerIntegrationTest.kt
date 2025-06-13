@@ -84,7 +84,9 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
   @Test
   fun `should return organisation details including gender for a known organisation code`() {
     // Given
-    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org", gender = "MALE")
+    val addressId = UUID.randomUUID()
+    persistenceHelper.createAddress(id = addressId, addressLine1 = "Street 1", addressLine2 = "Street 2", country = "England", town = "Town", county = "Derbyshire", postalCode = "ABC123")
+    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org", gender = "MALE", addressId = addressId)
 
     // When
     val organisation = getOrganisation("BWN")
@@ -92,6 +94,7 @@ class OrganisationControllerIntegrationTest : IntegrationTestBase() {
     // Then
     assertThat(organisation.code).isEqualTo("BWN")
     assertThat(organisation.gender).isEqualTo("MALE")
+    assertThat(organisation.address?.addressLine1).isEqualTo("Street 1")
   }
 
   @Test

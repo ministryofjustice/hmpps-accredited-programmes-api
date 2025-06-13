@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS address
     );
 
 ALTER TABLE organisation
-    ADD COLUMN address uuid;
+    ADD COLUMN address_id uuid;
 
 ALTER TABLE organisation
     ADD CONSTRAINT address_id_fk
-        FOREIGN KEY (address) REFERENCES address(id);
+        FOREIGN KEY (address_id) REFERENCES address(id);
