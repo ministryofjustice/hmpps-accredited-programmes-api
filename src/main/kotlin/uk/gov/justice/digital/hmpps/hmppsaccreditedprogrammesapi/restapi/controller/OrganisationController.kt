@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Address
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Organisation
@@ -109,6 +110,7 @@ class OrganisationController(
         code = it.code,
         prisonName = it.name,
         gender = it.gender.name,
+        address = it.address?.let { addressEntity -> Address(addressEntity.addressLine1, addressEntity.town, addressEntity.postalCode, addressEntity.country, addressEntity.addressLine2, addressEntity.county) },
       ),
     )
   } ?: throw NotFoundException("No Organisation found at /organisation/$code")
