@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentCaptor
@@ -25,8 +24,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SentenceCategoryType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SentenceCategoryRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PersonEntityFactory
 import java.time.LocalDate
+import kotlin.test.assertEquals
 
 private const val PRISON_NUMBER = "Prisoner123"
 
@@ -51,8 +50,19 @@ class PersonServiceTest {
   @InjectMocks
   lateinit var personService: PersonService
 
-  @BeforeEach
-  fun setup() {
+  private fun mockGetPrisoners() {
+    val prisoner = Prisoner(
+      prisonerNumber = PRISON_NUMBER,
+      prisonName = "Prison 1",
+      firstName = "John",
+      lastName = "Doe",
+      tariffDate = LocalDate.of(1985, 1, 1),
+      gender = "Male",
+    )
+    whenever(peopleSearchApiService.getPrisoners(listOf(PRISON_NUMBER))).thenReturn(listOf(prisoner))
+  }
+
+  private fun mockGetSentenceInformation() {
     val sentenceInformation = SentenceInformation(
       prisonerNumber = PRISON_NUMBER,
       latestPrisonTerm = PrisonTerm(
@@ -98,20 +108,6 @@ class PersonServiceTest {
     )
     val response = ClientResult.Success(HttpStatus.OK, sentenceInformation)
     whenever(prisonApiClient.getSentenceInformation(PRISON_NUMBER)).thenReturn(response)
-
-    val prisoner = Prisoner(
-      prisonerNumber = PRISON_NUMBER,
-      prisonName = "Prison 1",
-      firstName = "John",
-      lastName = "Doe",
-      tariffDate = LocalDate.of(1985, 1, 1),
-      gender = "Male",
-    )
-
-    whenever(peopleSearchApiService.getPrisoners(listOf(PRISON_NUMBER))).thenReturn(listOf(prisoner))
-
-    whenever(personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER))
-      .thenReturn(PersonEntityFactory().withPrisonNumber(PRISON_NUMBER).produce())
   }
 
   private fun determinateAndIndeterminateSentenceCategories(): List<SentenceCategoryEntity> = listOf<SentenceCategoryEntity>(
@@ -162,6 +158,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set DETERMINATE_AND_INDETERMINATE category sentence information during person create or update`() {
     // Given
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -184,6 +182,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set INDETERMINATE category and true recall sentence information during person create or update`() {
     // Given
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -206,6 +206,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set DETERMINATE category and true recall sentence information during person create or update`() {
     // Given
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -228,6 +230,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set UNKNOWN category sentence information when no sentence information is available during person create or update`() {
     // Given
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -250,6 +254,7 @@ class PersonServiceTest {
   @Test
   fun `should set No active sentences category when no sentence information is available`() {
     // Given
+    mockGetPrisoners()
     val sentenceInformation = SentenceInformation(
       prisonerNumber = PRISON_NUMBER,
       latestPrisonTerm = PrisonTerm(
@@ -272,6 +277,8 @@ class PersonServiceTest {
   @Test
   fun `should add sentence information when creating a person`() {
     // Given
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER)).thenReturn(null)
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
@@ -292,31 +299,96 @@ class PersonServiceTest {
     personEntity.sentenceType shouldBe "Determinate and Indeterminate"
   }
 
-  private fun createKeyDates(): KeyDates = KeyDates(
-    sentenceStartDate = LocalDate.now(),
-    effectiveSentenceEndDate = LocalDate.now().plusDays(1),
-    confirmedReleaseDate = LocalDate.now().plusDays(2),
-    releaseDate = LocalDate.now().plusDays(3),
-    sentenceExpiryDate = LocalDate.now().plusDays(4),
-    automaticReleaseDate = LocalDate.now().plusDays(5),
-    conditionalReleaseDate = LocalDate.now().plusDays(6),
-    nonParoleDate = LocalDate.now().plusDays(7),
-    postRecallReleaseDate = LocalDate.now().plusDays(8),
-    licenceExpiryDate = LocalDate.now().plusDays(9),
-    homeDetentionCurfewEligibilityDate = LocalDate.now().plusDays(10),
-    paroleEligibilityDate = LocalDate.now().plusDays(11),
-    homeDetentionCurfewActualDate = LocalDate.now().plusDays(12),
-    actualParoleDate = LocalDate.now().plusDays(13),
-    releaseOnTemporaryLicenceDate = LocalDate.now().plusDays(14),
-    earlyRemovalSchemeEligibilityDate = LocalDate.now().plusDays(15),
-    earlyTermDate = LocalDate.now().plusDays(16),
-    midTermDate = LocalDate.now().plusDays(17),
-    lateTermDate = LocalDate.now().plusDays(18),
-    topupSupervisionExpiryDate = LocalDate.now().plusDays(19),
-    tariffDate = LocalDate.now().plusDays(20),
-    dtoPostRecallReleaseDate = LocalDate.now().plusDays(21),
-    tariffEarlyRemovalSchemeEligibilityDate = LocalDate.now().plusDays(22),
-    topupSupervisionStartDate = LocalDate.now().plusDays(23),
-    homeDetentionCurfewEndDate = LocalDate.now().plusDays(24),
+  @Test
+  fun `buildKeyDates returns key dates with earliestReleaseDate as expected`() {
+    val sentenceInformation = SentenceInformation(
+      prisonerNumber = "A1234BC",
+      latestPrisonTerm = PrisonTerm(
+        courtSentences = emptyList(),
+        keyDates = createKeyDates(),
+      ),
+    )
+
+    val result = personService.buildKeyDates(sentenceInformation)
+
+    val earliest = result.find { it.earliestReleaseDate!! }
+    assertEquals("RD", earliest?.code)
+  }
+
+  @Test
+  fun `buildKeyDates ignores earlier key dates when they are not in the relevant dates used specified in the case list`() {
+    val sentenceInformation = SentenceInformation(
+      prisonerNumber = "A1234BC",
+      latestPrisonTerm = PrisonTerm(
+        courtSentences = emptyList(),
+        keyDates = createKeyDates(
+          sentenceStartDate = LocalDate.now().minusDays(10),
+          tariffDate = LocalDate.now(),
+          conditionalReleaseDate = LocalDate.now().minusDays(1),
+          releaseDate = LocalDate.now().plusDays(1),
+          paroleEligibilityDate = LocalDate.now().minusDays(4),
+          postRecallReleaseDate = LocalDate.now().minusDays(2),
+        ),
+      ),
+    )
+
+    val result = personService.buildKeyDates(sentenceInformation)
+
+    val earliest = result.find { it.earliestReleaseDate!! }
+    assertEquals("PED", earliest?.code)
+  }
+
+  private fun createKeyDates(
+    sentenceStartDate: LocalDate = LocalDate.now(),
+    effectiveSentenceEndDate: LocalDate = LocalDate.now().plusDays(1),
+    confirmedReleaseDate: LocalDate = LocalDate.now().plusDays(2),
+    releaseDate: LocalDate = LocalDate.now().plusDays(3),
+    sentenceExpiryDate: LocalDate = LocalDate.now().plusDays(4),
+    automaticReleaseDate: LocalDate = LocalDate.now().plusDays(5),
+    conditionalReleaseDate: LocalDate = LocalDate.now().plusDays(6),
+    nonParoleDate: LocalDate = LocalDate.now().plusDays(7),
+    postRecallReleaseDate: LocalDate = LocalDate.now().plusDays(8),
+    licenceExpiryDate: LocalDate = LocalDate.now().plusDays(9),
+    homeDetentionCurfewEligibilityDate: LocalDate = LocalDate.now().plusDays(10),
+    paroleEligibilityDate: LocalDate = LocalDate.now().plusDays(11),
+    homeDetentionCurfewActualDate: LocalDate = LocalDate.now().plusDays(12),
+    actualParoleDate: LocalDate = LocalDate.now().plusDays(13),
+    releaseOnTemporaryLicenceDate: LocalDate = LocalDate.now().plusDays(14),
+    earlyRemovalSchemeEligibilityDate: LocalDate = LocalDate.now().plusDays(15),
+    earlyTermDate: LocalDate = LocalDate.now().plusDays(16),
+    midTermDate: LocalDate = LocalDate.now().plusDays(17),
+    lateTermDate: LocalDate = LocalDate.now().plusDays(18),
+    topupSupervisionExpiryDate: LocalDate = LocalDate.now().plusDays(19),
+    tariffDate: LocalDate = LocalDate.now().plusDays(20),
+    dtoPostRecallReleaseDate: LocalDate = LocalDate.now().plusDays(21),
+    tariffEarlyRemovalSchemeEligibilityDate: LocalDate = LocalDate.now().plusDays(22),
+    topupSupervisionStartDate: LocalDate = LocalDate.now().plusDays(23),
+    homeDetentionCurfewEndDate: LocalDate = LocalDate.now().plusDays(24),
+  ): KeyDates = KeyDates(
+    sentenceStartDate = sentenceStartDate,
+    effectiveSentenceEndDate = effectiveSentenceEndDate,
+    confirmedReleaseDate = confirmedReleaseDate,
+    releaseDate = releaseDate,
+    sentenceExpiryDate = sentenceExpiryDate,
+    automaticReleaseDate = automaticReleaseDate,
+    conditionalReleaseDate = conditionalReleaseDate,
+    nonParoleDate = nonParoleDate,
+    postRecallReleaseDate = postRecallReleaseDate,
+    licenceExpiryDate = licenceExpiryDate,
+    homeDetentionCurfewEligibilityDate = homeDetentionCurfewEligibilityDate,
+    paroleEligibilityDate = paroleEligibilityDate,
+    homeDetentionCurfewActualDate = homeDetentionCurfewActualDate,
+    actualParoleDate = actualParoleDate,
+    releaseOnTemporaryLicenceDate = releaseOnTemporaryLicenceDate,
+    earlyRemovalSchemeEligibilityDate = earlyRemovalSchemeEligibilityDate,
+    earlyTermDate = earlyTermDate,
+    midTermDate = midTermDate,
+    lateTermDate = lateTermDate,
+    topupSupervisionExpiryDate = topupSupervisionExpiryDate,
+    tariffDate = tariffDate,
+    dtoPostRecallReleaseDate = dtoPostRecallReleaseDate,
+    tariffEarlyRemovalSchemeEligibilityDate = tariffEarlyRemovalSchemeEligibilityDate,
+    topupSupervisionStartDate = topupSupervisionStartDate,
+    homeDetentionCurfewEndDate = homeDetentionCurfewEndDate,
   )
 }
