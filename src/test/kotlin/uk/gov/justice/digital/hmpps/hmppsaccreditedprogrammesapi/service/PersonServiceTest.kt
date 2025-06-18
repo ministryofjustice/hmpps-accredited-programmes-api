@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentCaptor
@@ -51,7 +52,20 @@ class PersonServiceTest {
   @InjectMocks
   lateinit var personService: PersonService
 
-  fun setup() {
+
+  private fun mockGetPrisoners() {
+    val prisoner = Prisoner(
+      prisonerNumber = PRISON_NUMBER,
+      prisonName = "Prison 1",
+      firstName = "John",
+      lastName = "Doe",
+      tariffDate = LocalDate.of(1985, 1, 1),
+      gender = "Male",
+      )
+    whenever(peopleSearchApiService.getPrisoners(listOf(PRISON_NUMBER))).thenReturn(listOf(prisoner))
+  }
+
+  private fun mockGetSentenceInformation() {
     val sentenceInformation = SentenceInformation(
       prisonerNumber = PRISON_NUMBER,
       latestPrisonTerm = PrisonTerm(
@@ -94,22 +108,9 @@ class PersonServiceTest {
         ),
         keyDates = createKeyDates(),
       ),
-    )
+      )
     val response = ClientResult.Success(HttpStatus.OK, sentenceInformation)
     whenever(prisonApiClient.getSentenceInformation(PRISON_NUMBER)).thenReturn(response)
-
-    val prisoner = Prisoner(
-      prisonerNumber = PRISON_NUMBER,
-      prisonName = "Prison 1",
-      firstName = "John",
-      lastName = "Doe",
-      tariffDate = LocalDate.of(1985, 1, 1),
-      gender = "Male",
-    )
-    whenever(peopleSearchApiService.getPrisoners(listOf(PRISON_NUMBER))).thenReturn(listOf(prisoner))
-
-    whenever(personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER))
-      .thenReturn(PersonEntityFactory().withPrisonNumber(PRISON_NUMBER).produce())
   }
 
   private fun determinateAndIndeterminateSentenceCategories(): List<SentenceCategoryEntity> = listOf<SentenceCategoryEntity>(
@@ -160,7 +161,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set DETERMINATE_AND_INDETERMINATE category sentence information during person create or update`() {
     // Given
-    setup()
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -183,7 +185,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set INDETERMINATE category and true recall sentence information during person create or update`() {
     // Given
-    setup()
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -206,7 +209,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set DETERMINATE category and true recall sentence information during person create or update`() {
     // Given
-    setup()
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -229,7 +233,8 @@ class PersonServiceTest {
   @Test
   fun `should correctly set UNKNOWN category sentence information when no sentence information is available during person create or update`() {
     // Given
-    setup()
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
         listOf(
@@ -252,7 +257,7 @@ class PersonServiceTest {
   @Test
   fun `should set No active sentences category when no sentence information is available`() {
     // Given
-    setup()
+    mockGetPrisoners()
     val sentenceInformation = SentenceInformation(
       prisonerNumber = PRISON_NUMBER,
       latestPrisonTerm = PrisonTerm(
@@ -275,7 +280,8 @@ class PersonServiceTest {
   @Test
   fun `should add sentence information when creating a person`() {
     // Given
-    setup()
+    mockGetSentenceInformation()
+    mockGetPrisoners()
     whenever(personRepository.findPersonEntityByPrisonNumber(PRISON_NUMBER)).thenReturn(null)
     whenever(
       sentenceCategoryRepository.findAllByDescriptionIn(
