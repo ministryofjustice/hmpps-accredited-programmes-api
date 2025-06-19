@@ -1,5 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
@@ -17,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.KeyDate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SentenceDetails
+import uk.gov.justice.hmpps.sqs.HmppsQueueFactory.Companion.log
 import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
 
@@ -170,13 +176,27 @@ class PersonService(
     }
   }
 
-  fun updateAllPeople() {
-    log.info("Attempting to update all people in person cache.")
+  private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+  fun updateAllPeople(batchSize: Int = 500) = runBlocking {
     val people = personRepository.findAll()
-    people.forEach {
-      updatePerson(it.prisonNumber, true)
+
+    val chunks = people.chunked(batchSize)
+
+    log.info("Found ${chunks.size} of $batchSize each ")
+
+    val jobs = chunks.mapIndexed { index, chunk ->
+      coroutineScope.launch {
+        log.info("Processing chunk ${index + 1}/${chunks.size} with ${chunk.size} people on ${Thread.currentThread().name}")
+        chunk.forEach { person ->
+          updatePerson(person.prisonNumber, true)
+        }
+        log.info("Processed chunk ${index + 1}/${chunks.size} with ${chunk.size} people on ${Thread.currentThread().name}")
+      }
     }
-    log.info("Updated all people in person cache.")
+
+    jobs.joinAll()
+    log.info("Finished updating all people.")
   }
 
   fun updatePeople(prisonNumbers: List<String>) {
@@ -205,6 +225,8 @@ class PersonService(
       val relevantCodesForCaseList = KeyDateType.relevantDatesForEarliestReleaseDateCalculation.map { it.code }.toSet()
       val filteredKeyDates = keyDates.filter { it.code in relevantCodesForCaseList }
       val earliestReleaseDateCode = filteredKeyDates.minBy { it.date!! }.code
+
+      println("******* Earliest release date ${sentenceInformation.prisonerNumber} $earliestReleaseDateCode ")
 
       val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
       return remappedKeyDates
