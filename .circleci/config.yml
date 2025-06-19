@@ -147,8 +147,8 @@ workflows:
           context:
             - hmpps-common-vars
             - hmpps-accredited-programmes-api-preprod
-#          requires:
-#            - request-preprod-approval
+          requires:
+            - request-preprod-approval
 #      - tag_pact_version:
 #          name: "tag_pact_version_preprod"
 #          tag: "deployed:preprod"
