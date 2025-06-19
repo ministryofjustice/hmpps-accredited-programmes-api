@@ -22,8 +22,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.KeyDate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SentenceDetails
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService.KeyDateType.Companion.relevantDatesForEarliestReleaseDateCalculationCodesForCaseList
 import uk.gov.justice.hmpps.sqs.HmppsQueueFactory.Companion.log
 import java.time.LocalDate
+import kotlin.code
 import kotlin.reflect.full.memberProperties
 
 @Service
@@ -42,6 +44,8 @@ class PersonService(
       var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
       if (personEntity == null) {
         val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
+        println("******* Earliest release date and type for $prisonNumber new ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
+
         personEntity = PersonEntity(
           surname = it.lastName,
           forename = it.firstName,
@@ -78,6 +82,7 @@ class PersonService(
     sentenceType: String,
   ) {
     val earliestReleaseDateAndType = earliestReleaseDateAndType(prisoner)
+    println("******* Earliest release date and type for ${prisoner.prisonerNumber} update ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
     personEntity.surname = prisoner.lastName
     personEntity.forename = prisoner.firstName
     personEntity.conditionalReleaseDate = prisoner.conditionalReleaseDate
@@ -222,12 +227,7 @@ class PersonService(
     }
     if (keyDates.isNotEmpty()) {
       // now find the earliest of these dates:
-      val relevantCodesForCaseList = KeyDateType.relevantDatesForEarliestReleaseDateCalculation.map { it.code }.toSet()
-      val filteredKeyDates = keyDates.filter { it.code in relevantCodesForCaseList }
-      val earliestReleaseDateCode = filteredKeyDates.minBy { it.date!! }.code
-
-      println("******* Earliest release date ${sentenceInformation.prisonerNumber} $earliestReleaseDateCode ")
-
+      val earliestReleaseDateCode = keyDates.filter { it.code in relevantDatesForEarliestReleaseDateCalculationCodesForCaseList }.minBy { it.date!! }.code
       val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
       return remappedKeyDates
     } else {
@@ -286,14 +286,16 @@ class PersonService(
       private val mappingToEnum: Map<String, KeyDateType> = entries.associateBy { it.mapping }
 
       fun fromMapping(mapping: String): KeyDateType? = mappingToEnum[mapping]
-      val relevantDatesForEarliestReleaseDateCalculation =
+      private val relevantDatesForEarliestReleaseDateCalculation =
         listOf<KeyDateType>(
-          KeyDateType.TARIFF_DATE,
-          KeyDateType.CONDITIONAL_RELEASE_DATE,
-          KeyDateType.RELEASE_DATE,
-          KeyDateType.PAROLE_ELIGIBILITY_DATE,
-          KeyDateType.POST_RECALL_RELEASE_DATE,
+          TARIFF_DATE,
+          CONDITIONAL_RELEASE_DATE,
+          RELEASE_DATE,
+          PAROLE_ELIGIBILITY_DATE,
+          POST_RECALL_RELEASE_DATE,
         )
+
+      val relevantDatesForEarliestReleaseDateCalculationCodesForCaseList = relevantDatesForEarliestReleaseDateCalculation.map { it.code }.toSet()
     }
   }
 

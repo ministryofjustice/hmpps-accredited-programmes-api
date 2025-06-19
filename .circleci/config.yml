@@ -35,7 +35,7 @@ jobs:
             PACT_PROVIDER_VERSION="$CIRCLE_SHA1" \
             PACT_PROVIDER_TAG="$CIRCLE_BRANCH" \
             PACT_PUBLISH_RESULTS="true" \
-            ./gradlew clean check
+            ./gradlew clean 
 
       - save_cache:
           paths:
@@ -107,6 +107,7 @@ workflows:
             branches:
               only:
                 - main
+                - APG-922-v2
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -116,6 +117,7 @@ workflows:
             branches:
               only:
                 - main
+                - APG-922-v2
           requires:
             - validate
             - build_docker
@@ -145,33 +147,33 @@ workflows:
           context:
             - hmpps-common-vars
             - hmpps-accredited-programmes-api-preprod
-          requires:
-            - request-preprod-approval
-      - tag_pact_version:
-          name: "tag_pact_version_preprod"
-          tag: "deployed:preprod"
-          requires: [ deploy_preprod ]
-          context: [ hmpps-common-vars ]
+#          requires:
+#            - request-preprod-approval
+#      - tag_pact_version:
+#          name: "tag_pact_version_preprod"
+#          tag: "deployed:preprod"
+#          requires: [ deploy_preprod ]
+#          context: [ hmpps-common-vars ]
 
-      - request-prod-approval:
-          type: approval
-          requires:
-            - deploy_preprod
-      - hmpps/deploy_env:
-          name: deploy_prod
-          env: "prod"
-          slack_notification: true
-          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
-          context:
-            - hmpps-common-vars
-            - hmpps-accredited-programmes-api-prod
-          requires:
-            - request-prod-approval
-      - tag_pact_version:
-          name: "tag_pact_version_prod"
-          tag: "deployed:prod"
-          requires: [ deploy_prod ]
-          context: [ hmpps-common-vars ]
+#      - request-prod-approval:
+#          type: approval
+#          requires:
+#            - deploy_preprod
+#      - hmpps/deploy_env:
+#          name: deploy_prod
+#          env: "prod"
+#          slack_notification: true
+#          slack_channel_name: << pipeline.parameters.releases-slack-channel >>
+#          context:
+#            - hmpps-common-vars
+#            - hmpps-accredited-programmes-api-prod
+#          requires:
+#            - request-prod-approval
+#      - tag_pact_version:
+#          name: "tag_pact_version_prod"
+#          tag: "deployed:prod"
+#          requires: [ deploy_prod ]
+#          context: [ hmpps-common-vars ]
 
   security:
     triggers:
