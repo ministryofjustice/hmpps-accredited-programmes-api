@@ -206,6 +206,8 @@ class PersonService(
       val filteredKeyDates = keyDates.filter { it.code in relevantCodesForCaseList }
       val earliestReleaseDateCode = filteredKeyDates.minBy { it.date!! }.code
 
+      println("******* Earliest release date ${sentenceInformation.prisonerNumber} $earliestReleaseDateCode ")
+
       val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
       return remappedKeyDates
     } else {
