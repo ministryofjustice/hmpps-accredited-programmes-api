@@ -187,23 +187,25 @@ class PersonService(
     log.info("Updated $prisonNumbers  people in person cache.")
   }
 
-  private fun buildKeyDates(sentenceInformation: SentenceInformation): List<KeyDate> {
+  fun buildKeyDates(sentenceInformation: SentenceInformation): List<KeyDate> {
     val keyDates = ArrayList<KeyDate>()
     for (date in KeyDates::class.memberProperties) {
       val keyDateType = KeyDateType.fromMapping(date.name)
       if (date.get(sentenceInformation.latestPrisonTerm.keyDates) != null && keyDateType != null) {
         keyDates.add(
           createKeyDate(
-            keyDateType,
-            date.get(sentenceInformation.latestPrisonTerm.keyDates) as LocalDate,
+            releaseDateType = keyDateType,
+            date = date.get(sentenceInformation.latestPrisonTerm.keyDates) as LocalDate,
           ),
         )
       }
     }
     if (keyDates.isNotEmpty()) {
       // now find the earliest of these dates:
-      val earliestReleaseDateCode =
-        keyDates.filter { it.date != null }.minBy { it.date!! }.code
+      val relevantCodesForCaseList = KeyDateType.relevantDatesForEarliestReleaseDateCalculation.map { it.code }.toSet()
+      val filteredKeyDates = keyDates.filter { it.code in relevantCodesForCaseList }
+      val earliestReleaseDateCode = filteredKeyDates.minBy { it.date!! }.code
+
       val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
       return remappedKeyDates
     } else {
@@ -262,6 +264,14 @@ class PersonService(
       private val mappingToEnum: Map<String, KeyDateType> = entries.associateBy { it.mapping }
 
       fun fromMapping(mapping: String): KeyDateType? = mappingToEnum[mapping]
+      val relevantDatesForEarliestReleaseDateCalculation =
+        listOf<KeyDateType>(
+          KeyDateType.TARIFF_DATE,
+          KeyDateType.CONDITIONAL_RELEASE_DATE,
+          KeyDateType.RELEASE_DATE,
+          KeyDateType.PAROLE_ELIGIBILITY_DATE,
+          KeyDateType.POST_RECALL_RELEASE_DATE,
+        )
     }
   }
 
