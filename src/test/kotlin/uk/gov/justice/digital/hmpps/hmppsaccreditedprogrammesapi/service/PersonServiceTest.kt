@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SentenceCategoryRepository
 import java.time.LocalDate
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 private const val PRISON_NUMBER = "Prisoner123"
 
@@ -316,6 +318,49 @@ class PersonServiceTest {
   }
 
   @Test
+  fun `buildKeyDates returns empty list when the required sentence date types are missing`() {
+    val sentenceInformation = SentenceInformation(
+      prisonerNumber = "A1234BC",
+      latestPrisonTerm = PrisonTerm(
+        courtSentences = emptyList(),
+        keyDates = KeyDates(
+          sentenceStartDate = LocalDate.now(),
+          effectiveSentenceEndDate = null,
+          confirmedReleaseDate = null,
+          releaseDate = null,
+          sentenceExpiryDate = null,
+          automaticReleaseDate = null,
+          conditionalReleaseDate = null,
+          nonParoleDate = null,
+          postRecallReleaseDate = null,
+          licenceExpiryDate = null,
+          homeDetentionCurfewEligibilityDate = null,
+          paroleEligibilityDate = null,
+          homeDetentionCurfewActualDate = null,
+          actualParoleDate = null,
+          releaseOnTemporaryLicenceDate = null,
+          earlyRemovalSchemeEligibilityDate = null,
+          earlyTermDate = null,
+          midTermDate = null,
+          lateTermDate = null,
+          topupSupervisionExpiryDate = null,
+          tariffDate = null,
+          dtoPostRecallReleaseDate = null,
+          tariffEarlyRemovalSchemeEligibilityDate = null,
+          topupSupervisionStartDate = null,
+          homeDetentionCurfewEndDate = null,
+        ),
+      ),
+    )
+
+    val result = personService.buildKeyDates(sentenceInformation)
+    assertTrue { result.isEmpty() }
+
+    val earliest = result.find { it.earliestReleaseDate!! }
+    assertNull(earliest?.code)
+  }
+
+  @Test
   fun `buildKeyDates ignores earlier key dates when they are not in the relevant dates used specified in the case list`() {
     val sentenceInformation = SentenceInformation(
       prisonerNumber = "A1234BC",
@@ -333,7 +378,6 @@ class PersonServiceTest {
     )
 
     val result = personService.buildKeyDates(sentenceInformation)
-
     val earliest = result.find { it.earliestReleaseDate!! }
     assertEquals("PED", earliest?.code)
   }

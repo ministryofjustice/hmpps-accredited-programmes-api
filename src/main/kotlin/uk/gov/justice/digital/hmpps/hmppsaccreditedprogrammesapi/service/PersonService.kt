@@ -143,7 +143,8 @@ class PersonService(
       log.info("No matching categories exist")
       SentenceCategoryType.UNKNOWN.description
     } else {
-      val overallCategoryDescription = SentenceCategoryType.determineOverallCategory(matchingSentenceCategories).description
+      val overallCategoryDescription =
+        SentenceCategoryType.determineOverallCategory(matchingSentenceCategories).description
       log.info("Category matches found for active sentences: $overallCategoryDescription")
       overallCategoryDescription
     }
@@ -170,18 +171,22 @@ class PersonService(
 
   fun updatePerson(prisonNumber: String, fromUpdateEndpoint: Boolean = false) {
     log.info("Attempting to update person with prison number: $prisonNumber")
-    val personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
-    if (personEntity != null) {
-      log.info("Prisoner is of interest to ACP - about to update: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
-      val sentenceInformation = getSentenceInformation(prisonNumber)
-      val sentenceType = determineSentenceType(sentenceInformation)
-      peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
-        updatePerson(it, personEntity, sentenceType)
+    try {
+      val personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
+      if (personEntity != null) {
+        log.info("Prisoner is of interest to ACP - about to update: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
+        val sentenceInformation = getSentenceInformation(prisonNumber)
+        val sentenceType = determineSentenceType(sentenceInformation)
+        peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
+          updatePerson(it, personEntity, sentenceType)
+        }
+        personRepository.save(personEntity)
+        log.info("Prisoner $prisonNumber update successful")
+      } else {
+        log.info("Prisoner is not of interest to ACP: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
       }
-      personRepository.save(personEntity)
-      log.info("Prisoner $prisonNumber update successful")
-    } else {
-      log.info("Prisoner is not of interest to ACP: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
+    } catch (ex: Exception) {
+      log.warn("Failed to update person with prisonNumber $prisonNumber", ex)
     }
   }
 
@@ -218,23 +223,31 @@ class PersonService(
 
   fun buildKeyDates(sentenceInformation: SentenceInformation): List<KeyDate> {
     val keyDates = ArrayList<KeyDate>()
-    for (date in KeyDates::class.memberProperties) {
-      val keyDateType = KeyDateType.fromMapping(date.name)
-      if (date.get(sentenceInformation.latestPrisonTerm.keyDates) != null && keyDateType != null) {
-        keyDates.add(
-          createKeyDate(
-            releaseDateType = keyDateType,
-            date = date.get(sentenceInformation.latestPrisonTerm.keyDates) as LocalDate,
-          ),
-        )
+    try {
+      for (date in KeyDates::class.memberProperties) {
+        val keyDateType = KeyDateType.fromMapping(date.name)
+        if (date.get(sentenceInformation.latestPrisonTerm.keyDates) != null && keyDateType != null) {
+          keyDates.add(
+            createKeyDate(
+              releaseDateType = keyDateType,
+              date = date.get(sentenceInformation.latestPrisonTerm.keyDates) as LocalDate,
+            ),
+          )
+        }
       }
-    }
-    if (keyDates.isNotEmpty()) {
-      // now find the earliest of these dates:
-      val earliestReleaseDateCode = keyDates.filter { it.code in relevantDatesForEarliestReleaseDateCalculationCodesForCaseList }.minBy { it.date!! }.code
-      val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
-      return remappedKeyDates
-    } else {
+      if (keyDates.isNotEmpty()) {
+        // now find the earliest of these dates:
+        val earliestReleaseDateCode =
+          keyDates.filter { it.code in relevantDatesForEarliestReleaseDateCalculationCodesForCaseList }
+            .takeIf { it.isNotEmpty() }
+            ?.minBy { it.date!! }?.code
+        val remappedKeyDates = keyDates.map { it.copy(earliestReleaseDate = (it.code == earliestReleaseDateCode)) }
+        return remappedKeyDates
+      } else {
+        return keyDates
+      }
+    } catch (ex: Exception) {
+      log.warn("Failed to build key dates for ${sentenceInformation.prisonerNumber}", ex)
       return keyDates
     }
   }
@@ -299,7 +312,8 @@ class PersonService(
           POST_RECALL_RELEASE_DATE,
         )
 
-      val relevantDatesForEarliestReleaseDateCalculationCodesForCaseList = relevantDatesForEarliestReleaseDateCalculation.map { it.code }.toSet()
+      val relevantDatesForEarliestReleaseDateCalculationCodesForCaseList =
+        relevantDatesForEarliestReleaseDateCalculation.map { it.code }.toSet()
     }
   }
 
