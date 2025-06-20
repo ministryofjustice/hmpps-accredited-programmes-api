@@ -238,7 +238,7 @@ class ReferenceDataControllerIntegrationTest : IntegrationTestBase() {
 
     response.filter { it.categoryCode == SexualOffenceCategoryType.AGAINST_MINORS }.size.shouldBeEqual(6)
     assertThat(response.filter { it.categoryCode == SexualOffenceCategoryType.AGAINST_MINORS }).allMatch { it.categoryDescription == "Sexual offence against somebody aged under 18" }
-    response.filter { it.categoryCode == SexualOffenceCategoryType.AGAINST_MINORS && it.id == UUID.fromString("f5afed62-0747-432e-97b4-19b255e72b52") }.getOrNull(0)?.score?.shouldBeEqual(3)
+    response.filter { it.categoryCode == SexualOffenceCategoryType.AGAINST_MINORS && it.id == UUID.fromString("f5afed62-0747-432e-97b4-19b255e72b52") }.getOrNull(0)?.score?.shouldBeEqual(1)
 
     response.filter { it.categoryCode == SexualOffenceCategoryType.INCLUDES_VIOLENCE_FORCE_HUMILIATION }.size.shouldBeEqual(11)
     assertThat(response.filter { it.categoryCode == SexualOffenceCategoryType.INCLUDES_VIOLENCE_FORCE_HUMILIATION }).allMatch { it.categoryDescription == "Sexual offences that include violence, force or humiliation" }

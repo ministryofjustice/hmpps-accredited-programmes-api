@@ -1,0 +1,1 @@
+UPDATE sexual_offence_details set score = 1 where description = 'Possessing indecent images of under-18s';
