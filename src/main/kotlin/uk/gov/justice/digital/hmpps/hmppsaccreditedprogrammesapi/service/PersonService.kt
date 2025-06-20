@@ -45,7 +45,7 @@ class PersonService(
       if (personEntity == null) {
         val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
         log.info("******* Earliest release date and type for $prisonNumber new ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
-        log.info("******* NEW person entity fouund in db - needs creating $it $personEntity $sentenceType ")
+        log.info("******* NEW person entity found in db - needs creating $it $personEntity $sentenceType ")
         personEntity = PersonEntity(
           surname = it.lastName,
           forename = it.firstName,
