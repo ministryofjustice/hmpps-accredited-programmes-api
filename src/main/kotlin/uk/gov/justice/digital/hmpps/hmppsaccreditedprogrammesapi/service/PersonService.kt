@@ -44,8 +44,8 @@ class PersonService(
       var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
       if (personEntity == null) {
         val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
-        println("******* Earliest release date and type for $prisonNumber new ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
-
+        log.info("******* Earliest release date and type for $prisonNumber new ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
+        log.info("******* NEW person entity fouund in db - needs creating $it $personEntity $sentenceType ")
         personEntity = PersonEntity(
           surname = it.lastName,
           forename = it.firstName,
@@ -62,8 +62,11 @@ class PersonService(
           gender = it.gender,
         )
       } else {
+        log.info("******* UPDATE person entity fouund in db - needs updating $it $personEntity $sentenceType ")
         updatePerson(it, personEntity, sentenceType)
       }
+
+      log.info("******* Person entity before getting persisted $prisonNumber $personEntity")
       personRepository.save(personEntity)
     }
   }
@@ -82,7 +85,7 @@ class PersonService(
     sentenceType: String,
   ) {
     val earliestReleaseDateAndType = earliestReleaseDateAndType(prisoner)
-    println("******* Earliest release date and type for ${prisoner.prisonerNumber} update ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
+    log.info("******* Earliest release date and type for ${prisoner.prisonerNumber} update ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
     personEntity.surname = prisoner.lastName
     personEntity.forename = prisoner.firstName
     personEntity.conditionalReleaseDate = prisoner.conditionalReleaseDate
@@ -161,6 +164,7 @@ class PersonService(
       .flatMap { it.sentences }
       .map { Sentence(it.sentenceTypeDescription, it.sentenceStartDate) }
     val keyDates = buildKeyDates(sentenceInformation)
+    log.info("***** Key dates for $prisonNumber $keyDates")
     return SentenceDetails(sentences, keyDates)
   }
 
