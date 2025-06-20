@@ -44,8 +44,7 @@ class PersonService(
       var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
       if (personEntity == null) {
         val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
-        log.info("******* Earliest release date and type for $prisonNumber new ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
-        log.info("******* NEW person entity found in db - needs creating $it $personEntity $sentenceType ")
+        log.info("Earliest release date and type for prisoner not in our database $prisonNumber ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
         personEntity = PersonEntity(
           surname = it.lastName,
           forename = it.firstName,
@@ -62,11 +61,9 @@ class PersonService(
           gender = it.gender,
         )
       } else {
-        log.info("******* UPDATE person entity fouund in db - needs updating $it $personEntity $sentenceType ")
         updatePerson(it, personEntity, sentenceType)
       }
 
-      log.info("******* Person entity before getting persisted $prisonNumber $personEntity")
       personRepository.save(personEntity)
     }
   }
@@ -85,7 +82,7 @@ class PersonService(
     sentenceType: String,
   ) {
     val earliestReleaseDateAndType = earliestReleaseDateAndType(prisoner)
-    log.info("******* Earliest release date and type for ${prisoner.prisonerNumber} update ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
+    log.info("Earliest release date and type for prisoner in our database ${prisoner.prisonerNumber} ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
     personEntity.surname = prisoner.lastName
     personEntity.forename = prisoner.firstName
     personEntity.conditionalReleaseDate = prisoner.conditionalReleaseDate
@@ -128,7 +125,7 @@ class PersonService(
       .distinct()
 
     if (distinctActiveSentences.isEmpty()) {
-      log.info("No court sentences exist for prisoner - setting sentence type to NO_ACTIVE_SENTENCES")
+      log.info("No court sentences exist for prisoner ${sentenceInformation.prisonerNumber} - setting sentence type to NO_ACTIVE_SENTENCES")
       return SentenceCategoryType.NO_ACTIVE_SENTENCES.description
     }
 
@@ -140,12 +137,12 @@ class PersonService(
       .map { it.category }
 
     return if (matchingSentenceCategories.isEmpty()) {
-      log.info("No matching categories exist")
+      log.info("No matching categories exist for prisoner ${sentenceInformation.prisonerNumber}")
       SentenceCategoryType.UNKNOWN.description
     } else {
       val overallCategoryDescription =
         SentenceCategoryType.determineOverallCategory(matchingSentenceCategories).description
-      log.info("Category matches found for active sentences: $overallCategoryDescription")
+      log.info("Category matches found for prisoner ${sentenceInformation.prisonerNumber} active sentences: $overallCategoryDescription")
       overallCategoryDescription
     }
   }
@@ -165,7 +162,6 @@ class PersonService(
       .flatMap { it.sentences }
       .map { Sentence(it.sentenceTypeDescription, it.sentenceStartDate) }
     val keyDates = buildKeyDates(sentenceInformation)
-    log.info("***** Key dates for $prisonNumber $keyDates")
     return SentenceDetails(sentences, keyDates)
   }
 
