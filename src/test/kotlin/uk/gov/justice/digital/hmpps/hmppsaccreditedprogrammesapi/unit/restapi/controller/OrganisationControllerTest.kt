@@ -20,11 +20,15 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.J
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ORGANISATION_ID_MDI
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_ID_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NAME_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AddressEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.OrganisationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PrisonRegisterApiService
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AddressEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -42,6 +46,9 @@ constructor(
 
   @MockkBean
   private lateinit var prisonRegisterApiService: PrisonRegisterApiService
+
+  @MockkBean
+  private lateinit var organisationService: OrganisationService
 
   @Nested
   inner class GetCoursesByOrganisationIdTests {
@@ -110,6 +117,30 @@ constructor(
           contentType(MediaType.APPLICATION_JSON)
           assertThat(prison.prisonId).isEqualTo(PRISON_ID_1)
           assertThat(prison.prisonName).isEqualTo(PRISON_NAME_1)
+        }
+      }
+    }
+  }
+
+  @Nested
+  inner class GetOrganisationByCode {
+    @Test
+    fun `Should return the organisations`() {
+      val organisationCode: String = "ABC"
+      val address: AddressEntity = AddressEntityFactory().produce()
+
+      val organisation = OrganisationEntityFactory().withCode(organisationCode).withAddress(address).produce()
+
+      every { organisationService.findOrganisationEntityByCode(organisationCode) } returns organisation
+      mockMvc.get("/organisation/$organisationCode") {
+        accept = MediaType.APPLICATION_JSON
+        header(AUTHORIZATION, jwtAuthHelper.bearerToken())
+      }.andExpect {
+        status { isOk() }
+        content {
+          contentType(MediaType.APPLICATION_JSON)
+          assertThat(organisation.code).isEqualTo(organisationCode)
+          assertThat(organisation.address).isEqualTo(organisation.address)
         }
       }
     }
