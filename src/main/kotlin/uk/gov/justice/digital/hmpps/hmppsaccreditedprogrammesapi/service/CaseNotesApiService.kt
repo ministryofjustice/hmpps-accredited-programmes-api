@@ -115,9 +115,11 @@ class CaseNotesApiService(
     message: String,
   ): String {
     log.info("Building case notes message :${referral.id} $referralStatusUpdate")
+    log.info("Building case note message with referralId ${referral.id} $referral")
 
     val course = referral.offering.course
     val orgName = organisationService.findOrganisationEntityByCode(referral.offering.organisationId)?.name
+    log.info("Building case note message with referralId ${referral.id} Offering: ${referral.offering} Course: $course ")
 
     val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
 
@@ -129,6 +131,9 @@ class CaseNotesApiService(
     log.info("programNameAndStrand : \n $programNameAndStrand")
 
     val buildingChoicesProgramNameAndStrand = "Building Choices: ${course.intensity?.lowercase()} intensity"
+    if (message.contains("BC_STRAND")) {
+      log.info("Building case note message with referralId ${referral.id} buildingChoicesProgramNameAndStrand: $buildingChoicesProgramNameAndStrand ")
+    }
 
     val customMessage =
       message.replace("PRISONER_NAME", prisonerName)
