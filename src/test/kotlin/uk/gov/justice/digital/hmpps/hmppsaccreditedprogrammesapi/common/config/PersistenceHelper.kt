@@ -85,12 +85,25 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createOrganisation(orgId: UUID = UUID.randomUUID(), code: String, name: String, gender: String = "MALE") {
-    entityManager.createNativeQuery("INSERT INTO organisation (organisation_id, code, name, gender) VALUES (:organisation_id, :code, :name, :gender)")
+  fun createOrganisation(orgId: UUID = UUID.randomUUID(), code: String, name: String, gender: String = "MALE", addressId: UUID? = null) {
+    entityManager.createNativeQuery("INSERT INTO organisation (organisation_id, code, name, gender,  address_id) VALUES (:organisation_id, :code, :name, :gender, :address_id)")
       .setParameter("organisation_id", orgId)
       .setParameter("code", code)
       .setParameter("name", name)
       .setParameter("gender", gender)
+      .setParameter("address_id", addressId)
+      .executeUpdate()
+  }
+
+  fun createAddress(id: UUID = UUID.randomUUID(), addressLine1: String, addressLine2: String, country: String, town: String, county: String, postalCode: String) {
+    entityManager.createNativeQuery("INSERT INTO address (id, address_line_1, address_line_2, country, town, county, postal_code) VALUES (:id, :address_line_1, :address_line_2, :country, :town, :county, :postal_code)")
+      .setParameter("id", id)
+      .setParameter("address_line_1", addressLine1)
+      .setParameter("address_line_2", addressLine2)
+      .setParameter("country", country)
+      .setParameter("town", town)
+      .setParameter("county", county)
+      .setParameter("postal_code", postalCode)
       .executeUpdate()
   }
 
