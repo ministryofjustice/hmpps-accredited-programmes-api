@@ -33,4 +33,6 @@ class OfferingEntity(
       id = UUID.randomUUID()
     }
   }
+
+  override fun toString(): String = "OfferingEntity(id=$id, organisationId='$organisationId', contactEmail='$contactEmail', secondaryContactEmail=$secondaryContactEmail, withdrawn=$withdrawn, referable=$referable, courseId=${course.id})"
 }
