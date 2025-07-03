@@ -83,6 +83,7 @@ class CaseNotesApiServiceTest {
       referral = referralEntity,
       referralStatusUpdate = referralStatusUpdate,
       message = statusMessageTemplate,
+      buildingChoicesCourseName = "Building Choices: high intensity",
     )
 
     // Then

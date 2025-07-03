@@ -220,7 +220,7 @@ constructor(
     // update the status
     referral.status = referralStatusUpdate.status.uppercase()
 
-    // write case notes
+    // write case notes - buildinGChoicesCourseName is null because this is NOT a transfer from a non BC course to a BC course
     caseNotesApiService.buildAndCreateCaseNote(referral, referralStatusUpdate)
 
     if (referral.status == ReferralStatus.PROGRAMME_COMPLETE.name || referral.status == ReferralStatus.DESELECTED.name) {
@@ -309,7 +309,10 @@ constructor(
           referral.primaryPomStaffId = it?.first
           referral.secondaryPomStaffId = it?.second
         }
-        caseNotesApiService.buildAndCreateCaseNote(referral, ReferralStatusUpdate(status = ReferralStatus.REFERRAL_SUBMITTED.name))
+        caseNotesApiService.buildAndCreateCaseNote(
+          referral,
+          ReferralStatusUpdate(status = ReferralStatus.REFERRAL_SUBMITTED.name),
+        )
         courseParticipationService.updateDraftHistoryForSubmittedReferral(referralId)
       }
 
@@ -516,12 +519,15 @@ constructor(
     auditService.audit(newReferral, null, AuditAction.CREATE_REFERRAL.name)
 
     updateOriginalReferralStatusToBuildingChoices(referral, transferReferralRequest)
+
+    // buildingChoicesCourseName is passed in as the org referral is not aware of what the new bc course is
     caseNotesApiService.buildAndCreateCaseNote(
-      referral,
-      ReferralStatusUpdate(
+      referral = referral,
+      referralStatusUpdate = ReferralStatusUpdate(
         status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name,
         notes = transferReferralRequest.transferReason,
       ),
+      buildingChoicesCourseName = newOffering.course.name,
     )
 
     return newReferral

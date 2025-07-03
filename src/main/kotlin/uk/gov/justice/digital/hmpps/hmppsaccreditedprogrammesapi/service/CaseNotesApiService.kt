@@ -55,7 +55,11 @@ class CaseNotesApiService(
     return createdCaseNote.entity
   }
 
-  fun buildAndCreateCaseNote(referral: ReferralEntity, referralStatusUpdate: ReferralStatusUpdate) {
+  fun buildAndCreateCaseNote(
+    referral: ReferralEntity,
+    referralStatusUpdate: ReferralStatusUpdate,
+    buildingChoicesCourseName: String? = null,
+  ) {
     try {
       if (featureSwitchService.isCaseNotesEnabled()) {
         log.info("START - Request received to create automatic case notes for ${referral.prisonNumber} $referralStatusUpdate")
@@ -64,7 +68,7 @@ class CaseNotesApiService(
         val referralStatusEntity = referralStatusRepository.getByCode(referralStatusUpdate.status)
 
         val message =
-          buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage)
+          buildCaseNoteMessage(person, referral, referralStatusUpdate, referralStatusEntity.caseNotesMessage, buildingChoicesCourseName)
 
         log.info("Building case note request object for ${referral.prisonNumber}")
 
@@ -113,8 +117,9 @@ class CaseNotesApiService(
     referral: ReferralEntity,
     referralStatusUpdate: ReferralStatusUpdate,
     message: String,
+    buildingChoicesCourseName: String? = null,
   ): String {
-    log.info("Building case notes message :${referral.id} $referralStatusUpdate")
+    log.info("Building case notes message :${referral.id} ${referral.prisonNumber} $referralStatusUpdate")
     log.info("Building case note message with referralId ${referral.id} $referral")
 
     val course = referral.offering.course
@@ -130,7 +135,7 @@ class CaseNotesApiService(
 
     log.info("programNameAndStrand : \n $programNameAndStrand")
 
-    val buildingChoicesProgramNameAndStrand = "Building Choices: ${course.intensity?.lowercase()} intensity"
+    val buildingChoicesProgramNameAndStrand = buildingChoicesCourseName.orEmpty()
     if (message.contains("BC_STRAND")) {
       log.info("Building case note message with referralId ${referral.id} buildingChoicesProgramNameAndStrand: $buildingChoicesProgramNameAndStrand ")
     }
