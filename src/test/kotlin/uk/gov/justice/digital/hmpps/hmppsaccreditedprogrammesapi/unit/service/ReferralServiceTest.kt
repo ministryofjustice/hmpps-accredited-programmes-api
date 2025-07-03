@@ -712,7 +712,7 @@ class ReferralServiceTest {
     val bcOfferingId = UUID.randomUUID()
     val buildingChoicesOffering = OfferingEntityFactory()
       .withId(bcOfferingId)
-      .withCourse(CourseEntityFactory().withId(courseId).produce())
+      .withCourse(CourseEntityFactory().withId(courseId).withName("Building choices: high intensity").produce())
       .produce()
 
     every { referralService.getReferralById(referralId) } returns existingReferral
@@ -743,7 +743,13 @@ class ReferralServiceTest {
     verify { referralStatusHistoryService.createReferralHistory(newReferral!!) }
     verify { referralStatusHistoryService.updateReferralHistory(referralId = referralId!!, previousStatusCode = ReferralStatus.REFERRAL_SUBMITTED.name, newStatus = any(), any(), any(), any()) }
     verify { referralRepository.save(existingReferral.apply { status = "MOVED_TO_BUILDING_CHOICES" }) }
-    verify { caseNotesApiService.buildAndCreateCaseNote(existingReferral, ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name, notes = transferReferralRequest.transferReason)) }
+    verify {
+      caseNotesApiService.buildAndCreateCaseNote(
+        referral = existingReferral,
+        referralStatusUpdate = ReferralStatusUpdate(status = ReferralStatus.MOVED_TO_BUILDING_CHOICES.name, notes = transferReferralRequest.transferReason),
+        buildingChoicesCourseName = "Building choices: high intensity",
+      )
+    }
   }
 
   @Test
