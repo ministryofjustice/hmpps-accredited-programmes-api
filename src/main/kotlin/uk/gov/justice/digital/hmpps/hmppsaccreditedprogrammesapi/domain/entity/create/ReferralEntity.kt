@@ -93,5 +93,4 @@ class ReferralEntity(
   }
 
   override fun hashCode(): Int = id.hashCode()
-  override fun toString(): String = "ReferralEntity(id=$id, version=$version, offering=$offering, prisonNumber='$prisonNumber', referrer=$referrer, additionalInformation=$additionalInformation, oasysConfirmed=$oasysConfirmed, hasReviewedProgrammeHistory=$hasReviewedProgrammeHistory, hasReviewedAdditionalInformation=$hasReviewedAdditionalInformation, status='$status', submittedOn=$submittedOn, deleted=$deleted, primaryPomStaffId=$primaryPomStaffId, secondaryPomStaffId=$secondaryPomStaffId, referrerOverrideReason=$referrerOverrideReason, originalReferralId=$originalReferralId, hasLdc=$hasLdc, hasLdcBeenOverriddenByProgrammeTeam=$hasLdcBeenOverriddenByProgrammeTeam, selectedSexualOffenceDetails=$selectedSexualOffenceDetails, eligibilityOverrideReasons=$eligibilityOverrideReasons)"
 }

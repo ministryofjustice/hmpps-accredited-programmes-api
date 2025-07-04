@@ -50,8 +50,6 @@ class CourseEntity(
     this.prerequisites.clear()
     this.prerequisites.addAll(newPrerequisites)
   }
-
-  override fun toString(): String = "CourseEntity(id=$id, name='$name', identifier='$identifier', description=$description, alternateName=$alternateName, prerequisites=$prerequisites, offerings=${offerings.map { it.id }}, audience='$audience', audienceColour=$audienceColour, withdrawn=$withdrawn, listDisplayName=$listDisplayName, displayOnProgrammeDirectory=$displayOnProgrammeDirectory, intensity=$intensity)"
 }
 
 @Embeddable
