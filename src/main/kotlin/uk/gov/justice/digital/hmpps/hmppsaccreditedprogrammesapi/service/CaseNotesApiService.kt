@@ -120,29 +120,22 @@ class CaseNotesApiService(
     buildingChoicesCourseName: String? = null,
   ): String {
     log.info("Building case notes message :${referral.id} ${referral.prisonNumber} $referralStatusUpdate")
-    log.info("Building case note message with referralId ${referral.id} $referral")
 
     val course = referral.offering.course
     val orgName = organisationService.findOrganisationEntityByCode(referral.offering.organisationId)?.name
-    log.info("Building case note message with referralId ${referral.id} Offering: ${referral.offering} Course: $course ")
+
+    log.info("Building case note message with referralId ${referral.id} prisonNumber ${referral.prisonNumber} Offering: ${referral.offering} Course: ${course.id} ")
 
     val programmeDescriptionMessage = "Referral to ${course.name}: ${course.audience} strand at $orgName \n\n"
-
-    log.info("programmeDescriptionMessage Course and org name : $programmeDescriptionMessage")
 
     val prisonerName = person?.fullName().orEmpty()
     val programNameAndStrand = "${course.name}: ${course.audience}"
 
-    log.info("programNameAndStrand : \n $programNameAndStrand")
-
-    val buildingChoicesProgramNameAndStrand = buildingChoicesCourseName.orEmpty()
-    if (message.contains("BC_STRAND")) {
-      log.info("Building case note message with referralId ${referral.id} buildingChoicesProgramNameAndStrand: $buildingChoicesProgramNameAndStrand ")
-    }
+    log.info("Programme details data built for case notes for referralId: :${referral.id} programNameAndStrand : $programNameAndStrand  programmeDescriptionMessage: $programmeDescriptionMessage buildingChoicesCourseName: $buildingChoicesCourseName")
 
     val customMessage =
       message.replace("PRISONER_NAME", prisonerName)
-        .replace("BC_STRAND", buildingChoicesProgramNameAndStrand)
+        .replace("BC_STRAND", buildingChoicesCourseName.orEmpty())
         .replace("PGM_NAME_STRAND", programNameAndStrand) + "\n"
 
     val details = referralStatusUpdate.notes
