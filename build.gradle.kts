@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.1"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.2.0"
   kotlin("plugin.jpa") version "2.2.0"
@@ -20,11 +20,11 @@ ext["hibernate.version"] = "6.6.11.Final"
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "2.8.9"
-  val sentryVersion = "8.16.0"
+  val sentryVersion = "8.17.0"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.5.1"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.7")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.8")
   runtimeOnly("org.postgresql:postgresql:42.7.7")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -40,7 +40,7 @@ dependencies {
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.6")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.7")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.1.1")
   implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.9")
