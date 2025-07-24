@@ -583,7 +583,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
     createdCourse.alternateName shouldBe alternativeName
     createdCourse.displayName shouldBe "Legacy Course One"
     createdCourse.audienceColour shouldBe "green"
-    createdCourse.intensity shouldBe CourseIntensity.HIGH.name
+    createdCourse.intensity shouldBe CourseIntensity.HIGH
   }
 
   fun createCourse(

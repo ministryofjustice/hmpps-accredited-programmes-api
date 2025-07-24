@@ -5,6 +5,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PrerequisiteEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.Gender
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Course
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseOffering
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CoursePrerequisite
 
@@ -20,7 +21,7 @@ fun CourseEntity.toApi(): Course = Course(
   displayName = name + addAudience(name, audience),
   withdrawn = withdrawn,
   displayOnProgrammeDirectory = displayOnProgrammeDirectory,
-  intensity = intensity,
+  intensity = intensity?.let { CourseIntensity.valueOf(it) },
 )
 
 fun addAudience(name: String, audience: String): String {
