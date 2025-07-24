@@ -1026,7 +1026,7 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       description = "kaizen general violence offence...",
       altName = "KAZ-2",
       audience = "General violence offence",
-      intensity = CourseIntensity.HIGH.name + "," + CourseIntensity.MODERATE.name,
+      intensity = CourseIntensity.HIGH.name + "_" + CourseIntensity.MODERATE.name,
     )
 
     val courses = webTestClient
