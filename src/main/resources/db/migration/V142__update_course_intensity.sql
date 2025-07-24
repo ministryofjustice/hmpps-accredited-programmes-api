@@ -1,0 +1,3 @@
+
+
+UPDATE COURSE SET intensity = 'HIGH_MODERATE' WHERE intensity='HIGH MODERATE';

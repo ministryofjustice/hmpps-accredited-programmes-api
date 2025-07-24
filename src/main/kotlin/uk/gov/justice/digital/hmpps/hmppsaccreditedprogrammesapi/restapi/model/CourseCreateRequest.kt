@@ -36,6 +36,6 @@ data class CourseCreateRequest(
   @Schema(example = "true", required = true, description = "flag is used to display course on the find dir")
   @get:JsonProperty("displayOnProgrammeDirectory", required = true) val displayOnProgrammeDirectory: Boolean? = true,
 
-  @Schema(example = "HIGH MODERATE", description = "Intensity of the course")
+  @Schema(example = "HIGH", description = "Intensity of the course", allowableValues = ["HIGH", "MODERATE", "HIGH_MODERATE"])
   @get:JsonProperty("intensity") val intensity: String? = null,
 )

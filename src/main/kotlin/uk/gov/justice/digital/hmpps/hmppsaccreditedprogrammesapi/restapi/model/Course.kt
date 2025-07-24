@@ -54,7 +54,7 @@ data class Course(
   @get:JsonProperty("displayOnProgrammeDirectory") val displayOnProgrammeDirectory: Boolean? = null,
 
   @Schema(example = "HIGH", description = "Intensity of the course", allowableValues = ["HIGH", "MODERATE", "HIGH_MODERATE"])
-  @get:JsonProperty("intensity") val intensity: String? = null,
+  @get:JsonProperty("intensity") val intensity: CourseIntensity? = null,
 
   @Schema(example = "null", description = "List of offerings for the course")
   @get:JsonProperty("courseOfferings") var courseOfferings: List<CourseOffering> = emptyList(),
@@ -63,4 +63,5 @@ data class Course(
 enum class CourseIntensity {
   HIGH,
   MODERATE,
+  HIGH_MODERATE,
 }
