@@ -101,6 +101,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
      (:hasLdc = true AND r.hasLdc = true) OR 
      (:hasLdc = false AND (r.hasLdc = false OR r.hasLdc IS NULL))
     )
+    ORDER BY r.id
 
     """,
   )
@@ -140,6 +141,7 @@ interface ReferralViewRepository : JpaRepository<ReferralViewEntity, UUID> {
      (:hasLdc = true AND r.hasLdc = true) OR 
      (:hasLdc = false AND (r.hasLdc = false OR r.hasLdc IS NULL))
     )
+    ORDER BY r.id
 
     """,
   )
