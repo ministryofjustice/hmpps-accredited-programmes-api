@@ -1831,7 +1831,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Retrieving a list of referral views for an organisation should return 200 with correct body in expected order`() {
+  fun `Retrieving a list of referral views for an organisation should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
 
