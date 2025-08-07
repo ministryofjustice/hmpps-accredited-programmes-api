@@ -58,13 +58,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SelectedSexualOffenceDetailsRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ConfirmationFields
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
@@ -94,9 +92,6 @@ import java.util.*
 class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
-  private lateinit var courseRepository: CourseRepository
-
-  @Autowired
   private lateinit var offeringRepository: OfferingRepository
 
   @Autowired
@@ -119,9 +114,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   lateinit var courseParticipationRepository: CourseParticipationRepository
-
-  @Autowired
-  lateinit var selectedSexualOffenceDetailsRepository: SelectedSexualOffenceDetailsRepository
 
   @BeforeEach
   fun setUp() {
@@ -317,7 +309,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val course = getAllCourses().first()
     val offering = getAllOfferingsForCourse(course.id).first()
     // only creates draft referral
-    val referralCreated = createReferral(offeringId = offering.id!!, prisonNumber = PRISON_NUMBER_1)
+    val referralCreated = createReferral(offeringId = offering.id, prisonNumber = PRISON_NUMBER_1)
     // submits a referral
     updateReferral(
       referralCreated.id,
@@ -1839,10 +1831,9 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Retrieving a list of referral views for an organisation should return 200 with correct body`() {
+  fun `Retrieving a list of referral views for an organisation should return 200 with correct body in expected order`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
 
     repeat(21) {
       val courseId = UUID.randomUUID()
