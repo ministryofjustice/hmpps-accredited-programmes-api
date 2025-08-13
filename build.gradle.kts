@@ -20,11 +20,11 @@ ext["hibernate.version"] = "6.6.11.Final"
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "2.8.9"
-  val sentryVersion = "8.18.0"
+  val sentryVersion = "8.19.1"
   val jsonWebtokenVersion = "0.12.6"
   val springSecurityVersion = "6.5.2"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.11")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.5.0")
   runtimeOnly("org.postgresql:postgresql:42.7.7")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
