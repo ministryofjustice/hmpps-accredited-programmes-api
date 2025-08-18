@@ -18,7 +18,7 @@ configurations {
 ext["hibernate.version"] = "6.6.11.Final"
 
 dependencies {
-  val kotestVersion = "5.9.1"
+  val kotestVersion = "6.0.0"
   val springdocVersion = "2.8.9"
   val sentryVersion = "8.19.1"
   val jsonWebtokenVersion = "0.12.7"
