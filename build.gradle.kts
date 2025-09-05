@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.6"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.0"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.2.10"
   kotlin("plugin.jpa") version "2.2.10"
@@ -19,8 +19,8 @@ ext["hibernate.version"] = "6.6.11.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.8.10"
-  val sentryVersion = "8.19.1"
+  val springdocVersion = "2.8.12"
+  val sentryVersion = "8.20.0"
   val jsonWebtokenVersion = "0.13.0"
   val springSecurityVersion = "6.5.3"
 
