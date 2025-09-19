@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.2"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.2.20"
   kotlin("plugin.jpa") version "2.2.20"
@@ -22,10 +22,10 @@ dependencies {
   val springdocVersion = "2.8.13"
   val sentryVersion = "8.21.1"
   val jsonWebtokenVersion = "0.13.0"
-  val springSecurityVersion = "6.5.3"
+  val springSecurityVersion = "6.5.5"
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.6.0")
-  runtimeOnly("org.postgresql:postgresql:42.7.7")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.7.0")
+  runtimeOnly("org.postgresql:postgresql:42.7.8")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
@@ -33,14 +33,14 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
-  implementation("com.google.guava:guava:33.4.8-jre")
+  implementation("com.google.guava:guava:33.5.0-jre")
 
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.10")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.11")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.1.2")
   implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.11")
