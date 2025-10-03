@@ -30,7 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.C
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationSettingType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseParticipationUpdate
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
+import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -383,29 +383,6 @@ class CourseParticipationControllerIntegrationTest : IntegrationTestBase() {
   fun `Attempting to delete a non-existent course participation should return 404`() {
     deleteCourseParticipation(UUID.randomUUID())
       .expectStatus().isNotFound
-  }
-
-  @Test
-  fun `get subject access report for a referral`() {
-    // Mocking a JWT token for the request
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
-    createCourseParticipation(
-      CourseParticipationCreate(
-        prisonNumber = PRISON_NUMBER_1,
-      ),
-    )
-
-    val cp = courseParticipationRepository.findByPrisonNumber(PRISON_NUMBER_1)
-
-    // Fetching the subject access report
-    val response = getSubjectAccessReport(PRISON_NUMBER_1)
-    response.shouldNotBeNull()
-
-    // Validating the response content
-    with(response.content.courseParticipation.first()) {
-      courseName shouldBe cp[0].courseName
-    }
   }
 
   @Test
