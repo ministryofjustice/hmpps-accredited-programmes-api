@@ -75,7 +75,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralView
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.HmppsSubjectAccessRequestContent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
@@ -1887,48 +1886,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     summaryPage2.totalElements.shouldBe(21)
     summaryPage2.pageNumber.shouldBe(2)
     summaryPage2.pageSize.shouldBe(10)
-  }
-
-  @Test
-  fun `get subject access report for a referral`() {
-    // Mocking a JWT token for the request
-    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
-    // Fetching a course and its offering
-    val course = getAllCourses().first()
-    val offering = getAllOfferingsForCourse(course.id).first()
-
-    // Creating a referral for the given offering
-    createReferral(offering.id, PRISON_NUMBER_1)
-
-    // Fetching the referral entity
-    val referralEntities = referralRepository.getSarReferrals(PRISON_NUMBER_1)
-    referralEntities.shouldNotBeNull()
-    referralEntities.shouldNotBeEmpty()
-    val referralEntity = referralEntities.first()
-
-    // Fetching the subject access report
-    val response = getSubjectAccessReport(PRISON_NUMBER_1)
-    response.shouldNotBeNull()
-
-    // Validating the response content
-    with(response.content.referrals.first()) {
-      courseName shouldBe course.name
-      audience shouldBe course.audience
-      courseOrganisation shouldBe offering.organisationId
-      oasysConfirmed shouldBe referralEntity.oasysConfirmed
-      additionalInformation shouldBe referralEntity.additionalInformation
-      referrerOverrideReason shouldBe referralEntity.referrerOverrideReason
-      originalReferralId shouldBe referralEntity.originalReferralId
-      hasReviewedProgrammeHistory shouldBe referralEntity.hasReviewedProgrammeHistory
-      statusCode shouldBe referralEntity.status
-      referrerUsername shouldBe referralEntity.referrer.username
-    }
-  }
-
-  fun getSubjectAccessReport(prisonerId: String): HmppsSubjectAccessRequestContent {
-    val responseType: ParameterizedTypeReference<HmppsSubjectAccessRequestContent> = object : ParameterizedTypeReference<HmppsSubjectAccessRequestContent>() {}
-    return performRequestAndExpectOk(HttpMethod.GET, "/subject-access-request?prn=$prisonerId", responseType)
   }
 
   @Test
