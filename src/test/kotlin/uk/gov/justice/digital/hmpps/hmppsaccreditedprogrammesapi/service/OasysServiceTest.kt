@@ -138,6 +138,7 @@ class OasysServiceTest {
 
   @Test
   fun `should return Rosh Analysis`() {
+    // Given
     val oasysRoshFull = OasysRoshFull(
       currentOffenceDetails = "Offence detail",
       currentWhereAndWhen = "where when",
@@ -146,6 +147,13 @@ class OasysServiceTest {
       currentAnyoneElsePresent = "Any one else involved",
       currentWhyDone = "motivation",
       currentSources = "source",
+      identifyBehavioursIncidents = null,
+      analysisSuicideSelfHarm = null,
+      analysisCoping = null,
+      analysisVulnerabilities = null,
+      analysisEscapeAbscond = null,
+      analysisControlBehaveTrust = null,
+      analysisBehavioursIncidents = null,
     )
 
     every { oasysApiClient.getRoshFull(any()) } returns ClientResult.Success(
@@ -153,8 +161,10 @@ class OasysServiceTest {
       oasysRoshFull,
     )
 
+    // When
     val result = service.getRoshFull(123123)
 
+    // Then
     assertEquals(oasysRoshFull, result)
   }
 

@@ -54,6 +54,19 @@
     },
     {
       "request": {
+        "url": "/assessments/timeline/A8888BB",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "assessments_A8888BB.json"
+      }
+    },
+    {
+      "request": {
         "url": "/assessments/timeline/A9999CC",
         "method": "GET"
       },
@@ -128,6 +141,19 @@
           "Content-Type": "application/json"
         },
         "bodyFileName": "rosh-analysis.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/assessments/2114585/section/sectionroshfull",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "rosh-analysis-extended.json"
       }
     },
     {

@@ -210,19 +210,59 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `Get rosh analysis from Oasys`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
+
+    // When
     val roshAnalysis = getRoshAnalysisByPrisonNumber(prisonNumber)
 
+    // Then
     roshAnalysis.shouldNotBeNull()
     roshAnalysis shouldBeEqual RoshAnalysis(
-      offenceDetails = "Assault with a base ball bat",
+      offenceDetails = "Failure to register a drone over 250g with the CAA",
       whereAndWhen = "in the park",
-      howDone = "with a base ball bat",
+      howDone = "Failure to register",
       whoVictims = "the gardener",
       anyoneElsePresent = "noone",
       whyDone = "anger issues",
       sources = "local police",
+      identifyBehavioursIncidents = null,
+      analysisSuicideSelfHarm = null,
+      analysisVulnerabilities = null,
+      analysisCoping = null,
+      analysisEscapeAbscond = null,
+      analysisControlBehaveTrust = null,
+      analysisBehavioursIncidents = null,
+    )
+  }
+
+  @Test
+  fun `Get rosh analysis with extended fields from Oasys`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A8888BB"
+
+    // When
+    val roshAnalysis = getRoshAnalysisByPrisonNumber(prisonNumber)
+
+    // Then
+    roshAnalysis.shouldNotBeNull()
+    roshAnalysis shouldBeEqual RoshAnalysis(
+      offenceDetails = "Failure to register a drone over 250g with the CAA",
+      whereAndWhen = "in the park",
+      howDone = "Failure to register",
+      whoVictims = "the gardener",
+      anyoneElsePresent = "noone",
+      whyDone = "anger issues",
+      sources = "local police",
+      identifyBehavioursIncidents = "an incident occurred",
+      analysisSuicideSelfHarm = "Suicide and self-harm concerns",
+      analysisVulnerabilities = "Analysis of any vulnerabilities",
+      analysisCoping = "Coping in custody",
+      analysisEscapeAbscond = "Escape and abscond concerns",
+      analysisControlBehaveTrust = "Disruptive Behaviour and Breach of Trust",
+      analysisBehavioursIncidents = "Patterns related to behaviours or incidents",
     )
   }
 

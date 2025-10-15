@@ -54,6 +54,7 @@
   "currentWhoVictims": "the gardener",
   "additionalInformation": null,
   "previousConcernsEscapeText": null,
+  "identifyBehavioursIncidents": "an incident occurred",
   "childProtectionConferences": null,
   "currentACCT": null,
   "previousConcernsCustodyCoping": null,
@@ -69,8 +70,14 @@
   "otherAgencies": null,
   "childProtectionConferencesDetails": null,
   "currentAnyoneElsePresent": "noone",
-  "riskOfSeriousHarm": null,
   "previousConcernsSelfHarmSuicide": null,
+  "analysisControlBehaveTrust": "Disruptive Behaviour and Breach of Trust",
+  "analysisEscapeAbscond": "Escape and abscond concerns",
+  "analysisVulnerabilities": "Analysis of any vulnerabilities",
+  "analysisCoping": "Coping in custody",
+  "analysisSuicideSelfharm": "Suicide and self-harm concerns",
+  "analysisBehavioursIncidents": "Patterns related to behaviours or incidents",
+  "riskOfSeriousHarm": "Risk of serious harm to others",
   "previousConcernsDisruptiveText": null,
   "assessor": {
     "name": "Test Wark"
