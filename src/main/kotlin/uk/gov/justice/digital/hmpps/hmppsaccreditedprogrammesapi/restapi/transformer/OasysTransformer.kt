@@ -64,6 +64,13 @@ fun OasysRoshFull.toModel() = RoshAnalysis(
   anyoneElsePresent = currentAnyoneElsePresent,
   whyDone = currentWhyDone,
   sources = currentSources,
+  identifyBehavioursIncidents = identifyBehavioursIncidents,
+  analysisSuicideSelfHarm = analysisSuicideSelfHarm,
+  analysisCoping = analysisCoping,
+  analysisVulnerabilities = analysisVulnerabilities,
+  analysisEscapeAbscond = analysisEscapeAbscond,
+  analysisControlBehaveTrust = analysisControlBehaveTrust,
+  analysisBehavioursIncidents = analysisBehavioursIncidents,
 )
 
 fun OasysLifestyle.toModel() = Lifestyle(
