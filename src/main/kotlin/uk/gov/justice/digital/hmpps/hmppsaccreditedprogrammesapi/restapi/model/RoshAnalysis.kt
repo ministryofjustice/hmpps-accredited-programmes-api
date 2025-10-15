@@ -48,7 +48,7 @@ data class RoshAnalysis(
   @Schema(description = "An analysis of any current vulnerabilities")
   @get:JsonProperty("analysisVulnerabilities") val analysisVulnerabilities: String? = null,
 
-  @Schema(description = "An analysis of any current or previous escape and abscond concerns ")
+  @Schema(description = "An analysis of any current or previous escape and abscond concerns")
   @get:JsonProperty("analysisEscapeAbscond") val analysisEscapeAbscond: String? = null,
 
   @Schema(description = "An analysis of any aggression, control issues, disruptive behaviour, or breach of trust concerns")

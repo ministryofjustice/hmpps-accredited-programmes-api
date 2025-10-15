@@ -220,9 +220,9 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
     // Then
     roshAnalysis.shouldNotBeNull()
     roshAnalysis shouldBeEqual RoshAnalysis(
-      offenceDetails = "Assault with a base ball bat",
+      offenceDetails = "Failure to register a drone over 250g with the CAA",
       whereAndWhen = "in the park",
-      howDone = "with a base ball bat",
+      howDone = "Failure to register",
       whoVictims = "the gardener",
       anyoneElsePresent = "noone",
       whyDone = "anger issues",
@@ -249,9 +249,9 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
     // Then
     roshAnalysis.shouldNotBeNull()
     roshAnalysis shouldBeEqual RoshAnalysis(
-      offenceDetails = "Assault with a base ball bat",
+      offenceDetails = "Failure to register a drone over 250g with the CAA",
       whereAndWhen = "in the park",
-      howDone = "with a base ball bat",
+      howDone = "Failure to register",
       whoVictims = "the gardener",
       anyoneElsePresent = "noone",
       whyDone = "anger issues",
