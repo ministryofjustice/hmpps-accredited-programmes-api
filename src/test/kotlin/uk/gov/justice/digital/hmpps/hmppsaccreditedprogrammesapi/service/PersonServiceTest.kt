@@ -14,10 +14,8 @@ import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.CourtSentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.KeyDates
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.PrisonTerm
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.Sentence
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.model.SentenceInformation
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
@@ -25,6 +23,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SentenceCategoryType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SentenceCategoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.testutil.SentenceInformationFactory
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -65,50 +64,11 @@ class PersonServiceTest {
   }
 
   private fun mockGetSentenceInformation() {
-    val sentenceInformation = SentenceInformation(
+    val sentenceInformation = SentenceInformationFactory().createSentenceInformationWithMultipleSentences(
       prisonerNumber = PRISON_NUMBER,
-      latestPrisonTerm = PrisonTerm(
-        courtSentences = listOf(
-          CourtSentence(
-            caseSeq = 3,
-            beginDate = LocalDate.now(),
-            caseStatus = "status",
-            sentences = listOf(
-              Sentence(
-                sentenceTypeDescription = "Sentence Type 1",
-                sentenceStartDate = LocalDate.now().minusDays(1),
-                sentenceStatus = "status",
-                sentenceCategory = "Category",
-                sentenceCalculationType = "calculationType",
-                lineSeq = 34,
-                offences = emptyList(),
-              ),
-              Sentence(
-                sentenceTypeDescription = "Sentence Type 2",
-                sentenceStartDate = LocalDate.now().minusDays(1),
-                sentenceStatus = "status",
-                sentenceCategory = "Category",
-                sentenceCalculationType = "calculationType",
-                lineSeq = 34,
-                offences = emptyList(),
-              ),
-              Sentence(
-                sentenceTypeDescription = "Sentence Type 3",
-                sentenceStartDate = LocalDate.now().minusDays(1),
-                sentenceStatus = "status",
-                sentenceCategory = "Category",
-                sentenceCalculationType = "calculationType",
-                lineSeq = 34,
-                offences = emptyList(),
-              ),
-            ),
-            issuingCourtDate = "firstIssuingCourtDate",
-          ),
-        ),
-        keyDates = createKeyDates(),
-      ),
+      sentenceTypes = listOf("Sentence Type 1", "Sentence Type 2", "Sentence Type 3"),
     )
-    val response = ClientResult.Success(HttpStatus.OK, sentenceInformation)
+    val response = ClientResult.Success<SentenceInformation>(HttpStatus.OK, sentenceInformation)
     whenever(prisonApiClient.getSentenceInformation(PRISON_NUMBER)).thenReturn(response)
   }
 
