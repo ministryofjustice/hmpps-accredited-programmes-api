@@ -31,6 +31,7 @@ data class Sentence(
   val sentenceCalculationType: String?,
   val sentenceTypeDescription: String?,
   val sentenceStartDate: LocalDate?,
+  val sentenceEndDate: LocalDate?,
   val lineSeq: Int?,
   val offences: List<Offence>?,
 )

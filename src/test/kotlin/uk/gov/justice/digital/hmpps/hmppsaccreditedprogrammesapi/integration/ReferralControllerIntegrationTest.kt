@@ -56,6 +56,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SentenceCategoryType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
@@ -1316,7 +1317,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
         actualSummary.referrerUsername shouldBe referralView.referrerUsername
         actualSummary.forename shouldBe referralView.forename
         actualSummary.surname shouldBe referralView.surname
-        actualSummary.sentenceType shouldBe referralView.sentenceType
+        actualSummary.sentenceType shouldBe SentenceCategoryType.NO_ACTIVE_SENTENCES.description
         actualSummary.listDisplayName shouldBe referralView.courseName
       }
     }
