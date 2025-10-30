@@ -49,6 +49,38 @@
     ]
   },
   {
+    "prisonId": "LPI",
+    "prisonName": "Liverpool (HMP)",
+    "active": true,
+    "male": true,
+    "female": false,
+    "contracted": false,
+    "lthse": false,
+    "types": [
+      {
+        "code": "HMP",
+        "description": "His Majesty’s Prison"
+      }
+    ],
+    "categories": [],
+    "addresses": [
+      {
+        "id": 11,
+        "addressLine1": "1 Main Street",
+        "addressLine2": "Toxteth",
+        "town": "Liverpool",
+        "county": "Merseyside",
+        "postcode": "LV1 3EP",
+        "country": "England"
+      }
+    ],
+    "operators": [
+      {
+        "name": "PSP"
+      }
+    ]
+  },
+  {
     "prisonId": "MDI",
     "prisonName": "Moorland (HMP & YOI)",
     "active": true,

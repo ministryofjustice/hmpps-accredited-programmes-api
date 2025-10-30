@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -113,10 +114,17 @@ constructor(
   }
 
   fun updateOffering(courseId: UUID, courseOffering: CourseOffering): CourseOffering {
+    log.debug(
+      "Request to update offering for course with id: {} for prison: {} to referrable: {} and withdrawn: {}",
+      courseId,
+      courseOffering.organisationId,
+      courseOffering.referable,
+      courseOffering.withdrawn,
+    )
     val course = getCourseById(courseId)
       ?: throw NotFoundException("No Course found with id: $courseId")
 
-    offeringRepository.findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(course.id!!, courseOffering.organisationId)
+    offeringRepository.findByCourseIdAndOrganisationId(course.id!!, courseOffering.organisationId)
       ?: throw BusinessException("Offering does not exist for course ${course.name}")
 
     val validPrisons = prisonRegisterApiService.getPrisons()
@@ -249,6 +257,10 @@ constructor(
     existingCourse.withdrawn = courseUpdateRequest.withdrawn ?: existingCourse.withdrawn
     existingCourse.toApi()
   } ?: throw NotFoundException("No Course found with id: $courseId")
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
 }
 
 fun Set<CoursePrerequisite>.toEntity(): MutableSet<PrerequisiteEntity> = this.map { PrerequisiteEntity(it.name, it.description) }.toMutableSet()

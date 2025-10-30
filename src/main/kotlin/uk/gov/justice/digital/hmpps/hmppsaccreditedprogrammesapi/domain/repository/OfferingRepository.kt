@@ -12,6 +12,7 @@ interface OfferingRepository : JpaRepository<OfferingEntity, UUID> {
   fun findAllByCourseId(courseId: UUID): List<OfferingEntity>
   fun findAllByCourseIdAndWithdrawnIsFalse(courseId: UUID): List<OfferingEntity>
   fun findByCourseIdAndOrganisationIdAndWithdrawnIsFalse(courseId: UUID, organisationId: String): OfferingEntity?
+  fun findByCourseIdAndOrganisationId(courseId: UUID, organisationId: String): OfferingEntity?
   fun findByCourseIdAndIdAndWithdrawnIsFalse(courseId: UUID, offeringId: UUID): OfferingEntity?
   fun findByOrganisationId(organisationId: String): List<OfferingEntity>
 
