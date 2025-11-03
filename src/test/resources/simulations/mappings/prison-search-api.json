@@ -18,6 +18,22 @@
     },
     {
       "request": {
+        "urlPattern": "/prisoner-search/match-prisoners",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "C7777CC"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results-match-C7777CC.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/prisoner-search/prisoner-numbers",
         "method": "POST",
         "bodyPatterns" : [ {
@@ -30,6 +46,22 @@
           "Content-Type": "application/json"
         },
         "bodyFileName": "prison-search-results.json"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/prisoner-search/prisoner-numbers",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "C7777CC"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results-C7777CC.json"
       }
     },
     {
