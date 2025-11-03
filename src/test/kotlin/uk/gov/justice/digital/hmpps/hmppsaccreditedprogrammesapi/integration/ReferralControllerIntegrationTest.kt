@@ -17,7 +17,9 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
@@ -85,10 +87,12 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.time.Year
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
+@AutoConfigureWebTestClient(timeout = "120000")
 class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
@@ -1767,6 +1771,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     courseNameFilter: String? = null,
     statusGroupFilter: String? = null,
     pageNumber: Number = 0,
+    size: Int = 10,
     sortColumn: String? = null,
     sortDirection: String? = null,
     nameOrId: String? = null,
@@ -1778,6 +1783,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     courseNameFilter?.let { uriBuilder.queryParam("courseName", encodeValue(it)) }
     statusGroupFilter?.let { uriBuilder.queryParam("statusGroup", encodeValue(it)) }
     uriBuilder.queryParam("page", pageNumber)
+    uriBuilder.queryParam("size", size)
     sortColumn?.let { uriBuilder.queryParam("sortColumn", encodeValue(it)) }
     sortDirection?.let { uriBuilder.queryParam("sortDirection", encodeValue(it)) }
     nameOrId?.let { uriBuilder.queryParam("nameOrId", encodeValue(it)) }
@@ -1887,6 +1893,130 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     summaryPage2.totalElements.shouldBe(21)
     summaryPage2.pageNumber.shouldBe(2)
     summaryPage2.pageSize.shouldBe(10)
+  }
+
+  @Test
+  @Timeout(value = 120, unit = TimeUnit.SECONDS)
+  fun `should handle sorting of case list view by sentenceType in both ascending and descending directions`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    // Create 5 referrals with a sentenceType of "No active sentences" - see prison-api.json and prison-search-api.json for mocking
+    repeat(5, createCourseAndOfferingAndReferral("Test course 1", PRISON_NUMBER_1))
+    // Create 5 referrals with a sentenceType of "Determinate" - see prison-api.json and prison-search-api.json for mocking
+    repeat(5, createCourseAndOfferingAndReferral("Test course 2", "C7777CC"))
+
+    // When - Test sorting by sentenceType ascending
+    val ascendingResultsFirstPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "sentenceType",
+      sortDirection = "ascending",
+      pageNumber = 0,
+      size = 7,
+    )
+    val ascendingResultsSecondPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "sentenceType",
+      sortDirection = "ascending",
+      pageNumber = 1,
+      size = 7,
+    )
+
+    logReferralViewToConsole(ascendingResultsFirstPage, 1)
+    logReferralViewToConsole(ascendingResultsSecondPage, 2)
+
+    // Then
+    ascendingResultsFirstPage.totalElements.shouldBe(10)
+    ascendingResultsFirstPage.content?.size.shouldBe(7)
+    ascendingResultsSecondPage.content?.size.shouldBe(3)
+    // verify referral ids are unique across both pages, no duplicates
+    assertThat(ascendingResultsFirstPage.content?.map { it.id }?.size).isEqualTo(7)
+    assertThat(ascendingResultsSecondPage.content?.map { it.id }?.size).isEqualTo(3)
+    // verify the number of sentence type records in each page is as expected
+    assertThat(ascendingResultsFirstPage.content?.count { it.sentenceType == "Determinate" }).isEqualTo(5)
+    assertThat(ascendingResultsFirstPage.content?.count { it.sentenceType == "No active sentences" }).isEqualTo(2)
+    assertThat(ascendingResultsSecondPage.content?.count { it.sentenceType == "Determinate" }).isEqualTo(0)
+    assertThat(ascendingResultsSecondPage.content?.count { it.sentenceType == "No active sentences" }).isEqualTo(3)
+
+    // When - Test sorting by sentenceType descending
+    val descendingResultsFirstPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "sentenceType",
+      sortDirection = "descending",
+      pageNumber = 0,
+      size = 3,
+    )
+    val descendingResultsSecondPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "sentenceType",
+      sortDirection = "descending",
+      pageNumber = 1,
+      size = 3,
+    )
+    val descendingResultsThirdPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "sentenceType",
+      sortDirection = "descending",
+      pageNumber = 2,
+      size = 3,
+    )
+    val descendingResultsFourthPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "sentenceType",
+      sortDirection = "descending",
+      pageNumber = 3,
+      size = 3,
+    )
+
+    logReferralViewToConsole(descendingResultsFirstPage, 1)
+    logReferralViewToConsole(descendingResultsSecondPage, 2)
+    logReferralViewToConsole(descendingResultsThirdPage, 3)
+
+    // Then
+    descendingResultsFirstPage.totalElements.shouldBe(10)
+    descendingResultsFirstPage.totalPages.shouldBe(4)
+    descendingResultsFirstPage.content?.size.shouldBe(3)
+    descendingResultsSecondPage.content?.size.shouldBe(3)
+    descendingResultsThirdPage.content?.size.shouldBe(3)
+    descendingResultsFourthPage.content?.size.shouldBe(1)
+    // verify referral ids are unique across both pages, no duplicates
+    assertThat(descendingResultsFirstPage.content?.map { it.id }?.size).isEqualTo(3)
+    assertThat(descendingResultsSecondPage.content?.map { it.id }?.size).isEqualTo(3)
+    assertThat(descendingResultsThirdPage.content?.map { it.id }?.size).isEqualTo(3)
+    assertThat(descendingResultsFourthPage.content?.map { it.id }?.size).isEqualTo(1)
+    // verify the number of each sentence type records in each page is as expected
+    assertThat(descendingResultsFirstPage.content?.count { it.sentenceType == "Determinate" }).isEqualTo(0)
+    assertThat(descendingResultsFirstPage.content?.count { it.sentenceType == "No active sentences" }).isEqualTo(3)
+    assertThat(descendingResultsSecondPage.content?.count { it.sentenceType == "Determinate" }).isEqualTo(1)
+    assertThat(descendingResultsSecondPage.content?.count { it.sentenceType == "No active sentences" }).isEqualTo(2)
+    assertThat(descendingResultsThirdPage.content?.count { it.sentenceType == "Determinate" }).isEqualTo(3)
+    assertThat(descendingResultsThirdPage.content?.count { it.sentenceType == "No active sentences" }).isEqualTo(0)
+    assertThat(descendingResultsFourthPage.content?.count { it.sentenceType == "Determinate" }).isEqualTo(1)
+    assertThat(descendingResultsFourthPage.content?.count { it.sentenceType == "No active sentences" }).isEqualTo(0)
+  }
+
+  private fun logReferralViewToConsole(paginatedReferralView: PaginatedReferralView, pageNumber: Int) {
+    println("[DEBUG_LOG] Page $pageNumber")
+    paginatedReferralView.content?.forEach { referral ->
+      println("[DEBUG_LOG] - ID: ${referral.id}, Prison: ${referral.prisonNumber}, SentenceType: ${referral.sentenceType}")
+    }
+  }
+
+  private fun createCourseAndOfferingAndReferral(courseIdentifier: String, prisonNumber: String): (Int) -> Unit = { index ->
+    val courseId = UUID.randomUUID()
+    val offeringId = UUID.randomUUID()
+    createCourse(
+      courseId = courseId,
+      identifier = "$courseIdentifier$index",
+      courseName = "Test Course$index",
+      description = "Test description$index",
+    )
+    createOffering(
+      courseId = courseId,
+      offeringId = offeringId,
+      orgId = ORGANISATION_ID_MDI,
+    )
+    createReferral(offeringId = offeringId, prisonNumber)
   }
 
   @Test
