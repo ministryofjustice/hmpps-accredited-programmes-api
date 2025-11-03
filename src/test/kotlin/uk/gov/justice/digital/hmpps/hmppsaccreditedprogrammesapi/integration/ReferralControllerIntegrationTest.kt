@@ -17,9 +17,7 @@ import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Timeout
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
@@ -87,12 +85,10 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.time.Year
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(JwtAuthHelper::class)
-@AutoConfigureWebTestClient(timeout = "120000")
 class ReferralControllerIntegrationTest : IntegrationTestBase() {
 
   @Autowired
@@ -1896,7 +1892,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  @Timeout(value = 120, unit = TimeUnit.SECONDS)
   fun `should handle sorting of case list view by sentenceType in both ascending and descending directions`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
