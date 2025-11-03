@@ -1,0 +1,30 @@
+[
+  {
+    "prisonerNumber": "C7777CC",
+    "bookingId": "1202335",
+    "bookNumber": "39420A",
+    "firstName": "MICKEY",
+    "lastName": "SMITH",
+    "dateOfBirth": "1975-01-01",
+    "gender": "Male",
+    "ethnicity": "White: Eng./Welsh/Scot./N.Irish/British",
+    "youthOffender": false,
+    "status": "ACTIVE IN",
+    "lastMovementTypeCode": "ADM",
+    "lastMovementReasonCode": "N",
+    "inOutStatus": "IN",
+    "prisonId": "MDI",
+    "prisonName": "Nottingham (HMP)",
+    "cellLocation": "RECP",
+    "aliases": [],
+    "alerts": [],
+    "legalStatus": "REMAND",
+    "imprisonmentStatus": "RECEP_REM",
+    "imprisonmentStatusDescription": "On remand (reception)",
+    "recall": false,
+    "indeterminateSentence": false,
+    "receptionDate": "2022-06-10",
+    "locationDescription": "Nottingham (HMP)",
+    "restrictedPatient": false
+  }
+]
