@@ -64,12 +64,16 @@ class ReferralController(
 ) {
   companion object {
     const val DEFAULT_DIRECTION = "ascending"
-    const val DEFAULT_SORT = "surname"
+    const val DEFAULT_SORT_COLUMN = "surname"
 
-    fun getSortBy(sortColumn: String, sortDirection: String): Sort = if (sortDirection == DEFAULT_DIRECTION) {
-      Sort.by(sortColumn).ascending()
-    } else {
-      Sort.by(sortColumn).descending()
+    fun getSortBy(sortColumn: String, sortDirection: String): Sort {
+      val primarySort = if (sortDirection == DEFAULT_DIRECTION) {
+        Sort.by(sortColumn).ascending()
+      } else {
+        Sort.by(sortColumn).descending()
+      }
+      // Add ID as secondary sort for deterministic ordering
+      return primarySort.and(Sort.by("id").ascending())
     }
 
     fun parseNameOrId(nameOrId: String?): NameOrIdSearch {
@@ -496,12 +500,12 @@ class ReferralController(
       value = "sortDirection",
       required = false,
     ) sortDirection: String?,
-    @Parameter(description = "When flag is true, then only ldc referrals are returned. If false of null is passed in all non ldc referrals are returned") @RequestParam(
+    @Parameter(description = "When flag is true, then only ldc referrals are returned. If false or null is passed in all non ldc referrals are returned") @RequestParam(
       value = "hasLdc",
       required = false,
     ) hasLdc: Boolean?,
   ): ResponseEntity<PaginatedReferralView> {
-    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT_COLUMN, sortDirection ?: DEFAULT_DIRECTION))
     val username: String =
       securityService.getCurrentUserName() ?: throw AccessDeniedException("unauthorised, username not present in token")
 
@@ -611,12 +615,12 @@ class ReferralController(
       value = "sortDirection",
       required = false,
     ) sortDirection: String?,
-    @Parameter(description = "When flag is true, then only ldc referrals are returned. If false of null is passed in all non ldc referrals are returned") @RequestParam(
+    @Parameter(description = "When flag is true, then only ldc referrals are returned. If false or null is passed in all non ldc referrals are returned") @RequestParam(
       value = "hasLdc",
       required = false,
     ) hasLdc: Boolean?,
   ): ResponseEntity<PaginatedReferralView> {
-    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT_COLUMN, sortDirection ?: DEFAULT_DIRECTION))
     val nameOrIdSearch = parseNameOrId(nameOrId)
     val apiReferralSummaryPage =
       referralService.getReferralViewByOrganisationId(

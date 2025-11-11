@@ -102,7 +102,7 @@ data class RelationshipDomainScore(
       add("curRelCloseFamily in RelationshipScores is null")
     }
     if (individualRelationshipScores.prevExpCloseRel == null) {
-      add("hostileOrientation in RelationshipScores is null")
+      add("prevExpCloseRel in RelationshipScores is null")
     }
     if (individualRelationshipScores.easilyInfluenced == null) {
       add("easilyInfluenced in RelationshipScores is null")
