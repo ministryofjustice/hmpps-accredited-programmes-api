@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController.Companion.DEFAULT_DIRECTION
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController.Companion.DEFAULT_SORT
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController.Companion.DEFAULT_SORT_COLUMN
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController.Companion.getSortBy
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.controller.ReferralController.Companion.parseNameOrId
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
@@ -179,7 +179,7 @@ class HealthySexProgrammeReferralController(
       required = false,
     ) hasLdc: Boolean?,
   ): ResponseEntity<PaginatedReferralView> {
-    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT, sortDirection ?: DEFAULT_DIRECTION))
+    val pageable = PageRequest.of(page, size, getSortBy(sortColumn ?: DEFAULT_SORT_COLUMN, sortDirection ?: DEFAULT_DIRECTION))
 
     val nameOrIdSearch = parseNameOrId(nameOrId)
 

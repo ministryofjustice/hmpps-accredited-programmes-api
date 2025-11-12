@@ -1990,10 +1990,92 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     assertThat(descendingResultsFourthPage.content?.count { it.sentenceType == "No active sentences" }).isEqualTo(0)
   }
 
+  @Test
+  fun `should handle sorting of case list view by location in descending directions`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    // Create 5 referrals with a location of "Transfer" and 5 with "Woodhill (HMP)"
+    repeat(5, createCourseAndOfferingAndReferral("Test course 1", PRISON_NUMBER_1))
+    repeat(5, createCourseAndOfferingAndReferral("Test course 2", "C7777CC"))
+
+    // When - Test sorting by location descending
+    val firstPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "location",
+      sortDirection = "descending",
+      pageNumber = 0,
+      size = 3,
+    )
+    val secondPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "location",
+      sortDirection = "descending",
+      pageNumber = 1,
+      size = 3,
+    )
+    val thirdPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "location",
+      sortDirection = "descending",
+      pageNumber = 2,
+      size = 3,
+    )
+    val fourthPage = getReferralViewsByOrganisationId(
+      organisationId = ORGANISATION_ID_MDI,
+      sortColumn = "location",
+      sortDirection = "descending",
+      pageNumber = 3,
+      size = 3,
+    )
+
+    logReferralViewToConsole(firstPage, 1)
+    logReferralViewToConsole(secondPage, 2)
+    logReferralViewToConsole(thirdPage, 3)
+    logReferralViewToConsole(fourthPage, 4)
+
+    // Then
+    firstPage.totalElements.shouldBe(10)
+    firstPage.totalPages.shouldBe(4)
+    firstPage.content?.size.shouldBe(3)
+    secondPage.content?.size.shouldBe(3)
+    thirdPage.content?.size.shouldBe(3)
+    fourthPage.content?.size.shouldBe(1)
+
+    // verify referral ids are unique across all pages, no duplicates
+    val allDescendingResults = listOfNotNull(
+      firstPage.content,
+      secondPage.content,
+      thirdPage.content,
+      fourthPage.content,
+    ).flatten()
+
+    // Verify all referral IDs are unique by comparing distinct count to total size
+    val allReferralIds = allDescendingResults.map { it.id }
+    assertThat(allReferralIds.distinct()).hasSize(allReferralIds.size)
+
+    assertThat(firstPage.content?.map { it.id }?.size).isEqualTo(3)
+    assertThat(secondPage.content?.map { it.id }?.size).isEqualTo(3)
+    assertThat(thirdPage.content?.map { it.id }?.size).isEqualTo(3)
+    assertThat(fourthPage.content?.map { it.id }?.size).isEqualTo(1)
+
+    assertThat(firstPage.content?.count { it.location == "Woodhill (HMP)" }).isEqualTo(3)
+    assertThat(firstPage.content?.count { it.location == "Transfer" }).isEqualTo(0)
+
+    assertThat(secondPage.content?.count { it.location == "Woodhill (HMP)" }).isEqualTo(2)
+    assertThat(secondPage.content?.count { it.location == "Transfer" }).isEqualTo(1)
+
+    assertThat(thirdPage.content?.count { it.location == "Woodhill (HMP)" }).isEqualTo(0)
+    assertThat(thirdPage.content?.count { it.location == "Transfer" }).isEqualTo(3)
+
+    assertThat(fourthPage.content?.count { it.location == "Woodhill (HMP)" }).isEqualTo(0)
+    assertThat(fourthPage.content?.count { it.location == "Transfer" }).isEqualTo(1)
+  }
+
   private fun logReferralViewToConsole(paginatedReferralView: PaginatedReferralView, pageNumber: Int) {
     println("[DEBUG_LOG] Page $pageNumber")
     paginatedReferralView.content?.forEach { referral ->
-      println("[DEBUG_LOG] - ID: ${referral.id}, Prison: ${referral.prisonNumber}, SentenceType: ${referral.sentenceType}")
+      println("[DEBUG_LOG] - ID: ${referral.id}, Prison: ${referral.prisonNumber}, SentenceType: ${referral.sentenceType}, Location: ${referral.location}, Status: ${referral.status}")
     }
   }
 
