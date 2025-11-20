@@ -33,14 +33,20 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `get sentences by prison number should return 200 with matching entries`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = PRISONER_1.prisonerNumber
+
+    // When
     val sentenceDetails = getSentences(prisonNumber)
+
+    // Then
     sentenceDetails.keyDates?.forEach { println("keyDate: $it \n") }
     sentenceDetails.sentences!!.size shouldBe 5
-    sentenceDetails.sentences!![0].description shouldBe "CJA03 Standard Determinate Sentence"
+    sentenceDetails.sentences[0].description shouldBe "CJA03 Standard Determinate Sentence"
+    sentenceDetails.sentences[0].sentenceEndDate shouldBe LocalDate.of(2016, Month.JULY, 29)
     sentenceDetails.keyDates!!.size.shouldBeGreaterThan(0)
-    val keyDate = sentenceDetails.keyDates?.firstOrNull { it.earliestReleaseDate == true }
+    val keyDate = sentenceDetails.keyDates.firstOrNull { it.earliestReleaseDate == true }
     keyDate!!.code.shouldBeEqual("PRRD")
   }
 
