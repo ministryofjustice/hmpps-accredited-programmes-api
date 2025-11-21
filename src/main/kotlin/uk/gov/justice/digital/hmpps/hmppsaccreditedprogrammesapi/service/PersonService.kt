@@ -160,7 +160,7 @@ class PersonService(
 
     val sentences = sentenceInformation.latestPrisonTerm.courtSentences
       .flatMap { it.sentences }
-      .map { Sentence(it.sentenceTypeDescription, it.sentenceStartDate) }
+      .map { Sentence(it.sentenceTypeDescription, it.sentenceStartDate, it.sentenceEndDate) }
     val keyDates = buildKeyDates(sentenceInformation)
     return SentenceDetails(sentences, keyDates)
   }
