@@ -1,5 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.transformer
 
+import uk.gov.justice.digital.hmpps.assessrisksandneeds.api.model.AllPredictorVersionedDto
+import uk.gov.justice.digital.hmpps.assessrisksandneeds.api.model.AllPredictorVersionedLegacyDto
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.AllPredictorVersioned
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysAttitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysBehaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysHealth
@@ -8,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysOffendingInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysPsychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRiskPredictorScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
@@ -17,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.A
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Behaviour
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Lifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OGRS4Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Psychiatric
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Relationships
@@ -115,46 +118,85 @@ fun buildRisks(
   oasysRelationships: OasysRelationships?,
   oasysRoshSummary: OasysRoshSummary?,
   oasysRiskSummary: RiskSummary?,
-  oasysRiskPredictorScores: OasysRiskPredictorScores?,
+  allPredictorVersioned: AllPredictorVersioned<Any>?,
   activeAlerts: List<Alert>?,
-) = Risks(
-  ogrsYear1 = oasysRiskPredictorScores?.groupReconvictionScore?.oneYear,
-  ogrsYear2 = oasysRiskPredictorScores?.groupReconvictionScore?.twoYears,
-  ogrsRisk = oasysRiskPredictorScores?.groupReconvictionScore?.scoreLevel?.fixCase(),
+): Risks {
+  // Map common fields to Risks model
+  val risks = Risks(
+    // SARA
+    imminentRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
+    imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
 
-  ovpYear1 = oasysRiskPredictorScores?.violencePredictorScore?.oneYear,
-  ovpYear2 = oasysRiskPredictorScores?.violencePredictorScore?.twoYears,
-  ovpRisk = oasysRiskPredictorScores?.violencePredictorScore?.scoreLevel?.fixCase(),
-  rsrScore = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.percentageScore,
-  rsrRisk = oasysRiskPredictorScores?.riskOfSeriousRecidivismScore?.scoreLevel?.fixCase(),
+    // ROSH
+    overallRoshLevel = oasysRiskSummary?.overallRiskLevel?.fixCase(),
+    riskPrisonersCustody = oasysRoshSummary?.riskPrisonersCustody?.type,
+    riskStaffCustody = oasysRoshSummary?.riskStaffCustody?.type,
+    riskStaffCommunity = oasysRoshSummary?.riskStaffCommunity?.type,
+    riskKnownAdultCustody = oasysRoshSummary?.riskKnownAdultCustody?.type,
+    riskKnownAdultCommunity = oasysRoshSummary?.riskKnownAdultCommunity?.type,
+    riskPublicCustody = oasysRoshSummary?.riskPublicCustody?.type,
+    riskPublicCommunity = oasysRoshSummary?.riskPublicCommunity?.type,
+    riskChildrenCustody = oasysRoshSummary?.riskChildrenCustody?.type,
+    riskChildrenCommunity = oasysRoshSummary?.riskChildrenCommunity?.type,
 
-  ospcScore = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
-  ospiScore = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
+    // Alerts
+    alerts = activeAlerts?.map {
+      uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Alert(
+        description = it.alertCode.description,
+        alertType = it.alertCode.alertTypeDescription,
+        dateCreated = it.createdAt.toLocalDate(),
+      )
+    }?.distinctBy {
+      Triple(it.description, it.alertType, it.dateCreated)
+    },
+  )
+  // For pre-OGRS4 assessments add the "legacy" fields
+  return if (allPredictorVersioned is AllPredictorVersionedLegacyDto) {
+    val allPredictorVersionedLegacyDto = allPredictorVersioned as AllPredictorVersionedLegacyDto?
+    risks.copy(
+      isLegacy = true,
+      ogrsYear1 = allPredictorVersionedLegacyDto?.output?.groupReconvictionScore?.oneYear,
+      ogrsYear2 = allPredictorVersionedLegacyDto?.output?.groupReconvictionScore?.twoYears,
+      ogrsRisk = allPredictorVersionedLegacyDto?.output?.groupReconvictionScore?.scoreLevel?.type,
+      ovpYear1 = allPredictorVersionedLegacyDto?.output?.violencePredictorScore?.oneYear,
+      ovpYear2 = allPredictorVersionedLegacyDto?.output?.violencePredictorScore?.twoYears,
+      ovpRisk = allPredictorVersionedLegacyDto?.output?.violencePredictorScore?.ovpRisk?.type,
+      rsrScore = allPredictorVersionedLegacyDto?.output?.riskOfSeriousRecidivismScore?.percentageScore,
+      rsrRisk = allPredictorVersionedLegacyDto?.output?.riskOfSeriousRecidivismScore?.scoreLevel?.type,
 
-  riskPrisonersCustody = oasysRoshSummary?.riskPrisonersCustody?.type,
-  riskStaffCustody = oasysRoshSummary?.riskStaffCustody?.type,
-  riskStaffCommunity = oasysRoshSummary?.riskStaffCommunity?.type,
-  riskKnownAdultCustody = oasysRoshSummary?.riskKnownAdultCustody?.type,
-  riskKnownAdultCommunity = oasysRoshSummary?.riskKnownAdultCommunity?.type,
-  riskPublicCustody = oasysRoshSummary?.riskPublicCustody?.type,
-  riskPublicCommunity = oasysRoshSummary?.riskPublicCommunity?.type,
-  riskChildrenCustody = oasysRoshSummary?.riskChildrenCustody?.type,
-  riskChildrenCommunity = oasysRoshSummary?.riskChildrenCommunity?.type,
-
-  imminentRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
-  imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
-
-  overallRoshLevel = oasysRiskSummary?.overallRiskLevel?.fixCase(),
-  alerts = activeAlerts?.map {
-    uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Alert(
-      description = it.alertCode.description,
-      alertType = it.alertCode.alertTypeDescription,
-      dateCreated = it.createdAt.toLocalDate(),
+      ospcScore = oasysOffendingInfo?.ospDCRisk ?: oasysOffendingInfo?.ospCRisk,
+      ospiScore = oasysOffendingInfo?.ospIICRisk ?: oasysOffendingInfo?.ospIRisk,
     )
-  }?.distinctBy {
-    Triple(it.description, it.alertType, it.dateCreated)
-  },
-)
+  } else { // For post-OGRS4 assessments add the new fields
+    val allPredictorVersionedDto = allPredictorVersioned as? AllPredictorVersionedDto
+    risks.apply {
+      isLegacy = false
+      OGRS4Risks = OGRS4Risks(
+        allReoffendingScoreType = allPredictorVersionedDto?.output?.allReoffendingPredictor?.staticOrDynamic?.type,
+        allReoffendingScore = allPredictorVersionedDto?.output?.allReoffendingPredictor?.score,
+        allReoffendingBand = allPredictorVersionedDto?.output?.allReoffendingPredictor?.band?.type,
+
+        violentReoffendingScoreType = allPredictorVersionedDto?.output?.violentReoffendingPredictor?.staticOrDynamic?.type,
+        violentReoffendingScore = allPredictorVersionedDto?.output?.violentReoffendingPredictor?.score,
+        violentReoffendingBand = allPredictorVersionedDto?.output?.violentReoffendingPredictor?.band?.type,
+
+        seriousViolentReoffendingScoreType = allPredictorVersionedDto?.output?.seriousViolentReoffendingPredictor?.staticOrDynamic?.type,
+        seriousViolentReoffendingScore = allPredictorVersionedDto?.output?.seriousViolentReoffendingPredictor?.score,
+        seriousViolentReoffendingBand = allPredictorVersionedDto?.output?.seriousViolentReoffendingPredictor?.band?.type,
+
+        directContactSexualReoffendingScore = allPredictorVersionedDto?.output?.directContactSexualReoffendingPredictor?.score,
+        directContactSexualReoffendingBand = allPredictorVersionedDto?.output?.directContactSexualReoffendingPredictor?.band?.type,
+
+        indirectImageContactSexualReoffendingScore = allPredictorVersionedDto?.output?.indirectImageContactSexualReoffendingPredictor?.score,
+        indirectImageContactSexualReoffendingBand = allPredictorVersionedDto?.output?.indirectImageContactSexualReoffendingPredictor?.band?.type,
+
+        combinedSeriousReoffendingScoreType = allPredictorVersionedDto?.output?.combinedSeriousReoffendingPredictor?.staticOrDynamic?.type,
+        combinedSeriousReoffendingScore = allPredictorVersionedDto?.output?.combinedSeriousReoffendingPredictor?.score,
+        combinedSeriousReoffendingBand = allPredictorVersionedDto?.output?.combinedSeriousReoffendingPredictor?.band?.type,
+      )
+    }
+  }
+}
 
 fun String.fixCase(): String = this.lowercase().replaceFirstChar(Char::titlecase)
 

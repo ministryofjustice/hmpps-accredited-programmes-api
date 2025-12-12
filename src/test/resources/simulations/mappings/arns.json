@@ -1,0 +1,39 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "url": "/assessments/id/2114585/risk/predictors/all",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "arns-ogrs4-predictors-success.json"
+      }
+    },
+    {
+      "request": {
+        "url": "/assessments/id/2114584/risk/predictors/all",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "arns-legacy-predictors-success.json"
+      }
+    },
+    {
+      "request": {
+        "url": "/assessments/id/99999999/risk/predictors/all",
+        "method": "GET"
+      },
+      "response": {
+        "status": 404
+      }
+    }
+  ]
+}
