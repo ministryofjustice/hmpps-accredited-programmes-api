@@ -171,7 +171,7 @@ fun buildRisks(
     val allPredictorVersionedDto = allPredictorVersioned as? AllPredictorVersionedDto
     risks.apply {
       isLegacy = false
-      OGRS4Risks = OGRS4Risks(
+      ogrs4Risks = OGRS4Risks(
         allReoffendingScoreType = allPredictorVersionedDto?.output?.allReoffendingPredictor?.staticOrDynamic?.type,
         allReoffendingScore = allPredictorVersionedDto?.output?.allReoffendingPredictor?.score,
         allReoffendingBand = allPredictorVersionedDto?.output?.allReoffendingPredictor?.band?.type,

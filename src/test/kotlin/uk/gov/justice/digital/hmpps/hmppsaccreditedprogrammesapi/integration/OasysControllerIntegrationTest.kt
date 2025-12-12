@@ -153,7 +153,7 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
           dateCreated = LocalDate.of(2014, 7, 23),
         ),
       ),
-      OGRS4Risks = null,
+      ogrs4Risks = null,
     )
   }
 
@@ -185,9 +185,9 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
       ),
     ).containsOnlyNulls()
     // assert that OGRS4 risk fields are populated
-    risks.OGRS4Risks.shouldNotBeNull()
+    risks.ogrs4Risks.shouldNotBeNull()
 
-    assertThat(risks.OGRS4Risks).isEqualTo(
+    assertThat(risks.ogrs4Risks).isEqualTo(
       OGRS4Risks(
         allReoffendingScoreType = ScoreType.STATIC.name,
         allReoffendingScore = BigDecimal(0.12).setScale(2, RoundingMode.HALF_UP),

@@ -76,5 +76,5 @@ data class Risks(
   @Schema(example = "null", description = "")
   val alerts: List<Alert>? = null,
 
-  var OGRS4Risks: OGRS4Risks? = null,
+  var ogrs4Risks: OGRS4Risks? = null,
 )
