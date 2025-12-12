@@ -53,6 +53,7 @@ class OasysService(
   val oasysApiClient: OasysApiClient,
   val prisonerAlertsApiClient: PrisonerAlertsApiClient,
   val auditService: AuditService,
+  val assessRiskAndNeedsService: AssessRiskAndNeedsService,
 ) {
   fun getOffenceDetail(prisonNumber: String): OffenceDetail? {
     auditService.audit(
@@ -173,7 +174,8 @@ class OasysService(
     val oasysRelationships = getRelationships(assessmentId)
     val oasysRoshSummary = getRoshSummary(assessmentId)
     val oasysScoreLevel = oasysRoshSummary?.getHighestPriorityScore()
-    val oasysRiskPredictorScores = getRiskPredictors(assessmentId)
+    val allPredictorVersioned = assessRiskAndNeedsService.getRiskPredictors(assessmentId)
+
     val activeAlerts = getActiveAlerts(prisonNumber)
 
     return buildRisks(
@@ -181,7 +183,7 @@ class OasysService(
       oasysRelationships,
       oasysRoshSummary,
       RiskSummary(oasysScoreLevel?.type),
-      oasysRiskPredictorScores,
+      allPredictorVersioned,
       activeAlerts,
     )
   }
