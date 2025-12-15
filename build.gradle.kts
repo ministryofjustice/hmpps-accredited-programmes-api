@@ -59,7 +59,7 @@ dependencies {
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:1.21.3")
+  testImplementation("org.testcontainers:testcontainers:2.0.3")
   testImplementation("org.testcontainers:postgresql:1.21.3")
   testImplementation("org.testcontainers:junit-jupiter:1.21.3")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
