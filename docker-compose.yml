@@ -55,7 +55,7 @@ services:
       - POSTGRES_PASSWORD=prison-register
       - POSTGRES_USER=prison-register
       - POSTGRES_DB=prison-register
-    image: postgres:15
+    image: postgres:18
     networks:
       - hmpps
     ports:
