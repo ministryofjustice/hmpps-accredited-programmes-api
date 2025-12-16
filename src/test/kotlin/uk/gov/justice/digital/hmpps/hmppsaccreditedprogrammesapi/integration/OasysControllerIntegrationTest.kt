@@ -7,6 +7,7 @@ import io.kotest.matchers.equals.shouldBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.type.ScoreLevel
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.arnsApi.model.type.ScoreType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Alert
@@ -24,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.D
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Health
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.LearningNeeds
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Lifestyle
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OGRS4Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OasysAssessmentDateInfo
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.OffenceDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Psychiatric
@@ -107,20 +111,21 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `Get risk information from Oasys`() {
+  fun `Get risk information from Oasys and ARNS`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val prisonNumber = "A9999BB"
     val risks = getRisksByPrisonNumber(prisonNumber)
 
     risks.shouldNotBeNull()
     risks shouldBeEqual Risks(
-      ogrsYear1 = BigDecimal(8),
-      ogrsYear2 = BigDecimal(15),
-      ogrsRisk = LOW,
-      ovpYear1 = BigDecimal(8),
-      ovpYear2 = BigDecimal(15),
+      isLegacy = true,
+      ogrsYear1 = BigDecimal(45),
+      ogrsYear2 = BigDecimal(63),
+      ogrsRisk = MEDIUM,
+      ovpYear1 = BigDecimal(23),
+      ovpYear2 = BigDecimal(36),
       ovpRisk = MEDIUM,
-      rsrScore = BigDecimal(1.46).setScale(2, RoundingMode.HALF_UP),
+      rsrScore = BigDecimal(3.45).setScale(2, RoundingMode.HALF_UP),
       rsrRisk = LOW,
       ospcScore = HIGH,
       ospiScore = MEDIUM,
@@ -147,6 +152,59 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
           alertType = "Child Communication Measures",
           dateCreated = LocalDate.of(2014, 7, 23),
         ),
+      ),
+      ogrs4Risks = null,
+    )
+  }
+
+  @Test
+  fun `should retrieve OGRS4 risk information from ARNS`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val prisonNumber = "A8888BB"
+
+    // When
+    val risks = getRisksByPrisonNumber(prisonNumber)
+
+    // Then
+    risks.shouldNotBeNull()
+    risks.isLegacy shouldBe false
+    // assert that all pre-OGRS4 risk fields are null
+    assertThat(
+      listOf(
+        risks.ogrsYear1,
+        risks.ogrsYear2,
+        risks.ogrsRisk,
+        risks.ovpYear1,
+        risks.ovpYear2,
+        risks.ovpRisk,
+        risks.rsrScore,
+        risks.rsrRisk,
+        risks.ospcScore,
+        risks.ospiScore,
+      ),
+    ).containsOnlyNulls()
+    // assert that OGRS4 risk fields are populated
+    risks.ogrs4Risks.shouldNotBeNull()
+
+    assertThat(risks.ogrs4Risks).isEqualTo(
+      OGRS4Risks(
+        allReoffendingScoreType = ScoreType.STATIC.name,
+        allReoffendingScore = BigDecimal(0.12).setScale(2, RoundingMode.HALF_UP),
+        allReoffendingBand = ScoreLevel.LOW.type,
+        violentReoffendingScoreType = ScoreType.DYNAMIC.name,
+        violentReoffendingScore = BigDecimal(0.34).setScale(2, RoundingMode.HALF_UP),
+        violentReoffendingBand = ScoreLevel.MEDIUM.type,
+        seriousViolentReoffendingScoreType = ScoreType.STATIC.name,
+        seriousViolentReoffendingScore = BigDecimal(0.05).setScale(2, RoundingMode.HALF_UP),
+        seriousViolentReoffendingBand = ScoreLevel.LOW.type,
+        directContactSexualReoffendingScore = BigDecimal(0.07).setScale(2, RoundingMode.HALF_UP),
+        directContactSexualReoffendingBand = ScoreLevel.LOW.type,
+        indirectImageContactSexualReoffendingScore = BigDecimal(0.09).setScale(2, RoundingMode.HALF_UP),
+        indirectImageContactSexualReoffendingBand = ScoreLevel.LOW.type,
+        combinedSeriousReoffendingScoreType = ScoreType.STATIC.name,
+        combinedSeriousReoffendingScore = BigDecimal(0.15).setScale(2, RoundingMode.HALF_UP),
+        combinedSeriousReoffendingBand = ScoreLevel.MEDIUM.type,
       ),
     )
   }
