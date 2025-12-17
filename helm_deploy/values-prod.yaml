@@ -18,6 +18,7 @@ generic-service:
     SERVICES_ALLOCATION-MANAGER-API_BASE-URL: https://moic.service.justice.gov.uk
     SERVICES_NOMIS-USER-ROLES-API_BASE-URL: https://nomis-user-roles-api.prison.service.justice.gov.uk
     SERVICES_PRISONER-ALERTS-API_BASE-URL: https://alerts-api.hmpps.service.justice.gov.uk
+    SERVICES_ASSESS-RISKS-AND-NEEDS-API_BASE-URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk
     SENTRY_ENVIRONMENT: prod
     HMPPS_SQS_QUEUES_AUDIT_QUEUE_NAME: "Digital-Prison-Services-prod-hmpps_audit_queue"
     FEATURESWITCH_CASE-NOTES-ENABLED: true
