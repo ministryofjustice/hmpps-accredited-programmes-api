@@ -5,10 +5,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.2.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.3.0"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.2.21"
-  kotlin("plugin.jpa") version "2.2.21"
+  kotlin("plugin.spring") version "2.3.0"
+  kotlin("plugin.jpa") version "2.3.0"
 }
 
 configurations {
@@ -20,7 +20,7 @@ ext["hibernate.version"] = "6.6.11.Final"
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "2.8.14"
-  val sentryVersion = "8.28.0"
+  val sentryVersion = "8.29.0"
   val jsonWebtokenVersion = "0.13.0"
   val springSecurityVersion = "6.5.7"
 
@@ -53,15 +53,15 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.18")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.19")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:2.0.2")
-  testImplementation("org.testcontainers:postgresql:1.21.3")
-  testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+  testImplementation("org.testcontainers:testcontainers:2.0.3")
+  testImplementation("org.testcontainers:postgresql:1.21.4")
+  testImplementation("org.testcontainers:junit-jupiter:1.21.4")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
