@@ -13,14 +13,6 @@ plugins {
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
-
-  all {
-    resolutionStrategy {
-      force("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
-      force("org.jetbrains.kotlin:kotlin-reflect:2.2.21")
-      force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21")
-    }
-  }
 }
 
 ext["hibernate.version"] = "6.6.11.Final"
