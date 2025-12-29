@@ -9,6 +9,7 @@ plugins {
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.2.21"
   kotlin("plugin.jpa") version "2.2.21"
+  kotlin("jvm") version "2.2.0"
 }
 
 configurations {
