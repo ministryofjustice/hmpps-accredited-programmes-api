@@ -47,7 +47,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew --no-daemon build -x test
+        run: ./gradlew --no-daemon build -x test --stacktrace
 
       # Temporarily disabled due to Kotlin version incompatibility
       - name: Perform CodeQL Analysis
