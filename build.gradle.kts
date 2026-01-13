@@ -47,7 +47,6 @@ dependencies {
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
-  testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
