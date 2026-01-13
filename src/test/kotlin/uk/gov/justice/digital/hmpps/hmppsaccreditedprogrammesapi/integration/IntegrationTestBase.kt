@@ -28,7 +28,10 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.localstack.LocalStackContainer
+import org.testcontainers.containers.localstack.LocalStackContainer.Service
 import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.TestPropertiesInitializer
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
@@ -95,6 +98,14 @@ abstract class IntegrationTestBase {
   companion object {
 
     @JvmStatic
+    private val localStackContainer: LocalStackContainer =
+      LocalStackContainer(DockerImageName.parse("localstack/localstack"))
+        .apply {
+          withEnv("DEFAULT_REGION", "eu-west-2")
+          withServices(Service.SNS, Service.SQS)
+        }
+
+    @JvmStatic
     private val postgresContainer = PostgreSQLContainer<Nothing>("postgres:16.4")
       .apply {
         withReuse(true)
@@ -102,13 +113,16 @@ abstract class IntegrationTestBase {
 
     @BeforeAll
     @JvmStatic
-    fun startPostgresContainer() {
+    fun startContainers() {
       postgresContainer.start()
+      localStackContainer.start()
     }
 
     @DynamicPropertySource
     @JvmStatic
     fun setUpProperties(registry: DynamicPropertyRegistry) {
+      registry.add("hmpps.sqs.localstackUrl") { localStackContainer.getEndpointOverride(Service.SNS).toString() }
+      registry.add("hmpps.sqs.region") { localStackContainer.region }
       registry.add("spring.datasource.url") { postgresContainer.jdbcUrl }
       registry.add("spring.datasource.username") { postgresContainer.username }
       registry.add("spring.datasource.password") { postgresContainer.password }

@@ -68,7 +68,7 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
       othersInvolvedDetail = null,
       peerGroupInfluences = "No",
       motivationAndTriggers = "Mainly due to jealousy and fuelled by drug use",
-      acceptsResponsibility = false,
+      acceptsResponsibility = true,
       acceptsResponsibilityDetail = "This has happened numerous times in the past",
       patternOffending = null,
     )
