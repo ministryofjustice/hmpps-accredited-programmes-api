@@ -47,7 +47,6 @@ dependencies {
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
-  testImplementation("com.h2database:h2")
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
@@ -59,9 +58,10 @@ dependencies {
 
   testImplementation("org.awaitility:awaitility-kotlin")
 
-  testImplementation("org.testcontainers:testcontainers:2.0.2")
-  testImplementation("org.testcontainers:postgresql:1.21.3")
-  testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+  testImplementation("org.testcontainers:testcontainers:2.0.3")
+  testImplementation("org.testcontainers:postgresql:1.21.4")
+  testImplementation("org.testcontainers:localstack:1.21.4")
+  testImplementation("org.testcontainers:junit-jupiter:1.21.4")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 

@@ -40,7 +40,7 @@ fun OasysOffenceDetail.toModel() = OffenceDetail(
   othersInvolvedDetail = othersInvolved,
   peerGroupInfluences = peerGroupInfluences,
   motivationAndTriggers = offenceMotivation,
-  acceptsResponsibility = acceptsResponsibility == YES,
+  acceptsResponsibility = acceptsResponsibilityYesNo == YES,
   acceptsResponsibilityDetail = patternOffending,
 )
 

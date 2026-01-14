@@ -79,19 +79,14 @@ if not visible), expand `hmpps-accredited-programmes-api`, `Tasks`,
 
 ## Running the tests
 
-Running localstack is necessary for gradle and intellij tests
-```bash
-docker compose up localstack
-```
-
 To run linting and tests, do:
 
 ```bash
 ./gradlew clean build
 ```
 
-Repository integration tests use an embedded H2 database. REST API tests start a
-local server which listens on a random port, and spin up a containerised Postgres instance as a backend Database via the test containers API.
+The integration tests start a local Spring Boot instance which listens on a random port, and create containerised Postgres and Localstack instances via the test containers API,
+negating the need for any external docker dependencies.
 
 ### Pact
 

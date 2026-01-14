@@ -17,11 +17,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -30,6 +28,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.REF
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.CourseParticipationService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
@@ -37,22 +36,18 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import java.time.Year
 import java.util.UUID
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@ActiveProfiles("test-h2")
 @Import(JwtAuthHelper::class)
-class CourseParticipationControllerTest
-@Autowired
-constructor(
-  val mockMvc: MockMvc,
-  val jwtAuthHelper: JwtAuthHelper,
-) {
+class CourseParticipationControllerTest : IntegrationTestBase() {
 
-  val objectMapper = jacksonObjectMapper().apply {
+  override val objectMapper = jacksonObjectMapper().apply {
     registerModule(JavaTimeModule())
     configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true)
     configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true)
   }
+
+  @Autowired
+  private lateinit var mockMvc: MockMvc
 
   @MockkBean
   private lateinit var courseParticipationService: CourseParticipationService
