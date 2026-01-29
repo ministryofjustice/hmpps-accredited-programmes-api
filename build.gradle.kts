@@ -22,7 +22,7 @@ dependencies {
   val springdocVersion = "2.8.15"
   val sentryVersion = "8.31.0"
   val jsonWebtokenVersion = "0.13.0"
-  val springSecurityVersion = "6.5.7"
+  val springSecurityVersion = "7.0.2"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.8.2")
   runtimeOnly("org.postgresql:postgresql:42.7.9")
