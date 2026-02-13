@@ -1,7 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import java.math.BigDecimal
+import java.time.LocalDate
 
 data class Risks(
 
@@ -77,4 +80,22 @@ data class Risks(
   val alerts: List<Alert>? = null,
 
   var ogrs4Risks: OGRS4Risks? = null,
+
+  @Schema(
+    example = "1 August 2025",
+    required = true,
+    description = "The date of the last Oasys assessment.",
+  )
+  @get:JsonProperty("lastUpdated", required = true)
+  @JsonFormat(pattern = "d MMMM yyyy")
+  val lastUpdated: LocalDate? = LocalDate.now(),
+
+  @Schema(
+    example = "1 August 2025",
+    required = true,
+    description = "The date this data was fetched from Oasys.",
+  )
+  @get:JsonProperty("dateRetrieved", required = true)
+  @JsonFormat(pattern = "d MMMM yyyy")
+  val dateRetrieved: LocalDate? = LocalDate.now(),
 )

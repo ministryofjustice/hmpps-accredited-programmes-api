@@ -25,6 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.P
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Relationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Risks
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.RoshAnalysis
+import java.time.LocalDate
 
 fun OasysOffenceDetail.toModel() = OffenceDetail(
   offenceDetails = offenceAnalysis,
@@ -149,6 +150,10 @@ fun buildRisks(
     }?.distinctBy {
       Triple(it.description, it.alertType, it.dateCreated)
     },
+
+    // Relevant dates
+    dateRetrieved = LocalDate.now(),
+    lastUpdated = oasysOffendingInfo?.latestCompleteDate?.toLocalDate(),
   )
   // For pre-OGRS4 assessments add the "legacy" fields
   return if (allPredictorVersioned is AllPredictorVersionedLegacyDto) {
