@@ -93,6 +93,19 @@
     },
     {
       "request": {
+        "urlPattern": "/assessments/2114585/section/section1",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "offending-info.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/assessments/2114584/section/section2",
         "method": "GET"
       },
