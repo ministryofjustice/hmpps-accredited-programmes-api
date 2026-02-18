@@ -738,8 +738,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
         CourseOffering(
           id = UUID.randomUUID(),
           organisationId = "AWI",
-          contactEmail = "awi1@whatton.com",
-          secondaryContactEmail = "awi2@whatton.com",
+          contactEmail = "awi1@digital.justice.gov.uk",
+          secondaryContactEmail = "awi2@digital.justice.gov.uk",
           referable = true,
           withdrawn = false,
           gender = Gender.MALE,
@@ -763,8 +763,8 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
         CourseOffering(
           id = null,
           organisationId = "AWI",
-          contactEmail = "awi1@whatton.com",
-          secondaryContactEmail = "awi2@whatton.com",
+          contactEmail = "awi1@digital.justice.gov.uk",
+          secondaryContactEmail = "awi2@digital.justice.gov.uk",
           referable = true,
           withdrawn = false,
           gender = Gender.MALE,
@@ -773,6 +773,31 @@ class CourseControllerIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isCreated
       .expectBody<CourseOffering>()
+      .returnResult().responseBody!!
+  }
+
+  @Test
+  fun `should return bad request on create offering when invalid emails are prvoded`() {
+    webTestClient
+      .post()
+      .uri("/courses/$COURSE_ID2/offerings")
+      .header(HttpHeaders.AUTHORIZATION, jwtAuthHelper.bearerToken())
+      .contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        CourseOffering(
+          id = null,
+          organisationId = "AWI",
+          contactEmail = "awi1@whatton.com",
+          secondaryContactEmail = "awi2@whatton.com",
+          referable = true,
+          withdrawn = false,
+          gender = Gender.MALE,
+        ),
+      )
+      .exchange()
+      .expectStatus().isBadRequest
+      .expectBody<List<uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config.ErrorResponse>>()
       .returnResult().responseBody!!
   }
 

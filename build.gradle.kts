@@ -35,6 +35,9 @@ dependencies {
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
   implementation("com.google.guava:guava:33.5.0-jre")
 
+  implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("jakarta.validation:jakarta.validation-api")
+
   implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 

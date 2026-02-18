@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -82,7 +83,7 @@ class CourseController(
   )
   fun addCourseOffering(
     @Parameter(description = "A course identifier", required = true) @PathVariable("id") id: UUID,
-    @Parameter(description = "", required = true) @RequestBody courseOffering: CourseOffering,
+    @Parameter(description = "", required = true) @RequestBody @Valid courseOffering: CourseOffering,
   ): ResponseEntity<CourseOffering> {
     val course = courseService.getCourseById(id)
       ?: throw NotFoundException("No Course found at /courses/$id")

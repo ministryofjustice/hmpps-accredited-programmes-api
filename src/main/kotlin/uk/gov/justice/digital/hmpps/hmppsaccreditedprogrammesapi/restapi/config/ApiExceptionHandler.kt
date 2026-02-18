@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.config
 
 import io.sentry.Sentry
 import jakarta.persistence.EntityNotFoundException
+import jakarta.validation.ConstraintViolationException
 import jakarta.validation.ValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -11,8 +12,10 @@ import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageConversionException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
@@ -116,6 +119,19 @@ class ApiExceptionHandler {
           userMessage = e.message,
           developerMessage = e.message,
         ),
+      )
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException::class)
+  fun handleConstraintViolation(e: MethodArgumentNotValidException): ResponseEntity<List<ErrorResponse>> {
+    log.error("Validation failed", e)
+    return ResponseEntity
+      .status(BAD_REQUEST)
+      .body(e.fieldErrors.map { ErrorResponse(
+        status = BAD_REQUEST,
+        userMessage = "Validation failed for field: ${it.field} with rejected value: ${it.rejectedValue} and message: ${it.defaultMessage}",
+        developerMessage =  "error field: ${it.field}, error value: ${it.rejectedValue}, error message: ${it.defaultMessage}",
+      ) }
       )
   }
 
