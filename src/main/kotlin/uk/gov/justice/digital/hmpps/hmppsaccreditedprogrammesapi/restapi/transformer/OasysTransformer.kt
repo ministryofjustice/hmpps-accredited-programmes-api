@@ -13,7 +13,9 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRelationships
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshFull
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.OasysRoshSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.PniResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.RiskSummary
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.SaraRiskLevel
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.Alert
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Attitude
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Behaviour
@@ -115,17 +117,17 @@ fun OasysAttitude.toModel() = Attitude(
 
 fun buildRisks(
   oasysOffendingInfo: OasysOffendingInfo?,
-  oasysRelationships: OasysRelationships?,
   oasysRoshSummary: OasysRoshSummary?,
   oasysRiskSummary: RiskSummary?,
   allPredictorVersioned: AllPredictorVersioned<Any>?,
   activeAlerts: List<Alert>?,
+  pniResponse: PniResponse?,
 ): Risks {
   // Map common fields to Risks model
   val risks = Risks(
     // SARA
-    imminentRiskOfViolenceTowardsOthers = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsOthers,
-    imminentRiskOfViolenceTowardsPartner = oasysRelationships?.sara?.imminentRiskOfViolenceTowardsPartner,
+    imminentRiskOfViolenceTowardsOthers = SaraRiskLevel.getRiskToOthers(pniResponse?.pniCalculation?.saraRiskLevel?.toOther).description,
+    imminentRiskOfViolenceTowardsPartner = SaraRiskLevel.getRiskForPartner(pniResponse?.pniCalculation?.saraRiskLevel?.toPartner).description,
 
     // ROSH
     overallRoshLevel = oasysRiskSummary?.overallRiskLevel?.fixCase(),

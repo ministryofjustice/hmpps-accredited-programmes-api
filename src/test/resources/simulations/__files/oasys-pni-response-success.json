@@ -21,8 +21,8 @@
     "totalDomainScore" : 5,
     "pni" : "H",
     "saraRiskLevel" : {
-      "toPartner" : 10,
-      "toOther" : 2
+      "toPartner" : 1,
+      "toOther" : 3
     },
     "missingFields" : [ ]
   },
