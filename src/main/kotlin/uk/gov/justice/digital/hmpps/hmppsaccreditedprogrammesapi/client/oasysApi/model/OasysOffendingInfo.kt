@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OasysOffendingInfo(
@@ -9,4 +10,5 @@ data class OasysOffendingInfo(
   val ospIICRisk: String?,
   val ospDCRisk: String?,
   val crn: String?,
+  val latestCompleteDate: LocalDateTime,
 )

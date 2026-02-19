@@ -154,6 +154,8 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
         ),
       ),
       ogrs4Risks = null,
+      lastUpdated = LocalDate.of(2024, 1, 22),
+      dateRetrieved = LocalDate.now(),
     )
   }
 
@@ -210,6 +212,9 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
         combinedSeriousReoffendingBand = ScoreLevel.MEDIUM.type,
       ),
     )
+    // ensure date fields are populated
+    assertThat(risks.lastUpdated).isEqualTo(LocalDate.of(2024, 1, 22))
+    assertThat(risks.dateRetrieved).isNotNull
   }
 
   @Test
