@@ -340,6 +340,19 @@
     },
     {
       "request": {
+        "url": "/assessments/pni/A8888BB?community=false",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "oasys-pni-response-success.json"
+      }
+    },
+    {
+      "request": {
         "url": "/assessments/pni/A4321AA?community=false",
         "method": "GET"
       },
