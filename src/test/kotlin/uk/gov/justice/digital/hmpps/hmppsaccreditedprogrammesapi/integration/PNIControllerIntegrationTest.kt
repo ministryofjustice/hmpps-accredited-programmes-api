@@ -119,9 +119,9 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
         ovpRisk = "Medium",
         rsr = 3.5.toBigDecimal(),
         sara = Sara(
-          overallResult = SaraRisk.MEDIUM,
-          saraRiskOfViolenceTowardsOthers = SaraRisk.MEDIUM.description,
-          saraRiskOfViolenceTowardsPartner = SaraRisk.NOT_APPLICABLE.description,
+          overallResult = SaraRisk.HIGH,
+          saraRiskOfViolenceTowardsOthers = SaraRisk.HIGH.description,
+          saraRiskOfViolenceTowardsPartner = SaraRisk.LOW.description,
           saraAssessmentId = 10082385L,
         ),
       ),

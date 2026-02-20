@@ -136,9 +136,9 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
         ospIic = "Low",
         rsr = BigDecimal("3.5"),
         sara = Sara(
-          overallResult = SaraRisk.MEDIUM,
-          saraRiskOfViolenceTowardsPartner = SaraRisk.NOT_APPLICABLE.description,
-          saraRiskOfViolenceTowardsOthers = SaraRisk.MEDIUM.description,
+          overallResult = SaraRisk.HIGH,
+          saraRiskOfViolenceTowardsPartner = SaraRisk.LOW.description,
+          saraRiskOfViolenceTowardsOthers = SaraRisk.HIGH.description,
           saraAssessmentId = 10082385,
         ),
       ),
