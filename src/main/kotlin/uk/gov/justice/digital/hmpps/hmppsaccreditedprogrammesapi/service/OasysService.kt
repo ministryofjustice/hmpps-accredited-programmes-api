@@ -171,20 +171,19 @@ class OasysService(
       ?: throw NotFoundException("No Risks information found for prison number $prisonNumber")
 
     val oasysOffendingInfo = getOffendingInfo(assessmentId)
-    val oasysRelationships = getRelationships(assessmentId)
     val oasysRoshSummary = getRoshSummary(assessmentId)
     val oasysScoreLevel = oasysRoshSummary?.getHighestPriorityScore()
     val allPredictorVersioned = assessRiskAndNeedsService.getRiskPredictors(assessmentId)
-
+    val pniCalculation = getPniCalculation(prisonNumber)
     val activeAlerts = getActiveAlerts(prisonNumber)
 
     return buildRisks(
       oasysOffendingInfo,
-      oasysRelationships,
       oasysRoshSummary,
       RiskSummary(oasysScoreLevel?.type),
       allPredictorVersioned,
       activeAlerts,
+      pniCalculation,
     )
   }
 

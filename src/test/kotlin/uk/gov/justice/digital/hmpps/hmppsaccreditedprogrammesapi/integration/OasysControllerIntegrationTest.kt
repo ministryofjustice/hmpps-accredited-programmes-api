@@ -139,8 +139,8 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
       riskKnownAdultCommunity = LOW,
       riskPublicCommunity = MEDIUM,
       riskChildrenCommunity = LOW,
-      imminentRiskOfViolenceTowardsPartner = null,
-      imminentRiskOfViolenceTowardsOthers = null,
+      imminentRiskOfViolenceTowardsPartner = "Low",
+      imminentRiskOfViolenceTowardsOthers = "High",
       alerts = listOf(
         Alert(
           description = "ACCT Open (HMPS)",
@@ -188,6 +188,9 @@ class OasysControllerIntegrationTest : IntegrationTestBase() {
     ).containsOnlyNulls()
     // assert that OGRS4 risk fields are populated
     risks.ogrs4Risks.shouldNotBeNull()
+    // assert that SARA values are present
+    assertThat(risks.imminentRiskOfViolenceTowardsPartner).isEqualTo("Low")
+    assertThat(risks.imminentRiskOfViolenceTowardsOthers).isEqualTo("High")
 
     assertThat(risks.ogrs4Risks).isEqualTo(
       OGRS4Risks(
