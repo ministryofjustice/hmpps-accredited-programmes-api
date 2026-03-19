@@ -86,9 +86,15 @@ testing {
             // testLogging.showStandardStreams = true
             maxParallelForks = 1
             environment["pact_do_not_track"] = "true"
-            environment["pact.provider.tag"] = environment["PACT_PROVIDER_TAG"]
-            environment["pact.provider.version"] = environment["PACT_PROVIDER_VERSION"]
-            environment["pact.verifier.publishResults"] = environment["PACT_PUBLISH_RESULTS"] ?: "false"
+            val pactProviderTag = System.getenv("PACT_PROVIDER_TAG")
+            val pactProviderVersion = System.getenv("PACT_PROVIDER_VERSION")
+
+            if (pactProviderTag != null && pactProviderVersion != null) {
+              environment["pact.provider.tag"] = pactProviderTag
+              environment["pact.provider.version"] = pactProviderVersion
+              environment["pact.verifier.publishResults"] =
+                System.getenv("PACT_PUBLISH_RESULTS") ?: "false"
+            }
           }
         }
       }
