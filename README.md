@@ -15,7 +15,8 @@ docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](http
 For building and running:
 
 - Docker
-- Java 21
+- Java 25
+- [Gradle](https://gradle.org/) version 9.3+
 
 Additionally, for running scripts:
 
@@ -110,9 +111,8 @@ as soon as possible to set up and clear state between tests.
 running our end to end tests. These are run against the deployed development
 environment on each merge to `main`. These tests log in with a test user account
 `ACP_TEST`, linked to one of the developers' email addresses. From time to time
-the password needs to be reset, causing the tests to fail. When this happens, we
-need to update the `HMPPS_AUTH_PASSWORD` environment variable set in the
-[CircleCI project settings](https://app.circleci.com/settings/project/github/ministryofjustice/hmpps-accredited-programmes-api/environment-variables).
+the password needs to be reset, the symptom being that the tests start to fail. 
+Please see https://github.com/ministryofjustice/hmpps-accredited-programmes-e2e for more details.
 
 ## OpenAPI documentation
 
