@@ -66,12 +66,12 @@ dependencies {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 kotlin {
   kotlinDaemonJvmArgs = listOf("-Xmx2g")
-  jvmToolchain(21)
+  jvmToolchain(25)
 }
 
 testing {
@@ -105,7 +105,7 @@ testing {
 tasks {
   withType<KotlinCompile> {
     compilerOptions {
-      jvmTarget.set(JvmTarget.JVM_21)
+      jvmTarget.set(JvmTarget.JVM_25)
     }
 
     kotlin.sourceSets["main"].kotlin.srcDir(layout.buildDirectory.dir("generated/src/main/kotlin"))
