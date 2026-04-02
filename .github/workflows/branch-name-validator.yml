@@ -6,8 +6,8 @@ jobs:
   check-jira-prefix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: deepakputhraya/action-branch-name@master
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: deepakputhraya/action-branch-name@e0f8db53a8e289f1ae6f6c3e8dc70a3d366fd876
         with:
           regex: '^(no-ticket/|renovate[-/]|hotfix/|FRI-[0-9]+/|APG-[0-9]+/)' # start branch with either 'no-ticket/' or 'FRI-NUMBER/' or 'APG-NUMBER/', allowing for bots and hotfixes
           ignore: main
