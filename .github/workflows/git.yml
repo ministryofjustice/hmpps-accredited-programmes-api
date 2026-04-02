@@ -12,4 +12,4 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Block fixup and squash commits
-        uses: 13rac1/block-fixup-merge-action@bd5504fb9ca0253e109d98eb86b7debc01970cdc
+        uses: 13rac1/block-fixup-merge-action@a85db59578fc612bc89431bf34e792bc4ec3eab9
