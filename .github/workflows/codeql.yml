@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
 
       # Temporarily disabled due to Kotlin version incompatibility
       # The gradle-spring-boot plugin 9.3.0 requires Kotlin 2.2.21+
