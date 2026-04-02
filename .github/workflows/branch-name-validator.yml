@@ -17,7 +17,7 @@ jobs:
           echo "Branch name: $BRANCH_NAME"
 
           # Define allowed pattern: feature/*, bugfix/*, hotfix/*, release/*
-          PATTERN="^(no-ticket/|renovate[-/]|hotfix/|IPB-[0-9]+/|COS-[0-9]+/)"
+          PATTERN="^(no-ticket/|renovate[-/]|hotfix/|FRI-[0-9]+/|APG-[0-9]+/)"
 
           if [[ ! "$BRANCH_NAME" =~ $PATTERN ]]; then
             echo "❌ Branch name '$BRANCH_NAME' is invalid."
