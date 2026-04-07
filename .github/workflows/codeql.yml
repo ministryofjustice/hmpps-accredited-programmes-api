@@ -31,7 +31,7 @@ jobs:
       # Re-enable once CodeQL adds support for newer Kotlin versions
       - name: Initialize CodeQL
         if: false
-        uses: github/codeql-action/init@f94817b9f0deeb3871261446912ae8f854d1b675
+        uses: github/codeql-action/init@b623f5fd572a69d335c9da3487c1ce53741a09bf
         with:
           languages: 'java'
           # Use only 'java' to analyze code written in Java, Kotlin or both
@@ -52,6 +52,6 @@ jobs:
       # Temporarily disabled due to Kotlin version incompatibility
       - name: Perform CodeQL Analysis
         if: false
-        uses: github/codeql-action/analyze@f94817b9f0deeb3871261446912ae8f854d1b675
+        uses: github/codeql-action/analyze@b623f5fd572a69d335c9da3487c1ce53741a09bf
         with:
           category: "/language:${{matrix.language}}"
