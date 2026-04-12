@@ -5,10 +5,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.3.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.6.0"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.3.0"
-  kotlin("plugin.jpa") version "2.3.0"
+  kotlin("plugin.spring") version "2.3.20"
+  kotlin("plugin.jpa") version "2.3.20"
 }
 
 configurations {
@@ -19,13 +19,13 @@ ext["hibernate.version"] = "6.6.11.Final"
 
 dependencies {
   val kotestVersion = "5.9.1"
-  val springdocVersion = "2.8.15"
-  val sentryVersion = "8.31.0"
+  val springdocVersion = "2.8.17"
+  val sentryVersion = "8.38.0"
   val jsonWebtokenVersion = "0.13.0"
-  val springSecurityVersion = "7.0.2"
+  val springSecurityVersion = "7.0.4"
 
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.8.2")
-  runtimeOnly("org.postgresql:postgresql:42.7.9")
+  runtimeOnly("org.postgresql:postgresql:42.7.10")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
@@ -42,8 +42,8 @@ dependencies {
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.6.3")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-  implementation("org.openfolder:kotlin-asyncapi-spring-web:3.2.0")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.18")
+  implementation("org.openfolder:kotlin-asyncapi-spring-web:3.2.2")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.21")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
@@ -52,7 +52,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.19")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.6.20")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
 
