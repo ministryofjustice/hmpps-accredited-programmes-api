@@ -20,6 +20,7 @@ class ReferralEntityFactory {
   private var referrerOverrideReason: String? = null
   private var hasLdc: Boolean = false
   private var hasLdcBeenOverwrittenByProgrammeTeam: Boolean = false
+  private var originalReferralId: UUID? = null
 
   fun withId(id: UUID?) = apply { this.id = id }
   fun withOffering(offering: OfferingEntity) = apply { this.offering = offering }
@@ -32,6 +33,8 @@ class ReferralEntityFactory {
   fun withReferrerOverrideReason(referrerOverrideReason: String?) = apply { this.referrerOverrideReason = referrerOverrideReason }
   fun withLdc(hasLdc: Boolean) = apply { this.hasLdc = hasLdc }
   fun withHasLdcBeenOverwrittenByProgrammeTeam(hasLdcBeenOverwrittenByProgrammeTeam: Boolean) = apply { this.hasLdcBeenOverwrittenByProgrammeTeam = hasLdcBeenOverwrittenByProgrammeTeam }
+  fun withSubmittedOn(submittedOn: LocalDateTime?) = apply { this.submittedOn = submittedOn }
+  fun withOriginalReferralId(originalReferralId: UUID?) = apply { this.originalReferralId = originalReferralId }
 
   fun produce() = ReferralEntity(
     id = this.id,
@@ -46,5 +49,6 @@ class ReferralEntityFactory {
     referrerOverrideReason = this.referrerOverrideReason,
     hasLdc = this.hasLdc,
     hasLdcBeenOverriddenByProgrammeTeam = this.hasLdcBeenOverwrittenByProgrammeTeam,
+    originalReferralId = this.originalReferralId,
   )
 }

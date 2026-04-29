@@ -50,8 +50,8 @@ class PersistenceHelper {
     entityManager.persist(referralEntity)
   }
 
-  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue", displayOnProgrammeDirectory: Boolean = true, intensity: String? = CourseIntensity.MODERATE.name) {
-    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn, audience_colour, display_on_programme_directory, intensity) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn, :audienceColour, :display_on_programme_directory, :intensity)")
+  fun createCourse(courseId: UUID, identifier: String, name: String, description: String, altName: String, audience: String, withdrawn: Boolean = false, audienceColour: String = "light-blue", displayOnProgrammeDirectory: Boolean = true, intensity: String? = CourseIntensity.MODERATE.name, listDisplayName: String? = null) {
+    entityManager.createNativeQuery("INSERT INTO course (course_id, identifier, name, description, alternate_name, audience, withdrawn, audience_colour, display_on_programme_directory, intensity, list_display_name) VALUES (:id, :identifier, :name, :description, :altName, :audience, :withdrawn, :audienceColour, :display_on_programme_directory, :intensity, :list_display_name)")
       .setParameter("id", courseId)
       .setParameter("identifier", identifier)
       .setParameter("name", name)
@@ -62,6 +62,7 @@ class PersistenceHelper {
       .setParameter("audienceColour", audienceColour)
       .setParameter("display_on_programme_directory", displayOnProgrammeDirectory)
       .setParameter("intensity", intensity)
+      .setParameter("list_display_name", listDisplayName)
       .executeUpdate()
   }
 
@@ -178,6 +179,132 @@ class PersistenceHelper {
       .setParameter("username", username)
       .setParameter("primaryEmail", primaryEmail)
       .setParameter("accountType", accountType)
+      .executeUpdate()
+  }
+
+  fun createAuditRecord(
+    id: UUID = UUID.randomUUID(),
+    referralId: UUID? = null,
+    prisonNumber: String,
+    referrerUsername: String? = null,
+    referralStatusFrom: String? = null,
+    referralStatusTo: String? = null,
+    courseId: UUID? = null,
+    courseName: String? = null,
+    courseLocation: String? = null,
+    auditAction: String,
+    auditUsername: String,
+    auditDateTime: LocalDateTime = LocalDateTime.now(),
+  ) {
+    entityManager.createNativeQuery("INSERT INTO audit_record (audit_record_id, referral_id, prison_number, referrer_username, referral_status_from, referral_status_to, course_id, course_name, course_location, audit_action, audit_username, audit_date_time) VALUES (:id, :referralId, :prisonNumber, :referrerUsername, :referralStatusFrom, :referralStatusTo, :courseId, :courseName, :courseLocation, :auditAction, :auditUsername, :auditDateTime)")
+      .setParameter("id", id)
+      .setParameter("referralId", referralId)
+      .setParameter("prisonNumber", prisonNumber)
+      .setParameter("referrerUsername", referrerUsername)
+      .setParameter("referralStatusFrom", referralStatusFrom)
+      .setParameter("referralStatusTo", referralStatusTo)
+      .setParameter("courseId", courseId)
+      .setParameter("courseName", courseName)
+      .setParameter("courseLocation", courseLocation)
+      .setParameter("auditAction", auditAction)
+      .setParameter("auditUsername", auditUsername)
+      .setParameter("auditDateTime", auditDateTime)
+      .executeUpdate()
+  }
+
+  fun createPniResult(
+    pniResultId: UUID = UUID.randomUUID(),
+    prisonNumber: String,
+    crn: String? = null,
+    referralId: UUID? = null,
+    oasysAssessmentId: Long? = null,
+    oasysAssessmentCompletedDate: LocalDateTime? = null,
+    programmePathway: String? = null,
+    needsClassification: String? = null,
+    overallNeedsScore: Int? = null,
+    riskClassification: String? = null,
+    pniAssessmentDate: LocalDateTime? = null,
+    pniValid: Boolean = true,
+    pniResultJson: String? = null,
+    basicSkillsScore: Int? = null,
+  ) {
+    entityManager.createNativeQuery("INSERT INTO pni_result (pni_result_id, prison_number, crn, referral_id, oasys_assessment_id, oasys_assessment_completed_date, programme_pathway, needs_classification, overall_needs_score, risk_classification, pni_assessment_date, pni_valid, pni_result_json, basic_skills_score) VALUES (:id, :prisonNumber, :crn, :referralId, :oasysAssessmentId, :oasysAssessmentCompletedDate, :programmePathway, :needsClassification, :overallNeedsScore, :riskClassification, :pniAssessmentDate, :pniValid, :pniResultJson, :basicSkillsScore)")
+      .setParameter("id", pniResultId)
+      .setParameter("prisonNumber", prisonNumber)
+      .setParameter("crn", crn)
+      .setParameter("referralId", referralId)
+      .setParameter("oasysAssessmentId", oasysAssessmentId)
+      .setParameter("oasysAssessmentCompletedDate", oasysAssessmentCompletedDate)
+      .setParameter("programmePathway", programmePathway)
+      .setParameter("needsClassification", needsClassification)
+      .setParameter("overallNeedsScore", overallNeedsScore)
+      .setParameter("riskClassification", riskClassification)
+      .setParameter("pniAssessmentDate", pniAssessmentDate)
+      .setParameter("pniValid", pniValid)
+      .setParameter("pniResultJson", pniResultJson)
+      .setParameter("basicSkillsScore", basicSkillsScore)
+      .executeUpdate()
+  }
+
+  fun createReferralStatus(
+    code: String,
+    description: String,
+    hintText: String = "Hint",
+    colour: String = "light-blue",
+    hasNotes: Boolean = false,
+    hasConfirmation: Boolean = false,
+    confirmationText: String = "Confirmation",
+    active: Boolean = true,
+    draft: Boolean = false,
+    closed: Boolean = false,
+    hold: Boolean = false,
+    release: Boolean = false,
+    defaultOrder: Int = 1,
+    notesOptional: Boolean = true,
+    caseNotesSubtype: String = "REFERRAL",
+    caseNotesMessage: String = "Case notes",
+  ) {
+    entityManager.createNativeQuery("INSERT INTO referral_status (code, description, hint_text, colour, has_notes, has_confirmation, confirmation_text, active, draft, closed, hold, release, default_order, notes_optional, case_notes_subtype, case_notes_message) VALUES (:code, :description, :hintText, :colour, :hasNotes, :hasConfirmation, :confirmationText, :active, :draft, :closed, :hold, :release, :defaultOrder, :notesOptional, :caseNotesSubtype, :caseNotesMessage)")
+      .setParameter("code", code)
+      .setParameter("description", description)
+      .setParameter("hintText", hintText)
+      .setParameter("colour", colour)
+      .setParameter("hasNotes", hasNotes)
+      .setParameter("hasConfirmation", hasConfirmation)
+      .setParameter("confirmationText", confirmationText)
+      .setParameter("active", active)
+      .setParameter("draft", draft)
+      .setParameter("closed", closed)
+      .setParameter("hold", hold)
+      .setParameter("release", release)
+      .setParameter("defaultOrder", defaultOrder)
+      .setParameter("notesOptional", notesOptional)
+      .setParameter("caseNotesSubtype", caseNotesSubtype)
+      .setParameter("caseNotesMessage", caseNotesMessage)
+      .executeUpdate()
+  }
+
+  fun createReferralStatusHistory(
+    id: UUID = UUID.randomUUID(),
+    referralId: UUID,
+    statusStartDate: LocalDateTime = LocalDateTime.now(),
+    username: String,
+    status: String,
+    previousStatus: String? = null,
+    notes: String? = null,
+    statusEndDate: LocalDateTime? = null,
+    durationAtThisStatus: Long? = null,
+  ) {
+    entityManager.createNativeQuery("INSERT INTO referral_status_history (status_history_id, referral_id, status_start_date, username, status, previous_status, notes, status_end_date, duration_at_this_status) VALUES (:id, :referralId, :statusStartDate, :username, :status, :previousStatus, :notes, :statusEndDate, :durationAtThisStatus)")
+      .setParameter("id", id)
+      .setParameter("referralId", referralId)
+      .setParameter("statusStartDate", statusStartDate)
+      .setParameter("username", username)
+      .setParameter("status", status)
+      .setParameter("previousStatus", previousStatus)
+      .setParameter("notes", notes)
+      .setParameter("statusEndDate", statusEndDate)
+      .setParameter("durationAtThisStatus", durationAtThisStatus)
       .executeUpdate()
   }
 

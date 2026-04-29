@@ -24,6 +24,7 @@ class CourseEntityFactory {
   private var audienceColour: String = randomUppercaseString()
   private var withdrawn: Boolean = false
   private var intensity: String = CourseIntensity.values().random().name
+  private var listDisplayName: String = randomUppercaseString()
 
   fun withId(id: UUID?) = apply {
     this.id = id
@@ -65,6 +66,10 @@ class CourseEntityFactory {
     this.intensity = intensity
   }
 
+  fun withListDisplayName(listDisplayName: String) = apply {
+    this.listDisplayName = listDisplayName
+  }
+
   fun produce() = CourseEntity(
     id = this.id,
     name = this.name,
@@ -77,6 +82,7 @@ class CourseEntityFactory {
     audienceColour = this.audienceColour,
     withdrawn = this.withdrawn,
     intensity = this.intensity,
+    listDisplayName = this.listDisplayName,
   )
 }
 

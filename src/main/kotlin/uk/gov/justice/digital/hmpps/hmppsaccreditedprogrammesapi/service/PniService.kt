@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniRuleRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualCognitiveScores
@@ -49,7 +49,7 @@ class PniService(
   private val pniNeedsEngine: PniNeedsEngine,
   private val pniRiskEngine: PniRiskEngine,
   private val pniRuleRepository: PniRuleRepository,
-  private val pniResultEntityRepository: PNIResultEntityRepository,
+  private val pniResultRepository: PniResultRepository,
   private val personService: PersonService,
   private val objectMapper: ObjectMapper,
 ) {
@@ -67,7 +67,7 @@ class PniService(
     val completedAssessment = oasysService.getLatestCompletedLayerThreeAssessment(oasysAssessmentTimeline)
       ?: throw NotFoundException("No completed assessments found for $pniScore.prisonNumber")
 
-    pniResultEntityRepository.save(buildEntity(pniScore, completedAssessment, referralId))
+    pniResultRepository.save(buildEntity(pniScore, completedAssessment, referralId))
   }
 
   fun getOasysPniScore(prisonNumber: String): PniScore {
@@ -179,7 +179,7 @@ class PniService(
     )
 
     if (savePni) {
-      pniResultEntityRepository.save(buildEntity(pniScore, completedAssessment, referralId))
+      pniResultRepository.save(buildEntity(pniScore, completedAssessment, referralId))
     }
     return pniScore
   }
@@ -336,7 +336,7 @@ class PniService(
   )
 
   fun deletePniData(referralIds: List<UUID>) {
-    pniResultEntityRepository.deleteAllById(referralIds)
+    pniResultRepository.deleteAllById(referralIds)
   }
 }
 

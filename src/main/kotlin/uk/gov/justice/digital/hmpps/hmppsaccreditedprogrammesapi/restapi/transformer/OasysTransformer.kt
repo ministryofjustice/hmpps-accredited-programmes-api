@@ -44,7 +44,8 @@ fun OasysOffenceDetail.toModel() = OffenceDetail(
   peerGroupInfluences = peerGroupInfluences,
   motivationAndTriggers = offenceMotivation,
   acceptsResponsibility = acceptsResponsibilityYesNo == YES,
-  acceptsResponsibilityDetail = patternOffending,
+  acceptsResponsibilityDetail = acceptsResponsibility,
+  patternOffending = patternOffending,
 )
 
 fun OasysRelationships.toModel() = Relationships(

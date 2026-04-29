@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model.Ldc
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualCognitiveScores
@@ -27,7 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.S
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.SexDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ThinkingDomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.SaraRisk
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResponseFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.model.PniResponseFactory
 import java.math.BigDecimal
 import java.util.UUID
 
@@ -40,7 +40,7 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
   lateinit var pniService: PniService
 
   @Autowired
-  lateinit var pniResultEntityRepository: PNIResultEntityRepository
+  lateinit var pniResultRepository: PniResultRepository
 
   @Test
   fun `should throw NotFoundException when attempting to calculate PNI score for an unknown prisoner number`() {
@@ -191,7 +191,7 @@ class PniServiceIntegrationTest : IntegrationTestBase() {
     pniService.savePni(pniScore, referralId)
 
     // Then
-    val pniResults = pniResultEntityRepository.findAllByPrisonNumber(prisonNumber)
+    val pniResults = pniResultRepository.findAllByPrisonNumber(prisonNumber)
     assertThat(pniResults).hasSize(1)
     assertThat(pniResults[0].prisonNumber).isEqualTo(prisonNumber)
     assertThat(pniResults[0].crn).isEqualTo("D006518")
