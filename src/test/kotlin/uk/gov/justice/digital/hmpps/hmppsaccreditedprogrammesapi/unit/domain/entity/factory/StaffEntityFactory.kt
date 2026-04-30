@@ -9,9 +9,9 @@ class StaffEntityFactory {
   private var id: UUID? = UUID.randomUUID()
   private var staffId: BigInteger = "487505".toBigInteger()
   private var firstName: String = "John"
-  private var lastName: String = "Smith"
-  private var primaryEmail: String? = "john.smith@digital.justice.gov.uk"
-  private var username: String = "JSMITH_ADM"
+  private var lastName: String = "Doe"
+  private var primaryEmail: String? = "john.doe@email.com"
+  private var username: String = "JDOE_ADM"
   private var accountType: AccountType = AccountType.ADMIN
 
   fun withId(id: UUID?) = apply {

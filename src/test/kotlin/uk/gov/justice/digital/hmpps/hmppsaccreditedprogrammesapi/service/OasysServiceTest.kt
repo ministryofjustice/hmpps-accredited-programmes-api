@@ -47,7 +47,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerAlertsApi.model.AlertsResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AlertFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniCalculationFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResponseFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.model.PniResponseFactory
 import java.time.LocalDateTime
 
 class OasysServiceTest {

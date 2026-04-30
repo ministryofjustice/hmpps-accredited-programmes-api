@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.v
 import java.util.*
 
 @Repository
-interface PNIResultEntityRepository : JpaRepository<PniResultEntity, UUID> {
+interface PniResultRepository : JpaRepository<PniResultEntity, UUID> {
   fun findAllByPrisonNumber(prisonNumber: String): List<PniResultEntity>
 
   fun findByReferralIdAndPrisonNumber(referralId: UUID, prisonNumber: String): PniResultEntity?

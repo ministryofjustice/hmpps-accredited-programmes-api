@@ -10,7 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.DomainScore
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualCognitiveScores
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.IndividualRelationshipScores
@@ -32,7 +32,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.Sa
 @Import(JwtAuthHelper::class)
 class PNIControllerIntegrationTest : IntegrationTestBase() {
   @Autowired
-  lateinit var pniResultEntityRepository: PNIResultEntityRepository
+  lateinit var pniResultRepository: PniResultRepository
 
   @Test
   fun `Get pni info for prisoner successful`() {
@@ -136,7 +136,7 @@ class PNIControllerIntegrationTest : IntegrationTestBase() {
     // When
     getPniInfoByPrisonNumberAndSave(prisonNumber)
     // Then
-    val pniResults = pniResultEntityRepository.findAllByPrisonNumber(prisonNumber)
+    val pniResults = pniResultRepository.findAllByPrisonNumber(prisonNumber)
     pniResults[0].prisonNumber shouldBe prisonNumber
     val pniScore = buildPniScore(prisonNumber)
     pniResults[0].crn shouldBe pniScore.crn

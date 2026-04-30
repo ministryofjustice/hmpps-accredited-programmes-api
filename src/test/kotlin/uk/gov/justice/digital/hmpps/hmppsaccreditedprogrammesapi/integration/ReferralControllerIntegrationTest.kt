@@ -60,8 +60,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OfferingRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PNIResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
@@ -107,7 +107,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   lateinit var referralRepository: ReferralRepository
 
   @Autowired
-  lateinit var pniResultRepository: PNIResultEntityRepository
+  lateinit var pniResultRepository: PniResultRepository
 
   @Autowired
   lateinit var staffRepository: StaffRepository

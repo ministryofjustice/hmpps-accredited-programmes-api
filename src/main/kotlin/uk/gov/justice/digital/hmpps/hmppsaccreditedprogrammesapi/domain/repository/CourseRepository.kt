@@ -43,5 +43,15 @@ interface CourseRepository : JpaRepository<CourseEntity, UUID> {
   )
   fun findBuildingChoicesCourses(courseIds: List<UUID>, audience: String? = null, gender: Gender): List<CourseEntity>?
 
+  @Query(
+    """
+    SELECT DISTINCT c FROM CourseEntity c
+    JOIN FETCH c.offerings o
+    JOIN ReferralEntity r ON r.offering.id = o.id
+    WHERE r.prisonNumber = :prisonNumber
+  """,
+  )
+  fun getSarCourses(prisonNumber: String): List<CourseEntity>
+
   fun findAllByName(name: String): List<CourseEntity>
 }

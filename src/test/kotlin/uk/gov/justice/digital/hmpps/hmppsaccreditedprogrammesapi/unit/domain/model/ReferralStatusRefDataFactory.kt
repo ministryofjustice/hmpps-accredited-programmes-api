@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory
+package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.model
 
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralStatusRefData
 

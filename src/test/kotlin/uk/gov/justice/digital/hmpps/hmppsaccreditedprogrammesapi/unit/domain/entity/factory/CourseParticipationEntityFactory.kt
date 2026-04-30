@@ -32,6 +32,8 @@ class CourseParticipationEntityFactory {
   fun withOutcome(outcome: CourseParticipationOutcome?) = apply { this.outcome = outcome }
   fun withCreatedByUsername(createdByUsername: String) = apply { this.createdByUsername = createdByUsername }
   fun withCreatedDateTime(createdDateTime: LocalDateTime) = apply { this.createdDateTime = createdDateTime }
+  fun withLastModifiedByUsername(lastModifiedByUsername: String?) = apply { this.lastModifiedByUsername = lastModifiedByUsername }
+  fun withLastModifiedDateTime(lastModifiedDateTime: LocalDateTime?) = apply { this.lastModifiedDateTime = lastModifiedDateTime }
 
   fun produce() = CourseParticipationEntity(
     id = this.id,
