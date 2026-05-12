@@ -44,9 +44,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew --no-daemon build -x test
 
-      # Temporarily disabled due to Kotlin version incompatibility
       - name: Perform CodeQL Analysis
-        if: false
         uses: github/codeql-action/analyze@f94817b9f0deeb3871261446912ae8f854d1b675
         with:
           category: "/language:${{matrix.language}}"
