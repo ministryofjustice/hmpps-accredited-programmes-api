@@ -43,7 +43,7 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.6.3")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.2.0")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.18")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.20")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
