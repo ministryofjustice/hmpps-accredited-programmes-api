@@ -9,7 +9,6 @@ import org.springdoc.core.utils.SpringDocUtils
 import org.springframework.boot.info.BuildProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.lang.Exception
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -21,7 +20,7 @@ import java.time.format.DateTimeFormatter
   scheme = "bearer",
 )
 class OpenApiConfiguration(buildProperties: BuildProperties) {
-  private val version: String = buildProperties.version ?: throw Exception("No version exists")
+  private val version: String = buildProperties.version!!
 
   init {
     val schema: Schema<LocalDateTime> = Schema<LocalDateTime>()
