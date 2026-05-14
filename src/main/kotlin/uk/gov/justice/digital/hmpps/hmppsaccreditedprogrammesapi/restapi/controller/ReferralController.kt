@@ -922,7 +922,7 @@ class ReferralController(
       value = "offeringId",
       required = true,
     ) offeringId: UUID,
-  ): ResponseEntity<List<Referral>?> {
+  ): ResponseEntity<List<Referral>> {
     val duplicateReferrals = referralService.getDuplicateReferrals(prisonNumber, offeringId)
     if (duplicateReferrals.isNullOrEmpty()) {
       return ResponseEntity.noContent().build()

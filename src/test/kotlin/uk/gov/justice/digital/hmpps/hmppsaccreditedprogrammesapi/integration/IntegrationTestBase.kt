@@ -247,13 +247,13 @@ abstract class IntegrationTestBase {
     object : ParameterizedTypeReference<List<CourseOffering>>() {},
   )
 
-  fun <T> performRequestAndExpectOk(
+  fun <T : Any> performRequestAndExpectOk(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,
   ): T = performRequestAndExpectStatus(httpMethod, uri, returnType, HttpStatus.OK.value())
 
-  fun <T> performRequestAndExpectStatus(
+  fun <T : Any> performRequestAndExpectStatus(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,
@@ -269,7 +269,7 @@ abstract class IntegrationTestBase {
     .expectBody(returnType)
     .returnResult().responseBody!!
 
-  fun <T> performRequestAndExpectStatusWithBody(
+  fun <T : Any> performRequestAndExpectStatusWithBody(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,

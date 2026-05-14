@@ -134,7 +134,7 @@ class ApiExceptionHandler {
   }
 
   @ExceptionHandler(Throwable::class)
-  fun handleException(e: Throwable): ResponseEntity<ErrorResponse?>? {
+  fun handleException(e: Throwable): ResponseEntity<ErrorResponse> {
     Sentry.captureException(e)
     log.error("Unexpected error", e)
     return ResponseEntity
