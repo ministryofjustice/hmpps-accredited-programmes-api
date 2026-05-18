@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -93,6 +94,7 @@ object WiremockPortHolder {
 @ActiveProfiles("test")
 @Tag("integration")
 @ContextConfiguration(initializers = [TestPropertiesInitializer::class])
+@AutoConfigureWebTestClient
 abstract class IntegrationTestBase {
 
   companion object {

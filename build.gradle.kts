@@ -15,8 +15,6 @@ configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
-ext["hibernate.version"] = "6.6.11.Final"
-
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "3.0.3"
@@ -49,7 +47,6 @@ dependencies {
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.0.0")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
@@ -62,7 +59,6 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
-  testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
   testImplementation("org.awaitility:awaitility-kotlin")
 
   testImplementation("org.testcontainers:testcontainers:2.0.5")
@@ -70,6 +66,7 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-localstack:2.0.5")
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
+  testRuntimeOnly("org.flywaydb:flyway-database-postgresql")
 }
 
 java {
