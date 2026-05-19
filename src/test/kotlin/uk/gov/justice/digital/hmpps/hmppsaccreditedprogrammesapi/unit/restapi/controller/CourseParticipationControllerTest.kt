@@ -13,6 +13,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,6 +39,7 @@ import java.util.UUID
 
 @AutoConfigureMockMvc
 @Import(JwtAuthHelper::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CourseParticipationControllerTest : IntegrationTestBase() {
 
   override val objectMapper = jacksonObjectMapper().apply {

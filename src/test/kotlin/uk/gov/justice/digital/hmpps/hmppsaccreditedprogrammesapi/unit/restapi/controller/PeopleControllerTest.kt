@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Import
@@ -28,13 +29,14 @@ import java.time.format.DateTimeFormatter
 
 @AutoConfigureMockMvc
 @Import(JwtAuthHelper::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PeopleControllerTest : IntegrationTestBase() {
 
   @Autowired
   private lateinit var mockMvc: MockMvc
 
   @MockkBean
-  private lateinit var courseParticipationService: CourseParticipationService
+  lateinit var courseParticipationService: CourseParticipationService
 
   @Nested
   inner class FindByPrisonNumber {

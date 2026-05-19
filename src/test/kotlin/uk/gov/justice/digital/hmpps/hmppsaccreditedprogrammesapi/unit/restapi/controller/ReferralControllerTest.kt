@@ -10,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import jakarta.validation.ValidationException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,22 +53,23 @@ import java.util.*
 
 @AutoConfigureMockMvc
 @Import(JwtAuthHelper::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReferralControllerTest : IntegrationTestBase() {
 
   @Autowired
   private lateinit var mockMvc: MockMvc
 
   @MockkBean
-  private lateinit var referralService: ReferralService
+  lateinit var referralService: ReferralService
 
   @MockkBean
-  private lateinit var referralReferenceDataService: ReferralReferenceDataService
+  lateinit var referralReferenceDataService: ReferralReferenceDataService
 
   @MockkBean
-  private lateinit var auditService: AuditService
+  lateinit var auditService: AuditService
 
   @MockkBean
-  private lateinit var courseParticipationService: CourseParticipationService
+  lateinit var courseParticipationService: CourseParticipationService
 
   @Test
   fun `createReferral with JWT, existing user, and valid payload returns 201 with correct body`() {

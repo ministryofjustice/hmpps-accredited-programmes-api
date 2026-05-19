@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Import
@@ -27,16 +28,17 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 
 @AutoConfigureMockMvc
 @Import(JwtAuthHelper::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrganisationControllerTest : IntegrationTestBase() {
 
   @Autowired
   private lateinit var mockMvc: MockMvc
 
   @MockkBean
-  private lateinit var courseService: CourseService
+  lateinit var courseService: CourseService
 
   @MockkBean
-  private lateinit var prisonRegisterApiService: PrisonRegisterApiService
+  lateinit var prisonRegisterApiService: PrisonRegisterApiService
 
   @Nested
   inner class GetCoursesByOrganisationIdTests {
