@@ -13,6 +13,8 @@ class TestPropertiesInitializer : ApplicationContextInitializer<ConfigurableAppl
 
   override fun initialize(applicationContext: ConfigurableApplicationContext) {
     val wiremockPort = WiremockPortHolder.getPort()
+    // Start a shared WireMock server on the selected port so token endpoints are available
+    WiremockPortHolder.startServer(wiremockPort)
 
     val upstreamServiceUrlsToOverride = mutableMapOf<String, String>()
 
@@ -40,5 +42,11 @@ class TestPropertiesInitializer : ApplicationContextInitializer<ConfigurableAppl
 @Component
 class TestPropertiesDestructor {
   @PreDestroy
-  fun destroy() = WiremockPortHolder.releasePort()
+  fun destroy() {
+    try {
+      WiremockPortHolder.stopServer()
+    } finally {
+      WiremockPortHolder.releasePort()
+    }
+  }
 }

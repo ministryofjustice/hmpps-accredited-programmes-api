@@ -6,13 +6,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -55,6 +51,9 @@ object WiremockPortHolder {
   private var port: Int? = null
   private var channel: FileChannel? = null
 
+  // Shared WireMockServer started before Spring context initialization
+  var wireMockServer: WireMockServer? = null
+
   fun getPort(): Int {
     synchronized(this) {
       if (port != null) {
@@ -87,6 +86,28 @@ object WiremockPortHolder {
   }
 
   fun releasePort() = channel?.close()
+
+  fun startServer(port: Int) {
+    synchronized(this) {
+      if (wireMockServer != null) return
+      wireMockServer = WireMockServer(
+        WireMockConfiguration()
+          .port(port)
+          .usingFilesUnderClasspath("simulations"),
+      )
+      wireMockServer!!.start()
+    }
+  }
+
+  fun stopServer() {
+    synchronized(this) {
+      try {
+        wireMockServer?.stop()
+      } catch (_: Exception) {
+      }
+      wireMockServer = null
+    }
+  }
 }
 
 @Testcontainers
@@ -129,13 +150,6 @@ abstract class IntegrationTestBase {
       registry.add("spring.datasource.username") { postgresContainer.username }
       registry.add("spring.datasource.password") { postgresContainer.password }
     }
-
-    @JvmStatic
-    @RegisterExtension
-    var wiremock: WireMockExtension = WireMockExtension.newInstance()
-      .options(wireMockConfig().port(8095))
-      .failOnUnmatchedRequests(true)
-      .build()
   }
 
   @Autowired
@@ -178,18 +192,12 @@ abstract class IntegrationTestBase {
 
     println("WIREMOCK PORT=$wiremockPort")
 
-    wiremockServer = WireMockServer(
-      WireMockConfiguration()
-        .port(wiremockPort)
-        .usingFilesUnderClasspath("simulations")
-        .maxLoggedResponseSize(100_000),
-    )
-    wiremockServer.start()
-  }
+    // Use the shared WireMock server started before Spring context initialization
+    wiremockServer = WiremockPortHolder.wireMockServer
+      ?: throw IllegalStateException("Shared WireMock server not started for port $wiremockPort")
 
-  @AfterEach
-  fun stopMockServer() {
-    wiremockServer.stop()
+    // Clear request journal between tests
+    wiremockServer.resetRequests()
   }
 
   fun mockClientCredentialsJwtRequest(
