@@ -196,8 +196,8 @@ abstract class IntegrationTestBase {
     wiremockServer = WiremockPortHolder.wireMockServer
       ?: throw IllegalStateException("Shared WireMock server not started for port $wiremockPort")
 
-    // Clear request journal between tests
-    wiremockServer.resetRequests()
+    // Clear stubs and request journal between tests
+    wiremockServer.resetAll()
   }
 
   fun mockClientCredentialsJwtRequest(
