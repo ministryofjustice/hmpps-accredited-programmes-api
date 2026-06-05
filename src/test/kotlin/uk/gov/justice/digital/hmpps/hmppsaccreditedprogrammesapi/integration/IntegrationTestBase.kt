@@ -6,17 +6,14 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -54,6 +51,9 @@ object WiremockPortHolder {
   private var port: Int? = null
   private var channel: FileChannel? = null
 
+  // Shared WireMockServer started before Spring context initialization
+  var wireMockServer: WireMockServer? = null
+
   fun getPort(): Int {
     synchronized(this) {
       if (port != null) {
@@ -86,6 +86,28 @@ object WiremockPortHolder {
   }
 
   fun releasePort() = channel?.close()
+
+  fun startServer(port: Int) {
+    synchronized(this) {
+      if (wireMockServer != null) return
+      wireMockServer = WireMockServer(
+        WireMockConfiguration()
+          .port(port)
+          .usingFilesUnderClasspath("simulations"),
+      )
+      wireMockServer!!.start()
+    }
+  }
+
+  fun stopServer() {
+    synchronized(this) {
+      try {
+        wireMockServer?.stop()
+      } catch (_: Exception) {
+      }
+      wireMockServer = null
+    }
+  }
 }
 
 @Testcontainers
@@ -93,6 +115,7 @@ object WiremockPortHolder {
 @ActiveProfiles("test")
 @Tag("integration")
 @ContextConfiguration(initializers = [TestPropertiesInitializer::class])
+@AutoConfigureWebTestClient
 abstract class IntegrationTestBase {
 
   companion object {
@@ -127,13 +150,6 @@ abstract class IntegrationTestBase {
       registry.add("spring.datasource.username") { postgresContainer.username }
       registry.add("spring.datasource.password") { postgresContainer.password }
     }
-
-    @JvmStatic
-    @RegisterExtension
-    var wiremock: WireMockExtension = WireMockExtension.newInstance()
-      .options(wireMockConfig().port(8095))
-      .failOnUnmatchedRequests(true)
-      .build()
   }
 
   @Autowired
@@ -176,18 +192,12 @@ abstract class IntegrationTestBase {
 
     println("WIREMOCK PORT=$wiremockPort")
 
-    wiremockServer = WireMockServer(
-      WireMockConfiguration()
-        .port(wiremockPort)
-        .usingFilesUnderClasspath("simulations")
-        .maxLoggedResponseSize(100_000),
-    )
-    wiremockServer.start()
-  }
+    // Use the shared WireMock server started before Spring context initialization
+    wiremockServer = WiremockPortHolder.wireMockServer
+      ?: throw IllegalStateException("Shared WireMock server not started for port $wiremockPort")
 
-  @AfterEach
-  fun stopMockServer() {
-    wiremockServer.stop()
+    // Clear stubs and request journal between tests
+    wiremockServer.resetAll()
   }
 
   fun mockClientCredentialsJwtRequest(
@@ -247,13 +257,13 @@ abstract class IntegrationTestBase {
     object : ParameterizedTypeReference<List<CourseOffering>>() {},
   )
 
-  fun <T> performRequestAndExpectOk(
+  fun <T : Any> performRequestAndExpectOk(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,
   ): T = performRequestAndExpectStatus(httpMethod, uri, returnType, HttpStatus.OK.value())
 
-  fun <T> performRequestAndExpectStatus(
+  fun <T : Any> performRequestAndExpectStatus(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,
@@ -269,7 +279,7 @@ abstract class IntegrationTestBase {
     .expectBody(returnType)
     .returnResult().responseBody!!
 
-  fun <T> performRequestAndExpectStatusWithBody(
+  fun <T : Any> performRequestAndExpectStatusWithBody(
     httpMethod: HttpMethod,
     uri: String,
     returnType: ParameterizedTypeReference<T>,

@@ -48,7 +48,7 @@ class JwtAuthHelper {
 
   fun getClaims(
     auth: Authentication?,
-    authorities: List<String>,
+    authorities: List<String?>,
   ) = mutableMapOf<String, Any>().apply {
     put("user_name", auth?.name ?: REFERRER_USERNAME)
     put("authorities", authorities)

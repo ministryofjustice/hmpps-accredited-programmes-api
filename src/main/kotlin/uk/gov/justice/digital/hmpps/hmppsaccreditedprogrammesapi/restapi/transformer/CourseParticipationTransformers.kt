@@ -112,6 +112,6 @@ fun CourseParticipationProjection.toApi() = ApiCourseParticipation(
   outcome = ApiCourseParticipationOutcome.from(getOutcomeStatus(), getYearStarted(), getYearCompleted()),
   isDraft = getIsDraft(),
   addedBy = getAddedBy(),
-  createdAt = getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
+  createdAt = getCreatedAt()?.format(DateTimeFormatter.ISO_DATE_TIME) ?: "",
   referralStatus = getReferralStatus(),
 )

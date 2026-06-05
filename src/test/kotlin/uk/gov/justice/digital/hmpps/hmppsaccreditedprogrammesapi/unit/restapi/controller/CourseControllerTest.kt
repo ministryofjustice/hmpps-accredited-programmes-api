@@ -6,8 +6,9 @@ import io.mockk.every
 import io.mockk.verify
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType
@@ -26,6 +27,7 @@ import java.util.UUID
 
 @AutoConfigureMockMvc
 @Import(JwtAuthHelper::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CourseControllerTest : IntegrationTestBase() {
 
   @Autowired
