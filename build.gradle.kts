@@ -13,6 +13,19 @@ plugins {
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
+  // hmpps-subject-access-request-test-support:1.7.0 is compiled against mockito-kotlin 6.1.0, whose
+  // MockingKt.withSettings(...) has a different signature to 6.2.3 (which adds a Strictness param).
+  // The hmpps gradle plugin upgrades mockito-kotlin to 6.2.3 via an eachDependency rule, causing a
+  // NoSuchMethodError when SarIntegrationTestHelper is constructed. Use our own eachDependency rule
+  // (which runs after the plugin's) to pin mockito-kotlin back to the version the SAR lib expects.
+  all {
+    resolutionStrategy.eachDependency {
+      if (requested.group == "org.mockito.kotlin" && requested.name == "mockito-kotlin") {
+        useVersion("6.1.0")
+        because("hmpps-subject-access-request-test-support:1.7.0 is compiled against mockito-kotlin 6.1.0")
+      }
+    }
+  }
 }
 
 ext["hibernate.version"] = "6.6.11.Final"

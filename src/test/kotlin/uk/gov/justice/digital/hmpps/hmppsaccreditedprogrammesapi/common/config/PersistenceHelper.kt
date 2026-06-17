@@ -218,6 +218,12 @@ class PersistenceHelper {
     entityManager.persist(sexualOffenceDetailsEntity)
   }
 
+  fun deleteSexualOffenceDetails(id: UUID) {
+    entityManager.createNativeQuery("DELETE FROM sexual_offence_details WHERE id = :id")
+      .setParameter("id", id)
+      .executeUpdate()
+  }
+
   fun createCourseVariant(id: UUID = UUID.randomUUID(), courseId: UUID, variantCourseId: UUID = UUID.randomUUID()) {
     entityManager.createNativeQuery("INSERT INTO course_variant (id, course_id, variant_course_id) VALUES (:id, :courseId, :variantCourseId)")
       .setParameter("id", id)
