@@ -14,8 +14,10 @@ class CourseParticipationEntityFactory {
   private var id: UUID? = UUID.randomUUID()
   private var prisonNumber: String = randomPrisonNumber()
   private var courseName: String? = null
+  private var otherCourseName: String? = null
   private var source: String? = null
   private var detail: String? = null
+  private var outcomeDetail: String? = null
   private var setting: CourseParticipationSetting? = CourseParticipationSettingFactory().produce()
   private var outcome: CourseParticipationOutcome? = CourseParticipationOutcomeFactory().produce()
   private var createdByUsername: String = REFERRER_USERNAME
@@ -26,8 +28,10 @@ class CourseParticipationEntityFactory {
   fun withId(id: UUID?) = apply { this.id = id }
   fun withPrisonNumber(prisonNumber: String) = apply { this.prisonNumber = prisonNumber }
   fun withCourseName(courseName: String?) = apply { this.courseName = courseName }
+  fun withOtherCourseName(otherCourseName: String?) = apply { this.otherCourseName = otherCourseName }
   fun withSource(source: String?) = apply { this.source = source }
   fun withDetail(detail: String?) = apply { this.detail = detail }
+  fun withOutcomeDetail(outcomeDetail: String?) = apply { this.outcomeDetail = outcomeDetail }
   fun withSetting(setting: CourseParticipationSetting?) = apply { this.setting = setting }
   fun withOutcome(outcome: CourseParticipationOutcome?) = apply { this.outcome = outcome }
   fun withCreatedByUsername(createdByUsername: String) = apply { this.createdByUsername = createdByUsername }
@@ -38,9 +42,11 @@ class CourseParticipationEntityFactory {
   fun produce() = CourseParticipationEntity(
     id = this.id,
     courseName = this.courseName,
+    otherCourseName = this.otherCourseName,
     prisonNumber = this.prisonNumber,
     source = this.source,
     detail = this.detail,
+    outcomeDetail = this.outcomeDetail,
     setting = this.setting,
     outcome = this.outcome,
     createdByUsername = this.createdByUsername,

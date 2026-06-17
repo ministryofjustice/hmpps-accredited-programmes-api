@@ -35,9 +35,11 @@ class CourseParticipationEntity(
 
   var prisonNumber: String,
   var courseName: String?,
+  var otherCourseName: String? = null,
 
   var source: String?,
   var detail: String?,
+  var outcomeDetail: String? = null,
 
   @Column("is_draft")
   var isDraft: Boolean? = false,

@@ -5,17 +5,22 @@ import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OasysPniResultEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.SelectedSexualOffenceDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OasysPniResultEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.math.BigInteger
@@ -31,31 +36,45 @@ class SubjectAccessRequestService(
   private val auditRepository: AuditRepository,
   private val courseRepository: CourseRepository,
   private val pniResultRepository: PniResultRepository,
+  private val personRepository: PersonRepository,
+  private val oasysPniResultEntityRepository: OasysPniResultEntityRepository,
   private val referralStatusHistoryRepository: ReferralStatusHistoryRepository,
-  private val staffRepository: StaffRepository,
 
 ) : HmppsPrisonSubjectAccessRequestService {
 
-  override fun getPrisonContentFor(prn: String, fromDate: LocalDate?, toDate: LocalDate?): HmppsSubjectAccessRequestContent? = HmppsSubjectAccessRequestContent(
-    content = Content(
-      referralRepository.getSarReferrals(prn).filter { referral ->
-        val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it.atStartOfDay()) } ?: true
-        val beforeToDate = toDate?.let { referral.submittedOn?.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
-        afterFromDate && beforeToDate
-      }.toSarReferral(),
-      courseParticipationRepository.getSarParticipations(prn).filter { courseParticipation ->
-        val afterFromDate = fromDate?.let { courseParticipation.createdDateTime.isAfter(it.atStartOfDay()) } ?: true
-        val beforeToDate = toDate?.let { courseParticipation.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
-        afterFromDate && beforeToDate
-      }.toSarParticipation(),
-      auditRepository.getSarAuditRecords(prn).toSarAudit(),
-      courseRepository.getSarCourses(prn).toSarCourse(),
-      pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),
-      referralStatusHistoryRepository.findByPrisonNumber(prn).toSarReferralStatusHistory(),
-      staffRepository.findByPrisonNumber(prn).toSarStaff(),
-    ),
+  override fun getPrisonContentFor(prn: String, fromDate: LocalDate?, toDate: LocalDate?): HmppsSubjectAccessRequestContent? {
+    val filteredReferrals = referralRepository.getSarReferrals(prn).filter { referral ->
+      val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it.atStartOfDay()) } ?: true
+      val beforeToDate = toDate?.let { referral.submittedOn?.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
+      afterFromDate && beforeToDate
+    }
 
-  )
+    val referralStatusHistory = referralStatusHistoryRepository.findByPrisonNumber(prn)
+    val selectedSexualOffenceDetails = filteredReferrals
+      .flatMap { it.selectedSexualOffenceDetails }
+      .distinctBy { it.id }
+
+    return HmppsSubjectAccessRequestContent(
+      content = Content(
+        referrals = filteredReferrals.toSarReferral(),
+        courseParticipation = courseParticipationRepository.getSarParticipations(prn).filter { courseParticipation ->
+          val afterFromDate = fromDate?.let { courseParticipation.createdDateTime.isAfter(it.atStartOfDay()) } ?: true
+          val beforeToDate = toDate?.let { courseParticipation.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
+          afterFromDate && beforeToDate
+        }.toSarParticipation(),
+        auditRecords = auditRepository.getSarAuditRecords(prn).toSarAudit(),
+        courses = courseRepository.getSarCourses(prn).toSarCourse(),
+        pniResults = pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),
+        person = personRepository.findPersonEntityByPrisonNumber(prn)?.toSarPerson(),
+        oasysPniResults = oasysPniResultEntityRepository.findAllByPrisonNumber(prn).toSarOasysPniResult(),
+        referralStatusHistory = referralStatusHistory.toSarReferralStatusHistory(),
+        referralStatusReasons = referralStatusHistory.mapNotNull { it.reason }.distinctBy { it.code }.toSarReferralStatusReason(),
+        selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
+        sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
+      ),
+
+    )
+  }
 
   data class Content(
     val referrals: List<SarReferral>,
@@ -63,8 +82,12 @@ class SubjectAccessRequestService(
     val auditRecords: List<SarAuditRecord>,
     val courses: List<SarCourse>,
     val pniResults: List<SarPniResult>,
+    val person: SarPerson?,
+    val oasysPniResults: List<SarOasysPniResult>,
     val referralStatusHistory: List<SarReferralStatusHistoryEntity>,
-    val staff: List<SarStaff>,
+    val referralStatusReasons: List<SarReferralStatusReason>,
+    val selectedSexualOffenceDetails: List<SarSelectedSexualOffenceDetails>,
+    val sexualOffenceDetails: List<SarSexualOffenceDetails>,
   )
 
   data class SarReferral(
@@ -74,72 +97,134 @@ class SubjectAccessRequestService(
     val hasReviewedProgrammeHistory: Boolean?,
     val additionalInformation: String?,
     val submittedOn: LocalDateTime?,
+    val primaryPomStaffId: BigInteger?,
+    val secondaryPomStaffId: BigInteger?,
     val referrerOverrideReason: String?,
     val referrerUsername: String?,
-    val courseName: String?,
-    val audience: String?,
-    val courseOrganisation: String?,
     val originalReferralId: UUID?,
+    val hasLdc: Boolean?,
+    val hasLdcBeenOverriddenByProgrammeTeam: Boolean,
+    val hasReviewedAdditionalInformation: Boolean?,
     val deleted: Boolean,
-    val version: Long,
   )
 
   data class SarCourseParticipation(
     val prisonNumber: String,
-    val referralId: UUID?,
-    val isDraft: Boolean?,
+    val isDraft: Boolean?, // should be here
+    val otherCourseName: String?,
     val yearStarted: Int?,
     val source: String?,
     val type: String?,
     val outcomeStatus: String?,
+    val outcomeDetail: String?,
     val yearCompleted: Int?,
     val location: String?,
     val detail: String?,
     val courseName: String?,
-    val createdByUser: String?,
+    val createdByUser: String?, // should be here
     val createdDateTime: LocalDateTime?,
-    val updatedByUser: String?,
+    val updatedByUser: String?, // should be here
     val updatedDateTime: LocalDateTime?,
   )
 
   data class SarAuditRecord(
+    val prisonNumber: String,
     val referrerUsername: String?,
+    val referralStatusFrom: String?,
+    val referralStatusTo: String?,
+    val courseName: String?,
+    val courseLocation: String?,
+    val auditAction: String,
     val auditUsername: String,
+    val auditDateTime: LocalDateTime,
   )
 
   data class SarCourse(
-    val description: String?,
-    val alternateName: String?,
-    val audience: String,
-    val listDisplayName: String?,
-    val intensity: String?,
+    val name: String,
   )
 
   data class SarPniResult(
-    val pniResultJson: String?,
+    val prisonNumber: String,
+    val crn: String?,
+    val oasysAssessmentCompletedDate: LocalDateTime?,
+    val programmePathway: String?,
+    val needsClassification: String?,
+    val overallNeedsScore: Int?,
+    val riskClassification: String?,
+    val pniAssessmentDate: LocalDateTime?,
+    val pniValid: Boolean,
+    val pniResultJson: String?, // should be here
+    val basicSkillsScore: Int?,
+  )
+
+  data class SarPerson(
+    val id: UUID?,
+    val prisonNumber: String,
+    val forename: String,
+    val surname: String,
+    val conditionalReleaseDate: LocalDate?,
+    val paroleEligibilityDate: LocalDate?,
+    val tariffExpiryDate: LocalDate?,
+    val earliestReleaseDate: LocalDate?,
+    val earliestReleaseDateType: String?,
+    val indeterminateSentence: Boolean?,
+    val nonDtoReleaseDateType: String?,
+    val sentenceType: String?,
+    val location: String?,
+    val gender: String?,
+  )
+
+  data class SarOasysPniResult(
+    val pniResultId: UUID,
+    val prisonNumber: String,
+    val oasysAssessmentId: Long?,
+    val programmePathway: String?,
   )
 
   data class SarReferralStatusHistoryEntity(
-    val version: Long,
+    val id: UUID?,
+    val referralId: UUID,
+    val status: String,
+    val previousStatus: String?,
+    val category: String?,
+    val reason: String?,
+    val notes: String?,
+    val statusStartDate: LocalDateTime,
+    val statusEndDate: LocalDateTime?,
+    val durationAtThisStatus: Long?,
+    val username: String,
   )
 
-  data class SarStaff(
+  data class SarReferralStatusReason(
+    val code: String,
+    val referralStatusCategoryCode: String,
+    val description: String,
+    val active: Boolean,
+    val deselectOpen: Boolean,
+  )
+
+  data class SarSelectedSexualOffenceDetails(
     val id: UUID?,
-    val staffId: BigInteger?,
-    val firstName: String,
-    val lastName: String,
-    val primaryEmail: String?,
-    val username: String,
+    val referralId: UUID?,
+    val sexualOffenceDetailsId: UUID?,
+  )
+
+  data class SarSexualOffenceDetails(
+    val id: UUID?,
+    val category: String,
+    val description: String,
+    val score: Int,
   )
 
   private fun List<CourseParticipationEntity>.toSarParticipation(): List<SarCourseParticipation> = map {
     SarCourseParticipation(
       prisonNumber = it.prisonNumber,
-      referralId = it.referralId,
       isDraft = it.isDraft,
+      otherCourseName = it.otherCourseName,
       source = it.source,
       type = it.setting?.type?.name,
       outcomeStatus = it.outcome?.status?.name,
+      outcomeDetail = it.outcomeDetail,
       yearStarted = it.outcome?.yearStarted?.value,
       yearCompleted = it.outcome?.yearCompleted?.value,
       location = it.setting?.location,
@@ -160,54 +245,120 @@ class SubjectAccessRequestService(
       it.hasReviewedProgrammeHistory,
       it.additionalInformation,
       it.submittedOn,
+      it.primaryPomStaffId,
+      it.secondaryPomStaffId,
       it.referrerOverrideReason,
       it.referrer.username,
-      it.offering.course.name,
-      it.offering.course.audience,
-      it.offering.organisationId,
       it.originalReferralId,
+      it.hasLdc,
+      it.hasLdcBeenOverriddenByProgrammeTeam,
+      it.hasReviewedAdditionalInformation,
       it.deleted,
-      it.version,
     )
   }
 
   private fun List<AuditEntity>.toSarAudit(): List<SarAuditRecord> = map {
     SarAuditRecord(
+      prisonNumber = it.prisonNumber,
       referrerUsername = it.referrerUsername,
+      referralStatusFrom = it.referralStatusFrom,
+      referralStatusTo = it.referralStatusTo,
+      courseName = it.courseName,
+      courseLocation = it.courseLocation,
+      auditAction = it.auditAction,
       auditUsername = it.auditUsername,
+      auditDateTime = it.auditDateTime,
     )
   }
 
   private fun List<CourseEntity>.toSarCourse(): List<SarCourse> = map {
     SarCourse(
-      description = it.description,
-      alternateName = it.alternateName,
-      audience = it.audience,
-      listDisplayName = it.listDisplayName,
-      intensity = it.intensity,
+      name = it.name,
     )
   }
 
   private fun List<PniResultEntity>.toSarPniResult(): List<SarPniResult> = map {
     SarPniResult(
+      prisonNumber = it.prisonNumber,
+      crn = it.crn,
+      oasysAssessmentCompletedDate = it.oasysAssessmentCompletedDate,
+      programmePathway = it.programmePathway,
+      needsClassification = it.needsClassification,
+      overallNeedsScore = it.overallNeedsScore,
+      riskClassification = it.riskClassification,
+      pniAssessmentDate = it.pniAssessmentDate,
+      pniValid = it.pniValid,
       pniResultJson = it.pniResultJson,
+      basicSkillsScore = it.basicSkillsScore,
+    )
+  }
+
+  private fun PersonEntity.toSarPerson(): SarPerson = SarPerson(
+    id = id,
+    prisonNumber = prisonNumber,
+    forename = forename,
+    surname = surname,
+    conditionalReleaseDate = conditionalReleaseDate,
+    paroleEligibilityDate = paroleEligibilityDate,
+    tariffExpiryDate = tariffExpiryDate,
+    earliestReleaseDate = earliestReleaseDate,
+    earliestReleaseDateType = earliestReleaseDateType,
+    indeterminateSentence = indeterminateSentence,
+    nonDtoReleaseDateType = nonDtoReleaseDateType,
+    sentenceType = sentenceType,
+    location = location,
+    gender = gender,
+  )
+
+  private fun List<OasysPniResultEntity>.toSarOasysPniResult(): List<SarOasysPniResult> = map {
+    SarOasysPniResult(
+      pniResultId = it.pniResultId,
+      prisonNumber = it.prisonNumber,
+      oasysAssessmentId = it.oasysAssessmentId,
+      programmePathway = it.programmePathway,
     )
   }
 
   private fun List<ReferralStatusHistoryEntity>.toSarReferralStatusHistory(): List<SarReferralStatusHistoryEntity> = map {
     SarReferralStatusHistoryEntity(
-      version = it.version,
+      id = it.id,
+      referralId = it.referralId,
+      status = it.status.code,
+      previousStatus = it.previousStatus?.code,
+      category = it.category?.code,
+      reason = it.reason?.code,
+      notes = it.notes,
+      statusStartDate = it.statusStartDate,
+      statusEndDate = it.statusEndDate,
+      durationAtThisStatus = it.durationAtThisStatus,
+      username = it.username,
     )
   }
 
-  private fun List<StaffEntity>.toSarStaff(): List<SarStaff> = map {
-    SarStaff(
+  private fun List<ReferralStatusReasonEntity>.toSarReferralStatusReason(): List<SarReferralStatusReason> = map {
+    SarReferralStatusReason(
+      code = it.code,
+      referralStatusCategoryCode = it.referralStatusCategoryCode,
+      description = it.description,
+      active = it.active,
+      deselectOpen = it.deselectOpen,
+    )
+  }
+
+  private fun List<SelectedSexualOffenceDetailsEntity>.toSarSelectedSexualOffenceDetails(): List<SarSelectedSexualOffenceDetails> = map {
+    SarSelectedSexualOffenceDetails(
       id = it.id,
-      staffId = it.staffId,
-      username = it.username,
-      firstName = it.firstName,
-      lastName = it.lastName,
-      primaryEmail = it.primaryEmail,
+      referralId = it.referral.id,
+      sexualOffenceDetailsId = it.sexualOffenceDetails?.id,
+    )
+  }
+
+  private fun List<SexualOffenceDetailsEntity>.toSarSexualOffenceDetails(): List<SarSexualOffenceDetails> = map {
+    SarSexualOffenceDetails(
+      id = it.id,
+      category = it.category.name,
+      description = it.description,
+      score = it.score,
     )
   }
 }

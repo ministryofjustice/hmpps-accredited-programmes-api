@@ -43,7 +43,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://prison-register-db:5432/postgres
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
-    image: quay.io/hmpps/prison-register:latest
+    image: ghcr.io/ministryofjustice/prison-register:latest
     networks:
       - hmpps
     ports:
@@ -132,7 +132,7 @@ services:
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://hmpps-auth:8080/auth/.well-known/jwks.json
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
-    image: quay.io/hmpps/nomis-user-roles-api:latest
+    image: ghcr.io/ministryofjustice/nomis-user-roles-api:latest
     networks:
       - hmpps
     ports:
