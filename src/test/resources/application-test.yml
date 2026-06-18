@@ -61,11 +61,11 @@ hmpps:
       expected-api-response:
         path: /sar/sar-api-response.json
       expected-render-result:
-        path: /sar/sar-api-expected-render-result.html
+        path: /sar/sar-expected-render-result.html
       attachments-expected: false
       expected-flyway-schema-version: 101
       expected-jpa-entity-schema:
-        path: /sar/entity-schema-snapshot.json
+        path: /sar/entity-schema.json
 
 services:
   prison-api:

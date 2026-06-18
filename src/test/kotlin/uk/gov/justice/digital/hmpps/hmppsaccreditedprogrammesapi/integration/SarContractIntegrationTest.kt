@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarApiDataTest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarFlywaySchemaTest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelper
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarJpaEntitiesTest
+import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarReportTest
 import uk.gov.justice.hmpps.test.kotlin.auth.JwtAuthorisationHelper
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -21,6 +22,7 @@ import javax.sql.DataSource
 class SarContractIntegrationTest :
   IntegrationTestBase(),
   SarApiDataTest,
+  SarReportTest,
   SarFlywaySchemaTest,
   SarJpaEntitiesTest {
 
@@ -46,7 +48,7 @@ class SarContractIntegrationTest :
       expectedRenderResultPath = "/sar/sar-expected-render-result.html",
       attachmentsExpected = false,
       expectedFlywaySchemaVersion = "143",
-      expectedJpaEntitySchemaPath = "/sar/entity-schema-snapshot.json",
+      expectedJpaEntitySchemaPath = "/sar/entity-schema.json",
     )
   }
 
