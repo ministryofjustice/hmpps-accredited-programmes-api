@@ -13,19 +13,6 @@ plugins {
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
-  // hmpps-subject-access-request-test-support:1.7.0 is compiled against mockito-kotlin 6.1.0, whose
-  // MockingKt.withSettings(...) has a different signature to 6.2.3 (which adds a Strictness param).
-  // The hmpps gradle plugin upgrades mockito-kotlin to 6.2.3 via an eachDependency rule, causing a
-  // NoSuchMethodError when SarIntegrationTestHelper is constructed. Use our own eachDependency rule
-  // (which runs after the plugin's) to pin mockito-kotlin back to the version the SAR lib expects.
-  all {
-    resolutionStrategy.eachDependency {
-      if (requested.group == "org.mockito.kotlin" && requested.name == "mockito-kotlin") {
-        useVersion("6.1.0")
-        because("hmpps-subject-access-request-test-support:1.7.0 is compiled against mockito-kotlin 6.1.0")
-      }
-    }
-  }
 }
 
 dependencies {
@@ -81,8 +68,8 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
   testRuntimeOnly("org.flywaydb:flyway-database-postgresql")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:1.7.0")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.8.2")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.4.2")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.2.0")
 }
 
 java {

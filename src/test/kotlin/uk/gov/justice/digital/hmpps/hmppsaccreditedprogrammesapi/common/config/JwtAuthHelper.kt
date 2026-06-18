@@ -30,7 +30,7 @@ class JwtAuthHelper(
     return buildJwt(username, getAuthorities(auth))
   }
 
-  private fun getAuthorities(auth: Authentication?) = auth?.authorities?.map { it.authority }?.let {
+  private fun getAuthorities(auth: Authentication?) = auth?.authorities?.mapNotNull { it.authority }?.let {
     listOf("ROLE_ACCREDITED_PROGRAMMES_API") + it
   } ?: listOf("ROLE_ACCREDITED_PROGRAMMES_API")
 
