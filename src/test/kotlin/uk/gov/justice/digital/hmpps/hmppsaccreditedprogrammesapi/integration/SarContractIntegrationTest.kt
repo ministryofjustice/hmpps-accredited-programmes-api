@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
@@ -14,6 +15,7 @@ import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelpe
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarJpaEntitiesTest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarReportTest
 import uk.gov.justice.hmpps.test.kotlin.auth.JwtAuthorisationHelper
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -43,13 +45,51 @@ class SarContractIntegrationTest :
 
   private val sarIntegrationTestHelper by lazy {
     SarIntegrationTestHelper(
-      jwtAuthHelper = jwtAuthorisationHelper,
+      // The SAR library requests both the data and template endpoints with a ROLE_SAR_DATA_ACCESS
+      // token only. The /subject-access-request/template endpoint additionally requires
+      // ROLE_ACCREDITED_PROGRAMMES_API in this service, so we wrap the JwtAuthorisationHelper to add
+      // that role to every test token. This keeps the contract green without changing production
+      // SecurityConfiguration.
+      jwtAuthHelper = AccreditedProgrammesJwtAuthorisationHelper(jwtAuthorisationHelper),
       expectedApiResponsePath = "/sar/sar-api-response.json",
       expectedRenderResultPath = "/sar/sar-expected-render-result.html",
       attachmentsExpected = false,
       expectedFlywaySchemaVersion = "143",
       expectedJpaEntitySchemaPath = "/sar/entity-schema.json",
     )
+  }
+
+  /**
+   * A [JwtAuthorisationHelper] that always includes `ROLE_ACCREDITED_PROGRAMMES_API` in the issued
+   * token, in addition to any roles requested by the SAR test library. The library calls both the
+   * `/subject-access-request` and `/subject-access-request/template` endpoints with only
+   * `ROLE_SAR_DATA_ACCESS`, but this service requires `ROLE_ACCREDITED_PROGRAMMES_API` for the
+   * template endpoint. Adding the role here keeps the SAR contract green without modifying the
+   * production SecurityConfiguration.
+   *
+   * Token creation is delegated to the autowired [JwtAuthorisationHelper] so the JWT is signed with
+   * the same key pair as the application's auto-configured `jwtDecoder` bean (each helper instance
+   * generates its own key pair, so a freshly constructed helper would produce tokens the application
+   * rejects).
+   */
+  private class AccreditedProgrammesJwtAuthorisationHelper(
+    private val delegate: JwtAuthorisationHelper,
+  ) : JwtAuthorisationHelper() {
+    override fun setAuthorisationHeader(
+      clientId: String,
+      username: String?,
+      scope: List<String>,
+      roles: List<String>,
+    ): (HttpHeaders) -> Unit {
+      val token = delegate.createJwtAccessToken(
+        username = username,
+        clientId = clientId,
+        roles = (roles + "ROLE_ACCREDITED_PROGRAMMES_API").distinct(),
+        scope = scope,
+        expiryTime = Duration.ofHours(1),
+      )
+      return { headers -> headers.setBearerAuth(token) }
+    }
   }
 
   override fun getSarHelper(): SarIntegrationTestHelper = sarIntegrationTestHelper
