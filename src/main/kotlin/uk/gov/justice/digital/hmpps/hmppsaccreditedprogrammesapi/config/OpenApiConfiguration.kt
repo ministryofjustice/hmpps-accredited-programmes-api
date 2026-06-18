@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter
   scheme = "bearer",
 )
 class OpenApiConfiguration(buildProperties: BuildProperties) {
-  private val version: String = buildProperties.version
+  private val version: String = buildProperties.version!!
 
   init {
     val schema: Schema<LocalDateTime> = Schema<LocalDateTime>()

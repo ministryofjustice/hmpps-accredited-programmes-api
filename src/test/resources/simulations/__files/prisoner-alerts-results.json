@@ -7,7 +7,8 @@
         "alertTypeCode": "X",
         "alertTypeDescription": "Security",
         "code": "XCDO",
-        "description": "Involved in 2024 civil disorder"
+        "description": "Involved in 2024 civil disorder",
+        "canBeAdministered": true
       },
       "description": "Put this one back",
       "authorisedBy": "Michael Willis ",

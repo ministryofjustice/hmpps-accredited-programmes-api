@@ -151,7 +151,7 @@ constructor(
         referrer = referrerUser,
         originalReferralId = originalReferralId,
       ),
-    ) ?: throw Exception("Referral creation failed for $prisonNumber").also { log.warn("Failed to create referral for $prisonNumber") }
+    )
 
     referralStatusHistoryService.createReferralHistory(savedReferral)
     auditService.audit(savedReferral, null, AuditAction.CREATE_REFERRAL.name)
@@ -306,8 +306,8 @@ constructor(
         referral.submittedOn = LocalDateTime.now()
         referral.hasLdc = pniService.hasLDC(referral.prisonNumber)
         fetchAndSavePomDetails(referral).let {
-          referral.primaryPomStaffId = it?.first
-          referral.secondaryPomStaffId = it?.second
+          referral.primaryPomStaffId = it.first
+          referral.secondaryPomStaffId = it.second
         }
         caseNotesApiService.buildAndCreateCaseNote(
           referral,
@@ -564,9 +564,7 @@ constructor(
         primaryPomStaffId = pomDetails.first,
         secondaryPomStaffId = pomDetails.second,
       ),
-    ) ?: throw IllegalStateException("New referral creation failed during transfer to building choices for ${referral.prisonNumber}").also {
-      log.warn("Failed to create new referral during transfer to building choices for ${referral.prisonNumber}")
-    }
+    )
     return newReferral
   }
 

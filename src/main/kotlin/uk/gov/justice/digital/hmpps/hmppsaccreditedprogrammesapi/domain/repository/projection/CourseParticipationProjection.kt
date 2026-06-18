@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.projection
 
+import java.time.LocalDateTime
 import java.util.UUID
 
 interface CourseParticipationProjection {
@@ -8,7 +9,7 @@ interface CourseParticipationProjection {
   fun getReferralId(): UUID?
   fun getReferralStatus(): String?
   fun getAddedBy(): String
-  fun getCreatedAt(): String
+  fun getCreatedAt(): LocalDateTime
   fun getCourseName(): String?
   fun getType(): String?
   fun getYearStarted(): Int?
