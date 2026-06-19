@@ -6,4 +6,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import java.util.*
 
 @Repository
-interface OasysPniResultEntityRepository : JpaRepository<OasysPniResultEntity, UUID>
+interface OasysPniResultEntityRepository : JpaRepository<OasysPniResultEntity, UUID> {
+  fun findAllByPrisonNumber(prisonNumber: String): List<OasysPniResultEntity>
+}

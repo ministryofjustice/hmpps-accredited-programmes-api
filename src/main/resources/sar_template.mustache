@@ -1,0 +1,212 @@
+<h1 class="title">Accredited programmes</h1>
+<h2>Referrals</h2>
+    {{#referrals}}
+        <h3>Referral {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>{{ optionalValue prisonerNumber }}</td></tr>
+            <tr><td>Status</td><td>{{ optionalValue statusCode }}</td></tr>
+            <tr><td>Submitted on</td><td>{{ optionalValue (formatDate submittedOn) }}</td></tr>
+            <tr><td>Referrer</td><td>{{ getUserLastName referrerUsername }}</td></tr>
+            <tr><td>OASys confirmed</td><td>{{ convertBoolean oasysConfirmed }}</td></tr>
+            <tr><td>Has reviewed programme history</td><td>{{ convertBoolean hasReviewedProgrammeHistory }}</td></tr>
+            <tr><td>Primary POM staff ID</td><td>{{ optionalValue primaryPomStaffId }}</td></tr>
+            <tr><td>Secondary POM staff ID</td><td>{{ optionalValue secondaryPomStaffId }}</td></tr>
+            <tr><td>Original referral ID</td><td>{{ optionalValue originalReferralId }}</td></tr>
+            <tr><td>Has LDC</td><td>{{ convertBoolean hasLdc }}</td></tr>
+            <tr><td>Has LDC been overridden by programme team</td><td>{{ convertBoolean hasLdcBeenOverriddenByProgrammeTeam }}</td></tr>
+            <tr><td>Has reviewed additional information</td><td>{{ convertBoolean hasReviewedAdditionalInformation }}</td></tr>
+            <tr><td>Referrer override reason</td><td>{{ optionalValue referrerOverrideReason }}</td></tr>
+            <tr><td>Deleted</td><td>{{ convertBoolean deleted }}</td></tr>
+            <tr><td>Additional information</td><td>{{ optionalValue additionalInformation }}</td></tr>
+        </table>
+        <br>
+    {{/referrals}}
+    {{^referrals}}
+        <p>No Data Held</p>
+    {{/referrals}}
+
+    <h2>Course participation</h2>
+    {{#courseParticipation}}
+        <h3>Course {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>{{ optionalValue prisonNumber }}</td></tr>
+            <tr><td>Course name</td><td>{{ optionalValue courseName }}</td></tr>
+            <tr><td>Created date-time</td><td>{{ optionalValue (formatDate createdDateTime) }}</td></tr>
+            <tr><td>Is draft</td><td>{{ convertBoolean isDraft }}</td></tr>
+            <tr><td>Other course name</td><td>{{ optionalValue otherCourseName }}</td></tr>
+            <tr><td>Outcome detail</td><td>{{ optionalValue outcomeDetail }}</td></tr>
+            <tr><td>Created by</td><td>{{ getUserLastName createdByUser }}</td></tr>
+            <tr><td>Source</td><td>{{ optionalValue source }}</td></tr>
+            <tr><td>Type</td><td>{{ optionalValue type }}</td></tr>
+            <tr><td>Outcome</td><td>{{ optionalValue outcomeStatus }}</td></tr>
+            <tr><td>Year started</td><td>{{ optionalValue yearStarted }}</td></tr>
+            <tr><td>Year completed</td><td>{{ optionalValue yearCompleted }}</td></tr>
+            <tr><td>Location</td><td>{{ getPrisonName location }}</td></tr>
+            <tr><td>Updated by</td><td>{{ getUserLastName updatedByUser }}</td></tr>
+            <tr><td>Updated date-time</td><td>{{ optionalValue (formatDate updatedDateTime) }}</td></tr>
+            <tr><td>Detail</td><td>{{ optionalValue detail }}</td></tr>
+        </table>
+        <br>
+    {{/courseParticipation}}
+    {{^courseParticipation}}
+        <p>No Data Held</p>
+    {{/courseParticipation}}
+
+    <h2>Audit records</h2>
+    {{#auditRecords}}
+        <h3>Audit record {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>{{ optionalValue prisonNumber }}</td></tr>
+            <tr><td>Referrer</td><td>{{ getUserLastName referrerUsername }}</td></tr>
+            <tr><td>Audit username</td><td>{{ getUserLastName auditUsername }}</td></tr>
+            <tr><td>Status from</td><td>{{ optionalValue referralStatusFrom }}</td></tr>
+            <tr><td>Status to</td><td>{{ optionalValue referralStatusTo }}</td></tr>
+            <tr><td>Audit action</td><td>{{ optionalValue auditAction }}</td></tr>
+            <tr><td>Course name</td><td>{{ optionalValue courseName }}</td></tr>
+            <tr><td>Course location</td><td>{{ optionalValue courseLocation }}</td></tr>
+            <tr><td>Audit date-time</td><td>{{ optionalValue (formatDate auditDateTime) }}</td></tr>
+        </table>
+        <br>
+    {{/auditRecords}}
+    {{^auditRecords}}
+        <p>No Data Held</p>
+    {{/auditRecords}}
+
+    <h2>Courses</h2>
+    {{#courses}}
+        <h3>Course {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>Name</td><td>{{ optionalValue name }}</td></tr>
+        </table>
+        <br>
+    {{/courses}}
+    {{^courses}}
+        <p>No Data Held</p>
+    {{/courses}}
+
+    <h2>PNI results</h2>
+    {{#pniResults}}
+        <h3>PNI result {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>{{ optionalValue prisonNumber }}</td></tr>
+            <tr><td>CRN</td><td>{{ optionalValue crn }}</td></tr>
+            <tr><td>Programme pathway</td><td>{{ optionalValue programmePathway }}</td></tr>
+            <tr><td>Needs classification</td><td>{{ optionalValue needsClassification }}</td></tr>
+            <tr><td>Overall needs score</td><td>{{ optionalValue overallNeedsScore }}</td></tr>
+            <tr><td>Risk classification</td><td>{{ optionalValue riskClassification }}</td></tr>
+            <tr><td>OASys assessment completed date</td><td>{{ optionalValue (formatDate oasysAssessmentCompletedDate) }}</td></tr>
+            <tr><td>PNI assessment date</td><td>{{ optionalValue (formatDate pniAssessmentDate) }}</td></tr>
+            <tr><td>PNI valid</td><td>{{ convertBoolean pniValid }}</td></tr>
+            <tr><td>Basic skills score</td><td>{{ optionalValue basicSkillsScore }}</td></tr>
+            <tr><td>PNI result JSON</td><td>{{ optionalValue pniResultJson }}</td></tr>
+        </table>
+        <br>
+    {{/pniResults}}
+    {{^pniResults}}
+        <p>No Data Held</p>
+    {{/pniResults}}
+
+    <h2>Person</h2>
+    {{#person}}
+        <table class="summary-list">
+            <tr><td>Person ID</td><td>{{ optionalValue id }}</td></tr>
+            <tr><td>Prison number</td><td>{{ optionalValue prisonNumber }}</td></tr>
+            <tr><td>Forename</td><td>{{ optionalValue forename }}</td></tr>
+            <tr><td>Surname</td><td>{{ optionalValue surname }}</td></tr>
+            <tr><td>Location</td><td>{{ optionalValue location }}</td></tr>
+            <tr><td>Gender</td><td>{{ optionalValue gender }}</td></tr>
+            <tr><td>Conditional release date</td><td>{{ optionalValue conditionalReleaseDate }}</td></tr>
+            <tr><td>Parole eligibility date</td><td>{{ optionalValue paroleEligibilityDate }}</td></tr>
+            <tr><td>Tariff expiry date</td><td>{{ optionalValue tariffExpiryDate }}</td></tr>
+            <tr><td>Earliest release date</td><td>{{ optionalValue earliestReleaseDate }}</td></tr>
+            <tr><td>Earliest release date type</td><td>{{ optionalValue earliestReleaseDateType }}</td></tr>
+            <tr><td>Sentence type</td><td>{{ optionalValue sentenceType }}</td></tr>
+            <tr><td>Indeterminate sentence</td><td>{{ convertBoolean indeterminateSentence }}</td></tr>
+            <tr><td>Non DTO release date type</td><td>{{ optionalValue nonDtoReleaseDateType }}</td></tr>
+        </table>
+    {{/person}}
+    {{^person}}
+        <p>No Data Held</p>
+    {{/person}}
+
+    <h2>OASys PNI results</h2>
+    {{#oasysPniResults}}
+        <h3>OASys PNI result {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>PNI result ID</td><td>{{ optionalValue pniResultId }}</td></tr>
+            <tr><td>Prison number</td><td>{{ optionalValue prisonNumber }}</td></tr>
+            <tr><td>OASys assessment ID</td><td>{{ optionalValue oasysAssessmentId }}</td></tr>
+            <tr><td>Programme pathway</td><td>{{ optionalValue programmePathway }}</td></tr>
+        </table>
+        <br>
+    {{/oasysPniResults}}
+    {{^oasysPniResults}}
+        <p>No Data Held</p>
+    {{/oasysPniResults}}
+
+    <h2>Referral status history</h2>
+    {{#referralStatusHistory}}
+        <h3>Status history {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>Status history ID</td><td>{{ optionalValue id }}</td></tr>
+            <tr><td>Referral ID</td><td>{{ optionalValue referralId }}</td></tr>
+            <tr><td>Username</td><td>{{ getUserLastName username }}</td></tr>
+            <tr><td>Status</td><td>{{ optionalValue status }}</td></tr>
+            <tr><td>Previous status</td><td>{{ optionalValue previousStatus }}</td></tr>
+            <tr><td>Category</td><td>{{ optionalValue category }}</td></tr>
+            <tr><td>Reason</td><td>{{ optionalValue reason }}</td></tr>
+            <tr><td>Status start date</td><td>{{ optionalValue (formatDate statusStartDate) }}</td></tr>
+            <tr><td>Status end date</td><td>{{ optionalValue (formatDate statusEndDate) }}</td></tr>
+            <tr><td>Duration at this status</td><td>{{ optionalValue durationAtThisStatus }}</td></tr>
+            <tr><td>Notes</td><td>{{ optionalValue notes }}</td></tr>
+        </table>
+        <br>
+    {{/referralStatusHistory}}
+    {{^referralStatusHistory}}
+        <p>No Data Held</p>
+    {{/referralStatusHistory}}
+
+    <h2>Referral status reasons</h2>
+    {{#referralStatusReasons}}
+        <h3>Status reason {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>Code</td><td>{{ optionalValue code }}</td></tr>
+            <tr><td>Category code</td><td>{{ optionalValue referralStatusCategoryCode }}</td></tr>
+            <tr><td>Active</td><td>{{ convertBoolean active }}</td></tr>
+            <tr><td>Deselect open</td><td>{{ convertBoolean deselectOpen }}</td></tr>
+            <tr><td>Description</td><td>{{ optionalValue description }}</td></tr>
+        </table>
+        <br>
+    {{/referralStatusReasons}}
+    {{^referralStatusReasons}}
+        <p>No Data Held</p>
+    {{/referralStatusReasons}}
+
+    <h2>Selected sexual offence details</h2>
+    {{#selectedSexualOffenceDetails}}
+        <h3>Selected detail {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>ID</td><td>{{ optionalValue id }}</td></tr>
+            <tr><td>Referral ID</td><td>{{ optionalValue referralId }}</td></tr>
+            <tr><td>Sexual offence details ID</td><td>{{ optionalValue sexualOffenceDetailsId }}</td></tr>
+        </table>
+        <br>
+    {{/selectedSexualOffenceDetails}}
+    {{^selectedSexualOffenceDetails}}
+        <p>No Data Held</p>
+    {{/selectedSexualOffenceDetails}}
+
+    <h2>Sexual offence details</h2>
+    {{#sexualOffenceDetails}}
+        <h3>Sexual offence detail {{ optionalValue (getIndexPlusOne @index) }}</h3>
+        <table class="summary-list">
+            <tr><td>ID</td><td>{{ optionalValue id }}</td></tr>
+            <tr><td>Category</td><td>{{ optionalValue category }}</td></tr>
+            <tr><td>Score</td><td>{{ optionalValue score }}</td></tr>
+            <tr><td>Description</td><td>{{ optionalValue description }}</td></tr>
+        </table>
+        <br>
+    {{/sexualOffenceDetails}}
+    {{^sexualOffenceDetails}}
+        <p>No Data Held</p>
+    {{/sexualOffenceDetails}}

@@ -163,6 +163,10 @@ hmpps:
     queues:
       hmppsdomaineventsqueue:
         asyncQueueClient: true
+  sar:
+    template:
+      path: /sar_template.mustache
+      enabled: true
 
 log-client-credentials-jwt-info: false
 

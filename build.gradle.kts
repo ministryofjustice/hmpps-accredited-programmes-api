@@ -68,6 +68,8 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
   testRuntimeOnly("org.flywaydb:flyway-database-postgresql")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.4.2")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.2.0")
 }
 
 java {

@@ -1,0 +1,405 @@
+<style>
+    * {
+        font-family: "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif;
+        font-size: 12pt;
+        color: #0b0c0c;
+    }
+    /* --- HEADINGS --- */
+
+    .title {
+        font-size: 20pt;
+        text-align: center;
+    }
+
+    h1, h2, h3 {
+        color: #0b0c0c;
+        font-weight: 700;
+        display: block;
+        margin-top: 0;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
+    h1 {
+        font-size: 18pt;
+        line-height: 1.09375;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        margin-block-start: 0.67em;
+        margin-block-end: 0.67em;
+    }
+
+    h2 {
+        font-size: 17pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    h3 {
+        font-size: 16pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    h4 {
+        font-size: 15pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    h5 {
+        font-size: 14pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    /* --- SUMMARY LIST --- */
+
+    table.summary-list {
+        display: table;
+        width: 700px;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin: 0 0 5px;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
+    table.summary-list tr {
+        display: table-row;
+        margin: 0 0 20px;
+    }
+
+    table.summary-list tr td {
+        border-bottom: 1px solid #b1b4b6;
+        /*margin-bottom: 5px;*/
+        overflow-wrap: break-word;
+        display: table-cell;
+        /*padding-top: 2px;*/
+        /*padding-bottom: 2px;*/
+        /*padding-right: 0;*/
+        margin-inline-start: 40px;
+        width: 70%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        line-height: 1.25;
+        font-weight: 400;
+        white-space: normal;
+        vertical-align: top;
+    }
+
+    table.summary-list tr td:first-child {
+        font-size: 12pt;
+        width: 30%;
+        font-weight: 700;
+        padding-right: 20px;
+        vertical-align: top;
+    }
+
+    /* --- DATA TABLE --- */
+
+    table.data-table {
+        display: table;
+        width: 700px;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin: 0 0 5px;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
+    table.data-table tr {
+        display: table-row;
+        margin: 0 0 20px;
+    }
+
+    table.data-table tr td {
+        border-bottom: 1px solid #b1b4b6;
+        margin-bottom: 5px;
+        overflow-wrap: break-word;
+        display: table-cell;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-right: 0;
+        margin-inline-start: 40px;
+        table-layout: fixed;
+        border-collapse: collapse;
+        line-height: 1.25;
+        font-weight: 400;
+        white-space: pre-wrap;
+        vertical-align: top;
+    }
+
+    table.data-table tr:first-child td {
+        font-size: 12pt;
+        width: 30%;
+        font-weight: 700;
+        padding-right: 20px;
+        border-bottom: none;
+        vertical-align: top;
+    }
+
+    table.data-table tr td.data-column-5 { width: 5% }
+    table.data-table tr td.data-column-10 { width: 10% }
+    table.data-table tr td.data-column-15 { width: 15% }
+    table.data-table tr td.data-column-20 { width: 20% }
+    table.data-table tr td.data-column-25 { width: 25% }
+    table.data-table tr td.data-column-30 { width: 30% }
+    table.data-table tr td.data-column-35 { width: 35% }
+    table.data-table tr td.data-column-40 { width: 40% }
+    table.data-table tr td.data-column-45 { width: 45% }
+    table.data-table tr td.data-column-50 { width: 50% }
+    table.data-table tr td.data-column-55 { width: 55% }
+    table.data-table tr td.data-column-60 { width: 60% }
+    table.data-table tr td.data-column-65 { width: 65% }
+    table.data-table tr td.data-column-70 { width: 70% }
+    table.data-table tr td.data-column-75 { width: 75% }
+    table.data-table tr td.data-column-80 { width: 80% }
+    table.data-table tr td.data-column-85 { width: 85% }
+    table.data-table tr td.data-column-90 { width: 90% }
+    table.data-table tr td.data-column-95 { width: 95% }
+
+    table tr td.data-column-5 { width: 5% }
+    table tr td.data-column-10 { width: 10% }
+    table tr td.data-column-15 { width: 15% }
+    table tr td.data-column-20 { width: 20% }
+    table tr td.data-column-25 { width: 25% }
+    table tr td.data-column-30 { width: 30% }
+    table tr td.data-column-35 { width: 35% }
+    table tr td.data-column-40 { width: 40% }
+    table tr td.data-column-45 { width: 45% }
+    table tr td.data-column-50 { width: 50% }
+    table tr td.data-column-55 { width: 55% }
+    table tr td.data-column-60 { width: 60% }
+    table tr td.data-column-65 { width: 65% }
+    table tr td.data-column-70 { width: 70% }
+    table tr td.data-column-75 { width: 75% }
+    table tr td.data-column-80 { width: 80% }
+    table tr td.data-column-85 { width: 85% }
+    table tr td.data-column-90 { width: 90% }
+    table tr td.data-column-95 { width: 95% }
+
+    table.summary-list tr td.data-column-5 { width: 5% }
+    table.summary-list tr td.data-column-10 { width: 10% }
+    table.summary-list tr td.data-column-15 { width: 15% }
+    table.summary-list tr td.data-column-20 { width: 20% }
+    table.summary-list tr td.data-column-25 { width: 25% }
+    table.summary-list tr td.data-column-30 { width: 30% }
+    table.summary-list tr td.data-column-35 { width: 35% }
+    table.summary-list tr td.data-column-40 { width: 40% }
+    table.summary-list tr td.data-column-45 { width: 45% }
+    table.summary-list tr td.data-column-50 { width: 50% }
+    table.summary-list tr td.data-column-55 { width: 55% }
+    table.summary-list tr td.data-column-60 { width: 60% }
+    table.summary-list tr td.data-column-65 { width: 65% }
+    table.summary-list tr td.data-column-70 { width: 70% }
+    table.summary-list tr td.data-column-75 { width: 75% }
+    table.summary-list tr td.data-column-80 { width: 80% }
+    table.summary-list tr td.data-column-85 { width: 85% }
+    table.summary-list tr td.data-column-90 { width: 90% }
+    table.summary-list tr td.data-column-95 { width: 95% }
+
+    ul {
+        padding: 0 0 0 10px;
+    }
+
+</style>
+
+<h1 class="title">Accredited programmes</h1>
+<h2>Referrals</h2>
+    
+        <h3>Referral 1</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>A1234BC</td></tr>
+            <tr><td>Status</td><td>REFERRAL_STARTED</td></tr>
+            <tr><td>Submitted on</td><td>01 June 2024, 10:00:00 am</td></tr>
+            <tr><td>Referrer</td><td>Johnson</td></tr>
+            <tr><td>OASys confirmed</td><td>Yes</td></tr>
+            <tr><td>Has reviewed programme history</td><td>Yes</td></tr>
+            <tr><td>Primary POM staff ID</td><td>12345</td></tr>
+            <tr><td>Secondary POM staff ID</td><td>67890</td></tr>
+            <tr><td>Original referral ID</td><td>No Data Held</td></tr>
+            <tr><td>Has LDC</td><td>Yes</td></tr>
+            <tr><td>Has LDC been overridden by programme team</td><td>Yes</td></tr>
+            <tr><td>Has reviewed additional information</td><td>No Data Held</td></tr>
+            <tr><td>Referrer override reason</td><td>No Data Held</td></tr>
+            <tr><td>Deleted</td><td>No</td></tr>
+            <tr><td>Additional information</td><td>Some info</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>Course participation</h2>
+    
+        <h3>Course 1</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>A1234BC</td></tr>
+            <tr><td>Course name</td><td>Course 1</td></tr>
+            <tr><td>Created date-time</td><td>01 June 2024, 10:00:00 am</td></tr>
+            <tr><td>Is draft</td><td>No</td></tr>
+            <tr><td>Other course name</td><td>Other course</td></tr>
+            <tr><td>Outcome detail</td><td>No information to evidence</td></tr>
+            <tr><td>Created by</td><td>Johnson</td></tr>
+            <tr><td>Source</td><td>Source</td></tr>
+            <tr><td>Type</td><td>CUSTODY</td></tr>
+            <tr><td>Outcome</td><td>INCOMPLETE</td></tr>
+            <tr><td>Year started</td><td>2023</td></tr>
+            <tr><td>Year completed</td><td>2024</td></tr>
+            <tr><td>Location</td><td>Moorland (HMP &amp; YOI)</td></tr>
+            <tr><td>Updated by</td><td>Johnson</td></tr>
+            <tr><td>Updated date-time</td><td>01 June 2024, 10:00:00 am</td></tr>
+            <tr><td>Detail</td><td>Detail</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>Audit records</h2>
+    
+        <h3>Audit record 1</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>A1234BC</td></tr>
+            <tr><td>Referrer</td><td>Johnson</td></tr>
+            <tr><td>Audit username</td><td>Johnson</td></tr>
+            <tr><td>Status from</td><td>No Data Held</td></tr>
+            <tr><td>Status to</td><td>No Data Held</td></tr>
+            <tr><td>Audit action</td><td>CREATE_REFERRAL</td></tr>
+            <tr><td>Course name</td><td>No Data Held</td></tr>
+            <tr><td>Course location</td><td>No Data Held</td></tr>
+            <tr><td>Audit date-time</td><td>01 June 2024, 10:00:00 am</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>Courses</h2>
+    
+        <h3>Course 1</h3>
+        <table class="summary-list">
+            <tr><td>Name</td><td>Course 1</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>PNI results</h2>
+    
+        <h3>PNI result 1</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>A1234BC</td></tr>
+            <tr><td>CRN</td><td>X1234YZ</td></tr>
+            <tr><td>Programme pathway</td><td>ALTERNATIVE_PATHWAY</td></tr>
+            <tr><td>Needs classification</td><td>No Data Held</td></tr>
+            <tr><td>Overall needs score</td><td>No Data Held</td></tr>
+            <tr><td>Risk classification</td><td>No Data Held</td></tr>
+            <tr><td>OASys assessment completed date</td><td>No Data Held</td></tr>
+            <tr><td>PNI assessment date</td><td>No Data Held</td></tr>
+            <tr><td>PNI valid</td><td>Yes</td></tr>
+            <tr><td>Basic skills score</td><td>No Data Held</td></tr>
+            <tr><td>PNI result JSON</td><td>{&quot;result&quot;: &quot;success&quot;}</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>Person</h2>
+    
+        <table class="summary-list">
+            <tr><td>Person ID</td><td>99999999-9999-9999-9999-999999999999</td></tr>
+            <tr><td>Prison number</td><td>A1234BC</td></tr>
+            <tr><td>Forename</td><td>John</td></tr>
+            <tr><td>Surname</td><td>Doe</td></tr>
+            <tr><td>Location</td><td>HMP Moorland</td></tr>
+            <tr><td>Gender</td><td>Male</td></tr>
+            <tr><td>Conditional release date</td><td>No Data Held</td></tr>
+            <tr><td>Parole eligibility date</td><td>No Data Held</td></tr>
+            <tr><td>Tariff expiry date</td><td>No Data Held</td></tr>
+            <tr><td>Earliest release date</td><td>No Data Held</td></tr>
+            <tr><td>Earliest release date type</td><td>CRD</td></tr>
+            <tr><td>Sentence type</td><td>Determinate</td></tr>
+            <tr><td>Indeterminate sentence</td><td>No Data Held</td></tr>
+            <tr><td>Non DTO release date type</td><td>No Data Held</td></tr>
+        </table>
+    
+    
+
+    <h2>OASys PNI results</h2>
+    
+        <h3>OASys PNI result 1</h3>
+        <table class="summary-list">
+            <tr><td>PNI result ID</td><td>88888888-8888-8888-8888-888888888888</td></tr>
+            <tr><td>Prison number</td><td>A1234BC</td></tr>
+            <tr><td>OASys assessment ID</td><td>1234</td></tr>
+            <tr><td>Programme pathway</td><td>HIGH_INTENSITY_BC</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>Referral status history</h2>
+    
+        <h3>Status history 1</h3>
+        <table class="summary-list">
+            <tr><td>Status history ID</td><td>cccccccc-cccc-cccc-cccc-cccccccccccc</td></tr>
+            <tr><td>Referral ID</td><td>44444444-4444-4444-4444-444444444444</td></tr>
+            <tr><td>Username</td><td>Johnson</td></tr>
+            <tr><td>Status</td><td>REFERRAL_STARTED</td></tr>
+            <tr><td>Previous status</td><td>No Data Held</td></tr>
+            <tr><td>Category</td><td>No Data Held</td></tr>
+            <tr><td>Reason</td><td>No Data Held</td></tr>
+            <tr><td>Status start date</td><td>01 June 2024, 10:00:00 am</td></tr>
+            <tr><td>Status end date</td><td>No Data Held</td></tr>
+            <tr><td>Duration at this status</td><td>No Data Held</td></tr>
+            <tr><td>Notes</td><td>No Data Held</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>Referral status reasons</h2>
+    
+    
+        <p>No Data Held</p>
+    
+
+    <h2>Selected sexual offence details</h2>
+    
+        <h3>Selected detail 1</h3>
+        <table class="summary-list">
+            <tr><td>ID</td><td>bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb</td></tr>
+            <tr><td>Referral ID</td><td>44444444-4444-4444-4444-444444444444</td></tr>
+            <tr><td>Sexual offence details ID</td><td>aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa</td></tr>
+        </table>
+        <br>
+    
+    
+
+    <h2>Sexual offence details</h2>
+    
+        <h3>Sexual offence detail 1</h3>
+        <table class="summary-list">
+            <tr><td>ID</td><td>aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa</td></tr>
+            <tr><td>Category</td><td>AGAINST_MINORS</td></tr>
+            <tr><td>Score</td><td>2</td></tr>
+            <tr><td>Description</td><td>Example sexual offence</td></tr>
+        </table>
+        <br>
+    
+    

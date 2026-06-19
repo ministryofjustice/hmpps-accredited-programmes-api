@@ -25,6 +25,8 @@ class PersistenceHelper {
     entityManager.createNativeQuery("DELETE FROM prerequisite").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM course_participation").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM pni_result").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM oasys_pni_result").executeUpdate()
+    entityManager.createNativeQuery("DELETE FROM person").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM staff").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM selected_sexual_offence_details").executeUpdate()
     entityManager.createNativeQuery("DELETE FROM eligibility_override_reason").executeUpdate()
@@ -121,17 +123,19 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createCourseParticipation(participationId: UUID, referralId: UUID?, prisonNumber: String, courseName: String, source: String, detail: String, location: String, type: String, outcomeStatus: String, yearStarted: Int?, yearCompleted: Int?, isDraft: Boolean? = false, createdByUsername: String, createdDateTime: LocalDateTime, lastModifiedByUsername: String?, lastModifiedDateTime: LocalDateTime?) {
-    entityManager.createNativeQuery("INSERT INTO course_participation (course_participation_id, referral_id, prison_number, course_name, source, detail, location, type, outcome_status, year_started, year_completed, is_draft, created_by_username, created_date_time, last_modified_by_username, last_modified_date_time) VALUES (:id, :referralId, :prisonNumber, :courseName, :source, :detail, :location, :type, :outcomeStatus, :yearStarted, :yearCompleted, :isDraft, :createdByUsername, :createdDateTime, :lastModifiedByUsername, :lastModifiedDateTime)")
+  fun createCourseParticipation(participationId: UUID, referralId: UUID?, prisonNumber: String, courseName: String, source: String, detail: String, location: String, type: String, outcomeStatus: String, yearStarted: Int?, yearCompleted: Int?, isDraft: Boolean? = false, createdByUsername: String, createdDateTime: LocalDateTime, lastModifiedByUsername: String?, lastModifiedDateTime: LocalDateTime?, otherCourseName: String? = null, outcomeDetail: String? = null) {
+    entityManager.createNativeQuery("INSERT INTO course_participation (course_participation_id, referral_id, prison_number, course_name, other_course_name, source, detail, location, type, outcome_status, outcome_detail, year_started, year_completed, is_draft, created_by_username, created_date_time, last_modified_by_username, last_modified_date_time) VALUES (:id, :referralId, :prisonNumber, :courseName, :otherCourseName, :source, :detail, :location, :type, :outcomeStatus, :outcomeDetail, :yearStarted, :yearCompleted, :isDraft, :createdByUsername, :createdDateTime, :lastModifiedByUsername, :lastModifiedDateTime)")
       .setParameter("id", participationId)
       .setParameter("referralId", referralId)
       .setParameter("prisonNumber", prisonNumber)
       .setParameter("courseName", courseName)
+      .setParameter("otherCourseName", otherCourseName)
       .setParameter("source", source)
       .setParameter("detail", detail)
       .setParameter("location", location)
       .setParameter("type", type)
       .setParameter("outcomeStatus", outcomeStatus)
+      .setParameter("outcomeDetail", outcomeDetail)
       .setParameter("yearStarted", yearStarted)
       .setParameter("yearCompleted", yearCompleted)
       .setParameter("isDraft", isDraft)
@@ -139,6 +143,66 @@ class PersistenceHelper {
       .setParameter("createdDateTime", createdDateTime)
       .setParameter("lastModifiedByUsername", lastModifiedByUsername)
       .setParameter("lastModifiedDateTime", lastModifiedDateTime)
+      .executeUpdate()
+  }
+
+  fun createPerson(
+    personId: UUID = UUID.randomUUID(),
+    prisonNumber: String,
+    forename: String,
+    surname: String,
+    conditionalReleaseDate: String? = null,
+    paroleEligibilityDate: String? = null,
+    tariffExpiryDate: String? = null,
+    earliestReleaseDate: String? = null,
+    earliestReleaseDateType: String? = null,
+    indeterminateSentence: Boolean? = null,
+    nonDtoReleaseDateType: String? = null,
+    sentenceType: String? = null,
+    location: String? = null,
+    gender: String? = null,
+  ) {
+    entityManager.createNativeQuery("INSERT INTO person (person_id, prison_number, forename, surname, conditional_release_date, parole_eligibility_date, tariff_expiry_date, earliest_release_date, earliest_release_date_type, indeterminate_sentence, non_dto_release_date_type, sentence_type, location, gender) VALUES (:personId, :prisonNumber, :forename, :surname, :conditionalReleaseDate, :paroleEligibilityDate, :tariffExpiryDate, :earliestReleaseDate, :earliestReleaseDateType, :indeterminateSentence, :nonDtoReleaseDateType, :sentenceType, :location, :gender)")
+      .setParameter("personId", personId)
+      .setParameter("prisonNumber", prisonNumber)
+      .setParameter("forename", forename)
+      .setParameter("surname", surname)
+      .setParameter("conditionalReleaseDate", conditionalReleaseDate)
+      .setParameter("paroleEligibilityDate", paroleEligibilityDate)
+      .setParameter("tariffExpiryDate", tariffExpiryDate)
+      .setParameter("earliestReleaseDate", earliestReleaseDate)
+      .setParameter("earliestReleaseDateType", earliestReleaseDateType)
+      .setParameter("indeterminateSentence", indeterminateSentence)
+      .setParameter("nonDtoReleaseDateType", nonDtoReleaseDateType)
+      .setParameter("sentenceType", sentenceType)
+      .setParameter("location", location)
+      .setParameter("gender", gender)
+      .executeUpdate()
+  }
+
+  fun createOasysPniResult(
+    pniResultId: UUID = UUID.randomUUID(),
+    prisonNumber: String,
+    oasysAssessmentId: Long? = null,
+    programmePathway: String? = null,
+  ) {
+    entityManager.createNativeQuery("INSERT INTO oasys_pni_result (pni_result_id, prison_number, oasys_assessment_id, programme_pathway) VALUES (:pniResultId, :prisonNumber, :oasysAssessmentId, :programmePathway)")
+      .setParameter("pniResultId", pniResultId)
+      .setParameter("prisonNumber", prisonNumber)
+      .setParameter("oasysAssessmentId", oasysAssessmentId)
+      .setParameter("programmePathway", programmePathway)
+      .executeUpdate()
+  }
+
+  fun createSelectedSexualOffenceDetails(
+    id: UUID = UUID.randomUUID(),
+    referralId: UUID,
+    sexualOffenceDetailsId: UUID? = null,
+  ) {
+    entityManager.createNativeQuery("INSERT INTO selected_sexual_offence_details (id, referral_id, sexual_offence_details_id) VALUES (:id, :referralId, :sexualOffenceDetailsId)")
+      .setParameter("id", id)
+      .setParameter("referralId", referralId)
+      .setParameter("sexualOffenceDetailsId", sexualOffenceDetailsId)
       .executeUpdate()
   }
 
@@ -152,6 +216,12 @@ class PersistenceHelper {
 
   fun createSexualOffenceDetails(sexualOffenceDetailsEntity: SexualOffenceDetailsEntity) {
     entityManager.persist(sexualOffenceDetailsEntity)
+  }
+
+  fun deleteSexualOffenceDetails(id: UUID) {
+    entityManager.createNativeQuery("DELETE FROM sexual_offence_details WHERE id = :id")
+      .setParameter("id", id)
+      .executeUpdate()
   }
 
   fun createCourseVariant(id: UUID = UUID.randomUUID(), courseId: UUID, variantCourseId: UUID = UUID.randomUUID()) {

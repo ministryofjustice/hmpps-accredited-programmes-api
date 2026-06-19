@@ -56,6 +56,20 @@ hmpps:
       hmppsdomaineventstopic:
         arn: arn:aws:sns:eu-west-2:000000000000:${random.uuid}
 
+  sar:
+    template:
+      path: /sar_template.mustache
+      enabled: true
+    tests:
+      expected-api-response:
+        path: /sar/sar-api-response.json
+      expected-render-result:
+        path: /sar/sar-expected-render-result.html
+      attachments-expected: false
+      expected-flyway-schema-version: 101
+      expected-jpa-entity-schema:
+        path: /sar/entity-schema.json
+
 services:
   prison-api:
     base-url: http://localhost:#WIREMOCK_PORT
