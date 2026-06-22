@@ -167,6 +167,7 @@ hmpps:
     template:
       path: /sar_template.mustache
       enabled: true
+    additionalAccessRole: ACCREDITED_PROGRAMMES_API
 
 log-client-credentials-jwt-info: false
 
