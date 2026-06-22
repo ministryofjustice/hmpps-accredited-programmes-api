@@ -21,8 +21,10 @@ dependencies {
   val sentryVersion = "8.41.0"
   val jsonWebtokenVersion = "0.13.0"
   val springSecurityVersion = "7.0.5"
+  val flywayVersion = "11.17.1"
 
   runtimeOnly("org.postgresql:postgresql:42.7.11")
+  implementation("org.flywaydb:flyway-core:$flywayVersion")
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.2.0")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.3.2")
 
@@ -37,7 +39,7 @@ dependencies {
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
   implementation("com.google.guava:guava:33.6.0-jre")
 
-  implementation("io.sentry:sentry-spring-boot-starter-jakarta:$sentryVersion")
+  implementation("io.sentry:sentry-spring-boot-4:$sentryVersion")
   implementation("io.sentry:sentry-logback:$sentryVersion")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
@@ -49,7 +51,6 @@ dependencies {
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
-  testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
@@ -67,9 +68,10 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-localstack:2.0.5")
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
-  testRuntimeOnly("org.flywaydb:flyway-database-postgresql")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.4.2")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.2.0")
+
+  runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
 }
 
 java {
