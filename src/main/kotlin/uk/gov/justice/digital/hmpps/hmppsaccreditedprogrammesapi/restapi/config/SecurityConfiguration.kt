@@ -42,7 +42,7 @@ class SecurityConfiguration(
           "/info",
           "/swagger-ui.html",
         ).permitAll()
-        .requestMatchers("/subject-access-request").hasAnyRole("SAR_DATA_ACCESS")
+        .requestMatchers("/subject-access-request/**").hasAnyRole("SAR_DATA_ACCESS")
         .anyRequest().hasRole("ACCREDITED_PROGRAMMES_API")
     }
     .anonymous { it.disable() }
