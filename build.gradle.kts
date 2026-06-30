@@ -16,7 +16,7 @@ configurations {
 }
 
 dependencies {
-  val kotestVersion = "5.9.1"
+  val kotestVersion = "6.2.1"
   val springdocVersion = "3.0.3"
   val sentryVersion = "8.41.0"
   val jsonWebtokenVersion = "0.13.0"
