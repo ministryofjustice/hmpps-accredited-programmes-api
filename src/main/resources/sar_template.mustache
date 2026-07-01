@@ -213,7 +213,7 @@
 
     <h2>Staff</h2>
         {{#staff}}
-            <h3>Staff{{ optionalValue (getIndexPlusOne @index) }}</h3>
+            <h3>Staff {{ optionalValue (getIndexPlusOne @index) }}</h3>
             <table class="summary-list">
                 <tr><td>Last name</td><td>{{ optionalValue lastName }}</td></tr>
             </table>
