@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.SelectedSexualOffenceDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
@@ -21,6 +22,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.math.BigInteger
@@ -39,6 +41,7 @@ class SubjectAccessRequestService(
   private val personRepository: PersonRepository,
   private val oasysPniResultEntityRepository: OasysPniResultEntityRepository,
   private val referralStatusHistoryRepository: ReferralStatusHistoryRepository,
+  private val staffRepository: StaffRepository,
 
 ) : HmppsPrisonSubjectAccessRequestService {
 
@@ -71,6 +74,7 @@ class SubjectAccessRequestService(
         referralStatusReasons = referralStatusHistory.mapNotNull { it.reason }.distinctBy { it.code }.toSarReferralStatusReason(),
         selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
         sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
+        staff = staffRepository.findByPrisonNumber(prn).map { it.toSarStaff() }.distinctBy { it.staffId },
       ),
 
     )
@@ -88,6 +92,7 @@ class SubjectAccessRequestService(
     val referralStatusReasons: List<SarReferralStatusReason>,
     val selectedSexualOffenceDetails: List<SarSelectedSexualOffenceDetails>,
     val sexualOffenceDetails: List<SarSexualOffenceDetails>,
+    val staff: List<SarStaff>,
   )
 
   data class SarReferral(
@@ -214,6 +219,15 @@ class SubjectAccessRequestService(
     val category: String,
     val description: String,
     val score: Int,
+  )
+
+  data class SarStaff(
+    val staffId: BigInteger?,
+    val firstName: String,
+    val lastName: String,
+    val primaryEmail: String?,
+    val username: String,
+    val accountType: String,
   )
 
   private fun List<CourseParticipationEntity>.toSarParticipation(): List<SarCourseParticipation> = map {
@@ -361,4 +375,13 @@ class SubjectAccessRequestService(
       score = it.score,
     )
   }
+
+  private fun StaffEntity.toSarStaff() = SarStaff(
+    staffId = staffId,
+    firstName = firstName,
+    lastName = lastName,
+    primaryEmail = primaryEmail,
+    username = username,
+    accountType = accountType,
+  )
 }

@@ -213,6 +213,13 @@ class SarContractIntegrationTest :
       status = "REFERRAL_STARTED",
       statusStartDate = CREATED_DATE_TIME,
     )
+    persistenceHelper.createStaff(
+      staffId = "12345".toBigInteger(),
+      firstName = "John",
+      lastName = "Doe",
+      username = "JOHN_DOE",
+      primaryEmail = "john.doe@test.com",
+    )
   }
 
   private companion object {
