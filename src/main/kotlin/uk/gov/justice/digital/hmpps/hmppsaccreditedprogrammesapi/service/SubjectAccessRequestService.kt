@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OasysPniResultEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryEntity
@@ -18,6 +19,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OasysPniResultEntityRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
@@ -42,6 +44,7 @@ class SubjectAccessRequestService(
   private val oasysPniResultEntityRepository: OasysPniResultEntityRepository,
   private val referralStatusHistoryRepository: ReferralStatusHistoryRepository,
   private val staffRepository: StaffRepository,
+  private val organisationRepository: OrganisationRepository,
 
 ) : HmppsPrisonSubjectAccessRequestService {
 
@@ -75,6 +78,9 @@ class SubjectAccessRequestService(
         selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
         sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
         staff = staffRepository.findByPrisonNumber(prn).map { it.toSarStaff() }.distinctBy { it.staffId },
+        organisations = filteredReferrals.mapNotNull { it.offering?.organisationId }
+          .distinct()
+          .mapNotNull { organisationRepository.findOrganisationEntityByCode(it)?.toSarOrganisation() },
       ),
 
     )
@@ -93,6 +99,7 @@ class SubjectAccessRequestService(
     val selectedSexualOffenceDetails: List<SarSelectedSexualOffenceDetails>,
     val sexualOffenceDetails: List<SarSexualOffenceDetails>,
     val staff: List<SarStaff>,
+    val organisations: List<SarOrganisation>,
   )
 
   data class SarReferral(
@@ -383,5 +390,19 @@ class SubjectAccessRequestService(
     primaryEmail = primaryEmail,
     username = username,
     accountType = accountType,
+  )
+
+  data class SarOrganisation(
+    val id: String,
+    val code: String,
+    val name: String,
+    val gender: String,
+  )
+
+  private fun OrganisationEntity.toSarOrganisation() = SarOrganisation(
+    id = id.toString(),
+    code = code,
+    name = name,
+    gender = gender.name,
   )
 }

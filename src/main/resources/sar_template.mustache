@@ -144,6 +144,18 @@
         <p>No Data Held</p>
     {{/oasysPniResults}}
 
+     <h2>Organisation</h2>
+        {{#organisations}}
+            <h3>Organisation {{ optionalValue (getIndexPlusOne @index) }}</h3>
+            <table class="summary-list">
+                <tr><td>Name</td><td>{{ optionalValue name }}</td></tr>
+            </table>
+            <br>
+        {{/organisations}}
+        {{^organisations}}
+            <p>No Data Held</p>
+        {{/organisations}}
+
     <h2>Referral status history</h2>
     {{#referralStatusHistory}}
         <h3>Status history {{ optionalValue (getIndexPlusOne @index) }}</h3>
