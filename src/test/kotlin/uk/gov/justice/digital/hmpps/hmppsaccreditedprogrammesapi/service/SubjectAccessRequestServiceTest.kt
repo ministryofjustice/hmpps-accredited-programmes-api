@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AuditEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResultEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralStatusHistoryEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -41,6 +43,7 @@ class SubjectAccessRequestServiceTest {
   private val personRepository: PersonRepository = mockk()
   private val oasysPniResultEntityRepository: OasysPniResultEntityRepository = mockk()
   private val referralStatusHistoryRepository: ReferralStatusHistoryRepository = mockk()
+  private val staffRepository: StaffRepository = mockk()
 
   private lateinit var service: SubjectAccessRequestService
 
@@ -55,6 +58,7 @@ class SubjectAccessRequestServiceTest {
       personRepository,
       oasysPniResultEntityRepository,
       referralStatusHistoryRepository,
+      staffRepository,
     )
   }
 
@@ -148,6 +152,15 @@ class SubjectAccessRequestServiceTest {
       ),
     )
     every { referralStatusHistoryRepository.findByPrisonNumber(prn) } returns listOf(ReferralStatusHistoryEntityFactory().produce())
+    every { staffRepository.findByPrisonNumber(prn) } returns listOf(
+      StaffEntityFactory()
+        .withStaffId("12345".toBigInteger())
+        .withFirstName("Alex")
+        .withLastName("River")
+        .withPrimaryEmail("alex.river@justice.gov.uk")
+        .withUsername("ARIVER")
+        .produce(),
+    )
 
     // When
     val result = service.getPrisonContentFor(prn, fromDate, toDate)
@@ -166,6 +179,7 @@ class SubjectAccessRequestServiceTest {
       assertThat(referralStatusReasons).isEmpty()
       assertThat(selectedSexualOffenceDetails).isEmpty()
       assertThat(sexualOffenceDetails).isEmpty()
+      assertThat(staff).hasSize(1)
 
       val referral = referrals[0]
       assertThat(referral.referrerUsername).isEqualTo("user1")
@@ -198,6 +212,9 @@ class SubjectAccessRequestServiceTest {
 
       val referralStatusHistory = referralStatusHistory[0]
       assertThat(referralStatusHistory.status).isNotBlank()
+
+      val staffMember = staff[0]
+      assertThat(staffMember.lastName).isEqualTo("River")
     }
 
     verify { referralRepository.getSarReferrals(prn) }
@@ -208,5 +225,6 @@ class SubjectAccessRequestServiceTest {
     verify { personRepository.findPersonEntityByPrisonNumber(prn) }
     verify { oasysPniResultEntityRepository.findAllByPrisonNumber(prn) }
     verify { referralStatusHistoryRepository.findByPrisonNumber(prn) }
+    verify { staffRepository.findByPrisonNumber(prn) }
   }
 }
