@@ -5,10 +5,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.3.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.3"
   `jvm-test-suite`
-  kotlin("plugin.spring") version "2.3.21"
-  kotlin("plugin.jpa") version "2.3.21"
+  kotlin("plugin.spring") version "2.4.0"
+  kotlin("plugin.jpa") version "2.4.0"
 }
 
 configurations {
@@ -18,15 +18,15 @@ configurations {
 dependencies {
   val kotestVersion = "5.9.1"
   val springdocVersion = "3.0.3"
-  val sentryVersion = "8.41.0"
+  val sentryVersion = "8.47.0"
   val jsonWebtokenVersion = "0.13.0"
-  val springSecurityVersion = "7.0.5"
-  val flywayVersion = "11.17.1"
+  val springSecurityVersion = "7.1.0"
+  val flywayVersion = "11.20.3"
 
-  runtimeOnly("org.postgresql:postgresql:42.7.11")
+  runtimeOnly("org.postgresql:postgresql:42.7.12")
   implementation("org.flywaydb:flyway-core:$flywayVersion")
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.2.0")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.3.2")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.5.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.4.0")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-security")
@@ -45,16 +45,16 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion")
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
-  implementation("org.openfolder:kotlin-asyncapi-spring-web:3.2.2")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.22")
-  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:11.0.22")
+  implementation("org.openfolder:kotlin-asyncapi-spring-web:3.2.3")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.23")
+  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:11.0.23")
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:4.0.2")
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.7.1")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.7.3")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -68,8 +68,8 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-localstack:2.0.5")
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.4.2")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.2.0")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.6.0")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.5.0")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
 }
