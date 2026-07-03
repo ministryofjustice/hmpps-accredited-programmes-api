@@ -167,6 +167,7 @@ class SubjectAccessRequestService(
     val pniValid: Boolean,
     val pniResultJson: String?, // should be here
     val basicSkillsScore: Int?,
+    val oasysAssessmentId: Long?,
   )
 
   data class SarPerson(
@@ -311,6 +312,7 @@ class SubjectAccessRequestService(
       pniValid = it.pniValid,
       pniResultJson = it.pniResultJson,
       basicSkillsScore = it.basicSkillsScore,
+      oasysAssessmentId = it.oasysAssessmentId,
     )
   }
 

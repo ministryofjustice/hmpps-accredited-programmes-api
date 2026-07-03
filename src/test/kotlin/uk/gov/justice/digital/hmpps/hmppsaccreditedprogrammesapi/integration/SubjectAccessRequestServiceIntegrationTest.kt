@@ -95,6 +95,7 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       pniResultJson = "{\"result\": \"success\"}",
       crn = "X1234YZ",
       programmePathway = "ALTERNATIVE_PATHWAY",
+      oasysAssessmentId = 5678,
     )
     persistenceHelper.createOasysPniResult(
       prisonNumber = prisonNumber,
@@ -173,6 +174,7 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     with(content.pniResults[0]) {
       assertThat(crn).isEqualTo("X1234YZ")
       assertThat(pniResultJson).isEqualTo("{\"result\": \"success\"}")
+      assertThat(oasysAssessmentId).isEqualTo(5678L)
     }
 
     with(content.person!!) {
