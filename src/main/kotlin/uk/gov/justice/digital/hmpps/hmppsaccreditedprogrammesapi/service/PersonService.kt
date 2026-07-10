@@ -42,7 +42,7 @@ class PersonService(
     peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
       var personEntity = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
       if (personEntity == null) {
-        val earliestReleaseDateAndType = earliestReleaseDateAndType(it)
+        val earliestReleaseDateAndType = earliestReleaseDateAndType(sentenceInformation)
         log.info("Earliest release date and type for prisoner not in our database $prisonNumber ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
         personEntity = PersonEntity(
           surname = it.lastName,
@@ -60,16 +60,15 @@ class PersonService(
           gender = it.gender,
         )
       } else {
-        updatePerson(it, personEntity, sentenceType)
+        updatePerson(it, personEntity, sentenceInformation)
       }
-
       personRepository.save(personEntity)
     }
   }
 
   fun getPerson(prisonNumber: String) = personRepository.findPersonEntityByPrisonNumber(prisonNumber)
 
-  private fun earliestReleaseDateAndType(prisoner: Prisoner): Pair<LocalDate?, String?> = getSentenceDetails(prisoner.prisonerNumber)
+  private fun earliestReleaseDateAndType(sentenceInformation: SentenceInformation?): Pair<LocalDate?, String?> = getSentenceDetails(sentenceInformation)
     ?.keyDates
     ?.firstOrNull { it.earliestReleaseDate == true }
     ?.let { Pair(it.date, it.description) }
@@ -78,9 +77,10 @@ class PersonService(
   private fun updatePerson(
     prisoner: Prisoner,
     personEntity: PersonEntity,
-    sentenceType: String,
+    sentenceInformation: SentenceInformation?,
   ) {
-    val earliestReleaseDateAndType = earliestReleaseDateAndType(prisoner)
+    val sentenceType = determineSentenceType(sentenceInformation)
+    val earliestReleaseDateAndType = earliestReleaseDateAndType(sentenceInformation)
     log.info("Earliest release date and type for prisoner in our database ${prisoner.prisonerNumber} ${earliestReleaseDateAndType.first} ${earliestReleaseDateAndType.second}")
     personEntity.surname = prisoner.lastName
     personEntity.forename = prisoner.firstName
@@ -154,9 +154,8 @@ class PersonService(
     ?.distinct()
     .orEmpty()
 
-  fun getSentenceDetails(prisonNumber: String): SentenceDetails? {
-    val sentenceInformation = getSentenceInformation(prisonNumber)
-      ?: throw NotFoundException("No sentence information found for person with id: $prisonNumber")
+  fun getSentenceDetails(sentenceInformation: SentenceInformation?): SentenceDetails? {
+    sentenceInformation ?: throw NotFoundException("No sentence information found for person")
 
     val sentences = sentenceInformation.latestPrisonTerm.courtSentences
       .flatMap { it.sentences }
@@ -174,7 +173,7 @@ class PersonService(
         val sentenceInformation = getSentenceInformation(prisonNumber)
         val sentenceType = determineSentenceType(sentenceInformation)
         peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
-          updatePerson(it, personEntity, sentenceType)
+          updatePerson(it, personEntity, sentenceInformation)
         }
         personRepository.save(personEntity)
         log.info("Prisoner $prisonNumber update successful")

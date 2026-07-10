@@ -224,10 +224,8 @@ class PeopleController(
       prisonNumber = prisonNumber,
       auditAction = AuditAction.SENTENCE_DETAILS.name,
     )
-    return ResponseEntity.ok(
-      personService
-        .getSentenceDetails(prisonNumber),
-    )
+    val sentenceInformation = personService.getSentenceInformation(prisonNumber)
+    return ResponseEntity.ok(personService.getSentenceDetails(sentenceInformation))
   }
 
   @Operation(
