@@ -623,7 +623,7 @@ class ReferralServiceTest {
     referralService.updateReferralStatusById(referralId, referralStatusUpdate)
 
     // Then
-    verify(exactly = 0) { pniService.savePni(referral.prisonNumber, gender = null, savePni = true, referral.id) }
+    verify(exactly = 0) { pniService.savePni(any(), referral.id) }
   }
 
   @Test
