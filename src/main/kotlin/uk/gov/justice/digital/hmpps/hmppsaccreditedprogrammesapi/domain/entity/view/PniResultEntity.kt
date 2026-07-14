@@ -13,7 +13,7 @@ class PniResultEntity(
   @Id
   val pniResultId: UUID = UUID.randomUUID(),
   @Column
-  val prisonNumber: String,
+  var prisonNumber: String,
   @Column
   val crn: String?,
   @Column

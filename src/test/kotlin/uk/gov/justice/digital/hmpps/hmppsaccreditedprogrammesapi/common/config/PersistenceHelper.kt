@@ -5,9 +5,11 @@ import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -121,6 +123,10 @@ class PersistenceHelper {
       .setParameter("hasLdc", hasLdc)
       .setParameter("hasLdcBeenOverriddenByProgrammeTeam", hasLdcBeenOverriddenByProgrammeTeam)
       .executeUpdate()
+  }
+
+  fun createCourseParticipation(courseParticipationEntity: CourseParticipationEntity) {
+    entityManager.persist(courseParticipationEntity)
   }
 
   fun createCourseParticipation(participationId: UUID, referralId: UUID?, prisonNumber: String, courseName: String, source: String, detail: String, location: String, type: String, outcomeStatus: String, yearStarted: Int?, yearCompleted: Int?, isDraft: Boolean? = false, createdByUsername: String, createdDateTime: LocalDateTime, lastModifiedByUsername: String?, lastModifiedDateTime: LocalDateTime?, otherCourseName: String? = null, outcomeDetail: String? = null) {
@@ -280,6 +286,10 @@ class PersistenceHelper {
       .setParameter("auditUsername", auditUsername)
       .setParameter("auditDateTime", auditDateTime)
       .executeUpdate()
+  }
+
+  fun createPniResult(pniResultEntity: PniResultEntity) {
+    entityManager.persist(pniResultEntity)
   }
 
   fun createPniResult(

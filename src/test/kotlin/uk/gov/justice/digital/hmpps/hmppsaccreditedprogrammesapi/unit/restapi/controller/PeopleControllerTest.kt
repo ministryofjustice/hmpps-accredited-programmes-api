@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @AutoConfigureMockMvc
 @Import(JwtAuthHelper::class)
@@ -44,6 +45,7 @@ class PeopleControllerTest : IntegrationTestBase() {
     fun `getCourseParticipationsByPrisonNumber with JWT and valid prison number returns 200 with correct body`() {
       val createdAt = LocalDateTime.now()
       val cp1 = CourseParticipationEntityFactory()
+        .withId(UUID.randomUUID())
         .withCourseName("Course name 1")
         .withPrisonNumber(PRISON_NUMBER_1)
         .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.COMMUNITY).withLocation("Location").produce())
@@ -51,6 +53,7 @@ class PeopleControllerTest : IntegrationTestBase() {
         .withCreatedDateTime(createdAt)
         .produce()
       val cp2 = CourseParticipationEntityFactory()
+        .withId(UUID.randomUUID())
         .withCourseName("Course name 2")
         .withPrisonNumber(PRISON_NUMBER_1)
         .withSetting(CourseParticipationSettingFactory().withType(CourseSetting.CUSTODY).produce())

@@ -29,11 +29,23 @@ class DomainEventsListener(
 
   private fun handleMessage(message: DomainEventsMessage) {
     when (message.eventType) {
-      "prisoner-offender-search.prisoner.updated" -> handlePrisonerUpdatedMessage(message)
-      "offender-management.allocation.changed" -> handlePomAllocationChangedMessage(message)
-      "probation-case.requirement.created" -> log.info("Ignoring probation-case.requirement.created event \n $message")
+      HmppsDomainEventTypes.PRISONER_OFFENDER_SEARCH_PRISONER_UPDATED.value -> handlePrisonerUpdatedMessage(message)
+      HmppsDomainEventTypes.OFFENDER_MANAGEMENT_ALLOCATION_CHANGED.value -> handlePomAllocationChangedMessage(message)
+      HmppsDomainEventTypes.PROBATION_CASE_REQUIREMENT_CREATED.value -> log.info("Ignoring probation-case.requirement.created event \n $message")
+      HmppsDomainEventTypes.PRISON_OFFENDER_EVENTS_PRISONER_MERGED.value -> handlePrisonerMergedMessage(message)
       else -> log.error("Unknown event type: ${message.eventType}")
     }
+  }
+
+  private fun handlePrisonerMergedMessage(message: DomainEventsMessage) {
+    message.removedPrisonerNumber?.let {
+      log.info("Received prisoner merged message for removed prisoner: $it")
+      if (message.prisonerNumber == null) {
+        log.warn("Received prisoner merged message without new prisoner number, for removed prisoner: $it")
+        return
+      }
+      personService.updatePrisonNumberForPrisoner(message.prisonerNumber, it)
+    } ?: log.warn("Received prisoner merged message without removed prisoner number")
   }
 
   private fun handlePomAllocationChangedMessage(message: DomainEventsMessage) {
@@ -55,6 +67,7 @@ data class DomainEventsMessage(
   val personReference: PersonReference = PersonReference(),
 ) {
   val prisonerNumber = additionalInformation?.get("nomsNumber") as String?
+  val removedPrisonerNumber = additionalInformation?.get("removedNomsNumber") as String?
 }
 
 data class PersonReference(val identifiers: List<PersonIdentifier> = listOf()) {

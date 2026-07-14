@@ -15,7 +15,7 @@ class PersonEntity(
   var surname: String,
   var forename: String,
   @Column(unique = true)
-  val prisonNumber: String,
+  var prisonNumber: String,
   var conditionalReleaseDate: LocalDate?,
   var paroleEligibilityDate: LocalDate?,
   var tariffExpiryDate: LocalDate?,

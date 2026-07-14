@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.u
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import java.util.UUID
 
-// Refactor CourseEntityFactory
 class CourseEntityFactory {
   private var id: UUID? = UUID.randomUUID()
   private var name: String = randomLowercaseString()
@@ -86,7 +85,6 @@ class CourseEntityFactory {
   )
 }
 
-// Refactor CourseUpdateFactory
 class CourseUpdateFactory {
   private var name: String = randomLowercaseString()
   private var identifier: String = randomUppercaseString()
@@ -118,7 +116,6 @@ class CourseUpdateFactory {
   )
 }
 
-// Refactor PrerequisiteEntityFactory
 class PrerequisiteEntityFactory {
   private var name: String = randomLowercaseString()
   private var description: String = randomSentence()
@@ -137,7 +134,6 @@ class PrerequisiteEntityFactory {
   )
 }
 
-// Refactor NewPrerequisiteFactory
 class NewPrerequisiteFactory {
   private var name: String = randomLowercaseString()
   private var description: String? = null
