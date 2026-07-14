@@ -175,7 +175,6 @@ class SarContractIntegrationTest :
       pniResultJson = "{\"result\": \"success\"}",
       crn = "X1234YZ",
       programmePathway = "ALTERNATIVE_PATHWAY",
-      oasysAssessmentId = 5678,
     )
     persistenceHelper.createOasysPniResult(
       pniResultId = OASYS_PNI_RESULT_ID,
