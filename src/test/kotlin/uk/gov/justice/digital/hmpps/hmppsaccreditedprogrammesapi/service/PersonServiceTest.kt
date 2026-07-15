@@ -21,7 +21,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisoner
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SentenceCategoryEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SentenceCategoryType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SentenceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.testutil.SentenceInformationFactory
 import java.time.LocalDate
@@ -44,6 +47,15 @@ class PersonServiceTest {
 
   @Mock
   lateinit var sentenceCategoryRepository: SentenceCategoryRepository
+
+  @Mock
+  lateinit var referralRepository: ReferralRepository
+
+  @Mock
+  lateinit var courseParticipationRepository: CourseParticipationRepository
+
+  @Mock
+  lateinit var pniResultRepository: PniResultRepository
 
   @Captor
   lateinit var personEntityCaptor: ArgumentCaptor<PersonEntity>

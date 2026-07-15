@@ -1,10 +1,16 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.containing
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
@@ -20,10 +26,13 @@ import org.springframework.test.web.reactive.server.expectBody
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.OffenderAllocationResponse
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.ResourceLoader
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.PomDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.DomainEventsMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.PersonIdentifier
@@ -31,7 +40,13 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.Person
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.listener.SQSMessage
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Referral
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ReferralCreate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.testutil.PrisonerFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResultEntityFactory
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
+import java.math.BigInteger
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -45,54 +60,38 @@ class DomainEventsListenerTest : IntegrationTestBase() {
   @Autowired
   lateinit var referralRepository: ReferralRepository
 
+  @Autowired
+  lateinit var personRepository: PersonRepository
+
+  @Autowired
+  lateinit var courseParticipationRepository: CourseParticipationRepository
+
+  @Autowired
+  lateinit var pniResultRepository: PniResultRepository
+
+  lateinit var offeringEntity: OfferingEntity
+
   @BeforeEach
   fun setUp() {
     persistenceHelper.clearAllTableContent()
 
-    persistenceHelper.createCourse(
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
-      "SC",
-      "Super Course",
-      "Sample description",
-      "SC++",
-      "General offence",
-    )
-    persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
+    val courseEntity1 = CourseEntityFactory()
+      .withIdentifier("SC")
+      .withName("Super Course")
+      .withDescription("Sample description")
+      .withAlternateName("SC++")
+      .withAudience("General offence")
+      .produce()
+    persistenceHelper.createCourse(courseEntity1)
+
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
 
-    persistenceHelper.createOffering(
-      UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
-      "MDI",
-      "nobody-mdi@digital.justice.gov.uk",
-      "nobody2-mdi@digital.justice.gov.uk",
-      true,
-    )
-    persistenceHelper.createOffering(
-      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
-      "BWN",
-      "nobody-bwn@digital.justice.gov.uk",
-      "nobody2-bwn@digital.justice.gov.uk",
-      true,
-    )
+    offeringEntity = OfferingEntityFactory()
+      .withCourse(courseEntity1)
+      .withOrganisationId("MDI")
+      .produce()
 
-    persistenceHelper.createCourse(
-      UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
-      "CC",
-      "Custom Course",
-      "Sample description",
-      "CC",
-      "General offence",
-    )
-    persistenceHelper.createCourse(
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
-      "RC",
-      "RAPID Course",
-      "Sample description",
-      "RC",
-      "General offence",
-    )
+    persistenceHelper.createOffering(offeringEntity)
   }
 
   fun sendDomainEvent(
@@ -111,24 +110,22 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val nomsNumber = "C6666DD"
-    val offeringId = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
-    createReferral(offeringId, nomsNumber)
+    val offeringId = offeringEntity.id
+    createReferral(offeringId!!, nomsNumber)
 
-    val referralViewBefore = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
-    referralViewBefore shouldNotBe null
-    referralViewBefore?.forename?.shouldBeEqual("JOHN")
-    referralViewBefore?.surname?.shouldBeEqual("SMITH")
+    val referralViewBeforeUpdate = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    referralViewBeforeUpdate shouldNotBe null
+    referralViewBeforeUpdate?.forename?.shouldBeEqual("JOHN")
+    referralViewBeforeUpdate?.surname?.shouldBeEqual("SMITH")
 
-    val results = ResourceLoader.file<List<Prisoner>>("prison-search-results")
-    val result = results[0]
-    result.lastName = "changed"
-    result.firstName = "name"
+    val prisoner = PrisonerFactory().withLastName("changed").withFirstName("name").produce()
     wiremockServer.stubFor(
-      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(containing(nomsNumber))
+      post(urlEqualTo("/prisoner-search/prisoner-numbers"))
+        .withRequestBody(containing(nomsNumber))
         .willReturn(
-          WireMock.aResponse()
+          aResponse()
             .withHeader("Content-Type", "application/json")
-            .withBody(objectMapper.writeValueAsString(listOf(result))),
+            .withBody(objectMapper.writeValueAsString(listOf(prisoner))),
         ),
     )
 
@@ -148,31 +145,36 @@ class DomainEventsListenerTest : IntegrationTestBase() {
       referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     } matches { it?.surname == "changed" }
 
-    val referralViewAfter = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
+    val referralViewAfterUpdate = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
 
-    referralViewAfter shouldNotBe null
-    referralViewAfter?.forename?.shouldBeEqual("name")
-    referralViewAfter?.surname?.shouldBeEqual("changed")
+    referralViewAfterUpdate shouldNotBe null
+    referralViewAfterUpdate?.forename?.shouldBeEqual("name")
+    referralViewAfterUpdate?.surname?.shouldBeEqual("changed")
   }
 
   @Test
   fun `should handle POM allocation message successfully`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val nomsNumber = "C6666CC"
-    val offeringId = UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517")
-    createReferral(offeringId, nomsNumber)
+    createReferral(offeringEntity.id!!, nomsNumber)
 
     val referralViewBeforeEvent = referralViewRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     referralViewBeforeEvent?.primaryPomUsername shouldBe null
 
-    val result = ResourceLoader.file<OffenderAllocationResponse>("pom_details_487577")
+    val offenderAllocationResponse = OffenderAllocationResponse(
+      primaryPom = PomDetail(
+        staffId = BigInteger.valueOf(487577),
+        name = "Dave, Jones",
+      ),
+      secondaryPom = null,
+    )
 
     wiremockServer.stubFor(
-      WireMock.get(WireMock.urlEqualTo("/api/allocation/$nomsNumber"))
+      get(urlEqualTo("/api/allocation/$nomsNumber"))
         .willReturn(
-          WireMock.aResponse()
+          aResponse()
             .withHeader("Content-Type", "application/json")
-            .withBody(objectMapper.writeValueAsString(result)),
+            .withBody(objectMapper.writeValueAsString(offenderAllocationResponse)),
         ),
     )
 
@@ -195,6 +197,73 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     await untilCallTo {
       referralRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     } matches { it?.primaryPomStaffId == "487577".toBigInteger() }
+  }
+
+  @Test
+  fun `should handle prisoner merged message successfully and update prisoner number`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val nomsNumber = "A1234AA"
+    val removedNomsNumber = "C6666DD"
+    val createdReferral = createReferral(offeringEntity.id!!, removedNomsNumber)
+
+    val referralViewBeforeUpdate = referralViewRepository.findAll().firstOrNull { it.prisonNumber == removedNomsNumber }
+    referralViewBeforeUpdate shouldNotBe null
+    referralViewBeforeUpdate?.prisonNumber?.shouldBe("C6666DD")
+
+    persistenceHelper.createCourseParticipation(
+      CourseParticipationEntityFactory()
+        .withReferralId(createdReferral.id)
+        .withPrisonNumber(removedNomsNumber)
+        .produce(),
+    )
+
+    persistenceHelper.createPniResult(
+      PniResultEntityFactory()
+        .withPrisonNumber(removedNomsNumber)
+        .withReferralId(createdReferral.id)
+        .produce(),
+    )
+
+    // When
+    val eventType = "prison-offender-events.prisoner.merged"
+    sendDomainEvent(
+      DomainEventsMessage(
+        eventType,
+        additionalInformation = mapOf(
+          "nomsNumber" to nomsNumber,
+          "removedNomsNumber" to removedNomsNumber,
+        ),
+      ),
+    )
+
+    // Then
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // verify that the referral record has been updated with the new prisoner number
+    val result = referralRepository.findAllByPrisonNumber(removedNomsNumber)
+    assertThat(result).isEmpty()
+
+    val postUpdateReferrals = referralRepository.findAllByPrisonNumber(nomsNumber)
+    assertThat(postUpdateReferrals).hasSize(1)
+
+    // verify that the person record has been updated with the new prisoner number
+    personRepository.findPersonEntityByPrisonNumber(removedNomsNumber).shouldBeNull()
+    val updatedPerson = personRepository.findPersonEntityByPrisonNumber(nomsNumber)
+    assertThat(updatedPerson?.prisonNumber).isEqualTo(nomsNumber)
+
+    // verify that the course participation record has been updated with the new prisoner number
+    courseParticipationRepository.findByPrisonNumber(removedNomsNumber).shouldBeEmpty()
+    val updatedCourseParticipation = courseParticipationRepository.findByPrisonNumber(nomsNumber).firstOrNull()
+    assertThat(updatedCourseParticipation?.prisonNumber).isEqualTo(nomsNumber)
+
+    // verify that the PNI result record has been updated with the new prisoner number
+    pniResultRepository.findAllByPrisonNumber(removedNomsNumber).shouldBeEmpty()
+    val updatedPniResult = pniResultRepository.findAllByPrisonNumber(nomsNumber).firstOrNull()
+    assertThat(updatedPniResult?.prisonNumber).isEqualTo(nomsNumber)
   }
 
   fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) = webTestClient

@@ -10,9 +10,11 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import java.time.LocalDateTime
 import java.time.Year
 import java.util.UUID
+
 class CourseParticipationEntityFactory {
-  private var id: UUID? = UUID.randomUUID()
+  private var id: UUID? = null
   private var prisonNumber: String = randomPrisonNumber()
+  private var referralId: UUID? = null
   private var courseName: String? = null
   private var otherCourseName: String? = null
   private var source: String? = null
@@ -27,6 +29,7 @@ class CourseParticipationEntityFactory {
 
   fun withId(id: UUID?) = apply { this.id = id }
   fun withPrisonNumber(prisonNumber: String) = apply { this.prisonNumber = prisonNumber }
+  fun withReferralId(referralId: UUID?) = apply { this.referralId = referralId }
   fun withCourseName(courseName: String?) = apply { this.courseName = courseName }
   fun withOtherCourseName(otherCourseName: String?) = apply { this.otherCourseName = otherCourseName }
   fun withSource(source: String?) = apply { this.source = source }
@@ -44,6 +47,7 @@ class CourseParticipationEntityFactory {
     courseName = this.courseName,
     otherCourseName = this.otherCourseName,
     prisonNumber = this.prisonNumber,
+    referralId = this.referralId,
     source = this.source,
     detail = this.detail,
     outcomeDetail = this.outcomeDetail,
