@@ -117,7 +117,6 @@ class SubjectAccessRequestService(
     val hasLdc: Boolean?,
     val hasLdcBeenOverriddenByProgrammeTeam: Boolean,
     val hasReviewedAdditionalInformation: Boolean?,
-    val deleted: Boolean,
   )
 
   data class SarCourseParticipation(
@@ -271,7 +270,6 @@ class SubjectAccessRequestService(
       it.hasLdc,
       it.hasLdcBeenOverriddenByProgrammeTeam,
       it.hasReviewedAdditionalInformation,
-      it.deleted,
     )
   }
 
