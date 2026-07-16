@@ -10,7 +10,7 @@ import java.math.BigInteger
  * surname, for use in the custody Subject Access Request (SAR) report.
  *
  * Returns `null` when no matching staff row exists; the SAR mustache template renders
- * `-` for null values.
+ * `No Data Held` (via the `optionalValue` helper) for null values.
  *
  * Kept as a service (rather than calling the repository directly) so that future
  * cross-cutting concerns – caching, batching, or a change of fallback rule – have a
