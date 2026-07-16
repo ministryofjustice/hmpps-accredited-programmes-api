@@ -6,11 +6,11 @@
             <tr><td>Prisoner number</td><td>{{ optionalValue prisonerNumber }}</td></tr>
             <tr><td>Status</td><td>{{ optionalValue statusCode }}</td></tr>
             <tr><td>Submitted on</td><td>{{ optionalValue (formatDate submittedOn) }}</td></tr>
-            <tr><td>Referrer</td><td>{{ getUserLastName referrerUsername }}</td></tr>
+            <tr><td>Referrer</td><td>{{ optionalValue referrerUsername }}</td></tr>
             <tr><td>OASys confirmed</td><td>{{ convertBoolean oasysConfirmed }}</td></tr>
             <tr><td>Has reviewed programme history</td><td>{{ convertBoolean hasReviewedProgrammeHistory }}</td></tr>
-            <tr><td>Primary POM staff ID</td><td>{{ optionalValue primaryPomStaffId }}</td></tr>
-            <tr><td>Secondary POM staff ID</td><td>{{ optionalValue secondaryPomStaffId }}</td></tr>
+            <tr><td>Primary POM staff surname</td><td>{{ optionalValue primaryPomStaffSurname }}</td></tr>
+            <tr><td>Secondary POM staff surname</td><td>{{ optionalValue secondaryPomStaffSurname }}</td></tr>
             <tr><td>Original referral ID</td><td>{{ optionalValue originalReferralId }}</td></tr>
             <tr><td>Has LDC</td><td>{{ convertBoolean hasLdc }}</td></tr>
             <tr><td>Has LDC been overridden by programme team</td><td>{{ convertBoolean hasLdcBeenOverriddenByProgrammeTeam }}</td></tr>
@@ -35,14 +35,14 @@
             <tr><td>Is draft</td><td>{{ convertBoolean isDraft }}</td></tr>
             <tr><td>Other course name</td><td>{{ optionalValue otherCourseName }}</td></tr>
             <tr><td>Outcome detail</td><td>{{ optionalValue outcomeDetail }}</td></tr>
-            <tr><td>Created by</td><td>{{ getUserLastName createdByUser }}</td></tr>
+            <tr><td>Created by</td><td>{{ optionalValue createdByUser }}</td></tr>
             <tr><td>Source</td><td>{{ optionalValue source }}</td></tr>
             <tr><td>Type</td><td>{{ optionalValue type }}</td></tr>
             <tr><td>Outcome</td><td>{{ optionalValue outcomeStatus }}</td></tr>
             <tr><td>Year started</td><td>{{ optionalValue yearStarted }}</td></tr>
             <tr><td>Year completed</td><td>{{ optionalValue yearCompleted }}</td></tr>
             <tr><td>Location</td><td>{{ getPrisonName location }}</td></tr>
-            <tr><td>Updated by</td><td>{{ getUserLastName updatedByUser }}</td></tr>
+            <tr><td>Updated by</td><td>{{ optionalValue updatedByUser }}</td></tr>
             <tr><td>Updated date-time</td><td>{{ optionalValue (formatDate updatedDateTime) }}</td></tr>
             <tr><td>Detail</td><td>{{ optionalValue detail }}</td></tr>
         </table>
@@ -57,8 +57,8 @@
         <h3>Audit record {{ optionalValue (getIndexPlusOne @index) }}</h3>
         <table class="summary-list">
             <tr><td>Prisoner number</td><td>{{ optionalValue prisonNumber }}</td></tr>
-            <tr><td>Referrer</td><td>{{ getUserLastName referrerUsername }}</td></tr>
-            <tr><td>Audit username</td><td>{{ getUserLastName auditUsername }}</td></tr>
+            <tr><td>Referrer</td><td>{{ optionalValue referrerUsername }}</td></tr>
+            <tr><td>Audit username</td><td>{{ optionalValue auditUsername }}</td></tr>
             <tr><td>Status from</td><td>{{ optionalValue referralStatusFrom }}</td></tr>
             <tr><td>Status to</td><td>{{ optionalValue referralStatusTo }}</td></tr>
             <tr><td>Audit action</td><td>{{ optionalValue auditAction }}</td></tr>
@@ -163,7 +163,7 @@
         <table class="summary-list">
             <tr><td>Status history ID</td><td>{{ optionalValue id }}</td></tr>
             <tr><td>Referral ID</td><td>{{ optionalValue referralId }}</td></tr>
-            <tr><td>Username</td><td>{{ getUserLastName username }}</td></tr>
+            <tr><td>Username</td><td>{{ optionalValue username }}</td></tr>
             <tr><td>Status</td><td>{{ optionalValue status }}</td></tr>
             <tr><td>Previous status</td><td>{{ optionalValue previousStatus }}</td></tr>
             <tr><td>Category</td><td>{{ optionalValue category }}</td></tr>
