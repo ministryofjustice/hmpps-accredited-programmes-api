@@ -77,7 +77,7 @@ class SubjectAccessRequestService(
         referralStatusReasons = referralStatusHistory.mapNotNull { it.reason }.distinctBy { it.code }.toSarReferralStatusReason(),
         selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
         sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
-        staff = staffRepository.findByPrisonNumber(prn).map { it.toSarStaff() }.distinctBy { it.staffId },
+        staff = staffRepository.findByPrisonNumber(prn).map { it.toSarStaff() }.distinctBy { it.username },
         organisations = filteredReferrals.mapNotNull { it.offering?.organisationId }
           .distinct()
           .mapNotNull { organisationRepository.findOrganisationEntityByCode(it)?.toSarOrganisation() },
@@ -230,12 +230,8 @@ class SubjectAccessRequestService(
   )
 
   data class SarStaff(
-    val staffId: BigInteger?,
-    val firstName: String,
     val lastName: String,
-    val primaryEmail: String?,
     val username: String,
-    val accountType: String,
   )
 
   private fun List<CourseParticipationEntity>.toSarParticipation(): List<SarCourseParticipation> = map {
@@ -386,12 +382,8 @@ class SubjectAccessRequestService(
   }
 
   private fun StaffEntity.toSarStaff() = SarStaff(
-    staffId = staffId,
-    firstName = firstName,
     lastName = lastName,
-    primaryEmail = primaryEmail,
     username = username,
-    accountType = accountType,
   )
 
   data class SarOrganisation(
