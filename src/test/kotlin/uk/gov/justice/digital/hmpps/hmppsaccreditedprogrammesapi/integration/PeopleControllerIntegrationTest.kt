@@ -74,11 +74,14 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
 
   @Test
   fun `search for a person by prisonId`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-
     val peopleSearchRequest = PeopleSearchRequest("C6666DD", listOf("MDI"))
+
+    // When
     val response = searchPrisoners(peopleSearchRequest)
 
+    // Then
     response.shouldNotBeNull()
     response.first() shouldBeEqual PeopleSearchResponse(
       bookingId = "1202335",
@@ -94,6 +97,38 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
       lastName = "SMITH",
       paroleEligibilityDate = null,
       prisonerNumber = "C6666DD",
+      religion = null,
+      sentenceExpiryDate = null,
+      sentenceStartDate = null,
+      tariffDate = null,
+    )
+  }
+
+  @Test
+  fun `should allow searching for a person by first and last names`() {
+    // Given
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val peopleSearchRequest = PeopleSearchRequest(firstName = "MICKEY", lastName = "SMITH")
+
+    // When
+    val response = searchPrisoners(peopleSearchRequest)
+
+    // Then
+    response.shouldNotBeNull()
+    response.first() shouldBeEqual PeopleSearchResponse(
+      bookingId = "1202335",
+      conditionalReleaseDate = null,
+      prisonId = "MDI",
+      prisonName = "Nottingham (HMP)",
+      dateOfBirth = LocalDate.of(1975, 1, 1),
+      ethnicity = "White: Eng./Welsh/Scot./N.Irish/British",
+      gender = "Male",
+      homeDetentionCurfewEligibilityDate = null,
+      indeterminateSentence = false,
+      firstName = "MICKEY",
+      lastName = "SMITH",
+      paroleEligibilityDate = null,
+      prisonerNumber = "C7777CC",
       religion = null,
       sentenceExpiryDate = null,
       sentenceStartDate = null,
