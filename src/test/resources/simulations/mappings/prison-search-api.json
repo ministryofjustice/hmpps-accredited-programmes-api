@@ -34,6 +34,22 @@
     },
     {
       "request": {
+        "urlPattern": "/prisoner-search/match-prisoners",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "MICKEY"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results-match-C7777CC.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/prisoner-search/prisoner-numbers",
         "method": "POST",
         "bodyPatterns" : [ {

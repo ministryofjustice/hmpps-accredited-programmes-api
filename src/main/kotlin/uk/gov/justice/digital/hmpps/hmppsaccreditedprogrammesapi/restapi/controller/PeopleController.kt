@@ -230,7 +230,7 @@ class PeopleController(
 
   @Operation(
     tags = ["Person"],
-    summary = "Search for a prisoner via prison search api by prisoner id and caseload.",
+    summary = "Search for a prisoner via prison search api by prisoner id, prisoner names and prison code.",
     operationId = "searchPeople",
     description = """""",
     responses = [
@@ -265,7 +265,7 @@ class PeopleController(
     ) @RequestBody peopleSearchRequest: PeopleSearchRequest,
   ): ResponseEntity<List<PeopleSearchResponse>> {
     auditService.audit(
-      prisonNumber = peopleSearchRequest.prisonerIdentifier,
+      prisonNumber = peopleSearchRequest.prisonerIdentifier ?: "Unknown prisoner identifier",
       auditAction = AuditAction.NOMIS_SEARCH_FOR_PERSON.name,
     )
 
