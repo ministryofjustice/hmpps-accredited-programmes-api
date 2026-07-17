@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class PeopleSearchResponse(
 
   @Schema(example = "1202156", description = "The NOMIS booking ID")
