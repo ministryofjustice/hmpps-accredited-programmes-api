@@ -15,7 +15,7 @@ class StaffLookupServiceTest {
 
   @Test
   fun `findLastNameByUsername returns surname when a matching staff row exists`() {
-    every { staffRepository.findLastNameByUsername("ARIVER") } returns "River"
+    every { staffRepository.findLastNameByUsername("ARIVER") } returns listOf("River")
 
     assertThat(service.findLastNameByUsername("ARIVER")).isEqualTo("River")
 
@@ -24,7 +24,7 @@ class StaffLookupServiceTest {
 
   @Test
   fun `findLastNameByUsername returns null when no staff row matches`() {
-    every { staffRepository.findLastNameByUsername("MISSING") } returns null
+    every { staffRepository.findLastNameByUsername("MISSING") } returns emptyList()
 
     assertThat(service.findLastNameByUsername("MISSING")).isNull()
   }
@@ -46,7 +46,7 @@ class StaffLookupServiceTest {
   @Test
   fun `findLastNameByStaffId returns surname when a matching staff row exists`() {
     val staffId = BigInteger.valueOf(12345)
-    every { staffRepository.findLastNameByStaffId(staffId) } returns "River"
+    every { staffRepository.findLastNameByStaffId(staffId) } returns listOf("River")
 
     assertThat(service.findLastNameByStaffId(staffId)).isEqualTo("River")
 
@@ -56,7 +56,7 @@ class StaffLookupServiceTest {
   @Test
   fun `findLastNameByStaffId returns null when no staff row matches`() {
     val staffId = BigInteger.valueOf(99999)
-    every { staffRepository.findLastNameByStaffId(staffId) } returns null
+    every { staffRepository.findLastNameByStaffId(staffId) } returns emptyList()
 
     assertThat(service.findLastNameByStaffId(staffId)).isNull()
   }

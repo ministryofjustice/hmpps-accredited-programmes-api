@@ -1,8 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository
 
-import io.kotest.matchers.equals.shouldBeEqual
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactly
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -45,12 +44,11 @@ class StaffRepositoryIntegrationTest : IntegrationTestBase() {
     val result = staffRepository.findLastNameByUsername("ARIVER")
 
     // Then
-    result.shouldNotBeNull()
-    result.shouldBeEqual("River")
+    result.shouldContainExactly("River")
   }
 
   @Test
-  fun `findLastNameByUsername returns null when no staff row matches`() {
+  fun `findLastNameByUsername returns empty list when no staff row matches`() {
     // Given
     persistenceHelper.clearAllTableContent()
 
@@ -58,7 +56,7 @@ class StaffRepositoryIntegrationTest : IntegrationTestBase() {
     val result = staffRepository.findLastNameByUsername("DOES_NOT_EXIST")
 
     // Then
-    result.shouldBeNull()
+    result.shouldBeEmpty()
   }
 
   @Test
@@ -70,12 +68,11 @@ class StaffRepositoryIntegrationTest : IntegrationTestBase() {
     val result = staffRepository.findLastNameByStaffId(seededStaffId)
 
     // Then
-    result.shouldNotBeNull()
-    result.shouldBeEqual("River")
+    result.shouldContainExactly("River")
   }
 
   @Test
-  fun `findLastNameByStaffId returns null when no staff row matches`() {
+  fun `findLastNameByStaffId returns empty list when no staff row matches`() {
     // Given
     persistenceHelper.clearAllTableContent()
 
@@ -83,6 +80,6 @@ class StaffRepositoryIntegrationTest : IntegrationTestBase() {
     val result = staffRepository.findLastNameByStaffId(BigInteger.valueOf(9_999_999))
 
     // Then
-    result.shouldBeNull()
+    result.shouldBeEmpty()
   }
 }

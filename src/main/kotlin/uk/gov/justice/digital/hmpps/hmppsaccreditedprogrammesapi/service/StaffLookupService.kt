@@ -21,7 +21,7 @@ import java.math.BigInteger
 class StaffLookupService(
   private val staffRepository: StaffRepository,
 ) {
-  fun findLastNameByUsername(username: String?): String? = username?.takeIf { it.isNotBlank() }?.let { staffRepository.findLastNameByUsername(it) }
+  fun findLastNameByUsername(username: String?): String? = username?.takeIf { it.isNotBlank() }?.let { staffRepository.findLastNameByUsername(it).firstOrNull() }
 
-  fun findLastNameByStaffId(staffId: BigInteger?): String? = staffId?.let { staffRepository.findLastNameByStaffId(it) }
+  fun findLastNameByStaffId(staffId: BigInteger?): String? = staffId?.let { staffRepository.findLastNameByStaffId(it).firstOrNull() }
 }
