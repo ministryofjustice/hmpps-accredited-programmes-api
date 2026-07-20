@@ -17,7 +17,14 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.PeopleSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.ErrorResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PeopleSearchRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.PrisonerNumberUpdateRequest
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PeopleSearchApiService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
@@ -27,14 +34,21 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffSe
 @Tag(
   name = "Admin",
   description = """
-    This endpoint will refresh all of the prisoners within ACP - BE GENTLE.
+    API endpoints for ad-hoc data refreshing tasks.
   """,
 )
 class AdminController(
   private val personService: PersonService,
   private val referralService: ReferralService,
   private val staffService: StaffService,
+  private val personRepository: PersonRepository,
+  private val peopleSearchApiService: PeopleSearchApiService,
 ) {
+
+  companion object {
+    private val log = LoggerFactory.getLogger(this::class.java)
+  }
+
   @Operation(
     tags = ["Admin"],
     summary = "endpoint to update the cache in the person table. " +
@@ -110,7 +124,33 @@ class AdminController(
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Referrals deleted")
   }
 
-  companion object {
-    private val log = LoggerFactory.getLogger(this::class.java)
+  @PutMapping("/person/update-prisoner-number")
+  @Operation(
+    summary = "Update a prisoner's prisoner number following a NOMIS prisoner number merge",
+    tags = ["Admin"],
+  )
+  fun updatePrisonerNumber(
+    @Parameter(required = true)
+    @RequestBody prisonerNumberUpdateRequest: PrisonerNumberUpdateRequest,
+  ): ResponseEntity<String> {
+    // verify that the current prisoner number exists within AcP
+    val person = personRepository.findPersonEntityByPrisonNumber(prisonerNumberUpdateRequest.currentPrisonerNumber)
+      ?: log.error("Prisoner number: ${prisonerNumberUpdateRequest.currentPrisonerNumber} not found in ACP").also {
+        throw NotFoundException("Prisoner number: ${prisonerNumberUpdateRequest.currentPrisonerNumber} not found in ACP")
+      }
+
+    // verify that the new prisoner number exists in NOMIS
+    val personSearchResponse = peopleSearchApiService.searchPeople(PeopleSearchRequest(prisonerIdentifier = prisonerNumberUpdateRequest.newPrisonerNumber))
+    if (personSearchResponse.isEmpty() || !prisonerNamesMatch(person as PersonEntity, personSearchResponse[0])) {
+      log.error("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS").also {
+        throw NotFoundException("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS")
+      }
+    }
+    personService.updatePrisonNumberForPrisoner(prisonerNumberUpdateRequest.newPrisonerNumber, prisonerNumberUpdateRequest.currentPrisonerNumber)
+    log.info("SUCCESS - Prisoner number updated from ${prisonerNumberUpdateRequest.currentPrisonerNumber} to ${prisonerNumberUpdateRequest.newPrisonerNumber}")
+    return ResponseEntity.status(HttpStatus.OK).body("Prisoner number updated from ${prisonerNumberUpdateRequest.currentPrisonerNumber} to ${prisonerNumberUpdateRequest.newPrisonerNumber}")
   }
+
+  private fun prisonerNamesMatch(person: PersonEntity, response: PeopleSearchResponse) = person.forename.equals(response.firstName, true) &&
+    person.surname.equals(response.lastName, true)
 }
