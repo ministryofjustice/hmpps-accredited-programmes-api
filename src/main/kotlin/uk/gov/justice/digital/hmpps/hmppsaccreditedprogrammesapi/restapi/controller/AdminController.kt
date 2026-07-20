@@ -127,10 +127,44 @@ class AdminController(
   @PutMapping("/person/update-prisoner-number")
   @Operation(
     summary = "Update a prisoner's prisoner number following a NOMIS prisoner number merge",
+    description = """
+      This endpoint updates a prisoner's number in the ACP system after a NOMIS prisoner number merge has occurred.
+      It performs the following validations:
+      1. Verifies the current prisoner number exists in the ACP database
+      2. Verifies the new prisoner number exists in NOMIS
+      3. Confirms the prisoner names match between ACP and NOMIS records
+      If all validations pass, the prisoner number is updated in the ACP system.
+    """,
     tags = ["Admin"],
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Prisoner number successfully updated",
+      ),
+      ApiResponse(
+        responseCode = "400",
+        description = "Invalid request - prisoner names do not match between systems",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Not Found - either the current prisoner number does not exist in ACP or the new prisoner number does not exist in NOMIS",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "500",
+        description = "Internal server error",
+        content = [Content(schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+    security = [SecurityRequirement(name = "bearerAuth")],
   )
   fun updatePrisonerNumber(
-    @Parameter(required = true)
+    @Parameter(
+      required = true,
+      description = "Request containing the current and new prisoner numbers for the merge operation",
+    )
+    @Valid
     @RequestBody prisonerNumberUpdateRequest: PrisonerNumberUpdateRequest,
   ): ResponseEntity<String> {
     // verify that the current prisoner number exists within AcP
@@ -138,7 +172,6 @@ class AdminController(
       ?: log.error("Prisoner number: ${prisonerNumberUpdateRequest.currentPrisonerNumber} not found in ACP").also {
         throw NotFoundException("Prisoner number: ${prisonerNumberUpdateRequest.currentPrisonerNumber} not found in ACP")
       }
-
     // verify that the new prisoner number exists in NOMIS
     val personSearchResponse = peopleSearchApiService.searchPeople(PeopleSearchRequest(prisonerIdentifier = prisonerNumberUpdateRequest.newPrisonerNumber))
     if (personSearchResponse.isEmpty() || !prisonerNamesMatch(person as PersonEntity, personSearchResponse[0])) {
