@@ -148,7 +148,7 @@ class AdminController(
     }
     personService.updatePrisonNumberForPrisoner(prisonerNumberUpdateRequest.newPrisonerNumber, prisonerNumberUpdateRequest.currentPrisonerNumber)
     log.info("SUCCESS - Prisoner number updated from ${prisonerNumberUpdateRequest.currentPrisonerNumber} to ${prisonerNumberUpdateRequest.newPrisonerNumber}")
-    return ResponseEntity.status(HttpStatus.OK).body("Prisoner number updated from ${prisonerNumberUpdateRequest.currentPrisonerNumber} to ${prisonerNumberUpdateRequest.newPrisonerNumber}")
+    return ResponseEntity.status(HttpStatus.OK).body("Prisoner number updated")
   }
 
   private fun prisonerNamesMatch(person: PersonEntity, response: PeopleSearchResponse) = person.forename.equals(response.firstName, true) &&
