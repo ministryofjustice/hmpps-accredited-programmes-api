@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PeopleSearchResponse(
-  val bookingId: String,
+  val bookingId: String?,
   val conditionalReleaseDate: LocalDate?,
   val prisonId: String?,
   val prisonName: String?,
