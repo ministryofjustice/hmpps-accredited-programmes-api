@@ -73,7 +73,6 @@ class SubjectAccessRequestServiceTest {
     // usernames and `resolveSurnamesByStaffId` returns an empty map when no staff
     // rows exist for the given IDs.
     every { staffLookupService.resolveSurnamesByUsername(any()) } answers {
-      @Suppress("UNCHECKED_CAST")
       val usernames = firstArg<Collection<String?>>()
       usernames.asSequence()
         .filterNotNull()

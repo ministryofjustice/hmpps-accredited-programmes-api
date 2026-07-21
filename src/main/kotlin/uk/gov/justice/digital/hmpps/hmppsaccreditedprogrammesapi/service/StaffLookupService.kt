@@ -42,10 +42,7 @@ class StaffLookupService(
    * logged so duplicates remain visible in production telemetry.
    */
   fun resolveSurnamesByUsername(usernames: Collection<String?>): Map<String, String> {
-    val cleaned = usernames.asSequence()
-      .filterNotNull()
-      .filter { it.isNotBlank() }
-      .toSet()
+    val cleaned = usernames.filterNotNull().filter { it.isNotBlank() }.toSet()
     if (cleaned.isEmpty()) return emptyMap()
     val rows = staffRepository.findSurnamesByUsernames(cleaned)
     return rows.groupBy { it.username }.mapValues { (username, matches) ->
