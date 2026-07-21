@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposit
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -78,6 +79,89 @@ class StaffRepositoryIntegrationTest : IntegrationTestBase() {
 
     // When
     val result = staffRepository.findLastNameByStaffId(BigInteger.valueOf(9_999_999))
+
+    // Then
+    result.shouldBeEmpty()
+  }
+
+  @Test
+  fun `findSurnamesByUsernames returns a projection row per matched staff username`() {
+    // Given
+    persistenceHelper.clearAllTableContent()
+    persistenceHelper.createStaff(
+      staffId = "1".toBigInteger(),
+      firstName = "Alex",
+      lastName = "River",
+      username = "ARIVER",
+      primaryEmail = "a@justice.gov.uk",
+    )
+    persistenceHelper.createStaff(
+      staffId = "2".toBigInteger(),
+      firstName = "Bea",
+      lastName = "Smith",
+      username = "BSMITH",
+      primaryEmail = "b@justice.gov.uk",
+    )
+
+    // When
+    val result = staffRepository.findSurnamesByUsernames(listOf("ARIVER", "BSMITH", "MISSING"))
+
+    // Then – MISSING is silently dropped by the IN clause
+    val byUsername = result.associate { it.username to it.lastName }
+    byUsername shouldBe mapOf("ARIVER" to "River", "BSMITH" to "Smith")
+  }
+
+  @Test
+  fun `findSurnamesByUsernames returns empty list when no usernames match`() {
+    // Given
+    persistenceHelper.clearAllTableContent()
+
+    // When
+    val result = staffRepository.findSurnamesByUsernames(listOf("DOES_NOT_EXIST"))
+
+    // Then
+    result.shouldBeEmpty()
+  }
+
+  @Test
+  fun `findSurnamesByStaffIds returns a projection row per matched staff id`() {
+    // Given
+    persistenceHelper.clearAllTableContent()
+    persistenceHelper.createStaff(
+      staffId = "1".toBigInteger(),
+      firstName = "Alex",
+      lastName = "River",
+      username = "ARIVER",
+      primaryEmail = "a@justice.gov.uk",
+    )
+    persistenceHelper.createStaff(
+      staffId = "2".toBigInteger(),
+      firstName = "Bea",
+      lastName = "Smith",
+      username = "BSMITH",
+      primaryEmail = "b@justice.gov.uk",
+    )
+
+    // When
+    val result = staffRepository.findSurnamesByStaffIds(
+      listOf("1".toBigInteger(), "2".toBigInteger(), "9999".toBigInteger()),
+    )
+
+    // Then – unmatched IDs are silently dropped by the IN clause
+    val byStaffId = result.associate { it.staffId to it.lastName }
+    byStaffId shouldBe mapOf(
+      "1".toBigInteger() to "River",
+      "2".toBigInteger() to "Smith",
+    )
+  }
+
+  @Test
+  fun `findSurnamesByStaffIds returns empty list when no staff ids match`() {
+    // Given
+    persistenceHelper.clearAllTableContent()
+
+    // When
+    val result = staffRepository.findSurnamesByStaffIds(listOf("9999".toBigInteger()))
 
     // Then
     result.shouldBeEmpty()

@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralStatusHistoryEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
+import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -66,11 +67,21 @@ class SubjectAccessRequestServiceTest {
       organisationRepository,
       staffLookupService,
     )
-    // By default resolve every username to "River" and every staff ID to null; individual
-    // tests can override. This mirrors the behaviour of a happy-path staff lookup where
-    // one staff row (surname "River") exists for the sole username seeded below.
-    every { staffLookupService.findLastNameByUsername(any()) } returns "River"
-    every { staffLookupService.findLastNameByStaffId(any()) } returns null
+    // By default resolve every username to "River" and every staff ID to an empty
+    // result; individual tests can override. This mirrors the batch-lookup contract
+    // where `resolveSurnamesByUsername` returns a map keyed by the requested
+    // usernames and `resolveSurnamesByStaffId` returns an empty map when no staff
+    // rows exist for the given IDs.
+    every { staffLookupService.resolveSurnamesByUsername(any()) } answers {
+      @Suppress("UNCHECKED_CAST")
+      val usernames = firstArg<Collection<String?>>()
+      usernames.asSequence()
+        .filterNotNull()
+        .filter { it.isNotBlank() }
+        .toSet()
+        .associateWith { "River" }
+    }
+    every { staffLookupService.resolveSurnamesByStaffId(any()) } returns emptyMap<BigInteger, String>()
   }
 
   @Test
