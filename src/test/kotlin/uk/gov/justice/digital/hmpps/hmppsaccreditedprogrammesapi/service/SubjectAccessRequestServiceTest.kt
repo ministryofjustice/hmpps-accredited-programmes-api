@@ -47,6 +47,7 @@ class SubjectAccessRequestServiceTest {
   private val referralStatusHistoryRepository: ReferralStatusHistoryRepository = mockk()
   private val staffRepository: StaffRepository = mockk()
   private val organisationRepository: OrganisationRepository = mockk()
+  private val staffLookupService: StaffLookupService = mockk()
 
   private lateinit var service: SubjectAccessRequestService
 
@@ -63,7 +64,13 @@ class SubjectAccessRequestServiceTest {
       referralStatusHistoryRepository,
       staffRepository,
       organisationRepository,
+      staffLookupService,
     )
+    // By default resolve every username to "River" and every staff ID to null; individual
+    // tests can override. This mirrors the behaviour of a happy-path staff lookup where
+    // one staff row (surname "River") exists for the sole username seeded below.
+    every { staffLookupService.findLastNameByUsername(any()) } returns "River"
+    every { staffLookupService.findLastNameByStaffId(any()) } returns null
   }
 
   @Test
@@ -194,7 +201,9 @@ class SubjectAccessRequestServiceTest {
       assertThat(staff).hasSize(1)
 
       val referral = referrals[0]
-      assertThat(referral.referrerUsername).isEqualTo("user1")
+      assertThat(referral.referrerUsername).isEqualTo("River")
+      assertThat(referral.primaryPomStaffSurname).isNull()
+      assertThat(referral.secondaryPomStaffSurname).isNull()
       assertThat(referral.hasReviewedAdditionalInformation).isNull()
 
       val participation = courseParticipation[0]
@@ -202,10 +211,12 @@ class SubjectAccessRequestServiceTest {
       assertThat(participation.otherCourseName).isEqualTo("Other course")
       assertThat(participation.outcomeStatus).isEqualTo("INCOMPLETE")
       assertThat(participation.outcomeDetail).isEqualTo("Outcome details")
+      assertThat(participation.createdByUser).isEqualTo("River")
+      assertThat(participation.updatedByUser).isEqualTo("River")
 
       val audit = auditRecords[0]
-      assertThat(audit.auditUsername).isEqualTo("user1")
-      assertThat(audit.referrerUsername).isEqualTo("user1")
+      assertThat(audit.auditUsername).isEqualTo("River")
+      assertThat(audit.referrerUsername).isEqualTo("River")
       assertThat(audit.auditAction).isEqualTo("NOMIS_SEARCH_FOR_PERSON")
 
       val course = courses[0]
@@ -225,6 +236,7 @@ class SubjectAccessRequestServiceTest {
 
       val referralStatusHistory = referralStatusHistory[0]
       assertThat(referralStatusHistory.status).isNotBlank()
+      assertThat(referralStatusHistory.username).isEqualTo("River")
 
       val staffMember = staff[0]
       assertThat(staffMember.lastName).isEqualTo("River")

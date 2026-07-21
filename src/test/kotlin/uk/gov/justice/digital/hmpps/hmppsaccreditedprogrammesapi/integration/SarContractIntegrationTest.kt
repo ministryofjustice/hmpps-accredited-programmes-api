@@ -218,7 +218,7 @@ class SarContractIntegrationTest :
       staffId = "12345".toBigInteger(),
       firstName = "John",
       lastName = "Doe",
-      username = "JOHN_DOE",
+      username = "TEST_USER",
       primaryEmail = "john.doe@test.com",
     )
   }
