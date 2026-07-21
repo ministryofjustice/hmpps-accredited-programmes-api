@@ -27,7 +27,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
-import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -45,6 +44,7 @@ class SubjectAccessRequestService(
   private val referralStatusHistoryRepository: ReferralStatusHistoryRepository,
   private val staffRepository: StaffRepository,
   private val organisationRepository: OrganisationRepository,
+  private val staffLookupService: StaffLookupService,
 
 ) : HmppsPrisonSubjectAccessRequestService {
 
@@ -109,15 +109,14 @@ class SubjectAccessRequestService(
     val hasReviewedProgrammeHistory: Boolean?,
     val additionalInformation: String?,
     val submittedOn: LocalDateTime?,
-    val primaryPomStaffId: BigInteger?,
-    val secondaryPomStaffId: BigInteger?,
+    val primaryPomStaffSurname: String?,
+    val secondaryPomStaffSurname: String?,
     val referrerOverrideReason: String?,
     val referrerUsername: String?,
     val originalReferralId: UUID?,
     val hasLdc: Boolean?,
     val hasLdcBeenOverriddenByProgrammeTeam: Boolean,
     val hasReviewedAdditionalInformation: Boolean?,
-    val deleted: Boolean,
   )
 
   data class SarCourseParticipation(
@@ -147,7 +146,7 @@ class SubjectAccessRequestService(
     val courseName: String?,
     val courseLocation: String?,
     val auditAction: String,
-    val auditUsername: String,
+    val auditUsername: String?,
     val auditDateTime: LocalDateTime,
   )
 
@@ -205,7 +204,7 @@ class SubjectAccessRequestService(
     val statusStartDate: LocalDateTime,
     val statusEndDate: LocalDateTime?,
     val durationAtThisStatus: Long?,
-    val username: String,
+    val username: String?,
   )
 
   data class SarReferralStatusReason(
@@ -248,9 +247,9 @@ class SubjectAccessRequestService(
       location = it.setting?.location,
       detail = it.detail,
       courseName = it.courseName,
-      createdByUser = it.createdByUsername,
+      createdByUser = staffLookupService.findLastNameByUsername(it.createdByUsername),
       createdDateTime = it.createdDateTime,
-      updatedByUser = it.lastModifiedByUsername,
+      updatedByUser = staffLookupService.findLastNameByUsername(it.lastModifiedByUsername),
       updatedDateTime = it.lastModifiedDateTime,
     )
   }
@@ -263,28 +262,27 @@ class SubjectAccessRequestService(
       it.hasReviewedProgrammeHistory,
       it.additionalInformation,
       it.submittedOn,
-      it.primaryPomStaffId,
-      it.secondaryPomStaffId,
+      staffLookupService.findLastNameByStaffId(it.primaryPomStaffId),
+      staffLookupService.findLastNameByStaffId(it.secondaryPomStaffId),
       it.referrerOverrideReason,
-      it.referrer.username,
+      staffLookupService.findLastNameByUsername(it.referrer.username),
       it.originalReferralId,
       it.hasLdc,
       it.hasLdcBeenOverriddenByProgrammeTeam,
       it.hasReviewedAdditionalInformation,
-      it.deleted,
     )
   }
 
   private fun List<AuditEntity>.toSarAudit(): List<SarAuditRecord> = map {
     SarAuditRecord(
       prisonNumber = it.prisonNumber,
-      referrerUsername = it.referrerUsername,
+      referrerUsername = staffLookupService.findLastNameByUsername(it.referrerUsername),
       referralStatusFrom = it.referralStatusFrom,
       referralStatusTo = it.referralStatusTo,
       courseName = it.courseName,
       courseLocation = it.courseLocation,
       auditAction = it.auditAction,
-      auditUsername = it.auditUsername,
+      auditUsername = staffLookupService.findLastNameByUsername(it.auditUsername),
       auditDateTime = it.auditDateTime,
     )
   }
@@ -350,7 +348,7 @@ class SubjectAccessRequestService(
       statusStartDate = it.statusStartDate,
       statusEndDate = it.statusEndDate,
       durationAtThisStatus = it.durationAtThisStatus,
-      username = it.username,
+      username = staffLookupService.findLastNameByUsername(it.username),
     )
   }
 

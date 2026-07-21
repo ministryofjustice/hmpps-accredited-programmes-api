@@ -12,6 +12,12 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
 
   fun findByStaffId(staffId: BigInteger): StaffEntity?
 
+  @Query("SELECT s.lastName FROM StaffEntity s WHERE s.username = :username")
+  fun findLastNameByUsername(username: String): List<String>
+
+  @Query("SELECT s.lastName FROM StaffEntity s WHERE s.staffId = :staffId")
+  fun findLastNameByStaffId(staffId: BigInteger): List<String>
+
   @Query(
     """
     SELECT DISTINCT s FROM StaffEntity s 
