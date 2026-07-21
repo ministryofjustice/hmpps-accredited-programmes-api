@@ -8,10 +8,12 @@
 -- (s.staff_id = r.primary_pom_staff_id OR s.staff_id = r.secondary_pom_staff_id)
 -- also benefits from the staff_id index.
 --
--- These indexes are intentionally non-UNIQUE. The runtime code already
--- assumes uniqueness (returns String? / StaffEntity?) and would throw
--- NonUniqueResultException if duplicates existed, but enforcing UNIQUE at
--- the DB level requires a data audit first — tracked as a follow-up.
+-- These indexes are intentionally non-UNIQUE: production data is known to
+-- contain multiple staff rows sharing the same `username` and/or `staff_id`
+-- (see APG-2492 code review). The surname-projection queries reflect this
+-- by returning List<String>; StaffLookupService picks the first result.
+-- Promoting these to UNIQUE would require a data audit + dedupe pass and
+-- is tracked as a separate follow-up.
 
 CREATE INDEX IF NOT EXISTS idx_staff_username ON staff(username);
 CREATE INDEX IF NOT EXISTS idx_staff_staff_id ON staff(staff_id);
