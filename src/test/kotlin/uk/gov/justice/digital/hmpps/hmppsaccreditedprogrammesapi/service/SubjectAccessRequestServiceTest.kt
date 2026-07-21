@@ -139,7 +139,6 @@ class SubjectAccessRequestServiceTest {
         .withCrn("X1234")
         .withProgrammePathway("HIGH_INTENSITY")
         .withPniResultJson("{ \"status\": \"accepted\",}")
-        .withOasysAssessmentId(9876L)
         .produce(),
     )
     every { personRepository.findPersonEntityByPrisonNumber(prn) } returns PersonEntity(
@@ -225,7 +224,6 @@ class SubjectAccessRequestServiceTest {
       val pniResult = pniResults[0]
       assertThat(pniResult.crn).isEqualTo("X1234")
       assertThat(pniResult.pniResultJson).isEqualTo("{ \"status\": \"accepted\",}")
-      assertThat(pniResult.oasysAssessmentId).isEqualTo(9876L)
 
       val person = person!!
       assertThat(person.prisonNumber).isEqualTo(prn)
