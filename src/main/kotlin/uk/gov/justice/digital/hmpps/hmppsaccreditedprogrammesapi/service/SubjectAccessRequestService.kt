@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
+import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -55,25 +56,39 @@ class SubjectAccessRequestService(
       afterFromDate && beforeToDate
     }
 
+    val filteredParticipations = courseParticipationRepository.getSarParticipations(prn).filter { courseParticipation ->
+      val afterFromDate = fromDate?.let { courseParticipation.createdDateTime.isAfter(it.atStartOfDay()) } ?: true
+      val beforeToDate = toDate?.let { courseParticipation.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
+      afterFromDate && beforeToDate
+    }
+
+    val auditRecords = auditRepository.getSarAuditRecords(prn)
     val referralStatusHistory = referralStatusHistoryRepository.findByPrisonNumber(prn)
     val selectedSexualOffenceDetails = filteredReferrals
       .flatMap { it.selectedSexualOffenceDetails }
       .distinctBy { it.id }
 
+    // Resolve every staff surname referenced by the SAR payload in exactly two
+    // queries (one by-username, one by-staff-id), rather than the previous
+    // per-row point-lookup pattern which produced O(N) queries per referral /
+    // course participation / audit / status-history row.
+    val staffSurnames = resolveStaffSurnames(
+      filteredReferrals,
+      filteredParticipations,
+      auditRecords,
+      referralStatusHistory,
+    )
+
     return HmppsSubjectAccessRequestContent(
       content = Content(
-        referrals = filteredReferrals.toSarReferral(),
-        courseParticipation = courseParticipationRepository.getSarParticipations(prn).filter { courseParticipation ->
-          val afterFromDate = fromDate?.let { courseParticipation.createdDateTime.isAfter(it.atStartOfDay()) } ?: true
-          val beforeToDate = toDate?.let { courseParticipation.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
-          afterFromDate && beforeToDate
-        }.toSarParticipation(),
-        auditRecords = auditRepository.getSarAuditRecords(prn).toSarAudit(),
+        referrals = filteredReferrals.toSarReferral(staffSurnames),
+        courseParticipation = filteredParticipations.toSarParticipation(staffSurnames),
+        auditRecords = auditRecords.toSarAudit(staffSurnames),
         courses = courseRepository.getSarCourses(prn).toSarCourse(),
         pniResults = pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),
         person = personRepository.findPersonEntityByPrisonNumber(prn)?.toSarPerson(),
         oasysPniResults = oasysPniResultEntityRepository.findAllByPrisonNumber(prn).toSarOasysPniResult(),
-        referralStatusHistory = referralStatusHistory.toSarReferralStatusHistory(),
+        referralStatusHistory = referralStatusHistory.toSarReferralStatusHistory(staffSurnames),
         referralStatusReasons = referralStatusHistory.mapNotNull { it.reason }.distinctBy { it.code }.toSarReferralStatusReason(),
         selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
         sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
@@ -84,6 +99,54 @@ class SubjectAccessRequestService(
       ),
 
     )
+  }
+
+  /**
+   * Pre-resolves every staff surname referenced across the four SAR entity
+   * collections that carry staff identifiers, collapsing what used to be
+   * O(rows) point-lookups into two batch queries.
+   */
+  private fun resolveStaffSurnames(
+    referrals: List<ReferralEntity>,
+    participations: List<CourseParticipationEntity>,
+    audits: List<AuditEntity>,
+    statusHistory: List<ReferralStatusHistoryEntity>,
+  ): StaffSurnames {
+    val usernames = buildSet {
+      referrals.forEach { add(it.referrer.username) }
+      participations.forEach {
+        add(it.createdByUsername)
+        it.lastModifiedByUsername?.let(::add)
+      }
+      audits.forEach {
+        it.referrerUsername?.let(::add)
+        add(it.auditUsername)
+      }
+      statusHistory.forEach { add(it.username) }
+    }
+    val staffIds = buildSet {
+      referrals.forEach {
+        it.primaryPomStaffId?.let(::add)
+        it.secondaryPomStaffId?.let(::add)
+      }
+    }
+    return StaffSurnames(
+      byUsername = staffLookupService.resolveSurnamesByUsername(usernames),
+      byStaffId = staffLookupService.resolveSurnamesByStaffId(staffIds),
+    )
+  }
+
+  /**
+   * In-memory view of the two staff-surname maps built once per SAR request.
+   * Both lookup helpers short-circuit on null so mappers can consult them
+   * uniformly regardless of whether the source column is nullable.
+   */
+  private data class StaffSurnames(
+    val byUsername: Map<String, String>,
+    val byStaffId: Map<BigInteger, String>,
+  ) {
+    fun forUsername(username: String?): String? = username?.let { byUsername[it] }
+    fun forStaffId(staffId: BigInteger?): String? = staffId?.let { byStaffId[it] }
   }
 
   data class Content(
@@ -233,7 +296,7 @@ class SubjectAccessRequestService(
     val username: String,
   )
 
-  private fun List<CourseParticipationEntity>.toSarParticipation(): List<SarCourseParticipation> = map {
+  private fun List<CourseParticipationEntity>.toSarParticipation(surnames: StaffSurnames): List<SarCourseParticipation> = map {
     SarCourseParticipation(
       prisonNumber = it.prisonNumber,
       isDraft = it.isDraft,
@@ -247,14 +310,14 @@ class SubjectAccessRequestService(
       location = it.setting?.location,
       detail = it.detail,
       courseName = it.courseName,
-      createdByUser = staffLookupService.findLastNameByUsername(it.createdByUsername),
+      createdByUser = surnames.forUsername(it.createdByUsername),
       createdDateTime = it.createdDateTime,
-      updatedByUser = staffLookupService.findLastNameByUsername(it.lastModifiedByUsername),
+      updatedByUser = surnames.forUsername(it.lastModifiedByUsername),
       updatedDateTime = it.lastModifiedDateTime,
     )
   }
 
-  private fun List<ReferralEntity>.toSarReferral(): List<SarReferral> = map {
+  private fun List<ReferralEntity>.toSarReferral(surnames: StaffSurnames): List<SarReferral> = map {
     SarReferral(
       it.prisonNumber,
       it.oasysConfirmed,
@@ -262,10 +325,10 @@ class SubjectAccessRequestService(
       it.hasReviewedProgrammeHistory,
       it.additionalInformation,
       it.submittedOn,
-      staffLookupService.findLastNameByStaffId(it.primaryPomStaffId),
-      staffLookupService.findLastNameByStaffId(it.secondaryPomStaffId),
+      surnames.forStaffId(it.primaryPomStaffId),
+      surnames.forStaffId(it.secondaryPomStaffId),
       it.referrerOverrideReason,
-      staffLookupService.findLastNameByUsername(it.referrer.username),
+      surnames.forUsername(it.referrer.username),
       it.originalReferralId,
       it.hasLdc,
       it.hasLdcBeenOverriddenByProgrammeTeam,
@@ -273,16 +336,16 @@ class SubjectAccessRequestService(
     )
   }
 
-  private fun List<AuditEntity>.toSarAudit(): List<SarAuditRecord> = map {
+  private fun List<AuditEntity>.toSarAudit(surnames: StaffSurnames): List<SarAuditRecord> = map {
     SarAuditRecord(
       prisonNumber = it.prisonNumber,
-      referrerUsername = staffLookupService.findLastNameByUsername(it.referrerUsername),
+      referrerUsername = surnames.forUsername(it.referrerUsername),
       referralStatusFrom = it.referralStatusFrom,
       referralStatusTo = it.referralStatusTo,
       courseName = it.courseName,
       courseLocation = it.courseLocation,
       auditAction = it.auditAction,
-      auditUsername = staffLookupService.findLastNameByUsername(it.auditUsername),
+      auditUsername = surnames.forUsername(it.auditUsername),
       auditDateTime = it.auditDateTime,
     )
   }
@@ -336,7 +399,7 @@ class SubjectAccessRequestService(
     )
   }
 
-  private fun List<ReferralStatusHistoryEntity>.toSarReferralStatusHistory(): List<SarReferralStatusHistoryEntity> = map {
+  private fun List<ReferralStatusHistoryEntity>.toSarReferralStatusHistory(surnames: StaffSurnames): List<SarReferralStatusHistoryEntity> = map {
     SarReferralStatusHistoryEntity(
       id = it.id,
       referralId = it.referralId,
@@ -348,7 +411,7 @@ class SubjectAccessRequestService(
       statusStartDate = it.statusStartDate,
       statusEndDate = it.statusEndDate,
       durationAtThisStatus = it.durationAtThisStatus,
-      username = staffLookupService.findLastNameByUsername(it.username),
+      username = surnames.forUsername(it.username),
     )
   }
 
