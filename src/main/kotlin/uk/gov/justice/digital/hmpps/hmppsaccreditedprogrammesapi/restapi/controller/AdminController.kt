@@ -175,11 +175,6 @@ class AdminController(
       }
     // verify that the new prisoner number exists in NOMIS
     val personSearchResponse = peopleSearchApiService.searchPeople(PeopleSearchRequest(prisonerIdentifier = prisonerNumberUpdateRequest.newPrisonerNumber))
-//    if (personSearchResponse.isEmpty() || !prisonerNamesMatch(person as PersonEntity, personSearchResponse[0])) {
-//      log.error("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS").also {
-//        throw NotFoundException("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS")
-//      }
-//    }
     if (personSearchResponse.isEmpty()) {
       log.error("New prisoner number ${prisonerNumberUpdateRequest.newPrisonerNumber} not found in NOMIS")
       throw NotFoundException("New prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} not found in NOMIS")
