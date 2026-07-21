@@ -9,11 +9,10 @@
 -- also benefits from the staff_id index.
 --
 -- These indexes are intentionally non-UNIQUE: production data is known to
--- contain multiple staff rows sharing the same `username` and/or `staff_id`
--- (see APG-2492 code review). The surname-projection queries reflect this
+-- contain multiple staff rows sharing the same `username` and/or `staff_id`. 
+-- The surname-projection queries reflect this
 -- by returning List<String>; StaffLookupService picks the first result.
--- Promoting these to UNIQUE would require a data audit + dedupe pass and
--- is tracked as a separate follow-up.
+-- Promoting these to UNIQUE would require a data audit + dedupe pass.
 
 CREATE INDEX IF NOT EXISTS idx_staff_username ON staff(username);
 CREATE INDEX IF NOT EXISTS idx_staff_staff_id ON staff(staff_id);
