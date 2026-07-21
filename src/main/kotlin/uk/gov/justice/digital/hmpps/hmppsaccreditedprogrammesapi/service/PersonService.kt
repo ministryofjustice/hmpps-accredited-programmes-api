@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.AuthorisableActionResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.ClientResult
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonApi.PrisonApiClient
@@ -17,7 +18,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exceptio
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SentenceCategoryType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SentenceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.KeyDate
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.Sentence
@@ -33,6 +37,9 @@ class PersonService(
   private val peopleSearchApiService: PeopleSearchApiService,
   private val personRepository: PersonRepository,
   private val sentenceCategoryRepository: SentenceCategoryRepository,
+  private val referralRepository: ReferralRepository,
+  private val courseParticipationRepository: CourseParticipationRepository,
+  private val pniResultRepository: PniResultRepository,
 ) {
 
   fun createOrUpdatePerson(prisonNumber: String) {
@@ -171,7 +178,6 @@ class PersonService(
       if (personEntity != null) {
         log.info("Prisoner is of interest to ACP - about to update: $prisonNumber fromUpdateEndpoint=$fromUpdateEndpoint")
         val sentenceInformation = getSentenceInformation(prisonNumber)
-        val sentenceType = determineSentenceType(sentenceInformation)
         peopleSearchApiService.getPrisoners(listOf(prisonNumber)).firstOrNull()?.let {
           updatePerson(it, personEntity, sentenceInformation)
         }
@@ -255,6 +261,35 @@ class PersonService(
     date = date,
     order = releaseDateType.order,
   )
+
+  @Transactional
+  fun updatePrisonNumberForPrisoner(newPrisonerNumber: String, removedPrisonerNumber: String) {
+    val referrals = referralRepository.findAllByPrisonNumber(removedPrisonerNumber)
+    if (referrals.isEmpty()) {
+      log.info("Merged prisoner with prisoner number $removedPrisonerNumber is not of interest")
+      return
+    }
+
+    referrals.forEach { referral ->
+      // update the prison number on the referral table
+      referral.prisonNumber = newPrisonerNumber
+      log.info("Updated prison number on referral record from $removedPrisonerNumber to $newPrisonerNumber")
+      // update the prison number on the person table
+      val person = personRepository.findPersonEntityByPrisonNumber(removedPrisonerNumber)
+      log.info("Updated prison number on person record from $removedPrisonerNumber to $newPrisonerNumber")
+      person?.prisonNumber = newPrisonerNumber
+      // update the prison number on the course participation table
+      courseParticipationRepository.findByPrisonNumber(removedPrisonerNumber).forEach {
+        it.prisonNumber = newPrisonerNumber
+        log.info("Updated prison number on course participation record from $removedPrisonerNumber to $newPrisonerNumber")
+      }
+      // update the prison number on the pni result table
+      pniResultRepository.findAllByPrisonNumber(removedPrisonerNumber).forEach {
+        it.prisonNumber = newPrisonerNumber
+        log.info("Updated prison number on pni result record from $removedPrisonerNumber to $newPrisonerNumber")
+      }
+    }
+  }
 
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)

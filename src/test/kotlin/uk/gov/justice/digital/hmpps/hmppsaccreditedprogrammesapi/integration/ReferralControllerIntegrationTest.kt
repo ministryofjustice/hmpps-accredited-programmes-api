@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.containing
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAnyOf
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -29,10 +32,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.util.UriComponentsBuilder
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.Prisoner
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.ResourceLoader
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_NAME
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.ON_HOLD_REFERRAL_SUBMITTED_COLOUR
@@ -77,14 +77,17 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.StaffDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.TransferReferralRequest
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.type.ReferralStatus
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.testutil.PrisonerFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationSettingFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.time.Year
-import java.util.*
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -119,59 +122,44 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   fun setUp() {
     persistenceHelper.clearAllTableContent()
 
-    persistenceHelper.createCourse(
-      COURSE_ID,
-      "SC",
-      COURSE_NAME,
-      "Sample description",
-      "SC++",
-      "General offence",
-    )
+    val courseEntity1 = CourseEntityFactory()
+      .withIdentifier("SC")
+      .withName(COURSE_NAME)
+      .withDescription("Sample description")
+      .withAlternateName("SC++")
+      .withAudience("General offence")
+      .withListDisplayName(COURSE_NAME)
+      .produce()
+    persistenceHelper.createCourse(courseEntity1)
+
     persistenceHelper.createOrganisation(code = "BWN", name = "BWN org")
     persistenceHelper.createOrganisation(code = "MDI", name = "MDI org")
 
     persistenceHelper.createOffering(
-      UUID.fromString("7fffcc6a-11f8-4713-be35-cf5ff1aee517"),
-      COURSE_ID,
-      "MDI",
-      "nobody-mdi@digital.justice.gov.uk",
-      "nobody2-mdi@digital.justice.gov.uk",
-      true,
+      OfferingEntityFactory()
+        .withCourse(courseEntity1)
+        .withOrganisationId("MDI")
+        .produce(),
     )
     persistenceHelper.createOffering(
-      UUID.fromString("790a2dfe-7de5-4504-bb9c-83e6e53a6537"),
-      UUID.fromString("d3abc217-75ee-46e9-a010-368f30282367"),
-      "BWN",
-      "nobody-bwn@digital.justice.gov.uk",
-      "nobody2-bwn@digital.justice.gov.uk",
-      true,
+      OfferingEntityFactory()
+        .withCourse(courseEntity1)
+        .withOrganisationId("BWN")
+        .produce(),
     )
 
-    persistenceHelper.createCourse(
-      UUID.fromString("28e47d30-30bf-4dab-a8eb-9fda3f6400e8"),
-      "CC",
-      "Custom Course",
-      "Sample description",
-      "CC",
-      "General offence",
-      intensity = CourseIntensity.MODERATE.name,
-    )
-    persistenceHelper.createCourse(
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
-      "RC",
-      "RAPID Course",
-      "Sample description",
-      "RC",
-      "General offence",
-      intensity = CourseIntensity.HIGH.name,
-    )
+    val highIntensityCourse = CourseEntityFactory()
+      .withName("RAPID Course")
+      .withIntensity(CourseIntensity.HIGH.name)
+      .withIdentifier("RC")
+      .produce()
+    persistenceHelper.createCourse(highIntensityCourse)
+
     persistenceHelper.createOffering(
-      UUID.randomUUID(),
-      UUID.fromString("1811faa6-d568-4fc4-83ce-41118b90242e"),
-      "WSI",
-      "nobody-bwn@digital.justice.gov.uk",
-      "nobody2-bwn@digital.justice.gov.uk",
-      true,
+      OfferingEntityFactory()
+        .withCourse(highIntensityCourse)
+        .withOrganisationId("WSI")
+        .produce(),
     )
   }
 
@@ -600,7 +588,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val courseParticipation = courseParticipationList[0]
     assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
     assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
-    assertThat(courseParticipation.courseId).isEqualTo(COURSE_ID)
     assertThat(courseParticipation.referralId).isEqualTo(createdReferral.id)
     assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
     assertThat(courseParticipation.outcome?.yearCompleted).isEqualTo(Year.now())
@@ -638,7 +625,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val courseParticipation = courseParticipationList[0]
     assertThat(courseParticipation.prisonNumber).isEqualTo(PRISON_NUMBER_1)
     assertThat(courseParticipation.courseName).isEqualTo(COURSE_NAME)
-    assertThat(courseParticipation.courseId).isEqualTo(COURSE_ID)
     assertThat(courseParticipation.referralId).isEqualTo(createdReferral.id)
     assertThat(courseParticipation.outcome?.status).isEqualTo(CourseStatus.COMPLETE)
     assertThat(courseParticipation.outcome?.yearStarted).isEqualTo(Year.of(2018))
@@ -1275,7 +1261,7 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   @Test
   fun `Retrieving a list of filtered referral views for an organisation should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
-    val course = getAllCourses().first()
+    val course = getAllCourses().first { it.name == "Super course" }
     val offering = getAllOfferingsForCourse(course.id).first()
     val referralCreated = createReferral(offering.id, PRISON_NUMBER_1)
     val createdReferral = getReferralById(referralCreated.id)
@@ -1304,7 +1290,6 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
           forename = PRISONER_1.firstName,
           surname = PRISONER_1.lastName,
           sentenceType = "Determinate",
-
         ),
       ).forEach { referralView ->
         actualSummary.id shouldBe referralView.id
@@ -2174,7 +2159,8 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `update all people`() {
+  fun `should update all person records`() {
+    // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
 
     val nomsNumber = "C6666DD"
@@ -2187,25 +2173,23 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     referralViewBefore?.forename?.shouldBeEqual("JOHN")
     referralViewBefore?.surname?.shouldBeEqual("SMITH")
 
-    val results = ResourceLoader.file<List<Prisoner>>("prison-search-results")
-    val result = results[0]
-    result.lastName = "changed"
-    result.firstName = "name"
+    val prisoner = PrisonerFactory().withLastName("changed").withFirstName("name").produce()
     wiremockServer.stubFor(
-      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
-        WireMock.containing(
+      post(urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
+        containing(
           nomsNumber,
         ),
-      )
-        .willReturn(
-          WireMock.aResponse()
-            .withHeader("Content-Type", "application/json")
-            .withBody(objectMapper.writeValueAsString(listOf(result))),
-        ),
+      ).willReturn(
+        aResponse()
+          .withHeader("Content-Type", "application/json")
+          .withBody(objectMapper.writeValueAsString(listOf(prisoner))),
+      ),
     )
 
+    // When
     updateAllPeople()
 
+    // Then
     await untilCallTo {
       personRepository.findAll().firstOrNull { it.prisonNumber == nomsNumber }
     } matches { it?.surname == "changed" }
@@ -2223,18 +2207,19 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
     val nomsNumber = "A8610DY"
 
-    val results = ResourceLoader.file<List<Prisoner>>("prison-search-results_A8610DY")
+    val prisoner = PrisonerFactory().withPrisonerNumber("A8610DY").produce()
     wiremockServer.stubFor(
-      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
-        WireMock.containing(
-          nomsNumber,
-        ),
-      )
+      post(urlEqualTo("/prisoner-search/prisoner-numbers"))
+        .withRequestBody(
+          containing(
+            nomsNumber,
+          ),
+        )
         .willReturn(
-          WireMock.aResponse()
+          aResponse()
             .withHeader("Content-Type", "application/json")
             .withBody(
-              objectMapper.writeValueAsString(results),
+              objectMapper.writeValueAsString(listOf(prisoner)),
             ),
         ),
     )
@@ -2243,19 +2228,21 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     val offering = getAllOfferingsForCourse(course.id).first()
     createReferral(offering.id, nomsNumber)
 
-    val result = results[0]
-    result.lastName = "changed"
-    result.firstName = "name"
+    val updatedPrisoner = PrisonerFactory()
+      .withLastName("changed")
+      .withFirstName("name")
+      .withPrisonerNumber("A8610DY")
+      .produce()
     wiremockServer.stubFor(
-      WireMock.post(WireMock.urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
-        WireMock.containing(
+      post(urlEqualTo("/prisoner-search/prisoner-numbers")).withRequestBody(
+        containing(
           nomsNumber,
         ),
       )
         .willReturn(
-          WireMock.aResponse()
+          aResponse()
             .withHeader("Content-Type", "application/json")
-            .withBody(objectMapper.writeValueAsString(listOf(result))),
+            .withBody(objectMapper.writeValueAsString(listOf(updatedPrisoner))),
         ),
     )
 

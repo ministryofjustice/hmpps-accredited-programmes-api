@@ -128,6 +128,13 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       username = "TEST_USER",
       status = "REFERRAL_STARTED",
     )
+    persistenceHelper.createStaff(
+      staffId = staffId,
+      firstName = "John",
+      lastName = "Doe",
+      username = "TEST_USER",
+      primaryEmail = "john.doe@test.com",
+    )
     // When
     val result = subjectAccessRequestService.getPrisonContentFor(prisonNumber, LocalDate.now(), LocalDate.now().plusDays(1))
 
@@ -147,7 +154,9 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
 
     with(content.referrals[0]) {
       assertThat(prisonerNumber).isEqualTo(prisonNumber)
-      assertThat(referrerUsername).isEqualTo("TEST_USER")
+      assertThat(referrerUsername).isEqualTo("Doe")
+      assertThat(primaryPomStaffSurname).isEqualTo("Doe")
+      assertThat(secondaryPomStaffSurname).isNull()
       assertThat(hasLdc).isTrue()
       assertThat(hasLdcBeenOverriddenByProgrammeTeam).isTrue()
     }
@@ -161,8 +170,8 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     }
 
     with(content.auditRecords[0]) {
-      assertThat(auditUsername).isEqualTo("TEST_USER")
-      assertThat(referrerUsername).isEqualTo("TEST_USER")
+      assertThat(auditUsername).isEqualTo("Doe")
+      assertThat(referrerUsername).isEqualTo("Doe")
       assertThat(prisonNumber).isEqualTo("A1234BC")
     }
 
