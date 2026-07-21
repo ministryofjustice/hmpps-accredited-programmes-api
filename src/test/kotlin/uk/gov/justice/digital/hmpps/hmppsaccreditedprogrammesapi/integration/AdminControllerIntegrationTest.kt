@@ -14,7 +14,6 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.PeopleSearchResponse
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.config.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_ID
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.COURSE_NAME
@@ -26,7 +25,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.R
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.PersonService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.ReferralService
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.StaffService
-import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.testutil.PeopleSearchResponseFactory
 import java.util.UUID
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -166,6 +165,41 @@ class AdminControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should return http 400 when prisoner name does not match returned results from Nomis`() {
+    // Given
+    val newPrisonerNumber = "A1234DD"
+    val referral = createReferral(offeringId1)
+    assertThat(referral.prisonNumber).isEqualTo(PRISON_NUMBER_1)
+
+    val matchedPrisoners = listOf(
+      PeopleSearchResponseFactory()
+        .withPrisonerNumber(newPrisonerNumber)
+        .withFirstName("John")
+        .withLastName("Doe")
+        .produce(),
+    )
+    wiremockServer.stubFor(
+      post(urlEqualTo("/prisoner-search/match-prisoners"))
+        .willReturn(
+          aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody(objectMapper.writeValueAsString(matchedPrisoners)),
+        ),
+    )
+
+    // When & Then
+    performRequestAndExpectStatusWithBody(
+      httpMethod = HttpMethod.PUT,
+      uri = "/admin/person/update-prisoner-number",
+      body = PrisonerNumberUpdateRequest(
+        currentPrisonerNumber = PRISON_NUMBER_1,
+        newPrisonerNumber = newPrisonerNumber,
+      ),
+      expectedResponseStatus = HttpStatus.BAD_REQUEST.value(),
+    )
+  }
+
+  @Test
   fun `should update prisoner number on referral with new prisoner number for known person`() {
     // Given
     val newPrisonerNumber = "A1234DD"
@@ -173,25 +207,9 @@ class AdminControllerIntegrationTest : IntegrationTestBase() {
     assertThat(referral.prisonNumber).isEqualTo(PRISON_NUMBER_1)
 
     val matchedPrisoners = listOf(
-      PeopleSearchResponse(
-        bookingId = null,
-        prisonerNumber = newPrisonerNumber,
-        firstName = "John",
-        lastName = "Smith",
-        prisonId = "MDI",
-        gender = "Male",
-        ethnicity = "White",
-        dateOfBirth = LocalDate.of(1980, 1, 1),
-        prisonName = "Moorland (HMP & YOI)",
-        conditionalReleaseDate = LocalDate.of(2023, 1, 1),
-        sentenceStartDate = LocalDate.of(2022, 1, 1),
-        sentenceExpiryDate = LocalDate.of(2024, 1, 1),
-        religion = null,
-        paroleEligibilityDate = LocalDate.of(2023, 1, 1),
-        indeterminateSentence = false,
-        homeDetentionCurfewEligibilityDate = null,
-        tariffDate = null,
-      ),
+      PeopleSearchResponseFactory()
+        .withPrisonerNumber(newPrisonerNumber)
+        .produce(),
     )
     wiremockServer.stubFor(
       post(urlEqualTo("/prisoner-search/match-prisoners"))

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.prisonerSearchApi.model.PeopleSearchResponse
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.BusinessException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.NotFoundException
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
@@ -174,10 +175,18 @@ class AdminController(
       }
     // verify that the new prisoner number exists in NOMIS
     val personSearchResponse = peopleSearchApiService.searchPeople(PeopleSearchRequest(prisonerIdentifier = prisonerNumberUpdateRequest.newPrisonerNumber))
-    if (personSearchResponse.isEmpty() || !prisonerNamesMatch(person as PersonEntity, personSearchResponse[0])) {
-      log.error("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS").also {
-        throw NotFoundException("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS")
-      }
+//    if (personSearchResponse.isEmpty() || !prisonerNamesMatch(person as PersonEntity, personSearchResponse[0])) {
+//      log.error("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS").also {
+//        throw NotFoundException("New Prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} does not exist in NOMIS")
+//      }
+//    }
+    if (personSearchResponse.isEmpty()) {
+      log.error("New prisoner number ${prisonerNumberUpdateRequest.newPrisonerNumber} not found in NOMIS")
+      throw NotFoundException("New prisoner number: ${prisonerNumberUpdateRequest.newPrisonerNumber} not found in NOMIS")
+    }
+    if (!prisonerNamesMatch(person as PersonEntity, personSearchResponse[0])) {
+      log.error("Prisoner names do not match for new number ${prisonerNumberUpdateRequest.newPrisonerNumber}")
+      throw BusinessException("Prisoner names do not match between ACP and NOMIS for prisoner number ${prisonerNumberUpdateRequest.newPrisonerNumber}")
     }
     personService.updatePrisonNumberForPrisoner(prisonerNumberUpdateRequest.newPrisonerNumber, prisonerNumberUpdateRequest.currentPrisonerNumber)
     log.info("SUCCESS - Prisoner number updated from ${prisonerNumberUpdateRequest.currentPrisonerNumber} to ${prisonerNumberUpdateRequest.newPrisonerNumber}")
