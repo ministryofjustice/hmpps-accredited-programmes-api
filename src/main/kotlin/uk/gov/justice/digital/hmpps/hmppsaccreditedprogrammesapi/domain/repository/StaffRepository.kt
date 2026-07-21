@@ -30,22 +30,27 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
 
   fun findByStaffId(staffId: BigInteger): StaffEntity?
 
-  @Query("SELECT s.lastName FROM StaffEntity s WHERE s.username = :username")
+  @Query("SELECT s.lastName FROM StaffEntity s WHERE s.username = :username ORDER BY s.id")
   fun findLastNameByUsername(username: String): List<String>
 
-  @Query("SELECT s.lastName FROM StaffEntity s WHERE s.staffId = :staffId")
+  @Query("SELECT s.lastName FROM StaffEntity s WHERE s.staffId = :staffId ORDER BY s.id")
   fun findLastNameByStaffId(staffId: BigInteger): List<String>
 
   /**
    * Batch equivalent of [findLastNameByUsername]: returns one row per matched
    * staff record so callers can group into a `username -> lastName` map in a
    * single query. Uses idx_staff_username (see V144).
+   *
+   * `ORDER BY s.id` guarantees that when a username has more than one matching
+   * staff row, callers grouping by `username` and picking `.first()` always
+   * select the same row across repeated queries.
    */
   @Query(
     """
     SELECT s.username AS username, s.lastName AS lastName
     FROM StaffEntity s
     WHERE s.username IN :usernames
+    ORDER BY s.username, s.id
     """,
   )
   fun findSurnamesByUsernames(usernames: Collection<String>): List<UsernameSurnameProjection>
@@ -54,12 +59,17 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
    * Batch equivalent of [findLastNameByStaffId]: returns one row per matched
    * staff record so callers can group into a `staffId -> lastName` map in a
    * single query. Uses idx_staff_staff_id (see V144).
+   *
+   * `ORDER BY s.id` guarantees that when a staff id has more than one matching
+   * staff row, callers grouping by `staffId` and picking `.first()` always
+   * select the same row across repeated queries.
    */
   @Query(
     """
     SELECT s.staffId AS staffId, s.lastName AS lastName
     FROM StaffEntity s
     WHERE s.staffId IN :staffIds
+    ORDER BY s.staffId, s.id
     """,
   )
   fun findSurnamesByStaffIds(staffIds: Collection<BigInteger>): List<StaffIdSurnameProjection>

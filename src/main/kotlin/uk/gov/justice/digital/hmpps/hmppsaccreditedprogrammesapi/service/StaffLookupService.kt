@@ -38,7 +38,8 @@ class StaffLookupService(
    * Nulls and blank strings are filtered out before hitting the database; the
    * returned map only contains entries for usernames with at least one matching
    * staff row. When a username maps to multiple staff rows (which the schema
-   * permits – see V144 migration notes) the first row is retained and a WARN is
+   * permits – see V144 migration notes) the first row is retained (ordered by
+   * `staff.id` in JPQL for stability across repeated calls) and a WARN is
    * logged so duplicates remain visible in production telemetry.
    */
   fun resolveSurnamesByUsername(usernames: Collection<String?>): Map<String, String> {
@@ -62,7 +63,8 @@ class StaffLookupService(
    *
    * Nulls are filtered out before hitting the database; the returned map only
    * contains entries for staff IDs with at least one matching staff row. When a
-   * staff ID maps to multiple rows the first row is retained and a WARN is
+   * staff ID maps to multiple rows the first row is retained (ordered by
+   * `staff.id` in JPQL for stability across repeated calls) and a WARN is
    * logged so duplicates remain visible in production telemetry.
    */
   fun resolveSurnamesByStaffId(staffIds: Collection<BigInteger?>): Map<BigInteger, String> {
