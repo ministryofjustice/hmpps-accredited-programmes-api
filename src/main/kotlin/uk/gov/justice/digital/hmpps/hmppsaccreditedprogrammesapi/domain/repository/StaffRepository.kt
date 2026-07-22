@@ -56,9 +56,10 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
   fun findSurnamesByUsernames(usernames: Collection<String>): List<UsernameSurnameProjection>
 
   /**
-   * Batch equivalent of [findLastNameByStaffId]: returns one row per matched
-   * staff record so callers can group into a `staffId -> lastName` map in a
-   * single query. Uses idx_staff_staff_id (see V144).
+   * Batch equivalent of [findLastNameByStaffId]: for each staff record whose
+   * `staffId` appears in `staffIds`, emits one projection row so callers can
+   * group by `staffId` and resolve surnames in a single query. Uses
+   * `idx_staff_staff_id` (see V144).
    *
    * `ORDER BY s.id` guarantees that when a staff id has more than one matching
    * staff row, callers grouping by `staffId` and picking `.first()` always
