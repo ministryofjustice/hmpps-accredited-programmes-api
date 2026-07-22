@@ -45,4 +45,10 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
     """,
   )
   fun findByIdWithHspDetails(@Param("id") id: UUID): Optional<ReferralEntity>
+
+  @Query(
+    value = "SELECT * FROM referral WHERE prison_number = :prisonNumber",
+    nativeQuery = true,
+  )
+  fun findAllByPrisonNumberIncludingDeleted(@Param("prisonNumber") prisonNumber: String): List<ReferralEntity>
 }

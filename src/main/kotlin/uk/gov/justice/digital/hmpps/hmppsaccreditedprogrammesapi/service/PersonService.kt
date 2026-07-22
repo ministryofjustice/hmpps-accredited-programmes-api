@@ -264,7 +264,7 @@ class PersonService(
 
   @Transactional
   fun updatePrisonNumberForPrisoner(newPrisonerNumber: String, removedPrisonerNumber: String) {
-    val referrals = referralRepository.findAllByPrisonNumber(removedPrisonerNumber)
+    val referrals = referralRepository.findAllByPrisonNumberIncludingDeleted(removedPrisonerNumber)
     if (referrals.isEmpty()) {
       log.info("Merged prisoner with prisoner number $removedPrisonerNumber is not of interest")
       return
