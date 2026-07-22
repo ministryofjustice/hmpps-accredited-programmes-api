@@ -31,7 +31,10 @@ Accessing these endpoints requires a personal HMPPS Auth production client with 
 
 ### Finding the new prisoner number
 
-The people search is used to search for a person in NOMIS using the `forename` and `surname` held in the `person` DB table. It returns a list of people that match the search criteria and discretion should be used to select the correct person and the new prisoner number when multiple results are returned.
+If you have nDelius access the CRN number held on the `pni_result.crn` column may be used to search for the correct person. After a prisoner merge in Nomis,
+the Case Summary screen may have the previous Noms number in the "Additional Identifiers" section.
+
+Alternatively the people search can be used to search for a person in NOMIS using the `forename` and `surname` held in the `person` DB table. It returns a list of people that match the search criteria and discretion should be used to select the correct person. 
 
 - [POST /people/search](../../src/main/kotlin/uk/gov/justice/digital/hmpps/hmppsaccreditedprogrammesapi/restapi/controller/PeopleController.kt)
 
