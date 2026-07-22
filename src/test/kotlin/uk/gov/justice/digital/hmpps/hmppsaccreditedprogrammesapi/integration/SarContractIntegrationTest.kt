@@ -54,7 +54,7 @@ class SarContractIntegrationTest :
       expectedApiResponsePath = "/sar/sar-api-response.json",
       expectedRenderResultPath = "/sar/sar-expected-render-result.html",
       attachmentsExpected = false,
-      expectedFlywaySchemaVersion = "143",
+      expectedFlywaySchemaVersion = "144",
       expectedJpaEntitySchemaPath = "/sar/entity-schema.json",
     )
   }
