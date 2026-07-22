@@ -168,14 +168,120 @@ Any of the three paths ends the same way: a single PRN pasted into the
 canonical retest identifier for every check in category **A** and for
 the manual smoke test in **D2**.
 
+#### Update — 2026-07-22 investigation outcome
+
+Dhruv pointed at the [`hmpps-community-payback-api`](https://github.com/ministryofjustice/hmpps-community-payback-api)
+repo. Investigation ([cloned locally at `../hmpps-community-payback-api`](../../../hmpps-community-payback-api)):
+
+- CP is a **peer SAR provider** (their own `/subject-access-request?crn=<CRN>`
+  endpoint returning `content.eteCourseCompletionEvents[…]`), not a
+  source that feeds ACP.
+- CP's schema (`ete_course_completion_events`, `appointment_events`)
+  holds Education/Training/Employment data for people on community
+  sentences, keyed by CRN with no PRN column and no CRN↔PRN mapping.
+- **ACP's `course_participation` records are populated in-house**
+  (created by probation practitioners via the ACP UI — see the
+  `created_by_username` / `last_modified_by_username` free-text
+  columns), not ingested from CP.
+- CP's canonical fixture CRN is `X995728` but it's only present in
+  their own test resources and won't correspond to any ACP data.
+
+**Conclusion:** Dhruv's redirect is architecturally accurate ("we
+handle course-completion for community sentences") but doesn't unblock
+the retest. Pivot to querying the ACP dev DB directly to find a PRN
+that meets the required data shape.
+
+#### Path 1 (preferred) — query the ACP dev DB directly
+
+Port-forward to the dev DB via [`doc/how-to/access-dev-database-remotely.md`](../how-to/access-dev-database-remotely.md).
+
+Must-have candidate query (finds every PRN meeting the mandatory
+criteria in one hit):
+
+```sql
+SELECT prison_number,
+       COUNT(*)                             AS cp_count,
+       COUNT(DISTINCT source)               AS source_variety,
+       COUNT(DISTINCT outcome_status)       AS outcome_variety,
+       array_agg(DISTINCT source)           AS sources_seen,
+       array_agg(DISTINCT outcome_status)   AS outcomes_seen
+FROM   course_participation
+GROUP  BY prison_number
+HAVING COUNT(*) > 1
+   AND COUNT(DISTINCT source) > 1
+   AND COUNT(DISTINCT outcome_status) > 1
+ORDER  BY cp_count DESC
+LIMIT  20;
+```
+
+For each candidate PRN, cross-check the nice-to-haves (replace
+`:prn` with the value from the query above):
+
+```sql
+SELECT (SELECT COUNT(*)
+        FROM   pni_result
+        WHERE  prison_number = :prn)                     AS pni_rows,
+       (SELECT COUNT(*)
+        FROM   oasys_pni_result
+        WHERE  prison_number = :prn)                     AS oasys_pni_rows,
+       (SELECT COUNT(*)
+        FROM   referral
+        WHERE  prison_number = :prn)                     AS referral_rows,
+       (SELECT COUNT(*)
+        FROM   referral
+        WHERE  prison_number = :prn
+          AND  original_referral_id IS NOT NULL)         AS refs_with_original,
+       (SELECT COUNT(*)
+        FROM   selected_sexual_offence_details sod
+        JOIN   referral r ON sod.referral_id = r.id
+        WHERE  r.prison_number = :prn)                   AS sexual_offence_rows;
+```
+
+A PRN that returns non-zero counts on all six columns is the retest
+candidate — and it doubles for APG-2493 validation (the
+`refs_with_original` > 0 ticks that nice-to-have).
+
+> ⚠️ **Caveat:** dev DB row counts are typically thin. If no PRN meets
+> every criterion, fall back to Path 2.
+
+#### Path 2 (fallback) — seed a synthetic PRN in dev
+
+Non-destructive: pick an existing test PRN (e.g. `A1234AA` — already
+present in ACP test fixtures) and INSERT the missing rows to satisfy
+the criteria. Mirror the authoring pattern already used in
+`src/test/kotlin/.../common/config/PersistenceHelper.kt`
+(`createStaff`, `createAuditRecord` etc. show the shape of the raw
+INSERTs).
+
+Minimum seed for the must-haves:
+
+```sql
+-- Assumes a referral for prison_number = 'A1234AA' already exists
+-- (adjust :referral_id / :subject_prn accordingly)
+INSERT INTO course_participation (
+    course_participation_id, referral_id, prison_number, course_name,
+    other_course_name, source, setting_type, outcome_status,
+    outcome_detail, created_by_username, created_date_time,
+    last_modified_by_username, last_modified_date_time, is_draft
+) VALUES
+    (gen_random_uuid(), :referral_id, 'A1234AA', 'Building Choices', NULL,
+     'COMMUNITY', 'COMMUNITY', 'COMPLETE', 'Completed successfully',
+     'test-user', now(), 'test-user', now(), false),
+    (gen_random_uuid(), :referral_id, 'A1234AA', 'Anger Management', NULL,
+     'CUSTODY',   'CUSTODY',   'INCOMPLETE', 'Did not finish',
+     'test-user', now(), 'test-user', now(), false);
+```
+
+Record the seed SQL under `## Results` below so the retest is
+reproducible.
+
 ### Results
 
 _(To be filled in as checks are executed.)_
 
-- **Retest PRN:** _tbc — awaiting Dhruv / Community Campus_
-- Source (CRN provided → PRN resolved via prisoner-search? direct
-  PRN? seeder run?): _tbc_
-- Date PRN provided: _tbc_
+- **Retest PRN:** _tbc — Path 1 dev-DB query pending; Path 2 seed as fallback_
+- Source (Path 1 SELECT / Path 2 seed / other): _tbc_
+- Date PRN captured: _tbc_
 - E2 duplicate baseline count (from preprod staff table): _tbc_
 - B1 staff-query count observed for this PRN: _tbc_
 - B2 p95 latency delta vs pre-APG-2492 baseline: _tbc_
