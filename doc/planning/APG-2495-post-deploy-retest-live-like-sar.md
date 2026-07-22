@@ -117,13 +117,78 @@ Even if all checks pass, capture and paste into the ticket:
 5. A short "signed off by Ops" note once D2 has been walked through
    with someone from OSAR.
 
+## Test data
+
+The whole retest hinges on having a **known-good PRN in dev** whose data
+exercises every SAR section end-to-end. Empty sections render as "No
+Data Held" via `optionalValue` and are functionally useless for
+regression coverage.
+
+### Required data shape for the retest PRN
+
+**Must-have** on `course_participation`:
+- more than one row for the PRN
+- a mix of `source = COMMUNITY` and `source = CUSTODY`
+- a mix of `outcome_status` — at least one `COMPLETED` and one
+  `INCOMPLETE`
+
+**Nice-to-have** for the same person so the other SAR sections aren't
+empty:
+- a populated `pni_result` row
+- an entry in `oasys_pni_result`
+- an entry in `sexual_offence_details` (via
+  `selected_sexual_offence_details` on a referral)
+- multiple referrals so `referrer` / `primaryPomStaffId` /
+  `secondaryPomStaffId` all resolve to real staff surnames (this is
+  what the APG-2492 changes are being validated against)
+- at least one referral whose `originalReferralId` is non-null (useful
+  once APG-2493 lands — same PRN can be re-used to validate the
+  enriched original-referral block later)
+
+### Sourcing the PRN
+
+`course_participation` data is owned by the Community Campus team. As
+of 2026-07-22 the working thread is with:
+
+- **Kath Cooper** (initial contact via Steve)
+- **Marcus** (ndelius / Community team — pointed us at Community Campus)
+- **Dhruv Patel** (Community Campus — took over the request)
+
+Community Campus keys their datasets by **CRN**, not PRN. The bridging
+step is either:
+
+1. Dhruv shares a CRN with the required shape; we map it to a PRN via
+   prisoner-search on our side.
+2. Dhruv shares the PRN directly if his team have already resolved it.
+3. Community Campus points at a dev-DB seeder / SQL we can run
+   ourselves.
+
+Any of the three paths ends the same way: a single PRN pasted into the
+`## Results` section of this note (see below), which then becomes the
+canonical retest identifier for every check in category **A** and for
+the manual smoke test in **D2**.
+
+### Results
+
+_(To be filled in as checks are executed.)_
+
+- **Retest PRN:** _tbc — awaiting Dhruv / Community Campus_
+- Source (CRN provided → PRN resolved via prisoner-search? direct
+  PRN? seeder run?): _tbc_
+- Date PRN provided: _tbc_
+- E2 duplicate baseline count (from preprod staff table): _tbc_
+- B1 staff-query count observed for this PRN: _tbc_
+- B2 p95 latency delta vs pre-APG-2492 baseline: _tbc_
+- C1 WARN count in observation window: _tbc_
+
 ## Deliverables
 
 This is a **testing-only ticket** — no production code change lives
 on this branch. Only artefacts:
 
 - `doc/planning/APG-2495-post-deploy-retest-live-like-sar.md` (this
-  file), which grows a `## Results` section as checks are ticked off.
+  file), whose `## Test data → Results` section is filled in as checks
+  are ticked off.
 - Attach captured screenshots / query logs to the Jira ticket.
 - Close the ticket only when every exit criterion above is met.
 
@@ -132,4 +197,3 @@ on this branch. Only artefacts:
 - Zero lines of production code
 - ~2 hours end-to-end (dev checks: 30 min; preprod checks: 1h; write-up
   and screenshots: 30 min)
-
