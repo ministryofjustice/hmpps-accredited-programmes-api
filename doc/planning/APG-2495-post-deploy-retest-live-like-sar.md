@@ -276,11 +276,27 @@ reproducible.
 
 ### Results
 
-_(To be filled in as checks are executed.)_
+_(Updated as checks are executed.)_
 
-- **Retest PRN:** _tbc — Path 1 dev-DB query pending; Path 2 seed as fallback_
-- Source (Path 1 SELECT / Path 2 seed / other): _tbc_
-- Date PRN captured: _tbc_
+- **Retest PRN:** `A8610DY`
+- Source (Path 1 SELECT / Path 2 seed / other): **Path 1** — ACP dev DB
+  `course_participation` must-have candidate query (see above), scored
+  against the fixed `type`-based variety filter. Sole PRN in the top 20
+  with `type_variety = 2` (real COMMUNITY + CUSTODY mix); all four
+  others were CUSTODY-only.
+- Date PRN captured: 2026-07-23
+- Retest PRN data-shape snapshot at capture time:
+
+  | Metric | Value | Requirement |
+  |---|---|---|
+  | `course_participation` rows | 11 | > 1 ✅ |
+  | Distinct `type` values | 2 (`COMMUNITY`, `CUSTODY`; plus one legacy `null`) | mix ✅ |
+  | Distinct `outcome_status` values | `COMPLETE`, `INCOMPLETE` (plus one legacy `null`) | mix ✅ |
+  | `pni_result` rows | 185 | > 0 ✅ |
+  | `referral` rows | 199 | multiple ✅ |
+  | Referrals with `original_referral_id IS NOT NULL` | 7 | > 0 ✅ (double-serves APG-2493) |
+  | `selected_sexual_offence_details` rows (via referral join) | 12 | > 0 ✅ |
+
 - E2 duplicate baseline count (from preprod staff table): _tbc_
 - B1 staff-query count observed for this PRN: _tbc_
 - B2 p95 latency delta vs pre-APG-2492 baseline: _tbc_
