@@ -93,12 +93,26 @@ class SubjectAccessRequestService(
         selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
         sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
         staff = staffRepository.findByPrisonNumber(prn).map { it.toSarStaff() }.distinctBy { it.username },
-        organisations = filteredReferrals.mapNotNull { it.offering?.organisationId }
-          .distinct()
-          .mapNotNull { organisationRepository.findOrganisationEntityByCode(it)?.toSarOrganisation() },
+        organisations = resolveSarOrganisations(filteredReferrals),
       ),
 
     )
+  }
+
+  /**
+   * Resolves the [SarOrganisation] list for the SAR content payload in a single
+   * `WHERE code IN (?)` query rather than the previous O(N) per-code point
+   * lookup. Preserves the previous behaviour exactly:
+   *  - order follows the first-appearance order of `organisationId` across
+   *    [filteredReferrals] (kept via `distinct()` on the ordered list);
+   *  - codes with no matching organisation row are silently dropped, matching
+   *    the previous `mapNotNull { ... findOrganisationEntityByCode(it) }`.
+   */
+  private fun resolveSarOrganisations(filteredReferrals: List<ReferralEntity>): List<SarOrganisation> {
+    val codes = filteredReferrals.mapNotNull { it.offering?.organisationId }.distinct()
+    if (codes.isEmpty()) return emptyList()
+    val byCode = organisationRepository.findAllByCodeIn(codes).associateBy { it.code }
+    return codes.mapNotNull { byCode[it]?.toSarOrganisation() }
   }
 
   /**

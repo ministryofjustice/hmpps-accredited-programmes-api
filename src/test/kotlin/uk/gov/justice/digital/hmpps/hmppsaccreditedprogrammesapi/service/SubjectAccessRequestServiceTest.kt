@@ -185,10 +185,12 @@ class SubjectAccessRequestServiceTest {
         .withUsername("ARIVER")
         .produce(),
     )
-    every { organisationRepository.findOrganisationEntityByCode("MDI") } returns OrganisationEntityFactory()
-      .withCode("MDI")
-      .withName("HMP Moorland")
-      .produce()
+    every { organisationRepository.findAllByCodeIn(listOf("MDI")) } returns listOf(
+      OrganisationEntityFactory()
+        .withCode("MDI")
+        .withName("HMP Moorland")
+        .produce(),
+    )
 
     // When
     val result = service.getPrisonContentFor(prn, fromDate, toDate)
