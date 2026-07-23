@@ -128,14 +128,16 @@ regression coverage.
 
 **Must-have** on `course_participation`:
 - more than one row for the PRN
-- a mix of `source = COMMUNITY` and `source = CUSTODY`
-- a mix of `outcome_status` — at least one `COMPLETED` and one
+- a mix of `type = COMMUNITY` and `type = CUSTODY` (the controlled
+  enum is `type`, renamed from `setting` in V18; `source` is a
+  free-text audit column — practitioner comments, usernames, etc. —
+  and is *not* the COMMUNITY/CUSTODY discriminator)
+- a mix of `outcome_status` — at least one `COMPLETE` and one
   `INCOMPLETE`
 
 **Nice-to-have** for the same person so the other SAR sections aren't
 empty:
 - a populated `pni_result` row
-- an entry in `oasys_pni_result`
 - an entry in `sexual_offence_details` (via
   `selected_sexual_offence_details` on a referral)
 - multiple referrals so `referrer` / `primaryPomStaffId` /
@@ -201,14 +203,14 @@ criteria in one hit):
 ```sql
 SELECT prison_number,
        COUNT(*)                             AS cp_count,
-       COUNT(DISTINCT source)               AS source_variety,
+       COUNT(DISTINCT type)                 AS type_variety,
        COUNT(DISTINCT outcome_status)       AS outcome_variety,
-       array_agg(DISTINCT source)           AS sources_seen,
+       array_agg(DISTINCT type)             AS types_seen,
        array_agg(DISTINCT outcome_status)   AS outcomes_seen
 FROM   course_participation
 GROUP  BY prison_number
 HAVING COUNT(*) > 1
-   AND COUNT(DISTINCT source) > 1
+   AND COUNT(DISTINCT type) > 1
    AND COUNT(DISTINCT outcome_status) > 1
 ORDER  BY cp_count DESC
 LIMIT  20;
@@ -222,9 +224,6 @@ SELECT (SELECT COUNT(*)
         FROM   pni_result
         WHERE  prison_number = :prn)                     AS pni_rows,
        (SELECT COUNT(*)
-        FROM   oasys_pni_result
-        WHERE  prison_number = :prn)                     AS oasys_pni_rows,
-       (SELECT COUNT(*)
         FROM   referral
         WHERE  prison_number = :prn)                     AS referral_rows,
        (SELECT COUNT(*)
@@ -233,11 +232,11 @@ SELECT (SELECT COUNT(*)
           AND  original_referral_id IS NOT NULL)         AS refs_with_original,
        (SELECT COUNT(*)
         FROM   selected_sexual_offence_details sod
-        JOIN   referral r ON sod.referral_id = r.id
+        JOIN   referral r ON sod.referral_id = r.referral_id
         WHERE  r.prison_number = :prn)                   AS sexual_offence_rows;
 ```
 
-A PRN that returns non-zero counts on all six columns is the retest
+A PRN that returns non-zero counts on all four columns is the retest
 candidate — and it doubles for APG-2493 validation (the
 `refs_with_original` > 0 ticks that nice-to-have).
 
@@ -260,15 +259,15 @@ Minimum seed for the must-haves:
 -- (adjust :referral_id / :subject_prn accordingly)
 INSERT INTO course_participation (
     course_participation_id, referral_id, prison_number, course_name,
-    other_course_name, source, setting_type, outcome_status,
+    other_course_name, source, type, outcome_status,
     outcome_detail, created_by_username, created_date_time,
     last_modified_by_username, last_modified_date_time, is_draft
 ) VALUES
     (gen_random_uuid(), :referral_id, 'A1234AA', 'Building Choices', NULL,
-     'COMMUNITY', 'COMMUNITY', 'COMPLETE', 'Completed successfully',
+     'seed-community', 'COMMUNITY', 'COMPLETE', 'Completed successfully',
      'test-user', now(), 'test-user', now(), false),
     (gen_random_uuid(), :referral_id, 'A1234AA', 'Anger Management', NULL,
-     'CUSTODY',   'CUSTODY',   'INCOMPLETE', 'Did not finish',
+     'seed-custody',   'CUSTODY',   'INCOMPLETE', 'Did not finish',
      'test-user', now(), 'test-user', now(), false);
 ```
 
