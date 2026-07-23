@@ -301,6 +301,9 @@ _(Updated as checks are executed.)_
 - B1 staff-query count observed for this PRN: **✅ 3** (proven via integration test — see below)
 - B2 p95 latency delta vs pre-APG-2492 baseline: _parked with trigger — no organic SAR traffic on preprod; awaits HAAR-5793 + synthetic-load re-run (see B2 section below)_
 - C1 WARN count in observation window: **✅ 0** (over the 20h+ since deploy; matches E2's zero-duplicate calibration — see C1 section below)
+- A2 surnames-in-every-identifier-field (live dev): **✅ pass** — see A2 section
+- A3 cross-section surname consistency (live dev): **✅ pass** — see A3 section
+- A5 statusHistory renders surnames (live dev): **✅ pass** — see A5 section
 
 #### A1 — subject with no referrals
 
@@ -357,6 +360,121 @@ client request, `ROLE_SAR_DATA_ACCESS` on dev, mirrored on the shape
 Thomas Wilson-Cook used for the MDA API client. Once it lands, A2 /
 A3 / A5 / C2 / C3 will run against the live dev endpoint as a
 belt-and-braces on top of the integration-test coverage recorded here.
+
+**HAAR-5793 landed 2026-07-23.** Role `ROLE_SAR_DATA_ACCESS` added to
+the existing `hmpps-accredited-programmes-client-1` (secret was also
+rotated in the same op — `SYSTEM_CLIENT_SECRET` length went from 16
+to 60 chars, which had been silently breaking earlier token attempts
+that used the stale 16-char value). Auth call now:
+
+```
+POST https://sign-in-dev.hmpps.service.justice.gov.uk/auth/oauth/token
+     -u <client_id>:<client_secret>
+     -H 'Content-Type: application/x-www-form-urlencoded'
+     -d 'grant_type=client_credentials'
+```
+
+Note the body-form `grant_type` — the query-string form used by
+[`script/kubernetes-scripts/get-token`](../../script/kubernetes-scripts/get-token)
+is rejected by the migrated auth server with `HTTP 400
+invalid_request`, so that helper wants updating separately. Filed as
+follow-up. A minted token has authorities including
+`ROLE_SAR_DATA_ACCESS`, `ROLE_ACCREDITED_PROGRAMMES_API`,
+`ROLE_VIEW_PRISONER_DATA`, `ROLE_PROBATION`, plus four others.
+
+Live A2 / A3 / A5 were then run via
+[`script/apg2495-run-live-sar-checks.sh`](../../script/apg2495-run-live-sar-checks.sh)
+against the retest PRN `A8610DY` on dev. Results captured below.
+
+#### A2 — surnames present in every identifier field (live dev)
+
+**Status:** ✅ pass.
+
+Live `GET /subject-access-request?prn=A8610DY` on dev returned
+`HTTP 200` with a fully-populated payload:
+
+| Section | Row count |
+|---------|-----------|
+| `referrals` | 189 |
+| `courseParticipation` | 11 |
+| `auditRecords` | 28 483 |
+| `referralStatusHistory` | 593 |
+| `pniResults` | 185 |
+| `staff` (via `findByPrisonNumber`) | 1 |
+| `person` (populated) | yes |
+
+Post-APG-2492 identifier-field content:
+
+- `referrals[].primaryPomStaffSurname` — 166/189 non-null; sample
+  value `"Pobee-norris"`. Because the source column is a numeric
+  `primaryPomStaffId`, a surname-shaped return is definitive proof
+  that the by-staff-id batch resolver has translated the id.
+- `referrals[].secondaryPomStaffSurname` — 0/189 non-null (no
+  secondary POM assignments in this subject's history; not a
+  resolver miss).
+- `referrals[].referrerUsername` — 39/189 non-null; sample value
+  `"ELANGOVAN"`. Confirmed against dev `staff` table:
+
+  ```
+  SELECT username, last_name FROM staff WHERE last_name = 'ELANGOVAN';
+       username    | last_name
+  ----------------+-----------
+   AELANGOVAN_ADM | ELANGOVAN
+  ```
+
+  so the value in the SAR response is the *resolved surname*, not
+  the raw username — exactly the transformation APG-2492 was written
+  to deliver.
+- `auditRecords[].auditUsername` — 9 783/28 483 non-null (~34%); same
+  surname shape as above.
+- `referralStatusHistory[].username` — 138/593 non-null (~23%),
+  distinct values `["ELANGOVAN", "Robertson"]`.
+
+The high null percentages in the identifier fields are legitimate:
+rows that predate username-capture have `NULL` at the source, and
+`resolveSurnamesByUsername(null)` correctly short-circuits per the
+note's `optionalValue → "No Data Held"` design. No raw
+`..._ADM`-suffixed usernames or numeric staff ids leaked through
+into the response.
+
+#### A3 — same identifier renders the same surname across sections
+
+**Status:** ✅ pass.
+
+For subject `A8610DY`, unique non-null usernames observed:
+
+- `auditRecords[].auditUsername` set: `{"ELANGOVAN", "Robertson"}`
+- `referralStatusHistory[].username` set: `{"ELANGOVAN", "Robertson"}`
+- Intersection: `{"ELANGOVAN", "Robertson"}` — every shared
+  identifier renders the same surname across sections.
+
+This is guaranteed by design (`SubjectAccessRequestService` builds a
+single `StaffSurnames.byUsername` map once per SAR and threads it
+through every mapper), but the empirical check on a 28 483-row audit
+history plus a 593-row status history confirms the invariant on
+real data.
+
+**Note on the retest-script's A3 implementation.** The initial
+version of the A3 step in
+[`script/apg2495-run-live-sar-checks.sh`](../../script/apg2495-run-live-sar-checks.sh)
+used a nested `jq` iteration of the form
+`(.auditRecords[]?.auditUsername) as $a | .referralStatusHistory[]? | select(.username == $a)`,
+which is `O(N × M) = O(28 483 × 593) ≈ 17 M` comparisons on the retest
+subject. That hangs long enough that `set -e` never bails, and the
+script silently stalls mid-run — downstream steps (A5, C2, C3) never
+execute. Fixed in the same batch as this result being recorded, by
+rewriting the check as a set intersection on unique values which
+drops it to `O(N + M)` and returns in under 100 ms.
+
+#### A5 — statusHistory[].username IS a surname, not a raw username
+
+**Status:** ✅ pass.
+
+`referralStatusHistory[].username` distinct non-null values:
+`["ELANGOVAN", "Robertson"]`. Both surname-shaped; neither is the
+pre-APG-2492 raw-username form (which would look like
+`JROBERTSON_ADM` / `AELANGOVAN_ADM`, both of which we know exist in
+dev's `staff` table under `last_name = 'Robertson' / 'ELANGOVAN'`).
 
 #### B1 — SAR generates exactly 3 staff-repository calls
 
