@@ -297,10 +297,10 @@ _(Updated as checks are executed.)_
   | Referrals with `original_referral_id IS NOT NULL` | 7 | > 0 ✅ (double-serves APG-2493) |
   | `selected_sexual_offence_details` rows (via referral join) | 12 | > 0 ✅ |
 
-- E2 duplicate baseline count (from preprod staff table): _tbc (preprod deploy pending)_
+- E2 duplicate baseline count (from preprod staff table): _tbc — preprod deployed at `d7a6d11` (includes `dbbd4442`); query ready to run_
 - B1 staff-query count observed for this PRN: **✅ 3** (proven via integration test — see below)
-- B2 p95 latency delta vs pre-APG-2492 baseline: _tbc (preprod deploy pending)_
-- C1 WARN count in observation window: _tbc (preprod deploy pending)_
+- B2 p95 latency delta vs pre-APG-2492 baseline: _tbc — preprod deployed at `d7a6d11`; App Insights window opens 2026-07-22T15:03Z (deploy time)_
+- C1 WARN count in observation window: _tbc — preprod deployed at `d7a6d11`; App Insights `traces` query ready to run_
 
 #### A1 — subject with no referrals
 
@@ -396,6 +396,47 @@ Live-endpoint corroboration (a `spring.jpa.show-sql=true` capture
 against dev) will be added to this section once HAAR-5793 lands, as a
 belt-and-braces confirmation that no additional SQL crosses the wire
 outside the repository layer.
+
+#### D1 — SarContractIntegrationTest green on the merge commit
+
+**Status:** ✅ pass on `dbbd4442`.
+
+Evidence (via `gh run list --commit dbbd4442`):
+
+- **CodeQL** workflow: [run 29928655921](https://github.com/ministryofjustice/hmpps-accredited-programmes-api/actions/runs/29928655921)
+  — `success`.
+- **Pipeline [test → build → deploy]** workflow: [run 29928655580](https://github.com/ministryofjustice/hmpps-accredited-programmes-api/actions/runs/29928655580)
+  — run-level status is `cancelled`, but that is *entirely* attributable
+  to the manual `Deploy to the prod environment / Deploy to prod`
+  gate being cancelled (probably to stage the release cadence). Every
+  other job on this run succeeded:
+
+  | Job | Result |
+  |-----|--------|
+  | `Validate the kotlin / Verify the gradle app` (test suite, incl. `SarContractIntegrationTest`) | ✅ success |
+  | `Build docker image / Build linux/amd64 (parallel)` | ✅ success |
+  | `Build docker image / Build linux/arm64 (parallel)` | ✅ success |
+  | `Build docker image / Push multi-platform image` | ✅ success |
+  | `Deploy to the dev environment / Deploy to dev` | ✅ success |
+  | `Deploy to the preprod environment / Deploy to preprod` | ✅ success |
+  | `Deploy to the prod environment / Deploy to prod` | 🚫 cancelled (manual gate) |
+
+D1 is satisfied: the Kotlin test suite — which contains the contract
+test — ran and passed on the exact merge commit. The cancelled prod
+deploy is out-of-scope for APG-2495 (that is a release-cadence
+decision, not a test-signal).
+
+#### Preprod deployment status — B2 / B3 / C1 / E2 unblocked
+
+Confirmed via `gh run list` that preprod is currently serving
+`d7a6d11e` (deployed 2026-07-22T15:03:12Z), which is `dbbd4442`
+plus one downstream commit (APG-2507 — merged-prisoner-handling fix,
+unrelated to the SAR staff-surname pipeline). Both the batch
+resolver and the V144 indexes are therefore live on preprod as of
+2026-07-22, so the preprod-dependent exit criteria (B2 latency, B3
+`EXPLAIN`, C1 WARN count, E2 duplicate baseline) can be executed
+against the current preprod snapshot without waiting for further
+releases.
 
 ## Deliverables
 
