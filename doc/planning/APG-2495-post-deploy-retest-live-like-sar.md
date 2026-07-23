@@ -299,8 +299,8 @@ _(Updated as checks are executed.)_
 
 - E2 duplicate baseline count (from preprod staff table): **✅ 0** (see B3/E2 section below)
 - B1 staff-query count observed for this PRN: **✅ 3** (proven via integration test — see below)
-- B2 p95 latency delta vs pre-APG-2492 baseline: _tbc — preprod deployed at `d7a6d11`; App Insights window opens 2026-07-22T15:03Z (deploy time)_
-- C1 WARN count in observation window: _tbc — expected 0 per E2 (see below); App Insights `traces` query pending_
+- B2 p95 latency delta vs pre-APG-2492 baseline: _parked with trigger — no organic SAR traffic on preprod; awaits HAAR-5793 + synthetic-load re-run (see B2 section below)_
+- C1 WARN count in observation window: **✅ 0** (over the 20h+ since deploy; matches E2's zero-duplicate calibration — see C1 section below)
 
 #### A1 — subject with no referrals
 
@@ -502,6 +502,102 @@ duplicate was inserted after this baseline was taken, or a
 non-canonical `staff` row appeared via ingestion. This makes C1's
 expected-value assertion sharp: **≥ 1 WARN in the observation
 window fails C1**; **0 WARNs passes**.
+
+#### C1 — Batch-resolver WARN count in preprod observation window
+
+**Status:** ✅ pass — **0 WARNs** in the 20h+ since preprod deploy.
+
+Executed against the preprod App Insights (cloud role name
+`hmpps-accredited-programmes-api`, deploy time `2026-07-22T15:03:12Z`):
+
+```kql
+traces
+| where cloud_RoleName == "hmpps-accredited-programmes-api"
+| where timestamp >= datetime(2026-07-22T15:03:12Z)
+| where severityLevel >= 2
+| where message has "Multiple staff rows found"
+| summarize warn_count = count()
+```
+
+Result: `warn_count = 0`. A companion query listing the offending
+trace rows also returned zero rows.
+
+This is consistent with the E2 baseline: preprod `staff` has zero
+duplicates on both `username` and `staff_id`, so the resolver's WARN
+path (which fires only when a lookup key maps to more than one row)
+has nothing to log. If a WARN appears at any point after this
+observation window, it's a real data-quality regression — the
+resolver is behaving correctly.
+
+#### B2 — SAR endpoint p95 latency delta (parked with reactivation trigger)
+
+**Status:** ⏸ parked. **No organic SAR traffic on preprod** means
+there is neither a pre-deploy baseline nor a post-deploy sample to
+compare against — the p95 assertion is uncomputable from the current
+telemetry.
+
+Diagnostic evidence (App Insights, preprod, last 48h):
+
+```kql
+requests
+| where cloud_RoleName == "hmpps-accredited-programmes-api"
+| where timestamp > ago(48h)
+| summarize request_count = count(), distinct_url_paths = dcount(url)
+        --> request_count = 131 707, distinct_url_paths = 174
+
+requests
+| where cloud_RoleName == "hmpps-accredited-programmes-api"
+| where timestamp > ago(48h)
+| where url has "subject" or url has "sar" or url has "access-request"
+        --> 0 rows
+```
+
+Preprod is heavily trafficked (131k requests / 48h over 174 distinct
+paths) but the SAR endpoint is not on any of those paths — normal for
+a backend service where the SAR aggregator only hits preprod when
+manually triggered. This is not a B2 failure; it's a measurement
+prerequisite that isn't met yet.
+
+**Reactivation trigger.** Once HAAR-5793 lands (unlocks live SAR
+calls from the retest laptop), self-generate a small burst against
+the retest PRN `A8610DY` — 20 sequential `GET /subject-access-request?prn=A8610DY`
+requests spaced by ~1s, taking care to warm the JVM with 2–3 discards
+first. Wait 10 minutes for App Insights ingestion, then re-run B2
+with a single post-load window and compare `p95(duration)` against
+the two-week rolling p95 pre-deploy (`2026-07-08` → `2026-07-22T14:00Z`)
+as the baseline. The `bufferHours` / `windowHours` template already
+captured in this note's Path-1 section is directly reusable — swap
+the pre-window bounds and drop the `if` on the empty post-window.
+
+Original B2 KQL retained here for the reactivation:
+
+```kql
+let deployTime = datetime(2026-07-22T15:03:12Z);
+let bufferHours = 1h;
+let windowHours = 24h;
+let preStart  = deployTime - windowHours - bufferHours;
+let preEnd    = deployTime - bufferHours;
+let postStart = deployTime + bufferHours;
+let postEnd   = deployTime + bufferHours + windowHours;
+requests
+| where cloud_RoleName == "hmpps-accredited-programmes-api"
+| where url matches regex @"/subject-access-request(\?|$)"
+| where timestamp between (preStart .. preEnd) or timestamp between (postStart .. postEnd)
+| extend window = case(
+    timestamp between (preStart  .. preEnd),  "1_pre_APG-2492",
+    timestamp between (postStart .. postEnd), "2_post_APG-2492",
+    "other")
+| summarize
+    request_count = count(),
+    p50_ms = percentile(duration, 50),
+    p90_ms = percentile(duration, 90),
+    p95_ms = percentile(duration, 95),
+    p99_ms = percentile(duration, 99),
+    avg_ms = avg(duration),
+    max_ms = max(duration)
+    by window
+| order by window asc
+```
 
 ## Deliverables
 
