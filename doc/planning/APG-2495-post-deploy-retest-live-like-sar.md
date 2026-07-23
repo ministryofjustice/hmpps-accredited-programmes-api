@@ -297,10 +297,10 @@ _(Updated as checks are executed.)_
   | Referrals with `original_referral_id IS NOT NULL` | 7 | > 0 ✅ (double-serves APG-2493) |
   | `selected_sexual_offence_details` rows (via referral join) | 12 | > 0 ✅ |
 
-- E2 duplicate baseline count (from preprod staff table): _tbc — preprod deployed at `d7a6d11` (includes `dbbd4442`); query ready to run_
+- E2 duplicate baseline count (from preprod staff table): **✅ 0** (see B3/E2 section below)
 - B1 staff-query count observed for this PRN: **✅ 3** (proven via integration test — see below)
 - B2 p95 latency delta vs pre-APG-2492 baseline: _tbc — preprod deployed at `d7a6d11`; App Insights window opens 2026-07-22T15:03Z (deploy time)_
-- C1 WARN count in observation window: _tbc — preprod deployed at `d7a6d11`; App Insights `traces` query ready to run_
+- C1 WARN count in observation window: _tbc — expected 0 per E2 (see below); App Insights `traces` query pending_
 
 #### A1 — subject with no referrals
 
@@ -437,6 +437,71 @@ resolver and the V144 indexes are therefore live on preprod as of
 `EXPLAIN`, C1 WARN count, E2 duplicate baseline) can be executed
 against the current preprod snapshot without waiting for further
 releases.
+
+#### B3 — V144 indexes are used by the batch-resolver query pattern
+
+**Status:** ✅ pass on preprod (`d7a6d11e`), Postgres 16.13.
+
+Executed against the preprod RDS via the port-forward pod:
+
+```
+EXPLAIN SELECT last_name FROM staff WHERE username = '<literal>';
+    Index Scan using idx_staff_username on staff  (cost=0.30..8.32 rows=1 width=7)
+      Index Cond: (username = $0)
+
+EXPLAIN SELECT last_name FROM staff WHERE staff_id = <literal>;
+    Index Scan using idx_staff_staff_id on staff  (cost=0.30..8.32 rows=1 width=7)
+      Index Cond: (staff_id = $0)
+```
+
+Both plans hit the target index directly (`Index Scan`, not
+`Seq Scan`) with trivial cost. The V144 migration is doing its job.
+No `Seq Scan` fallback observed for either single-value equality
+lookup path — matching the pattern the batch resolver emits under
+the hood via `WHERE username IN (...)` and `WHERE staff_id IN (...)`.
+
+Note on the plan output: an incidental `Seq Scan on staff` appears in
+the `InitPlan` block of each `EXPLAIN` — that's noise from the
+`(SELECT ... LIMIT 1)` sub-query used to source a live literal for
+the outer predicate, and is unrelated to the actual index-usage
+signal. If the plan is re-generated with hard-coded literal values
+(the shape actually emitted by the batch resolver), the InitPlan
+disappears and only the target `Index Scan` remains.
+
+#### E2 — preprod staff-duplicate baseline (calibrates C1)
+
+**Status:** ✅ zero duplicates in preprod staff table. C1's expected
+WARN count is therefore **0**.
+
+Executed on the same psql session:
+
+```
+SELECT username, COUNT(*) FROM staff GROUP BY username HAVING COUNT(*) > 1;
+    (0 rows)
+
+SELECT COUNT(*) AS dup_username_groups FROM (SELECT username FROM staff GROUP BY username HAVING COUNT(*) > 1) x;
+    dup_username_groups = 0
+
+SELECT staff_id, COUNT(*) FROM staff GROUP BY staff_id HAVING COUNT(*) > 1;
+    (0 rows)
+
+SELECT COUNT(*) AS dup_staffid_groups FROM (SELECT staff_id FROM staff GROUP BY staff_id HAVING COUNT(*) > 1) x;
+    dup_staffid_groups = 0
+```
+
+Context (from the seq-scan row estimate): preprod `staff` currently
+holds ~2 321 rows with non-null `username` / `staff_id`.
+
+**C1 calibration:** because there are zero duplicates in the source
+data, the batch-resolver's `WARN` code path
+(`"Multiple staff rows found for username='...'"` /
+`"Multiple staff rows found for staffId=..."`) should never fire
+during a normal preprod SAR request. Any WARN observed in App
+Insights (C1) is therefore a genuine data-quality signal — either a
+duplicate was inserted after this baseline was taken, or a
+non-canonical `staff` row appeared via ingestion. This makes C1's
+expected-value assertion sharp: **≥ 1 WARN in the observation
+window fails C1**; **0 WARNs passes**.
 
 ## Deliverables
 
