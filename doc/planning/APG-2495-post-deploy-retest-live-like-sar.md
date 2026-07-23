@@ -58,7 +58,7 @@ lets Ops catch data-quality issues before they cause weird SAR output.
 | # | Check | How |
 |---|---|---|
 | D1 | `SarContractIntegrationTest` passes in CI on the deployed commit. | GitHub Actions run for the merge commit; expect green. |
-| D2 | The HMPPS SAR aggregator's downstream consumer still renders the ACP block cleanly. | Trigger a full-service SAR (aggregator + ACP + other backends) against a preprod subject; visually inspect the rendered PDF. |
+| D2 | The HMPPS SAR aggregator's downstream consumer still renders the ACP block cleanly. | Trigger a full-service SAR (aggregator + ACP + other backends) against the retest PRN. **Dev is preferred** (our retest subject `A8610DY` has verified full-shape data there — 189 referrals, 11 course participations, mixed COMMUNITY/CUSTODY, plus we've already validated the ACP block via A2/A3/A5 on that env). Preprod is an acceptable fallback if the aggregator team's setup prefers it, but data shape on preprod for the same PRN is not verified. |
 
 ### E. Data pipeline sanity
 
@@ -70,8 +70,11 @@ lets Ops catch data-quality issues before they cause weird SAR output.
 ## Test environments
 
 - **Dev** — full test suite (A1–A5, C1–C3, D1) on refreshed dev data.
-- **Preprod** — B1–B3 perf and observability checks (D2 optional if we
-  can coordinate with the aggregator team).
+  Also preferred for D2 (aggregator walkthrough) since the retest
+  PRN's data shape is only guaranteed on dev.
+- **Preprod** — B1–B3 perf and observability checks. D2 is an
+  acceptable preprod fallback if the aggregator team's setup
+  prefers it.
 - **Prod** — post-release monitoring only: watch App Insights WARN
   count and p95 latency for 24h after cut, roll back if either regresses.
 
