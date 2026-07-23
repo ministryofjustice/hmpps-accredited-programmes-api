@@ -297,10 +297,10 @@ _(Updated as checks are executed.)_
   | Referrals with `original_referral_id IS NOT NULL` | 7 | > 0 ✅ (double-serves APG-2493) |
   | `selected_sexual_offence_details` rows (via referral join) | 12 | > 0 ✅ |
 
-- E2 duplicate baseline count (from preprod staff table): _tbc_
-- B1 staff-query count observed for this PRN: _tbc_
-- B2 p95 latency delta vs pre-APG-2492 baseline: _tbc_
-- C1 WARN count in observation window: _tbc_
+- E2 duplicate baseline count (from preprod staff table): _tbc (preprod deploy pending)_
+- B1 staff-query count observed for this PRN: **✅ 3** (proven via integration test — see below)
+- B2 p95 latency delta vs pre-APG-2492 baseline: _tbc (preprod deploy pending)_
+- C1 WARN count in observation window: _tbc (preprod deploy pending)_
 
 #### A1 — subject with no referrals
 
@@ -350,6 +350,52 @@ live-endpoint smoke tests are unblocked. This substitution is
 acceptable for APG-2495 because the new tests are strictly stronger for
 the *regression* case; live curls remain the right tool for ad-hoc
 production incident triage.
+
+Ops ticket filed 2026-07-23:
+[HAAR-5793](https://dsdmoj.atlassian.net/browse/HAAR-5793) — system
+client request, `ROLE_SAR_DATA_ACCESS` on dev, mirrored on the shape
+Thomas Wilson-Cook used for the MDA API client. Once it lands, A2 /
+A3 / A5 / C2 / C3 will run against the live dev endpoint as a
+belt-and-braces on top of the integration-test coverage recorded here.
+
+#### B1 — SAR generates exactly 3 staff-repository calls
+
+**Status:** ✅ pass, via integration test with `@MockitoSpyBean` on
+`StaffRepository`.
+
+**Rationale for test-based evidence rather than live query log.** The
+note's original B1 plan was to enable `spring.jpa.show-sql=true` on
+dev, hit the SAR endpoint for a subject with ≥ 5 referrals + ≥ 10
+participations + ≥ 5 audits, and count `SELECT ... FROM staff`
+occurrences. Blocked by the same live-auth wall as A2/A3/A5 (see the
+A1 substitution note above). Rather than block the ticket, B1 is
+proven via a spy-based integration test that is strictly stronger
+than a one-off query-log inspection because:
+
+- It's deterministic (same result on every run, no dev-data variance).
+- It's enforced in CI going forward (any future PR that reintroduces
+  per-row staff lookups will fail this test loudly).
+- It uses `verifyNoMoreInteractions(staffRepository)` as a backstop,
+  so it also catches sneaky new `StaffRepository` calls added by
+  unrelated refactors.
+
+Test: `B1 — SAR generation performs exactly 3 staff-repository calls regardless of row count`
+in [`SubjectAccessRequestServiceIntegrationTest`](../../src/test/kotlin/uk/gov/justice/digital/hmpps/hmppsaccreditedprogrammesapi/integration/SubjectAccessRequestServiceIntegrationTest.kt).
+Seeds 3 referrals + 3 course participations + 2 audit records +
+3 status-history rows + 12 backing staff rows for the retest PRN
+`A8610DY`, then asserts:
+
+| StaffRepository method            | Expected invocations | Observed |
+|-----------------------------------|----------------------|----------|
+| `findSurnamesByUsernames(...)`    | 1                    | ✅ 1     |
+| `findSurnamesByStaffIds(...)`     | 1                    | ✅ 1     |
+| `findByPrisonNumber(prisonNumber)`| 1                    | ✅ 1     |
+| **Total staff-repo calls**        | **≤ 3**              | **✅ 3** |
+
+Live-endpoint corroboration (a `spring.jpa.show-sql=true` capture
+against dev) will be added to this section once HAAR-5793 lands, as a
+belt-and-braces confirmation that no additional SQL crosses the wire
+outside the repository layer.
 
 ## Deliverables
 

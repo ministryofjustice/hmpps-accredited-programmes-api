@@ -3,10 +3,16 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.anyCollection
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoMoreInteractions
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SexualOffenceCategoryType
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SubjectAccessRequestService
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,6 +22,9 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   private lateinit var subjectAccessRequestService: SubjectAccessRequestService
+
+  @MockitoSpyBean
+  private lateinit var staffRepository: StaffRepository
 
   @Test
   fun `should return all fields in SAR content`() {
@@ -289,5 +298,163 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     assertThat(content.organisations).isEmpty()
 
     assertThat(content.person).isNull()
+  }
+
+  /**
+   * APG-2495 B1 — post-APG-2492 batch-resolver query-count regression guard.
+   *
+   * The pre-APG-2492 code path resolved staff surnames per row, producing an
+   * `O(referrals + participations × 2 + audits × 2 + statusHistory)` number of
+   * point-lookup queries against `staff`. The batch resolver introduced in
+   * APG-2492 (`StaffLookupService.resolveSurnamesByUsername/ByStaffId`)
+   * collapses that into two batch queries — one by-username, one by-staff-id —
+   * plus a single `findByPrisonNumber` for the `Content.staff` array.
+   *
+   * B1 asserts the query count is **exactly 3 `StaffRepository` calls per
+   * SAR**, regardless of how many rows the subject has. If a future change
+   * accidentally re-introduces per-row lookups, `verifyNoMoreInteractions`
+   * will catch it and this test fails loudly.
+   *
+   * Test subject shape: multi-referral, multi-participation, multi-audit,
+   * multi-status-history. The seed is deliberately chatty so that if
+   * batching were disabled we'd see ≫ 3 calls.
+   */
+  @Test
+  fun `B1 — SAR generation performs exactly 3 staff-repository calls regardless of row count`() {
+    val prisonNumber = "A8610DY"
+    val courseId = UUID.randomUUID()
+    val offeringId = UUID.randomUUID()
+
+    val referralIds = List(3) { UUID.randomUUID() }
+    val referrerUsernames = listOf("REFERRER_A", "REFERRER_B", "REFERRER_C")
+    val primaryPomStaffIds = listOf("101".toBigInteger(), "102".toBigInteger(), "103".toBigInteger())
+    val secondaryPomStaffIds = listOf("201".toBigInteger(), "202".toBigInteger(), "203".toBigInteger())
+    val cpAuthorUsernames = listOf("CP_AUTHOR_1", "CP_AUTHOR_2", "CP_AUTHOR_3")
+    val auditActorUsernames = listOf("AUDIT_ACTOR_1", "AUDIT_ACTOR_2")
+
+    persistenceHelper.clearAllTableContent()
+
+    persistenceHelper.createOrganisation(code = "MDI", name = "HMP Moorland")
+    persistenceHelper.createCourse(
+      courseId = courseId,
+      identifier = "C1",
+      name = "Course 1",
+      description = "Course 1 Description",
+      altName = "C1 Alt Name",
+      audience = "General",
+      intensity = "HIGH",
+      listDisplayName = "Course 1",
+    )
+    persistenceHelper.createOffering(
+      offeringId = offeringId,
+      courseId = courseId,
+      orgId = "MDI",
+      contactEmail = "test@example.com",
+      secondaryContactEmail = "test2@example.com",
+      referable = true,
+    )
+
+    // Referrers and 3 referrals — each with distinct referrer + POM staff ids.
+    referrerUsernames.forEach { persistenceHelper.createReferrerUser(it) }
+    referralIds.forEachIndexed { idx, referralId ->
+      persistenceHelper.createReferral(
+        referralId = referralId,
+        offeringId = offeringId,
+        prisonNumber = prisonNumber,
+        referrerUsername = referrerUsernames[idx],
+        additionalInformation = "info $idx",
+        oasysConfirmed = true,
+        hasReviewedProgrammeHistory = true,
+        status = "REFERRAL_STARTED",
+        submittedOn = LocalDateTime.now(),
+        primaryPomStaffId = primaryPomStaffIds[idx],
+        secondaryPomStaffId = secondaryPomStaffIds[idx],
+      )
+    }
+
+    // 3 course participations with distinct created-by / last-modified-by users.
+    cpAuthorUsernames.forEachIndexed { idx, author ->
+      persistenceHelper.createCourseParticipation(
+        participationId = UUID.randomUUID(),
+        referralId = referralIds[idx % referralIds.size],
+        prisonNumber = prisonNumber,
+        courseName = "Course $idx",
+        source = "source-$idx",
+        detail = "detail-$idx",
+        location = "location-$idx",
+        type = if (idx % 2 == 0) CourseSetting.COMMUNITY.name else CourseSetting.CUSTODY.name,
+        outcomeStatus = if (idx % 2 == 0) "COMPLETE" else "INCOMPLETE",
+        yearStarted = 2020 + idx,
+        yearCompleted = 2021 + idx,
+        createdByUsername = author,
+        createdDateTime = LocalDateTime.now(),
+        lastModifiedByUsername = author,
+        lastModifiedDateTime = LocalDateTime.now(),
+      )
+    }
+
+    // 2 audit records with distinct actors.
+    auditActorUsernames.forEach { actor ->
+      persistenceHelper.createAuditRecord(
+        prisonNumber = prisonNumber,
+        auditAction = AuditAction.CREATE_REFERRAL.name,
+        auditUsername = actor,
+        referrerUsername = actor,
+      )
+    }
+
+    // 3 status-history rows, each mapping to one of the referrers.
+    referralIds.forEachIndexed { idx, referralId ->
+      persistenceHelper.createReferralStatusHistory(
+        referralId = referralId,
+        username = referrerUsernames[idx],
+        status = "REFERRAL_STARTED",
+      )
+    }
+
+    // Backing staff rows so surnames actually resolve (proves the batch path
+    // returns real values, not just short-circuits).
+    val allUsernames = referrerUsernames + cpAuthorUsernames + auditActorUsernames
+    allUsernames.forEachIndexed { idx, username ->
+      persistenceHelper.createStaff(
+        staffId = (1000 + idx).toBigInteger(),
+        firstName = "First$idx",
+        lastName = "Last$idx",
+        username = username,
+        primaryEmail = "user$idx@example.com",
+      )
+    }
+    (primaryPomStaffIds + secondaryPomStaffIds).forEachIndexed { idx, staffId ->
+      persistenceHelper.createStaff(
+        staffId = staffId,
+        firstName = "Pom$idx",
+        lastName = "PomLast$idx",
+        username = "POM_USER_$idx",
+        primaryEmail = "pom$idx@example.com",
+      )
+    }
+
+    // Also persist a person so `content.staff` (via findByPrisonNumber) has
+    // rows to return — otherwise the query still runs but returns empty and
+    // the batching evidence is less concrete.
+    persistenceHelper.createPerson(
+      prisonNumber = prisonNumber,
+      forename = "TEST",
+      surname = "SUBJECT",
+    )
+
+    // Reset spy — even though seed methods use native SQL and don't touch
+    // the repository, be defensive: any pre-call interactions get zeroed.
+    org.mockito.Mockito.clearInvocations(staffRepository)
+
+    // WHEN — generate the SAR
+    val result = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
+
+    // THEN — exactly 3 staff-repo calls
+    assertNotNull(result)
+    verify(staffRepository).findSurnamesByUsernames(anyCollection())
+    verify(staffRepository).findSurnamesByStaffIds(anyCollection())
+    verify(staffRepository).findByPrisonNumber(anyString())
+    verifyNoMoreInteractions(staffRepository)
   }
 }
