@@ -282,7 +282,9 @@ reproducible.
 
 _(Updated as checks are executed.)_
 
-- **Retest PRN:** `A8610DY`
+- **Retest PRN (dev, A1–A5 / B1 / C2 / C3):** `A8610DY`
+- **Retest PRN (preprod, D2 aggregator walkthrough):** `A0137CY` — see
+  D2 section below for shape snapshot + sourcing rationale.
 - Source (Path 1 SELECT / Path 2 seed / other): **Path 1** — ACP dev DB
   `course_participation` must-have candidate query (see above), scored
   against the fixed `type`-based variety filter. Sole PRN in the top 20
@@ -310,6 +312,7 @@ _(Updated as checks are executed.)_
 - A5 statusHistory renders surnames (live dev): **✅ pass** — see A5 section
 - C2 WARN fires on injected duplicate (live dev): **✅ pass** — see C2 section
 - C3 deterministic surname pick across 3 SAR calls (live dev): **✅ pass** — see C3 section
+- D2 preprod-native aggregator-walkthrough subject identified: **✅ `A0137CY`** — Slack ask to SAR/aggregator team pending; see D2 section
 
 #### A1 — subject with no referrals
 
@@ -830,9 +833,59 @@ requests
     p99_ms = percentile(duration, 99),
     avg_ms = avg(duration),
     max_ms = max(duration)
-    by window
+| by window
 | order by window asc
 ```
+
+#### D2 — preprod-native aggregator-walkthrough subject identified
+
+**Status:** ✅ subject identified (`A0137CY`); aggregator-team Slack
+ask pending. The check itself completes when the aggregator team
+confirm the rendered PDF's ACP block looks sane end-to-end.
+
+**Sourcing.** Ran the Path 1 must-have candidate query (see `## Test
+data → Path 1`) against the **preprod** DB via the port-forward pod
+already open from the B3 / E2 work — 10 preprod PRNs met the mandatory
+criteria (> 1 course-participation row, mixed `type`, mixed
+`outcome_status`). For each of the 10, ran the nice-to-haves
+cross-check (`pni_result`, `referral`, `refs_with_original`,
+`sexual_offence_details`) and picked the PRN with the highest total
+rows across the ACP-visible sections — that's `A0137CY`.
+
+**Data-shape snapshot for `A0137CY` (preprod, 2026-07-23):**
+
+| Metric | Value | Requirement |
+|---|---|---|
+| `course_participation` rows | 4 | > 1 ✅ |
+| Distinct `type` values | mix of `COMMUNITY` + `CUSTODY` | mix ✅ |
+| Distinct `outcome_status` values | mix of `COMPLETE` + `INCOMPLETE` | mix ✅ |
+| `pni_result` rows | 10 | > 0 ✅ |
+| `referral` rows | 2 | multiple ✅ |
+| Referrals with `original_referral_id IS NOT NULL` | 0 | > 0 ❌ (nice-to-have) |
+| `selected_sexual_offence_details` rows (via referral join) | 0 | > 0 ❌ (nice-to-have) |
+
+**Nice-to-have caveat.** None of the 10 preprod candidates had
+`refs_with_original > 0` or `selected_sexual_offence_details` rows —
+those two nice-to-haves are only realised on dev (`A8610DY` has 7
+referrals with original + 12 sexual-offence-details rows). That's
+fine for D2's purpose (aggregator PDF rendering with a realistic ACP
+block), and it does not affect any exit criterion — the two missing
+nice-to-haves are APG-2493 concerns, not APG-2495. Recorded here so a
+future retest doesn't waste cycles re-searching preprod for a
+better-shaped candidate.
+
+**Why `A0137CY` and not one of the other 9 candidates.** Highest
+total-rows-across-ACP-sections of the 10 preprod PRNs meeting the
+must-haves (4 course participations + 10 pni_result rows + 2
+referrals = the most SAR-block content the aggregator's template
+gets to render on preprod today). A referral count of 2 is enough
+to exercise `referrals[]` array-rendering behaviour and to
+cross-check surname consistency between `referrer` and audit rows.
+
+**Next step:** Slack the SAR / aggregator team with the preprod PRN,
+ask them to trigger a full-service SAR (aggregator + ACP + other
+backends) and share the rendered PDF for a visual sanity check. Sign
+this section off once they confirm the ACP block renders cleanly.
 
 ## Deliverables
 
