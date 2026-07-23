@@ -270,12 +270,25 @@ if [ -n "${APG2495_DEV_DB_HOST:-}" ] && [ -n "${APG2495_DEV_DB_PASS:-}" ]; then
   log ""
   log "=== C2 + C3 — inject duplicate staff row, verify WARN + deterministic pick ==="
 
-  # Pick a real username from the SAR response so we don't invent a phantom.
-  DUP_USER=$(jq -r '.content.referrals[0].referrerUsername // empty' "$A2_JSON")
+  # The SAR response only contains *resolved surnames*, not raw usernames — so
+  # we cannot derive an injection target from the JSON alone. Pull one from
+  # audit_record via the dev DB. Additional EXISTS constraint: the username
+  # must have at least one row in `staff` — otherwise the batch resolver's
+  # `resolveSurnamesByUsername` won't include it in the result map and the
+  # duplicate we inject would just look like a fresh row, not a duplicate.
+  # This also filters out historical audit rows whose actor no longer has a
+  # matching staff record (a common source of nulls in the SAR response).
+  DUP_USER=$(psql_dev -tAc "
+    SELECT DISTINCT ar.audit_username
+    FROM   audit_record ar
+    WHERE  ar.prison_number = '$RETEST_PRN'
+      AND  ar.audit_username IS NOT NULL
+      AND  EXISTS (SELECT 1 FROM staff s WHERE s.username = ar.audit_username)
+    LIMIT  1;" | tr -d '[:space:]')
   if [ -z "$DUP_USER" ]; then
-    log "C2 SKIP — could not derive a real username from A2 response (referrerUsername null)"
+    log "C2 SKIP — no audit_record with a staff-matched audit_username for prison_number=$RETEST_PRN"
   else
-    log "C2 injecting duplicate staff row for username='$DUP_USER'"
+    log "C2 injecting duplicate staff row for username='$DUP_USER' (audit_record ⨝ staff for $RETEST_PRN)"
 
     # Look up the real staff row for that username, then insert a shadow copy
     # with a fresh UUID and a synthetic staff_id. Trap ensures cleanup.

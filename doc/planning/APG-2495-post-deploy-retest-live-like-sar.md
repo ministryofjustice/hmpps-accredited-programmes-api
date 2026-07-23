@@ -304,6 +304,8 @@ _(Updated as checks are executed.)_
 - A2 surnames-in-every-identifier-field (live dev): **✅ pass** — see A2 section
 - A3 cross-section surname consistency (live dev): **✅ pass** — see A3 section
 - A5 statusHistory renders surnames (live dev): **✅ pass** — see A5 section
+- C2 WARN fires on injected duplicate (live dev): **✅ pass** — see C2 section
+- C3 deterministic surname pick across 3 SAR calls (live dev): **✅ pass** — see C3 section
 
 #### A1 — subject with no referrals
 
@@ -475,6 +477,93 @@ drops it to `O(N + M)` and returns in under 100 ms.
 pre-APG-2492 raw-username form (which would look like
 `JROBERTSON_ADM` / `AELANGOVAN_ADM`, both of which we know exist in
 dev's `staff` table under `last_name = 'Robertson' / 'ELANGOVAN'`).
+
+#### C2 — WARN fires when duplicate staff row is injected (live dev)
+
+**Status:** ✅ pass.
+
+Selection query (via
+[`script/apg2495-run-live-sar-checks.sh`](../../script/apg2495-run-live-sar-checks.sh))
+picks a real audit-author username that is guaranteed to be
+referenced by the SAR call *and* has a backing `staff` row:
+
+```sql
+SELECT DISTINCT ar.audit_username
+FROM   audit_record ar
+WHERE  ar.prison_number = 'A8610DY'
+  AND  ar.audit_username IS NOT NULL
+  AND  EXISTS (SELECT 1 FROM staff s WHERE s.username = ar.audit_username)
+LIMIT  1;
+   -> AELANGOVAN_ADM
+```
+
+The script then inserts a duplicate `staff` row for that username
+(new `id` UUID and offset `staff_id` so we don't collide on any
+uniqueness constraint), verifies the row count went from 1 → 2, and
+issues one live SAR call for `A8610DY`.
+
+Log capture from dev (immediately after the C2 SAR call):
+
+```
+kubectl -n hmpps-accredited-programmes-dev logs -l app=hmpps-accredited-programmes-api --tail=500 \
+  | grep -F 'Multiple staff rows found' | grep -F 'AELANGOVAN_ADM'
+```
+
+Output (four WARN lines — 1 from C2's SAR call plus 3 from the C3
+back-to-back calls that follow immediately after, all correlated to
+their own `trace_id` for App Insights):
+
+```
+2026-07-23 16:15:44.996  WARN 1 --- [nio-8080-exec-5] u.g.j.d.h.h.service.StaffLookupService   : Multiple staff rows found for username='AELANGOVAN_ADM' (2 rows); using the first surname. | trace_id=6c755939b5e25c15c14f721e2b1dd692, …
+2026-07-23 16:15:46.546  WARN 1 --- [nio-8080-exec-4] u.g.j.d.h.h.service.StaffLookupService   : Multiple staff rows found for username='AELANGOVAN_ADM' (2 rows); using the first surname. | trace_id=0ffc1cca4461af97a53c44d466cfa359, …
+2026-07-23 16:15:48.259  WARN 1 --- [nio-8080-exec-5] u.g.j.d.h.h.service.StaffLookupService   : Multiple staff rows found for username='AELANGOVAN_ADM' (2 rows); using the first surname. | trace_id=105f7412de87cb2ad8a2459ffc34d83b, …
+2026-07-23 16:15:49.667  WARN 1 --- [nio-8080-exec-8] u.g.j.d.h.h.service.StaffLookupService   : Multiple staff rows found for username='AELANGOVAN_ADM' (2 rows); using the first surname. | trace_id=41ab1248557546cc4082330e1f969e88, …
+```
+
+The message names both the offending `username` and the row count
+(`2 rows`), which is exactly the observability hook the note calls
+for. The `trace_id` on each line is what App Insights correlates to
+the request record — so if this WARN ever fires in preprod / prod
+(current preprod baseline: 0 per C1), Ops can pivot from the WARN
+directly to the failing request without a manual join.
+
+The script's EXIT trap deletes the injected duplicate row on
+completion regardless of pass/fail:
+
+```
+[apg2495] cleaning up injected duplicate row id=bb5aaa6a-a744-4113-ba75-e83736a464c7
+DELETE 1
+```
+
+Dev `staff` table returned to its 1-row-per-username baseline after
+the check.
+
+#### C3 — deterministic surname pick across repeated SAR calls (live dev)
+
+**Status:** ✅ pass.
+
+With the C2 duplicate still injected for `AELANGOVAN_ADM`, three
+back-to-back live SAR calls for `A8610DY` were issued. For each
+response, all sections carrying username-derived identifiers
+(`referrals[].referrerUsername`, `auditRecords[].auditUsername`,
+`auditRecords[].referrerUsername`, `referralStatusHistory[].username`,
+`courseParticipation[].createdByUser`,
+`courseParticipation[].updatedByUser`) were unioned and deduped, and
+the resulting distinct-surname set for each of the three responses
+was compared.
+
+Result: exactly one distinct surname set across all three runs:
+
+```
+ELANGOVAN,Robertson
+```
+
+The deterministic winner selection introduced by APG-2492's
+`ORDER BY <lookup key>, s.id` clause on
+`StaffRepository.findSurnamesByUsernames` and `findSurnamesByStaffIds`
+is behaving as designed — the "first surname" from the duplicate pair
+is stable across repeated requests, so the SAR PDF a subject sees on
+Monday looks identical to the one they see on Wednesday.
 
 #### B1 — SAR generates exactly 3 staff-repository calls
 
