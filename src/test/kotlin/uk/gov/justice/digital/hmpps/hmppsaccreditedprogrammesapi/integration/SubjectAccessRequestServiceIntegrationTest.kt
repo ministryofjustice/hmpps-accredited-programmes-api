@@ -205,4 +205,89 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(score).isEqualTo(2)
     }
   }
+
+  /**
+   * APG-2495 A1 — regression guard for the post-APG-2492 batch staff-surname
+   * resolver. When a subject has zero referrals, participations, audits and
+   * status-history rows, `resolveStaffSurnames()` is invoked with empty input
+   * sets. It must short-circuit cleanly (no empty `IN ()` clause, no NPE) and
+   * every SAR collection must serialise as an empty list. The `person` block
+   * still populates from the standalone `person` row.
+   *
+   * Chosen PRN mirrors the dev-DB retest subject captured in
+   * `doc/planning/APG-2495-post-deploy-retest-live-like-sar.md`.
+   */
+  @Test
+  fun `A1 — subject with a person row but no referrals returns populated person and empty collections`() {
+    val prisonNumber = "A4433DZ"
+
+    persistenceHelper.clearAllTableContent()
+    persistenceHelper.createPerson(
+      prisonNumber = prisonNumber,
+      forename = "JOAN",
+      surname = "BALISTRERI",
+      location = "Moorland (HMP & YOI)",
+      gender = "Female",
+    )
+
+    val result = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
+
+    assertNotNull(result)
+    val content = result!!.content as SubjectAccessRequestService.Content
+
+    // The whole point of A1: every collection must be empty, no exceptions thrown.
+    assertThat(content.referrals).isEmpty()
+    assertThat(content.courseParticipation).isEmpty()
+    assertThat(content.auditRecords).isEmpty()
+    assertThat(content.courses).isEmpty()
+    assertThat(content.pniResults).isEmpty()
+    assertThat(content.oasysPniResults).isEmpty()
+    assertThat(content.referralStatusHistory).isEmpty()
+    assertThat(content.referralStatusReasons).isEmpty()
+    assertThat(content.selectedSexualOffenceDetails).isEmpty()
+    assertThat(content.sexualOffenceDetails).isEmpty()
+    assertThat(content.staff).isEmpty()
+    assertThat(content.organisations).isEmpty()
+
+    assertThat(content.person).isNotNull
+    with(content.person!!) {
+      assertThat(this.prisonNumber).isEqualTo(prisonNumber)
+      assertThat(forename).isEqualTo("JOAN")
+      assertThat(surname).isEqualTo("BALISTRERI")
+      assertThat(location).isEqualTo("Moorland (HMP & YOI)")
+      assertThat(gender).isEqualTo("Female")
+    }
+  }
+
+  /**
+   * APG-2495 A1 (companion) — a totally-unknown PRN with no rows anywhere,
+   * including the `person` table. Proves the SAR responder yields a
+   * well-formed empty payload rather than 500ing when the batch staff-surname
+   * resolver is called with empty input sets AND `personRepository` returns
+   * null.
+   */
+  @Test
+  fun `A1 — unknown subject with no rows anywhere returns empty content and null person`() {
+    persistenceHelper.clearAllTableContent()
+
+    val result = subjectAccessRequestService.getPrisonContentFor("Z9999ZZ", null, null)
+
+    assertNotNull(result)
+    val content = result!!.content as SubjectAccessRequestService.Content
+
+    assertThat(content.referrals).isEmpty()
+    assertThat(content.courseParticipation).isEmpty()
+    assertThat(content.auditRecords).isEmpty()
+    assertThat(content.courses).isEmpty()
+    assertThat(content.pniResults).isEmpty()
+    assertThat(content.oasysPniResults).isEmpty()
+    assertThat(content.referralStatusHistory).isEmpty()
+    assertThat(content.referralStatusReasons).isEmpty()
+    assertThat(content.selectedSexualOffenceDetails).isEmpty()
+    assertThat(content.sexualOffenceDetails).isEmpty()
+    assertThat(content.staff).isEmpty()
+    assertThat(content.organisations).isEmpty()
+
+    assertThat(content.person).isNull()
+  }
 }
