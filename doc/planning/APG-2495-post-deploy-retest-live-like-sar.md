@@ -81,7 +81,7 @@ All of the following must hold before APG-2493 / APG-2510 can start:
 
 - [ ] A1–A5 pass (functional).
 - [ ] B1 shows staff-query count ≤ 3 per SAR.
-- [ ] B2 shows p95 latency ≤ baseline.
+- [ ] B2 shows p95 latency ≤ baseline. **Waived for APG-2495 — see B2 section in Results:** no organic SAR traffic on preprod, and the causal perf claim is already covered by B1 (query-count regression guard) + B3 (index-usage confirmation). Reactivation KQL retained for future organic-traffic sampling.
 - [ ] B3 confirms both V144 indexes are used.
 - [ ] C1 baseline captured (expected WARN count in preprod, per E2).
 - [ ] C2 + C3 confirm WARN logging + deterministic pick behave as
@@ -299,7 +299,7 @@ _(Updated as checks are executed.)_
 
 - E2 duplicate baseline count (from preprod staff table): **✅ 0** (see B3/E2 section below)
 - B1 staff-query count observed for this PRN: **✅ 3** (proven via integration test — see below)
-- B2 p95 latency delta vs pre-APG-2492 baseline: _parked with trigger — no organic SAR traffic on preprod; awaits HAAR-5793 + synthetic-load re-run (see B2 section below)_
+- B2 p95 latency delta vs pre-APG-2492 baseline: **not measured for this ticket** — no organic SAR traffic on preprod to sample; a preprod-scoped SAR-role auth client would only enable *synthetic-vs-synthetic* comparison (see B2 section below). B1 + B3 already cover the causal perf claim.
 - C1 WARN count in observation window: **✅ 0** (over the 20h+ since deploy; matches E2's zero-duplicate calibration — see C1 section below)
 - A2 surnames-in-every-identifier-field (live dev): **✅ pass** — see A2 section
 - A3 cross-section surname consistency (live dev): **✅ pass** — see A3 section
@@ -736,47 +736,71 @@ has nothing to log. If a WARN appears at any point after this
 observation window, it's a real data-quality regression — the
 resolver is behaving correctly.
 
-#### B2 — SAR endpoint p95 latency delta (parked with reactivation trigger)
+#### B2 — SAR endpoint p95 latency delta (not measured for this ticket)
 
-**Status:** ⏸ parked. **No organic SAR traffic on preprod** means
-there is neither a pre-deploy baseline nor a post-deploy sample to
-compare against — the p95 assertion is uncomputable from the current
-telemetry.
+**Status:** 🚫 not measured. **B1 + B3 cover the causal perf claim;
+B2 offers no incremental regression signal on the current preprod
+telemetry.**
 
-Diagnostic evidence (App Insights, preprod, last 48h):
+Two independent obstacles, either of which is sufficient to make B2
+uncomputable *as designed* for APG-2495:
 
-```kql
-requests
-| where cloud_RoleName == "hmpps-accredited-programmes-api"
-| where timestamp > ago(48h)
-| summarize request_count = count(), distinct_url_paths = dcount(url)
-        --> request_count = 131 707, distinct_url_paths = 174
+1. **No organic SAR traffic on preprod.** App Insights over the 48h
+   window straddling the deploy:
 
-requests
-| where cloud_RoleName == "hmpps-accredited-programmes-api"
-| where timestamp > ago(48h)
-| where url has "subject" or url has "sar" or url has "access-request"
-        --> 0 rows
-```
+   ```kql
+   requests
+   | where cloud_RoleName == "hmpps-accredited-programmes-api"
+   | where timestamp > ago(48h)
+   | summarize request_count = count(), distinct_url_paths = dcount(url)
+           --> request_count = 131 707, distinct_url_paths = 174
 
-Preprod is heavily trafficked (131k requests / 48h over 174 distinct
-paths) but the SAR endpoint is not on any of those paths — normal for
-a backend service where the SAR aggregator only hits preprod when
-manually triggered. This is not a B2 failure; it's a measurement
-prerequisite that isn't met yet.
+   requests
+   | where cloud_RoleName == "hmpps-accredited-programmes-api"
+   | where timestamp > ago(48h)
+   | where url has "subject" or url has "sar" or url has "access-request"
+           --> 0 rows
+   ```
 
-**Reactivation trigger.** Once HAAR-5793 lands (unlocks live SAR
-calls from the retest laptop), self-generate a small burst against
-the retest PRN `A8610DY` — 20 sequential `GET /subject-access-request?prn=A8610DY`
-requests spaced by ~1s, taking care to warm the JVM with 2–3 discards
-first. Wait 10 minutes for App Insights ingestion, then re-run B2
-with a single post-load window and compare `p95(duration)` against
-the two-week rolling p95 pre-deploy (`2026-07-08` → `2026-07-22T14:00Z`)
-as the baseline. The `bufferHours` / `windowHours` template already
-captured in this note's Path-1 section is directly reusable — swap
-the pre-window bounds and drop the `if` on the empty post-window.
+   Preprod is heavily trafficked (131k requests / 48h over 174 distinct
+   paths), but no SAR path is served in either the pre- or post-deploy
+   window. Nothing to compare against.
 
-Original B2 KQL retained here for the reactivation:
+2. **Preprod auth wall.** The dev SAR-scoped token minted after
+   HAAR-5793 landed does not authorise against the preprod endpoint
+   (verified: `HTTP 403` on
+   `GET https://accredited-programmes-api-preprod.hmpps.service.justice.gov.uk/subject-access-request?prn=A8610DY`).
+   A separate preprod-scoped SAR-role client would be needed to
+   self-generate load; HAAR-5793 was scoped to dev.
+
+**Deliberate downgrade rather than "parked".** Even if we filed a
+HAAR-5793 follow-up for preprod SAR access and self-generated a burst
+of requests, the resulting number would be *synthetic-load p95 vs
+zero-organic-traffic pre-deploy baseline* — not a regression
+measurement, just a magnitude for a hypothetical response time. The
+regression risk B2 was written to catch (per-row staff lookups
+inflating SAR latency in the wild) is already covered from two
+angles:
+
+- **B1** deterministically asserts the query-count model: exactly 3
+  `StaffRepository` calls per SAR regardless of row count, verified
+  by `@MockitoSpyBean` + `verifyNoMoreInteractions`. Any regression
+  toward per-row lookups fails B1 loudly in CI.
+- **B3** demonstrates on live preprod that both V144 indexes are
+  used by the resolver's `WHERE username IN (...)` /
+  `WHERE staff_id IN (...)` query shape (`Index Scan`, cost ≈ 8.32).
+
+Together B1 + B3 cover the causal chain end-to-end. B2 would only
+add a coarse outcome measurement, and one that can't be sampled from
+current preprod traffic anyway.
+
+**Future retest reactivation.** If preprod ever starts serving
+organic SAR traffic (e.g. once the aggregator team integrates ACP
+into preprod runs — see D2 below), the B2 KQL below can be run
+against the accumulated telemetry with zero further effort. Keeping
+it here for that reason.
+
+Original B2 KQL retained for the reactivation:
 
 ```kql
 let deployTime = datetime(2026-07-22T15:03:12Z);
