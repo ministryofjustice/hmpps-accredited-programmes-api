@@ -89,6 +89,21 @@ To run linting and tests, do:
 The integration tests start a local Spring Boot instance which listens on a random port, and create containerised Postgres and Localstack instances via the test containers API,
 negating the need for any external docker dependencies.
 
+### Rendering a captured SAR JSON payload
+
+For OSAR handovers we sometimes need to render a captured SAR JSON payload into
+the same HTML the SAR aggregator produces. `SarHtmlRenderHarnessTest` is a
+dev-only harness that does this using the real `hmpps-subject-access-request-lib`
+template renderer. It is skipped unless `APG_SAR_HTML_INPUT` is set:
+
+```bash
+APG_SAR_HTML_INPUT=/path/to/sar-payload.json \
+  ./gradlew test --tests '*SarHtmlRenderHarnessTest*'
+```
+
+The rendered HTML is written to `$TMPDIR/apg-sar-rendered-<basename>.html`
+(override with `APG_SAR_HTML_OUT=/some/dir`).
+
 ### Pact
 
 [We use
