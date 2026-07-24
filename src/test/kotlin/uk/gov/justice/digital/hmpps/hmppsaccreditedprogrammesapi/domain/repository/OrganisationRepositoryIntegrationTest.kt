@@ -4,7 +4,6 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.integration.IntegrationTestBase
 import kotlin.test.Test
 
@@ -16,7 +15,6 @@ import kotlin.test.Test
  * relies on.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 class OrganisationRepositoryIntegrationTest : IntegrationTestBase() {
 
   @Autowired
