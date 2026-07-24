@@ -867,12 +867,19 @@ rows across the ACP-visible sections — that's `A0137CY`.
 **Nice-to-have caveat.** None of the 10 preprod candidates had
 `refs_with_original > 0` or `selected_sexual_offence_details` rows —
 those two nice-to-haves are only realised on dev (`A8610DY` has 7
-referrals with original + 12 sexual-offence-details rows). That's
-fine for D2's purpose (aggregator PDF rendering with a realistic ACP
-block), and it does not affect any exit criterion — the two missing
-nice-to-haves are APG-2493 concerns, not APG-2495. Recorded here so a
-future retest doesn't waste cycles re-searching preprod for a
-better-shaped candidate.
+referrals with original + 12 sexual-offence-details rows). Impact on
+D2 is narrow: the aggregator PDF will render those two sub-blocks
+empty ("No Data Held"), so we can't *visually* confirm they look
+right on preprod for this walk-through. It does **not** shrink
+APG-2495's coverage of the APG-2492 batch staff-surname resolver —
+that pipeline runs off `referrer` / `primaryPomStaffId` /
+`secondaryPomStaffId` on the referrals we do have, plus `audit_record`
+and `referral_status_history` rows, none of which need
+`original_referral_id` or `selected_sexual_offence_details` to be
+populated. A follow-up preprod subject with those two nice-to-haves
+present would additionally double as a warm APG-2493 validation
+target; parked as a future-retest note so we don't burn cycles
+re-searching now.
 
 **Why `A0137CY` and not one of the other 9 candidates.** Highest
 total-rows-across-ACP-sections of the 10 preprod PRNs meeting the
