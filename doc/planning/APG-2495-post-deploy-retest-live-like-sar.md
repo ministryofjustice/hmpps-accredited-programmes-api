@@ -910,3 +910,171 @@ on this branch. Only artefacts:
 - Zero lines of production code
 - ~2 hours end-to-end (dev checks: 30 min; preprod checks: 1h; write-up
   and screenshots: 30 min)
+
+## APG-2493 dev report (for OSAR handover)
+
+**Ticket driving this section:** APG-2493 (enrich SAR referrals with a
+nested `originalReferral` block) — merged as PR #1101, commit
+`106e27d2` on `main`.
+
+**Deployment verification (2026-07-24):**
+
+- `main` HEAD: `106e27d2 APG-2493: enrich SAR referrals with a nested originalReferral block (#1101)`
+- Dev `/info`:
+
+  ```json
+  {
+    "git":   { "branch": "main", "commit": { "id": "106e27d", "time": "2026-07-24T11:30:10Z" } },
+    "build": { "version": "2026-07-24.402.106e27d", "time": "2026-07-24T11:30:55.541Z" }
+  }
+  ```
+
+  SHAs match → dev is running APG-2493. Live SAR responses from dev
+  will now include `referrals[].originalReferral` where the source
+  referral has a non-null `originalReferralId`.
+
+**Retest PRN:** `A8610DY` (same subject used for A1–A5 / B1 / C2 / C3
+on this branch — confirmed to have at least one referral with a
+non-null `originalReferralId` in the retest-data-shape snapshot; the
+dev-DB SQL captured earlier in this note showed 7 such referrals).
+
+**Report generation:** use
+[`script/apg2493-generate-dev-report.sh`](../../script/apg2493-generate-dev-report.sh).
+The script assumes an `APG2495_TOKEN` env var (HMPPS Auth JWT with
+`ROLE_SAR_DATA_ACCESS`). The correct dev creds live in the **UI**'s
+secret (not the API's) — specifically **`hmpps-accredited-programmes-ui`**
+secret in namespace `hmpps-accredited-programmes-dev`, under keys
+**`SYSTEM_CLIENT_ID` / `SYSTEM_CLIENT_SECRET`**. That yields the
+`hmpps-accredited-programmes-client-1` (36-char) HMPPS Auth client
+which HAAR-5793 augmented with `ROLE_SAR_DATA_ACCESS`. Other candidate
+secrets in the same namespace to *avoid*:
+
+- `hmpps-accredited-programmes-api` → holds `SYSTEM_CLIENT_ID` for
+  `hmpps-accredited-programmes-api-client-2`, an outbound-only client
+  with no SAR role.
+- `hmpps-accredited-programmes-api-client-creds` and
+  `hmpps-accredited-programmes-ui-client-creds` → both hold literal
+  `"example value"` placeholder stubs.
+
+**Also: you must be on the MoJ VPN (GlobalProtect)** — the auth server's
+fronting gateway returns `HTTP 403` with an empty body to off-VPN
+callers. Full mint command:
+
+```zsh
+CID=$(kubectl -n hmpps-accredited-programmes-dev get secret hmpps-accredited-programmes-ui \
+    -o jsonpath='{.data.SYSTEM_CLIENT_ID}' | base64 --decode)
+CSECRET=$(kubectl -n hmpps-accredited-programmes-dev get secret hmpps-accredited-programmes-ui \
+    -o jsonpath='{.data.SYSTEM_CLIENT_SECRET}' | base64 --decode)
+export APG2495_TOKEN=$(curl -sS -u "$CID:$CSECRET" \
+    -H 'Content-Type: application/x-www-form-urlencoded' \
+    -d 'grant_type=client_credentials' \
+    https://sign-in-dev.hmpps.service.justice.gov.uk/auth/oauth/token | jq -r .access_token)
+# sanity: role must include ROLE_SAR_DATA_ACCESS
+PAYLOAD=$(echo "$APG2495_TOKEN" | cut -d. -f2)
+while [ $((${#PAYLOAD} % 4)) -ne 0 ]; do PAYLOAD="${PAYLOAD}="; done
+echo "$PAYLOAD" | base64 --decode | jq '.authorities | any(. == "ROLE_SAR_DATA_ACCESS")'
+```
+
+The script writes the full SAR JSON to
+`/tmp/apg2493-dev-A8610DY-<timestamp>.json` and prints:
+
+- deployed dev build (commit + version) — belt-and-braces re-check
+- top-level section row counts (referrals, courseParticipation, etc.)
+- APG-2493 coverage: total referrals, count with `originalReferralId`
+  populated, count with the enriched `originalReferral` block populated
+- a pretty-printed sample of the first populated `originalReferral`
+- the list of keys present on that sample (should be the 9-field spec
+  Ops signed off via Naseem: `id`, `referralStatus`, `submittedOn`,
+  `courseName`, `courseStrand`, `referrerUsername`,
+  `primaryPomStaffSurname`, `secondaryPomStaffSurname`,
+  `organisationName`)
+
+**Handover to OSAR.** Attach the generated JSON (or a redacted excerpt
+of one referral with a populated `originalReferral`) to Sharon's
+Aug-3-deadline thread, alongside a note explaining that the new
+enrichment resolves the "which programme did this person originally
+apply for" gap OSAR flagged. Preprod aggregator PDF walkthrough (D2
+on this note, using PRN `A0137CY`) will follow next.
+
+### Run log
+
+Executed 2026-07-24, results:
+
+- Date executed: **2026-07-24 13:26 UTC**
+- Executed by: Raby (local laptop, on VPN, token minted from
+  `hmpps-accredited-programmes-client-1` credentials in the UI k8s
+  secret — see mint block above)
+- Output file: **`/tmp/apg2493-dev-A8610DY-20260724-132627.json`** (8 014 266 bytes)
+- HTTP status: **200**
+- Deployed dev build at time of call: commit `106e27d`, version `2026-07-24.402.106e27d`
+- Total referrals: **189**
+- Referrals with `originalReferralId`: **7**
+- Referrals with populated `originalReferral`: **7** (100 % of the
+  enrichable subset — no unresolved originals)
+- Keys on populated `originalReferral` (observed on first sample):
+  `additionalInformation`, `courseName`, `hasLdc`, `id`,
+  `organisationName`, `referrerOverrideReason`, `referrerSurname`,
+  `statusCode`, `submittedOn`
+- Attached to OSAR thread (link): _pending — see "Spec-vs-implementation delta" below before sending_
+
+### Spec-vs-implementation delta (surface before OSAR handover)
+
+The planning-note "9-field spec Ops signed off via Naseem" listed:
+`id`, `referralStatus`, `submittedOn`, `courseName`, `courseStrand`,
+`referrerUsername`, `primaryPomStaffSurname`,
+`secondaryPomStaffSurname`, `organisationName`.
+
+Actual APG-2493 response ships **9 fields** — but not the same 9:
+
+| Spec field | Ship status |
+|---|---|
+| `id` | ✅ present as `id` |
+| `referralStatus` | ⚠️ present as `statusCode` (renamed) |
+| `submittedOn` | ✅ present as `submittedOn` |
+| `courseName` | ✅ present as `courseName` |
+| `courseStrand` | ❌ **not present** |
+| `referrerUsername` | ⚠️ present as `referrerSurname` (renamed; arguably better — pre-resolved by APG-2492 batch resolver) |
+| `primaryPomStaffSurname` | ❌ **not present** |
+| `secondaryPomStaffSurname` | ❌ **not present** |
+| `organisationName` | ✅ present as `organisationName` |
+| — | ➕ extra: `additionalInformation` |
+| — | ➕ extra: `hasLdc` |
+| — | ➕ extra: `referrerOverrideReason` |
+
+**Sample first populated `originalReferral`** (captured 2026-07-24 from
+the retest PRN's response):
+
+```json
+{
+  "id":                     "18ab24d7-6d7d-4a45-97a0-ccd517fe27c8",
+  "courseName":             "Becoming New Me Plus",
+  "organisationName":       "Whatton (HMP)",
+  "submittedOn":            "2024-06-26T20:34:19.892459",
+  "statusCode":             "MOVED_TO_BUILDING_CHOICES",
+  "referrerSurname":        null,
+  "referrerOverrideReason": null,
+  "hasLdc":                 null,
+  "additionalInformation":  "test"
+}
+```
+
+**Decision required before OSAR handover:**
+
+- **Option A (ship as-is).** The planning note's "9-field spec" is
+  stale or was superseded by a later Ops clarification (the
+  `referrerUsername → referrerSurname` rename is objectively better —
+  OSAR asked for surnames, not raw usernames, in the parent
+  APG-2492). If the actually-agreed spec matches what shipped,
+  attach the JSON to Sharon's thread as-is.
+- **Option B (hotfix on APG-2493).** If the three missing fields
+  (`courseStrand`, `primaryPomStaffSurname`,
+  `secondaryPomStaffSurname`) are genuine spec items, open a small
+  follow-up branch off `main` (`APG-2493/original-referral-missing-fields`)
+  to add them to `SarOriginalReferral` + its mapper + template, ship,
+  wait for dev deploy, re-run this script, then hand over.
+
+Suggested triage: re-read Naseem's original email + attached table
+against the shipped JSON above; if any of the three "missing" fields
+are called out there, take Option B. Otherwise, Option A.
+
+
