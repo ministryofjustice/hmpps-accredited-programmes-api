@@ -18,6 +18,20 @@
             <tr><td>Referrer override reason</td><td>{{ optionalValue referrerOverrideReason }}</td></tr>
             <tr><td>Additional information</td><td>{{ optionalValue additionalInformation }}</td></tr>
         </table>
+        {{#originalReferral}}
+            <h4>Original referral</h4>
+            <table class="summary-list">
+                <tr><td>Original referral ID</td><td>{{ optionalValue id }}</td></tr>
+                <tr><td>Course name</td><td>{{ optionalValue courseName }}</td></tr>
+                <tr><td>Organisation name</td><td>{{ optionalValue organisationName }}</td></tr>
+                <tr><td>Submitted on</td><td>{{ optionalValue (formatDate submittedOn) }}</td></tr>
+                <tr><td>Status</td><td>{{ optionalValue statusCode }}</td></tr>
+                <tr><td>Referrer surname</td><td>{{ optionalValue referrerSurname }}</td></tr>
+                <tr><td>Referrer override reason</td><td>{{ optionalValue referrerOverrideReason }}</td></tr>
+                <tr><td>Has LDC</td><td>{{ convertBoolean hasLdc }}</td></tr>
+                <tr><td>Additional information</td><td>{{ optionalValue additionalInformation }}</td></tr>
+            </table>
+        {{/originalReferral}}
         <br>
     {{/referrals}}
     {{^referrals}}

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditEntity
@@ -49,6 +50,8 @@ class SubjectAccessRequestService(
 
 ) : HmppsPrisonSubjectAccessRequestService {
 
+  private val log = LoggerFactory.getLogger(SubjectAccessRequestService::class.java)
+
   override fun getPrisonContentFor(prn: String, fromDate: LocalDate?, toDate: LocalDate?): HmppsSubjectAccessRequestContent? {
     val filteredReferrals = referralRepository.getSarReferrals(prn).filter { referral ->
       val afterFromDate = fromDate?.let { referral.submittedOn?.isAfter(it.atStartOfDay()) } ?: true
@@ -68,20 +71,59 @@ class SubjectAccessRequestService(
       .flatMap { it.selectedSexualOffenceDetails }
       .distinctBy { it.id }
 
+    // Batch-load every referral referenced by an `originalReferralId` on the
+    // filtered set in a single `WHERE referral_id IN (?)` query. Missing IDs
+    // (referential-integrity drift – e.g. an original hard-deleted outside
+    // of the normal soft-delete flow) are silently dropped by the IN clause
+    // and logged as a WARN so they remain visible in production telemetry.
+    val originalReferralIds = filteredReferrals.mapNotNull { it.originalReferralId }.toSet()
+    val originalsById: Map<UUID, ReferralEntity> = if (originalReferralIds.isEmpty()) {
+      emptyMap()
+    } else {
+      referralRepository.findAllById(originalReferralIds).associateBy { it.id!! }
+    }
+    val unresolvedOriginals = originalReferralIds - originalsById.keys
+    if (unresolvedOriginals.isNotEmpty()) {
+      log.warn(
+        "SAR: {} originalReferralId(s) referenced by filtered referrals could not be loaded: {}",
+        unresolvedOriginals.size,
+        unresolvedOriginals,
+      )
+    }
+
     // Resolve every staff surname referenced by the SAR payload in exactly two
     // queries (one by-username, one by-staff-id), rather than the previous
     // per-row point-lookup pattern which produced O(N) queries per referral /
-    // course participation / audit / status-history row.
+    // course participation / audit / status-history row. The original-referral
+    // set is folded in here so per-original referrer surnames come for free
+    // from the same two queries.
     val staffSurnames = resolveStaffSurnames(
-      filteredReferrals,
+      filteredReferrals + originalsById.values,
       filteredParticipations,
       auditRecords,
       referralStatusHistory,
     )
 
+    // Resolve organisations across the current *and* original referrals in a
+    // single `WHERE code IN (?)` query. `organisationsByCode` is reused for
+    // both the top-level `Content.organisations` list (order preserved from
+    // the filtered referrals only, matching the previous per-code behaviour)
+    // and every `SarOriginalReferral.organisationName` lookup below.
+    val codesFromFiltered = filteredReferrals.mapNotNull { it.offering?.organisationId }.distinct()
+    val allOrgCodes = buildSet {
+      addAll(codesFromFiltered)
+      originalsById.values.forEach { it.offering?.organisationId?.let(::add) }
+    }
+    val organisationsByCode: Map<String, OrganisationEntity> = if (allOrgCodes.isEmpty()) {
+      emptyMap()
+    } else {
+      organisationRepository.findAllByCodeIn(allOrgCodes).associateBy { it.code }
+    }
+    val organisationNamesByCode: Map<String, String> = organisationsByCode.mapValues { it.value.name }
+
     return HmppsSubjectAccessRequestContent(
       content = Content(
-        referrals = filteredReferrals.toSarReferral(staffSurnames),
+        referrals = filteredReferrals.toSarReferral(staffSurnames, originalsById, organisationNamesByCode),
         courseParticipation = filteredParticipations.toSarParticipation(staffSurnames),
         auditRecords = auditRecords.toSarAudit(staffSurnames),
         courses = courseRepository.getSarCourses(prn).toSarCourse(),
@@ -93,9 +135,7 @@ class SubjectAccessRequestService(
         selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
         sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
         staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() },
-        organisations = filteredReferrals.mapNotNull { it.offering?.organisationId }
-          .distinct()
-          .mapNotNull { organisationRepository.findOrganisationEntityByCode(it)?.toSarOrganisation() },
+        organisations = codesFromFiltered.mapNotNull { organisationsByCode[it]?.toSarOrganisation() },
       ),
 
     )
@@ -180,6 +220,30 @@ class SubjectAccessRequestService(
     val hasLdc: Boolean?,
     val hasLdcBeenOverriddenByProgrammeTeam: Boolean,
     val hasReviewedAdditionalInformation: Boolean?,
+    val originalReferral: SarOriginalReferral?,
+  )
+
+  /**
+   * Enriched view of the referral this record supersedes (typically a WITHDRAWN
+   * referral that was re-submitted onto a different pathway). Rendered as a
+   * nested block on each [SarReferral] so a subject can understand what a bare
+   * `originalReferralId` UUID refers to; `null` when the parent referral has
+   * no `originalReferralId` or when the referenced row could not be loaded.
+   *
+   * Every field mirrors the corresponding field on the parent [SarReferral]
+   * (or the resolved organisation / staff surname) so the mustache template
+   * can render the block with the same `optionalValue` conventions.
+   */
+  data class SarOriginalReferral(
+    val id: UUID,
+    val courseName: String?,
+    val organisationName: String?,
+    val submittedOn: LocalDateTime?,
+    val statusCode: String?,
+    val referrerSurname: String?,
+    val referrerOverrideReason: String?,
+    val hasLdc: Boolean?,
+    val additionalInformation: String?,
   )
 
   data class SarCourseParticipation(
@@ -315,7 +379,11 @@ class SubjectAccessRequestService(
     )
   }
 
-  private fun List<ReferralEntity>.toSarReferral(surnames: StaffSurnames): List<SarReferral> = map {
+  private fun List<ReferralEntity>.toSarReferral(
+    surnames: StaffSurnames,
+    originalsById: Map<UUID, ReferralEntity>,
+    organisationNamesByCode: Map<String, String>,
+  ): List<SarReferral> = map {
     SarReferral(
       it.prisonNumber,
       it.oasysConfirmed,
@@ -331,8 +399,26 @@ class SubjectAccessRequestService(
       it.hasLdc,
       it.hasLdcBeenOverriddenByProgrammeTeam,
       it.hasReviewedAdditionalInformation,
+      originalReferral = it.originalReferralId?.let { originalId ->
+        originalsById[originalId]?.toSarOriginalReferral(surnames, organisationNamesByCode)
+      },
     )
   }
+
+  private fun ReferralEntity.toSarOriginalReferral(
+    surnames: StaffSurnames,
+    organisationNamesByCode: Map<String, String>,
+  ): SarOriginalReferral = SarOriginalReferral(
+    id = id!!,
+    courseName = offering?.course?.name,
+    organisationName = offering?.organisationId?.let { organisationNamesByCode[it] },
+    submittedOn = submittedOn,
+    statusCode = status,
+    referrerSurname = surnames.forUsername(referrer.username),
+    referrerOverrideReason = referrerOverrideReason,
+    hasLdc = hasLdc,
+    additionalInformation = additionalInformation,
+  )
 
   private fun List<AuditEntity>.toSarAudit(surnames: StaffSurnames): List<SarAuditRecord> = map {
     SarAuditRecord(

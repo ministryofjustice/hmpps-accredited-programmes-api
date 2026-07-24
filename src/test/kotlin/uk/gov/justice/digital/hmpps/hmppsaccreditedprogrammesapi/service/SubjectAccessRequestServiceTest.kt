@@ -90,6 +90,7 @@ class SubjectAccessRequestServiceTest {
     val fromDate = LocalDate.of(2022, 1, 1)
     val toDate = LocalDate.of(2023, 1, 1)
 
+    val originalReferralId = UUID.fromString("11111111-2222-3333-4444-555555555555")
     val referralEntity = ReferralEntityFactory()
       .withPrisonNumber(prn)
       .withOasysConfirmed(true)
@@ -105,7 +106,61 @@ class SubjectAccessRequestServiceTest {
           .withCourse(CourseEntityFactory().withName("Anger Management").produce())
           .produce(),
       )
-      .withOriginalReferralId(UUID.randomUUID())
+      .withOriginalReferralId(originalReferralId)
+      .produce()
+
+    // Seeded "original referral" that the parent's `originalReferralId` points at.
+    // Every field is distinct from the parent so the SarOriginalReferral assertions
+    // below prove the mapper is reading from the original entity rather than
+    // leaking through parent state.
+    val originalReferralEntity = ReferralEntityFactory()
+      .withId(originalReferralId)
+      .withPrisonNumber(prn)
+      .withStatus("WITHDRAWN")
+      .withSubmittedOn(LocalDateTime.of(2021, 3, 15, 9, 30))
+      .withAdditionalInformation("Superseded original")
+      .withReferrerOverrideReason("Original override")
+      .withReferrer(ReferrerUserEntity(username = "original_user"))
+      .withOffering(
+        OfferingEntityFactory()
+          .withOrganisationId("MDI")
+          .withCourse(CourseEntityFactory().withName("Building Choices").produce())
+          .produce(),
+      )
+      .withHasLdcBeenOverwrittenByProgrammeTeam(false)
+      .withLdc(false)
+      .produce()
+
+    // Second referral: an `originalReferralId` that intentionally does NOT
+    // resolve via `findAllById` – proves the defensive "unresolved -> null"
+    // branch (logged as a WARN in production) and that a `null`
+    // originalReferralId maps to a `null` originalReferral block.
+    val orphanedOriginalId = UUID.fromString("77777777-8888-9999-aaaa-bbbbbbbbbbbb")
+    val orphanReferralEntity = ReferralEntityFactory()
+      .withPrisonNumber(prn)
+      .withStatus("REFERRAL_STARTED")
+      .withSubmittedOn(LocalDateTime.of(2022, 6, 2, 10, 0))
+      .withReferrer(ReferrerUserEntity(username = "user2"))
+      .withOffering(
+        OfferingEntityFactory()
+          .withOrganisationId("MDI")
+          .withCourse(CourseEntityFactory().withName("Anger Management").produce())
+          .produce(),
+      )
+      .withOriginalReferralId(orphanedOriginalId)
+      .produce()
+    val nullOriginalReferralEntity = ReferralEntityFactory()
+      .withPrisonNumber(prn)
+      .withStatus("REFERRAL_STARTED")
+      .withSubmittedOn(LocalDateTime.of(2022, 6, 3, 10, 0))
+      .withReferrer(ReferrerUserEntity(username = "user3"))
+      .withOffering(
+        OfferingEntityFactory()
+          .withOrganisationId("MDI")
+          .withCourse(CourseEntityFactory().withName("Anger Management").produce())
+          .produce(),
+      )
+      .withOriginalReferralId(null)
       .produce()
 
     val participationEntity = CourseParticipationEntityFactory()
@@ -123,7 +178,10 @@ class SubjectAccessRequestServiceTest {
       .withLastModifiedDateTime(LocalDateTime.of(2022, 8, 1, 10, 0))
       .produce()
 
-    every { referralRepository.getSarReferrals(prn) } returns listOf(referralEntity)
+    every { referralRepository.getSarReferrals(prn) } returns listOf(referralEntity, orphanReferralEntity, nullOriginalReferralEntity)
+    // Batch stub: seeded original resolves, orphaned original silently drops
+    // out of the returned list (mirrors production IN-clause behaviour).
+    every { referralRepository.findAllById(setOf(originalReferralId, orphanedOriginalId)) } returns listOf(originalReferralEntity)
     every { courseParticipationRepository.getSarParticipations(prn) } returns listOf(participationEntity)
     every { auditRepository.getSarAuditRecords(prn) } returns listOf(
       AuditEntityFactory()
@@ -185,10 +243,12 @@ class SubjectAccessRequestServiceTest {
         .withUsername("ARIVER")
         .produce(),
     )
-    every { organisationRepository.findOrganisationEntityByCode("MDI") } returns OrganisationEntityFactory()
-      .withCode("MDI")
-      .withName("HMP Moorland")
-      .produce()
+    every { organisationRepository.findAllByCodeIn(match { it.toSet() == setOf("MDI") }) } returns listOf(
+      OrganisationEntityFactory()
+        .withCode("MDI")
+        .withName("HMP Moorland")
+        .produce(),
+    )
 
     // When
     val result = service.getPrisonContentFor(prn, fromDate, toDate)
@@ -196,7 +256,7 @@ class SubjectAccessRequestServiceTest {
     // Then
     assertThat(result).isNotNull()
     with(result!!.content as SubjectAccessRequestService.Content) {
-      assertThat(referrals.size).isEqualTo(1)
+      assertThat(referrals.size).isEqualTo(3)
       assertThat(courseParticipation.size).isEqualTo(1)
       assertThat(auditRecords.size).isEqualTo(1)
       assertThat(courses.size).isEqualTo(1)
@@ -214,6 +274,36 @@ class SubjectAccessRequestServiceTest {
       assertThat(referral.primaryPomStaffSurname).isNull()
       assertThat(referral.secondaryPomStaffSurname).isNull()
       assertThat(referral.hasReviewedAdditionalInformation).isNull()
+      assertThat(referral.originalReferralId).isEqualTo(originalReferralId)
+
+      // SarOriginalReferral – every field is sourced from the seeded original,
+      // proving the mapper reads through `originalsById` rather than leaking
+      // parent state, and that organisation-name / referrer-surname come from
+      // the batch maps (not a separate lookup per original).
+      val originalReferral = referral.originalReferral!!
+      assertThat(originalReferral.id).isEqualTo(originalReferralId)
+      assertThat(originalReferral.courseName).isEqualTo("Building Choices")
+      assertThat(originalReferral.organisationName).isEqualTo("HMP Moorland")
+      assertThat(originalReferral.submittedOn).isEqualTo(LocalDateTime.of(2021, 3, 15, 9, 30))
+      assertThat(originalReferral.statusCode).isEqualTo("WITHDRAWN")
+      assertThat(originalReferral.referrerSurname).isEqualTo("River")
+      assertThat(originalReferral.referrerOverrideReason).isEqualTo("Original override")
+      assertThat(originalReferral.hasLdc).isEqualTo(false)
+      assertThat(originalReferral.additionalInformation).isEqualTo("Superseded original")
+
+      // Orphaned original-referral-id (referential-integrity drift): the
+      // parent still exposes the raw UUID for debugging, but the nested block
+      // is null because `findAllById` returned no row for it. A WARN is logged
+      // in production (not asserted here to avoid coupling to a specific log
+      // appender – the observable contract is the null nested block).
+      val orphanReferral = referrals[1]
+      assertThat(orphanReferral.originalReferralId).isEqualTo(orphanedOriginalId)
+      assertThat(orphanReferral.originalReferral).isNull()
+
+      // originalReferralId == null: no batch lookup performed, block is null.
+      val plainReferral = referrals[2]
+      assertThat(plainReferral.originalReferralId).isNull()
+      assertThat(plainReferral.originalReferral).isNull()
 
       val participation = courseParticipation[0]
       assertThat(participation.courseName).isEqualTo("Drug Awareness")
