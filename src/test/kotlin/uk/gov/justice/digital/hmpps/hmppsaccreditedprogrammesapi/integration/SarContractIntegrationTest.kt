@@ -127,6 +127,26 @@ class SarContractIntegrationTest :
       referable = true,
     )
     persistenceHelper.createReferrerUser("TEST_USER")
+    // Seed a superseded "original" referral so the main referral below carries a populated
+    // `originalReferralId`, and the SAR contract snapshots (JSON + HTML + generated PDF) exercise
+    // the populated `originalReferral` block rather than the null-branch. Distinct field
+    // values keep the snapshot diff unambiguous against the parent referral.
+    persistenceHelper.createReferral(
+      referralId = ORIGINAL_REFERRAL_ID,
+      offeringId = OFFERING_ID,
+      prisonNumber = PRISON_NUMBER,
+      referrerUsername = "TEST_USER",
+      additionalInformation = "Superseded original",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "WITHDRAWN",
+      submittedOn = ORIGINAL_SUBMITTED_ON,
+      primaryPomStaffId = 12345.toBigInteger(),
+      secondaryPomStaffId = 67890.toBigInteger(),
+      referrerOverrideReason = "Original override reason",
+      hasLdc = false,
+      hasLdcBeenOverriddenByProgrammeTeam = false,
+    )
     persistenceHelper.createReferral(
       referralId = REFERRAL_ID,
       offeringId = OFFERING_ID,
@@ -139,6 +159,7 @@ class SarContractIntegrationTest :
       submittedOn = SUBMITTED_ON,
       primaryPomStaffId = 12345.toBigInteger(),
       secondaryPomStaffId = 67890.toBigInteger(),
+      originalReferralId = ORIGINAL_REFERRAL_ID,
       hasLdc = true,
       hasLdcBeenOverriddenByProgrammeTeam = true,
     )
@@ -227,12 +248,17 @@ class SarContractIntegrationTest :
     val FROM_DATE: LocalDate = LocalDate.of(2024, 1, 1)
     val TO_DATE: LocalDate = LocalDate.of(2024, 12, 31)
     val SUBMITTED_ON: LocalDateTime = LocalDateTime.of(2024, 6, 1, 10, 0, 0)
+
+    // Kept inside FROM_DATE..TO_DATE so the SAR date-range filter surfaces the original referral
+    // alongside the superseding one; earlier than SUBMITTED_ON so it reads as the antecedent.
+    val ORIGINAL_SUBMITTED_ON: LocalDateTime = LocalDateTime.of(2024, 2, 10, 9, 30, 0)
     val CREATED_DATE_TIME: LocalDateTime = LocalDateTime.of(2024, 6, 1, 10, 0, 0)
 
     val ORGANISATION_ID: UUID = UUID.fromString("11111111-1111-1111-1111-111111111111")
     val COURSE_ID: UUID = UUID.fromString("22222222-2222-2222-2222-222222222222")
     val OFFERING_ID: UUID = UUID.fromString("33333333-3333-3333-3333-333333333333")
     val REFERRAL_ID: UUID = UUID.fromString("44444444-4444-4444-4444-444444444444")
+    val ORIGINAL_REFERRAL_ID: UUID = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd")
     val PARTICIPATION_ID: UUID = UUID.fromString("55555555-5555-5555-5555-555555555555")
     val AUDIT_RECORD_ID: UUID = UUID.fromString("66666666-6666-6666-6666-666666666666")
     val PNI_RESULT_ID: UUID = UUID.fromString("77777777-7777-7777-7777-777777777777")
