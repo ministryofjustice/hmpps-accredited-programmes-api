@@ -197,13 +197,6 @@ class SarContractIntegrationTest :
       referralId = REFERRAL_ID,
       sexualOffenceDetailsId = SEXUAL_OFFENCE_ID,
     )
-    persistenceHelper.createReferralStatusHistory(
-      id = REFERRAL_STATUS_HISTORY_ID,
-      referralId = REFERRAL_ID,
-      username = "TEST_USER",
-      status = "REFERRAL_STARTED",
-      statusStartDate = CREATED_DATE_TIME,
-    )
     persistenceHelper.createStaff(
       staffId = "12345".toBigInteger(),
       firstName = "John",
@@ -230,6 +223,5 @@ class SarContractIntegrationTest :
     val PERSON_ID: UUID = UUID.fromString("99999999-9999-9999-9999-999999999999")
     val SEXUAL_OFFENCE_ID: UUID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
     val SELECTED_SEXUAL_OFFENCE_ID: UUID = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
-    val REFERRAL_STATUS_HISTORY_ID: UUID = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc")
   }
 }

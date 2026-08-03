@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
@@ -26,7 +25,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResultEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralStatusHistoryEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.math.BigInteger
 import java.time.LocalDate
@@ -42,7 +40,6 @@ class SubjectAccessRequestServiceTest {
   private val pniResultRepository: PniResultRepository = mockk()
   private val personRepository: PersonRepository = mockk()
   private val oasysPniResultEntityRepository: OasysPniResultEntityRepository = mockk()
-  private val referralStatusHistoryRepository: ReferralStatusHistoryRepository = mockk()
   private val staffRepository: StaffRepository = mockk()
   private val organisationRepository: OrganisationRepository = mockk()
   private val staffLookupService: StaffLookupService = mockk()
@@ -58,7 +55,6 @@ class SubjectAccessRequestServiceTest {
       pniResultRepository,
       personRepository,
       oasysPniResultEntityRepository,
-      referralStatusHistoryRepository,
       staffRepository,
       organisationRepository,
       staffLookupService,
@@ -217,7 +213,6 @@ class SubjectAccessRequestServiceTest {
         programmePathway = "ALTERNATIVE_PATHWAY",
       ),
     )
-    every { referralStatusHistoryRepository.findByPrisonNumber(prn) } returns listOf(ReferralStatusHistoryEntityFactory().produce())
     every { staffRepository.findByPrisonNumber(prn) } returns listOf(
       StaffEntityFactory()
         .withStaffId("12345".toBigInteger())
@@ -246,8 +241,6 @@ class SubjectAccessRequestServiceTest {
       assertThat(pniResults.size).isEqualTo(1)
       assertThat(person).isNotNull
       assertThat(oasysPniResults.size).isEqualTo(1)
-      assertThat(referralStatusHistory.size).isEqualTo(1)
-      assertThat(referralStatusReasons).isEmpty()
       assertThat(selectedSexualOffenceDetails).isEmpty()
       assertThat(sexualOffenceDetails).isEmpty()
       assertThat(staff).hasSize(1)
@@ -310,10 +303,6 @@ class SubjectAccessRequestServiceTest {
       val oasysPniResult = oasysPniResults[0]
       assertThat(oasysPniResult.prisonNumber).isEqualTo(prn)
 
-      val referralStatusHistory = referralStatusHistory[0]
-      assertThat(referralStatusHistory.status).isNotBlank()
-      assertThat(referralStatusHistory.username).isEqualTo("River")
-
       val staffMember = staff[0]
       assertThat(staffMember.lastName).isEqualTo("River")
 
@@ -329,7 +318,6 @@ class SubjectAccessRequestServiceTest {
     verify { pniResultRepository.findAllByPrisonNumber(prn) }
     verify { personRepository.findPersonEntityByPrisonNumber(prn) }
     verify { oasysPniResultEntityRepository.findAllByPrisonNumber(prn) }
-    verify { referralStatusHistoryRepository.findByPrisonNumber(prn) }
     verify { staffRepository.findByPrisonNumber(prn) }
   }
 }

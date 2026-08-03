@@ -9,10 +9,8 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralStatusHistoryEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.SelectedSexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
@@ -22,7 +20,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
@@ -40,7 +37,6 @@ class SubjectAccessRequestService(
   private val pniResultRepository: PniResultRepository,
   private val personRepository: PersonRepository,
   private val oasysPniResultEntityRepository: OasysPniResultEntityRepository,
-  private val referralStatusHistoryRepository: ReferralStatusHistoryRepository,
   private val staffRepository: StaffRepository,
   private val organisationRepository: OrganisationRepository,
   private val staffLookupService: StaffLookupService,
@@ -62,7 +58,6 @@ class SubjectAccessRequestService(
       afterFromDate && beforeToDate
     }
 
-    val referralStatusHistory = referralStatusHistoryRepository.findByPrisonNumber(prn)
     val selectedSexualOffenceDetails = filteredReferrals
       .flatMap { it.selectedSexualOffenceDetails }
       .distinctBy { it.id }
@@ -90,13 +85,12 @@ class SubjectAccessRequestService(
     // Resolve every staff surname referenced by the SAR payload in exactly two
     // queries (one by-username, one by-staff-id), rather than the previous
     // per-row point-lookup pattern which produced O(N) queries per referral /
-    // course participation / status-history row. The original-referral
-    // set is folded in here so per-original referrer surnames come for free
-    // from the same two queries.
+    // course participation row. The original-referral set is folded in here
+    // so per-original referrer surnames come for free from the same two
+    // queries.
     val staffSurnames = resolveStaffSurnames(
       filteredReferrals + originalsById.values,
       filteredParticipations,
-      referralStatusHistory,
     )
 
     // Resolve organisations across the current *and* original referrals in a
@@ -124,8 +118,6 @@ class SubjectAccessRequestService(
         pniResults = pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),
         person = personRepository.findPersonEntityByPrisonNumber(prn)?.toSarPerson(),
         oasysPniResults = oasysPniResultEntityRepository.findAllByPrisonNumber(prn).toSarOasysPniResult(),
-        referralStatusHistory = referralStatusHistory.toSarReferralStatusHistory(staffSurnames),
-        referralStatusReasons = referralStatusHistory.mapNotNull { it.reason }.distinctBy { it.code }.toSarReferralStatusReason(),
         selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
         sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
         staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() },
@@ -136,14 +128,13 @@ class SubjectAccessRequestService(
   }
 
   /**
-   * Pre-resolves every staff surname referenced across the four SAR entity
+   * Pre-resolves every staff surname referenced across the SAR entity
    * collections that carry staff identifiers, collapsing what used to be
    * O(rows) point-lookups into two batch queries.
    */
   private fun resolveStaffSurnames(
     referrals: List<ReferralEntity>,
     participations: List<CourseParticipationEntity>,
-    statusHistory: List<ReferralStatusHistoryEntity>,
   ): StaffSurnames {
     val usernames = buildSet {
       referrals.forEach { add(it.referrer.username) }
@@ -151,7 +142,6 @@ class SubjectAccessRequestService(
         add(it.createdByUsername)
         it.lastModifiedByUsername?.let(::add)
       }
-      statusHistory.forEach { add(it.username) }
     }
     val staffIds = buildSet {
       referrals.forEach {
@@ -185,8 +175,6 @@ class SubjectAccessRequestService(
     val pniResults: List<SarPniResult>,
     val person: SarPerson?,
     val oasysPniResults: List<SarOasysPniResult>,
-    val referralStatusHistory: List<SarReferralStatusHistoryEntity>,
-    val referralStatusReasons: List<SarReferralStatusReason>,
     val selectedSexualOffenceDetails: List<SarSelectedSexualOffenceDetails>,
     val sexualOffenceDetails: List<SarSexualOffenceDetails>,
     val staff: List<SarStaff>,
@@ -293,28 +281,6 @@ class SubjectAccessRequestService(
     val prisonNumber: String,
     val oasysAssessmentId: Long?,
     val programmePathway: String?,
-  )
-
-  data class SarReferralStatusHistoryEntity(
-    val id: UUID?,
-    val referralId: UUID,
-    val status: String,
-    val previousStatus: String?,
-    val category: String?,
-    val reason: String?,
-    val notes: String?,
-    val statusStartDate: LocalDateTime,
-    val statusEndDate: LocalDateTime?,
-    val durationAtThisStatus: Long?,
-    val username: String?,
-  )
-
-  data class SarReferralStatusReason(
-    val code: String,
-    val referralStatusCategoryCode: String,
-    val description: String,
-    val active: Boolean,
-    val deselectOpen: Boolean,
   )
 
   data class SarSelectedSexualOffenceDetails(
@@ -441,32 +407,6 @@ class SubjectAccessRequestService(
       prisonNumber = it.prisonNumber,
       oasysAssessmentId = it.oasysAssessmentId,
       programmePathway = it.programmePathway,
-    )
-  }
-
-  private fun List<ReferralStatusHistoryEntity>.toSarReferralStatusHistory(surnames: StaffSurnames): List<SarReferralStatusHistoryEntity> = map {
-    SarReferralStatusHistoryEntity(
-      id = it.id,
-      referralId = it.referralId,
-      status = it.status.code,
-      previousStatus = it.previousStatus?.code,
-      category = it.category?.code,
-      reason = it.reason?.code,
-      notes = it.notes,
-      statusStartDate = it.statusStartDate,
-      statusEndDate = it.statusEndDate,
-      durationAtThisStatus = it.durationAtThisStatus,
-      username = surnames.forUsername(it.username),
-    )
-  }
-
-  private fun List<ReferralStatusReasonEntity>.toSarReferralStatusReason(): List<SarReferralStatusReason> = map {
-    SarReferralStatusReason(
-      code = it.code,
-      referralStatusCategoryCode = it.referralStatusCategoryCode,
-      description = it.description,
-      active = it.active,
-      deselectOpen = it.deselectOpen,
     )
   }
 
