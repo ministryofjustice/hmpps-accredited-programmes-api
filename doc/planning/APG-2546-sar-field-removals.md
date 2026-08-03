@@ -125,8 +125,11 @@ Two conflicting notes on the same rows:
 Options to put to Roxanne:
 
 - **A** — remove the whole section from the SAR (nothing surfaces).
-- **B** — keep `programme_pathway` visible, remove
-  `pniResultId` / `prisonNumber` / `oasysAssessmentId`.
+- **B** — strip `pniResultId` and `oasysAssessmentId`, keep
+  `prisonNumber` and `programmePathway`. (Verified against DTO
+  `SubjectAccessRequestService.kt` lines 315–320: those are the four
+  fields; there is no separate `programmePathway` vs ID mix beyond
+  this — Option B is concrete, not hypothetical.)
 
 Implementation effort is roughly identical either way.
 
@@ -177,7 +180,7 @@ turns that PDF back into something a human can read.
   - Delete `auditRecords: List<SarAuditRecord>` from `Content` data class (line 195)
   - Delete `data class SarAuditRecord(...)` (lines 268–278)
   - Delete `AuditEntity.List<*>.toSarAudit(...)` mapper (search once file is open)
-  - Remove `AuditRepository` from constructor injection (line 40)
+  - Remove `AuditRepository` from constructor injection (line 41)
   - Remove `AuditEntity` and `AuditRepository` imports
   - Remove `auditRecords` argument from `resolveStaffSurnames(...)` call site + method signature
 - `src/main/kotlin/.../domain/repository/AuditRepository.kt`
@@ -185,8 +188,8 @@ turns that PDF back into something a human can read.
 - `src/main/resources/sar_template.mustache`
   - Delete lines 68–86 (whole `<h2>Audit records</h2>` block including empty-state branch)
 - `src/test/kotlin/.../integration/SarContractIntegrationTest.kt`
-  - Delete `persistenceHelper.createAuditRecord(...)` seed (line 185)
-  - Delete `AUDIT_RECORD_ID` UUID constant
+  - Delete `persistenceHelper.createAuditRecord(...)` seed (line 164)
+  - Delete `AUDIT_RECORD_ID` UUID constant (constants block at lines 237–243)
   - Delete `AuditAction` import if now unused
 - `src/test/kotlin/.../service/SubjectAccessRequestServiceTest.kt`
   - Delete mock `every { auditRepository.getSarAuditRecords(...) }` (line 186)
@@ -234,7 +237,7 @@ Coupled because `referralStatusReasons` is derived from
   - Delete lines 172–208 (both `<h2>Referral status history</h2>` and
     `<h2>Referral status reasons</h2>` blocks)
 - `src/test/kotlin/.../integration/SarContractIntegrationTest.kt`
-  - Delete `persistenceHelper.createReferralStatusHistory(...)` seed (line 230)
+  - Delete `persistenceHelper.createReferralStatusHistory(...)` seed (line 209)
   - Delete `REFERRAL_STATUS_HISTORY_ID` UUID constant
 - `src/test/kotlin/.../service/SubjectAccessRequestServiceTest.kt`
   - Delete mock `every { referralStatusHistoryRepository.findByPrisonNumber(...) }` (line 236)
@@ -261,9 +264,9 @@ lets us delete the whole `selectedSexualOffenceDetails` local var
 - `src/main/resources/sar_template.mustache`
   - Delete lines 210–237 (both blocks)
 - `src/test/kotlin/.../integration/SarContractIntegrationTest.kt`
-  - Delete `persistenceHelper.createSexualOffenceDetails(...)` (line 216)
-  - Delete `persistenceHelper.createSelectedSexualOffenceDetails(...)` (line 225)
-  - Delete `persistenceHelper.deleteSexualOffenceDetails(SEXUAL_OFFENCE_ID)` teardown (top of `setupTestData()`)
+  - Delete `persistenceHelper.createSexualOffenceDetails(...)` (line 195)
+  - Delete `persistenceHelper.createSelectedSexualOffenceDetails(...)` (line 204)
+  - Delete `persistenceHelper.deleteSexualOffenceDetails(SEXUAL_OFFENCE_ID)` teardown (line 108, top of `setupTestData()`)
   - Delete `SEXUAL_OFFENCE_ID` and `SELECTED_SEXUAL_OFFENCE_ID` UUID constants
   - Delete `SexualOffenceDetailsEntity` and `SexualOffenceCategoryType` imports
 - `src/test/kotlin/.../service/SubjectAccessRequestServiceTest.kt`
@@ -281,11 +284,13 @@ lets us delete the whole `selectedSexualOffenceDetails` local var
   - Remove `OasysPniResultEntityRepository` from constructor injection
   - Remove `OasysPniResultEntity` and `OasysPniResultEntityRepository` imports
 - `src/main/kotlin/.../domain/repository/OasysPniResultEntityRepository.kt`
-  - Consider deleting `findAllByPrisonNumber` if verified dead
+  - **Do NOT delete** `findAllByPrisonNumber` — still called by
+    `PersonService.kt` (line 287) in the person-deletion cascade
+    (verified via `grep -rln findAllByPrisonNumber src/main`).
 - `src/main/resources/sar_template.mustache`
   - Delete lines 145–158
 - `src/test/kotlin/.../integration/SarContractIntegrationTest.kt`
-  - Delete `persistenceHelper.createOasysPniResult(...)` (line 200)
+  - Delete `persistenceHelper.createOasysPniResult(...)` (line 179)
   - Delete `OASYS_PNI_RESULT_ID` UUID constant
 - `src/test/kotlin/.../service/SubjectAccessRequestServiceTest.kt`
   - Delete oasysPniResults assertions (lines 265, 332)
@@ -308,8 +313,10 @@ subject sees a UUID string that is meaningless to them.
   - Delete `id: String` field from `SarOrganisation` (line 533)
   - Delete `id = id.toString()` from `OrganisationEntity.toSarOrganisation()` mapper
 - `src/main/resources/sar_template.mustache`
-  - Delete the `<tr><td>Id</td>...</tr>` line inside `{{#person}}` block (line ~124)
-  - Delete the `<tr><td>Id</td>...</tr>` line inside `{{#organisations}}` block (line ~163)
+  - Delete the `<tr><td>Person ID</td>...</tr>` line inside `{{#person}}` block (line 125)
+  - **Note:** the `{{#organisations}}` block (lines 160–170) does *not*
+    render an Id row today — it only renders `Name`. `SarOrganisation.id`
+    removal is therefore DTO + mapper only, no template change.
 - Regenerate + promote snapshots.
 
 **No test file changes** — the unit test asserts collection sizes
