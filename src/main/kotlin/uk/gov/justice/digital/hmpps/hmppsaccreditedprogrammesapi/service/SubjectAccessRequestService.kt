@@ -90,7 +90,7 @@ class SubjectAccessRequestService(
     // Resolve every staff surname referenced by the SAR payload in exactly two
     // queries (one by-username, one by-staff-id), rather than the previous
     // per-row point-lookup pattern which produced O(N) queries per referral /
-    // course participation / audit / status-history row. The original-referral
+    // course participation / status-history row. The original-referral
     // set is folded in here so per-original referrer surnames come for free
     // from the same two queries.
     val staffSurnames = resolveStaffSurnames(
