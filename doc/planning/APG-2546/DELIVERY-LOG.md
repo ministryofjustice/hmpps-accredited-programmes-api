@@ -9,14 +9,22 @@ end.
 
 ## Status at a glance
 
+> **📉 Round-2 page-count target already hit.** With PR-1 merged
+> and PR-2 open + reviewed, the sample SAR PDF has dropped from
+> the round-1 baseline of ~8,000 pages to **3 pages**. PRs 3, 4,
+> and 5 are still worthwhile (Roxanne's red-flagged rows, privacy
+> hygiene, etc.) but the "8,000-page complaint" is functionally
+> resolved. Consider this when prioritising OSAR round-2 handover
+> vs. finishing PRs 3–5.
+
 | Item | State | Notes |
 |---|---|---|
 | Planning branch (`APG-2546/planning-sar-field-removals`) | ✅ committed, ⏳ awaiting push | Squash `95993514` into `1dd32fef` before push if you want a clean history. |
 | Q1 to Roxanne (`oasys_pni_result` A vs B) | ⏳ sent + followed up 2026-08-03 | Default → **A** if no reply by 2026-08-14. |
 | Q2 to Roxanne (`is_national` on organisation) | ⏳ sent + followed up 2026-08-03 | Default → **leave off** if no reply by 2026-08-14. |
 | PR-1 — remove `auditRecords` | ✅ merged `50f67cff` 2026-08-03 | PR #1107. 9-lens agent review all green. Branch head `04ab44ed` (initial `4801f6e6` + review-fix `04ab44ed`). |
-| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ⬜ ready to start | Branch off `main` @ `50f67cff`. **Also update `SubjectAccessRequestServiceIntegrationTest.kt`** — same compile-blocker pattern PR-1 hit. |
-| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready | Rebase off `main` after PR-2. Same integration-test note as PR-2. |
+| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ⏳ opened #1109 2026-08-03, reviewed clean | Awaiting merge. Head `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages** (down from round-1's ~8,000). |
+| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start after PR-2 merges | Same integration-test note as PR-2. |
 | PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Same integration-test note if Q1 = A. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
 | PR-6 — regenerate OSAR round-2 review PDF + handover | 🚫 blocked on PRs 1–5 | Docs + snapshot regen only. |
@@ -130,8 +138,12 @@ defaults:
 
 - **PR link:** #1107.
 - **Merge commit on `main`:** `50f67cff`.
-- **Sample PDF page count post-PR:** TBD (measure alongside PR-2
-  or defer to PR-6).
+- **Sample PDF page count post-PR:** not measured at merge time —
+  first measurement is post-PR-2 = **3 pages** (see PR-2 entry
+  below). PR-1 alone certainly delivered the bulk of the drop
+  (28,483-row `auditRecords` section was the ~8,000-page
+  contributor); PR-2 shaves off a further couple of hundred rows
+  of status-history/reasons.
 - **Reviewer:** _(fill in from GitHub once merge notification lands)_.
 - **Notes / surprises:** none blocking. 9-lens agent review all
   green. Review-fix `04ab44ed` (stale block comment) pushed and
@@ -140,7 +152,62 @@ defaults:
   write-side confirmed untouched by inspection (no PR changes to
   `AuditService` / `PeopleController` write paths).
 
+### 2026-08-03 — PR-2 opened (awaiting merge to `main`)
+
+- **Branch:** `APG-2546/remove-status-history-and-reasons` (from
+  `main` @ `50f67cff`, i.e. tip-of-`main` after PR-1 merged).
+- **PR link:** #1109.
+- **Head commit on branch:** `f890b221` (initial `22c97122` +
+  review-fix amend; force-pushed once).
+- **Files changed:** 8 files, +5 / −167 (post-amend).
+- **Verification:** `./gradlew ktlintCheck test` green (678 tests),
+  snapshots regenerated (`sar-api-response.json` +
+  `sar-expected-render-result.html`), `entity-schema.json`
+  correctly untouched.
+- **No deviations from the PR-2 doc.** The
+  `SubjectAccessRequestServiceIntegrationTest.kt` §6 that
+  PR-1's experience added was hit exactly as documented — both
+  `createReferralStatusHistory` seeds + the
+  `content.referralStatusHistory` assertion removed.
+- **`ReferralStatusHistoryRepository.findByPrisonNumber`:** the
+  agent confirmed by grep that SAR service was the only remaining
+  caller in `src/main` and **deleted** the method (as suggested in
+  the PR-2 doc). `@EntityGraph` import correctly kept for the
+  surviving `getAllByReferralIdOrderByStatusStartDateDesc`.
+- **Review outcome (post-review by second agent — clean):**
+  - No ticket refs anywhere in the code diff.
+  - Import removals limited to what's necessary; no dangling unused
+    imports.
+  - Constructor-injection ordering preserved.
+  - Mustache blocks removed cleanly; blank-line spacing between
+    surviving `{{#organisations}}` and
+    `<h2>Selected sexual offence details</h2>` preserved.
+- **Review fixes amended into `f890b221`:**
+  1. Stale KDoc on `resolveStaffSurnames` still said "four SAR
+     entity collections" — accurate pre-APG-2492 (referrals /
+     participations / audits / statusHistory); PR-1 dropped audits
+     (→ three), PR-2 dropped statusHistory (→ two). Changed to
+     "the SAR entity collections" to match PR-1's "don't bother
+     counting" approach.
+  2. Stale rationale comment above
+     `val staffSurnames = resolveStaffSurnames(...)` still
+     enumerated "O(N) queries per referral / course participation /
+     status-history row". Dropped `status-history row` — mirrors
+     PR-1's `audit` removal in commit `04ab44ed`.
+- **Sample PDF post-PR-2:** **3 pages**. Round-1 baseline was
+  ~8,000 pages, so with PRs 1 + 2 landed we are effectively at the
+  round-2 target already. PRs 3, 4 (whichever option), and 5 will
+  trim further but the "8,000-page complaint" is functionally
+  resolved from this point forward.
+
 ### YYYY-MM-DD — PR-2 merged
+
+- **PR link:** #1109.
+- **Merge commit on `main`:** _(short SHA — fill in once merged)_.
+- **Sample PDF page count post-PR:** 3 pages (measured at branch
+  head — expected unchanged at merge).
+- **Reviewer:** _(name)_.
+- **Notes / surprises:** _(anything raised in review)_.
 
 - **PR link:** _()_.
 - **Merge commit on `main`:** _()_.
