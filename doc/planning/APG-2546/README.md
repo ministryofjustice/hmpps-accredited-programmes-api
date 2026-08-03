@@ -8,6 +8,7 @@ history in context. Read these alongside the top-level plan at
 | File | Purpose |
 |---|---|
 | `00-roxanne-followup.md` | Follow-up message to Roxanne re Q1 / Q2, with internal branching notes. |
+| `DELIVERY-LOG.md` | Running delivery log — status at a glance, timeline entries, contingencies. Update this every time a PR merges or Roxanne answers. |
 | `PR-1-remove-audit-records.md` | Delete `auditRecords` section — the "28,483 rows" fix. |
 | `PR-2-remove-status-history-and-reasons.md` | Delete `referralStatusHistory` + `referralStatusReasons`. |
 | `PR-3-remove-sexual-offence-details.md` | Delete `sexualOffenceDetails` + `selectedSexualOffenceDetails`. |
@@ -41,4 +42,3 @@ Paste this into a new chat when handing off a PR:
 > bottom of the doc. Do not deviate from the doc without flagging
 > it back to me first. Assumed starting point: tip of `main` after
 > PR-(N-1) has merged.
-
