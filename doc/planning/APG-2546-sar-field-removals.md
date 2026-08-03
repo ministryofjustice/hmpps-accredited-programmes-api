@@ -404,7 +404,7 @@ email has a clean paper trail.
 | PR | Merged commit | Sample PDF page count | Notes |
 |---|---|---|---|
 | 1 (auditRecords) | `50f67cff` (PR #1107, merged 2026-08-03) | Not measured at merge time; combined PR-1+PR-2 = **3 pages** (see PR-2 row) | 9-lens agent review all green. Included cleanup of `SubjectAccessRequestServiceIntegrationTest.kt` (compile-blocker after `Content.auditRecords` removal — not in PR-1 doc, propagated into PR-2/3/4 docs). |
-| 2 (statusHistory + reasons) | PR #1109 opened 2026-08-03, head `f890b221` (incl. review-fix amend) — merge SHA TBD | **3 pages** (down from round-1 ~8,000) | No deviations from doc. Review-fix amend `f890b221` dropped stale `resolveStaffSurnames` KDoc + rationale-comment enumerations that no longer applied after PR-1 and PR-2 stripped `audits` and `statusHistory` from the resolver. |
+| 2 (statusHistory + reasons) | `cd306c99` (PR #1109, merged 2026-08-03) | **3 pages** (down from round-1 ~8,000) | No deviations from doc. Review-fix amend `f890b221` dropped stale `resolveStaffSurnames` KDoc + rationale-comment enumerations that no longer applied after PR-1 and PR-2 stripped `audits` and `statusHistory` from the resolver. |
 | 3 (sexualOffenceDetails ×2) | TBD | TBD | |
 | 4 (oasysPniResults) | TBD | TBD | pending Q1 |
 | 5 (IDs strip) | TBD | TBD | |

@@ -23,8 +23,8 @@ end.
 | Q1 to Roxanne (`oasys_pni_result` A vs B) | ⏳ sent + followed up 2026-08-03 | Default → **A** if no reply by 2026-08-14. |
 | Q2 to Roxanne (`is_national` on organisation) | ⏳ sent + followed up 2026-08-03 | Default → **leave off** if no reply by 2026-08-14. |
 | PR-1 — remove `auditRecords` | ✅ merged `50f67cff` 2026-08-03 | PR #1107. 9-lens agent review all green. Branch head `04ab44ed` (initial `4801f6e6` + review-fix `04ab44ed`). |
-| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ⏳ opened #1109 2026-08-03, reviewed clean | Awaiting merge. Head `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages** (down from round-1's ~8,000). |
-| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start after PR-2 merges | Same integration-test note as PR-2. |
+| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ✅ merged `cd306c99` 2026-08-03 | PR #1109. Branch head was `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages**. |
+| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start | Branch off `main` @ `cd306c99`. Same integration-test note as PR-2. |
 | PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Same integration-test note if Q1 = A. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
 | PR-6 — regenerate OSAR round-2 review PDF + handover | 🚫 blocked on PRs 1–5 | Docs + snapshot regen only. |
@@ -215,14 +215,15 @@ defaults:
   handover email inherits the right number. `referral_status_reason`
   rows 205–209 (5 fields) match the doc as originally written.
 
-### YYYY-MM-DD — PR-2 merged
+### 2026-08-03 — PR-2 merged
 
 - **PR link:** #1109.
-- **Merge commit on `main`:** _(short SHA — fill in once merged)_.
+- **Merge commit on `main`:** `cd306c99`.
 - **Sample PDF page count post-PR:** 3 pages (measured at branch
-  head — expected unchanged at merge).
-- **Reviewer:** _(name)_.
-- **Notes / surprises:** _(anything raised in review)_.
+  head pre-merge — expected unchanged post-merge).
+- **Reviewer:** _(fill in from GitHub once merge notification lands)_.
+- **Notes / surprises:** none blocking. Review-fix amend `f890b221`
+  merged as part of the PR.
 
 - **PR link:** _()_.
 - **Merge commit on `main`:** _()_.
