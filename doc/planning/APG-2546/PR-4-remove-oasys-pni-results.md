@@ -21,8 +21,9 @@ The `SarOasysPniResult` DTO currently exposes four fields:
 | `oasysAssessmentId` | Long | internal / external ID |
 | `programmePathway` | String | category (e.g. `HIGH_INTENSITY_BC`) |
 
-**Both options remove the two internal IDs**; the difference is
-whether `prisonNumber` and `programmePathway` remain visible.
+**Both options remove all three ID fields**; the difference is
+whether the section wrapper (and `programmePathway`) remains at
+all.
 
 ## Prerequisites for a fresh agent
 
@@ -87,37 +88,43 @@ Expect at least one hit in `PersonService.kt` after your edits.
 - No mock removal needed if `oasysPniResults` was sourced through
   the integration seed rather than a mock — grep to confirm.
 
-## Option B — strip only the two internal IDs
+## Option B — strip all three IDs, keep only `programmePathway`
 
-Keep the section, remove `pniResultId` and `oasysAssessmentId`.
-Leaves `prisonNumber` + `programmePathway` visible to the subject.
+This is what Roxanne was offered in the Q1 message: "keep
+`programme_pathway`, remove the three ID fields". The section
+wrapper (heading, table shell, empty-state branch) stays; only
+`programmePathway` renders inside it.
 
 ### 1. `src/main/kotlin/…/service/SubjectAccessRequestService.kt`
 
 - Lines 315–320 — inside `data class SarOasysPniResult(...)`, delete
-  the `pniResultId` and `oasysAssessmentId` parameters.
+  the `pniResultId`, `prisonNumber`, and `oasysAssessmentId`
+  parameters. Only `programmePathway` should remain.
 - Inside `toSarOasysPniResult` mapper (~line 476) — delete the
-  `pniResultId = …` and `oasysAssessmentId = …` field assignments.
+  `pniResultId = …`, `prisonNumber = …`, and `oasysAssessmentId = …`
+  field assignments. Only the `programmePathway = …` assignment
+  should remain.
 - Everything else in the service, repository, and constructor stays.
 
 ### 2. Repository, template block, integration seed
 
 - **Repository:** no change. `findAllByPrisonNumber` is still called
-  for both SAR and PersonService.
+  for both SAR and `PersonService`.
 - **Template** `src/main/resources/sar_template.mustache`, lines
-  145–158 — delete the two `<tr><td>…</td>{{pniResultId}}…</tr>` and
-  `<tr><td>…</td>{{oasysAssessmentId}}…</tr>` rows inside the OASys
-  PNI results table. Leave the section heading, table shell, and
-  the `prisonNumber` + `programmePathway` rows alone.
+  145–158 — delete the three `<tr>` rows that render
+  `{{pniResultId}}`, `{{prisonNumber}}`, and `{{oasysAssessmentId}}`.
+  Keep the section heading, table shell, empty-state branch, and
+  the `{{programmePathway}}` row.
 - **Integration seed:** no change — the seed row still needs to
-  exist, it just renders two fewer fields.
+  exist, it just renders one field instead of four.
 
 ### 3. `src/test/kotlin/…/service/SubjectAccessRequestServiceTest.kt`
 
-- Around line 332 — delete only the `oasysPniResults[0].pniResultId
-  shouldBe …` and `oasysPniResults[0].oasysAssessmentId shouldBe …`
-  assertions. Keep the size and the `prisonNumber` /
-  `programmePathway` assertions.
+- Around line 332 — delete the `oasysPniResults[0].pniResultId
+  shouldBe …`, `oasysPniResults[0].prisonNumber shouldBe …`, and
+  `oasysPniResults[0].oasysAssessmentId shouldBe …` assertions.
+  Keep the collection-size assertion and the `programmePathway`
+  assertion.
 
 ## Snapshot regeneration (both options)
 
@@ -146,10 +153,13 @@ grep -rn "findAllByPrisonNumber" src/main   # still present in PersonService
 ### Option B
 
 ```zsh
-grep -rn "pniResultId\|oasysAssessmentId" src/main/kotlin/…/service/SubjectAccessRequestService.kt
-# expect zero — both removed from DTO and mapper
-grep -rn "pniResultId\|oasysAssessmentId" src/main/resources/sar_template.mustache
-# expect zero
+grep -rn "pniResultId\|prisonNumber\|oasysAssessmentId" src/main/kotlin/uk/gov/justice/digital/hmpps/hmppsaccreditedprogrammesapi/service/SubjectAccessRequestService.kt
+# expect zero hits inside SarOasysPniResult DTO and toSarOasysPniResult
+# mapper (other unrelated .prisonNumber reads in the file are fine
+# — visual inspect)
+grep -n "pniResultId\|prisonNumber\|oasysAssessmentId" src/main/resources/sar_template.mustache
+# expect zero inside the {{#oasysPniResults}} block (lines 145–158)
+# — other blocks may still render prisonNumber, that's fine
 ./gradlew ktlintCheck test
 ```
 
@@ -208,18 +218,26 @@ Not changed:
 ```
 APG-2546: strip internal IDs from oasysPniResults section in SAR
 
-Removes pniResultId and oasysAssessmentId from the oasysPniResults
-section per Roxanne's Q1 answer (Option B). Retains prisonNumber
-and programmePathway (a category label, not an ID) so the subject
-still sees which pathway their OASys PNI result placed them on.
+Strips pniResultId, prisonNumber, and oasysAssessmentId from the
+oasysPniResults section per Roxanne's Q1 answer (Option B — "keep
+programme_pathway, remove the three ID fields"). Retains only
+programmePathway (a category label, not an ID — e.g.
+HIGH_INTENSITY_BC) so the subject still sees which pathway their
+OASys PNI result placed them on.
 
 Changes:
-- Remove the two ID fields from SarOasysPniResult DTO + mapper
-- Remove the two ID rows from the OASys PNI results template block
-- Remove the two ID assertions from the unit test
-- Regenerate SAR contract snapshots (small diff — two fields per row)
+- Remove the three ID fields from SarOasysPniResult DTO + mapper
+- Remove the three ID rows from the OASys PNI results template
+  block (keep the heading, table shell, and the programmePathway
+  row)
+- Remove the three ID assertions from the unit test
+- Regenerate SAR contract snapshots
 
-Repository, seed, section heading, empty-state branch all unchanged.
+Not changed:
+- OasysPniResultEntityRepository.findAllByPrisonNumber — still
+  used by PersonService for the person-deletion cascade
+- Integration test seed — still needed to populate the row that
+  the section renders
 ```
 
 ## Definition of done

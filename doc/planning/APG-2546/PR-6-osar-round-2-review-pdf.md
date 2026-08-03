@@ -108,8 +108,8 @@ Removed sections vs round 1:
 - `referralStatusHistory` + `referralStatusReasons` (PR-2)
 - `sexualOffenceDetails` + `selectedSexualOffenceDetails` (PR-3)
 - `oasysPniResults` (PR-4, per Roxanne's Q1 answer) *or* only the
-  two internal IDs (PR-4 Option B — update this line based on
-  which option shipped)
+  three ID fields inside it — keeping `programmePathway` — under
+  PR-4 Option B. Update this line based on which option shipped.
 - `SarPerson.id` and `SarOrganisation.id` (PR-5)
 
 Ready for OSAR content sign-off.

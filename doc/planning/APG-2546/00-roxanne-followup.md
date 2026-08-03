@@ -1,10 +1,14 @@
 # Follow-up to Roxanne — APG-2546 Q1 / Q2 nudge
 
+> **Status:** sent 2026-08-03. Text preserved here for the
+> paper trail and so we know exactly what defaults + deadline
+> Roxanne is expecting.
+>
 > **Context:** Q1 (oasys_pni_result) and Q2 (organisation.is_national)
-> were already sent to Roxanne as two separate messages. This is a
-> single warm follow-up that (a) gives her the "no pressure, here's my
-> default if you don't reply" bit so she knows we're not blocked and
-> (b) adds nothing that contradicts the framing already sent.
+> were sent to Roxanne as two separate messages earlier 2026-08-03.
+> This follow-up (a) gives her the "no pressure, here's my default if
+> you don't reply" bit so she knows we're not blocked and (b) adds
+> nothing that contradicts the framing already sent.
 >
 > **Do NOT resend the A / B options** — she has them from the
 > originals. Restating them would just make her scroll and wonder if
@@ -77,43 +81,15 @@ Branching from her answers into the working docs:
   Branch name `APG-2546/remove-oasys-pni-results` (already the
   planned name).
 - **Q1 = B** → `PR-4-remove-oasys-pni-results.md`, Option B branch.
-  Rename branch to `APG-2546/strip-oasys-pni-result-ids`. Note
-  that Option B as offered to her strips **all three IDs**
-  (`pni_result_id`, `prison_number`, `oasys_assessment_id`),
-  keeping only `programme_pathway`. That is what she is answering,
-  not the "leave prison_number in" variant that the PR-4 doc's
-  Option B section was briefly reframed to. **Correct the PR-4
-  doc's Option B section if Q1 lands as B** — see next section.
+  Rename branch to `APG-2546/strip-oasys-pni-result-ids`. Option B
+  as offered to her strips **all three IDs** (`pni_result_id`,
+  `prison_number`, `oasys_assessment_id`), keeping only
+  `programme_pathway`. PR-4 doc already matches that definition
+  (fixed 2026-08-03).
 - **Q2 = "leave off"** → close APG-2494 as won't-do (again), no
   code change.
 - **Q2 = "please add"** → new ticket (revive APG-2494 or spin
   fresh). Do not fold into APG-2546 — different shape (add not
   remove) and different reviewer path.
 
-## Correction to be aware of — PR-4 Option B scope
-
-The current `PR-4-remove-oasys-pni-results.md` describes Option B
-as stripping only `pniResultId` and `oasysAssessmentId`, leaving
-`prisonNumber` + `programmePathway`. **That does not match what
-Roxanne was actually offered.** Her original message framed
-Option B as "keep programme_pathway, remove the three ID fields"
-— which strips `prisonNumber` too.
-
-If Q1 lands as B, update PR-4 doc Option B before starting the
-branch:
-
-- DTO — strip `pniResultId`, `prisonNumber`, `oasysAssessmentId`.
-  Only `programmePathway` remains.
-- Mapper — remove all three field assignments.
-- Template — remove three `<tr>` rows, keep only `programmePathway`.
-- Unit test — remove three field-level assertions, keep only
-  `programmePathway` assertion + section size.
-
-Effort is still ~half a day; snapshot diff is larger than the
-current Option B description suggests but still smaller than
-Option A.
-
-This inconsistency is left in the PR-4 doc rather than fixed
-pre-emptively because Q1 might land as A, in which case the
-Option B section is moot. Fix on the day if needed.
 

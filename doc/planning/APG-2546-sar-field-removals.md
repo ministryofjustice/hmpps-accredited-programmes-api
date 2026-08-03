@@ -122,16 +122,19 @@ Two conflicting notes on the same rows:
   be a No"* — implies **remove all IDs** (but is the `programme_pathway`
   field an ID? no — it's a category like `HIGH_INTENSITY_BC`)
 
-Options to put to Roxanne:
+Options put to Roxanne (Q1 sent + follow-up sent 2026-08-03):
 
 - **A** — remove the whole section from the SAR (nothing surfaces).
-- **B** — strip `pniResultId` and `oasysAssessmentId`, keep
-  `prisonNumber` and `programmePathway`. (Verified against DTO
-  `SubjectAccessRequestService.kt` lines 315–320: those are the four
-  fields; there is no separate `programmePathway` vs ID mix beyond
-  this — Option B is concrete, not hypothetical.)
+- **B** — strip all three ID fields (`pniResultId`, `prisonNumber`,
+  `oasysAssessmentId`), keep only `programmePathway`.
+  (Verified against DTO `SubjectAccessRequestService.kt` lines
+  315–320: those are the four fields, `programmePathway` is a
+  category label — e.g. `HIGH_INTENSITY_BC` — not an ID.)
 
 Implementation effort is roughly identical either way.
+
+**Default if no reply by 2026-08-14 (see `APG-2546/00-roxanne-followup.md`):
+Option A.**
 
 ### Q2 — `is_national` on `SarOrganisation` (row 109)
 
@@ -149,6 +152,10 @@ This was tracked earlier as APG-2494 and marked won't-do; may have
 been revived by Roxanne without realising. Clarification needed.
 
 **Do not attempt to add `isNational` until Roxanne confirms.**
+
+**Default if no reply by 2026-08-14 (see `APG-2546/00-roxanne-followup.md`):
+leave off (close APG-2494 won't-do again).** Q2 sent + follow-up sent
+2026-08-03.
 
 ## PR plan
 
@@ -296,8 +303,14 @@ lets us delete the whole `selectedSexualOffenceDetails` local var
   - Delete oasysPniResults assertions (lines 265, 332)
 - Regenerate + promote snapshots.
 
-**If Option B (strip IDs, keep `programme_pathway`):**
-- Same as PR-5 pattern — DTO field removals only, section stays.
+**If Option B (strip all three IDs, keep only `programmePathway`):**
+- Same shape as PR-5 pattern — DTO field removals + template row
+  deletions only, section wrapper stays.
+- Strip `pniResultId`, `prisonNumber`, `oasysAssessmentId` from the
+  DTO, mapper, template rows, and unit-test assertions.
+- Keep only `programmePathway` visible.
+- See `APG-2546/PR-4-remove-oasys-pni-results.md` Option B section
+  for the file-by-file breakdown.
 
 ### PR-5 detail — strip internal ID fields from remaining sections
 

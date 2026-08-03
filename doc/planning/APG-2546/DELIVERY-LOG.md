@@ -37,6 +37,14 @@ Legend: ⬜ ready • 🚫 blocked • ⏳ in flight • ✅ complete.
 - Roxanne Q1 + Q2 originals sent (by Raby, direct to Roxanne).
 - Follow-up drafted, rewritten in Raby's voice, sent same day.
   Commit `1dd32fef`.
+- Delivery-log added. Commit `acba45c4`.
+- Pre-handoff consistency pass: fixed Option B definition drift
+  across `APG-2546-sar-field-removals.md` and
+  `PR-4-remove-oasys-pni-results.md` so both match what Roxanne
+  was actually offered (strip **all three** IDs, keep only
+  `programmePathway`). Removed the "Correction to be aware of"
+  workaround from the follow-up doc since it's no longer needed.
+  Marked the follow-up doc as "sent 2026-08-03" in its header.
 
 ### YYYY-MM-DD — Q1 answer received
 
