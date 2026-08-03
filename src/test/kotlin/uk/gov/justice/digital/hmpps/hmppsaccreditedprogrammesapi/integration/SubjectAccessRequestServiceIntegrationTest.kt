@@ -116,11 +116,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       referralId = referralId,
       sexualOffenceDetailsId = sexualOffenceId,
     )
-    persistenceHelper.createReferralStatusHistory(
-      referralId = referralId,
-      username = "TEST_USER",
-      status = "REFERRAL_STARTED",
-    )
     persistenceHelper.createStaff(
       staffId = staffId,
       firstName = "John",
@@ -140,7 +135,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     assertThat(content.pniResults).hasSize(1)
     assertThat(content.person).isNotNull
     assertThat(content.oasysPniResults).hasSize(1)
-    assertThat(content.referralStatusHistory).hasSize(1)
     assertThat(content.selectedSexualOffenceDetails).hasSize(1)
     assertThat(content.sexualOffenceDetails).hasSize(1)
 

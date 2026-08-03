@@ -150,44 +150,6 @@
             <p>No Data Held</p>
         {{/organisations}}
 
-    <h2>Referral status history</h2>
-    {{#referralStatusHistory}}
-        <h3>Status history {{ optionalValue (getIndexPlusOne @index) }}</h3>
-        <table class="summary-list">
-            <tr><td>Status history ID</td><td>{{ optionalValue id }}</td></tr>
-            <tr><td>Referral ID</td><td>{{ optionalValue referralId }}</td></tr>
-            <tr><td>Username</td><td>{{ optionalValue username }}</td></tr>
-            <tr><td>Status</td><td>{{ optionalValue status }}</td></tr>
-            <tr><td>Previous status</td><td>{{ optionalValue previousStatus }}</td></tr>
-            <tr><td>Category</td><td>{{ optionalValue category }}</td></tr>
-            <tr><td>Reason</td><td>{{ optionalValue reason }}</td></tr>
-            <tr><td>Status start date</td><td>{{ optionalValue (formatDate statusStartDate) }}</td></tr>
-            <tr><td>Status end date</td><td>{{ optionalValue (formatDate statusEndDate) }}</td></tr>
-            <tr><td>Duration at this status</td><td>{{ optionalValue durationAtThisStatus }}</td></tr>
-            <tr><td>Notes</td><td>{{ optionalValue notes }}</td></tr>
-        </table>
-        <br>
-    {{/referralStatusHistory}}
-    {{^referralStatusHistory}}
-        <p>No Data Held</p>
-    {{/referralStatusHistory}}
-
-    <h2>Referral status reasons</h2>
-    {{#referralStatusReasons}}
-        <h3>Status reason {{ optionalValue (getIndexPlusOne @index) }}</h3>
-        <table class="summary-list">
-            <tr><td>Code</td><td>{{ optionalValue code }}</td></tr>
-            <tr><td>Category code</td><td>{{ optionalValue referralStatusCategoryCode }}</td></tr>
-            <tr><td>Active</td><td>{{ convertBoolean active }}</td></tr>
-            <tr><td>Deselect open</td><td>{{ convertBoolean deselectOpen }}</td></tr>
-            <tr><td>Description</td><td>{{ optionalValue description }}</td></tr>
-        </table>
-        <br>
-    {{/referralStatusReasons}}
-    {{^referralStatusReasons}}
-        <p>No Data Held</p>
-    {{/referralStatusReasons}}
-
     <h2>Selected sexual offence details</h2>
     {{#selectedSexualOffenceDetails}}
         <h3>Selected detail {{ optionalValue (getIndexPlusOne @index) }}</h3>
