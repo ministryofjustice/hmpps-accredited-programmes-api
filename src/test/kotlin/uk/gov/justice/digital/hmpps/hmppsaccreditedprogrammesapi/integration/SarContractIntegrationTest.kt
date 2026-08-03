@@ -5,7 +5,6 @@ import jakarta.persistence.PersistenceContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.test.web.reactive.server.WebTestClient
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SexualOffenceCategoryType
@@ -161,14 +160,6 @@ class SarContractIntegrationTest :
       otherCourseName = "Other course",
       outcomeDetail = "No information to evidence",
     )
-    persistenceHelper.createAuditRecord(
-      id = AUDIT_RECORD_ID,
-      prisonNumber = PRISON_NUMBER,
-      auditAction = AuditAction.CREATE_REFERRAL.name,
-      auditUsername = "TEST_USER",
-      referrerUsername = "TEST_USER",
-      auditDateTime = CREATED_DATE_TIME,
-    )
     persistenceHelper.createPniResult(
       pniResultId = PNI_RESULT_ID,
       prisonNumber = PRISON_NUMBER,
@@ -234,7 +225,6 @@ class SarContractIntegrationTest :
     val OFFERING_ID: UUID = UUID.fromString("33333333-3333-3333-3333-333333333333")
     val REFERRAL_ID: UUID = UUID.fromString("44444444-4444-4444-4444-444444444444")
     val PARTICIPATION_ID: UUID = UUID.fromString("55555555-5555-5555-5555-555555555555")
-    val AUDIT_RECORD_ID: UUID = UUID.fromString("66666666-6666-6666-6666-666666666666")
     val PNI_RESULT_ID: UUID = UUID.fromString("77777777-7777-7777-7777-777777777777")
     val OASYS_PNI_RESULT_ID: UUID = UUID.fromString("88888888-8888-8888-8888-888888888888")
     val PERSON_ID: UUID = UUID.fromString("99999999-9999-9999-9999-999999999999")

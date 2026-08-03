@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OasysPniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OasysPniResultEntityRepository
@@ -20,7 +19,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralStatusHistoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.AuditEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
@@ -40,7 +38,6 @@ class SubjectAccessRequestServiceTest {
 
   private val referralRepository: ReferralRepository = mockk()
   private val courseParticipationRepository: CourseParticipationRepository = mockk()
-  private val auditRepository: AuditRepository = mockk()
   private val courseRepository: CourseRepository = mockk()
   private val pniResultRepository: PniResultRepository = mockk()
   private val personRepository: PersonRepository = mockk()
@@ -57,7 +54,6 @@ class SubjectAccessRequestServiceTest {
     service = SubjectAccessRequestService(
       referralRepository,
       courseParticipationRepository,
-      auditRepository,
       courseRepository,
       pniResultRepository,
       personRepository,
@@ -183,18 +179,6 @@ class SubjectAccessRequestServiceTest {
     // out of the returned list (mirrors production IN-clause behaviour).
     every { referralRepository.findAllById(setOf(originalReferralId, orphanedOriginalId)) } returns listOf(originalReferralEntity)
     every { courseParticipationRepository.getSarParticipations(prn) } returns listOf(participationEntity)
-    every { auditRepository.getSarAuditRecords(prn) } returns listOf(
-      AuditEntityFactory()
-        .withPrisonNumber(prn)
-        .withReferralStatusFrom("REFERRAL_STARTED")
-        .withReferralStatusTo("REFERRAL_SUBMITTED")
-        .withCourseName("Anger Management")
-        .withCourseLocation("MDI")
-        .withAuditAction("NOMIS_SEARCH_FOR_PERSON")
-        .withAuditUsername("user1")
-        .withReferrerUsername("user1")
-        .produce(),
-    )
     every { courseRepository.getSarCourses(prn) } returns listOf(
       CourseEntityFactory()
         .withName("Course Name")
@@ -258,7 +242,6 @@ class SubjectAccessRequestServiceTest {
     with(result!!.content as SubjectAccessRequestService.Content) {
       assertThat(referrals.size).isEqualTo(3)
       assertThat(courseParticipation.size).isEqualTo(1)
-      assertThat(auditRecords.size).isEqualTo(1)
       assertThat(courses.size).isEqualTo(1)
       assertThat(pniResults.size).isEqualTo(1)
       assertThat(person).isNotNull
@@ -313,11 +296,6 @@ class SubjectAccessRequestServiceTest {
       assertThat(participation.createdByUser).isEqualTo("River")
       assertThat(participation.updatedByUser).isEqualTo("River")
 
-      val audit = auditRecords[0]
-      assertThat(audit.auditUsername).isEqualTo("River")
-      assertThat(audit.referrerUsername).isEqualTo("River")
-      assertThat(audit.auditAction).isEqualTo("NOMIS_SEARCH_FOR_PERSON")
-
       val course = courses[0]
       assertThat(course.name).isEqualTo("Course Name")
 
@@ -347,7 +325,6 @@ class SubjectAccessRequestServiceTest {
 
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
-    verify { auditRepository.getSarAuditRecords(prn) }
     verify { courseRepository.getSarCourses(prn) }
     verify { pniResultRepository.findAllByPrisonNumber(prn) }
     verify { personRepository.findPersonEntityByPrisonNumber(prn) }
