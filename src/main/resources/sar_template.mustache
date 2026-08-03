@@ -150,35 +150,6 @@
             <p>No Data Held</p>
         {{/organisations}}
 
-    <h2>Selected sexual offence details</h2>
-    {{#selectedSexualOffenceDetails}}
-        <h3>Selected detail {{ optionalValue (getIndexPlusOne @index) }}</h3>
-        <table class="summary-list">
-            <tr><td>ID</td><td>{{ optionalValue id }}</td></tr>
-            <tr><td>Referral ID</td><td>{{ optionalValue referralId }}</td></tr>
-            <tr><td>Sexual offence details ID</td><td>{{ optionalValue sexualOffenceDetailsId }}</td></tr>
-        </table>
-        <br>
-    {{/selectedSexualOffenceDetails}}
-    {{^selectedSexualOffenceDetails}}
-        <p>No Data Held</p>
-    {{/selectedSexualOffenceDetails}}
-
-    <h2>Sexual offence details</h2>
-    {{#sexualOffenceDetails}}
-        <h3>Sexual offence detail {{ optionalValue (getIndexPlusOne @index) }}</h3>
-        <table class="summary-list">
-            <tr><td>ID</td><td>{{ optionalValue id }}</td></tr>
-            <tr><td>Category</td><td>{{ optionalValue category }}</td></tr>
-            <tr><td>Score</td><td>{{ optionalValue score }}</td></tr>
-            <tr><td>Description</td><td>{{ optionalValue description }}</td></tr>
-        </table>
-        <br>
-    {{/sexualOffenceDetails}}
-    {{^sexualOffenceDetails}}
-        <p>No Data Held</p>
-    {{/sexualOffenceDetails}}
-
     <h2>Staff</h2>
         {{#staff}}
             <h3>Staff {{ optionalValue (getIndexPlusOne @index) }}</h3>

@@ -241,8 +241,6 @@ class SubjectAccessRequestServiceTest {
       assertThat(pniResults.size).isEqualTo(1)
       assertThat(person).isNotNull
       assertThat(oasysPniResults.size).isEqualTo(1)
-      assertThat(selectedSexualOffenceDetails).isEmpty()
-      assertThat(sexualOffenceDetails).isEmpty()
       assertThat(staff).hasSize(1)
 
       val referral = referrals[0]
