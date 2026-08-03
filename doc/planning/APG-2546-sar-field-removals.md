@@ -403,7 +403,7 @@ email has a clean paper trail.
 
 | PR | Merged commit | Sample PDF page count | Notes |
 |---|---|---|---|
-| 1 (auditRecords) | PR #1107 opened 2026-08-03, head `4801f6e6` — merge SHA TBD | TBD (target: several thousand pages ↓) | Included cleanup of `SubjectAccessRequestServiceIntegrationTest.kt` (compile-blocker after `Content.auditRecords` removal — not in PR-1 doc, propagated into PR-2/3/4 docs). |
+| 1 (auditRecords) | PR #1107 opened 2026-08-03, head `04ab44ed` (incl. review-fix) — merge SHA TBD | TBD (target: several thousand pages ↓) | 9-lens agent review all green. Included cleanup of `SubjectAccessRequestServiceIntegrationTest.kt` (compile-blocker after `Content.auditRecords` removal — not in PR-1 doc, propagated into PR-2/3/4 docs). |
 | 2 (statusHistory + reasons) | TBD | TBD | |
 | 3 (sexualOffenceDetails ×2) | TBD | TBD | |
 | 4 (oasysPniResults) | TBD | TBD | pending Q1 |

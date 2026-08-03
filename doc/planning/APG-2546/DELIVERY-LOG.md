@@ -78,8 +78,10 @@ defaults:
 - **Branch:** `APG-2546/remove-audit-records` (from `main`
   @ `106e27d2`).
 - **PR link:** #1107.
-- **Head commit on branch:** `4801f6e6`.
-- **Files changed:** 8 files, +19 / −152.
+- **Head commit on branch:** `04ab44ed` (initial `4801f6e6`, plus
+  review-fix `04ab44ed`).
+- **Files changed:** 8 files, +19 / −152 (initial) + a small
+  block-comment fix.
 - **Verification:** all grep checks zero, `./gradlew ktlintCheck test`
   green (678 tests), snapshots regenerated, `entity-schema.json`
   byte-identical as predicted.
@@ -95,6 +97,30 @@ defaults:
      doesn't exist on `main`, only on the planning branch — out of
      scope for PR-1. Update path handled here on the planning
      branch (this log + the plan's artefacts table) instead.
+- **Review outcome (9-lens agent review, all green):**
+  correctness ✅, tests ✅, API/contract ✅ (no controller /
+  OpenAPI / `restapi/model` touched), data/migrations ✅ (no Flyway,
+  `AuditEntity` table untouched, schema v144 asserted unchanged),
+  security/privacy ✅ (net win — usernames + audit-action strings
+  no longer egress via SAR; write-side `AuditService` untouched),
+  performance ✅ (one fewer JPA query per SAR, B1 two-query shape
+  preserved), observability ✅ (unresolved-original `log.warn`
+  preserved), style/conventions ✅ (zero `APG-` refs in
+  `src/main` or `src/test`, commit-msg format matches history,
+  ktlint clean), devex/docs/rollback ✅ (PR body from doc template,
+  rollback = single `git revert`).
+- **Review fix pushed as `04ab44ed`:** stale "audit" enumeration
+  removed from the block comment above `resolveStaffSurnames(...)`
+  — it was still listing "referral / course participation / audit
+  / status-history row" as sources of usernames after the parameter
+  was dropped.
+- **Optional pre-merge to-dos flagged** (non-blocking):
+  - Artefacts-row update on the planning branch — done here as
+    part of commit `8d934143`.
+  - Smoke-test verify the write-side audit path
+    (`AuditService`, `PeopleController.auditService.audit(...)`) is
+    unaffected. Nothing in the PR touched it; CI covers this
+    implicitly via the write-side unit tests.
 - **Impact on PR-2 / PR-3 / PR-4:** all three will need the same
   `SubjectAccessRequestServiceIntegrationTest.kt` cleanup as Content
   fields drop out. PR-2, PR-3, and PR-4 (Option A) docs updated to
