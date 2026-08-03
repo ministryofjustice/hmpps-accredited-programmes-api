@@ -14,8 +14,8 @@ end.
 | Planning branch (`APG-2546/planning-sar-field-removals`) | ✅ committed, ⏳ awaiting push | Squash `95993514` into `1dd32fef` before push if you want a clean history. |
 | Q1 to Roxanne (`oasys_pni_result` A vs B) | ⏳ sent + followed up 2026-08-03 | Default → **A** if no reply by 2026-08-14. |
 | Q2 to Roxanne (`is_national` on organisation) | ⏳ sent + followed up 2026-08-03 | Default → **leave off** if no reply by 2026-08-14. |
-| PR-1 — remove `auditRecords` | ⏳ opened #1107 2026-08-03 | Awaiting merge to `main`. Head `4801f6e6`. Update state to ✅ + merge SHA once landed. |
-| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ⬜ ready | Rebase off `main` after PR-1 lands. **Also update `SubjectAccessRequestServiceIntegrationTest.kt`** — same compile-blocker pattern PR-1 hit. |
+| PR-1 — remove `auditRecords` | ✅ merged `50f67cff` 2026-08-03 | PR #1107. 9-lens agent review all green. Branch head `04ab44ed` (initial `4801f6e6` + review-fix `04ab44ed`). |
+| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ⬜ ready to start | Branch off `main` @ `50f67cff`. **Also update `SubjectAccessRequestServiceIntegrationTest.kt`** — same compile-blocker pattern PR-1 hit. |
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready | Rebase off `main` after PR-2. Same integration-test note as PR-2. |
 | PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Same integration-test note if Q1 = A. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
@@ -126,13 +126,19 @@ defaults:
   fields drop out. PR-2, PR-3, and PR-4 (Option A) docs updated to
   call this out explicitly.
 
-### YYYY-MM-DD — PR-1 merged
+### 2026-08-03 — PR-1 merged
 
 - **PR link:** #1107.
-- **Merge commit on `main`:** _(short SHA — fill in once merged)_.
-- **Sample PDF page count post-PR:** _(N pages)_.
-- **Reviewer:** _(name)_.
-- **Notes / surprises:** _(anything raised in review)_.
+- **Merge commit on `main`:** `50f67cff`.
+- **Sample PDF page count post-PR:** TBD (measure alongside PR-2
+  or defer to PR-6).
+- **Reviewer:** _(fill in from GitHub once merge notification lands)_.
+- **Notes / surprises:** none blocking. 9-lens agent review all
+  green. Review-fix `04ab44ed` (stale block comment) pushed and
+  merged as part of the PR. Both flagged pre-merge to-dos handled:
+  artefacts-table update landed on the planning branch; audit
+  write-side confirmed untouched by inspection (no PR changes to
+  `AuditService` / `PeopleController` write paths).
 
 ### YYYY-MM-DD — PR-2 merged
 
