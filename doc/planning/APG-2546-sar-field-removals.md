@@ -81,11 +81,16 @@ code change.
 
 ### C. Coupled removals (need to happen at the same time as A/B)
 
-- `selectedSexualOffenceDetails` (whole section) — not explicitly
-  flagged by Roxanne but its only purpose is to link
-  `sexualOffenceDetails` back to referrals. Once `sexualOffenceDetails`
-  goes, `selectedSexualOffenceDetails` is meaningless. Removing both
-  in the same PR (§3 above).
+- `selectedSexualOffenceDetails` (whole section) — no per-field
+  red flag from Roxanne, but PR-3's DD cross-check (2026-08-03)
+  surfaced a **table-level** note on row 225 that directly rebuts
+  the "it's just join IDs, keep it" fallback: *"It still
+  represents personal criminal data, even if derived or selected
+  rather than raw."* Combined with the pure-coupling argument
+  (its only purpose is to link `sexualOffenceDetails` back to
+  referrals; once `sexualOffenceDetails` goes it is meaningless),
+  the removal is doubly justified. Removed alongside
+  `sexualOffenceDetails` in PR-3.
 
 ### D. Cross-checks — already done in prior tickets, no action here
 
@@ -405,7 +410,7 @@ email has a clean paper trail.
 |---|---|---|---|
 | 1 (auditRecords) | `50f67cff` (PR #1107, merged 2026-08-03) | Not measured at merge time; combined PR-1+PR-2 = **3 pages** (see PR-2 row) | 9-lens agent review all green. Included cleanup of `SubjectAccessRequestServiceIntegrationTest.kt` (compile-blocker after `Content.auditRecords` removal — not in PR-1 doc, propagated into PR-2/3/4 docs). |
 | 2 (statusHistory + reasons) | `cd306c99` (PR #1109, merged 2026-08-03) | **3 pages** (down from round-1 ~8,000) | No deviations from doc. Review-fix amend `f890b221` dropped stale `resolveStaffSurnames` KDoc + rationale-comment enumerations that no longer applied after PR-1 and PR-2 stripped `audits` and `statusHistory` from the resolver. |
-| 3 (sexualOffenceDetails ×2) | TBD | TBD | |
+| 3 (sexualOffenceDetails ×2) | PR #1110 opened 2026-08-03, head `fc5ae133` (incl. review-amend) — merge SHA TBD | **3 pages** (unchanged from PR-2) | No deviations from doc. DD cross-check: all 4 red-flagged `sexual_offence_details` fields (rows 233/234/235/237) removed exactly. Row 225's table-level note strengthens the coupled `selected_sexual_offence_details` removal beyond the pure-coupling argument (§C updated). Review-amend `fc5ae133` reinstated the blank line after `clearAllTableContent()` per project convention. |
 | 4 (oasysPniResults) | TBD | TBD | pending Q1 |
 | 5 (IDs strip) | TBD | TBD | |
 | 6 (OSAR round-2 PDF) | TBD | TBD (target: ~4–5 pages) | |

@@ -231,13 +231,56 @@ defaults:
 - **Reviewer:** _()_.
 - **Notes / surprises:** _()_.
 
+### 2026-08-03 — PR-3 opened (awaiting merge to `main`)
+
+- **Branch:** `APG-2546/remove-sexual-offence-details` (from
+  `main` @ `cd306c99`, i.e. tip-of-`main` after PR-2 merged).
+- **PR link:** #1110.
+- **Head commit on branch:** `fc5ae133` (initial `448f0d2f` +
+  review-amend for blank-line convention; force-pushed once).
+- **Files changed:** 7 files, +1 / −147 post-amend (pre-amend was
+  −148; the one-line delta is the reinstated blank line between
+  `persistenceHelper.clearAllTableContent()` and the first
+  `create*` call in `SarContractIntegrationTest.setupTestData()` —
+  matches convention verified against three sibling integration
+  tests).
+- **Verification:** `./gradlew ktlintCheck test --tests '*Sar*'
+  --tests '*SubjectAccessRequestService*'` green (ktlint clean),
+  snapshots regenerated.
+- **No deviations from the PR-3 doc.** The integration-test §6
+  (`SubjectAccessRequestServiceIntegrationTest.kt`) added post-PR-1
+  was hit exactly as documented.
+- **DD spreadsheet cross-check (Roxanne's sheet, `Accredited
+  Programmes Custody`):**
+  - **`sexual_offence_details` table (rows 233–237):** four fields
+    carry the "After call with Raby 29.07 — this should be a no"
+    note (`id`, `category`, `description`, `score`). PR-3 removed
+    exactly those four from `SarSexualOffenceDetails`. Row 236
+    `hint_text` was never on SAR and stays absent. 1:1 match, zero
+    over/under-removal.
+  - **`selected_sexual_offence_details` table (rows 225–228):** no
+    per-field red flag but row 225's **table-level** note says
+    *"It still represents personal criminal data, even if derived
+    or selected rather than raw."* That's a direct Roxanne
+    rebuttal of the "it's just join IDs, keep it" fallback the
+    PR-3 doc's "Non-obvious §3" floated. So the coupled removal
+    is more strongly justified than the doc suggested — Roxanne
+    pre-empted the fallback argument in writing.
+- **Review outcome (agent-reviewed, all clean):** blank-line
+  convention fix noted above amended into `fc5ae133`. Xlsx working
+  copy (`Copy of 2026.07.08_copy_...`) intentionally untracked,
+  same as prior cycle.
+- **Sample PDF post-PR-3:** **3 pages** (unchanged from PR-2 — the
+  sexual-offence sections were tiny in the seed set).
+
 ### YYYY-MM-DD — PR-3 merged
 
-- **PR link:** _()_.
-- **Merge commit on `main`:** _()_.
-- **Sample PDF page count post-PR:** _()_.
-- **Reviewer:** _()_.
-- **Notes / surprises:** _()_.
+- **PR link:** #1110.
+- **Merge commit on `main`:** _(short SHA — fill in once merged)_.
+- **Sample PDF page count post-PR:** 3 pages (measured at branch
+  head — expected unchanged at merge).
+- **Reviewer:** _(name)_.
+- **Notes / surprises:** _(anything raised in review)_.
 
 ### YYYY-MM-DD — PR-4 merged
 
