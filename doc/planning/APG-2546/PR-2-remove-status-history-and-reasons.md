@@ -16,7 +16,14 @@ without leaving dead code.
 
 Row references on Roxanne's DD spreadsheet:
 
-- `referralStatusHistory` — rows 192–201 (all 10 fields flagged red)
+- `referralStatusHistory` — rows 192–202 (all 11 fields flagged red;
+  the doc previously said "192–201, 10 fields" — corrected 2026-08-03
+  after cross-check against `.xlsx`. Row 202 = `username`, flagged
+  with both a "surname not user code" note *and* the standard
+  "After call with Raby 29.07 — this should be a no" verdict. PR-2
+  removed the whole DTO so behaviour is unaffected either way; the
+  count fix is purely so the OSAR handover email in PR-6 doesn't
+  inherit the wrong number.)
 - `referralStatusReasons` — rows 205–209 (all 5 fields flagged red)
 
 ## Prerequisites for a fresh agent
@@ -176,7 +183,7 @@ this cleanup.
 APG-2546: remove referralStatusHistory + referralStatusReasons sections from SAR
 
 Removes two coupled sections per OSAR round-2 review (Roxanne DD
-spreadsheet rows 192–201 and 205–209 — all fields flagged red).
+spreadsheet rows 192–202 and 205–209 — all fields flagged red).
 
 Coupling rationale: referralStatusReasons is derived in-service from
 referralStatusHistory, so removing them together avoids an

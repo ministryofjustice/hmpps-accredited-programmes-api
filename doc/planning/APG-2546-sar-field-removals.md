@@ -57,7 +57,7 @@ the matching assertions from `SubjectAccessRequestServiceTest`.
 | # | Section | DTO | Fields flagged | Roxanne rows |
 |---|---|---|---|---|
 | 1 | `auditRecords` | `SarAuditRecord` | all 9 | 22, 23, 24, 25, 27, 28, 29, 30, 31 |
-| 2 | `referralStatusHistory` | `SarReferralStatusHistoryEntity` | all 10 | 192–201 |
+| 2 | `referralStatusHistory` | `SarReferralStatusHistoryEntity` | all 11 | 192–202 |
 | 3 | `referralStatusReasons` | `SarReferralStatusReason` | all 5 | 205–209 |
 | 4 | `sexualOffenceDetails` | `SarSexualOffenceDetails` | all 4 | 233, 234, 235, 237 |
 | 5 | `oasysPniResults` | `SarOasysPniResult` | all 4 | 85, 86, 87, 88 (⚠ clarification pending — see below) |

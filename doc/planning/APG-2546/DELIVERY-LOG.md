@@ -199,6 +199,21 @@ defaults:
   round-2 target already. PRs 3, 4 (whichever option), and 5 will
   trim further but the "8,000-page complaint" is functionally
   resolved from this point forward.
+- **DD spreadsheet cross-check (post-review sanity pass):** re-read
+  `doc/2026.07.08_copy_Probation Digital Data review December 251.xlsx`,
+  sheet `Accredited Programmes Custody`, rows 190–212, against the
+  fields PR-2 removed. All **16** red-flagged fields removed, zero
+  over-removed, zero under-removed. **One doc-only correction:** the
+  planning docs originally said "referralStatusHistory rows 192–201,
+  all 10 fields" — spreadsheet actually flags **rows 192–202, all 11
+  fields** (row 202 = `username`, tagged with both a "surname not
+  user code" note *and* the standard "After call with Raby 29.07 —
+  this should be a no" verdict). PR-2 removed the whole DTO so the
+  code is unaffected; the count was fixed in
+  `APG-2546-sar-field-removals.md` §A and
+  `PR-2-remove-status-history-and-reasons.md` so PR-6's OSAR
+  handover email inherits the right number. `referral_status_reason`
+  rows 205–209 (5 fields) match the doc as originally written.
 
 ### YYYY-MM-DD — PR-2 merged
 
