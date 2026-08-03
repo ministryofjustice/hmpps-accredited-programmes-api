@@ -88,6 +88,26 @@ Expect at least one hit in `PersonService.kt` after your edits.
 - No mock removal needed if `oasysPniResults` was sourced through
   the integration seed rather than a mock — grep to confirm.
 
+### 6. `src/test/kotlin/…/integration/SubjectAccessRequestServiceIntegrationTest.kt`
+
+**Not in the original plan — surfaced by PR-1.** Once
+`Content.oasysPniResults` is removed in step 1, this file will fail
+to compile if it asserts on `content.oasysPniResults`. Mirror the
+PR-1 fix:
+
+- Grep the file for `oasysPniResults` — delete every assertion,
+  seed, and helper that references it.
+- Delete any UUID constants, seed helpers, or imports that become
+  unused as a result.
+- The rest of the file (B1's "exactly 3 staff-repo calls per SAR"
+  assertion, referrals seeding, etc.) stays.
+
+**Option B skips this step** — Option B keeps `Content.oasysPniResults`
+in place; only its DTO shape shrinks. Existing assertions on the
+`Content` field continue to compile. But re-run the tests anyway to
+catch anything that asserted on the fields that were stripped inside
+the DTO.
+
 ## Option B — strip all three IDs, keep only `programmePathway`
 
 This is what Roxanne was offered in the Q1 message: "keep

@@ -106,6 +106,20 @@ grep, and don't reflexively keep either.
   declaration, the constructor arg passed to the service under
   test, and the import.
 
+### 6. `src/test/kotlin/…/integration/SubjectAccessRequestServiceIntegrationTest.kt`
+
+**Not in the original plan — surfaced by PR-1.** Once the two
+`Content` fields are removed in step 1, this file will fail to
+compile because it asserts on `content.referralStatusHistory` and/or
+`content.referralStatusReasons`. Mirror the PR-1 fix:
+
+- Grep the file for `referralStatusHistory` and `referralStatusReasons`
+  — delete every assertion, seed, and mock that references either.
+- Delete any UUID constants, seed helpers, or imports that become
+  unused as a result.
+- The rest of the file (B1's "exactly 3 staff-repo calls per SAR"
+  assertion, referrals seeding, etc.) stays.
+
 ## Snapshot regeneration
 
 Same as PR-1:

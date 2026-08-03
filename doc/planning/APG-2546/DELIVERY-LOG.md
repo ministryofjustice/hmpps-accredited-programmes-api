@@ -14,10 +14,10 @@ end.
 | Planning branch (`APG-2546/planning-sar-field-removals`) | ✅ committed, ⏳ awaiting push | Squash `95993514` into `1dd32fef` before push if you want a clean history. |
 | Q1 to Roxanne (`oasys_pni_result` A vs B) | ⏳ sent + followed up 2026-08-03 | Default → **A** if no reply by 2026-08-14. |
 | Q2 to Roxanne (`is_national` on organisation) | ⏳ sent + followed up 2026-08-03 | Default → **leave off** if no reply by 2026-08-14. |
-| PR-1 — remove `auditRecords` | ⬜ not started | Not blocked. Start here. |
-| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ⬜ not started | Rebase off `main` after PR-1. |
-| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ not started | Rebase off `main` after PR-2. |
-| PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Move to ⬜ once Q1 answered. |
+| PR-1 — remove `auditRecords` | ⏳ opened #1107 2026-08-03 | Awaiting merge to `main`. Head `4801f6e6`. Update state to ✅ + merge SHA once landed. |
+| PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ⬜ ready | Rebase off `main` after PR-1 lands. **Also update `SubjectAccessRequestServiceIntegrationTest.kt`** — same compile-blocker pattern PR-1 hit. |
+| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready | Rebase off `main` after PR-2. Same integration-test note as PR-2. |
+| PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Same integration-test note if Q1 = A. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
 | PR-6 — regenerate OSAR round-2 review PDF + handover | 🚫 blocked on PRs 1–5 | Docs + snapshot regen only. |
 | OSAR content sign-off (Sharon + Roxanne + QAT) | 🚫 blocked on PR-6 handover | Round-2 review. |
@@ -73,14 +73,40 @@ defaults:
 - **Nudge log:** _(list the reminder pings sent to Roxanne / OSAR
   channel before the default was applied)_.
 
+### 2026-08-03 — PR-1 opened (awaiting merge to `main`)
+
+- **Branch:** `APG-2546/remove-audit-records` (from `main`
+  @ `106e27d2`).
+- **PR link:** #1107.
+- **Head commit on branch:** `4801f6e6`.
+- **Files changed:** 8 files, +19 / −152.
+- **Verification:** all grep checks zero, `./gradlew ktlintCheck test`
+  green (678 tests), snapshots regenerated, `entity-schema.json`
+  byte-identical as predicted.
+- **Deviations from the PR-1 doc** — both good calls:
+  1. Also removed the `createAuditRecord` seed +
+     `content.auditRecords` assertions in
+     `SubjectAccessRequestServiceIntegrationTest.kt`. Not listed in
+     the PR-1 doc — was a compile-blocker after `Content.auditRecords`
+     was deleted. Mirrors the pattern the doc did prescribe for the
+     sibling test files. Flagged in the PR body.
+  2. Skipped the "Artefacts" table note in
+     `doc/planning/APG-2546-sar-field-removals.md`. That file
+     doesn't exist on `main`, only on the planning branch — out of
+     scope for PR-1. Update path handled here on the planning
+     branch (this log + the plan's artefacts table) instead.
+- **Impact on PR-2 / PR-3 / PR-4:** all three will need the same
+  `SubjectAccessRequestServiceIntegrationTest.kt` cleanup as Content
+  fields drop out. PR-2, PR-3, and PR-4 (Option A) docs updated to
+  call this out explicitly.
+
 ### YYYY-MM-DD — PR-1 merged
 
-- **PR link:** _(https://github.com/.../pull/NNNN)_.
-- **Merge commit on `main`:** _(short SHA)_.
+- **PR link:** #1107.
+- **Merge commit on `main`:** _(short SHA — fill in once merged)_.
 - **Sample PDF page count post-PR:** _(N pages)_.
 - **Reviewer:** _(name)_.
-- **Notes / surprises:** _(anything that came up in review,
-  especially anything future PRs should know)_.
+- **Notes / surprises:** _(anything raised in review)_.
 
 ### YYYY-MM-DD — PR-2 merged
 
@@ -197,4 +223,6 @@ following — replace `N` with the PR number:
   (aggregator dev-portal / cover-sheet work — out of scope for
   this ticket).
 - **Predecessor round-1 note:** `doc/planning/APG-2495-post-deploy-retest-live-like-sar.md`.
+
+
 

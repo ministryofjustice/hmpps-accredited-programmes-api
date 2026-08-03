@@ -99,6 +99,21 @@ leave the repos alone.
   repository at the unit-test layer (they came out of the referrals
   graph seeded via the integration test).
 
+### 6. `src/test/kotlin/…/integration/SubjectAccessRequestServiceIntegrationTest.kt`
+
+**Not in the original plan — surfaced by PR-1.** Once the two
+`Content` fields are removed in step 1, this file will fail to
+compile because it asserts on `content.sexualOffenceDetails` and/or
+`content.selectedSexualOffenceDetails`. Mirror the PR-1 fix:
+
+- Grep the file for `sexualOffenceDetails` and
+  `selectedSexualOffenceDetails` — delete every assertion, seed, and
+  helper that references either.
+- Delete any UUID constants, seed helpers, or imports that become
+  unused as a result.
+- The rest of the file (B1's "exactly 3 staff-repo calls per SAR"
+  assertion, referrals seeding, etc.) stays.
+
 ## Snapshot regeneration
 
 ```zsh
