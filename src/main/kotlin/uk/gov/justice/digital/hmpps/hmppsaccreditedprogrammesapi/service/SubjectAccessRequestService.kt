@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OasysPniResultEntity
@@ -16,7 +15,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.ReferralStatusReasonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.AuditRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OasysPniResultEntityRepository
@@ -38,7 +36,6 @@ import java.util.*
 class SubjectAccessRequestService(
   private val referralRepository: ReferralRepository,
   private val courseParticipationRepository: CourseParticipationRepository,
-  private val auditRepository: AuditRepository,
   private val courseRepository: CourseRepository,
   private val pniResultRepository: PniResultRepository,
   private val personRepository: PersonRepository,
@@ -65,7 +62,6 @@ class SubjectAccessRequestService(
       afterFromDate && beforeToDate
     }
 
-    val auditRecords = auditRepository.getSarAuditRecords(prn)
     val referralStatusHistory = referralStatusHistoryRepository.findByPrisonNumber(prn)
     val selectedSexualOffenceDetails = filteredReferrals
       .flatMap { it.selectedSexualOffenceDetails }
@@ -100,7 +96,6 @@ class SubjectAccessRequestService(
     val staffSurnames = resolveStaffSurnames(
       filteredReferrals + originalsById.values,
       filteredParticipations,
-      auditRecords,
       referralStatusHistory,
     )
 
@@ -125,7 +120,6 @@ class SubjectAccessRequestService(
       content = Content(
         referrals = filteredReferrals.toSarReferral(staffSurnames, originalsById, organisationNamesByCode),
         courseParticipation = filteredParticipations.toSarParticipation(staffSurnames),
-        auditRecords = auditRecords.toSarAudit(staffSurnames),
         courses = courseRepository.getSarCourses(prn).toSarCourse(),
         pniResults = pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),
         person = personRepository.findPersonEntityByPrisonNumber(prn)?.toSarPerson(),
@@ -149,7 +143,6 @@ class SubjectAccessRequestService(
   private fun resolveStaffSurnames(
     referrals: List<ReferralEntity>,
     participations: List<CourseParticipationEntity>,
-    audits: List<AuditEntity>,
     statusHistory: List<ReferralStatusHistoryEntity>,
   ): StaffSurnames {
     val usernames = buildSet {
@@ -157,10 +150,6 @@ class SubjectAccessRequestService(
       participations.forEach {
         add(it.createdByUsername)
         it.lastModifiedByUsername?.let(::add)
-      }
-      audits.forEach {
-        it.referrerUsername?.let(::add)
-        add(it.auditUsername)
       }
       statusHistory.forEach { add(it.username) }
     }
@@ -192,7 +181,6 @@ class SubjectAccessRequestService(
   data class Content(
     val referrals: List<SarReferral>,
     val courseParticipation: List<SarCourseParticipation>,
-    val auditRecords: List<SarAuditRecord>,
     val courses: List<SarCourse>,
     val pniResults: List<SarPniResult>,
     val person: SarPerson?,
@@ -263,18 +251,6 @@ class SubjectAccessRequestService(
     val createdDateTime: LocalDateTime?,
     val updatedByUser: String?, // should be here
     val updatedDateTime: LocalDateTime?,
-  )
-
-  data class SarAuditRecord(
-    val prisonNumber: String,
-    val referrerUsername: String?,
-    val referralStatusFrom: String?,
-    val referralStatusTo: String?,
-    val courseName: String?,
-    val courseLocation: String?,
-    val auditAction: String,
-    val auditUsername: String?,
-    val auditDateTime: LocalDateTime,
   )
 
   data class SarCourse(
@@ -419,20 +395,6 @@ class SubjectAccessRequestService(
     hasLdc = hasLdc,
     additionalInformation = additionalInformation,
   )
-
-  private fun List<AuditEntity>.toSarAudit(surnames: StaffSurnames): List<SarAuditRecord> = map {
-    SarAuditRecord(
-      prisonNumber = it.prisonNumber,
-      referrerUsername = surnames.forUsername(it.referrerUsername),
-      referralStatusFrom = it.referralStatusFrom,
-      referralStatusTo = it.referralStatusTo,
-      courseName = it.courseName,
-      courseLocation = it.courseLocation,
-      auditAction = it.auditAction,
-      auditUsername = surnames.forUsername(it.auditUsername),
-      auditDateTime = it.auditDateTime,
-    )
-  }
 
   private fun List<CourseEntity>.toSarCourse(): List<SarCourse> = map {
     SarCourse(

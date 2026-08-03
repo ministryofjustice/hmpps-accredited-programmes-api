@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.AuditAction
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SexualOffenceCategoryType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SubjectAccessRequestService
@@ -84,12 +83,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       otherCourseName = "Other course",
       outcomeDetail = "No information to evidence",
     )
-    persistenceHelper.createAuditRecord(
-      prisonNumber = prisonNumber,
-      auditAction = AuditAction.CREATE_REFERRAL.name,
-      auditUsername = "TEST_USER",
-      referrerUsername = "TEST_USER",
-    )
     persistenceHelper.createPniResult(
       prisonNumber = prisonNumber,
       pniResultJson = "{\"result\": \"success\"}",
@@ -143,7 +136,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     val content = result!!.content as SubjectAccessRequestService.Content
     assertThat(content.referrals).hasSize(1)
     assertThat(content.courseParticipation).hasSize(1)
-    assertThat(content.auditRecords).hasSize(1)
     assertThat(content.courses).hasSize(1)
     assertThat(content.pniResults).hasSize(1)
     assertThat(content.person).isNotNull
@@ -167,12 +159,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(outcomeStatus).isEqualTo("INCOMPLETE")
       assertThat(otherCourseName).isEqualTo("Other course")
       assertThat(outcomeDetail).isEqualTo("No information to evidence")
-    }
-
-    with(content.auditRecords[0]) {
-      assertThat(auditUsername).isEqualTo("Doe")
-      assertThat(referrerUsername).isEqualTo("Doe")
-      assertThat(prisonNumber).isEqualTo("A1234BC")
     }
 
     with(content.courses[0]) {
