@@ -14,7 +14,7 @@ history in context. Read these alongside the top-level plan at
 | `PR-3-remove-sexual-offence-details.md` | Delete `sexualOffenceDetails` + `selectedSexualOffenceDetails`. |
 | `PR-4-remove-oasys-pni-results.md` | Delete `oasysPniResults` (Option A) *or* strip its two IDs (Option B) — blocked on Roxanne's Q1 answer. |
 | `PR-5-strip-internal-ids.md` | Delete `SarPerson.id` and `SarOrganisation.id`. Independent of Q2. |
-| `PR-6-osar-round-2-review-pdf.md` | Docs-only. Regenerate the review PDF and hand over to OSAR. |
+| `PR-6-osar-round-2-content-handover.md` | Docs-only. Content-only handover (JSON + HTML) to OSAR per William Falconer's 2026-08-04 guidance — no PDF. Appearance / headers / footers sit with Cameron's team under APG-2547. |
 
 ## Suggested sequencing
 

@@ -9,13 +9,16 @@ end.
 
 ## Status at a glance
 
-> **📉 Round-2 page-count target already hit.** With PR-1 merged
-> and PR-2 open + reviewed, the sample SAR PDF has dropped from
-> the round-1 baseline of ~8,000 pages to **3 pages**. PRs 3, 4,
-> and 5 are still worthwhile (Roxanne's red-flagged rows, privacy
-> hygiene, etc.) but the "8,000-page complaint" is functionally
-> resolved. Consider this when prioritising OSAR round-2 handover
-> vs. finishing PRs 3–5.
+> **📉 Content-readability target already hit (internal metric).**
+> With PR-1 merged and PR-2 open + reviewed, the **test-harness**
+> SAR PDF has dropped from the round-1 baseline of ~8,000 pages
+> to **3 pages**. This is a chrome-less content dump (no cover,
+> no headers, no footers) and is **not** what OSAR will review —
+> the OSAR PDF is produced by Cameron's team's SAR worker with
+> full chrome (APG-2547). It is nonetheless reassuring evidence
+> that the "8,000-page complaint" is fixed at the *content* level,
+> which is APG-2546's remit. PRs 3, 4, and 5 are still worthwhile
+> (Roxanne's red-flagged rows, privacy hygiene, etc.).
 
 | Item | State | Notes |
 |---|---|---|
@@ -27,11 +30,12 @@ end.
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start | Branch off `main` @ `cd306c99`. Same integration-test note as PR-2. |
 | PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Same integration-test note if Q1 = A. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
-| PR-6 — regenerate OSAR round-2 review PDF + handover | 🚫 blocked on PRs 1–5 | Docs + snapshot regen only. |
-| OSAR content sign-off (Sharon + Roxanne + QAT) | 🚫 blocked on PR-6 handover | Round-2 review. |
-| Ticket transition to Done | 🚫 blocked on OSAR sign-off | |
+| PR-6 — OSAR round-2 content handover | 🚫 blocked on PRs 1–5 | **Scope updated 2026-08-04:** content-only (JSON + HTML), no PDF, per William Falconer's guidance. Appearance = APG-2547 = Cameron's team. See `PR-6-osar-round-2-content-handover.md`. |
+| OSAR **content** sign-off (Sharon + Roxanne + QAT + William) | 🚫 blocked on PR-6 handover | Round-2 review of the content we produce. This is APG-2546's end state. |
+| APG-2547 — OSAR **appearance** sign-off (headers / footers / cover) | 🔄 out of our scope | Owned by Cameron's team on `../hmpps-subject-access-request-worker`. Precedent = Accommodation team. Any appearance pushback in the round-2 review gets redirected to `#haa-sar-functionality-change-request`. Tracked here so we don't get pulled back in. |
+| Ticket transition to Done | 🚫 blocked on OSAR **content** sign-off | APG-2546 closes on content sign-off only. APG-2547 lives independently. |
 
-Legend: ⬜ ready • 🚫 blocked • ⏳ in flight • ✅ complete.
+Legend: ⬜ ready • 🚫 blocked • ⏳ in flight • ✅ complete • 🔄 out of our scope.
 
 ## Timeline
 
@@ -272,6 +276,58 @@ defaults:
   same as prior cycle.
 - **Sample PDF post-PR-3:** **3 pages** (unchanged from PR-2 — the
   sexual-offence sections were tiny in the seed set).
+
+### 2026-08-04 — William Falconer email → PR-6 scope changed to content-only
+
+**What happened.** Snr Tech Architect William Falconer emailed
+`#osar-review` (or similar) to clarify how consumer teams should
+hand over for OSAR review. Direct quote:
+
+> To be clear — we should provide content produced by the test
+> harness as provided by \[Cameron's\] team for this. This is the
+> agreed approach and should not include full rendering of headers
+> and footers. This is produced by the SAR Service, and is outside
+> of the scope of the teams building the report contents. We
+> already have precedent in accommodation for this and expect to
+> follow the same consistent approach on all teams doing this work.
+
+**Impact.**
+
+- **PR-6** was framed as "hand over a live-like PDF". Revised to
+  "hand over content only (JSON + HTML), no PDF". New doc:
+  `PR-6-osar-round-2-content-handover.md`. Old
+  `PR-6-osar-round-2-review-pdf.md` deleted.
+- **APG-2547** (appearance / headers / footers) is confirmed as
+  Cameron's team's remit, not ours. Added to status table as
+  a 🔄 out-of-scope item so it's visible but doesn't block
+  APG-2546's close-out.
+- **Test-harness PDF page count** (round-1 ~8,000 → now 3 pages)
+  is reframed as an **internal readability metric only**. It's
+  still reassuring evidence that the content-level readability
+  problem is fixed, but it does NOT go into the OSAR handover
+  email or the round-2 run-log entry as the primary metric —
+  those emphasise the content delta (sections removed, DD rows,
+  Roxanne's flags) instead.
+- **Top-level plan** updated: §"Origin of this work" now says
+  APG-2547 owns appearance; §"Not in scope for APG-2546" leads
+  with William's email; PR-6 detail block rewritten;
+  artefacts-table row 6 updated.
+
+**Verified on the sibling repo** (`../hmpps-subject-access-request-worker`):
+
+- `services/pdf/v2/PdfService.kt` — 370 lines, uses iText to
+  build cover + contents + service partials + rear + merge.
+- `services/pdf/events/SubjectAccessRequestHeaderAndFooterEventHandler.kt`
+  — 72 lines, adds "Official Sensitive" footer + subject-name /
+  NOMIS-ID / n-Delius-case header via a `PdfDocumentEvent` handler.
+- Our contract test uses `hmpps-subject-access-request-test-support:2.4.2`
+  (build.gradle.kts line 71) — a *different* code path that has
+  none of this chrome. This is the "PDF generator we wrote quickly"
+  in colloquial terms — it's fine as a content dump, not fine as
+  an OSAR handover.
+
+**No PR is being cut for this — it's a docs / framing update on
+the planning branch only.**
 
 ### YYYY-MM-DD — PR-3 merged
 

@@ -9,11 +9,16 @@ see `doc/planning/APG-2495-post-deploy-retest-live-like-sar.md`), QAT
 came back with two workstreams (Slack, 30 Jul):
 
 1. **Content changes** — remove several fields / whole sections from
-   the SAR payload the aggregator will render into an OSAR PDF.
-2. **Appearance changes** — cover-sheet / dev-portal artefacts,
-   currently blocked on the aggregator team's stuck dev pipeline
-   (kicked to `#haa-sar-functionality-change-request`; out of scope
-   for this branch).
+   the SAR payload that Cameron's team's worker renders into an OSAR
+   PDF. **This is APG-2546 / this branch.**
+2. **Appearance changes** — cover-sheet, headers, footers, and
+   related presentation. **This is APG-2547**, and per William
+   Falconer's 2026-08-04 guidance it sits with Cameron's team on
+   the SAR worker (`../hmpps-subject-access-request-worker`), not
+   us. Any OSAR reviewer feedback on presentation goes to
+   `#haa-sar-functionality-change-request`. Out of scope for this
+   branch; the PR-6 content handover doc explains how we frame that
+   split in the OSAR sign-off email.
 
 Content changes were captured by Roxanne on the data-dictionary
 spreadsheet held locally at
@@ -174,7 +179,7 @@ its own snapshot regen. Sequence:
 | 3 | `APG-2546/remove-sexual-offence-details` | `APG-2546: remove sexualOffenceDetails + selectedSexualOffenceDetails sections from SAR` | see PR-3 detail below | 0.5 d |
 | 4 | `APG-2546/remove-oasys-pni-results` | `APG-2546: remove oasysPniResults section from SAR` (or "strip IDs from oasysPniResults" depending on Q1 answer) | see PR-4 detail below | 0.5 d |
 | 5 | `APG-2546/strip-internal-ids` | `APG-2546: strip internal ID fields from remaining SAR sections` | see PR-5 detail below | 0.5–1 d |
-| 6 | `APG-2546/osar-round-2-review-pdf` | `APG-2546: regenerate live-like OSAR review PDF (round 2)` | doc-only (planning note + generated PDF handed off in `~/Downloads/sar-dev-3/`) | 0.5 d |
+| 6 | `APG-2546/osar-round-2-content-handover` | `APG-2546: OSAR round-2 content handover — docs-only` | doc-only (planning note + JSON/HTML content bundle handed off in `~/Downloads/sar-dev-3/`) | 0.5 d |
 
 **Total working days:** ~3.5 dev + ~1.5 buffer = **~5 dev days** — comfortably inside the 3-week (~15 dev days) envelope. Slack is intentionally large to absorb one OSAR review-cycle.
 
@@ -341,21 +346,32 @@ subject sees a UUID string that is meaningless to them.
 and a couple of surname / status fields; it doesn't currently probe
 `SarPerson.id` or `SarOrganisation.id`. Snapshots pick up the diff.
 
-### PR-6 detail — regenerate the OSAR round-2 review PDF
+### PR-6 detail — OSAR round-2 content handover (content-only)
+
+**Scope updated 2026-08-04 following William Falconer's guidance
+that consumer teams provide content only, not fully-rendered PDFs.
+See `APG-2546/PR-6-osar-round-2-content-handover.md` for the full
+handover doc.**
 
 Once PRs 1–5 are merged:
 
-1. Regenerate the SAR contract fixture snapshots on `main` — should
-   already be reflected via each preceding PR, but do a clean
-   `SAR_GENERATE_ACTUAL=true ./gradlew test --tests '*SarContractIntegrationTest*'`
-   as a belt-and-braces.
-2. The generated `build/test-generated/sar-generated-report.pdf` is
-   the review artefact.
-3. Copy into `~/Downloads/sar-dev-3/` alongside the JSON + HTML.
-4. Append a run-log entry to `doc/planning/APG-2495-post-deploy-retest-live-like-sar.md`
+1. Regenerate the SAR contract fixture snapshots on `main` as a
+   belt-and-braces:
+   `SAR_GENERATE_ACTUAL=true ./gradlew clean test --tests '*SarContractIntegrationTest*'`.
+2. Copy the two **content** files into `~/Downloads/sar-dev-3/`:
+   - `src/test/resources/sar/sar-api-response.json`
+   - `src/test/resources/sar/sar-expected-render-result.html`
+3. **Do not copy** `build/test-generated/sar-generated-report.pdf`
+   — that's a chrome-less test-harness PDF, not an OSAR-quality
+   PDF. Handing it over would contradict William's guidance and
+   invite appearance-review pushback that belongs to Cameron's
+   team under APG-2547.
+4. Append a run-log entry to
+   `doc/planning/APG-2495-post-deploy-retest-live-like-sar.md`
    under a new heading "OSAR round 2 (2026-08-xx)".
-5. Email OSAR (Sharon + Roxanne + QAT) using the "test-harness content
-   sign-off" framing from the round-1 handover.
+5. Email OSAR (Sharon + Roxanne + QAT + William) for **content**
+   sign-off. Explicitly redirect any appearance queries to Cameron's
+   team on `#haa-sar-functionality-change-request` under APG-2547.
 
 ## Sequencing
 
@@ -379,15 +395,24 @@ rows" complaint we're primarily fixing).
 
 Explicitly excluded so no scope creep:
 
-- **Aggregator dev-portal "pending status" stuck** — kicked to
-  `#haa-sar-functionality-change-request`. Not this branch.
-- **Cover-sheet on the eventual PDF** — same channel, same reason.
-- **`is_national` on `SarOrganisation`** — deferred pending Roxanne's
-  clarification (Q2). If she confirms it's a real ADD, a separate
-  ticket (revived APG-2494 or new) will be spun up.
+- **Appearance / cover-sheet / headers / footers on the OSAR PDF**
+  — this is **APG-2547**, owned by Cameron's team's SAR worker at
+  `../hmpps-subject-access-request-worker`. Confirmed via 2026-08-04
+  email from William Falconer (Snr Tech Architect) that consumer
+  teams like us provide **content only** (JSON + HTML from the
+  test harness); the worker wraps that content in the standard
+  chrome. Precedent: the Accommodation SAR consumer team. Any OSAR
+  reviewer feedback on appearance goes to
+  `#haa-sar-functionality-change-request` under APG-2547, not here.
+- **Aggregator dev-portal "pending status" stuck** — same
+  `#haa-sar-functionality-change-request` channel; also aggregator
+  team's remit, not ours.
+- **`is_national` on `SarOrganisation`** — deferred pending
+  Roxanne's clarification (Q2). If she confirms it's a real ADD,
+  a separate ticket (revived APG-2494 or new) will be spun up.
 - **Any preprod UAT of live SARs** — that's downstream of OSAR
-  content sign-off, and blocked on the aggregator team's pipeline
-  regardless.
+  content sign-off and possibly co-owned with Cameron's team;
+  separate exercise, not APG-2546.
 
 ## Rollback plan
 
@@ -413,7 +438,7 @@ email has a clean paper trail.
 | 3 (sexualOffenceDetails ×2) | PR #1110 opened 2026-08-03, head `fc5ae133` (incl. review-amend) — merge SHA TBD | **3 pages** (unchanged from PR-2) | No deviations from doc. DD cross-check: all 4 red-flagged `sexual_offence_details` fields (rows 233/234/235/237) removed exactly. Row 225's table-level note strengthens the coupled `selected_sexual_offence_details` removal beyond the pure-coupling argument (§C updated). Review-amend `fc5ae133` reinstated the blank line after `clearAllTableContent()` per project convention. |
 | 4 (oasysPniResults) | TBD | TBD | pending Q1 |
 | 5 (IDs strip) | TBD | TBD | |
-| 6 (OSAR round-2 PDF) | TBD | TBD (target: ~4–5 pages) | |
+| 6 (OSAR round-2 content handover) | TBD | Handover is content-only (JSON + HTML), no PDF, per William Falconer's 2026-08-04 guidance | Internal readability metric (test-harness PDF): already 3 pages post-PR-2 vs round-1 ~8,000. Appearance / cover / headers / footers = Cameron's team / APG-2547. |
 
 ## Rough size
 
