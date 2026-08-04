@@ -1,9 +1,21 @@
 # PR-4 — Remove `oasysPniResults` from SAR (or strip its IDs)
 
-> **Ticket:** APG-2546 • **Branch:** `APG-2546/remove-oasys-pni-results`
-> (Option A) or `APG-2546/strip-oasys-pni-result-ids` (Option B)
-> • **Est.:** 0.5 dev day • **Blocks:** Q1 answer from Roxanne
+> **Ticket:** APG-2546 • **Branch:** `APG-2546/strip-oasys-pni-result-ids`
+> (Option B — confirmed 2026-08-04 pm)
+> • **Est.:** 0.5 dev day • **Blocks:** nothing (Q1 answered)
 > • **Depends on:** PR-3 merged (rebase off `main` after PR-3 lands)
+
+## ✅ Q1 answered — execute Option B (corrected)
+
+Roxanne confirmed in person on 2026-08-04 pm (see DELIVERY-LOG
+"Roxanne in-person answers 2026-08-04 pm" entry). **Skip Option A
+entirely.** Option A section retained below strictly for the
+paper trail — do not execute.
+
+Confirmed Option B scope: **strip `pniResultId` +
+`oasysAssessmentId`, keep `prisonNumber` + `programmePathway`.**
+Two-field surviving section, no ambiguity, no "default vs
+definite" hedging.
 
 ## Purpose
 
@@ -43,17 +55,20 @@ is strip because it aligns with the ID-removal theme and row
 
 ## Prerequisites for a fresh agent
 
-**Do not start this PR until Q1 is answered.** Check
-`doc/planning/APG-2546/00-roxanne-followup.md` for the current state,
-and confirm in `#osar-review` if uncertain.
-
-If Q1 is answered Option A → follow the "Option A" branch below.
-If Option B → follow the "Option B" branch below.
+**Q1 is answered.** Corrected Option B is what to execute. Do
+not re-litigate A vs B — Roxanne closed it in person.
 
 Read `doc/planning/APG-2546-sar-field-removals.md` (§A row 5, "Open
-questions", PR-4 detail).
+questions", PR-4 detail) for context, and the DELIVERY-LOG
+"Roxanne in-person answers 2026-08-04 pm" timeline entry for
+provenance.
 
-## Option A — remove the whole section
+## Option A — remove the whole section [SUPERSEDED, do NOT execute]
+
+> **Status:** superseded by Roxanne's 2026-08-04 pm in-person
+> answer confirming corrected Option B. Kept below strictly as
+> historical / paper-trail — if you're a fresh agent picking up
+> PR-4, skip to "Option B" further down.
 
 ### 1. `src/main/kotlin/…/service/SubjectAccessRequestService.kt`
 

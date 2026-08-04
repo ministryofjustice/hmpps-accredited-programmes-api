@@ -67,7 +67,7 @@ the matching assertions from `SubjectAccessRequestServiceTest`.
 | 2 | `referralStatusHistory` | `SarReferralStatusHistoryEntity` | all 11 | 192–202 |
 | 3 | `referralStatusReasons` | `SarReferralStatusReason` | all 5 | 205–209 |
 | 4 | `sexualOffenceDetails` | `SarSexualOffenceDetails` | all 4 | 233, 234, 235, 237 |
-| 5 | `oasysPniResults` | `SarOasysPniResult` | all 4 | 85, 86, 87, 88 (⚠ clarification pending — see below) |
+| 5 | `oasysPniResults` | `SarOasysPniResult` | 2 of 4 (strip `pniResultId` + `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`) | 85, 86, 87, 88 (✅ Q1 answered 2026-08-04 pm — see below) |
 
 ### B. Internal ID fields to strip from remaining sections
 
@@ -75,10 +75,13 @@ the matching assertions from `SubjectAccessRequestServiceTest`.
 |---|---|---|
 | `SarPerson` | `id` | 111 |
 | `SarOrganisation` | `id` | 105 |
+| `SarReferral` | `originalReferralId` | 165 (10.07 dev note "do not add the uuid", confirmed in person by Roxanne 2026-08-04 pm — fold into PR-5) |
 | `SarPniResult` | `pniResultId`, `referralId`, `oasysAssessmentId` | 127, 128, 131 |
 
-`SarPerson.id` and `SarOrganisation.id` are currently populated —
-they'll go from the DTO, the mapper, the template, and the snapshots.
+`SarPerson.id`, `SarOrganisation.id`, and `SarReferral.originalReferralId`
+are currently populated — they'll go from the DTO, the mapper, the
+template (where rendered), and the snapshots. The resolved
+`originalReferral` sub-block on `SarReferral` stays.
 `SarPniResult` doesn't currently expose `pniResultId` / `referralId`
 / `oasysAssessmentId` (verified against the DTO at
 `SubjectAccessRequestService.kt` lines 284–295) — the fields Roxanne
@@ -126,40 +129,40 @@ of those PRs depends on the answer.
 
 ### Q1 — `oasysPniResults` section (rows 85–88)
 
-Two conflicting notes on the same rows:
+**✅ ANSWERED 2026-08-04 pm (in person).** Corrected Option B
+confirmed by Roxanne — strip `pniResultId` + `oasysAssessmentId`,
+keep `prisonNumber` + `programmePathway`. See DELIVERY-LOG
+"Roxanne in-person answers 2026-08-04 pm" entry for provenance;
+see `APG-2546/PR-4-remove-oasys-pni-results.md` for the
+implementation. Q1-correction message (drafted in
+`00-roxanne-followup.md`) was **not sent** — Roxanne answered
+the whole stack in person before it went out. Kept in the doc
+for the paper trail but explicitly marked "do NOT send".
+
+Historical context (kept for provenance) — the two conflicting
+notes on the row that motivated Q1 in the first place:
 
 - *"10.07.26 — Dev states this should be on the report, will need to
-  check new report"* — implies **keep**
+  check new report"* — implied **keep**
 - *"After call with Raby 29.07 — this should be a no — All IDs should
-  be a No"* — implies **remove all IDs** (but is the `programme_pathway`
-  field an ID? no — it's a category like `HIGH_INTENSITY_BC`)
+  be a No"* — implied **remove all IDs** (but `programme_pathway`
+  isn't an ID, it's a category like `HIGH_INTENSITY_BC`)
 
-Options put to Roxanne (Q1 sent + follow-up sent 2026-08-03):
+Options put to Roxanne (Q1 sent + follow-up sent 2026-08-03) — kept
+for the paper trail:
 
 - **A** — remove the whole section from the SAR (nothing surfaces).
+  ✂️ superseded by in-person answer.
 - **B** — strip all three ID fields (`pniResultId`, `prisonNumber`,
   `oasysAssessmentId`), keep only `programmePathway`.
-  (Verified against DTO `SubjectAccessRequestService.kt` lines
-  315–320: those are the four fields, `programmePathway` is a
-  category label — e.g. `HIGH_INTENSITY_BC` — not an ID.)
+  ⚠️ semantically wrong as sent (`prisonNumber` is the PRN, not
+  an internal ID; DD row 86 says keep). Corrected in person.
+- **B (corrected)** — the actual confirmed answer, see banner above.
 
-**⚠️ Correction needed on Option B as sent (surfaced 2026-08-04 pm
-by full DD notes sweep — see DELIVERY-LOG "DD notes sweep beyond
-red-flagged rows"):** the Option B message told Roxanne we'd strip
-`prison_number`, but DD row 86 has an unretracted dev note from
-10.07.26 saying `prison_number` "should be on the report", and it
-was NOT red-flagged in her 29.07 pass. Treating `prison_number`
-as an internal ID for stripping is a semantic error — it's the
-subject's PRN. If Roxanne answers "B" against the current framing,
-she'd be endorsing something the DD itself contradicts. **We owe
-her a short correction message** before her Q1 response lands —
-see `APG-2546/00-roxanne-followup.md` §"Q1 Option B correction
-(2026-08-04 pm)".
+Implementation effort is identical to the sent-but-superseded
+Option B (one fewer field to strip). ~0.5 dev day.
 
-Implementation effort is roughly identical either way.
-
-**Default if no reply by 2026-08-14 (see `APG-2546/00-roxanne-followup.md`):
-Option A.**
+**Default banner deleted — no longer relevant, Q1 answered.**
 
 ### Q2 — `is_national` on `SarOrganisation` (row 109)
 
@@ -192,8 +195,8 @@ its own snapshot regen. Sequence:
 | 1 | `APG-2546/remove-audit-records` | `APG-2546: remove auditRecords section from SAR` | see PR-1 detail below | 0.5 d |
 | 2 | `APG-2546/remove-status-history-and-reasons` | `APG-2546: remove referralStatusHistory + referralStatusReasons sections from SAR` | see PR-2 detail below | 0.5 d |
 | 3 | `APG-2546/remove-sexual-offence-details` | `APG-2546: remove sexualOffenceDetails + selectedSexualOffenceDetails sections from SAR` | see PR-3 detail below | 0.5 d |
-| 4 | `APG-2546/remove-oasys-pni-results` | `APG-2546: remove oasysPniResults section from SAR` (or "strip IDs from oasysPniResults" depending on Q1 answer) | see PR-4 detail below | 0.5 d |
-| 5 | `APG-2546/strip-internal-ids` | `APG-2546: strip internal ID fields from remaining SAR sections` | see PR-5 detail below | 0.5–1 d |
+| 4 | `APG-2546/strip-oasys-pni-result-ids` | `APG-2546: strip pniResultId + oasysAssessmentId from oasysPniResults, keep prisonNumber + programmePathway` | see PR-4 detail below | 0.5 d |
+| 5 | `APG-2546/strip-internal-ids` | `APG-2546: strip internal ID fields from remaining SAR sections (SarPerson.id, SarOrganisation.id, SarReferral.originalReferralId)` | see PR-5 detail below | 0.5–1 d |
 | 6 | `APG-2546/osar-round-2-handover` | `APG-2546: OSAR round-2 handover — docs-only` | doc-only (planning notes + downloaded PDF handed off in `~/Downloads/sar-dev-3/`; Option 1 primary, Option 2 fallback) | 0.5–1 d |
 
 **Total working days:** ~3.5 dev + ~1.5 buffer = **~5 dev days** — comfortably inside the 3-week (~15 dev days) envelope. Slack is intentionally large to absorb one OSAR review-cycle.
@@ -305,9 +308,28 @@ lets us delete the whole `selectedSexualOffenceDetails` local var
   - Delete sexualOffenceDetails-empty assertion (line 269)
 - Regenerate + promote snapshots.
 
-### PR-4 detail — remove `oasysPniResults` (or strip IDs, per Q1 answer)
+### PR-4 detail — strip IDs from `oasysPniResults` (Option B corrected, confirmed 2026-08-04 pm)
 
-**If Roxanne confirms Option A (whole section):**
+**✅ Q1 answered in person 2026-08-04 pm.** Execute Option B
+(corrected). Option A superseded, do not execute — kept below
+strictly for the paper trail.
+
+**Option B (corrected — the confirmed path):**
+- Same shape as PR-5 pattern — DTO field removals + template row
+  deletions only, section wrapper stays.
+- **Strip** `pniResultId` (DD row 85 red-flagged + "All IDs should
+  be a No"). **Strip** `oasysAssessmentId` (Roxanne confirmed
+  2026-08-04 pm — "OASys system reference, not user-facing").
+- **Keep** `prisonNumber` (DD row 86 dev note "should be on the
+  report"; PRN, not internal ID; consistent with every other SAR
+  section retaining the subject's PRN).
+- **Keep** `programmePathway` (DD row 88 dev note "should be on
+  the report"; routing category like `HIGH_INTENSITY_BC`, not
+  an ID; the subject has a right to see the routing decision).
+- See `APG-2546/PR-4-remove-oasys-pni-results.md` Option B section
+  for the file-by-file breakdown.
+
+**Option A (whole-section removal) — SUPERSEDED, do NOT execute:**
 - `src/main/kotlin/.../service/SubjectAccessRequestService.kt`
   - Delete `oasysPniResults = ...` from `Content(...)` (line 132)
   - Delete `oasysPniResults: List<SarOasysPniResult>` field from `Content` (line 197)
@@ -328,31 +350,21 @@ lets us delete the whole `selectedSexualOffenceDetails` local var
   - Delete oasysPniResults assertions (lines 265, 332)
 - Regenerate + promote snapshots.
 
-**If Option B (strip IDs, keep `prisonNumber` + `programmePathway`):**
-*(Scope refined 2026-08-04 pm after full DD notes sweep — see
-`APG-2546/PR-4-remove-oasys-pni-results.md` for the field-by-field
-DD-signal table and the DELIVERY-LOG entry "DD notes sweep beyond
-red-flagged rows".)*
-
-- Same shape as PR-5 pattern — DTO field removals + template row
-  deletions only, section wrapper stays.
-- Strip `pniResultId` (definite; DD row 85 red-flagged + "All IDs
-  should be a No"). Strip `oasysAssessmentId` (default; DD row 87
-  ambiguous — 10.07 dev note says keep, blanket 29.07 note says
-  strip; resolve with Roxanne).
-- **Keep `prisonNumber`** (DD row 86 dev note "should be on the
-  report", not red-flagged; consistent with every other SAR
-  section retaining the subject's PRN).
-- **Keep `programmePathway`** (DD row 88, positive dev signal).
-- See `APG-2546/PR-4-remove-oasys-pni-results.md` Option B section
-  for the file-by-file breakdown.
 
 ### PR-5 detail — strip internal ID fields from remaining sections
 
-Two DTO field-removals (both are `id`s that Roxanne flagged as
-"internal ref — should be a no"). Currently `SarPerson.id` and
-`SarOrganisation.id` are populated in every SAR response — the
-subject sees a UUID string that is meaningless to them.
+Three DTO field-removals: two `id`s that Roxanne red-flagged as
+"internal ref — should be a no" (rows 105 and 111), plus
+`SarReferral.originalReferralId` (row 165, "pull referral data
+(if not already) do not add the uuid") **confirmed in person by
+Roxanne 2026-08-04 pm as a fold-in to this PR**.
+
+Currently `SarPerson.id`, `SarOrganisation.id`, and
+`SarReferral.originalReferralId` populate every SAR response with
+UUID strings that are meaningless to the subject. The
+`originalReferral` sub-block on `SarReferral` (already populated
+via batch lookup) stays — only the raw UUID + its template row
+come out.
 
 **Files:**
 - `src/main/kotlin/.../service/SubjectAccessRequestService.kt`
@@ -360,16 +372,35 @@ subject sees a UUID string that is meaningless to them.
   - Delete `id = id` field-assignment in `PersonEntity.toSarPerson()` mapper
   - Delete `id: String` field from `SarOrganisation` (line 533)
   - Delete `id = id.toString()` from `OrganisationEntity.toSarOrganisation()` mapper
+  - Delete `originalReferralId: UUID?` field from `SarReferral`
+    (~line 245 area — grep for `originalReferralId` inside
+    `data class SarReferral(...)`)
+  - Delete `originalReferralId = …` field assignment inside
+    `toSarReferral` mapper
 - `src/main/resources/sar_template.mustache`
   - Delete the `<tr><td>Person ID</td>...</tr>` line inside `{{#person}}` block (line 125)
+  - Delete the `<tr><td>Original referral ID</td><td>{{ optionalValue originalReferralId }}</td></tr>`
+    row at line 14. The `originalReferral` block (rendered lower in the template) is unaffected.
   - **Note:** the `{{#organisations}}` block (lines 160–170) does *not*
     render an Id row today — it only renders `Name`. `SarOrganisation.id`
     removal is therefore DTO + mapper only, no template change.
 - Regenerate + promote snapshots.
 
-**No test file changes** — the unit test asserts collection sizes
-and a couple of surname / status fields; it doesn't currently probe
-`SarPerson.id` or `SarOrganisation.id`. Snapshots pick up the diff.
+**Test file changes:**
+- `SubjectAccessRequestServiceTest.kt` around lines 277 / 300 /
+  305 — delete `assertThat(referral.originalReferralId).isEqualTo(…)`
+  / `.isNull()` assertions. Keep assertions on the
+  `originalReferral` sub-block (id, prison number etc.) — that's
+  the subject-facing surface now.
+- No other changes — the unit test asserts collection sizes and
+  a couple of surname / status fields; it doesn't currently probe
+  `SarPerson.id` or `SarOrganisation.id`. Snapshots pick up the diff.
+
+**Entity layer is unchanged.** The batch lookup that populates
+the `originalReferral` sub-block (via `referralRepository.findAllById(...)`)
+still needs the source UUID from the entity layer, so
+`ReferralEntity.originalReferralId` stays. Only the *DTO* and
+*template* stop exposing it.
 
 ### PR-6 detail — OSAR round-2 handover (Option 1 primary, Option 2 fallback)
 

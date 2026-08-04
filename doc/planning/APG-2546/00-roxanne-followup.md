@@ -96,29 +96,31 @@ Branching from her answers into the working docs:
 
 ## Q1 Option B correction (2026-08-04 pm) — needs sending
 
-> **Status:** DRAFT — surfaced by the DD notes sweep on
-> 2026-08-04 pm (see DELIVERY-LOG entry "DD notes sweep beyond
-> red-flagged rows"). Break the earlier "do NOT resend A / B
-> options" rule because the B option as sent contains a
-> genuine semantic error — worth the noise cost.
-
-**What went wrong.** The Q1 message described Option B as
-"strip `pni_result_id`, `prison_number`, and
-`oasys_assessment_id`; keep only `programme_pathway`". A full
-sweep of the DD notes column (not just Roxanne's 29.07 red
-flags) shows row 86 (`oasys_pni_result.prison_number`) carries
-an unretracted 10.07.26 dev note "should be on the report", and
-`prison_number` was not red-flagged in the 29.07 pass. It's the
-subject's PRN, not an internal UUID — every other section of
-the SAR keeps it. If Roxanne picks B against the framing as
-sent, she'd sign off stripping a field the DD's own dev note
-tells us to keep.
-
-**What we owe her.** A short, "no drama" correction on Option
-B. Don't restate the whole A / B setup — just repair the B
-description. Also worth surfacing the `oasys_assessment_id`
-ambiguity (10.07 dev note says keep; 29.07 blanket "all IDs →
-No" says strip) so we get a clean signal on that field too.
+> **Status:** ⚠️ NOT SENT — SUPERSEDED. Roxanne answered the
+> whole correction stack (Option B scope, `oasys_assessment_id`,
+> `original_referral_id`) in person on 2026-08-04 pm before the
+> correction message went out. Answers recorded below and
+> propagated into DELIVERY-LOG timeline + PR-4 / PR-5 docs.
+> The draft is kept here for the paper trail; do NOT send.
+>
+> **Roxanne's in-person answers (2026-08-04 pm):**
+> - **Option B scope correction** ("`prison_number` should stay,
+>   not be stripped"): ✅ confirmed. Corrected Option B stands
+>   as "strip `pni_result_id` + `oasys_assessment_id`, keep
+>   `prison_number` + `programme_pathway`".
+> - **`oasys_assessment_id`** (was ambiguous): ✅ strip. Aligns
+>   with the "OASys system reference, not user-facing" default.
+> - **`original_referral_id`** on `SarReferral` (was flagged as
+>   PR-5 potential extension): ✅ strip the UUID (fold into
+>   PR-5 scope). The resolved `originalReferral` sub-block
+>   stays; only the raw UUID + its "Original referral ID"
+>   template row are removed.
+>
+> **What this unblocks:**
+> - PR-4 → ⬜ ready to start on the corrected Option B branch
+>   (`APG-2546/strip-oasys-pni-result-ids`).
+> - PR-5 → scope extension confirmed (originalReferralId fold-in).
+> - Q2 (`is_national`) — unchanged, still open.
 
 ### Slack / email draft
 

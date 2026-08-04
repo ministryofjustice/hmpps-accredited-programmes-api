@@ -1,34 +1,43 @@
 # PR-5 — Strip internal ID fields from remaining SAR sections
 
 > **Ticket:** APG-2546 • **Branch:** `APG-2546/strip-internal-ids`
-> • **Est.:** 0.5 dev day • **Blocks:** nothing (independent of Q1)
+> • **Est.:** 0.5–1 dev day • **Blocks:** nothing (independent of Q1/Q2)
 > • **Depends on:** PR-4 merged (rebase off `main` after PR-4 lands)
 
 ## Purpose
 
-Two DTO field-removals — both are `id`s that Roxanne flagged as
-"internal ref — should be a no" (spreadsheet rows 105 and 111).
+Three DTO field-removals, all `id`s that either Roxanne red-flagged
+directly or the DD's dev-note column tells us shouldn't render as
+raw UUIDs:
 
-Currently `SarPerson.id` and `SarOrganisation.id` populate every SAR
-response with a UUID string that is meaningless to the subject.
+1. **`SarPerson.id`** (spreadsheet row 111) — Roxanne 29.07
+   red-flag "internal ref — should be a no".
+2. **`SarOrganisation.id`** (row 105) — same red-flag pattern.
+3. **`SarReferral.originalReferralId`** (row 165) — 10.07 dev note
+   "pull referral data (if not already) do not add the uuid".
+   **Confirmed 2026-08-04 pm in person by Roxanne** — fold into
+   this PR (see DELIVERY-LOG "Roxanne in-person answers 2026-08-04
+   pm"). The resolved `originalReferral` sub-block stays; only the
+   raw UUID + its template row come out.
 
-There is a **third** related row on the spreadsheet — rows 127, 128,
+Currently `SarPerson.id`, `SarOrganisation.id`, and
+`SarReferral.originalReferralId` populate every SAR response with
+UUID strings that are meaningless to the subject.
+
+There is a **fourth** related row on the spreadsheet — rows 127, 128,
 131 flag `SarPniResult.pniResultId`, `referralId`,
 `oasysAssessmentId` — but those fields are already absent from the
 `SarPniResult` DTO (verified against
 `SubjectAccessRequestService.kt` lines 284–296, 2026-08-03). No
 code change needed for `SarPniResult`; this PR only touches
-`SarPerson` and `SarOrganisation`.
+`SarPerson`, `SarOrganisation`, and `SarReferral`.
 
-## Potential scope extension — `SarReferral.originalReferralId` (2026-08-04 pm)
+## `SarReferral.originalReferralId` — confirmed scope extension (2026-08-04 pm)
 
-Surfaced by the DD notes sweep (see DELIVERY-LOG "DD notes sweep
-beyond red-flagged rows" entry). Row 165 dev note on
-`referral.original_referral_id`:
+Confirmed by Roxanne in person on 2026-08-04 pm — see
+DELIVERY-LOG "Roxanne in-person answers 2026-08-04 pm" entry.
 
-> "pull referral data (if not already) do not add the uuid"
-
-State on `main`:
+**State on `main`:**
 
 - We *do* pull the referral data — `SarReferral.originalReferral`
   is a populated sub-block (verified `SubjectAccessRequestServiceTest.kt`
@@ -38,39 +47,32 @@ State on `main`:
   `src/main/resources/sar_template.mustache:14`
   (`<td>Original referral ID</td><td>{{originalReferralId}}</td>`).
 
-Per the DD dev note, the raw UUID should not be rendered — only
-the resolved `originalReferral` block should. That means stripping
-`originalReferralId` from the DTO + template + assertions, same
-mechanics as `SarPerson.id` / `SarOrganisation.id`.
+**Code changes** (fits alongside step 1 below):
 
-Not in Roxanne's 30 Jul red-flag pass, so this isn't
-"pre-authorised" by her. Decision options:
+- `SubjectAccessRequestService.kt` — delete
+  `originalReferralId: UUID?` field from `SarReferral` data class
+  (~line 245 area — grep for `originalReferralId` inside
+  `data class SarReferral(...)`).
+- `SubjectAccessRequestService.kt` — inside the `toSarReferral`
+  mapper, delete the `originalReferralId = …` field assignment.
+- `src/main/resources/sar_template.mustache:14` — delete the
+  `<tr><td>Original referral ID</td><td>{{ optionalValue originalReferralId }}</td></tr>`
+  row. The `originalReferral` block (rendered lower down in the
+  template) is unaffected.
+- `SubjectAccessRequestServiceTest.kt` — around lines 277 and 300,
+  delete any `assertThat(referral.originalReferralId).isEqualTo(…)`
+  / `.isNull()` assertions. Keep the assertions on the
+  `originalReferral` sub-block (id, prison number etc.) — that's
+  what the subject actually sees now.
+- Sanity check with `grep -n "originalReferralId" src/main` after
+  edits — expect zero hits inside `SubjectAccessRequestService.kt`
+  and zero renders in the template.
 
-- **(a) Fold into PR-5 scope now.** Argument: 10.07 dev note is
-  unambiguous, template row is trivially removable, and it fits
-  the ID-strip theme of this PR exactly. Cost: adds a
-  non-Roxanne-flagged change to a Roxanne-flagged PR — but the
-  DD is her source of truth, so this is defensible.
-- **(b) Defer to a follow-up.** Argument: keep PR-5 tight to
-  Roxanne's explicit flags; raise `originalReferralId` in the
-  next Roxanne message alongside the Option B `oasysAssessmentId`
-  question.
-
-If (a): the code changes fit alongside step 1 below —
-`SarReferral.originalReferralId` field in `SubjectAccessRequestService.kt`
-(~line 245), matching mapper assignment (~line 300–330 area,
-`toSarReferral`), and template line 14. Also verify the
-`SubjectAccessRequestServiceTest.kt` referral assertions around
-line 277 aren't asserting on `originalReferralId` being the raw
-UUID.
-
-If (b): leave PR-5 as-is and add `originalReferralId` to the
-next Roxanne follow-up.
-
-**Current default: (b)** — keep PR-5 tight until the next
-Roxanne round, but raise it explicitly on the Roxanne follow-up
-so we get a clean signal. Flip to (a) if you want to move
-faster.
+The batch lookup that populates `originalReferral` (via
+`referralRepository.findAllById(...)`) still needs the source
+UUID from the entity layer — so the *entity* still has
+`originalReferralId`; only the *DTO* + *template* stop exposing
+it.
 
 ## Prerequisites for a fresh agent
 

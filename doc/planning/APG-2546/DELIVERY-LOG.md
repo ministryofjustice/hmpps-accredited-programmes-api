@@ -29,8 +29,8 @@ end.
 | PR-1 — remove `auditRecords` | ✅ merged `50f67cff` 2026-08-03 | PR #1107. 9-lens agent review all green. Branch head `04ab44ed` (initial `4801f6e6` + review-fix `04ab44ed`). |
 | PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ✅ merged `cd306c99` 2026-08-03 | PR #1109. Branch head was `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages**. |
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start | Branch off `main` @ `cd306c99`. Same integration-test note as PR-2. |
-| PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 + Q1-correction | Same integration-test note if Q1 = A. Option B scope refined 2026-08-04 pm (DD notes sweep) — correction owed to Roxanne before her B answer lands; see `00-roxanne-followup.md` §"Q1 Option B correction". |
-| PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
+| PR-4 — remove `oasysPniResults` (or strip IDs) | ⬜ ready to start | Q1 answered in person 2026-08-04 pm → Option B (corrected). Branch `APG-2546/strip-oasys-pni-result-ids`. Strip `pniResultId` + `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`. See PR-4 doc + DELIVERY-LOG "Roxanne in-person answers 2026-08-04 pm" entry. |
+| PR-5 — strip `SarPerson.id` + `SarOrganisation.id` (+ `SarReferral.originalReferralId`) | ⬜ not started | Scope confirmed 2026-08-04 pm: fold in `SarReferral.originalReferralId` strip (+ template row 14). Independent of Q1/Q2 answers. |
 | PR-6 — OSAR round-2 handover | 🚫 blocked on PRs 1–5 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as PR-5 hits `main`. See `PR-6-osar-round-2-handover.md`. |
 | OSAR content sign-off (Sharon + Roxanne + QAT + William + David) | 🚫 blocked on PR-6 handover | Round-2 review. This is APG-2546's end state. |
 | APG-2547 — appearance / template registration with Cameron's SAR product | 🤝 coordination needed | Not "out of our scope" — we need to post the template link on `#haa-sar-functionality-change-request` and get `SARBT001` role added. Cameron's team wraps our template in cover/header/footer; that wrapping is theirs, but the coordination is joint. |
@@ -495,6 +495,63 @@ first argument.
 **No PR is being cut for this — docs / framing update only.
 The PR-4 Option B scope refinement will land as part of the
 actual PR-4 code branch when Roxanne's Q1 comes back.**
+
+### 2026-08-04 (pm, later still) — Roxanne in-person answers → Q1 fully resolved, PR-4 unblocked, PR-5 scope confirmed
+
+**What happened.** Bumped into Roxanne in person. Walked her
+through the three DD-sweep findings before the correction
+message went out. She answered all three on the spot.
+
+**Answers:**
+
+1. **Option B scope correction on `oasys_pni_result`** (was:
+   "Option B as I framed it wrongly strips `prison_number`;
+   corrected Option B keeps `prison_number` + `programme_pathway`,
+   strips `pni_result_id` + `oasys_assessment_id`") — ✅
+   **corrected Option B confirmed**. `prison_number` stays
+   because it's the PRN not an internal ID, `programme_pathway`
+   stays because it's the routing decision the subject has a
+   right to see, and both IDs go.
+2. **`oasys_assessment_id`** ambiguity — ✅ **strip**. Aligns
+   with the "OASys system reference, not user-facing" default
+   position we noted in the correction draft.
+3. **`SarReferral.originalReferralId`** (was: PR-5 potential
+   scope extension, (a) fold-in vs (b) defer) — ✅ **strip
+   the UUID, fold into PR-5**. Resolved `originalReferral`
+   sub-block stays; template row 14 comes out.
+
+**Q1 status:** fully answered. PR-4 unblocked.
+**Q2 (`is_national` on `SarOrganisation`)**: unchanged, still
+open. She hasn't confirmed yet. Deadline still Fri 2026-08-14,
+default still "leave off".
+
+**Impact.**
+
+- **`00-roxanne-followup.md`** — Q1-correction draft flipped
+  from DRAFT → NOT SENT / SUPERSEDED. Kept in doc for the
+  paper trail but explicitly labelled "do NOT send". Roxanne's
+  in-person answers recorded at the top of that section.
+- **PR-4 doc** — Option B section becomes the confirmed path
+  (no more "definite + default" hedging). Option A section
+  retained as historical / superseded — do not execute.
+- **PR-5 doc** — "Potential scope extension" for
+  `originalReferralId` flipped to "Confirmed scope extension".
+  Code positions kept, (a)/(b) decision block removed.
+- **Top-level plan** — Q1 block gains a ✅ ANSWERED banner
+  pointing at the corrected Option B; PR-4 detail simplified
+  to just Option B corrected; PR-5 detail extended with the
+  `originalReferralId` strip.
+- **Status table** at top of this log — PR-4 flipped from
+  🚫 blocked → ⬜ ready to start; PR-5 note extended.
+
+**Sequencing decision.** With Q1 out of the way and PR-3 still
+in review, we can start PR-4 (corrected Option B) as soon as
+PR-3 merges. PR-5 stays after PR-4 (rebase off `main`) to keep
+snapshot diffs readable, as originally planned.
+
+**No PR is being cut for this — docs / framing update only.
+The PR-4 code branch is now the next thing off the rank once
+PR-3 merges.**
 
 ### YYYY-MM-DD — PR-3 merged
 
