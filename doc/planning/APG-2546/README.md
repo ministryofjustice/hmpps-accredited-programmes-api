@@ -14,7 +14,7 @@ history in context. Read these alongside the top-level plan at
 | `PR-3-remove-sexual-offence-details.md` | Delete `sexualOffenceDetails` + `selectedSexualOffenceDetails`. |
 | `PR-4-remove-oasys-pni-results.md` | Delete `oasysPniResults` (Option A) *or* strip its two IDs (Option B) — blocked on Roxanne's Q1 answer. |
 | `PR-5-strip-internal-ids.md` | Delete `SarPerson.id` and `SarOrganisation.id`. Independent of Q2. |
-| `PR-6-osar-round-2-content-handover.md` | Docs-only. Content-only handover (JSON + HTML) to OSAR per William Falconer's 2026-08-04 guidance — no PDF. Appearance / headers / footers sit with Cameron's team under APG-2547. |
+| `PR-6-osar-round-2-handover.md` | Docs-only. Round-2 handover to OSAR via Option 1 (OSAR-preferred, full-chrome PDF from Cameron's team's SAR dev service) with Option 2 (chrome-less test harness) as fallback. Per Deborah's 2026-08-04 clarification. |
 
 ## Suggested sequencing
 
@@ -24,7 +24,11 @@ history in context. Read these alongside the top-level plan at
    then **PR-5** — serial merges keep each snapshot diff readable.
 4. When Roxanne answers Q1, do **PR-4** (chose Option A or B based
    on her answer).
-5. When all five are on `main`, do **PR-6** (docs handover).
+5. When all five are on `main`, do **PR-6** (docs handover). Post
+   template-registration request in `#haa-sar-functionality-change-request`
+   as soon as PR-5 is on `main` — don't wait until PRs 1–5 are all
+   deployed. Round 1 saw a pipeline block, so give Option 1 as much
+   lead time as possible.
 
 If Roxanne answers Q1 fast, PR-4 can slot in wherever it fits —
 the docs don't assume a specific merge order between PRs 1–5, only

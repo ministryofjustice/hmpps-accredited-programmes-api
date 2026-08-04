@@ -12,13 +12,14 @@ end.
 > **📉 Content-readability target already hit (internal metric).**
 > With PR-1 merged and PR-2 open + reviewed, the **test-harness**
 > SAR PDF has dropped from the round-1 baseline of ~8,000 pages
-> to **3 pages**. This is a chrome-less content dump (no cover,
-> no headers, no footers) and is **not** what OSAR will review —
-> the OSAR PDF is produced by Cameron's team's SAR worker with
-> full chrome (APG-2547). It is nonetheless reassuring evidence
-> that the "8,000-page complaint" is fixed at the *content* level,
-> which is APG-2546's remit. PRs 3, 4, and 5 are still worthwhile
-> (Roxanne's red-flagged rows, privacy hygiene, etc.).
+> to **3 pages**. This is the chrome-less Option 2 output (no
+> cover, no headers, no footers) — the same content that
+> Cameron's team's SAR product wraps in the full OSAR-quality PDF
+> under Option 1 (the OSAR-preferred handover route). So it's
+> both a genuine internal readability metric *and* representative
+> of what OSAR will see, minus chrome. The "8,000-page complaint"
+> is fixed at the content level. PRs 3, 4, and 5 are still
+> worthwhile (Roxanne's red-flagged rows, privacy hygiene, etc.).
 
 | Item | State | Notes |
 |---|---|---|
@@ -30,10 +31,10 @@ end.
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start | Branch off `main` @ `cd306c99`. Same integration-test note as PR-2. |
 | PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Same integration-test note if Q1 = A. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
-| PR-6 — OSAR round-2 content handover | 🚫 blocked on PRs 1–5 | **Scope updated 2026-08-04:** content-only (JSON + HTML), no PDF, per William Falconer's guidance. Appearance = APG-2547 = Cameron's team. See `PR-6-osar-round-2-content-handover.md`. |
-| OSAR **content** sign-off (Sharon + Roxanne + QAT + William) | 🚫 blocked on PR-6 handover | Round-2 review of the content we produce. This is APG-2546's end state. |
-| APG-2547 — OSAR **appearance** sign-off (headers / footers / cover) | 🔄 out of our scope | Owned by Cameron's team on `../hmpps-subject-access-request-worker`. Precedent = Accommodation team. Any appearance pushback in the round-2 review gets redirected to `#haa-sar-functionality-change-request`. Tracked here so we don't get pulled back in. |
-| Ticket transition to Done | 🚫 blocked on OSAR **content** sign-off | APG-2546 closes on content sign-off only. APG-2547 lives independently. |
+| PR-6 — OSAR round-2 handover | 🚫 blocked on PRs 1–5 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as PR-5 hits `main`. See `PR-6-osar-round-2-handover.md`. |
+| OSAR content sign-off (Sharon + Roxanne + QAT + William + David) | 🚫 blocked on PR-6 handover | Round-2 review. This is APG-2546's end state. |
+| APG-2547 — appearance / template registration with Cameron's SAR product | 🤝 coordination needed | Not "out of our scope" — we need to post the template link on `#haa-sar-functionality-change-request` and get `SARBT001` role added. Cameron's team wraps our template in cover/header/footer; that wrapping is theirs, but the coordination is joint. |
+| Ticket transition to Done | 🚫 blocked on OSAR content sign-off | APG-2546 closes on content sign-off. |
 
 Legend: ⬜ ready • 🚫 blocked • ⏳ in flight • ✅ complete • 🔄 out of our scope.
 
@@ -328,6 +329,69 @@ hand over for OSAR review. Direct quote:
 
 **No PR is being cut for this — it's a docs / framing update on
 the planning branch only.**
+
+### 2026-08-04 (pm) — Deborah clarification → PR-6 scope re-updated to Option 1 primary / Option 2 fallback
+
+**What happened.** Deborah (Senior Delivery Manager on Cameron's
+SAR product team) responded to a DM asking how a consumer team
+actually generates a report. She laid out **two** paths:
+
+- **Option 1 (OSAR-preferred).** Register the template with her
+  team via `#haa-sar-functionality-change-request`, push code to
+  DEV, get `SARBT001` role on a test nDelius account, generate
+  the report via `sign-in-dev.hmpps.service.justice.gov.uk`. The
+  output is a **full-chrome PDF** with the standard cover sheet
+  and top-and-tail pages. This is what OSAR actually want.
+- **Option 2 (fallback).** Cameron's team's test harness /
+  library (Indy's, documented at
+  <https://dsdmoj.atlassian.net/wiki/x/DgMOaQE>) — same PDF but
+  **without** cover sheets. Deliberately built as an escape
+  hatch for exactly the sort of dev-pipeline block that hit
+  round 1. This is what William's email was pointing at, and
+  it's the same library our `SarContractIntegrationTest`
+  already uses (`build/test-generated/sar-generated-report.pdf`).
+
+**Impact — the morning's revision was materially wrong.**
+
+- PR-6 was rewritten this morning to "content-only handover
+  (JSON + HTML), no PDF" on the reading that William's email
+  meant "no PDF at all". Deborah's message shows that reading
+  was too aggressive — William was steering us at Option 2
+  (chrome-less PDF) not "content only". Both Options produce a
+  PDF; neither produces a JSON+HTML bundle as the primary
+  artefact.
+- **PR-6 doc renamed and rewritten (this pm):**
+  `PR-6-osar-round-2-content-handover.md` → deleted.
+  `PR-6-osar-round-2-handover.md` → new, with Option 1 as
+  primary path, Option 2 as fallback, sanity-check list, and
+  updated OSAR email draft mentioning David Evans.
+- **APG-2547 reframed.** Was 🔄 "wholly Cameron's team". Now
+  🤝 "coordination needed" — appearance still lives with
+  Cameron's team but we participate by registering the template
+  and taking the SARBT001 role. Not a we-don't-touch-it ticket.
+- **📉 banner reframed.** The 3-page test-harness PDF is *both*
+  an internal readability metric *and* representative of what
+  OSAR see (minus chrome) under Option 2 — because it is
+  literally the Option 2 output.
+- **New concern surfaced by Deborah:** OSAR prefer as many
+  fields populated as possible for vettor training. Under
+  Option 1 we address this by picking a rich dev CRN. Under
+  Option 2 the current fixture is minimum-viable and would
+  need beefing up — recorded as out-of-scope for APG-2546 but
+  flagged for a possible future ticket if OSAR asks in round 2.
+- **Kick-off timing.** Template-registration request should be
+  posted on `#haa-sar-functionality-change-request` as soon as
+  PR-5 hits `main`, not after PR-6 starts, to give Option 1 as
+  much lead time as possible against another pipeline block.
+
+**Verification still to do (see PR-6 doc §"Non-obvious §1"):**
+confirm the Confluence page's Option 2 library is the same as
+`hmpps-subject-access-request-test-support:2.4.2` at
+`build.gradle.kts:71` — 95% confident, not yet proven.
+
+**No PR is being cut for this — it's another docs / framing
+update on the planning branch only. Superseded the morning's
+William-email revision within the same day.**
 
 ### YYYY-MM-DD — PR-3 merged
 
