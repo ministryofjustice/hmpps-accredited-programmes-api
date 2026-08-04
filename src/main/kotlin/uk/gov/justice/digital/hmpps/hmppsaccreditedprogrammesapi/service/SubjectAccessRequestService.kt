@@ -267,9 +267,7 @@ class SubjectAccessRequestService(
   )
 
   data class SarOasysPniResult(
-    val pniResultId: UUID,
     val prisonNumber: String,
-    val oasysAssessmentId: Long?,
     val programmePathway: String?,
   )
 
@@ -380,9 +378,7 @@ class SubjectAccessRequestService(
 
   private fun List<OasysPniResultEntity>.toSarOasysPniResult(): List<SarOasysPniResult> = map {
     SarOasysPniResult(
-      pniResultId = it.pniResultId,
       prisonNumber = it.prisonNumber,
-      oasysAssessmentId = it.oasysAssessmentId,
       programmePathway = it.programmePathway,
     )
   }
