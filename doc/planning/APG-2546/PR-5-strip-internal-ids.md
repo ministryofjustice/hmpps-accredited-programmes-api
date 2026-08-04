@@ -51,10 +51,14 @@ DELIVERY-LOG "Roxanne in-person answers 2026-08-04 pm" entry.
 
 - `SubjectAccessRequestService.kt` — delete
   `originalReferralId: UUID?` field from `SarReferral` data class
-  (~line 245 area — grep for `originalReferralId` inside
-  `data class SarReferral(...)`).
+  (line 219 — inside `data class SarReferral(...)` starting at
+  line 208).
 - `SubjectAccessRequestService.kt` — inside the `toSarReferral`
-  mapper, delete the `originalReferralId = …` field assignment.
+  mapper (starts at line 382), delete the `it.originalReferralId,`
+  positional argument at line 398 (the mapper uses positional
+  construction, not named — so the field just drops out of the
+  argument list; verify the removed field lines up with the
+  DTO's removed slot).
 - `src/main/resources/sar_template.mustache:14` — delete the
   `<tr><td>Original referral ID</td><td>{{ optionalValue originalReferralId }}</td></tr>`
   row. The `originalReferral` block (rendered lower down in the
@@ -65,8 +69,11 @@ DELIVERY-LOG "Roxanne in-person answers 2026-08-04 pm" entry.
   `originalReferral` sub-block (id, prison number etc.) — that's
   what the subject actually sees now.
 - Sanity check with `grep -n "originalReferralId" src/main` after
-  edits — expect zero hits inside `SubjectAccessRequestService.kt`
-  and zero renders in the template.
+  edits — expect the entity-level references at ~lines 74–88
+  (the batch-lookup that populates the `originalReferral` block)
+  and the mapper's `it.originalReferralId?.let { … }` conditional
+  at ~line 402 to remain. Zero renders of `{{originalReferralId}}`
+  in the template.
 
 The batch lookup that populates `originalReferral` (via
 `referralRepository.findAllById(...)`) still needs the source
@@ -78,9 +85,16 @@ it.
 
 Read `doc/planning/APG-2546-sar-field-removals.md` (§B, PR-5 detail).
 
-You do **not** need Q2 answered to do this PR. Q2 concerns *adding*
-`isNational` to `SarOrganisation`, which is out of scope for
-APG-2546 regardless of her answer.
+All external questions are resolved as of 2026-08-04 pm — Q1
+answered in person (corrected Option B, drives PR-4 not PR-5),
+Q2 closed on "leave off" default (concerned *adding*
+`isNational` to `SarOrganisation`, deferred out of APG-2546
+regardless). See DELIVERY-LOG "Roxanne in-person answers
+2026-08-04 pm" and "Q2 closed on default" for provenance.
+
+The `SarReferral.originalReferralId` fold-in is confirmed and
+its file positions are recorded in §"…confirmed scope
+extension" above.
 
 ## Files to change
 

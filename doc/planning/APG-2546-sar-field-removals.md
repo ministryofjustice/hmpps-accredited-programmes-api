@@ -24,9 +24,13 @@ came back with two workstreams (Slack, 30 Jul):
 
 Content changes were captured by Roxanne on the data-dictionary
 spreadsheet held locally at
-`doc/2026.07.08_copy_Probation Digital Data review December 251.xlsx`
+`doc/Copy of 2026.07.08_copy_Probation Digital Data review December 251.xlsx`
 (sheet `Accredited Programmes Custody`, not committed to the repo).
 This branch turns her red-flagged rows into a concrete PR plan.
+The whole-notes-column sweep (see
+`APG-2546/scripts/dd-notes-sweep.py`) also surfaces dev-authored
+annotations on non-red rows — used to catch the Q1 Option B
+scope error and PR-5's `originalReferralId` extension.
 
 **Working estimate:** ~3 weeks (2–4 range communicated to William
 Falconer 30 Jul). Reduced by fact that all changes are section-level
@@ -392,10 +396,12 @@ come out.
   - Delete `id: String` field from `SarOrganisation` (line 533)
   - Delete `id = id.toString()` from `OrganisationEntity.toSarOrganisation()` mapper
   - Delete `originalReferralId: UUID?` field from `SarReferral`
-    (~line 245 area — grep for `originalReferralId` inside
-    `data class SarReferral(...)`)
-  - Delete `originalReferralId = …` field assignment inside
-    `toSarReferral` mapper
+    (line 219, inside the DTO starting at line 208)
+  - Delete `it.originalReferralId,` positional argument from
+    `toSarReferral` mapper (line 398, inside mapper starting
+    at line 382). The `originalReferral = it.originalReferralId?.let { … }`
+    conditional at ~line 402 stays — that's what populates the
+    resolved block.
 - `src/main/resources/sar_template.mustache`
   - Delete the `<tr><td>Person ID</td>...</tr>` line inside `{{#person}}` block (line 125)
   - Delete the `<tr><td>Original referral ID</td><td>{{ optionalValue originalReferralId }}</td></tr>`

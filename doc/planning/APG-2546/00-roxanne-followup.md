@@ -56,6 +56,12 @@ Raby
 
 ## Internal notes (not for Roxanne)
 
+> **📌 This section is superseded — kept for the paper trail.**
+> Both Qs resolved 2026-08-04 pm (Q1 in person, Q2 on default).
+> No calendar nudge needed; no PR-4 default kick-off decision to
+> make. See DELIVERY-LOG "Roxanne in-person answers 2026-08-04
+> pm" and "Q2 closed on default" for the concrete outcomes.
+
 Deadline for a reply before we act on defaults: **Friday
 2026-08-14** (end of next week from send date). Set a calendar
 nudge for the Monday after (2026-08-17) to either kick off PR-4
@@ -86,6 +92,11 @@ Default behaviour if she doesn't reply by 2026-08-14:
   locked the default in. APG-2494 stays won't-do.
 
 Branching from her answers into the working docs:
+
+> **📌 Superseded — kept for the paper trail.** Actual outcome:
+> Q1 = corrected Option B on branch
+> `APG-2546/strip-oasys-pni-result-ids` (see PR-4 doc); Q2 =
+> "leave off" default applied (APG-2494 stays won't-do).
 
 - **Q1 = A** → `PR-4-remove-oasys-pni-results.md`, Option A branch.
   Branch name `APG-2546/remove-oasys-pni-results` (already the

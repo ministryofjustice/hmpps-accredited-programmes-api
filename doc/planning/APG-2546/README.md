@@ -7,20 +7,26 @@ history in context. Read these alongside the top-level plan at
 
 | File | Purpose |
 |---|---|
-| `00-roxanne-followup.md` | Follow-up message to Roxanne re Q1 / Q2, with internal branching notes. |
+| `00-roxanne-followup.md` | Follow-up message to Roxanne re Q1 / Q2 with internal branching notes. As of 2026-08-04 pm: both Qs resolved (Q1 in person, Q2 on default) — doc is paper-trail only. See DELIVERY-LOG for the concrete outcomes. |
 | `DELIVERY-LOG.md` | Running delivery log — status at a glance, timeline entries, contingencies. Update this every time a PR merges or Roxanne answers. |
 | `PR-1-remove-audit-records.md` | Delete `auditRecords` section — the "28,483 rows" fix. |
 | `PR-2-remove-status-history-and-reasons.md` | Delete `referralStatusHistory` + `referralStatusReasons`. |
 | `PR-3-remove-sexual-offence-details.md` | Delete `sexualOffenceDetails` + `selectedSexualOffenceDetails`. |
 | `PR-4-remove-oasys-pni-results.md` | Strip `pniResultId` + `oasysAssessmentId` from `oasysPniResults`; keep `prisonNumber` + `programmePathway`. **Option B corrected, confirmed by Roxanne in person 2026-08-04 pm.** Option A retained in doc as superseded / paper-trail only. |
-| `PR-5-strip-internal-ids.md` | Delete `SarPerson.id`, `SarOrganisation.id`, and `SarReferral.originalReferralId` (the last fold-in confirmed by Roxanne in person 2026-08-04 pm). Independent of Q2. |
+| `PR-5-strip-internal-ids.md` | Delete `SarPerson.id`, `SarOrganisation.id`, and `SarReferral.originalReferralId` (the last fold-in confirmed by Roxanne in person 2026-08-04 pm). All external questions resolved — nothing external gates this PR. |
 | `PR-6-osar-round-2-handover.md` | Docs-only. Round-2 handover to OSAR via Option 1 (OSAR-preferred, full-chrome PDF from Cameron's team's SAR dev service) with Option 2 (chrome-less test harness) as fallback. Per Deborah's 2026-08-04 clarification. |
 | `scripts/dd-notes-sweep.py` | Belt-and-braces DD reader — dumps every note-bearing row on the "Accredited Programmes Custody" sheet, not just red-flagged ones. Missing this sweep on day zero cost us a Q1 Option B correction to Roxanne. Rerun whenever the DD refreshes. Working copy of the xlsx is untracked; either drop a copy at the default path or pass one as argv[1]. |
 
 ## Suggested sequencing
 
-1. Send `00-roxanne-followup.md` to Roxanne.
-2. Start **PR-1** immediately (blocks nothing).
+> **State as of 2026-08-04 pm:** PRs 1 & 2 merged; PR-3 opened
+> #1110 and reviewed clean, awaiting merge; PRs 4 & 5 unblocked
+> and ready to start (all external questions resolved). Steps 1
+> and 2 below are done; the numbered list is kept as an
+> end-to-end map for future readers.
+
+1. Send `00-roxanne-followup.md` to Roxanne. ✅ done 2026-08-03.
+2. Start **PR-1** immediately (blocks nothing). ✅ merged 2026-08-03.
 3. Once PR-1 is merged, rebase and start **PR-2**, then **PR-3**,
    then **PR-5** — serial merges keep each snapshot diff readable.
 4. When Roxanne answers Q1, do **PR-4** (chose Option A or B based

@@ -10,25 +10,25 @@ end.
 ## Status at a glance
 
 > **📉 Content-readability target already hit (internal metric).**
-> With PR-1 merged and PR-2 open + reviewed, the **test-harness**
-> SAR PDF has dropped from the round-1 baseline of ~8,000 pages
-> to **3 pages**. This is the chrome-less Option 2 output (no
-> cover, no headers, no footers) — the same content that
-> Cameron's team's SAR product wraps in the full OSAR-quality PDF
-> under Option 1 (the OSAR-preferred handover route). So it's
-> both a genuine internal readability metric *and* representative
-> of what OSAR will see, minus chrome. The "8,000-page complaint"
-> is fixed at the content level. PRs 3, 4, and 5 are still
-> worthwhile (Roxanne's red-flagged rows, privacy hygiene, etc.).
+> With PRs 1 and 2 both merged, the **test-harness** SAR PDF has
+> dropped from the round-1 baseline of ~8,000 pages to **3
+> pages**. This is the chrome-less Option 2 output (no cover, no
+> headers, no footers) — the same content that Cameron's team's
+> SAR product wraps in the full OSAR-quality PDF under Option 1
+> (the OSAR-preferred handover route). So it's both a genuine
+> internal readability metric *and* representative of what OSAR
+> will see, minus chrome. The "8,000-page complaint" is fixed at
+> the content level. PRs 3, 4, and 5 are still worthwhile
+> (Roxanne's red-flagged rows, privacy hygiene, etc.).
 
 | Item | State | Notes |
 |---|---|---|
-| Planning branch (`APG-2546/planning-sar-field-removals`) | ✅ committed, ⏳ awaiting push | Squash `95993514` into `1dd32fef` before push if you want a clean history. |
+| Planning branch (`APG-2546/planning-sar-field-removals`) | ⏳ in flight | Committed and pushed rolling; typically local ahead of origin by a small number of commits between chats. |
 | Q1 to Roxanne (`oasys_pni_result` A vs B) | ✅ answered 2026-08-04 pm in person → corrected Option B | Strip `pniResultId` + `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`. See "Roxanne in-person answers" timeline entry. |
 | Q2 to Roxanne (`is_national` on organisation) | ✅ closed 2026-08-04 pm on "leave off" default | Roxanne had in-person window on 2026-08-04 pm and did not raise; per 2026-08-03 follow-up terms this locks the default in. APG-2494 stays won't-do. If raised later, spin fresh ticket. See "Q2 closed on default" timeline entry. |
 | PR-1 — remove `auditRecords` | ✅ merged `50f67cff` 2026-08-03 | PR #1107. 9-lens agent review all green. Branch head `04ab44ed` (initial `4801f6e6` + review-fix `04ab44ed`). |
 | PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ✅ merged `cd306c99` 2026-08-03 | PR #1109. Branch head was `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages**. |
-| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start | Branch off `main` @ `cd306c99`. Same integration-test note as PR-2. |
+| PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⏳ open, reviewed clean, awaiting merge | PR #1110. Branch head `fc5ae133` (incl. review-amend for blank-line convention). |
 | PR-4 — remove `oasysPniResults` (or strip IDs) | ⬜ ready to start | Q1 answered in person 2026-08-04 pm → Option B (corrected). Branch `APG-2546/strip-oasys-pni-result-ids`. Strip `pniResultId` + `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`. See PR-4 doc + DELIVERY-LOG "Roxanne in-person answers 2026-08-04 pm" entry. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` (+ `SarReferral.originalReferralId`) | ⬜ not started | Scope confirmed 2026-08-04 pm: fold in `SarReferral.originalReferralId` strip (+ template row 14). All external questions resolved. |
 | PR-6 — OSAR round-2 handover | 🚫 blocked on PRs 1–5 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as PR-5 hits `main`. See `PR-6-osar-round-2-handover.md`. |
@@ -523,9 +523,12 @@ message went out. She answered all three on the spot.
    sub-block stays; template row 14 comes out.
 
 **Q1 status:** fully answered. PR-4 unblocked.
-**Q2 (`is_national` on `SarOrganisation`)**: unchanged, still
-open. She hasn't confirmed yet. Deadline still Fri 2026-08-14,
-default still "leave off".
+**Q2 (`is_national` on `SarOrganisation`)**: at the time this
+entry was written, still open with a Fri 2026-08-14 deadline
+and "leave off" default. **Subsequently closed later 2026-08-04
+pm** on that same "leave off" default — see the next timeline
+entry "Q2 closed on default → APG-2546 has zero open external
+questions".
 
 **Impact.**
 

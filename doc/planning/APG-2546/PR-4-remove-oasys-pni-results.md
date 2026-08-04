@@ -258,6 +258,11 @@ back the fixture, the DTO shape, and the mapper.
 
 ### Option A
 
+### Option A — SUPERSEDED (do NOT use)
+
+*Kept for the paper trail. Corrected Option B is the confirmed
+path — use §"Option B" below.*
+
 ```
 APG-2546: remove oasysPniResults section from SAR
 
@@ -279,27 +284,36 @@ Not changed:
   grep). Do not delete.
 ```
 
-### Option B
+### Option B (corrected — the confirmed path)
 
 ```
-APG-2546: strip internal IDs from oasysPniResults section in SAR
+APG-2546: strip pniResultId + oasysAssessmentId from oasysPniResults
 
-Strips pniResultId, prisonNumber, and oasysAssessmentId from the
-oasysPniResults section per Roxanne's Q1 answer (Option B — "keep
-programme_pathway, remove the three ID fields"). Retains only
-programmePathway (a category label, not an ID — e.g.
-HIGH_INTENSITY_BC) so the subject still sees which pathway their
-OASys PNI result placed them on.
+Strips pniResultId and oasysAssessmentId from the oasysPniResults
+section per Roxanne's in-person Q1 answer 2026-08-04 pm
+(corrected Option B — "strip the internal IDs, keep prisonNumber
+and programmePathway"). Retains prisonNumber (the subject's PRN
+— DD row 86 dev note "should be on the report", not an internal
+ID) and programmePathway (a routing category label like
+HIGH_INTENSITY_BC, DD row 88 dev note "should be on the report"
+— the subject has a right to see the routing decision).
 
 Changes:
-- Remove the three ID fields from SarOasysPniResult DTO + mapper
-- Remove the three ID rows from the OASys PNI results template
-  block (keep the heading, table shell, and the programmePathway
-  row)
-- Remove the three ID assertions from the unit test
+- Remove pniResultId + oasysAssessmentId from SarOasysPniResult
+  DTO + toSarOasysPniResult mapper (SubjectAccessRequestService.kt
+  lines 315-320 / 476)
+- Remove the two ID rows from the OASys PNI results template
+  block (keep the heading, table shell, the prisonNumber row and
+  the programmePathway row) — sar_template.mustache lines 145-158
+- Remove the two ID assertions from the unit test
+  SubjectAccessRequestServiceTest.kt around line 332
 - Regenerate SAR contract snapshots
 
 Not changed:
+- SarOasysPniResult.prisonNumber (kept per DD row 86 dev note
+  + subject's PRN convention across every other SAR section)
+- SarOasysPniResult.programmePathway (kept per DD row 88 dev
+  note + routing-decision relevance)
 - OasysPniResultEntityRepository.findAllByPrisonNumber — still
   used by PersonService for the person-deletion cascade
 - Integration test seed — still needed to populate the row that
@@ -308,8 +322,10 @@ Not changed:
 
 ## Definition of done
 
-- [ ] Q1 answer recorded in `00-roxanne-followup.md` internal notes.
-- [ ] Correct option's checklist run and green.
+- [ ] Executing corrected Option B (Roxanne's in-person Q1 answer
+      2026-08-04 pm recorded in DELIVERY-LOG + `00-roxanne-followup.md`).
+- [ ] Option B checklist run and green (strip `pniResultId` +
+      `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`).
 - [ ] `./gradlew ktlintCheck test` green.
 - [ ] Snapshot diffs committed.
 - [ ] Sample PDF page count noted in the artefacts table.
