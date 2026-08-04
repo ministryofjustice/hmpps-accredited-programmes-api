@@ -65,6 +65,68 @@ artefacts. Option 1 is the ask if we can get it.
 - Access to `~/Downloads/sar-dev-3/` (kept as a local handover
   directory since round 1's `sar-dev-1`).
 
+## First actions when picking this up (kick-off checklist)
+
+Two things need to happen the moment PR-5 is on `main` — before
+touching anything else in this doc. They're both time-sensitive
+because round 1 showed the SAR pipeline can stall for days.
+
+### A. Post the template-registration request
+
+As soon as PR-5's merge commit lands on `main`, post in
+`#haa-sar-functionality-change-request` with the exact form:
+
+```
+Ticket: APG-2546
+Product: Accredited Programmes API
+Template on main: https://github.com/ministryofjustice/hmpps-accredited-programmes-api/blob/<PR-5-merge-sha>/src/main/resources/sar_template.mustache
+Ask: please register the updated template on the SAR dev
+service for OSAR round-2 review. Also, please add role
+SARBT001 to test nDelius account <account-name> if not already
+present (needed to see the SAR tile on Auth home).
+```
+
+- Use the **permalink at the PR-5 merge SHA**, not `main/...`,
+  so the exact revision is unambiguous.
+- Do this even if the dev deploy hasn't completed yet — the
+  channel work is separate from the deploy pipeline and can
+  run in parallel.
+- Per Deborah's DM: "One of my devs will do that for you."
+  Expected turnaround same-day / next-day if channel is quiet;
+  chase after 24h of silence.
+- If the SARBT001 role needs a separate identity-team route in
+  your org, kick that off in parallel (round 1 saw it take
+  longer than the template registration).
+
+### B. Verify the Option 2 library == our contract-test library
+
+Before you can honestly claim `build/test-generated/sar-generated-report.pdf`
+is a valid Option 2 fallback artefact, prove that the library
+Indy's Confluence page describes is the same one we depend on:
+
+1. Read <https://dsdmoj.atlassian.net/wiki/x/DgMOaQE> — Indy's
+   "Test library for supporting Offender Subject Access Request
+   report reviews".
+2. Note the artefact coordinates it references (group / artifact
+   id / version).
+3. Compare with `build.gradle.kts:71`:
+   ```zsh
+   grep -n 'hmpps-subject-access-request-test-support' build.gradle.kts
+   ```
+   We currently depend on
+   `hmpps-subject-access-request-test-support:2.4.2`.
+4. Record the outcome in the delivery log's next timeline entry:
+   - ✅ same library → Option 2 is the contract-test PDF as
+     documented in this doc.
+   - ❌ different library → follow the Confluence steps
+     verbatim, and update this doc to point at the correct
+     artefact path.
+
+Do this **before** you need Option 2 — waiting until Option 1
+has stalled and then discovering the library assumption is
+wrong is exactly the sort of last-minute scramble round 1
+punished us for. Current confidence: ~95%, not yet proven.
+
 ## Option 1 — primary path
 
 ### 1. Confirm main + dev are in sync
@@ -270,12 +332,10 @@ git --no-pager diff --stat main -- src/main src/test/kotlin
 
 ### 1. Verify Option 2 output = our contract-test PDF
 
-Before relying on `build/test-generated/sar-generated-report.pdf`
-as the Option 2 artefact, read Indy's Confluence page and confirm
-the library it references is the same as the one we depend on
-(`hmpps-subject-access-request-test-support:2.4.2` at
-`build.gradle.kts:71`). If they diverge, follow Confluence, not
-this doc.
+See §"First actions when picking this up" §B — this needs to
+be done at kick-off, not deferred to when Option 2 is actually
+needed. Recorded here as well so it stays in the "things
+that'll bite you" list a fresh agent skims before wrapping up.
 
 ### 2. Cameron's team may need up to 2 working days to register the template
 
@@ -360,6 +420,12 @@ Appearance feedback (if any) → Cameron's team, APG-2547.
 ## Definition of done
 
 - [ ] PRs 1–5 all merged to `main` and deployed to DEV.
+- [ ] Kick-off §A done: template-registration + SARBT001 request
+      posted on `#haa-sar-functionality-change-request` with the
+      PR-5-merge-SHA permalink to `sar_template.mustache`.
+- [ ] Kick-off §B done: Option 2 library == our contract-test
+      library confirmed (or the doc updated to the correct
+      artefact path).
 - [ ] Template registered on the SAR dev service (or the
       documented reason Option 2 was used instead).
 - [ ] `~/Downloads/sar-dev-3/` contains the round-2 PDF.
