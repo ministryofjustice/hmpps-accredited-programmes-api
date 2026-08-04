@@ -481,13 +481,16 @@ via `/tmp/dd_notes_sweep.py`.
   notes on the same row — verify SAR output is what dev
   eventually settled on.
 
-**Sweep methodology.** `/tmp/dd_notes_sweep.py`, reads
-`doc/Copy of 2026.07.08_copy_...xlsx` via openpyxl,
+**Sweep methodology.** `doc/planning/APG-2546/scripts/dd-notes-sweep.py`,
+reads `doc/Copy of 2026.07.08_copy_...xlsx` via openpyxl,
 `data_only=True`, iterates Accredited Programmes Custody sheet
 rows 15..245, collects (Entity, Element, Mandatory, SAR data,
 In SAR API, Additional Notes) for every row with a non-null
-Additional Notes. Script kept out of the repo — one-off tool.
-Reruns cheap if the spreadsheet is refreshed.
+Additional Notes. Kept in-repo so future DD refreshes (or
+adjacent tickets on the same sheet) can rerun without
+rebuilding. Working copy of the xlsx is untracked — either drop
+your copy at the default path or pass the xlsx path as the
+first argument.
 
 **No PR is being cut for this — docs / framing update only.
 The PR-4 Option B scope refinement will land as part of the

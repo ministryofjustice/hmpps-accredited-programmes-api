@@ -15,6 +15,7 @@ history in context. Read these alongside the top-level plan at
 | `PR-4-remove-oasys-pni-results.md` | Delete `oasysPniResults` (Option A) *or* strip its two IDs (Option B) — blocked on Roxanne's Q1 answer. |
 | `PR-5-strip-internal-ids.md` | Delete `SarPerson.id` and `SarOrganisation.id`. Independent of Q2. |
 | `PR-6-osar-round-2-handover.md` | Docs-only. Round-2 handover to OSAR via Option 1 (OSAR-preferred, full-chrome PDF from Cameron's team's SAR dev service) with Option 2 (chrome-less test harness) as fallback. Per Deborah's 2026-08-04 clarification. |
+| `scripts/dd-notes-sweep.py` | Belt-and-braces DD reader — dumps every note-bearing row on the "Accredited Programmes Custody" sheet, not just red-flagged ones. Missing this sweep on day zero cost us a Q1 Option B correction to Roxanne. Rerun whenever the DD refreshes. Working copy of the xlsx is untracked; either drop a copy at the default path or pass one as argv[1]. |
 
 ## Suggested sequencing
 
