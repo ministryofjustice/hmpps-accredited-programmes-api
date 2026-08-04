@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.test.web.reactive.server.WebTestClient
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SexualOffenceCategoryType
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarApiDataTest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarFlywaySchemaTest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelper
@@ -101,10 +99,6 @@ class SarContractIntegrationTest :
 
   override fun setupTestData() {
     persistenceHelper.clearAllTableContent()
-    // clearAllTableContent() does not clear the sexual_offence_details reference-data table, so
-    // remove any row from a previous test invocation to keep setupTestData() idempotent (it runs
-    // once per contract test).
-    persistenceHelper.deleteSexualOffenceDetails(SEXUAL_OFFENCE_ID)
 
     persistenceHelper.createOrganisation(orgId = ORGANISATION_ID, code = "MDI", name = "HMP Moorland")
     persistenceHelper.createCourse(
@@ -183,20 +177,6 @@ class SarContractIntegrationTest :
       location = "HMP Moorland",
       gender = "Male",
     )
-    persistenceHelper.createSexualOffenceDetails(
-      sexualOffenceDetailsEntity = SexualOffenceDetailsEntity(
-        id = SEXUAL_OFFENCE_ID,
-        category = SexualOffenceCategoryType.AGAINST_MINORS,
-        description = "Example sexual offence",
-        hintText = "hint",
-        score = 2,
-      ),
-    )
-    persistenceHelper.createSelectedSexualOffenceDetails(
-      id = SELECTED_SEXUAL_OFFENCE_ID,
-      referralId = REFERRAL_ID,
-      sexualOffenceDetailsId = SEXUAL_OFFENCE_ID,
-    )
     persistenceHelper.createStaff(
       staffId = "12345".toBigInteger(),
       firstName = "John",
@@ -221,7 +201,5 @@ class SarContractIntegrationTest :
     val PNI_RESULT_ID: UUID = UUID.fromString("77777777-7777-7777-7777-777777777777")
     val OASYS_PNI_RESULT_ID: UUID = UUID.fromString("88888888-8888-8888-8888-888888888888")
     val PERSON_ID: UUID = UUID.fromString("99999999-9999-9999-9999-999999999999")
-    val SEXUAL_OFFENCE_ID: UUID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-    val SELECTED_SEXUAL_OFFENCE_ID: UUID = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
   }
 }

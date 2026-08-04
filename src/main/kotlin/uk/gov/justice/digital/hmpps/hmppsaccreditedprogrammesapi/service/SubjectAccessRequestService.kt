@@ -9,9 +9,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.SelectedSexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
@@ -57,10 +55,6 @@ class SubjectAccessRequestService(
       val beforeToDate = toDate?.let { courseParticipation.createdDateTime.isBefore(it.plusDays(1).atStartOfDay()) } ?: true
       afterFromDate && beforeToDate
     }
-
-    val selectedSexualOffenceDetails = filteredReferrals
-      .flatMap { it.selectedSexualOffenceDetails }
-      .distinctBy { it.id }
 
     // Batch-load every referral referenced by an `originalReferralId` on the
     // filtered set in a single `WHERE referral_id IN (?)` query. Missing IDs
@@ -118,8 +112,6 @@ class SubjectAccessRequestService(
         pniResults = pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),
         person = personRepository.findPersonEntityByPrisonNumber(prn)?.toSarPerson(),
         oasysPniResults = oasysPniResultEntityRepository.findAllByPrisonNumber(prn).toSarOasysPniResult(),
-        selectedSexualOffenceDetails = selectedSexualOffenceDetails.toSarSelectedSexualOffenceDetails(),
-        sexualOffenceDetails = selectedSexualOffenceDetails.mapNotNull { it.sexualOffenceDetails }.distinctBy { it.id }.toSarSexualOffenceDetails(),
         staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() },
         organisations = codesFromFiltered.mapNotNull { organisationsByCode[it]?.toSarOrganisation() },
       ),
@@ -175,8 +167,6 @@ class SubjectAccessRequestService(
     val pniResults: List<SarPniResult>,
     val person: SarPerson?,
     val oasysPniResults: List<SarOasysPniResult>,
-    val selectedSexualOffenceDetails: List<SarSelectedSexualOffenceDetails>,
-    val sexualOffenceDetails: List<SarSexualOffenceDetails>,
     val staff: List<SarStaff>,
     val organisations: List<SarOrganisation>,
   )
@@ -281,19 +271,6 @@ class SubjectAccessRequestService(
     val prisonNumber: String,
     val oasysAssessmentId: Long?,
     val programmePathway: String?,
-  )
-
-  data class SarSelectedSexualOffenceDetails(
-    val id: UUID?,
-    val referralId: UUID?,
-    val sexualOffenceDetailsId: UUID?,
-  )
-
-  data class SarSexualOffenceDetails(
-    val id: UUID?,
-    val category: String,
-    val description: String,
-    val score: Int,
   )
 
   data class SarStaff(
@@ -407,23 +384,6 @@ class SubjectAccessRequestService(
       prisonNumber = it.prisonNumber,
       oasysAssessmentId = it.oasysAssessmentId,
       programmePathway = it.programmePathway,
-    )
-  }
-
-  private fun List<SelectedSexualOffenceDetailsEntity>.toSarSelectedSexualOffenceDetails(): List<SarSelectedSexualOffenceDetails> = map {
-    SarSelectedSexualOffenceDetails(
-      id = it.id,
-      referralId = it.referral.id,
-      sexualOffenceDetailsId = it.sexualOffenceDetails?.id,
-    )
-  }
-
-  private fun List<SexualOffenceDetailsEntity>.toSarSexualOffenceDetails(): List<SarSexualOffenceDetails> = map {
-    SarSexualOffenceDetails(
-      id = it.id,
-      category = it.category.name,
-      description = it.description,
-      score = it.score,
     )
   }
 

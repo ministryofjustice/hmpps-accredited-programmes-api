@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.type.SexualOffenceCategoryType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SubjectAccessRequestService
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,8 +23,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     val offeringId = UUID.randomUUID()
     val referralId = UUID.randomUUID()
     val participationId = UUID.randomUUID()
-    val sexualOffenceId = UUID.randomUUID()
-    val expectedReferralId = referralId
     val staffId = 12345.toBigInteger()
 
     persistenceHelper.clearAllTableContent()
@@ -103,19 +100,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       location = "HMP Moorland",
       gender = "Male",
     )
-    persistenceHelper.createSexualOffenceDetails(
-      sexualOffenceDetailsEntity = uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.referencedata.SexualOffenceDetailsEntity(
-        id = sexualOffenceId,
-        category = SexualOffenceCategoryType.AGAINST_MINORS,
-        description = "Example sexual offence",
-        hintText = "hint",
-        score = 2,
-      ),
-    )
-    persistenceHelper.createSelectedSexualOffenceDetails(
-      referralId = referralId,
-      sexualOffenceDetailsId = sexualOffenceId,
-    )
     persistenceHelper.createStaff(
       staffId = staffId,
       firstName = "John",
@@ -135,8 +119,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     assertThat(content.pniResults).hasSize(1)
     assertThat(content.person).isNotNull
     assertThat(content.oasysPniResults).hasSize(1)
-    assertThat(content.selectedSexualOffenceDetails).hasSize(1)
-    assertThat(content.sexualOffenceDetails).hasSize(1)
 
     with(content.referrals[0]) {
       assertThat(prisonerNumber).isEqualTo(prisonNumber)
@@ -173,16 +155,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     with(content.oasysPniResults[0]) {
       assertThat(prisonNumber).isEqualTo("A1234BC")
       assertThat(programmePathway).isEqualTo("HIGH_INTENSITY_BC")
-    }
-
-    with(content.selectedSexualOffenceDetails[0]) {
-      assertThat(referralId).isEqualTo(expectedReferralId)
-      assertThat(sexualOffenceDetailsId).isEqualTo(sexualOffenceId)
-    }
-
-    with(content.sexualOffenceDetails[0]) {
-      assertThat(id).isEqualTo(sexualOffenceId)
-      assertThat(score).isEqualTo(2)
     }
   }
 }
