@@ -63,6 +63,12 @@ Option A or ping her again in `#osar-review`.
 
 Default behaviour if she doesn't reply by 2026-08-14:
 
+> **Both defaults have been overtaken by events** — Q1 answered
+> in person 2026-08-04 pm (see DELIVERY-LOG "Roxanne in-person
+> answers 2026-08-04 pm"); Q2 closed on default 2026-08-04 pm
+> (see DELIVERY-LOG "Q2 closed on default"). The original text
+> below is kept for the paper trail only.
+
 - **Q1 default → Option A** (remove whole `oasysPniResults` section).
   Rationale: consistent with her 29.07 blanket "all IDs → No" rule;
   the remaining single field (`programme_pathway`) on its own gives
@@ -70,10 +76,14 @@ Default behaviour if she doesn't reply by 2026-08-14:
   a whole-section removal is the cleaner default. Easy to add back
   as Option B if she comes back later saying "actually keep the
   pathway".
+  → **N/A — Q1 answered in person, corrected Option B confirmed.**
 - **Q2 default → A / leave off**. Rationale: consistent with the
   previous won't-do call on APG-2494 (marked won't-do earlier in the
   year); the field simply isn't in the code today, so "do nothing"
   is safe. If she pushes for it later, spin fresh ticket.
+  → **Applied 2026-08-04 pm.** Roxanne had face-to-face window and
+  did not raise, so the follow-up's "unless you say otherwise" clause
+  locked the default in. APG-2494 stays won't-do.
 
 Branching from her answers into the working docs:
 

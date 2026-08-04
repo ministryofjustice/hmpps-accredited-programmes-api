@@ -24,13 +24,13 @@ end.
 | Item | State | Notes |
 |---|---|---|
 | Planning branch (`APG-2546/planning-sar-field-removals`) | ✅ committed, ⏳ awaiting push | Squash `95993514` into `1dd32fef` before push if you want a clean history. |
-| Q1 to Roxanne (`oasys_pni_result` A vs B) | ⏳ sent + followed up 2026-08-03 | Default → **A** if no reply by 2026-08-14. |
-| Q2 to Roxanne (`is_national` on organisation) | ⏳ sent + followed up 2026-08-03 | Default → **leave off** if no reply by 2026-08-14. |
+| Q1 to Roxanne (`oasys_pni_result` A vs B) | ✅ answered 2026-08-04 pm in person → corrected Option B | Strip `pniResultId` + `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`. See "Roxanne in-person answers" timeline entry. |
+| Q2 to Roxanne (`is_national` on organisation) | ✅ closed 2026-08-04 pm on "leave off" default | Roxanne had in-person window on 2026-08-04 pm and did not raise; per 2026-08-03 follow-up terms this locks the default in. APG-2494 stays won't-do. If raised later, spin fresh ticket. See "Q2 closed on default" timeline entry. |
 | PR-1 — remove `auditRecords` | ✅ merged `50f67cff` 2026-08-03 | PR #1107. 9-lens agent review all green. Branch head `04ab44ed` (initial `4801f6e6` + review-fix `04ab44ed`). |
 | PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ✅ merged `cd306c99` 2026-08-03 | PR #1109. Branch head was `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages**. |
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start | Branch off `main` @ `cd306c99`. Same integration-test note as PR-2. |
 | PR-4 — remove `oasysPniResults` (or strip IDs) | ⬜ ready to start | Q1 answered in person 2026-08-04 pm → Option B (corrected). Branch `APG-2546/strip-oasys-pni-result-ids`. Strip `pniResultId` + `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`. See PR-4 doc + DELIVERY-LOG "Roxanne in-person answers 2026-08-04 pm" entry. |
-| PR-5 — strip `SarPerson.id` + `SarOrganisation.id` (+ `SarReferral.originalReferralId`) | ⬜ not started | Scope confirmed 2026-08-04 pm: fold in `SarReferral.originalReferralId` strip (+ template row 14). Independent of Q1/Q2 answers. |
+| PR-5 — strip `SarPerson.id` + `SarOrganisation.id` (+ `SarReferral.originalReferralId`) | ⬜ not started | Scope confirmed 2026-08-04 pm: fold in `SarReferral.originalReferralId` strip (+ template row 14). All external questions resolved. |
 | PR-6 — OSAR round-2 handover | 🚫 blocked on PRs 1–5 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as PR-5 hits `main`. See `PR-6-osar-round-2-handover.md`. |
 | OSAR content sign-off (Sharon + Roxanne + QAT + William + David) | 🚫 blocked on PR-6 handover | Round-2 review. This is APG-2546's end state. |
 | APG-2547 — appearance / template registration with Cameron's SAR product | 🤝 coordination needed | Not "out of our scope" — we need to post the template link on `#haa-sar-functionality-change-request` and get `SARBT001` role added. Cameron's team wraps our template in cover/header/footer; that wrapping is theirs, but the coordination is joint. |
@@ -59,32 +59,34 @@ Legend: ⬜ ready • 🚫 blocked • ⏳ in flight • ✅ complete • 🔄 o
   workaround from the follow-up doc since it's no longer needed.
   Marked the follow-up doc as "sent 2026-08-03" in its header.
 
-### YYYY-MM-DD — Q1 answer received
+### 2026-08-04 pm — Q1 answered (in person) + Q2 closed on default
 
-- **Roxanne's answer:** _(fill in "A" or "B" and quote her exact
-  words)_.
-- **PR-4 branch chosen:** _(Option A → `APG-2546/remove-oasys-pni-results`
-  / Option B → `APG-2546/strip-oasys-pni-result-ids`)_.
-- **PR-4 doc updated:** _(yes/no — only needed if Q1=B, per the
-  "Correction to be aware of" section of the follow-up doc)_.
+Consolidated placeholder for the two Roxanne outcomes. Full
+details in the two later timeline entries:
+
+- **Q1:** "Roxanne in-person answers 2026-08-04 pm" —
+  corrected Option B confirmed. `SarReferral.originalReferralId`
+  fold-in to PR-5 confirmed. `oasysAssessmentId` = strip.
+- **Q2:** "Q2 closed on default 2026-08-04 (pm, end of day)" —
+  Roxanne did not raise `is_national` in the same window; per
+  2026-08-03 follow-up terms, "leave off" default locks in.
+  APG-2494 stays won't-do.
+
+Original placeholder headings for "Q1 answer received", "Q2
+answer received", and "Q1/Q2 default triggered" removed —
+both outcomes are now concrete.
 
 ### YYYY-MM-DD — Q2 answer received
 
-- **Roxanne's answer:** _(fill in "leave off" or "add" and quote
-  her exact words)_.
-- **Follow-up ticket:** _(N/A if leave off / new APG-XXXX ticket
-  link if add)_.
+_(Placeholder resolved — see "2026-08-04 pm — Q1 answered (in
+person) + Q2 closed on default" above.)_
 
 ### YYYY-MM-DD — Q1/Q2 default triggered
 
-Use only if we hit 2026-08-14 without answers and fall back to
-defaults:
-
-- **Q1 defaulted to A** (remove whole section).
-- **Q2 defaulted to leave off** (no code change; APG-2494 closed
-  won't-do again).
-- **Nudge log:** _(list the reminder pings sent to Roxanne / OSAR
-  channel before the default was applied)_.
+_(Placeholder resolved — Q2 defaulted "leave off" on 2026-08-04
+pm as recorded above; Q1 did not need default because Roxanne
+answered in person. Kept as a heading only so future ticket
+authors doing similar Q&Q patterns can see the structure.)_
 
 ### 2026-08-03 — PR-1 opened (awaiting merge to `main`)
 
@@ -552,6 +554,55 @@ snapshot diffs readable, as originally planned.
 **No PR is being cut for this — docs / framing update only.
 The PR-4 code branch is now the next thing off the rank once
 PR-3 merges.**
+
+### 2026-08-04 (pm, end of day) — Q2 closed on default → APG-2546 has zero open external questions
+
+**What happened.** Q2 (`is_national` on `SarOrganisation`, DD
+row 109) was left open when Q1 got answered in person. Roxanne
+had face-to-face contact this afternoon and did not raise
+`is_national`. Under the terms of the 2026-08-03 follow-up
+("I'd assume `is_national` is 'leave it off' unless you say
+otherwise") that in-person window without an override locks
+the default in.
+
+**Resolution.** Q2 closed on the "leave off" default, consistent
+with APG-2494's earlier won't-do call. No code change; no add
+work in APG-2546. If Roxanne raises `is_national` later, spin a
+fresh ticket — do not fold in.
+
+**DD state check** (for provenance):
+- DD row 109 Column H = Yes (Roxanne flipped 10.07 based on a
+  dev telling her it should be there) + dev note "should be in
+  new SAR report form".
+- `SarOrganisation` DTO field set (verified 2026-08-04):
+  `id`, `code`, `name`, `gender`. No `isNational`.
+- Confirmed via `sar-api-response.json` fixture — organisations
+  render `{"id","code","name","gender"}` only.
+
+**Residual DD drift** (not APG-2546 scope, not blocking):
+- DD row 109 still says Column H = Yes; code says No. If we
+  want zero DD drift, ask Roxanne to flip Column H back to No
+  on her next DD pass. Nice-to-have. Logged here so it's not
+  forgotten.
+
+**Impact.**
+
+- **Top-level plan** — Q2 block flipped from "Do not attempt to
+  add until Roxanne confirms" + default banner → ✅ CLOSED on
+  default banner + kept the historical context for provenance.
+  New heading "No open questions blocking APG-2546" now names
+  the state explicitly.
+- **Status table** at top of this log — Q2 blocking references
+  removed; new "external questions" row added showing all
+  external clarifications closed.
+- **`00-roxanne-followup.md`** — defaults section flipped to
+  show both Q1 and Q2 as resolved (Q1 in person, Q2 on default).
+
+**No external actions blocking APG-2546.** Next step is
+purely internal: get PR-3 merged, then PR-4 (corrected Option
+B), then PR-5 (three-strip), then PR-6 (round-2 handover).
+
+**No PR is being cut for this — docs / framing update only.**
 
 ### YYYY-MM-DD — PR-3 merged
 

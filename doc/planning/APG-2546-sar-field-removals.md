@@ -164,26 +164,45 @@ Option B (one fewer field to strip). ~0.5 dev day.
 
 **Default banner deleted — no longer relevant, Q1 answered.**
 
-### Q2 — `is_national` on `SarOrganisation` (row 109)
+### Q2 — `is_national` on `SarOrganisation` (row 109) — ✅ CLOSED on default
 
-Roxanne changed column H (In SAR API) from No to Yes on 10/07, with
-note *"advised should be in new SAR report form 01.07.26 hence
-needed new live like report"*. But the current `SarOrganisation`
-DTO (line 532) does not include `isNational`. So her spreadsheet is
-either:
+**Closed 2026-08-04 pm** on the "leave off" default that Roxanne
+was told about in the 2026-08-03 follow-up. She had face-to-face
+contact on 2026-08-04 pm (when Q1 was answered — see DELIVERY-LOG
+"Roxanne in-person answers 2026-08-04 pm") and did not raise
+`is_national`, which under the follow-up's explicit terms
+("I'd assume is_national is 'leave it off' unless you say
+otherwise") locks the default in. If she raises it later, spin a
+fresh ticket — do not fold into APG-2546.
 
-- **Stale** (a dev told her it had landed but it hadn't) — no action
-- **A silent ADD request** — needs a new field + entity read +
-  template + snapshot regen (~0.5 d, roughly on par with a Removal PR)
+Historical context (kept for provenance):
 
-This was tracked earlier as APG-2494 and marked won't-do; may have
-been revived by Roxanne without realising. Clarification needed.
+Roxanne changed column H (In SAR API) from No to Yes on 10/07,
+with note *"advised should be in new SAR report form 01.07.26
+hence needed new live like report"*. But the current
+`SarOrganisation` DTO does not include `isNational`. So her
+spreadsheet was either:
 
-**Do not attempt to add `isNational` until Roxanne confirms.**
+- **Stale** (a dev told her it had landed but it hadn't) — no
+  action needed. ← this is the resolution we're going with.
+- **A silent ADD request** — would have needed a new field +
+  entity read + template + snapshot regen (~0.5 d).
 
-**Default if no reply by 2026-08-14 (see `APG-2546/00-roxanne-followup.md`):
-leave off (close APG-2494 won't-do again).** Q2 sent + follow-up sent
-2026-08-03.
+This was tracked earlier as APG-2494 and marked won't-do; may
+have been revived by Roxanne without realising. Q2 sent +
+follow-up sent 2026-08-03; closed on default 2026-08-04 pm.
+
+**Residual DD drift:** DD row 109 still has Column H = Yes and
+carries the 10.07 dev note. Code state = No. If we want zero
+drift on the DD, ask Roxanne to flip Column H back to No on her
+next DD pass. Not APG-2546 scope; not blocking anything;
+recorded as a nice-to-have in the delivery log.
+
+## No open questions blocking APG-2546
+
+Q1 answered 2026-08-04 pm (corrected Option B).
+Q2 closed 2026-08-04 pm on default (leave off).
+All PRs can now proceed serially without external clarification.
 
 ## PR plan
 
