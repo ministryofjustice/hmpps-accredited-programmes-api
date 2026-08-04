@@ -92,4 +92,88 @@ Branching from her answers into the working docs:
   fresh). Do not fold into APG-2546 — different shape (add not
   remove) and different reviewer path.
 
+---
+
+## Q1 Option B correction (2026-08-04 pm) — needs sending
+
+> **Status:** DRAFT — surfaced by the DD notes sweep on
+> 2026-08-04 pm (see DELIVERY-LOG entry "DD notes sweep beyond
+> red-flagged rows"). Break the earlier "do NOT resend A / B
+> options" rule because the B option as sent contains a
+> genuine semantic error — worth the noise cost.
+
+**What went wrong.** The Q1 message described Option B as
+"strip `pni_result_id`, `prison_number`, and
+`oasys_assessment_id`; keep only `programme_pathway`". A full
+sweep of the DD notes column (not just Roxanne's 29.07 red
+flags) shows row 86 (`oasys_pni_result.prison_number`) carries
+an unretracted 10.07.26 dev note "should be on the report", and
+`prison_number` was not red-flagged in the 29.07 pass. It's the
+subject's PRN, not an internal UUID — every other section of
+the SAR keeps it. If Roxanne picks B against the framing as
+sent, she'd sign off stripping a field the DD's own dev note
+tells us to keep.
+
+**What we owe her.** A short, "no drama" correction on Option
+B. Don't restate the whole A / B setup — just repair the B
+description. Also worth surfacing the `oasys_assessment_id`
+ambiguity (10.07 dev note says keep; 29.07 blanket "all IDs →
+No" says strip) so we get a clean signal on that field too.
+
+### Slack / email draft
+
+> Hi Roxanne — quick correction on the oasys_pni_result Q1 I
+> sent, sorry for the extra ping. I did a wider sweep of the
+> DD notes column this afternoon and spotted that Option B as
+> I framed it would strip `prison_number` off the row — but
+> row 86 has a dev note from 10.07 saying `prison_number`
+> should stay, and it wasn't in your 29.07 "all IDs → No"
+> pass. That's my mistake in the write-up — `prison_number`
+> is the PRN, not an internal ID, and every other section of
+> the SAR keeps it.
+>
+> So Option B is really "strip `pni_result_id` (and probably
+> `oasys_assessment_id` — see below), keep `prison_number`
+> and `programme_pathway`". Option A is unchanged.
+>
+> While I'm here — `oasys_assessment_id` (row 87) has a
+> similar 10.07 "should be on the report" note but your 29.07
+> blanket "all IDs → No" arguably covers it too. My default
+> would be to strip it (it's an OASys system reference, not
+> user-facing), but if you'd prefer to keep it as a link back
+> for reviewers, that's fine — one-line change either way.
+>
+> No response needed if Option A is where you land. If it's
+> B, a thumbs-up on "keep `prison_number` + `programme_pathway`,
+> strip both IDs" is all I need. Same deadline (Fri 14th) and
+> same defaults otherwise.
+>
+> Thanks — Raby
+
+### Internal notes on this correction
+
+- **Send channel:** same as Q1 (`#osar-review` / DM — whichever
+  Q1 went out on).
+- **Timing:** send before Roxanne's Q1 response lands. If her
+  response has already come in as "B" under the old framing,
+  send this as a "just to confirm before I cut the PR" check.
+- **If she doesn't reply to the correction by 2026-08-14:**
+  default is still Option A (unchanged from original follow-up).
+  If she has already replied "B" and doesn't respond to the
+  correction, act on the *corrected* B (keep `prison_number` +
+  `programme_pathway`, strip both IDs) — the DD is her source
+  of truth and the correction only removes a mistake we
+  introduced, not something she asked for.
+- **Extra topic to fold in if you're sending this anyway:**
+  `SarReferral.originalReferralId` (row 165) — 10.07 dev note
+  "pull referral data (if not already) do not add the uuid".
+  Not red-flagged. We already pull the referral data (as
+  `originalReferral` sub-block); the raw UUID and its template
+  row (`sar_template.mustache:14`) should probably be
+  stripped. See PR-5 doc §"Potential scope extension" for the
+  code position and the (a)/(b) decision. Reasonable to add a
+  short "and while we're here" paragraph asking her to
+  green-light stripping `originalReferralId` too — natural
+  extension of PR-5 rather than a separate ticket.
+
 

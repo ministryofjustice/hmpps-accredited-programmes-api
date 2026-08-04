@@ -14,16 +14,32 @@ Row references on Roxanne's DD spreadsheet: rows 85, 86, 87, 88.
 
 The `SarOasysPniResult` DTO currently exposes four fields:
 
-| Field | Type | Role |
-|---|---|---|
-| `pniResultId` | UUID | internal ID |
-| `prisonNumber` | String | subject identifier |
-| `oasysAssessmentId` | Long | internal / external ID |
-| `programmePathway` | String | category (e.g. `HIGH_INTENSITY_BC`) |
+| Field | Type | Role | DD row | DD signal |
+|---|---|---|---|---|
+| `pniResultId` | UUID | internal ID | 85 | 29.07 red-flag + "All IDs should be a No" → **strip** |
+| `prisonNumber` | String | subject's business ID | 86 | 10.07 dev "should be on the report" + NOT red-flagged → **keep** |
+| `oasysAssessmentId` | Long | external OASys ref | 87 | 10.07 dev "should be on the report" *and* row 85's blanket "All IDs should be a No" → **ambiguous** (default: strip, but flag to Roxanne) |
+| `programmePathway` | String | category (e.g. `HIGH_INTENSITY_BC`) | 88 | 10.07 dev "should be on the report" + NOT red-flagged → **keep** |
 
-**Both options remove all three ID fields**; the difference is
-whether the section wrapper (and `programmePathway`) remains at
-all.
+**Option A** removes the whole section — the field-by-field
+signals above are moot because nothing renders.
+
+**Option B** — *scope refined 2026-08-04 pm after full DD notes
+sweep* (see DELIVERY-LOG "DD notes sweep beyond red-flagged rows"
+entry). Previous framing "strip all three IDs, keep only
+programmePathway" was wrong: it counted `prisonNumber` as an
+internal ID for removal, but the DD row 86 dev note explicitly
+says to keep it, and every other SAR section retains
+`prisonNumber` as the subject identifier. Real Option B is:
+
+> **Strip `pniResultId` (definitely) and `oasysAssessmentId`
+> (probably — resolve with Roxanne before final commit). Keep
+> `prisonNumber` and `programmePathway`.**
+
+If Roxanne comes back saying "keep `oasysAssessmentId` too",
+that's fine — it's a one-line diff either way. Default position
+is strip because it aligns with the ID-removal theme and row
+85's "All IDs should be a No" was written as a blanket policy.
 
 ## Prerequisites for a fresh agent
 
@@ -108,43 +124,58 @@ in place; only its DTO shape shrinks. Existing assertions on the
 catch anything that asserted on the fields that were stripped inside
 the DTO.
 
-## Option B — strip all three IDs, keep only `programmePathway`
+## Option B — strip IDs, keep `prisonNumber` + `programmePathway`
 
-This is what Roxanne was offered in the Q1 message: "keep
-`programme_pathway`, remove the three ID fields". The section
-wrapper (heading, table shell, empty-state branch) stays; only
-`programmePathway` renders inside it.
+*Scope refined 2026-08-04 pm — see the field table at the top of
+this doc. Previous "strip all three IDs, keep only
+programmePathway" wording was semantically wrong because
+`prisonNumber` isn't an internal ID.*
+
+This is close to what Roxanne was offered in the Q1 message
+("keep `programme_pathway`, remove the ID fields") — with the DD
+sweep clarifying that `prisonNumber` is not on the strip list
+and `oasysAssessmentId` is ambiguous (default: strip).
+
+The section wrapper (heading, table shell, empty-state branch)
+stays; only the ID row(s) get removed from the DTO / template /
+assertions.
 
 ### 1. `src/main/kotlin/…/service/SubjectAccessRequestService.kt`
 
-- Lines 315–320 — inside `data class SarOasysPniResult(...)`, delete
-  the `pniResultId`, `prisonNumber`, and `oasysAssessmentId`
-  parameters. Only `programmePathway` should remain.
+- Lines 315–320 — inside `data class SarOasysPniResult(...)`,
+  delete `pniResultId` (definite) and `oasysAssessmentId`
+  (default). Keep `prisonNumber` and `programmePathway`.
 - Inside `toSarOasysPniResult` mapper (~line 476) — delete the
-  `pniResultId = …`, `prisonNumber = …`, and `oasysAssessmentId = …`
-  field assignments. Only the `programmePathway = …` assignment
-  should remain.
+  matching `pniResultId = …` (definite) and
+  `oasysAssessmentId = …` (default) field assignments. Keep
+  the `prisonNumber = …` and `programmePathway = …` assignments.
 - Everything else in the service, repository, and constructor stays.
+
+If Roxanne confirms `oasysAssessmentId` should also stay, the
+diff is: don't delete it from the DTO, don't delete it from the
+mapper, don't delete the corresponding template row / assertion.
+One-liner divergence per surface.
 
 ### 2. Repository, template block, integration seed
 
 - **Repository:** no change. `findAllByPrisonNumber` is still called
   for both SAR and `PersonService`.
 - **Template** `src/main/resources/sar_template.mustache`, lines
-  145–158 — delete the three `<tr>` rows that render
-  `{{pniResultId}}`, `{{prisonNumber}}`, and `{{oasysAssessmentId}}`.
-  Keep the section heading, table shell, empty-state branch, and
-  the `{{programmePathway}}` row.
+  145–158 — delete the `<tr>` row rendering `{{pniResultId}}`
+  (definite) and the `<tr>` row rendering `{{oasysAssessmentId}}`
+  (default). Keep the section heading, table shell, empty-state
+  branch, the `{{prisonNumber}}` row, and the `{{programmePathway}}`
+  row.
 - **Integration seed:** no change — the seed row still needs to
-  exist, it just renders one field instead of four.
+  exist, it just renders two fields instead of four (or three
+  fields if Roxanne says keep `oasysAssessmentId`).
 
 ### 3. `src/test/kotlin/…/service/SubjectAccessRequestServiceTest.kt`
 
 - Around line 332 — delete the `oasysPniResults[0].pniResultId
-  shouldBe …`, `oasysPniResults[0].prisonNumber shouldBe …`, and
-  `oasysPniResults[0].oasysAssessmentId shouldBe …` assertions.
-  Keep the collection-size assertion and the `programmePathway`
-  assertion.
+  shouldBe …` (definite) and `oasysPniResults[0].oasysAssessmentId
+  shouldBe …` (default) assertions. Keep the collection-size,
+  `prisonNumber`, and `programmePathway` assertions.
 
 ## Snapshot regeneration (both options)
 

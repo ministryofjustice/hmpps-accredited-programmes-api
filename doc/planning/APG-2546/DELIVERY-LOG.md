@@ -29,7 +29,7 @@ end.
 | PR-1 — remove `auditRecords` | ✅ merged `50f67cff` 2026-08-03 | PR #1107. 9-lens agent review all green. Branch head `04ab44ed` (initial `4801f6e6` + review-fix `04ab44ed`). |
 | PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ✅ merged `cd306c99` 2026-08-03 | PR #1109. Branch head was `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages**. |
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ⬜ ready to start | Branch off `main` @ `cd306c99`. Same integration-test note as PR-2. |
-| PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 | Same integration-test note if Q1 = A. |
+| PR-4 — remove `oasysPniResults` (or strip IDs) | 🚫 blocked on Q1 + Q1-correction | Same integration-test note if Q1 = A. Option B scope refined 2026-08-04 pm (DD notes sweep) — correction owed to Roxanne before her B answer lands; see `00-roxanne-followup.md` §"Q1 Option B correction". |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` | ⬜ not started | Independent of Q1/Q2 answers. |
 | PR-6 — OSAR round-2 handover | 🚫 blocked on PRs 1–5 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as PR-5 hits `main`. See `PR-6-osar-round-2-handover.md`. |
 | OSAR content sign-off (Sharon + Roxanne + QAT + William + David) | 🚫 blocked on PR-6 handover | Round-2 review. This is APG-2546's end state. |
@@ -392,6 +392,106 @@ confirm the Confluence page's Option 2 library is the same as
 **No PR is being cut for this — it's another docs / framing
 update on the planning branch only. Superseded the morning's
 William-email revision within the same day.**
+
+### 2026-08-04 (pm, later) — DD notes sweep beyond red-flagged rows → PR-4 Option B scope needs refining, PR-5 has a potential extension
+
+**Why the sweep.** During Deborah's exchange the DD row for
+`oasys_pni_result.programme_pathway` (row 88) surfaced with a
+10.07.26 dev note: "Dev states this should be on the report will
+need to check new report". That note isn't on a red-flagged row
+so all our earlier DD cross-checks (red-only filters) missed it.
+Ran a full-sheet sweep of column I (Additional Notes) on the
+"Accredited Programmes Custody" tab — 65 note-bearing rows —
+via `/tmp/dd_notes_sweep.py`.
+
+**Findings that change APG-2546 scope:**
+
+1. **PR-4 Option B is mis-specified.** Currently the PR-4 doc
+   and top-level plan describe Option B as "strip all three IDs
+   (`pniResultId`, `prisonNumber`, `oasysAssessmentId`), keep
+   only `programmePathway`". But the DD says:
+   - **row 85** `pni_result_id` — red-flagged 29.07 + note
+     "All IDs should be a No" → strip. ✓
+   - **row 86** `prison_number` — 10.07 dev "should be on the
+     report" + NOT red-flagged → **KEEP**. `prisonNumber` is
+     the subject's business ID (a PRN like "A1234BC"), not an
+     internal UUID. Treating it as an "internal ID for removal"
+     is a semantic error. Every other SAR section keeps
+     `prisonNumber` — this one should too.
+   - **row 87** `oasys_assessment_id` — 10.07 dev "should be on
+     the report" AND row 85's blanket "All IDs should be a No".
+     **Ambiguous** — a Long ref to the OASys assessment, not a
+     UUID. The 29.07 red-flag pass didn't explicitly re-flag
+     row 87 individually. Recommend: strip by default (aligns
+     with the ID-removal theme + row 85's blanket note), and
+     add explicit call-out to Roxanne in her Q1 follow-up.
+   - **row 88** `programme_pathway` — 10.07 dev "should be on
+     the report" + NOT red-flagged → **KEEP**. ✓ (already the
+     PR-4 Option B target.)
+
+   Net: real Option B is "strip `pniResultId` (+ probably
+   `oasysAssessmentId`); keep `prisonNumber` + `programmePathway`",
+   not "strip 3 keep 1". Updated the PR-4 doc + top-level plan
+   to reflect this.
+
+2. **PR-5 has a potential extension: `originalReferralId`.**
+   Row 165 (`referral.original_referral_id`) dev note: "pull
+   referral data (if not already) do not add the uuid".
+   - We already pull the referral data — `SarReferral` has an
+     `originalReferral` sub-block populated via batch lookup
+     (verified `SubjectAccessRequestServiceTest.kt` lines
+     277–305).
+   - We also still expose the raw UUID on
+     `SarReferral.originalReferralId`, and the template renders
+     it at `sar_template.mustache:14`
+     (`<td>Original referral ID</td><td>{{originalReferralId}}</td>`).
+   - The DD dev note explicitly says "do not add the uuid" —
+     so `originalReferralId` and its template row should be
+     stripped. Consistent with PR-5's ID-strip theme.
+   - Not in Roxanne's 30 Jul red-flag pass, but the 10.07 dev
+     note is unambiguous. Recommend: add to PR-5's scope
+     rather than spin a separate PR, since the mechanics
+     (DTO field + template row + optional test assertion)
+     match `SarPerson.id` / `SarOrganisation.id` exactly.
+   - Added a "potential scope extension" block to PR-5 doc.
+     Not committing to it as PR-5 scope until confirmed with
+     Roxanne (or you decide unilaterally that a dev-note
+     signal is enough — an argument can be made either way
+     because "do not add the uuid" is unambiguous).
+
+**Findings adjacent to APG-2546 (worth logging, not scope):**
+
+- **Row 64** `course_participation.is_draft` — "ensure we share
+  drafts too". Verify the SAR query doesn't filter out drafts.
+  If it does, separate ticket.
+- **Rows 57, 59** `course_participation.{created,last_modified}_by_username`
+  — "surname only", currently API=No. If we should surface as
+  surnames on SAR, separate scope.
+- **Rows 162, 163** `referral.{primary,secondary}_pom_staff_id`
+  — "surname only". Verify the SAR resolves to surnames rather
+  than raw IDs/usernames. APG-2492 (referrer surname) precedent.
+- **Row 108** `organisation.gender` + **row 109**
+  `organisation.is_national` — 10.07 dev "should be in new SAR
+  report form". Row 109 is exactly what Q2 to Roxanne is about.
+  Row 108: verify current SAR includes `gender` for
+  organisations.
+- **Row 107** `organisation.name` — has both "needs to be
+  removed from SAR endpoint" (old) AND "should be in new SAR
+  report form" (10.07 update). Currently API=Yes. Contradictory
+  notes on the same row — verify SAR output is what dev
+  eventually settled on.
+
+**Sweep methodology.** `/tmp/dd_notes_sweep.py`, reads
+`doc/Copy of 2026.07.08_copy_...xlsx` via openpyxl,
+`data_only=True`, iterates Accredited Programmes Custody sheet
+rows 15..245, collects (Entity, Element, Mandatory, SAR data,
+In SAR API, Additional Notes) for every row with a non-null
+Additional Notes. Script kept out of the repo — one-off tool.
+Reruns cheap if the spreadsheet is refreshed.
+
+**No PR is being cut for this — docs / framing update only.
+The PR-4 Option B scope refinement will land as part of the
+actual PR-4 code branch when Roxanne's Q1 comes back.**
 
 ### YYYY-MM-DD — PR-3 merged
 

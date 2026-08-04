@@ -143,6 +143,19 @@ Options put to Roxanne (Q1 sent + follow-up sent 2026-08-03):
   315–320: those are the four fields, `programmePathway` is a
   category label — e.g. `HIGH_INTENSITY_BC` — not an ID.)
 
+**⚠️ Correction needed on Option B as sent (surfaced 2026-08-04 pm
+by full DD notes sweep — see DELIVERY-LOG "DD notes sweep beyond
+red-flagged rows"):** the Option B message told Roxanne we'd strip
+`prison_number`, but DD row 86 has an unretracted dev note from
+10.07.26 saying `prison_number` "should be on the report", and it
+was NOT red-flagged in her 29.07 pass. Treating `prison_number`
+as an internal ID for stripping is a semantic error — it's the
+subject's PRN. If Roxanne answers "B" against the current framing,
+she'd be endorsing something the DD itself contradicts. **We owe
+her a short correction message** before her Q1 response lands —
+see `APG-2546/00-roxanne-followup.md` §"Q1 Option B correction
+(2026-08-04 pm)".
+
 Implementation effort is roughly identical either way.
 
 **Default if no reply by 2026-08-14 (see `APG-2546/00-roxanne-followup.md`):
@@ -315,12 +328,22 @@ lets us delete the whole `selectedSexualOffenceDetails` local var
   - Delete oasysPniResults assertions (lines 265, 332)
 - Regenerate + promote snapshots.
 
-**If Option B (strip all three IDs, keep only `programmePathway`):**
+**If Option B (strip IDs, keep `prisonNumber` + `programmePathway`):**
+*(Scope refined 2026-08-04 pm after full DD notes sweep — see
+`APG-2546/PR-4-remove-oasys-pni-results.md` for the field-by-field
+DD-signal table and the DELIVERY-LOG entry "DD notes sweep beyond
+red-flagged rows".)*
+
 - Same shape as PR-5 pattern — DTO field removals + template row
   deletions only, section wrapper stays.
-- Strip `pniResultId`, `prisonNumber`, `oasysAssessmentId` from the
-  DTO, mapper, template rows, and unit-test assertions.
-- Keep only `programmePathway` visible.
+- Strip `pniResultId` (definite; DD row 85 red-flagged + "All IDs
+  should be a No"). Strip `oasysAssessmentId` (default; DD row 87
+  ambiguous — 10.07 dev note says keep, blanket 29.07 note says
+  strip; resolve with Roxanne).
+- **Keep `prisonNumber`** (DD row 86 dev note "should be on the
+  report", not red-flagged; consistent with every other SAR
+  section retaining the subject's PRN).
+- **Keep `programmePathway`** (DD row 88, positive dev signal).
 - See `APG-2546/PR-4-remove-oasys-pni-results.md` Option B section
   for the file-by-file breakdown.
 

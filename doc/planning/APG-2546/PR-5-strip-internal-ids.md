@@ -20,6 +20,58 @@ There is a **third** related row on the spreadsheet — rows 127, 128,
 code change needed for `SarPniResult`; this PR only touches
 `SarPerson` and `SarOrganisation`.
 
+## Potential scope extension — `SarReferral.originalReferralId` (2026-08-04 pm)
+
+Surfaced by the DD notes sweep (see DELIVERY-LOG "DD notes sweep
+beyond red-flagged rows" entry). Row 165 dev note on
+`referral.original_referral_id`:
+
+> "pull referral data (if not already) do not add the uuid"
+
+State on `main`:
+
+- We *do* pull the referral data — `SarReferral.originalReferral`
+  is a populated sub-block (verified `SubjectAccessRequestServiceTest.kt`
+  lines 277–305).
+- We *also* still expose the raw UUID at
+  `SarReferral.originalReferralId`, and the template renders it at
+  `src/main/resources/sar_template.mustache:14`
+  (`<td>Original referral ID</td><td>{{originalReferralId}}</td>`).
+
+Per the DD dev note, the raw UUID should not be rendered — only
+the resolved `originalReferral` block should. That means stripping
+`originalReferralId` from the DTO + template + assertions, same
+mechanics as `SarPerson.id` / `SarOrganisation.id`.
+
+Not in Roxanne's 30 Jul red-flag pass, so this isn't
+"pre-authorised" by her. Decision options:
+
+- **(a) Fold into PR-5 scope now.** Argument: 10.07 dev note is
+  unambiguous, template row is trivially removable, and it fits
+  the ID-strip theme of this PR exactly. Cost: adds a
+  non-Roxanne-flagged change to a Roxanne-flagged PR — but the
+  DD is her source of truth, so this is defensible.
+- **(b) Defer to a follow-up.** Argument: keep PR-5 tight to
+  Roxanne's explicit flags; raise `originalReferralId` in the
+  next Roxanne message alongside the Option B `oasysAssessmentId`
+  question.
+
+If (a): the code changes fit alongside step 1 below —
+`SarReferral.originalReferralId` field in `SubjectAccessRequestService.kt`
+(~line 245), matching mapper assignment (~line 300–330 area,
+`toSarReferral`), and template line 14. Also verify the
+`SubjectAccessRequestServiceTest.kt` referral assertions around
+line 277 aren't asserting on `originalReferralId` being the raw
+UUID.
+
+If (b): leave PR-5 as-is and add `originalReferralId` to the
+next Roxanne follow-up.
+
+**Current default: (b)** — keep PR-5 tight until the next
+Roxanne round, but raise it explicitly on the Roxanne follow-up
+so we get a clean signal. Flip to (a) if you want to move
+faster.
+
 ## Prerequisites for a fresh agent
 
 Read `doc/planning/APG-2546-sar-field-removals.md` (§B, PR-5 detail).
