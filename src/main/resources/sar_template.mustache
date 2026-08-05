@@ -11,7 +11,6 @@
             <tr><td>Has reviewed programme history</td><td>{{ convertBoolean hasReviewedProgrammeHistory }}</td></tr>
             <tr><td>Primary POM staff surname</td><td>{{ optionalValue primaryPomStaffSurname }}</td></tr>
             <tr><td>Secondary POM staff surname</td><td>{{ optionalValue secondaryPomStaffSurname }}</td></tr>
-            <tr><td>Original referral ID</td><td>{{ optionalValue originalReferralId }}</td></tr>
             <tr><td>Has LDC</td><td>{{ convertBoolean hasLdc }}</td></tr>
             <tr><td>Has LDC been overridden by programme team</td><td>{{ convertBoolean hasLdcBeenOverriddenByProgrammeTeam }}</td></tr>
             <tr><td>Has reviewed additional information</td><td>{{ convertBoolean hasReviewedAdditionalInformation }}</td></tr>
@@ -103,7 +102,6 @@
     <h2>Person</h2>
     {{#person}}
         <table class="summary-list">
-            <tr><td>Person ID</td><td>{{ optionalValue id }}</td></tr>
             <tr><td>Prison number</td><td>{{ optionalValue prisonNumber }}</td></tr>
             <tr><td>Forename</td><td>{{ optionalValue forename }}</td></tr>
             <tr><td>Surname</td><td>{{ optionalValue surname }}</td></tr>
