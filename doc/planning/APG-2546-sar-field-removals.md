@@ -75,12 +75,13 @@ the matching assertions from `SubjectAccessRequestServiceTest`.
 
 ### B. Internal ID fields to strip from remaining sections
 
-| Section | Field(s) to remove from DTO | Roxanne rows |
-|---|---|---|
-| `SarPerson` | `id` | 111 |
-| `SarOrganisation` | `id` | 105 |
-| `SarReferral` | `originalReferralId` | 165 (10.07 dev note "do not add the uuid", confirmed in person by Roxanne 2026-08-04 pm — fold into PR-5) |
-| `SarPniResult` | `pniResultId`, `referralId`, `oasysAssessmentId` | 127, 128, 131 |
+| Section | Field(s) to remove from DTO | Roxanne rows | Landing PR |
+|---|---|---|---|
+| `SarPerson` | `id` | 111 | PR-5 |
+| `SarOrganisation` | `id` | 105 | PR-5 |
+| `SarReferral` | `originalReferralId` | 165 (10.07 dev note "do not add the uuid", confirmed in person by Roxanne 2026-08-04 pm — fold into PR-5) | PR-5 |
+| `SarOriginalReferral` (nested sub-block) | `id` | Not a DD row per se — spun off PR-5's nine-lens review 2026-08-05 as the last raw-UUID leak on the SAR surface. Covered by Roxanne's rows 105 + 111 blanket "No Ids to be included in SAR reports" rule. | **PR-7** |
+| `SarPniResult` | `pniResultId`, `referralId`, `oasysAssessmentId` | 127, 128, 131 | (already absent — no code change) |
 
 `SarPerson.id`, `SarOrganisation.id`, and `SarReferral.originalReferralId`
 are currently populated — they'll go from the DTO, the mapper, the
@@ -210,8 +211,9 @@ All PRs can now proceed serially without external clarification.
 
 ## PR plan
 
-6 focused PRs. Each stands alone, each ~15-min review, each includes
-its own snapshot regen. Sequence:
+7 focused PRs (originally 6 — PR-7 added 2026-08-05 as a follow-on
+from PR-5's nine-lens review). Each stands alone, each ~15-min
+review, each includes its own snapshot regen. Sequence:
 
 | # | Branch | Title | Files touched | Est. |
 |---|---|---|---|---|
@@ -220,9 +222,15 @@ its own snapshot regen. Sequence:
 | 3 | `APG-2546/remove-sexual-offence-details` | `APG-2546: remove sexualOffenceDetails + selectedSexualOffenceDetails sections from SAR` | see PR-3 detail below | 0.5 d |
 | 4 | `APG-2546/strip-oasys-pni-result-ids` | `APG-2546: strip pniResultId + oasysAssessmentId from oasysPniResults, keep prisonNumber + programmePathway` | see PR-4 detail below | 0.5 d |
 | 5 | `APG-2546/strip-internal-ids` | `APG-2546: strip internal ID fields from remaining SAR sections (SarPerson.id, SarOrganisation.id, SarReferral.originalReferralId)` | see PR-5 detail below | 0.5–1 d |
+| 7 | `APG-2546/strip-original-referral-uuid` | `APG-2546: strip SarOriginalReferral.id UUID from the SAR sub-block` | see PR-7 detail below (single field + template row + one test assertion) | 0.25 d |
 | 6 | `APG-2546/osar-round-2-handover` | `APG-2546: OSAR round-2 handover — docs-only` | doc-only (planning notes + downloaded PDF handed off in `~/Downloads/sar-dev-3/`; Option 1 primary, Option 2 fallback) | 0.5–1 d |
 
-**Total working days:** ~3.5 dev + ~1.5 buffer = **~5 dev days** — comfortably inside the 3-week (~15 dev days) envelope. Slack is intentionally large to absorb one OSAR review-cycle.
+**Total working days:** ~3.75 dev + ~1.5 buffer = **~5.25 dev days** — comfortably inside the 3-week (~15 dev days) envelope. Slack is intentionally large to absorb one OSAR review-cycle.
+
+PR-7 is numbered 7 (not slotted as PR-5b or renumbered as the new
+PR-6) to preserve the stable PR-6 identifier used across the
+existing docs / commit history / delivery log. Serial merge order
+is 1 → 2 → 3 → 4 → 5 → **7** → 6.
 
 ### PR-1 detail — remove `auditRecords`
 
@@ -427,18 +435,58 @@ still needs the source UUID from the entity layer, so
 `ReferralEntity.originalReferralId` stays. Only the *DTO* and
 *template* stop exposing it.
 
+### PR-7 detail — strip retained `SarOriginalReferral.id` UUID
+
+Follow-on from PR-5's nine-lens code review 2026-08-05 — see
+`APG-2546/PR-7-strip-original-referral-uuid.md` for the full doc
+and `DELIVERY-LOG.md` "PR-5 opened + nine-lens review clean + PR-7
+spun off review flag" entry for the paper trail.
+
+PR-5 retained `SarOriginalReferral.id` (the nested sub-block's own
+UUID) per its doc's explicit "sub-block is unaffected" instruction.
+On review reflection with Raby 2026-08-05, Roxanne's blanket "No
+Ids to be included in SAR reports" rule from rows 105 + 111 covers
+this too — the nested UUID is an internal referral primary key,
+opaque to the subject once the resolved details (course name,
+submitted on, status, referrer surname, override reason, LDC flag,
+additional info) are rendered right next to it.
+
+**Files:**
+
+- `src/main/kotlin/.../service/SubjectAccessRequestService.kt`
+  - Delete `val id: UUID,` field from `SarOriginalReferral` data class
+  - Delete `id = id!!,` from `ReferralEntity.toSarOriginalReferral(...)`
+    mapper (named-arg mapper — no positional-alignment risk)
+- `src/main/resources/sar_template.mustache`
+  - Delete `<tr><td>Original referral ID</td><td>{{ optionalValue id }}</td></tr>`
+    inside the `{{#originalReferral}}` block (around line 24 on
+    `main` after PR-5)
+- `SubjectAccessRequestServiceTest.kt`
+  - Delete `assertThat(originalReferral.id).isEqualTo(originalReferralId)`
+    (around line 258 after PR-5). Keep the local `originalReferralId`
+    seed variable + all mock-stub references — they still drive
+    the batch-lookup behaviour under test.
+- Regenerate snapshots (expected: no diff — see PR-7 doc "Non-obvious
+  things §1"; the integration-test fixture doesn't seed a resolvable
+  `originalReferral`, so removing a field from a data class whose
+  instances are never constructed in the fixture won't diff the
+  JSON / HTML snapshots).
+
+Entity-layer `ReferralEntity.originalReferralId` still needed by
+the batch lookup — unchanged.
+
 ### PR-6 detail — OSAR round-2 handover (Option 1 primary, Option 2 fallback)
 
 **Scope updated 2026-08-04 pm following Deborah's clarification
 of the two handover routes. See
 `APG-2546/PR-6-osar-round-2-handover.md` for the full doc.**
 
-Once PRs 1–5 are merged and deployed to DEV:
+Once PRs 1–5 **and PR-7** are merged and deployed to DEV:
 
 1. **Register our template** with Cameron's team by posting on
    `#haa-sar-functionality-change-request` with a link to
    `src/main/resources/sar_template.mustache` on `main`. Do this
-   as soon as PR-5 is on `main`, not after — Round 1 saw a
+   as soon as **PR-7** is on `main`, not after — Round 1 saw a
    pipeline block and Option 1 needs lead time.
 2. **Get `SARBT001` role** added to a test nDelius account if not
    already present (same channel, same team).
@@ -463,7 +511,7 @@ Once PRs 1–5 are merged and deployed to DEV:
 
 ## Sequencing
 
-PRs 1–5 all touch `SubjectAccessRequestService.kt` and
+PRs 1–5 and PR-7 all touch `SubjectAccessRequestService.kt` and
 `sar_template.mustache`. Pragmatic route: **serial**, one merge →
 rebase next → merge. Reasons:
 
@@ -475,9 +523,11 @@ rebase next → merge. Reasons:
   If any reviewer wants to see the intermediate PDF between two PRs,
   they can build locally at that point.
 
-Order chosen: **1 → 2 → 3 → 4 → 5 → 6**, matching descending impact
-on OSAR review pain (audit records first because it's the "28 000
-rows" complaint we're primarily fixing).
+Order chosen: **1 → 2 → 3 → 4 → 5 → 7 → 6**, matching descending
+impact on OSAR review pain (audit records first because it's the
+"28 000 rows" complaint we're primarily fixing) with PR-7 slotted
+after PR-5 to close out the raw-UUID scrub before the OSAR
+handover.
 
 ## Not in scope for APG-2546
 
@@ -531,15 +581,15 @@ email has a clean paper trail.
 |---|---|---|---|
 | 1 (auditRecords) | `50f67cff` (PR #1107, merged 2026-08-03) | Not measured at merge time; combined PR-1+PR-2 = **3 pages** (see PR-2 row) | 9-lens agent review all green. Included cleanup of `SubjectAccessRequestServiceIntegrationTest.kt` (compile-blocker after `Content.auditRecords` removal — not in PR-1 doc, propagated into PR-2/3/4 docs). |
 | 2 (statusHistory + reasons) | `cd306c99` (PR #1109, merged 2026-08-03) | **3 pages** (down from round-1 ~8,000) | No deviations from doc. Review-fix amend `f890b221` dropped stale `resolveStaffSurnames` KDoc + rationale-comment enumerations that no longer applied after PR-1 and PR-2 stripped `audits` and `statusHistory` from the resolver. |
-| 3 (sexualOffenceDetails ×2) | PR #1110 opened 2026-08-03, head `fc5ae133` (incl. review-amend) — merge SHA TBD | **3 pages** (unchanged from PR-2) | No deviations from doc. DD cross-check: all 4 red-flagged `sexual_offence_details` fields (rows 233/234/235/237) removed exactly. Row 225's table-level note strengthens the coupled `selected_sexual_offence_details` removal beyond the pure-coupling argument (§C updated). Review-amend `fc5ae133` reinstated the blank line after `clearAllTableContent()` per project convention. |
-| 4 (oasysPniResults) | TBD | TBD | pending Q1 |
-| 5 (IDs strip) | TBD | TBD | |
-| 6 (OSAR round-2 handover) | TBD | Option 1 primary: full-chrome PDF from Cameron's SAR dev service (page count TBD). Option 2 fallback: chrome-less PDF from our contract test (3 pages post-PR-2). Round-1 baseline: ~8,000 pages. | Handover per Deborah's 2026-08-04 clarification. Appearance / cover / headers / footers wrapped in via Option 1 = Cameron's team's SAR product / APG-2547. |
+| 3 (sexualOffenceDetails ×2) | `d6587351` (PR #1110, merged 2026-08-04) | **3 pages** (unchanged from PR-2) | No deviations from doc. DD cross-check: all 4 red-flagged `sexual_offence_details` fields (rows 233/234/235/237) removed exactly. Row 225's table-level note strengthens the coupled `selected_sexual_offence_details` removal beyond the pure-coupling argument (C updated). Review-amend `fc5ae133` reinstated the blank line after `clearAllTableContent()` per project convention. |
+| 4 (oasysPniResults — Option B corrected) | `2a79b856` (PR #1111, merged 2026-08-05 am) | **3 pages** | Q1 answered in person 2026-08-04 pm; Option B corrected scope executed directly (strip `pniResultId` + `oasysAssessmentId`; keep `prisonNumber` + `programmePathway`). |
+| 5 (IDs strip) | PR #1112 opened 2026-08-05, head `677c8ea2` — merge SHA TBD | **3 pages** | 9-lens review 2026-08-05 all green; one non-blocking flag (retained `SarOriginalReferral.id`) → spun off as PR-7. |
+| 7 (SarOriginalReferral.id strip) | TBD | TBD (expected 3 — nested block doesn't render in fixture) | Follow-on from PR-5 review flag. Snapshot regen expected to produce no diff — see `APG-2546/PR-7-strip-original-referral-uuid.md` "Non-obvious things §1". |
+| 6 (OSAR round-2 handover) | TBD | Option 1 primary: full-chrome PDF from Cameron's SAR dev service (page count TBD). Option 2 fallback: chrome-less PDF from our contract test (3 pages post-PR-2). Round-1 baseline: ~8,000 pages. | Handover per Deborah's 2026-08-04 clarification. Sequenced after PR-7 so the round-2 PDF reflects the final zero-UUID content shape. Appearance / cover / headers / footers wrapped in via Option 1 = Cameron's team's SAR product / APG-2547. |
 
 ## Rough size
 
 - ~500 lines removed across `src/`
-- 5 new commits + 1 doc commit
-- ~5 dev days (comfortably inside 3-week envelope communicated to William)
+- 6 new commits + 1 doc commit
+- ~5.25 dev days (comfortably inside 3-week envelope communicated to William)
 - Zero migrations, zero new dependencies
-
