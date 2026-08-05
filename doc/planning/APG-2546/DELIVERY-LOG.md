@@ -761,6 +761,22 @@ following — replace `N` with the PR number:
 > and any surprises so I can update
 > `doc/planning/APG-2546/DELIVERY-LOG.md` in the tracking chat.
 
+> **PR-7 exception to "PR-(N-1)":** the serial merge order is
+> `1 → 2 → 3 → 4 → 5 → 7 → 6` (PR-6 is docs-only handover and
+> lands after PR-7). For PR-7, "PR-(N-1)" means **PR-5 (#1112)**,
+> not PR-6. Verbatim prompt for PR-7:
+>
+> > I'm executing APG-2546 PR-7. The working doc is at
+> > `doc/planning/APG-2546/PR-7-strip-original-referral-uuid.md`.
+> > Please read it end to end, follow the "Files to change"
+> > section literally, run the snapshot regeneration (expect zero
+> > diff — see "Non-obvious things §1"), run the verification
+> > checklist, and open a PR using the description template at
+> > the bottom of the doc. Do not deviate from the doc without
+> > flagging it back to me first. Assumed starting point: tip of
+> > `main` after PR-5 (#1112) has merged. If #1112 hasn't merged
+> > yet, stop and tell me before touching anything.
+
 ## Contingencies
 
 - **Roxanne asks a question we didn't anticipate** → answer in the

@@ -60,3 +60,10 @@ Paste this into a new chat when handing off a PR:
 > bottom of the doc. Do not deviate from the doc without flagging
 > it back to me first. Assumed starting point: tip of `main` after
 > PR-(N-1) has merged.
+
+> **PR-7 exception:** the serial merge order is
+> `1 → 2 → 3 → 4 → 5 → 7 → 6` (PR-6 is docs-only handover and
+> lands *after* PR-7). For PR-7, replace "after PR-(N-1) has
+> merged" with **"after PR-5 (#1112) has merged"** — otherwise
+> the template points at the wrong predecessor.
+
