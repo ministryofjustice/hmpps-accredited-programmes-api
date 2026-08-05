@@ -67,26 +67,34 @@ artefacts. Option 1 is the ask if we can get it.
 
 ## First actions when picking this up (kick-off checklist)
 
-Two things need to happen the moment PR-5 is on `main` — before
+Two things need to happen the moment PR-7 is on `main` — before
 touching anything else in this doc. They're both time-sensitive
 because round 1 showed the SAR pipeline can stall for days.
 
+> **Trigger point is PR-7, not PR-5**, following the 2026-08-05
+> spin of PR-7 off PR-5's 9-lens review flag. PR-7 is the last
+> code PR in the APG-2546 stack (strips the retained
+> `SarOriginalReferral.id`); handover should reflect the final
+> zero-UUID content shape. Serial merge order is
+> `1 → 2 → 3 → 4 → 5 → 7 → 6`. See DELIVERY-LOG for the paper
+> trail.
+
 ### A. Post the template-registration request
 
-As soon as PR-5's merge commit lands on `main`, post in
+As soon as PR-7's merge commit lands on `main`, post in
 `#haa-sar-functionality-change-request` with the exact form:
 
 ```
 Ticket: APG-2546
 Product: Accredited Programmes API
-Template on main: https://github.com/ministryofjustice/hmpps-accredited-programmes-api/blob/<PR-5-merge-sha>/src/main/resources/sar_template.mustache
+Template on main: https://github.com/ministryofjustice/hmpps-accredited-programmes-api/blob/<PR-7-merge-sha>/src/main/resources/sar_template.mustache
 Ask: please register the updated template on the SAR dev
 service for OSAR round-2 review. Also, please add role
 SARBT001 to test nDelius account <account-name> if not already
 present (needed to see the SAR tile on Auth home).
 ```
 
-- Use the **permalink at the PR-5 merge SHA**, not `main/...`,
+- Use the **permalink at the PR-7 merge SHA**, not `main/...`,
   so the exact revision is unambiguous.
 - Do this even if the dev deploy hasn't completed yet — the
   channel work is separate from the deploy pipeline and can
@@ -134,7 +142,8 @@ punished us for. Current confidence: ~95%, not yet proven.
 ```zsh
 git checkout main && git pull --ff-only
 git --no-pager log --oneline --grep 'APG-2546' | head -20
-# expect: PR-1..PR-5 merges all listed
+# expect: PR-1..PR-5 + PR-7 merges all listed (serial order:
+# 1 -> 2 -> 3 -> 4 -> 5 -> 7 -> 6)
 ```
 
 Verify dev deploy is green (CircleCI / GitHub Actions dashboard or
@@ -150,7 +159,7 @@ Post in `#haa-sar-functionality-change-request` with:
 - Product: Accredited Programmes API
 - Template link on `main`:
   `src/main/resources/sar_template.mustache`
-  (permalink to the commit on `main` post-PR-5 is ideal so they
+  (permalink to the commit on `main` post-PR-7 is ideal so they
   register the exact revision)
 - Ask: "please register the updated template on the SAR dev
   service for OSAR round-2 review"
@@ -195,10 +204,16 @@ Open the downloaded PDF and eyeball:
 - **The removed sections are actually absent** — no
   `auditRecords`, no `referralStatusHistory` /
   `referralStatusReasons`, no `sexualOffenceDetails` /
-  `selectedSexualOffenceDetails`, and either no `oasysPniResults`
-  or (Option B) the section only shows `programmePathway`.
-- **`SarPerson.id` and `SarOrganisation.id` are absent** from
-  their respective sections.
+  `selectedSexualOffenceDetails`. The `oasysPniResults` section
+  survives but only shows `prisonNumber` + `programmePathway`
+  (corrected Option B — no `pniResultId`, no `oasysAssessmentId`).
+- **All raw internal UUIDs are absent** — no `SarPerson.id`, no
+  `SarOrganisation.id`, no `SarReferral.originalReferralId`
+  (top-level), and no `SarOriginalReferral.id` inside the nested
+  original-referral sub-block. The resolved `originalReferral`
+  sub-block itself remains — subjects see course name, submitted
+  on, status, referrer surname, override reason, LDC flag,
+  additional information; they just don't see the raw UUID.
 - **Referrer surnames render** (APG-2492 territory, cross-check),
   and staff `username` is absent (APG-2510 territory).
 - **Page count is roughly what you'd expect** — for a
@@ -274,20 +289,38 @@ spreadsheet from 30 July, sheet "Accredited Programmes Custody"):
 - auditRecords section — removed in full (the "8,000-page PDF"
   contributor). Rows 22–31.
 - referralStatusHistory + referralStatusReasons — removed in
-  full. Rows 192–201, 205–209.
+  full. Rows 192–202, 205–209.
 - sexualOffenceDetails + selectedSexualOffenceDetails — removed
   in full. Rows 233/234/235/237; row 225's table-level note
   directly rebutted the "keep the join table" fallback.
-- oasysPniResults — [Option A: removed in full | Option B: three
-  ID fields stripped, programme_pathway kept]. Rows 85–88.
-- SarPerson.id / SarOrganisation.id — removed. Rows 105, 111.
+- oasysPniResults — stripped pniResultId + oasysAssessmentId;
+  kept prisonNumber + programmePathway. Rows 85–88. (Q1 answered
+  in person by Roxanne on 2026-08-04 pm — corrected Option B.)
+- SarPerson.id / SarOrganisation.id / SarReferral.originalReferralId
+  — removed. Rows 105, 111, 165. (Row 165's "do not add the uuid"
+  fold-in confirmed by Roxanne in person 2026-08-04 pm.)
+- SarOriginalReferral.id (nested sub-block on referrals with a
+  resolved originalReferral) — removed. Not a specific DD row,
+  but covered by Roxanne's rows 105 + 111 blanket "No Ids to be
+  included in SAR reports" rule. Flagged in PR-5's 9-lens code
+  review 2026-08-05 and shipped as PR-7.
 - SarPniResult IDs (rows 127/128/131) — already absent from the
-  DTO; comment-only cleanup, no code change.
+  DTO before APG-2546 started; comment-only cleanup, no code
+  change.
 
-Cross-checked against already-delivered rows:
+Cross-checked against already-delivered rows (no APG-2546 work
+needed, listed so you can tick them off on the DD alongside the
+above):
+
 - SarReferral.deleted (row 160) — APG-2491.
 - SarStaff.username (implicit) — APG-2510.
-- Referrer surname resolution (rows 23, 30, 159) — APG-2492.
+- Referrer surname resolution (rows 23, 30, 159, 224) — APG-2492.
+- Primary / secondary POM staff surname resolution (rows 162, 163)
+  — APG-2492.
+- Course-participation "created by" / "updated by" surname
+  resolution (rows 57, 59) — APG-2492.
+- SarCourseParticipation.isDraft "ensure we share drafts too"
+  (row 64) — already implemented pre-APG-2546.
 
 Ask: content sign-off, 5 working days if you can. Appearance /
 cover-sheet / header-footer feedback (if any) sits with Cameron's
@@ -295,6 +328,23 @@ team under APG-2547.
 
 Thanks,
 Raby
+
+P.S. Roxanne — while doing the full-DD-sweep validation on
+2026-08-05 we spotted two rows where the DD spreadsheet's
+Column H (In SAR API) is out of sync with what the code actually
+does. Both are documentation-only drift, not blockers, so I'm
+just flagging them for your next DD refresh rather than raising
+a change request:
+
+- Row 109 (organisation.is_national) — Column H = Yes but code
+  correctly excludes the field (Q2 closed 2026-08-04 pm on the
+  "leave off" default we agreed). Column H should flip to No.
+- Row 224 (referrer_user.referrer_username) — Column H = No but
+  we do surface the surname via the APG-2492 batch resolver.
+  Column H should flip to Yes.
+
+No action needed from you before content sign-off; both are
+already handled correctly in code.
 ```
 
 Fallback wording (Option 2) — swap the "Full standard cover-sheet
@@ -341,8 +391,8 @@ that'll bite you" list a fresh agent skims before wrapping up.
 
 Deborah's message implied same-day turnaround if the channel is
 quiet, but round 1 saw a pipeline block. Kick Option 1 off early
-so there's slack if it stalls. Don't wait until PR-5 merges to
-post — post as soon as PR-5 is on `main`.
+so there's slack if it stalls. Don't wait until PR-7 merges to
+post — post as soon as PR-7 is on `main`.
 
 ### 3. Test-harness PDF page count is still a useful internal metric
 
@@ -419,10 +469,10 @@ Appearance feedback (if any) → Cameron's team, APG-2547.
 
 ## Definition of done
 
-- [ ] PRs 1–5 all merged to `main` and deployed to DEV.
-- [ ] Kick-off §A done: template-registration + SARBT001 request
+- [ ] PRs 1–5 and PR-7 all merged to `main` and deployed to DEV.
+- [ ] Kick-off A done: template-registration + SARBT001 request
       posted on `#haa-sar-functionality-change-request` with the
-      PR-5-merge-SHA permalink to `sar_template.mustache`.
+      PR-7-merge-SHA permalink to `sar_template.mustache`.
 - [ ] Kick-off §B done: Option 2 library == our contract-test
       library confirmed (or the doc updated to the correct
       artefact path).
