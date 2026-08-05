@@ -809,6 +809,38 @@ following — replace `N` with the PR number:
   post-handover — kick to `#haa-sar-functionality-change-request`
   and record here.
 
+## Deferred follow-ups (out of APG-2546 scope)
+
+Small items surfaced during APG-2546 delivery that are worth
+capturing but don't belong in this ticket. Right home is a
+separate ticket (SAR test hardening / hygiene), *not* a PR-N
+planning doc under this folder. If any of these grow beyond
+~30 minutes of work when picked up, the picker-up writes a
+short plan then, with fresh context.
+
+- **Seed a resolvable `originalReferral` in the SAR contract
+  fixture.** Surfaced during PR-7 nine-lens review 2026-08-05.
+  The integration-test fixture (`SarContractIntegrationTest`
+  `setupTestData()`) currently seeds a single referral with
+  `originalReferralId = null`, so the `{{#originalReferral}}`
+  mustache block never renders and the sub-block never appears
+  in the golden JSON / HTML snapshots. Consequence: PR-7's
+  removal of `SarOriginalReferral.id` produced zero snapshot
+  diff (correct behaviour — see PR-7 doc "Non-obvious things
+  §1"), and any *future* accidental re-introduction of a raw
+  UUID inside the sub-block would slip past the contract test.
+  The unit test (`SubjectAccessRequestServiceTest`) carries
+  correctness coverage today; this follow-up is defensive
+  belt-and-braces only. Estimated shape: seed one extra
+  referral row + one resolvable "original" row, regen
+  snapshots, verify the sub-block appears in golden JSON and
+  the mustache `<tr>`s appear in golden HTML. ~20-line diff
+  (fixture + snapshot bytes). Trigger conditions to promote to
+  a real PR: (a) a stakeholder wraps a round-2 artefact that
+  needs snapshot-visible zero-UUID sub-block evidence, or
+  (b) a future UUID re-introduction slips past review — either
+  signal flips this from nice-to-have to need-to-have.
+
 ## Related tickets and channels
 
 - **Blocked by:** none.
