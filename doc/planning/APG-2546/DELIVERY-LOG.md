@@ -10,7 +10,7 @@ end.
 ## Status at a glance
 
 > **📉 Content-readability target already hit (internal metric).**
-> With PRs 1–4 merged, the **test-harness** SAR PDF has dropped
+> With PRs 1–5 merged, the **test-harness** SAR PDF has dropped
 > from the round-1 baseline of ~8,000 pages to **3 pages** and
 > has held at 3 pages since PR-2 (later PRs strip fields inside
 > already-rendered sections rather than removing sections). This
@@ -20,9 +20,10 @@ end.
 > OSAR-preferred handover route). So it's both a genuine
 > internal readability metric *and* representative of what OSAR
 > will see, minus chrome. The "8,000-page complaint" is fixed at
-> the content level. **PR-5 and PR-7 are still worthwhile**
-> (privacy hygiene — the raw-UUID scrub Roxanne's rows 105 + 111
-> "No Ids in SAR" rule mandates).
+> the content level. **PR-7 is still worthwhile** (privacy
+> hygiene — last raw-UUID scrub on the nested `originalReferral`
+> sub-block, closes out Roxanne's rows 105 + 111 "No Ids in SAR"
+> rule).
 
 | Item | State | Notes |
 |---|---|---|
@@ -33,9 +34,9 @@ end.
 | PR-2 — remove `referralStatusHistory` + `referralStatusReasons` | ✅ merged `cd306c99` 2026-08-03 | PR #1109. Branch head was `f890b221` (initial `22c97122` + review-fix amend). No deviations from doc. Sample PDF post-PR-2 = **3 pages**. |
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ✅ merged `d6587351` 2026-08-04 | PR #1110. Branch head `fc5ae133` (incl. review-amend for blank-line convention). |
 | PR-4 — strip `pniResultId` + `oasysAssessmentId` from `oasysPniResults` (Option B corrected) | ✅ merged `2a79b856` 2026-08-05 am | PR #1111. Q1 answered in person 2026-08-04 pm → Option B (corrected). Stripped `pniResultId` + `oasysAssessmentId`; kept `prisonNumber` + `programmePathway`. Sample PDF: 3 pages. |
-| PR-5 — strip `SarPerson.id` + `SarOrganisation.id` (+ `SarReferral.originalReferralId`) | ⏳ open, nine-lens review clean, awaiting merge | PR #1112. Branch head `677c8ea2`. 9-lens review 2026-08-05 all green + one non-blocking flag → spun as PR-7. |
-| PR-7 — strip retained `SarOriginalReferral.id` UUID | ⬜ ready to start (once PR-5 merges) | Follow-on from PR-5's review flag. Raby confirmed 2026-08-05 that Roxanne's rows 105 + 111 blanket "no IDs" rule covers the nested sub-block's UUID too. See `PR-7-strip-original-referral-uuid.md`. Branch: `APG-2546/strip-original-referral-uuid`. |
-| PR-6 — OSAR round-2 handover | 🚫 blocked on PRs 1–5 + PR-7 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as **PR-7** hits `main` — the round-2 PDF should reflect the final zero-UUID content shape. See `PR-6-osar-round-2-handover.md`. |
+| PR-5 — strip `SarPerson.id` + `SarOrganisation.id` (+ `SarReferral.originalReferralId`) | ✅ merged `50968d07` 2026-08-05 | PR #1112. Branch head was `677c8ea2`. 9-lens review 2026-08-05 all green + one non-blocking flag (retained `SarOriginalReferral.id`) → spun as PR-7. |
+| PR-7 — strip retained `SarOriginalReferral.id` UUID | ⏳ open as draft, agent 9-lens review clean, peer review pending | PR #1113. Branch `APG-2546/strip-original-referral-uuid`, head `1cc54e9d` (single commit off `50968d07` = tip-of-`main` post-PR-5). Snapshot regen produced zero diff as predicted by PR-7 doc "Non-obvious things §1" — fixture doesn't seed a resolvable `originalReferral`. Fixture-hardening item flagged during nine-lens review → recorded in "Deferred follow-ups" section below (not APG-2546 scope). Sample PDF: 3 pages. |
+| PR-6 — OSAR round-2 handover | 🚫 blocked on PR-7 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as **PR-7** hits `main` — the round-2 PDF should reflect the final zero-UUID content shape. Doc pre-refreshed 2026-08-05 with Q1 resolved, PR-5 + PR-7 field-removals folded in, expanded cross-check block, and P.S. to Roxanne re residual DD drift on rows 109 + 224 — see `PR-6-osar-round-2-handover.md`. |
 | OSAR content sign-off (Sharon + Roxanne + QAT + William + David) | 🚫 blocked on PR-6 handover | Round-2 review. This is APG-2546's end state. |
 | APG-2547 — appearance / template registration with Cameron's SAR product | 🤝 coordination needed | Not "out of our scope" — we need to post the template link on `#haa-sar-functionality-change-request` and get `SARBT001` role added. Cameron's team wraps our template in cover/header/footer; that wrapping is theirs, but the coordination is joint. |
 | Ticket transition to Done | 🚫 blocked on OSAR content sign-off | APG-2546 closes on content sign-off. |
@@ -697,13 +698,74 @@ B), then PR-5 (three-strip), then PR-6 (round-2 handover).
   zero-UUID content shape. Status table + `README.md` sequencing
   updated to match.
 
-### YYYY-MM-DD — PR-5 merged
+### 2026-08-05 — PR-5 merged
 
-- **PR link:** _()_.
-- **Merge commit on `main`:** _()_.
-- **Sample PDF page count post-PR:** _()_.
-- **Reviewer:** _()_.
-- **Notes / surprises:** _()_.
+- **PR link:** #1112.
+- **Merge commit on `main`:** `50968d07`.
+- **Sample PDF page count post-PR:** 3 pages (unchanged — PR-5
+  strips DTO fields on already-rendered sections).
+- **Reviewer:** _(fill in from GitHub once notification lands)_.
+- **Notes / surprises:** none blocking. 9-lens agent review 2026-08-05
+  am was all green; only non-blocking flag (retained
+  `SarOriginalReferral.id` UUID on the nested sub-block) was
+  spun into PR-7 (#1113) rather than folded back into PR-5 —
+  see "PR-5 opened + nine-lens review clean + PR-7 spun off
+  review flag" entry above for the reasoning.
+
+### 2026-08-05 — PR-7 opened as draft + agent 9-lens review clean
+
+- **Branch:** `APG-2546/strip-original-referral-uuid` (from `main`
+  @ `50968d07`, tip-of-`main` after PR-5 merged).
+- **PR link:** #1113 (opened as draft — awaiting peer review).
+- **Head commit on branch:** `1cc54e9d` (single commit; no
+  review-fix amend on the branch — the fixture-hardening item
+  raised in the nine-lens review was deferred rather than
+  folded in, see below).
+- **Files changed:** 3 files, +0 / −4 (2 DTO/mapper lines, 1
+  template row, 1 test assertion).
+- **Verification:** `./gradlew ktlintCheck test` green (678 tests),
+  snapshot regen run — **zero diff** on `sar-api-response.json` +
+  `sar-expected-render-result.html` as predicted by PR-7 doc
+  "Non-obvious things §1" (integration-test fixture doesn't seed
+  a resolvable `originalReferral`, so the `{{#originalReferral}}`
+  block never renders in the fixture and removing a field from
+  its DTO doesn't diff the golden output). Coverage of the
+  removal lives in the unit test's dropped
+  `assertThat(originalReferral.id).isEqualTo(originalReferralId)`
+  assertion. Sample PDF: 3 pages.
+- **Nine-lens agent review outcome:** all lenses green.
+  correctness ✅ (DTO / mapper / template / test edits map 1:1
+  to the doc's "Files to change" spec), tests ✅ (dropped
+  assertion is the only meaningful test change; local
+  `originalReferralId` var still drives factory + mock stubs so
+  isn't dead), API/contract ✅ (no consumers of
+  `SarOriginalReferral.id` outside `SubjectAccessRequestService.kt`
+  per grep), data/migrations ✅ (no JPA edits;
+  `entity-schema.json` unchanged),
+  security/privacy ✅ (net win — last raw internal UUID egress
+  removed from the SAR API surface),
+  performance ✅ (unchanged), observability ✅ (unresolved-original
+  `log.warn` preserved), style/conventions ✅ (matches PR-4 + PR-5
+  named-arg-mapper pattern), devex/docs/rollback ✅ (rollback =
+  single `git revert`, PR body from doc template).
+- **One non-blocking flag deferred out of scope → Deferred
+  follow-ups section:** the SAR contract fixture doesn't seed a
+  resolvable `originalReferralId`, so the golden snapshots don't
+  actually observe the change and would miss any future
+  accidental re-introduction of a raw UUID inside the sub-block.
+  Fixture hardening (seed one extra referral + resolvable
+  original, regen snapshots to include the sub-block) is a
+  belt-and-braces test-hygiene item, **not APG-2546 scope**.
+  Captured in "Deferred follow-ups (out of APG-2546 scope)"
+  section below with trigger conditions for promoting it to a
+  real ticket. Rationale for not folding into PR-7: PR-7 is a
+  removal PR, fixture-widening is an additive PR; separate
+  concerns, separate tickets.
+- **Impact on PR-6 (OSAR handover):** none — PR-6 doc was
+  already refreshed 2026-08-05 to reflect PR-7 as the trigger
+  point and to fold PR-7's `SarOriginalReferral.id` removal
+  into the OSAR email draft. Waits for #1113 to merge before
+  kicking off.
 
 ### YYYY-MM-DD — PR-7 merged
 
