@@ -182,7 +182,6 @@ class SubjectAccessRequestService(
     val secondaryPomStaffSurname: String?,
     val referrerOverrideReason: String?,
     val referrerUsername: String?,
-    val originalReferralId: UUID?,
     val hasLdc: Boolean?,
     val hasLdcBeenOverriddenByProgrammeTeam: Boolean,
     val hasReviewedAdditionalInformation: Boolean?,
@@ -250,7 +249,6 @@ class SubjectAccessRequestService(
   )
 
   data class SarPerson(
-    val id: UUID?,
     val prisonNumber: String,
     val forename: String,
     val surname: String,
@@ -312,7 +310,6 @@ class SubjectAccessRequestService(
       surnames.forStaffId(it.secondaryPomStaffId),
       it.referrerOverrideReason,
       surnames.forUsername(it.referrer.username),
-      it.originalReferralId,
       it.hasLdc,
       it.hasLdcBeenOverriddenByProgrammeTeam,
       it.hasReviewedAdditionalInformation,
@@ -360,7 +357,6 @@ class SubjectAccessRequestService(
   }
 
   private fun PersonEntity.toSarPerson(): SarPerson = SarPerson(
-    id = id,
     prisonNumber = prisonNumber,
     forename = forename,
     surname = surname,
@@ -388,14 +384,12 @@ class SubjectAccessRequestService(
   )
 
   data class SarOrganisation(
-    val id: String,
     val code: String,
     val name: String,
     val gender: String,
   )
 
   private fun OrganisationEntity.toSarOrganisation() = SarOrganisation(
-    id = id.toString(),
     code = code,
     name = name,
     gender = gender.name,

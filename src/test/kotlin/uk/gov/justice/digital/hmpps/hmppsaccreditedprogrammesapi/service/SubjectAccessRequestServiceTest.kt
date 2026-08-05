@@ -248,7 +248,6 @@ class SubjectAccessRequestServiceTest {
       assertThat(referral.primaryPomStaffSurname).isNull()
       assertThat(referral.secondaryPomStaffSurname).isNull()
       assertThat(referral.hasReviewedAdditionalInformation).isNull()
-      assertThat(referral.originalReferralId).isEqualTo(originalReferralId)
 
       // SarOriginalReferral – every field is sourced from the seeded original,
       // proving the mapper reads through `originalsById` rather than leaking
@@ -271,12 +270,9 @@ class SubjectAccessRequestServiceTest {
       // in production (not asserted here to avoid coupling to a specific log
       // appender – the observable contract is the null nested block).
       val orphanReferral = referrals[1]
-      assertThat(orphanReferral.originalReferralId).isEqualTo(orphanedOriginalId)
       assertThat(orphanReferral.originalReferral).isNull()
 
-      // originalReferralId == null: no batch lookup performed, block is null.
       val plainReferral = referrals[2]
-      assertThat(plainReferral.originalReferralId).isNull()
       assertThat(plainReferral.originalReferral).isNull()
 
       val participation = courseParticipation[0]
