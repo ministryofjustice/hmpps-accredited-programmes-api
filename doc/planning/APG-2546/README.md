@@ -31,9 +31,12 @@ history in context. Read these alongside the top-level plan at
 2. Start **PR-1** immediately (blocks nothing). ✅ merged 2026-08-03.
 3. Once PR-1 is merged, rebase and start **PR-2**, then **PR-3**,
    then **PR-5** — serial merges keep each snapshot diff readable.
+   ✅ PR-2 merged 2026-08-03, PR-3 merged 2026-08-04, PR-5 opened
+   #1112 2026-08-05 (awaiting merge).
 4. When Roxanne answers Q1, do **PR-4** (chose Option A or B based
    on her answer). *(Update 2026-08-04 pm: Q1 answered in person,
    corrected Option B confirmed; execute Option B directly.)*
+   ✅ merged 2026-08-05 am.
 5. Once PR-5 is on `main`, do **PR-7** (strip the retained
    `SarOriginalReferral.id`). Small, scoped, closes out the raw-UUID
    scrub started in PR-5.

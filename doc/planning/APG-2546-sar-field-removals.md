@@ -113,10 +113,26 @@ code change.
 |---|---|---|
 | `SarReferral.deleted` removed | 160 | APG-2491 |
 | `SarStaff.username` removed | (implicit) | APG-2510 |
-| Referrer surname resolution (not raw username) | 23, 30, 159 | APG-2492 |
+| Referrer surname resolution (not raw username) — `SarReferral.referrerUsername` + `SarOriginalReferral.referrerSurname` | 23, 30, 159, 224 | APG-2492 |
+| Primary / secondary POM staff surname resolution — `SarReferral.primaryPomStaffSurname` + `secondaryPomStaffSurname` | 162, 163 | APG-2492 |
+| Course-participation "created by" / "updated by" surname resolution — `SarCourseParticipation.createdByUser` + `updatedByUser` | 57, 59 | APG-2492 |
+| `SarCourseParticipation.isDraft` surfaced ("ensure we share drafts too") | 64 | already implemented pre-APG-2546 |
 
-Included below so a reviewer can look at the spreadsheet's red rows,
-tick these off, and see we're not silently ignoring them.
+Included so a reviewer can look at the spreadsheet's red rows,
+tick these off, and see we're not silently ignoring them. Rows
+57 / 59 / 64 / 162 / 163 / 224 were previously implicit — added
+to the table 2026-08-05 during the full-DD-sweep validation pass
+(commit hash below). All six are covered in code today; the
+addition here is purely a paper-trail update, no PR needed.
+
+**Residual DD drift on these rows** (not blocking, worth flagging
+on Roxanne's next DD pass alongside the row 109 drift already
+logged in DELIVERY-LOG):
+
+- Row 224 (`referrer_user.referrer_username`) note reads *"Yes if
+  we can provide surname"* — implying Column H should now be Yes
+  since we do surface a surname via `surnames.forUsername(referrer.username)`.
+  Current Column H is No.
 
 ### E. Course reference-data fields — no code change needed
 

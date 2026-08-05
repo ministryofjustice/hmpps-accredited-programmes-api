@@ -10,16 +10,19 @@ end.
 ## Status at a glance
 
 > **📉 Content-readability target already hit (internal metric).**
-> With PRs 1 and 2 both merged, the **test-harness** SAR PDF has
-> dropped from the round-1 baseline of ~8,000 pages to **3
-> pages**. This is the chrome-less Option 2 output (no cover, no
-> headers, no footers) — the same content that Cameron's team's
-> SAR product wraps in the full OSAR-quality PDF under Option 1
-> (the OSAR-preferred handover route). So it's both a genuine
+> With PRs 1–4 merged, the **test-harness** SAR PDF has dropped
+> from the round-1 baseline of ~8,000 pages to **3 pages** and
+> has held at 3 pages since PR-2 (later PRs strip fields inside
+> already-rendered sections rather than removing sections). This
+> is the chrome-less Option 2 output (no cover, no headers, no
+> footers) — the same content that Cameron's team's SAR product
+> wraps in the full OSAR-quality PDF under Option 1 (the
+> OSAR-preferred handover route). So it's both a genuine
 > internal readability metric *and* representative of what OSAR
 > will see, minus chrome. The "8,000-page complaint" is fixed at
-> the content level. PRs 3, 4, and 5 are still worthwhile
-> (Roxanne's red-flagged rows, privacy hygiene, etc.).
+> the content level. **PR-5 and PR-7 are still worthwhile**
+> (privacy hygiene — the raw-UUID scrub Roxanne's rows 105 + 111
+> "No Ids in SAR" rule mandates).
 
 | Item | State | Notes |
 |---|---|---|
@@ -588,6 +591,13 @@ fresh ticket — do not fold in.
   want zero DD drift, ask Roxanne to flip Column H back to No
   on her next DD pass. Nice-to-have. Logged here so it's not
   forgotten.
+- DD row 224 (`referrer_user.referrer_username`) note reads
+  *"Yes if we can provide surname"* — implying Column H should
+  now be Yes (since we do surface a surname via
+  `surnames.forUsername(referrer.username)` — APG-2492). Column
+  H currently says No. Same DD-drift pattern; flag on the same
+  next DD pass. Surfaced 2026-08-05 during the full-DD-sweep
+  validation of PR-7 planning docs — see top-level plan §D.
 
 **Impact.**
 
@@ -781,8 +791,10 @@ following — replace `N` with the PR number:
 
 - **Roxanne asks a question we didn't anticipate** → answer in the
   same thread as her question, then record it here under a new
-  timeline entry, and update the PR-4 (or PR-5) doc if it changes
-  the technical scope.
+  timeline entry, and update the PR-5 (or PR-7) doc if it changes
+  the technical scope. Q1 + Q2 already resolved 2026-08-04 pm, so
+  new questions are less likely — but the residual DD-drift items
+  on rows 109 and 224 are the most likely re-open path.
 - **A PR review asks for a substantial change** → decide whether
   to (a) fold in on the branch, (b) split into a follow-up PR
   within APG-2546, or (c) spin a new ticket. Record the decision
