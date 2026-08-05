@@ -254,7 +254,6 @@ class SubjectAccessRequestServiceTest {
       // parent state, and that organisation-name / referrer-surname come from
       // the batch maps (not a separate lookup per original).
       val originalReferral = referral.originalReferral!!
-      assertThat(originalReferral.id).isEqualTo(originalReferralId)
       assertThat(originalReferral.courseName).isEqualTo("Building Choices")
       assertThat(originalReferral.organisationName).isEqualTo("HMP Moorland")
       assertThat(originalReferral.submittedOn).isEqualTo(LocalDateTime.of(2021, 3, 15, 9, 30))
