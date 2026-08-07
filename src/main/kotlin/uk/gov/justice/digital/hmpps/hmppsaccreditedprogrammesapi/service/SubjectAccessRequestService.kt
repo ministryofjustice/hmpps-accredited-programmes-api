@@ -200,7 +200,6 @@ class SubjectAccessRequestService(
    * can render the block with the same `optionalValue` conventions.
    */
   data class SarOriginalReferral(
-    val id: UUID,
     val courseName: String?,
     val organisationName: String?,
     val submittedOn: LocalDateTime?,
@@ -323,7 +322,6 @@ class SubjectAccessRequestService(
     surnames: StaffSurnames,
     organisationNamesByCode: Map<String, String>,
   ): SarOriginalReferral = SarOriginalReferral(
-    id = id!!,
     courseName = offering?.course?.name,
     organisationName = offering?.organisationId?.let { organisationNamesByCode[it] },
     submittedOn = submittedOn,
