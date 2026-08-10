@@ -9,21 +9,22 @@ end.
 
 ## Status at a glance
 
-> **📉 Content-readability target already hit (internal metric).**
-> With PRs 1–5 merged, the **test-harness** SAR PDF has dropped
-> from the round-1 baseline of ~8,000 pages to **3 pages** and
-> has held at 3 pages since PR-2 (later PRs strip fields inside
-> already-rendered sections rather than removing sections). This
-> is the chrome-less Option 2 output (no cover, no headers, no
-> footers) — the same content that Cameron's team's SAR product
-> wraps in the full OSAR-quality PDF under Option 1 (the
-> OSAR-preferred handover route). So it's both a genuine
-> internal readability metric *and* representative of what OSAR
-> will see, minus chrome. The "8,000-page complaint" is fixed at
-> the content level. **PR-7 is still worthwhile** (privacy
-> hygiene — last raw-UUID scrub on the nested `originalReferral`
-> sub-block, closes out Roxanne's rows 105 + 111 "No Ids in SAR"
-> rule).
+> **📉 Content-readability target hit + all six code PRs on `main`.**
+> With PRs 1–5 + 7 merged (PR-7 merged `baee4510` 2026-08-07),
+> the **test-harness** SAR PDF has dropped from the round-1
+> baseline of ~8,000 pages to **3 pages** and has held at 3
+> pages since PR-2 (later PRs strip fields inside already-rendered
+> sections rather than removing sections). This is the
+> chrome-less Option 2 output (no cover, no headers, no footers)
+> — the same content that Cameron's team's SAR product wraps in
+> the full OSAR-quality PDF under Option 1 (the OSAR-preferred
+> handover route). So it's both a genuine internal readability
+> metric *and* representative of what OSAR will see, minus
+> chrome. The "8,000-page complaint" is fixed at the content
+> level and the last raw-UUID scrub (PR-7 nested
+> `originalReferral.id`) is now on `main`. Only APG-2546 work
+> remaining is **PR-6** (docs-only round-2 OSAR handover) and
+> the round-2 content sign-off it kicks off.
 
 | Item | State | Notes |
 |---|---|---|
@@ -35,8 +36,8 @@ end.
 | PR-3 — remove `sexualOffenceDetails` + `selectedSexualOffenceDetails` | ✅ merged `d6587351` 2026-08-04 | PR #1110. Branch head `fc5ae133` (incl. review-amend for blank-line convention). |
 | PR-4 — strip `pniResultId` + `oasysAssessmentId` from `oasysPniResults` (Option B corrected) | ✅ merged `2a79b856` 2026-08-05 am | PR #1111. Q1 answered in person 2026-08-04 pm → Option B (corrected). Stripped `pniResultId` + `oasysAssessmentId`; kept `prisonNumber` + `programmePathway`. Sample PDF: 3 pages. |
 | PR-5 — strip `SarPerson.id` + `SarOrganisation.id` (+ `SarReferral.originalReferralId`) | ✅ merged `50968d07` 2026-08-05 | PR #1112. Branch head was `677c8ea2`. 9-lens review 2026-08-05 all green + one non-blocking flag (retained `SarOriginalReferral.id`) → spun as PR-7. |
-| PR-7 — strip retained `SarOriginalReferral.id` UUID | ⏳ open as draft, agent 9-lens review clean, peer review pending | PR #1113. Branch `APG-2546/strip-original-referral-uuid`, head `1cc54e9d` (single commit off `50968d07` = tip-of-`main` post-PR-5). Snapshot regen produced zero diff as predicted by PR-7 doc "Non-obvious things §1" — fixture doesn't seed a resolvable `originalReferral`. Fixture-hardening item flagged during nine-lens review → recorded in "Deferred follow-ups" section below (not APG-2546 scope). Sample PDF: 3 pages. |
-| PR-6 — OSAR round-2 handover | 🚫 blocked on PR-7 (+ dev deploy) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Kick off template-registration on `#haa-sar-functionality-change-request` as soon as **PR-7** hits `main` — the round-2 PDF should reflect the final zero-UUID content shape. Doc pre-refreshed 2026-08-05 with Q1 resolved, PR-5 + PR-7 field-removals folded in, expanded cross-check block, and P.S. to Roxanne re residual DD drift on rows 109 + 224 — see `PR-6-osar-round-2-handover.md`. |
+| PR-7 — strip retained `SarOriginalReferral.id` UUID | ✅ merged `baee4510` 2026-08-07 | PR #1113. Branch head `1cc54e9d`. Snapshot regen produced zero diff as predicted by PR-7 doc "Non-obvious things §1" — fixture doesn't seed a resolvable `originalReferral`. Fixture-hardening item flagged during nine-lens review → recorded in "Deferred follow-ups" section below (not APG-2546 scope). Sample PDF: 3 pages. |
+| PR-6 — OSAR round-2 handover | ⬜ ready to start (unblocked 2026-08-07 by PR-7 merge) | **Scope re-updated 2026-08-04 pm:** Option 1 primary (full-chrome PDF from Cameron's SAR dev service, OSAR-preferred), Option 2 fallback (chrome-less test harness). Post template-registration on `#haa-sar-functionality-change-request` **now** — round-2 PDF now reflects the final zero-UUID content shape. Doc pre-refreshed 2026-08-05 with Q1 resolved, PR-5 + PR-7 field-removals folded in, expanded cross-check block, and P.S. to Roxanne re residual DD drift on rows 109 + 224 — see `PR-6-osar-round-2-handover.md`. |
 | OSAR content sign-off (Sharon + Roxanne + QAT + William + David) | 🚫 blocked on PR-6 handover | Round-2 review. This is APG-2546's end state. |
 | APG-2547 — appearance / template registration with Cameron's SAR product | 🤝 coordination needed | Not "out of our scope" — we need to post the template link on `#haa-sar-functionality-change-request` and get `SARBT001` role added. Cameron's team wraps our template in cover/header/footer; that wrapping is theirs, but the coordination is joint. |
 | Ticket transition to Done | 🚫 blocked on OSAR content sign-off | APG-2546 closes on content sign-off. |
@@ -767,18 +768,75 @@ B), then PR-5 (three-strip), then PR-6 (round-2 handover).
   into the OSAR email draft. Waits for #1113 to merge before
   kicking off.
 
-### YYYY-MM-DD — PR-7 merged
+### 2026-08-07 — PR-7 merged
 
-- **PR link:** _()_.
-- **Merge commit on `main`:** _()_.
-- **Sample PDF page count post-PR:** expected 3 (fixture doesn't
-  seed a resolvable `originalReferral` — nested block never
-  renders in the SAR contract snapshot). Record actual.
-- **Snapshot diff observed:** expected none (see PR-7 doc "Non-obvious
-  things §1"). Record actual — any diff signals fixture drift and
-  should be investigated before merge.
-- **Reviewer:** _()_.
-- **Notes / surprises:** _()_.
+- **PR link:** #1113.
+- **Merge commit on `main`:** `baee4510` (full SHA
+  `baee45103cb07cc6f0c00ed128b51730deaaf1c1`), merged 2026-08-07 14:42 UTC.
+- **Sample PDF page count post-PR:** **3 pages** (unchanged — as
+  predicted; fixture doesn't seed a resolvable `originalReferral`
+  so the nested block never renders in the SAR contract snapshot).
+- **Snapshot diff observed:** **zero** on both
+  `sar-api-response.json` and `sar-expected-render-result.html`,
+  exactly as PR-7 doc "Non-obvious things §1" predicted. No
+  fixture drift.
+- **Reviewer:** _(fill in from GitHub notification when convenient
+  — Raby self-merged after peer review approval)._
+- **Notes / surprises:** none blocking. Nine-lens agent review
+  pre-merge was all green. Only non-blocking item (contract-test
+  fixture doesn't exercise the sub-block, so the change isn't
+  snapshot-visible) already captured in "Deferred follow-ups" —
+  now warm not cold thanks to Deborah's independent interest in
+  the fixture for vettor training (see next entry).
+- **Impact on PR-6:** unblocks it immediately. Post the
+  template-registration on `#haa-sar-functionality-change-request`
+  today — round-2 artefacts now reflect the final zero-UUID
+  content shape.
+- **All six APG-2546 code PRs are now on `main`.** Remaining
+  APG-2546 work is docs-only PR-6 handover + round-2 sign-off.
+
+### 2026-08-06 — Deborah fixture-interest thread → deferred follow-up promoted from cold to warm
+
+**What happened.** Follow-on to the 2026-08-04 pm Deborah exchange.
+On 2026-08-06 Deborah messaged: *"Also a good shout on populated
+fields — worth me looking at our fixture / seed data before we
+hand anything over so the vettors get a proper training set."*
+i.e. she is volunteering to eyeball
+`src/test/resources/sar/sar-api-response.json` before PR-6's
+handover pack ships, specifically to judge whether an Option 2
+fallback PDF would be a genuine vettor training exemplar or a
+"labels only, half the values null" placeholder.
+
+**Impact.**
+
+- **The "Deferred follow-ups" fixture-widening item is no longer
+  purely defensive belt-and-braces test-hygiene.** It has an
+  active stakeholder driver (round-2 vettor training) and one of
+  its written trigger conditions ("a stakeholder wraps a round-2
+  artefact that needs snapshot-visible populated sub-block
+  evidence") is now half-fulfilled — Deborah hasn't asked for it
+  yet, but she's actively looking at whether to.
+- **PR-6 execution has three branch conditions to prepare for**,
+  depending on Deborah's post-look verdict:
+  1. *Fixture is fine as-is* → ship Option 2 fallback with
+     current fixture; PR-6 unchanged.
+  2. *Widen fixture before shipping* → spin a small test-hygiene
+     ticket (seed a resolvable original referral + populate
+     currently-null derived fields), land it before PR-6's
+     Option 2 artefact is regenerated. Naturally rolls up with
+     the deferred follow-up. ~half a day of work.
+  3. *Prefer Option 1 with a rich CRN* → PR-6 primary route
+     anyway; fixture question moot for the shipped artefact but
+     the deferred follow-up stays open for future belt-and-braces.
+- **Nothing to do in code today.** The correct next action is a
+  Raby-to-Deborah reply attaching the current fixture JSON +
+  the post-PR-7 sample PDF (`build/test-generated/sar-generated-report.pdf`,
+  3 pages, 6.8 KB) and asking for her steer on 1/2/3 above.
+  Drafted as "Option A" in the 2026-08-06 chat.
+
+**No PR is being cut for this — it's a status / framing update
+on the planning branch only, coincident with the PR-7-merged
+update.**
 
 ### YYYY-MM-DD — PR-6 merged
 
@@ -882,6 +940,14 @@ short plan then, with fresh context.
 
 - **Seed a resolvable `originalReferral` in the SAR contract
   fixture.** Surfaced during PR-7 nine-lens review 2026-08-05.
+  **Status warmed 2026-08-06** — Deborah (Cameron's team SDM)
+  independently expressed interest in eyeballing the same
+  fixture ahead of the round-2 handover to judge whether it's
+  rich enough to be a genuine vettor training exemplar under
+  Option 2. Trigger condition (a) below is now partially
+  fulfilled and awaiting Deborah's post-look verdict — see
+  "2026-08-06 — Deborah fixture-interest thread" timeline
+  entry above.
   The integration-test fixture (`SarContractIntegrationTest`
   `setupTestData()`) currently seeds a single referral with
   `originalReferralId = null`, so the `{{#originalReferral}}`
@@ -893,15 +959,20 @@ short plan then, with fresh context.
   UUID inside the sub-block would slip past the contract test.
   The unit test (`SubjectAccessRequestServiceTest`) carries
   correctness coverage today; this follow-up is defensive
-  belt-and-braces only. Estimated shape: seed one extra
-  referral row + one resolvable "original" row, regen
-  snapshots, verify the sub-block appears in golden JSON and
-  the mustache `<tr>`s appear in golden HTML. ~20-line diff
-  (fixture + snapshot bytes). Trigger conditions to promote to
-  a real PR: (a) a stakeholder wraps a round-2 artefact that
-  needs snapshot-visible zero-UUID sub-block evidence, or
-  (b) a future UUID re-introduction slips past review — either
-  signal flips this from nice-to-have to need-to-have.
+  belt-and-braces *plus* now a possible vettor-training-quality
+  driver. Estimated shape: seed one extra referral row + one
+  resolvable "original" row + populate currently-null derived
+  fields (`referrerOverrideReason`, `hasReviewedAdditionalInformation`,
+  various dates) with realistic dev-shaped values, regen
+  snapshots, verify sub-block appears in golden JSON and
+  mustache `<tr>`s appear in golden HTML. ~20–40-line diff
+  (fixture + snapshot bytes) depending on scope of populated-fields
+  widening. Trigger conditions to promote to a real PR:
+  (a) a stakeholder (e.g. Deborah / OSAR) wraps a round-2
+  artefact that needs snapshot-visible populated sub-block
+  evidence — **partially fulfilled 2026-08-06**, or (b) a
+  future UUID re-introduction slips past review — either signal
+  flips this from nice-to-have to need-to-have.
 
 ## Related tickets and channels
 
