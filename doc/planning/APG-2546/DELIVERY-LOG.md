@@ -985,6 +985,48 @@ short plan then, with fresh context.
   results) — the widened fixture still seeds only one row of
   each so they didn't surface yet, but they're the same class
   of latent flake once a widening adds a second row.
+  **Follow-on deviation #7 recorded 2026-08-11 pm** — same-day
+  follow-on to close out the latent-flake follow-up flagged
+  under #6. Rather than spin a separate hygiene ticket the
+  work was folded onto the same PR-1115 branch (agreed with
+  Raby) since it's the same class of fix and the reviewer is
+  already looking at the ORDER BY story. Commit `9bdb6f7a`.
+  Three product-code ORDER BY additions + one staff-sort-key
+  change + one Flyway migration + one test schema-version bump:
+  (a) `CourseParticipationRepository.getSarParticipations` —
+      added `ORDER BY cp.createdDateTime NULLS LAST, cp.id`.
+  (b) `PniResultRepository.findAllByPrisonNumber` — promoted
+      from Spring-Data derived query to explicit `@Query`
+      with `ORDER BY p.pniAssessmentDate NULLS LAST,
+      p.pniResultId`.
+  (c) `OasysPniResultEntityRepository.findAllByPrisonNumber`
+      — same conversion, `ORDER BY o.oasysAssessmentId NULLS
+      LAST, o.pniResultId`.
+  (d) `StaffRepository.findByPrisonNumber` — **changed** the
+      #5 sort key from `s.staffId` to `s.lastName, s.staffId`.
+      Reviewer preference for a semantically-natural PDF
+      ordering (alphabetical by surname is the natural read
+      for a vettor scanning the Staff section); `staffId`
+      retained as tie-break. Snapshot goldens flipped
+      `[Doe, Bloggs]` → `[Bloggs, Doe]` accordingly.
+  (e) New Flyway `V145__add_staff_last_name_index.sql` —
+      non-UNIQUE `idx_staff_last_name` backing the new sort.
+      Same additive `IF NOT EXISTS` pattern as V144.
+  (f) `SarContractIntegrationTest.expectedFlywaySchemaVersion`
+      bumped `144` → `145` to match.
+  Verification unchanged: 678 tests pass, ktlint clean,
+  UUID-leak grep 0 on both goldens, sample PDF 4 pages,
+  `entity-schema.json` unchanged. **Ops note:** V145 will
+  run on the next dev deploy of this branch; idempotent,
+  cheap, reversible, no impact on the Option 1 template
+  registration + SAR-dev-service generation that's about to
+  kick off (which reads the template not the DB layout).
+  **One caveat during commit:** first commit attempt
+  accidentally staged `.snyk` (generated file) + the DD
+  working-copy xlsx via `git add -A`; caught immediately,
+  reset --soft + re-commit + force-push-with-lease
+  (`527d83a6` → `9bdb6f7a`). Neither file made it to origin
+  on the second-push tree.
   **Status warmed 2026-08-06** — Deborah (Cameron's team SDM)
   independently expressed interest in eyeballing the same
   fixture ahead of the round-2 handover to judge whether it's
