@@ -70,11 +70,6 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
    * returns join order unspecified. Chronological ascending is the natural
    * read for a vettor; `cp.id` is the primary-key tie-break for
    * same-timestamp rows.
-   *
-   * Part of the SAR ORDER BY hygiene sweep (PR #1115 follow-on) — sibling
-   * getters are [PniResultRepository.findAllByPrisonNumber],
-   * [OasysPniResultEntityRepository.findAllByPrisonNumber] and
-   * [StaffRepository.findByPrisonNumber].
    */
   @Query(
     """
