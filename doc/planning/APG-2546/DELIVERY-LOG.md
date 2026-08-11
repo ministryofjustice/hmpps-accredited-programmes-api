@@ -972,6 +972,19 @@ short plan then, with fresh context.
   deviation** — semantically a correctness hygiene fix
   (deterministic SAR ordering), but reviewers should call it
   out on the PR. 678 tests green post-fix.
+  **Follow-on deviation #6 recorded 2026-08-11** — CI on PR
+  #1115 caught a **second** ordering non-determinism, this
+  time in `ReferralRepository.getSarReferrals` (also no
+  `ORDER BY`; two referrals flip-flopped between chronological
+  and reverse-chronological order across runs). Local runs had
+  green-lit the golden in chronological order by luck. Fixed
+  with `ORDER BY r.submittedOn NULLS LAST, r.id` — commit
+  `bc9539b2`. **Third `src/main/` deviation**, same shape as
+  #5. Also worth a follow-up scan of the other SAR-collection
+  queries (course participation, PNI results, oasys PNI
+  results) — the widened fixture still seeds only one row of
+  each so they didn't surface yet, but they're the same class
+  of latent flake once a widening adds a second row.
   **Status warmed 2026-08-06** — Deborah (Cameron's team SDM)
   independently expressed interest in eyeballing the same
   fixture ahead of the round-2 handover to judge whether it's

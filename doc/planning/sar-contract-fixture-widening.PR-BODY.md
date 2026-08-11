@@ -2,7 +2,7 @@
 
 Title: **test: widen SAR contract fixture for vettor-training exemplar + originalReferral snapshot coverage**
 
-Base: `main`  Head: `APG-2546/sar-contract-fixture-widening` @ `3312e63b`  Draft.
+Base: `main`  Head: `APG-2546/sar-contract-fixture-widening` @ `bc9539b2`  Draft.
 
 ---
 
@@ -51,13 +51,16 @@ under "Deferred follow-ups":
     at the original via `originalReferralId`.
 - Regenerates both SAR contract snapshot goldens via
   `script/local-scripts/regenerate-sar-snapshots.sh`.
-- **One product-code hygiene fix** (surfaced by the widened
-  fixture, not scope creep): adds `ORDER BY s.staffId` to
-  `StaffRepository.findByPrisonNumber`'s JPQL so the SAR staff
-  array is deterministically ordered — see "Deviations from the
-  working doc" #4 below for the debugging trail.
+- **Two product-code hygiene fixes** (both surfaced by the
+  widened fixture, neither scope creep): adds `ORDER BY
+  s.staffId` to `StaffRepository.findByPrisonNumber` and
+  `ORDER BY r.submittedOn NULLS LAST, r.id` to
+  `ReferralRepository.getSarReferrals` — see "Deviations from
+  the working doc" #4 and #5 below for the debugging trail.
+  Both fixes lean on existing indexes; both are strict
+  tightenings (previously non-deterministic → deterministic).
 
-**Test-code and one one-line src/main hygiene change only —
+**Test-code and two one-line `src/main` hygiene changes only —
 no behavioural change to any SAR endpoint contract.**
 
 ### Why the diff is loud
@@ -145,22 +148,39 @@ Flagging as instructed by the doc's "no guessing" discipline:
    so Postgres returned the two joined staff rows in arbitrary
    order and the SAR-API-snapshot assertion flip-flopped between
    `[Doe, Bloggs]` and `[Bloggs, Doe]`. Fixed with `ORDER BY
-   s.staffId` — a single-line JPQL addition. This is a **second
+   s.staffId` — a single-line JPQL addition. This is a **first
    `src/main/` deviation** vs. the doc's "zero product-code
    impact" claim; semantically it's a correctness hygiene fix
    (SAR responses shouldn't be non-deterministically ordered)
    rather than scope creep, and the widened fixture is the first
-   case in the codebase that actually surfaced it.
+   case in the codebase that actually surfaced it. Backed by the
+   existing `idx_staff_staff_id` index from V144.
+
+5. **`ReferralRepository.getSarReferrals` also needed an `ORDER BY`.**
+   Same class of bug as #4, caught by CI on PR #1115 after local
+   runs green-lit the golden by luck. With two referrals in the
+   fixture, Postgres returned the top-level `referrals[]` array
+   in unspecified order — CI got the reverse of local and
+   surfaced 16 sibling-field flips symmetrical around the two
+   entries in the JSON snapshot. Fixed with `ORDER BY
+   r.submittedOn NULLS LAST, r.id` — chronological ascending by
+   submission time (natural read for a SAR reviewer:
+   original → withdrawn → resubmitted), NULLS LAST for
+   started-but-never-submitted, `r.id` for deterministic
+   tie-breaking. Second `src/main/` deviation, same shape and
+   justification as #4. Golden already in this order — no
+   regen needed.
 
 None of these deviations required inventing a fixture value — every
 populated value is still exactly as cited in the doc.
 
 ### Rollback
 
-`git revert <sha>` — one-line src/main hygiene fix + test-code
-change, no data / API / migration surface. The `ORDER BY
-s.staffId` addition is a strict tightening (previously
-non-deterministic → deterministic) so reverting it just
-restores the pre-existing indeterminism, not a regression to
-real client behaviour.
+`git revert <sha>` — two one-line `src/main/` hygiene fixes
+(both `ORDER BY` additions to JPQL queries) + test-code, no
+data / API / migration surface. The `ORDER BY` additions are
+strict tightenings (previously non-deterministic →
+deterministic) so reverting them just restores the
+pre-existing indeterminism, not a regression to real client
+behaviour.
 

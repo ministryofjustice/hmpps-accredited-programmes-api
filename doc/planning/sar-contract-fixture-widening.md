@@ -716,3 +716,60 @@ same ordering discipline still holds — sorted by `staffId`
 ascending. If a widening ever needs a *different* stable
 ordering (e.g. by insertion order for a workflow scenario),
 change both the JPQL `ORDER BY` and regenerate.
+
+### Deviation #6 (CI-only) — `ReferralRepository.getSarReferrals` ordering
+
+Local runs and the first CI attempt on branch head `3312e63b`
+green-lit the golden with referrals in
+`[WITHDRAWN(2024-01-15), REFERRAL_STARTED(2024-06-01)]` order.
+The subsequent CI run (PR #1115) came back with the referrals
+in the **opposite** order and failed with:
+
+```
+Different value found in node "referrals[0].statusCode",
+  expected: <"WITHDRAWN"> but was: <"REFERRAL_STARTED">.
+Different value found in node "referrals[0].originalReferral",
+  expected: <null> but was: <{...populated original referral...}>.
+…and 14 more sibling-field flips symmetrical around the two entries.
+```
+
+Root cause: same class of non-determinism as deviation #5 —
+`ReferralRepository.getSarReferrals` at `ReferralRepository.kt:15`
+had no `ORDER BY`, so Postgres returned the two matching
+referral rows in unspecified order. With the previous
+single-referral fixture (pre-widening) this never surfaced.
+Local test runs happened to hit the chronological order,
+CI's runner hit the reverse.
+
+Fix: added `ORDER BY r.submittedOn NULLS LAST, r.id` to the
+JPQL (commit `bc9539b2`). Rationale for that specific ordering:
+(i) chronological ascending by `submittedOn` is the natural
+read for a SAR reviewer (original submitted → withdrawn →
+resubmitted onto current pathway); (ii) `NULLS LAST` puts
+started-but-never-submitted referrals after real submissions
+(safer default than mixing them into the middle);
+(iii) `r.id` (UUID) breaks ties deterministically when two
+referrals share `submittedOn`. Golden already in this order
+so no regen needed.
+
+**This is now the third `src/main/` deviation** vs the doc's
+"zero product-code impact" claim (`LocalDate.parse` in
+`PersistenceHelper` was test-only; `ORDER BY s.staffId` in
+`StaffRepository` was the first real product fix;
+`ORDER BY r.submittedOn NULLS LAST, r.id` in
+`ReferralRepository` is the second). Same shape and same
+justification as deviation #5 — SAR responses shouldn't be
+non-deterministically ordered; the widened fixture is the
+first case in the codebase to have surfaced it.
+
+**Future re-run implication:** any collection-shaped part of
+the SAR payload backed by an unordered JPQL query is a latent
+flake once the fixture seeds ≥2 rows. Worth a scan of
+`SubjectAccessRequestService` next time: `getSarReferrals`,
+`courseParticipationRepository.findByPrisonNumber`,
+`pniResultRepository.…`, `oasysPniResultRepository.…`,
+`staffRepository.findByPrisonNumber`. First three not covered
+by this PR because the fixture still seeds only one row of
+each — but adding a second would surface the same class of
+flake.
+
