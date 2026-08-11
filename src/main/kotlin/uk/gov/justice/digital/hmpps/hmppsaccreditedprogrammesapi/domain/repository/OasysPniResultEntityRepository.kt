@@ -14,9 +14,16 @@ interface OasysPniResultEntityRepository : JpaRepository<OasysPniResultEntity, U
    *
    * `ORDER BY o.oasysAssessmentId NULLS LAST, o.pniResultId` guarantees
    * deterministic ordering across runs so the SAR contract-test golden
-   * snapshot doesn't flake when a subject has more than one OASys PNI result.
-   * `oasysAssessmentId` is the natural OASys-side ordering; `pniResultId`
-   * is the primary-key tie-break for same-assessment-id (or both-null) rows.
+   * snapshot (and the JSON payload consumed by the SAR chrome renderer)
+   * doesn't flake when a subject has more than one OASys PNI result —
+   * Postgres otherwise returns join order unspecified. `oasysAssessmentId`
+   * is the natural OASys-side ordering; `pniResultId` is the primary-key
+   * tie-break for same-assessment-id (or both-null) rows.
+   *
+   * Part of the SAR ORDER BY hygiene sweep (PR #1115 follow-on) — sibling
+   * getters are [CourseParticipationRepository.getSarParticipations],
+   * [PniResultRepository.findAllByPrisonNumber] and
+   * [StaffRepository.findByPrisonNumber].
    */
   @Query(
     """

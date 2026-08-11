@@ -64,11 +64,17 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
    * the SAR (Subject Access Request) custody report.
    *
    * `ORDER BY cp.createdDateTime NULLS LAST, cp.id` guarantees deterministic
-   * ordering across runs so the SAR contract-test golden snapshot doesn't
-   * flake when a subject has more than one participation row (Postgres
-   * otherwise returns join order unspecified). Chronological ascending is the
-   * natural read for a vettor; `cp.id` is the primary key tie-break for
+   * ordering across runs so the SAR contract-test golden snapshot (and the
+   * generated JSON payload consumed by the SAR chrome renderer) doesn't flake
+   * when a subject has more than one participation row — Postgres otherwise
+   * returns join order unspecified. Chronological ascending is the natural
+   * read for a vettor; `cp.id` is the primary-key tie-break for
    * same-timestamp rows.
+   *
+   * Part of the SAR ORDER BY hygiene sweep (PR #1115 follow-on) — sibling
+   * getters are [PniResultRepository.findAllByPrisonNumber],
+   * [OasysPniResultEntityRepository.findAllByPrisonNumber] and
+   * [StaffRepository.findByPrisonNumber].
    */
   @Query(
     """

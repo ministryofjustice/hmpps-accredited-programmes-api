@@ -81,9 +81,16 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
    * (Subject Access Request) custody report.
    *
    * `ORDER BY s.lastName, s.staffId` sorts alphabetically by surname (the
-   * natural read for a vettor scanning the Staff section of the rendered
-   * PDF) with `s.staffId` as tie-break for staff sharing a surname. Backed
-   * by `idx_staff_last_name` (see V145) and `idx_staff_staff_id` (see V144).
+   * natural read for a vettor scanning the Staff section of both the JSON
+   * payload and the rendered PDF) with `s.staffId` as tie-break for staff
+   * sharing a surname. Backed by `idx_staff_last_name` (see V145) and
+   * `idx_staff_staff_id` (see V144) so the sort doesn't scan the full
+   * staff table on every SAR request.
+   *
+   * Part of the SAR ORDER BY hygiene sweep (PR #1115 follow-on) — sibling
+   * getters are [CourseParticipationRepository.getSarParticipations],
+   * [PniResultRepository.findAllByPrisonNumber] and
+   * [OasysPniResultEntityRepository.findAllByPrisonNumber].
    */
   @Query(
     """
