@@ -12,7 +12,7 @@
 -- on staff_id (already indexed via idx_staff_staff_id, see V144)
 -- guarantees deterministic ordering when surnames collide.
 --
--- Cheap, additive, IF NOT EXISTS so re-runnable. No data change.
+-- IF NOT EXISTS so re-runnable. No data change.
 
 CREATE INDEX IF NOT EXISTS idx_staff_last_name ON staff(last_name);
 
