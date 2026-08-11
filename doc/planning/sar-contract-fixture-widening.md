@@ -69,9 +69,15 @@ before touching the fixture.
 
 ## Branch + PR conventions
 
-- **Branch name:** `APG-2546/sar-contract-fixture-widening` (no Jira
-  prefix — this isn't APG-2546 and doesn't yet have its own ticket
-  in Jira; if you spin one, prefix the branch to match).
+- **Branch name:** `APG-2546/sar-contract-fixture-widening`
+  (must carry a Jira prefix — CI branch-guideline check blocks
+  bare `test/…`, `chore/…`, etc. The delivered branch was
+  briefly `test/sar-contract-fixture-widening` and had to be
+  renamed 2026-08-11 when CI rejected it — see §"Post-shipping
+  branch rename 2026-08-11" at the bottom of this doc. This
+  ticket doesn't have its own Jira ID separate from APG-2546 yet
+  — reuse the APG-2546 prefix while it stays a follow-up under
+  that umbrella).
 - **Commit style:** matches recent history — see PRs #1107 through
   #1113 on `main`. Subject line: `test: widen SAR contract fixture
   for vettor-training exemplar + originalReferral snapshot coverage`.
@@ -670,7 +676,43 @@ prefix (`APG-…/…`). Renamed to
 remote branch deleted. **Consequence:** any draft PR opened
 against the old branch name was closed by GitHub when the remote
 branch was deleted; open a fresh draft PR against
-`APG-2546/sar-contract-fixture-widening`. §"Branch + PR
+`APG-2546/sar-contract-fixture-widening`. "Branch + PR
 conventions" above has been corrected so future re-runs pick
 the right prefix first time.
 
+### Deviation #5 (post-rebase) — `StaffRepository.findByPrisonNumber` ordering
+
+Surfaced on a second-run PDF regeneration 2026-08-11 (commit
+`3312e63b` on `APG-2546/sar-contract-fixture-widening`). The
+first regen happened to write the staff array in
+`[Doe, Bloggs]` order and the golden was captured against that
+ordering; the second regen came back `[Bloggs, Doe]` and the
+API-snapshot assertion failed with:
+
+```
+Different value found in node "staff[0].lastName", expected: <"Doe"> but was: <"Bloggs">
+Different value found in node "staff[1].lastName", expected: <"Bloggs"> but was: <"Doe">
+```
+
+Root cause: `StaffRepository.findByPrisonNumber` (JPQL query at
+`StaffRepository.kt:78`) had no `ORDER BY`, so Postgres returned
+the two joined rows in unspecified order. With the previous
+single-staff fixture this never surfaced. Fix: added
+`ORDER BY s.staffId` (single-line JPQL change), which pins
+`Doe (staffId=12345)` before `Bloggs (staffId=67890)` and
+matches the golden without further regen.
+
+**This is the second `src/main/` deviation** vs the doc's "zero
+product-code impact" claim (the first — `LocalDate.parse` in
+`PersistenceHelper` — was actually test-only). Semantically
+this one is a correctness fix — SAR responses shouldn't be
+non-deterministically ordered — but reviewers should call it out
+on the PR. Full test + ktlint remained green after the fix
+(678 tests, no regressions).
+
+**Future re-run implication:** if a future re-widening adds a
+third staff row (e.g. a case-manager, a third referrer), the
+same ordering discipline still holds — sorted by `staffId`
+ascending. If a widening ever needs a *different* stable
+ordering (e.g. by insertion order for a workflow scenario),
+change both the JPQL `ORDER BY` and regenerate.
