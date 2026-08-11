@@ -1027,6 +1027,35 @@ short plan then, with fresh context.
   reset --soft + re-commit + force-push-with-lease
   (`527d83a6` → `9bdb6f7a`). Neither file made it to origin
   on the second-push tree.
+  **Review round 2 (2026-08-11 pm):** nine-lens re-review of
+  `9bdb6f7a`. All lenses green; two agreed follow-ups actioned:
+  (i) KDoc + V145 comment tweaks — standardised the four
+  SAR-collection getters' KDoc into a common shape, added a
+  cross-reference between siblings so the sweep is
+  grep-navigable, and clarified that the ORDER BY guarantee
+  applies to both the JSON payload and the rendered PDF (not
+  just the PDF). V145 header comment got the same JSON+PDF
+  clarification, DDL untouched. Doc-only, no snapshot change.
+  Committed as `fe1257f3` (GPG-signed, explicit `git add
+  <paths>` — no `-A` this time).
+  (ii) Considered adding `@DataJpaTest` repository-level unit
+  tests to lock the four new ORDER BYs at repo layer.
+  **Deliberately deferred** — the ordering is already
+  end-to-end pinned by `SarContractIntegrationTest`'s JSON +
+  HTML goldens (which flipped `[Doe, Bloggs]` → `[Bloggs,
+  Doe]` accordingly when the staff sort key changed, proving
+  the goldens are load-bearing on order). Adding repo tests
+  would need new testcontainer scaffolding on the three repos
+  that don't currently have one plus dedicated multi-row
+  fixtures per repo, and would duplicate assertions the
+  golden already provides. Belongs in a broader "repository
+  test harness" story, not bolted onto a hygiene PR.
+  **Local PDF regenerated 2026-08-11 13:01** via
+  `script/local-scripts/regenerate-sar-snapshots.sh` on top
+  of `9bdb6f7a` to keep the on-disk artefact in sync with
+  the committed goldens. Idempotent (`git status --short`
+  showed no golden diffs), 4 pages, 9,080 bytes. Confirms
+  committed goldens match a fresh regen bit-for-bit.
   **Status warmed 2026-08-06** — Deborah (Cameron's team SDM)
   independently expressed interest in eyeballing the same
   fixture ahead of the round-2 handover to judge whether it's
