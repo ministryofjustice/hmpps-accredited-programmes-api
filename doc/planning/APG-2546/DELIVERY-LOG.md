@@ -961,6 +961,17 @@ short plan then, with fresh context.
   Postgres refused the implicit cast to `DATE` (fixed by
   parsing to `LocalDate` at bind time). Historical rationale
   preserved below.
+  **Follow-on deviation #5 recorded 2026-08-11** — a second
+  PDF-regen run hit non-determinism in
+  `StaffRepository.findByPrisonNumber` (JPQL query had no
+  `ORDER BY`; with the new two-staff fixture Postgres returned
+  the join in arbitrary row order and the SAR-API-snapshot
+  assertion flip-flopped between `[Doe, Bloggs]` and
+  `[Bloggs, Doe]`). Fixed with `ORDER BY s.staffId` — commit
+  `3312e63b` on the fixture branch. **Second `src/main/`
+  deviation** — semantically a correctness hygiene fix
+  (deterministic SAR ordering), but reviewers should call it
+  out on the PR. 678 tests green post-fix.
   **Status warmed 2026-08-06** — Deborah (Cameron's team SDM)
   independently expressed interest in eyeballing the same
   fixture ahead of the round-2 handover to judge whether it's

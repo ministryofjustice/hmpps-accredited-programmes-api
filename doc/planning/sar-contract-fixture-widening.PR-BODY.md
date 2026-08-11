@@ -134,6 +134,17 @@ Flagging as instructed by the doc's "no guessing" discipline:
    time inside the helper. Backwards-compatible (still accepts
    `String?`), and no existing caller passed a non-null value for
    these params, so no other tests are affected.
+4. **`StaffRepository.findByPrisonNumber` needed an `ORDER BY`.**
+   Surfaced on a second PDF regen: the JPQL query had no ordering,
+   so Postgres returned the two joined staff rows in arbitrary
+   order and the SAR-API-snapshot assertion flip-flopped between
+   `[Doe, Bloggs]` and `[Bloggs, Doe]`. Fixed with `ORDER BY
+   s.staffId` — a single-line JPQL addition. This is a **second
+   `src/main/` deviation** vs. the doc's "zero product-code
+   impact" claim; semantically it's a correctness hygiene fix
+   (SAR responses shouldn't be non-deterministically ordered)
+   rather than scope creep, and the widened fixture is the first
+   case in the codebase that actually surfaced it.
 
 None of these deviations required inventing a fixture value — every
 populated value is still exactly as cited in the doc.
