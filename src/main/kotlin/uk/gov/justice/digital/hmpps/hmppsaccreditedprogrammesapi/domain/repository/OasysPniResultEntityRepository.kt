@@ -19,11 +19,6 @@ interface OasysPniResultEntityRepository : JpaRepository<OasysPniResultEntity, U
    * Postgres otherwise returns join order unspecified. `oasysAssessmentId`
    * is the natural OASys-side ordering; `pniResultId` is the primary-key
    * tie-break for same-assessment-id (or both-null) rows.
-   *
-   * Part of the SAR ORDER BY hygiene sweep (PR #1115 follow-on) — sibling
-   * getters are [CourseParticipationRepository.getSarParticipations],
-   * [PniResultRepository.findAllByPrisonNumber] and
-   * [StaffRepository.findByPrisonNumber].
    */
   @Query(
     """
