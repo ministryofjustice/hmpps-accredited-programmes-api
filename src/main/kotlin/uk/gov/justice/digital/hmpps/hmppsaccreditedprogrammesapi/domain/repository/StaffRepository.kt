@@ -80,6 +80,7 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
     SELECT DISTINCT s FROM StaffEntity s 
     JOIN ReferralEntity r ON s.staffId = r.primaryPomStaffId OR s.staffId = r.secondaryPomStaffId 
     WHERE r.prisonNumber = :prisonNumber
+    ORDER BY s.staffId
   """,
   )
   fun findByPrisonNumber(prisonNumber: String): List<StaffEntity>
