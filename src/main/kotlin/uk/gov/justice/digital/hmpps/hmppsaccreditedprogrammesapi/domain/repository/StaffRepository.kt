@@ -75,12 +75,22 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
   )
   fun findSurnamesByStaffIds(staffIds: Collection<BigInteger>): List<StaffIdSurnameProjection>
 
+  /**
+   * Batch load of every distinct staff row acting as primary or secondary
+   * POM for any referral belonging to [prisonNumber], used by the SAR
+   * (Subject Access Request) custody report.
+   *
+   * `ORDER BY s.lastName, s.staffId` sorts alphabetically by surname (the
+   * natural read for a vettor scanning the Staff section of the rendered
+   * PDF) with `s.staffId` as tie-break for staff sharing a surname. Backed
+   * by `idx_staff_last_name` (see V145) and `idx_staff_staff_id` (see V144).
+   */
   @Query(
     """
     SELECT DISTINCT s FROM StaffEntity s 
     JOIN ReferralEntity r ON s.staffId = r.primaryPomStaffId OR s.staffId = r.secondaryPomStaffId 
     WHERE r.prisonNumber = :prisonNumber
-    ORDER BY s.staffId
+    ORDER BY s.lastName, s.staffId
   """,
   )
   fun findByPrisonNumber(prisonNumber: String): List<StaffEntity>
