@@ -1,6 +1,15 @@
 # SAR contract-fixture widening — vettor-training exemplar + snapshot coverage
 
-**Status:** ready to pick up on a fresh branch. **Not APG-2546 scope.**
+**Status:** ✅ picked up and shipped 2026-08-11. Branch
+`test/sar-contract-fixture-widening` (head `3969f93f`) off `main`
+@ `baee4510`; draft PR opened. See "Pickup notes 2026-08-11" at
+the bottom of this doc for what actually happened vs the plan
+below — three deviations were required and are captured there.
+The rest of this doc is preserved as-shipped so a future re-run
+against a different fixture (e.g. a full-chrome PDF replacement)
+has the same field-by-field cited-values plan to work from.
+
+**~~Status:~~** ~~ready to pick up on a fresh branch.~~ **Not APG-2546 scope.**
 Deferred follow-up recorded in `doc/planning/APG-2546/DELIVERY-LOG.md`
 under "Deferred follow-ups (out of APG-2546 scope)" — see there for
 origin history. This doc is self-contained so a fresh agent can execute
@@ -385,7 +394,7 @@ After the source-code changes above, run in order:
 
 1. **The snapshot diff will look scary.** ~15 rows in the HTML flip
    from "No Data Held" → real value, plus a whole new
-   `<h4>Original referral</h4>` block with 8 rows. Lead the PR body
+   `<h4>Original referral</h4>` block with 8 rows appears. Lead the PR body
    with **"expected snapshot diff = large, this is intentional. Here
    is the coverage-before/coverage-after."** Same discipline as
    PR-7's "expect zero snapshot diff" call-out but the opposite
@@ -545,3 +554,108 @@ Paste this into a new chat when handing off:
 > starting point: tip of `main` after APG-2546 PR-7 (#1113
 > `baee4510`) has merged.
 
+## Pickup notes 2026-08-11 — what actually happened
+
+Picked up on branch `test/sar-contract-fixture-widening` (head
+`3969f93f`) off `main` @ `baee4510`. Shipped as a draft PR
+following this doc's plan. Recording the three deviations that
+were required so a future re-run doesn't repeat the debugging.
+
+### Outcomes
+
+- 678 tests pass (matches the doc's target count exactly — pure
+  fixture widening, no test-count change).
+- `./gradlew ktlintCheck` green.
+- **UUID-leak grep returns 0 on both goldens** (APG-2546 UUID
+  scrub preserved — the merge-blocker check from
+  §"Verification checklist" #6).
+- Snapshot golden byte counts:
+  - `sar-api-response.json`: 1762 → **2720 B**
+  - `sar-expected-render-result.html`: 11720 → **13681 B**
+  - `entity-schema.json`: **unchanged** (5836 B ✓)
+- Sample PDF: **4 pages** (within expected 3–4 range).
+- Post-widening sanity greps:
+  - JSON `":null"` occurrences: 16 → **2** (target 0–2 ✓)
+  - HTML `No Data Held`: 15 → **1** (target 0–2 ✓)
+  - HTML `Original referral`: **1** ✓
+- DD-sweep re-run 2026-08-11 against the working xlsx — no field
+  this doc proposes populating has been re-flagged as "should be
+  a No" since the doc was written.
+
+### Deviations from this doc (kept minimal, all flagged in the PR body)
+
+1. **§"Files to change" / §"Field-by-field plan" line-number
+   references are stale.** The doc references `createAuditRecord`,
+   `createSexualOffenceDetails`, `createSelectedSexualOffenceDetails`,
+   and `createReferralStatusHistory` calls in
+   `SarContractIntegrationTest.setupTestData()`, plus corresponding
+   companion consts `AUDIT_RECORD_ID`, `SEXUAL_OFFENCE_ID`,
+   `SELECTED_SEXUAL_OFFENCE_ID`, `REFERRAL_STATUS_HISTORY_ID`.
+   **None of these exist on `main` at `baee4510`** — the test
+   file has been slimmed since this doc was written (likely as
+   part of APG-2546's PR-1 → PR-4 removals dropping the
+   corresponding sections from the SAR surface, which made
+   their fixture scaffolding redundant). Consequence:
+   - Doc says "Add after `REFERRAL_STATUS_HISTORY_ID` at
+     `SarContractIntegrationTest.kt:243`" — actual: added after
+     `PERSON_ID` (the real last const in the companion).
+   - Doc says "Extend the existing primary `createReferral(...)`
+     at `SarContractIntegrationTest.kt:130–144`" — actual line
+     numbers differ, but the block is unambiguous by contents.
+   The substantive plan is unaffected: still exactly one new
+   `createReferral` insertion (the original), extension of the
+   primary `createReferral`, widening of `createPerson` and
+   `createPniResult`, and one new `createStaff`. No made-up
+   values were needed.
+
+2. **§"Verification checklist" #2 snapshot-regeneration path
+   is wrong.** The doc says
+   `SAR_GENERATE_ACTUAL=true ./gradlew test --tests SarContractIntegrationTest`
+   writes `build/test-generated/sar-actual-api-response.json`
+   and `sar-actual-render-result.html`. **It doesn't.** The SAR
+   library writes `entity-schema.json.log`,
+   `sar-api-response.json.log`, and
+   `sar-generated-report.html.log` under `src/test/resources/`
+   (peer to the `sar/` folder). The repo has a canonical
+   `script/local-scripts/regenerate-sar-snapshots.sh` which
+   knows the real convention (finds the three `.log` files,
+   copies them into `sar/`, deletes the `.log`s). **Use the
+   script** — the manual `SAR_GENERATE_ACTUAL=true …` + `cp`
+   incantation in the doc is stale.
+
+3. **§"Field-by-field plan" §`createPerson` — the ISO-8601
+   date strings don't bind cleanly.** The doc claims each date
+   value (`conditionalReleaseDate = "2026-11-15"` etc.) is
+   "ISO-8601 date-string parseable by Postgres". This is wrong
+   under the current `PersistenceHelper.createPerson` binding:
+   the params are declared as `String?` and JPA/Hibernate binds
+   them as `varchar`, so Postgres raises
+   `ERROR: column "conditional_release_date" is of type date
+   but expression is of type character varying / Hint: You
+   will need to rewrite or cast the expression`. Fixed **inside
+   the helper** by parsing to `LocalDate` at bind time:
+
+   ```kotlin
+   .setParameter("conditionalReleaseDate", conditionalReleaseDate?.let { LocalDate.parse(it) })
+   .setParameter("paroleEligibilityDate",  paroleEligibilityDate?.let  { LocalDate.parse(it) })
+   .setParameter("tariffExpiryDate",       tariffExpiryDate?.let       { LocalDate.parse(it) })
+   .setParameter("earliestReleaseDate",    earliestReleaseDate?.let    { LocalDate.parse(it) })
+   ```
+
+   The public helper signature still accepts `String?` (so no
+   caller signature change), and no existing caller passed a
+   non-null value for any of these four params (verified via
+   `grep`), so no other test is affected. Adds one import
+   (`java.time.LocalDate`) to `PersistenceHelper.kt`. **This is
+   a fourth file changed vs. this doc's "Files to change"
+   section #1 (which only anticipated adding
+   `hasReviewedAdditionalInformation` to `createReferral`).**
+
+### For a future re-run: prerequisites-check tweak
+
+The "Prerequisites — do not skip" section still applies verbatim
+(main tip check, DD sweep). No changes there. But if a future
+picker-up sees `SarContractIntegrationTest.kt` has grown *back*
+(e.g. a new section has been added), they should verify the
+missing-const claim in deviation #1 is still true before placing
+new consts after `PERSON_ID`.

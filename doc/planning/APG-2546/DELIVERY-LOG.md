@@ -940,6 +940,27 @@ short plan then, with fresh context.
 
 - **Seed a resolvable `originalReferral` in the SAR contract
   fixture.** Surfaced during PR-7 nine-lens review 2026-08-05.
+  **Status: ticketed 2026-08-11** — picked up on branch
+  `test/sar-contract-fixture-widening` (head `3969f93f`) off
+  `main` @ `baee4510`; draft PR opened. Working doc:
+  `doc/planning/sar-contract-fixture-widening.md` on this branch.
+  **Outcomes:** 678 tests pass, ktlint clean, UUID-leak grep
+  returns 0 on both goldens (APG-2546 UUID scrub preserved),
+  sample PDF = 4 pages, snapshot goldens grew as predicted
+  (`sar-api-response.json` 1762→2720 B; `sar-expected-render-result.html`
+  11720→13681 B; `entity-schema.json` unchanged). Three
+  deviations from the working doc surfaced during pickup and
+  have been folded back into the doc (see its "Pickup notes
+  2026-08-11" section) so a future re-run doesn't repeat the
+  debugging: (i) stale line-number references — test file
+  slimmed on `main` since doc was written; (ii)
+  `SAR_GENERATE_ACTUAL=true` writes `.log` files under
+  `src/test/resources/`, not `build/test-generated/sar-actual-*`;
+  (iii) `PersistenceHelper.createPerson` needed a bind-type
+  fix — the four date-string params bound as `varchar` and
+  Postgres refused the implicit cast to `DATE` (fixed by
+  parsing to `LocalDate` at bind time). Historical rationale
+  preserved below.
   **Status warmed 2026-08-06** — Deborah (Cameron's team SDM)
   independently expressed interest in eyeballing the same
   fixture ahead of the round-2 handover to judge whether it's
