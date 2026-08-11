@@ -2,7 +2,7 @@
 
 Title: **test: widen SAR contract fixture for vettor-training exemplar + originalReferral snapshot coverage**
 
-Base: `main` · Head: `APG-2546/sar-contract-fixture-widening` @ `3969f93f` · Draft.
+Base: `main`  Head: `APG-2546/sar-contract-fixture-widening` @ `3312e63b`  Draft.
 
 ---
 
@@ -51,8 +51,14 @@ under "Deferred follow-ups":
     at the original via `originalReferralId`.
 - Regenerates both SAR contract snapshot goldens via
   `script/local-scripts/regenerate-sar-snapshots.sh`.
+- **One product-code hygiene fix** (surfaced by the widened
+  fixture, not scope creep): adds `ORDER BY s.staffId` to
+  `StaffRepository.findByPrisonNumber`'s JPQL so the SAR staff
+  array is deterministically ordered — see "Deviations from the
+  working doc" #4 below for the debugging trail.
 
-**No product-code changes.**
+**Test-code and one one-line src/main hygiene change only —
+no behavioural change to any SAR endpoint contract.**
 
 ### Why the diff is loud
 
@@ -151,6 +157,10 @@ populated value is still exactly as cited in the doc.
 
 ### Rollback
 
-`git revert <sha>` — pure test-code change, no data / API /
-migration surface. Zero product-code risk.
+`git revert <sha>` — one-line src/main hygiene fix + test-code
+change, no data / API / migration surface. The `ORDER BY
+s.staffId` addition is a strict tightening (previously
+non-deterministic → deterministic) so reverting it just
+restores the pre-existing indeterminism, not a regression to
+real client behaviour.
 
