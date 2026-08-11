@@ -1,7 +1,7 @@
 # SAR contract-fixture widening — vettor-training exemplar + snapshot coverage
 
 **Status:** ✅ picked up and shipped 2026-08-11. Branch
-`test/sar-contract-fixture-widening` (head `3969f93f`) off `main`
+`APG-2546/sar-contract-fixture-widening` (head `3969f93f`) off `main`
 @ `baee4510`; draft PR opened. See "Pickup notes 2026-08-11" at
 the bottom of this doc for what actually happened vs the plan
 below — three deviations were required and are captured there.
@@ -69,7 +69,7 @@ before touching the fixture.
 
 ## Branch + PR conventions
 
-- **Branch name:** `test/sar-contract-fixture-widening` (no Jira
+- **Branch name:** `APG-2546/sar-contract-fixture-widening` (no Jira
   prefix — this isn't APG-2546 and doesn't yet have its own ticket
   in Jira; if you spin one, prefix the branch to match).
 - **Commit style:** matches recent history — see PRs #1107 through
@@ -556,7 +556,7 @@ Paste this into a new chat when handing off:
 
 ## Pickup notes 2026-08-11 — what actually happened
 
-Picked up on branch `test/sar-contract-fixture-widening` (head
+Picked up on branch `APG-2546/sar-contract-fixture-widening` (head
 `3969f93f`) off `main` @ `baee4510`. Shipped as a draft PR
 following this doc's plan. Recording the three deviations that
 were required so a future re-run doesn't repeat the debugging.
@@ -659,3 +659,18 @@ picker-up sees `SarContractIntegrationTest.kt` has grown *back*
 (e.g. a new section has been added), they should verify the
 missing-const claim in deviation #1 is still true before placing
 new consts after `PERSON_ID`.
+
+### Post-shipping branch rename 2026-08-11
+
+Original branch name `test/sar-contract-fixture-widening` (per
+this doc's original §"Branch + PR conventions") was rejected by
+CI's branch-naming guideline check — the ruleset requires a Jira
+prefix (`APG-…/…`). Renamed to
+`APG-2546/sar-contract-fixture-widening`, force-pushed, old
+remote branch deleted. **Consequence:** any draft PR opened
+against the old branch name was closed by GitHub when the remote
+branch was deleted; open a fresh draft PR against
+`APG-2546/sar-contract-fixture-widening`. §"Branch + PR
+conventions" above has been corrected so future re-runs pick
+the right prefix first time.
+

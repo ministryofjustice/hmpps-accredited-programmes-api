@@ -941,7 +941,7 @@ short plan then, with fresh context.
 - **Seed a resolvable `originalReferral` in the SAR contract
   fixture.** Surfaced during PR-7 nine-lens review 2026-08-05.
   **Status: ticketed 2026-08-11** — picked up on branch
-  `test/sar-contract-fixture-widening` (head `3969f93f`) off
+  `APG-2546/sar-contract-fixture-widening` (head `3969f93f`) off
   `main` @ `baee4510`; draft PR opened. Working doc:
   `doc/planning/sar-contract-fixture-widening.md` on this branch.
   **Outcomes:** 678 tests pass, ktlint clean, UUID-leak grep
