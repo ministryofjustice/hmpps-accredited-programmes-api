@@ -19,11 +19,6 @@ interface PniResultRepository : JpaRepository<PniResultEntity, UUID> {
    * otherwise returns join order unspecified. Chronological ascending is
    * the natural read for a vettor; `p.pniResultId` is the primary-key
    * tie-break for same-date (or both-null) rows.
-   *
-   * Part of the SAR ORDER BY hygiene sweep (PR #1115 follow-on) — sibling
-   * getters are [CourseParticipationRepository.getSarParticipations],
-   * [OasysPniResultEntityRepository.findAllByPrisonNumber] and
-   * [StaffRepository.findByPrisonNumber].
    */
   @Query(
     """
