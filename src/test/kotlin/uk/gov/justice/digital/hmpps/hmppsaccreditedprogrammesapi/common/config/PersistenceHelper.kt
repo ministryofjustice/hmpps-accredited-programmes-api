@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import java.math.BigInteger
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -105,8 +106,8 @@ class PersistenceHelper {
       .executeUpdate()
   }
 
-  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?, primaryPomStaffId: BigInteger = "1".toBigInteger(), secondaryPomStaffId: BigInteger = "2".toBigInteger(), referrerOverrideReason: String? = null, originalReferralId: UUID? = null, hasLdc: Boolean = false, hasLdcBeenOverriddenByProgrammeTeam: Boolean = false) {
-    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on, primary_pom_staff_id, secondary_pom_staff_id, referrer_override_reason, original_referral_id, has_ldc, has_ldc_been_overridden_by_programme_team) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn, :primaryPomStaffId, :secondaryPomStaffId, :referrerOverrideReason, :originalReferralId, :hasLdc, :hasLdcBeenOverriddenByProgrammeTeam)")
+  fun createReferral(referralId: UUID, offeringId: UUID, prisonNumber: String, referrerUsername: String, additionalInformation: String, oasysConfirmed: Boolean, hasReviewedProgrammeHistory: Boolean, status: String, submittedOn: LocalDateTime?, primaryPomStaffId: BigInteger = "1".toBigInteger(), secondaryPomStaffId: BigInteger = "2".toBigInteger(), referrerOverrideReason: String? = null, originalReferralId: UUID? = null, hasLdc: Boolean = false, hasLdcBeenOverriddenByProgrammeTeam: Boolean = false, hasReviewedAdditionalInformation: Boolean? = null) {
+    entityManager.createNativeQuery("INSERT INTO referral (referral_id, offering_id, prison_number, referrer_username, additional_information, oasys_confirmed, has_reviewed_programme_history, status, submitted_on, primary_pom_staff_id, secondary_pom_staff_id, referrer_override_reason, original_referral_id, has_ldc, has_ldc_been_overridden_by_programme_team, has_reviewed_additional_information) VALUES (:id, :offeringId, :prisonNumber, :referrerUsername, :additionalInformation, :oasysConfirmed, :hasReviewedProgrammeHistory, :status, :submittedOn, :primaryPomStaffId, :secondaryPomStaffId, :referrerOverrideReason, :originalReferralId, :hasLdc, :hasLdcBeenOverriddenByProgrammeTeam, :hasReviewedAdditionalInformation)")
       .setParameter("id", referralId)
       .setParameter("offeringId", offeringId)
       .setParameter("prisonNumber", prisonNumber)
@@ -122,6 +123,7 @@ class PersistenceHelper {
       .setParameter("originalReferralId", originalReferralId)
       .setParameter("hasLdc", hasLdc)
       .setParameter("hasLdcBeenOverriddenByProgrammeTeam", hasLdcBeenOverriddenByProgrammeTeam)
+      .setParameter("hasReviewedAdditionalInformation", hasReviewedAdditionalInformation)
       .executeUpdate()
   }
 
@@ -173,10 +175,10 @@ class PersistenceHelper {
       .setParameter("prisonNumber", prisonNumber)
       .setParameter("forename", forename)
       .setParameter("surname", surname)
-      .setParameter("conditionalReleaseDate", conditionalReleaseDate)
-      .setParameter("paroleEligibilityDate", paroleEligibilityDate)
-      .setParameter("tariffExpiryDate", tariffExpiryDate)
-      .setParameter("earliestReleaseDate", earliestReleaseDate)
+      .setParameter("conditionalReleaseDate", conditionalReleaseDate?.let { LocalDate.parse(it) })
+      .setParameter("paroleEligibilityDate", paroleEligibilityDate?.let { LocalDate.parse(it) })
+      .setParameter("tariffExpiryDate", tariffExpiryDate?.let { LocalDate.parse(it) })
+      .setParameter("earliestReleaseDate", earliestReleaseDate?.let { LocalDate.parse(it) })
       .setParameter("earliestReleaseDateType", earliestReleaseDateType)
       .setParameter("indeterminateSentence", indeterminateSentence)
       .setParameter("nonDtoReleaseDateType", nonDtoReleaseDateType)

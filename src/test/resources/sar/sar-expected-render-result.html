@@ -227,19 +227,50 @@
         <h3>Referral 1</h3>
         <table class="summary-list">
             <tr><td>Prisoner number</td><td>A1234BC</td></tr>
+            <tr><td>Status</td><td>WITHDRAWN</td></tr>
+            <tr><td>Submitted on</td><td>15 January 2024, 9:30:00 am</td></tr>
+            <tr><td>Referrer</td><td>Doe</td></tr>
+            <tr><td>OASys confirmed</td><td>No</td></tr>
+            <tr><td>Has reviewed programme history</td><td>Yes</td></tr>
+            <tr><td>Primary POM staff surname</td><td>Doe</td></tr>
+            <tr><td>Secondary POM staff surname</td><td>Bloggs</td></tr>
+            <tr><td>Has LDC</td><td>No</td></tr>
+            <tr><td>Has LDC been overridden by programme team</td><td>No</td></tr>
+            <tr><td>Has reviewed additional information</td><td>Yes</td></tr>
+            <tr><td>Referrer override reason</td><td>Scored higher in OSP, should go onto Kaizen</td></tr>
+            <tr><td>Additional information</td><td>Initial referral — subsequently withdrawn following OSP re-scoring</td></tr>
+        </table>
+        
+        <br>
+    
+        <h3>Referral 2</h3>
+        <table class="summary-list">
+            <tr><td>Prisoner number</td><td>A1234BC</td></tr>
             <tr><td>Status</td><td>REFERRAL_STARTED</td></tr>
             <tr><td>Submitted on</td><td>01 June 2024, 10:00:00 am</td></tr>
             <tr><td>Referrer</td><td>Doe</td></tr>
             <tr><td>OASys confirmed</td><td>Yes</td></tr>
             <tr><td>Has reviewed programme history</td><td>Yes</td></tr>
             <tr><td>Primary POM staff surname</td><td>Doe</td></tr>
-            <tr><td>Secondary POM staff surname</td><td>No Data Held</td></tr>
+            <tr><td>Secondary POM staff surname</td><td>Bloggs</td></tr>
             <tr><td>Has LDC</td><td>Yes</td></tr>
             <tr><td>Has LDC been overridden by programme team</td><td>Yes</td></tr>
-            <tr><td>Has reviewed additional information</td><td>No Data Held</td></tr>
+            <tr><td>Has reviewed additional information</td><td>Yes</td></tr>
             <tr><td>Referrer override reason</td><td>No Data Held</td></tr>
             <tr><td>Additional information</td><td>Some info</td></tr>
         </table>
+        
+            <h4>Original referral</h4>
+            <table class="summary-list">
+                <tr><td>Course name</td><td>Course 1</td></tr>
+                <tr><td>Organisation name</td><td>HMP Moorland</td></tr>
+                <tr><td>Submitted on</td><td>15 January 2024, 9:30:00 am</td></tr>
+                <tr><td>Status</td><td>WITHDRAWN</td></tr>
+                <tr><td>Referrer surname</td><td>Doe</td></tr>
+                <tr><td>Referrer override reason</td><td>Scored higher in OSP, should go onto Kaizen</td></tr>
+                <tr><td>Has LDC</td><td>No</td></tr>
+                <tr><td>Additional information</td><td>Initial referral — subsequently withdrawn following OSP re-scoring</td></tr>
+            </table>
         
         <br>
     
@@ -288,13 +319,13 @@
             <tr><td>Prisoner number</td><td>A1234BC</td></tr>
             <tr><td>CRN</td><td>X1234YZ</td></tr>
             <tr><td>Programme pathway</td><td>ALTERNATIVE_PATHWAY</td></tr>
-            <tr><td>Needs classification</td><td>No Data Held</td></tr>
-            <tr><td>Overall needs score</td><td>No Data Held</td></tr>
-            <tr><td>Risk classification</td><td>No Data Held</td></tr>
-            <tr><td>OASys assessment completed date</td><td>No Data Held</td></tr>
-            <tr><td>PNI assessment date</td><td>No Data Held</td></tr>
+            <tr><td>Needs classification</td><td>HIGH_NEED</td></tr>
+            <tr><td>Overall needs score</td><td>12</td></tr>
+            <tr><td>Risk classification</td><td>HIGH_RISK</td></tr>
+            <tr><td>OASys assessment completed date</td><td>15 April 2026, 9:00:00 am</td></tr>
+            <tr><td>PNI assessment date</td><td>20 April 2026, 2:00:00 pm</td></tr>
             <tr><td>PNI valid</td><td>Yes</td></tr>
-            <tr><td>Basic skills score</td><td>No Data Held</td></tr>
+            <tr><td>Basic skills score</td><td>3</td></tr>
             <tr><td>PNI result JSON</td><td>{&quot;result&quot;: &quot;success&quot;}</td></tr>
         </table>
         <br>
@@ -309,14 +340,14 @@
             <tr><td>Surname</td><td>Doe</td></tr>
             <tr><td>Location</td><td>HMP Moorland</td></tr>
             <tr><td>Gender</td><td>Male</td></tr>
-            <tr><td>Conditional release date</td><td>No Data Held</td></tr>
-            <tr><td>Parole eligibility date</td><td>No Data Held</td></tr>
-            <tr><td>Tariff expiry date</td><td>No Data Held</td></tr>
-            <tr><td>Earliest release date</td><td>No Data Held</td></tr>
+            <tr><td>Conditional release date</td><td>2026-11-15</td></tr>
+            <tr><td>Parole eligibility date</td><td>2027-03-01</td></tr>
+            <tr><td>Tariff expiry date</td><td>2028-06-30</td></tr>
+            <tr><td>Earliest release date</td><td>2026-09-10</td></tr>
             <tr><td>Earliest release date type</td><td>CRD</td></tr>
             <tr><td>Sentence type</td><td>Determinate</td></tr>
-            <tr><td>Indeterminate sentence</td><td>No Data Held</td></tr>
-            <tr><td>Non DTO release date type</td><td>No Data Held</td></tr>
+            <tr><td>Indeterminate sentence</td><td>No</td></tr>
+            <tr><td>Non DTO release date type</td><td>Standard</td></tr>
         </table>
     
     
@@ -345,6 +376,12 @@
     <h2>Staff</h2>
         
             <h3>Staff 1</h3>
+            <table class="summary-list">
+                <tr><td>Last name</td><td>Bloggs</td></tr>
+            </table>
+            <br>
+        
+            <h3>Staff 2</h3>
             <table class="summary-list">
                 <tr><td>Last name</td><td>Doe</td></tr>
             </table>

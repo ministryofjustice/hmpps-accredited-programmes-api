@@ -59,10 +59,23 @@ interface CourseParticipationRepository : JpaRepository<CourseParticipationEntit
   )
   fun findCourseParticipationByReferralId(@Param("referralId") referralId: UUID): List<CourseParticipationProjection>
 
+  /**
+   * Batch load of every course-participation row for [prisonerNumber], used by
+   * the SAR (Subject Access Request) custody report.
+   *
+   * `ORDER BY cp.createdDateTime NULLS LAST, cp.id` guarantees deterministic
+   * ordering across runs so the SAR contract-test golden snapshot (and the
+   * generated JSON payload consumed by the SAR chrome renderer) doesn't flake
+   * when a subject has more than one participation row — Postgres otherwise
+   * returns join order unspecified. Chronological ascending is the natural
+   * read for a vettor; `cp.id` is the primary-key tie-break for
+   * same-timestamp rows.
+   */
   @Query(
     """
         SELECT cp FROM CourseParticipationEntity cp
         WHERE cp.prisonNumber = :prisonerNumber
+        ORDER BY cp.createdDateTime NULLS LAST, cp.id
         """,
   )
   fun getSarParticipations(

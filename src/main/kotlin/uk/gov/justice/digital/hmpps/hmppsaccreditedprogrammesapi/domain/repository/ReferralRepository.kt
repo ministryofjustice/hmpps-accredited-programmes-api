@@ -17,6 +17,7 @@ interface ReferralRepository : JpaRepository<ReferralEntity, UUID> {
     """
         SELECT r FROM ReferralEntity r
         WHERE r.prisonNumber = :prisonerNumber
+        ORDER BY r.submittedOn NULLS LAST, r.id
         """,
   )
   fun getSarReferrals(
