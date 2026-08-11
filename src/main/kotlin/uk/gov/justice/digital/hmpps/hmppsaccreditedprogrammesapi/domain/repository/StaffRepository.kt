@@ -86,11 +86,6 @@ interface StaffRepository : JpaRepository<StaffEntity, UUID> {
    * sharing a surname. Backed by `idx_staff_last_name` (see V145) and
    * `idx_staff_staff_id` (see V144) so the sort doesn't scan the full
    * staff table on every SAR request.
-   *
-   * Part of the SAR ORDER BY hygiene sweep (PR #1115 follow-on) — sibling
-   * getters are [CourseParticipationRepository.getSarParticipations],
-   * [PniResultRepository.findAllByPrisonNumber] and
-   * [OasysPniResultEntityRepository.findAllByPrisonNumber].
    */
   @Query(
     """
