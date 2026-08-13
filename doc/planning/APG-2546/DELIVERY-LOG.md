@@ -1127,7 +1127,8 @@ Round-2 delivery scaffolded on this planning branch as PRs 8–12 (continuation 
 - [`PR-9-scrub-nomis-and-crn.md`](./PR-9-scrub-nomis-and-crn.md) — skeleton
 - [`PR-10-organisation-into-referral.md`](./PR-10-organisation-into-referral.md) — skeleton
 - [`PR-11-remove-top-level-staff.md`](./PR-11-remove-top-level-staff.md) — skeleton
-- [`PR-12-round-2-docs-and-handover.md`](./PR-12-round-2-docs-and-handover.md) — skeleton
+- [`PR-12-round-2-hygiene-tidy.md`](./PR-12-round-2-hygiene-tidy.md) — skeleton
+- [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) — skeleton
 
 ## DD row 139 override
 
@@ -1175,7 +1176,8 @@ _(To be filled in as PRs land.)_
 | PR-9 | `PR-9-scrub-nomis-and-crn.md` | `APG-2546/scrub-nomis-and-crn` | _pending_ | _pending_ | _pending_ | — |
 | PR-10 | `PR-10-organisation-into-referral.md` | `APG-2546/organisation-into-referral` | _pending_ | _pending_ | _pending_ | — |
 | PR-11 | `PR-11-remove-top-level-staff.md` | `APG-2546/remove-top-level-staff` | _pending_ | _pending_ | _pending_ | — |
-| PR-12 | `PR-12-round-2-docs-and-handover.md` | `APG-2546/round-2-docs-handover` | _pending_ | _pending_ | _pending_ | — |
+| PR-12 | `PR-12-round-2-hygiene-tidy.md` | `APG-2546/round-2-hygiene-tidy` | _pending_ | _pending_ | _pending_ | Needs post-PR-8/9/10/11 combined state to sanity-grep — split out from what was originally PR-12 (docs) on 2026-08-13 pm. |
+| PR-13 | `PR-13-round-2-docs-and-handover.md` | `APG-2546/round-2-docs-handover` | _pending_ | _pending_ | _pending_ | — |
 
 ## Handover artefacts (round 2)
 

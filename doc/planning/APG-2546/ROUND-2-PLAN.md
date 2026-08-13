@@ -35,7 +35,7 @@ Round-2 is a **thinning sweep** — it removes surface Branston no
 longer needs (three whole blocks) and inlines two collections that
 duplicate context already available at the referral level. Same
 ticket (APG-2546) because it's a direct continuation of the same
-data-review conversation; new PR sequence PR-8…PR-12 continues from
+data-review conversation; new PR sequence PR-8…PR-13 continues from
 PR-7 (the last round-1 PR).
 
 ## Round-1 close-out state
@@ -83,11 +83,13 @@ PR removes / moves. Same discipline as round-1.
 | **PR-9** | Drop `prisonerNumber` from `referrals[]` + `courseParticipation[]` (surviving sections). | [`PR-9-scrub-nomis-and-crn.md`](./PR-9-scrub-nomis-and-crn.md) | ½ day |
 | **PR-10** | Add `organisationName` field to each referral; delete top-level `organisations[]`. | [`PR-10-organisation-into-referral.md`](./PR-10-organisation-into-referral.md) | 1 day |
 | **PR-11** | Delete top-level `staff[]` list per **option (a)**. Keep inline surname fields. | [`PR-11-remove-top-level-staff.md`](./PR-11-remove-top-level-staff.md) | ½ day |
-| **PR-12** | Round-2 docs handover: DELIVERY-LOG closeout, DD row 139 override recorded, fresh sample PDF from a preprod CRN + email/Slack templates to Branston. | [`PR-12-round-2-docs-and-handover.md`](./PR-12-round-2-docs-and-handover.md) | ½ day |
+| **PR-12** | Round-2 code hygiene / test tidy — final orphan-query audit across the combined post-PR-8/9/10/11 state, dead-DTO scan, KDoc cross-reference fixup (siblings deleted by PR-8/PR-11), fixture companion-const cleanup, `expectedFlywaySchemaVersion` verify, full-suite regression. No observable behaviour change. | [`PR-12-round-2-hygiene-tidy.md`](./PR-12-round-2-hygiene-tidy.md) | ½ day |
+| **PR-13** | Round-2 docs handover: DELIVERY-LOG closeout, DD row 139 override recorded, fresh sample PDF from a preprod CRN + email/Slack templates to Branston. | [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) | ½ day |
 
-**Total ~4 days.** Ordering: PR-8 first (biggest cut, reduces surface
+**Total ~4½ days.** Ordering: PR-8 first (biggest cut, reduces surface
 for everything downstream), then PR-9 / PR-10 / PR-11 can be
-parallelised, PR-12 last after all four merge.
+parallelised, **PR-12 after all four merge** (needs the combined state
+to sanity-grep), PR-13 last.
 
 ## Impact on PR #1115 (recently merged)
 
@@ -138,8 +140,8 @@ refreshes so nobody re-adds `pni_result_json` on a subsequent sweep.
 ## Success criteria
 
 - All 5 asks from Deborah's action list delivered
-- All 5 PRs (PR-8…PR-12) merged to main
-- Fresh sample PDF generated from a preprod CRN + shared with Branston via PR-12
+- All 6 PRs (PR-8…PR-13) merged to main
+- Fresh sample PDF generated from a preprod CRN + shared with Branston via PR-13
 - OSAR round-3 sign-off received
 - `DELIVERY-LOG.md` closed out with final SHAs + timings
 
@@ -158,11 +160,13 @@ refreshes so nobody re-adds `pni_result_json` on a subsequent sweep.
 
 **Round 2 (this sweep):**
 - [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md) — this file
+- [`AGENT-PROMPT-TEMPLATE.md`](./AGENT-PROMPT-TEMPLATE.md) — copy-paste-ready fresh-agent prompts for every round-2 PR
 - [`PR-8-remove-pni-oasys-person.md`](./PR-8-remove-pni-oasys-person.md) — fully drafted, agent-executable
 - [`PR-9-scrub-nomis-and-crn.md`](./PR-9-scrub-nomis-and-crn.md) — skeleton, expand before execution
 - [`PR-10-organisation-into-referral.md`](./PR-10-organisation-into-referral.md) — skeleton
 - [`PR-11-remove-top-level-staff.md`](./PR-11-remove-top-level-staff.md) — skeleton
-- [`PR-12-round-2-docs-and-handover.md`](./PR-12-round-2-docs-and-handover.md) — skeleton
+- [`PR-12-round-2-hygiene-tidy.md`](./PR-12-round-2-hygiene-tidy.md) — skeleton, expand after PR-8/9/10/11 merge (needs post-merge state)
+- [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) — skeleton
 
 **Both rounds share:**
 - [`DELIVERY-LOG.md`](./DELIVERY-LOG.md) — single running log (round-2 section appended)

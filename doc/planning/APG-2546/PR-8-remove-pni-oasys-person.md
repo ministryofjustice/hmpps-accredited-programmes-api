@@ -1,7 +1,7 @@
 # PR-8 — Remove `pniResults`, `oasysPniResults` and `person` sections
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/remove-pni-oasys-person`
-> • **Est.:** 1½ dev days • **Blocks:** PR-12 (round-2 handover)
+> • **Est.:** 1½ dev days • **Blocks:** PR-12 (hygiene tidy) and PR-13 (round-2 handover)
 > • **Depends on:** clean `main` after PR #1115 (`0cf89850`)
 
 ## Purpose
