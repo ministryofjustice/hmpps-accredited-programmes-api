@@ -1190,10 +1190,17 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   |---|---|
   | Pure dev-time (from PR estimates) | ~4½ days (PR-8 1½ + PR-9 ½ + PR-10 ½ + PR-11 ½ + PR-12 ½ + PR-13 1) |
   | Optimistic calendar (focused dev, same-day reviews) | ~6 working days (~1¼ weeks) |
-  | Realistic calendar (round-1's actual cadence, one small rebase / review cycle per PR) | **8–10 working days (~2 sprint weeks)** |
-  | Pessimistic (rework on one of PR-9/10/11, or slow reviews) | ~3 weeks |
+  | **Realistic calendar** (round-1's actual cadence, one review cycle per PR) | **8–10 working days (~2 sprint weeks)** |
+  | Slightly-slow (one of PR-9/10/11 needs a small follow-up commit — e.g. nullable-safety on `organisationNamesByCode`, or a preprod check that inline `primaryPomStaffSurname` populates on every referral before option (a) locks in; or a slow review day) | ~11–12 working days (~2¼ weeks) |
 
-  Not included: OSAR round-3 review turnaround from Branston (budget 3–5 working days after PR-13 ships) — which per the out-of-scope decision above closes APG-2546 on *reply received* regardless of round-3 asks.
+  **No "3-week pessimistic" scenario** — the two triggers that would have justified it are both closed:
+
+  - **R1 (header ownership)** — closed 2026-08-13 by SAR wrapper team confirmation. No remaining external-dependency wait states.
+  - **R5 (round-3 mid-sprint)** — scoped OUT of APG-2546 (see §"Round-3 review scoped OUT" above). Branston feedback on the PR-13 sample PDF does not block or extend round-2; it triggers a new ticket per the OOS process.
+
+  Remaining unknowns (PR-9 grep miss, PR-10 nullable edge case, PR-11 inline-field coverage gap, PR-12 cross-PR straggler) are each *"add half a day to one PR"* size, not *"revise the plan"* size — the line-number, orphan-audit, and test-impact tables are third-pass verified against `origin/main @ 0cf89850`, so fresh agents shouldn't hit "the doc says X but the code says Y" surprises.
+
+  Not included: OSAR round-3 review turnaround from Branston (budget 3–5 working days after PR-13 ships) — which per the OOS decision closes APG-2546 on *reply received* regardless of round-3 asks.
 
 ## Round 2 — PR outcomes
 
