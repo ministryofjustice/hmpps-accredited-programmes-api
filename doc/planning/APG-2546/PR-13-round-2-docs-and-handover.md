@@ -1,7 +1,7 @@
-# PR-12 — Round-2 docs handover + fresh sample PDF for Branston
+# PR-13 — Round-2 docs handover + fresh sample PDF for Branston
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/round-2-docs-handover`
-> • **Est.:** ½ dev day • **Depends on:** PR-8 + PR-9 + PR-10 + PR-11 merged
+> • **Est.:** ½ dev day • **Depends on:** PR-8 + PR-9 + PR-10 + PR-11 + PR-12 merged
 > • **Status:** skeleton — expand before execution
 
 ## Purpose
