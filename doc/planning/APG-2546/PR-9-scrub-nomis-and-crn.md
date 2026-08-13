@@ -17,12 +17,15 @@ After PR-8 lands, the only sections still emitting `prisonerNumber` /
 `crn` is only on the deleted `pniResults[]` block, so it's already
 gone by cascade from PR-8. Sanity-grep confirms.
 
-## Scope
+## Scope (verified against `origin/main` @ `0cf89850`, 2026-08-13 pm)
 
-- Remove `prisonerNumber` field from `SarReferral` DTO (grep exact class name)
-- Remove `prisonNumber` field from `SarCourseParticipation` DTO
-- Remove corresponding template rows (2 rows total)
-- Remove population statements in mappers
+- Remove `prisonerNumber: String` field from nested `data class SarReferral(...)` (line 175 on main)
+- Remove `prisonNumber: String` field from nested `data class SarCourseParticipation(...)` (line 214)
+- Remove corresponding template rows:
+  - `sar_template.mustache` line 6 (`<tr><td>Prisoner number</td>...</tr>` inside referrals block)
+  - `sar_template.mustache` line 43 (`<tr><td>Prisoner number</td>...</tr>` inside courseParticipation block)
+- Remove population statements in `toSarReferral(...)` and `toSarParticipation(...)` mappers
+- Verify no test-side assertions on these fields break — the golden is the primary assertion; if `SarContractIntegrationTest` or `SubjectAccessRequestServiceTest` reference `.prisonerNumber` / `.prisonNumber` explicitly, update.
 - Regenerate snapshots
 
 ## Not in scope

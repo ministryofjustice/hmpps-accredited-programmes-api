@@ -14,36 +14,44 @@ carries `primaryPomStaffSurname` + `secondaryPomStaffSurname` inline
 (added in PR-5). Deborah confirmed **option (a)** — just drop the
 redundant top-level `staff[]` list, keep the inline surname fields.
 
-## Scope
+## Scope (verified against `origin/main` @ `0cf89850`, 2026-08-13 pm)
 
-- Remove `staff: List<SarStaff>` field from `SarResponse` DTO
-- Delete top-level `<h2>Staff</h2>` template block (lines 148–158)
-- Delete `SarStaff` DTO class (orphan-audit first)
-- Remove SAR service population statement + underlying
-  `StaffRepository.findByPrisonNumber(...)` call
-- **Orphan-audit `StaffRepository.findByPrisonNumber`** — if no
-  non-SAR caller exists, delete the query. If it stays orphan-free,
-  the V145 `idx_staff_last_name` index also becomes orphan but stays
-  in the schema (Flyway forward-only; migration is additive +
-  reversible, no operational cost to leave the index in place).
-- Update fixture: `setupTestData()`'s second-POM staff seed added in
-  PR #1115 partly stays useful (still exercises the inline surname
-  fields on the referral) — decide whether to keep the second staff
-  row or thin it out. Probably keep — it's cheap and the referral
-  fields still exercise it.
-- Regenerate snapshots
+**Product code — all inside `src/main/kotlin/.../service/SubjectAccessRequestService.kt`:**
+
+- Delete `staff: List<SarStaff>` field from nested `data class Content(...)` (line 170 on main)
+- Delete `staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() }` line in `Content(...)` construction (line 115)
+- Delete nested `data class SarStaff(...)` (line 271) — grep-verified: only used inside this service file
+- Delete `.toSarStaff()` extension mapper — same
+
+**Template — `src/main/resources/sar_template.mustache`:**
+
+- Delete top-level `<h2>Staff</h2>` block (lines 148–158)
+
+**Repositories — orphan-audit pre-verified 2026-08-13, result locked:**
+
+- `staffRepository.findByPrisonNumber` (the SAR surname-sort `@Query` from PR #1115) — **orphan-in-prod confirmed.** Only callers on `origin/main`:
+  - `SubjectAccessRequestService.kt:115` (SAR — going away in this PR)
+  - `SubjectAccessRequestServiceTest.kt:216, 314` (test — going away with the mock cleanup)
+  
+  **Delete the query** along with its ORDER BY and KDoc. Sibling methods on `StaffRepository` (`findByStaffId`, `findLastNameByUsername`, `findLastNameByStaffId`, `findSurnamesByUsernames`, `findSurnamesByStaffIds`) stay untouched.
+
+- `V145__add_staff_last_name_index.sql` — **STAYS.** Flyway forward-only. The index on `staff.last_name` costs nothing to leave in place even without a query that uses it.
+
+**Test code:**
+
+- `src/test/kotlin/.../SarContractIntegrationTest.kt` — the second-POM staff seed added in PR #1115 partly stays useful (the referral's `secondaryPomStaffId` still gets exercised via the inline surname field on the referral). Keep the seed. Consider removing whichever companion const only feeds the top-level `staff[]` list — but if all staff consts also feed the referral's POM fields (they do), keep them.
+- `src/test/kotlin/.../SubjectAccessRequestServiceTest.kt` — remove mock setup at line 216 (`every { staffRepository.findByPrisonNumber(prn) } returns ...`) and verify call at line 314. Note: PR-8 removes lines 184/208/311/312/313; PR-11 removes 216/314.
+- Snapshot goldens regenerated.
 
 ## Impact on PR #1115 hygiene fix
 
 PR #1115 added `ORDER BY s.lastName, s.staffId` to
-`StaffRepository.findByPrisonNumber`. If the query is deleted here,
-that hygiene fix goes with it — which is fine, it was only in place
-to make the (now-being-deleted) top-level `staff[]` collection
-deterministic. Record in DELIVERY-LOG round-2 entry.
+`StaffRepository.findByPrisonNumber`. That hygiene fix goes with the
+query in this PR — which is fine, it was only in place to make the
+(now-being-deleted) top-level `staff[]` collection deterministic. Record
+in DELIVERY-LOG round-2 entry.
 
-If the orphan-audit shows another non-SAR caller, leave the query +
-its ORDER BY intact (it's cheap and now-deterministic behaviour
-doesn't cost anyone).
+V145 stays regardless (see above).
 
 ## Verification checklist skeleton
 

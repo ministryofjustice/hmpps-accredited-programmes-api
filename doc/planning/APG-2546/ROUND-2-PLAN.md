@@ -87,28 +87,34 @@ PR removes / moves. Same discipline as round-1.
 | **PR-13** | Round-2 docs handover: DELIVERY-LOG closeout, DD row 139 override recorded, fresh sample PDF from a preprod CRN + email/Slack templates to Branston. | [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) | ½ day |
 
 **Total ~4½ days.** Ordering: PR-8 first (biggest cut, reduces surface
-for everything downstream), then PR-9 / PR-10 / PR-11 can be
-parallelised, **PR-12 after all four merge** (needs the combined state
-to sanity-grep), PR-13 last.
+for everything downstream), then PR-9 / PR-10 / PR-11 in **serial or
+lightly-overlapping** — they all touch `SubjectAccessRequestService.kt`
+and `sar_template.mustache`, so parallel drafts will conflict on
+merge. Recommend serial unless the reviewer signals bandwidth to
+rebase-and-merge quickly. **PR-12 after all four merge** (needs the
+combined state to sanity-grep), PR-13 last.
 
 ## Impact on PR #1115 (recently merged)
 
 Recorded up front so nothing surprises the reviewer when PRs open:
 
-| From PR #1115 | Fate in round-2 | Handled in |
+| From PR #1115 | Fate in round-2 (verified 2026-08-13 pm against `origin/main` @ `0cf89850`) | Handled in |
 |---|---|---|
-| `PniResultRepository.findAllByPrisonNumber` — new `@Query` + `ORDER BY p.pniAssessmentDate NULLS LAST, p.pniResultId` | Query becomes orphaned from SAR (PNI section deleted). Orphan-audit: if no non-SAR caller exists, delete the query. | PR-8 |
-| `OasysPniResultEntityRepository.findAllByPrisonNumber` — same pattern | Same fate — orphan-audit, delete if unused. | PR-8 |
-| `PersistenceHelper.createPerson` — `LocalDate` bind fix | Dead in SAR fixture (person section gone). Helper serves other tests — leave the fix alone; just remove the `createPerson(...)` call from `SarContractIntegrationTest.setupTestData()`. | PR-8 |
-| `StaffRepository.findByPrisonNumber` — `ORDER BY s.lastName, s.staffId` (surname-sort) | Query becomes orphaned from SAR (top-level `staff[]` deleted). Orphan-audit; likely delete. `V145__add_staff_last_name_index.sql` **stays** (Flyway is forward-only, migration is additive + reversible). | PR-11 |
-| `ReferralRepository.getSarReferrals` — `ORDER BY r.submittedOn NULLS LAST, r.id` | **Stays useful** — referrals section retained. | — |
-| `CourseParticipationRepository.getSarParticipations` — `ORDER BY cp.createdDateTime NULLS LAST, cp.id` | **Stays useful** — courseParticipation section retained. | — |
-| Fixture widening — `originalReferral` sub-block + second-POM seed | Mostly stays useful; `person` widening stanza + PNI widening stanzas removed. | PR-8 |
+| `PniResultRepository.findAllByPrisonNumber` — new `@Query` + `ORDER BY p.pniAssessmentDate NULLS LAST, p.pniResultId` | 🛑 **STAY** — `PersonService.kt:287` (prisoner-merge NOMIS domain-event handler) is a production caller. Query is NOT SAR-orphaned. Just remove the SAR call site. | PR-8 |
+| `OasysPniResultEntityRepository.findAllByPrisonNumber` — same pattern | 🗑️ **DELETE** — only SAR + SAR-service-test callers on `origin/main`. Genuine prod-orphan after PR-8. | PR-8 |
+| `PersistenceHelper.createPerson` — `LocalDate` bind fix | Dead in SAR fixture (person section gone). Helper also called from `SubjectAccessRequestServiceIntegrationTest.kt:94` — **leave the fix alone**; just remove the SAR-contract-test call site. | PR-8 |
+| `StaffRepository.findByPrisonNumber` — `ORDER BY s.lastName, s.staffId` (surname-sort) | 🗑️ **DELETE** — only SAR + SAR-service-test callers. Prod-orphan after PR-11. `V145__add_staff_last_name_index.sql` **stays** (Flyway forward-only, additive + reversible). | PR-11 |
+| `ReferralRepository.getSarReferrals` — `ORDER BY r.submittedOn NULLS LAST, r.id` | ✅ **Stays useful** — referrals section retained. | — |
+| `CourseParticipationRepository.getSarParticipations` — `ORDER BY cp.createdDateTime NULLS LAST, cp.id` | ✅ **Stays useful** — courseParticipation section retained. | — |
+| Fixture widening — `originalReferral` sub-block + second-POM seed | Mostly stays useful; `person` widening stanza + PNI widening stanzas removed. Second-POM seed stays (still exercises the referral's inline `secondaryPomStaffSurname`). | PR-8 / PR-11 |
 | V145 index | Stays. Additive, reversible, forward-only migration. | — |
 
-Two dead queries + one dead helper-call is the total sunk-cost from
-PR #1115. Cheap. Recorded here so the paper trail exists in one
-place.
+One dead query (OasysPniResult) + one dead SAR-only query
+(StaffRepository.findByPrisonNumber) + one dead helper-call site
+(createPerson in SAR contract test) is the total sunk-cost from PR #1115.
+Cheap. Paper trail here. **All orphan-audit outcomes pre-verified
+2026-08-13 pm against `origin/main` @ `0cf89850`**, so PR-8/PR-11
+agents don't need to re-derive them.
 
 ## DD spreadsheet override — row 139
 

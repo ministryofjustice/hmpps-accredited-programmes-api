@@ -1,7 +1,8 @@
 # PR-10 — Add `organisationName` to referral; delete top-level `organisations[]`
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/organisation-into-referral`
-> • **Est.:** 1 dev day • **Depends on:** PR-8 merged
+> • **Est.:** ½ dev day (revised down from 1 day after 2026-08-13 pm plan review — the backend plumbing already exists on `origin/main`; scope is much smaller than the original skeleton suggested)
+> • **Depends on:** PR-8 merged
 > • **Status:** skeleton — expand before execution
 
 ## Purpose
@@ -14,53 +15,58 @@ The nested `originalReferral{…}` sub-block already carries
 apply the same shape to the parent referral, and delete the redundant
 top-level `<h2>Organisation</h2>` block (lines 136–146).
 
-## Scope
+## Scope (verified against `origin/main` @ `0cf89850`, 2026-08-13 pm)
 
-- Add `organisationName: String?` to `SarReferral` DTO
-- Add template row `<tr><td>Organisation</td><td>{{ optionalValue organisationName }}</td></tr>`
-  in the referrals `<table>` block — position sensibly (near the top,
-  above the POM surnames)
-- Backend: `getSarReferrals` in `ReferralRepository` — add a JOIN to
-  the `organisation` table on `referral.organisation_id` and project
-  `organisation.name` into the returned row. Referral entity already
-  carries `organisation_id`, so this is not a new lookup.
-- Delete top-level `organisations[]` field from `SarResponse`
-- Delete top-level `<h2>Organisation</h2>` template block
-- Delete `SarOrganisation` DTO (verify no other callers first)
-- Delete `OrganisationRepository.findByPrisonNumber` or equivalent
-  SAR-specific query (orphan-audit like PR-8)
-- Update fixture: single-line change to seed the organisation FK
-  on the primary referral in `setupTestData()`
-- Regenerate snapshots
+**Product code — all inside `src/main/kotlin/.../service/SubjectAccessRequestService.kt`:**
 
-## Backend design decision to confirm
+- Add `organisationName: String?` field to nested `data class SarReferral(...)` (line 174 on main)
+- Populate it in the existing `toSarReferral(...)` mapper by looking up `organisationNamesByCode[it.offering?.organisationId]` — the `organisationNamesByCode: Map<String, String>` parameter is **already threaded into `toSarReferral(...)`** on `origin/main` (line 109) because `SarOriginalReferral` uses it, so no new plumbing is required
+- Delete `organisations: List<SarOrganisation>` field from nested `data class Content(...)` (line 171)
+- Delete `organisations = codesFromFiltered.mapNotNull { organisationsByCode[it]?.toSarOrganisation() }` line in `Content(...)` construction (line 116)
+- Delete nested `data class SarOrganisation(...)` (line 384) — **grep-verified 2026-08-13**: only used inside this service file (assignment at line 116, declaration at 384, mapper at 390). Safe to delete.
+- Delete `.toSarOrganisation()` extension mapper (line 390)
 
-Two shapes possible for the JOIN:
+**Template — `src/main/resources/sar_template.mustache`:**
 
-**(A) Extend the existing `getSarReferrals` `@Query`** — add
-`LEFT JOIN organisation o ON o.organisation_id = r.organisation_id`
-and project `o.name`. Simplest; keeps one query.
+- Add `<tr><td>Organisation</td><td>{{ optionalValue organisationName }}</td></tr>` in the referrals `<table>` block. Position sensibly (near the top, above the POM surnames).
+- Delete top-level `<h2>Organisation</h2>` block (lines 136–146)
 
-**(B) Post-fetch enrichment** — fetch referrals unchanged, then
-resolve organisation names in the service layer via
-`OrganisationRepository.findAllByIds(...)`.
+**Repositories — no changes**
 
-Recommend **(A)** — one round-trip, sortable by
-`organisation.name` if we ever need it, no N+1 risk. Verify
-schema (`referral.organisation_id` FK exists + is nullable-friendly).
+`organisationRepository.findAllByCodeIn(...)` **stays** — still needed for `SarOriginalReferral.organisationName` resolution. All the associated resolver variables (`codesFromFiltered`, `allOrgCodes`, `organisationsByCode`, `organisationNamesByCode`) stay for the same reason.
 
-## Verification checklist skeleton
+## No backend query change needed — verified 2026-08-13
 
-- [ ] `grep -rn 'organisations\b\|SarOrganisation' src/main | grep -v test` — expect zero SAR-DTO hits post-change
+The organisation-lookup plumbing is **already in place** because `SarOriginalReferral.organisationName` needs it. On `origin/main`:
+
+```kotlin
+// Lines 96-107 in SubjectAccessRequestService.kt
+val allOrgCodes = buildSet {
+  addAll(codesFromFiltered)
+  originalsById.values.forEach { it.offering?.organisationId?.let(::add) }
+}
+val organisationsByCode: Map<String, OrganisationEntity> =
+  if (allOrgCodes.isEmpty()) emptyMap()
+  else organisationRepository.findAllByCodeIn(allOrgCodes).associateBy { it.code }
+val organisationNamesByCode: Map<String, String> = organisationsByCode.mapValues { it.value.name }
+
+// Line 109:
+referrals = filteredReferrals.toSarReferral(staffSurnames, originalsById, organisationNamesByCode),
+```
+
+So the parent `SarReferral` mapper **already has `organisationNamesByCode` in scope**. We just wire the lookup in and add the field to the DTO — no `getSarReferrals` JPQL change, no new query, no schema check. The "JPQL JOIN vs post-fetch" design question from an earlier version of this doc is moot: post-fetch is already the implementation and it's correct.
+
+## Verification checklist
+
+- [ ] `grep -rn 'organisations\b\|SarOrganisation\|toSarOrganisation' src/main` — expect zero hits post-change
+- [ ] `grep -rn '\.organisations\b\|SarOrganisation' src/test` — expect only fixture-seed hits; no top-level mock-setup or assertion hits
 - [ ] `./gradlew ktlintCheck test` clean
-- [ ] Snapshot regen: **added** one row per referral in JSON + HTML; **removed** the whole `<h2>Organisation</h2>` block
-- [ ] `entity-schema.json` reflects the new `SarReferral.organisationName` field
+- [ ] Snapshot regen: **added** one row per referral in JSON + HTML; **removed** the whole `<h2>Organisation</h2>` block and top-level `organisations` array in JSON
+- [ ] `entity-schema.json` reflects: added `SarReferral.organisationName` field, removed `SarOrganisation` class
 - [ ] UUID-leak grep still 0
-- [ ] Confirm the two referrals in the fixture render different organisation names (`HMP Moorland` for the original, something else for the primary — worth exercising the field is per-referral, not global)
+- [ ] Confirm the two referrals in the fixture render different organisation names so the field is demonstrably per-referral (not global)
 
 ## Notes for the agent
 
-Verify with a full grep before deleting `SarOrganisation` — some
-non-SAR call site might also reference it, especially historic seeder
-code.
+- Do not touch `originalReferralId` or `SarOriginalReferral` in this PR — PR-7 stripped the UUID and the sub-block already renders `organisationName`. It's the parent-referral wiring that needs the same treatment.
 

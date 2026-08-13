@@ -1140,21 +1140,21 @@ Deborah aware; may loop Roxanne to annotate row 139 for future DD refreshes so n
 
 ## Impact on PR #1115 (recorded up front)
 
-Two queries + one persistence-helper stanza from PR #1115 become dead code as round-2 sections are deleted:
+Two queries + one persistence-helper stanza from PR #1115 become dead code as round-2 sections are deleted. **Orphan-audit outcomes verified 2026-08-13 pm against `origin/main` @ `0cf89850`** (see [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md) §"Impact on PR #1115" for the full matrix):
 
 | From PR #1115 | Fate | Handled in |
 |---|---|---|
-| `PniResultRepository.findAllByPrisonNumber` `@Query` + ORDER BY | Query becomes orphan (PNI section deleted); orphan-audit + delete if unused | PR-8 |
-| `OasysPniResultEntityRepository.findAllByPrisonNumber` `@Query` + ORDER BY | Same fate | PR-8 |
-| `PersistenceHelper.createPerson` `LocalDate` bind fix | Dead in SAR fixture (person section gone). Helper serves other tests — leave fix in place, only remove the SAR-fixture call site. | PR-8 |
-| `StaffRepository.findByPrisonNumber` surname-sort `@Query` | Query becomes orphan (top-level `staff[]` deleted); orphan-audit + delete if unused | PR-11 |
+| `PniResultRepository.findAllByPrisonNumber` `@Query` + ORDER BY | 🛑 **STAY** — `PersonService.kt:287` is a prod caller (prisoner-merge handler) | PR-8 |
+| `OasysPniResultEntityRepository.findAllByPrisonNumber` `@Query` + ORDER BY | 🗑️ **DELETE** — prod-orphan after PR-8 | PR-8 |
+| `PersistenceHelper.createPerson` `LocalDate` bind fix | **STAY** in helper — `SubjectAccessRequestServiceIntegrationTest.kt:94` also calls it. Remove only the SAR-contract-test call site. | PR-8 |
+| `StaffRepository.findByPrisonNumber` surname-sort `@Query` | 🗑️ **DELETE** — prod-orphan after PR-11 | PR-11 |
 | `V145__add_staff_last_name_index.sql` | Stays. Flyway is forward-only; additive + reversible; costs nothing to leave in place. | — |
 | `ReferralRepository.getSarReferrals` ORDER BY | **Stays useful** (referrals retained) | — |
 | `CourseParticipationRepository.getSarParticipations` ORDER BY | **Stays useful** (courseParticipation retained) | — |
 | Fixture widening: `originalReferral` sub-block + second-POM seed | Mostly stays useful | — |
 | Fixture widening: `person` widening + PNI widening stanzas | Deleted along with their sections | PR-8 |
 
-Two dead queries + one dead helper call is the total sunk-cost from PR #1115. Cheap. Paper trail here.
+One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findByPrisonNumber) + one dead helper-call site (createPerson in SAR contract test) is the total sunk-cost from PR #1115. Cheap. Paper trail here.
 
 ## Timeline (round 2)
 
@@ -1165,6 +1165,14 @@ Two dead queries + one dead helper call is the total sunk-cost from PR #1115. Ch
   - `PR-8-remove-pni-oasys-person.md` fully drafted, agent-executable
   - `PR-9…PR-12` skeletons created for later expansion
   - This DELIVERY-LOG round-2 section appended
+- **2026-08-13 pm** — Structural revision: PR-12 split into hygiene (PR-12) + docs handover (PR-13). `AGENT-PROMPT-TEMPLATE.md` added.
+- **2026-08-13 pm** — Nine-lens deep validation review executed against `origin/main` @ `0cf89850`. Five corrections applied:
+  1. **PR-8 doc DTO location fixed** — top-level SAR response class is `Content` (nested in `SubjectAccessRequestService.kt`), not `SarResponse` in a separate file. All SAR DTOs are nested classes in the same file.
+  2. **PR-8 orphan-audit outcomes locked in** — `PniResultRepository.findAllByPrisonNumber` **stays** (prod caller in `PersonService.kt:287` — prisoner-merge handler); `OasysPniResultEntityRepository.findAllByPrisonNumber` **deletes** (prod-orphan after PR-8); `PersistenceHelper.createPerson` LocalDate fix **stays** (other test callers). This corrects a dangerous "delete if grep-empty in src/main" instruction that could have caused a production regression.
+  3. **PR-10 design decision superseded** — the "JPQL JOIN vs post-fetch" choice is moot; the service already uses `organisationRepository.findAllByCodeIn(...)` + `organisationNamesByCode` map threaded into `toSarReferral(...)` (line 109 on main) for `SarOriginalReferral` resolution. PR-10 scope is much smaller than the original doc suggested (½ day vs 1 day).
+  4. **PR-11 orphan-audit outcome locked in** — `StaffRepository.findByPrisonNumber` is prod-orphan after PR-11; delete the SAR-only query. V145 index stays.
+  5. **PR-8, PR-11 test-caller impact called out** — `SubjectAccessRequestServiceTest.kt` mock setups at lines 184/192/208/216/311/312/313/314 need explicit removal in the relevant PR.
+  6. Parallelisation claim tightened — PR-9/10/11 all touch `SubjectAccessRequestService.kt` + mustache; recommend serial over parallel to avoid merge conflicts.
 
 ## Round 2 — PR outcomes
 

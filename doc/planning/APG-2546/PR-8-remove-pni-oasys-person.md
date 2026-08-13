@@ -76,48 +76,83 @@ The three sections on `main` (`sar_template.mustache` line refs):
 {{/oasysPniResults}}
 ```
 
-Corresponding DTO fields (top-level SAR response):
+**Where the DTOs live** — verified 2026-08-13 on `origin/main`:
+
+- Top-level SAR response class is **`Content`** (NOT `SarResponse` — the class name is `Content`, nested inside `SubjectAccessRequestService`).
+- **All SAR DTOs are nested classes inside `SubjectAccessRequestService.kt`** — no separate DTO files exist. So "deleting `SarPniResult`" means deleting the nested `data class SarPniResult(…)` block inside that single file, not a separate `.kt` file.
+
+`Content` DTO on `origin/main` (line 163):
 
 ```kotlin
-data class SarResponse(
-    // ...existing fields (referrals, courseParticipation, courses, staff, organisations)...
+data class Content(
+    val referrals: List<SarReferral>,
+    val courseParticipation: List<SarCourseParticipation>,
+    val courses: List<SarCourse>,
     val pniResults: List<SarPniResult>,           // ← this PR removes
     val person: SarPerson?,                       // ← this PR removes
     val oasysPniResults: List<SarOasysPniResult>, // ← this PR removes
+    val staff: List<SarStaff>,
+    val organisations: List<SarOrganisation>,
 )
 ```
 
-(Exact class names to be confirmed on branch — grep
-`SarResponse`, `SarPniResult`, `SarPerson`, `SarOasysPniResult`
-before editing.)
+`Content` construction on `origin/main` (lines 108-118):
+
+```kotlin
+return HmppsSubjectAccessRequestContent(
+  content = Content(
+    referrals = filteredReferrals.toSarReferral(staffSurnames, originalsById, organisationNamesByCode),
+    courseParticipation = filteredParticipations.toSarParticipation(staffSurnames),
+    courses = courseRepository.getSarCourses(prn).toSarCourse(),
+    pniResults = pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),         // ← remove
+    person = personRepository.findPersonEntityByPrisonNumber(prn)?.toSarPerson(),          // ← remove
+    oasysPniResults = oasysPniResultEntityRepository.findAllByPrisonNumber(prn).toSarOasysPniResult(), // ← remove
+    staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() },
+    organisations = codesFromFiltered.mapNotNull { organisationsByCode[it]?.toSarOrganisation() },
+  ),
+)
+```
 
 ## Files to change
 
-**Product code**
+**Product code — all inside `src/main/kotlin/.../service/SubjectAccessRequestService.kt`:**
 
-| File | Change |
+| Change | Lines on `origin/main` (@ `0cf89850`) |
 |---|---|
-| `src/main/resources/sar_template.mustache` | Delete lines 79–99 (`<h2>PNI results>`), 101–121 (`<h2>Person>`), 123–134 (`<h2>OASys PNI results>`). Preserve whitespace between remaining blocks. |
-| SAR response DTO (grep `data class SarResponse`) | Remove three fields: `pniResults`, `person`, `oasysPniResults` (or whatever their exact names are). |
-| SAR service class (grep for `.pniResults =` / `.person =` / `.oasysPniResults =`) | Remove the population statements + the underlying repository / service calls. |
-| Three now-unused DTO classes (`SarPniResult`, `SarPerson`, `SarOasysPniResult`) | Delete the whole classes. |
-| `PniResultRepository.findAllByPrisonNumber(...)` | **Orphan-audit** — `grep -r findAllByPrisonNumber src/main` scoped to `PniResultRepository`. If no non-SAR caller, delete the query. Otherwise leave with ORDER BY intact. |
-| `OasysPniResultEntityRepository.findAllByPrisonNumber(...)` | Same orphan-audit + treatment. |
-| Any `SarPersonMapper` / equivalent | Delete if it becomes unused. |
+| Remove three fields from `data class Content(...)` | lines 167 (`pniResults`), 168 (`person`), 169 (`oasysPniResults`) |
+| Remove three population lines in the `Content(...)` construction | lines 112, 113, 114 |
+| Delete nested `data class SarPniResult(...)` and its mapper `.toSarPniResult()` extension | line 236 + mapper elsewhere in the file |
+| Delete nested `data class SarPerson(...)` and its mapper `.toSarPerson()` extension | line 250 + mapper |
+| Delete nested `data class SarOasysPniResult(...)` and its mapper `.toSarOasysPniResult()` extension | line 266 + mapper |
+| Delete the three field-inject/import references (`pniResultRepository`, `oasysPniResultEntityRepository`, `personRepository`) **IF** no other callers within the class. `personRepository` **stays** (other SAR-service methods may use it; verify). | class constructor params |
+
+**Template — `src/main/resources/sar_template.mustache`:**
+
+| Change | Lines on `origin/main` |
+|---|---|
+| Delete `<h2>PNI results>` block | 79–99 |
+| Delete `<h2>Person>` block | 101–121 |
+| Delete `<h2>OASys PNI results>` block | 123–134 |
+
+**Repositories — orphan-audit pre-verified 2026-08-13, results locked in:**
+
+| Repository query | Prod callers besides SAR | Verdict |
+|---|---|---|
+| `PniResultRepository.findAllByPrisonNumber` | **`PersonService.kt:287`** (prisoner-merge NOMIS domain-event handler) | 🛑 **KEEP THE QUERY.** Only remove the SAR service call site (line 112). ORDER BY from PR #1115 becomes irrelevant to SAR but remains harmless for the PersonService caller. |
+| `OasysPniResultEntityRepository.findAllByPrisonNumber` | None in `src/main` (only SAR line 114 + test-side callers in `SubjectAccessRequestServiceTest.kt`) | 🗑️ **Delete the query.** Test-side mocks in `SubjectAccessRequestServiceTest.kt` go with PR-8 anyway. V145 stays (forward-only). |
+| `PersonRepository.findPersonEntityByPrisonNumber` | **Six prod callers** — `AdminController.kt:172`, `PersonService.kt:50, 76, 177, 278`, plus SAR line 113. | 🛑 **KEEP THE QUERY.** Only remove the SAR call site. |
 
 **Migrations**
 
-None. V145 stays (Flyway forward-only; the index it adds is on
-`staff.last_name` and is used by another query PR-11 will decide about
-separately).
+None. V145 stays.
 
-**Test code**
+**Test code:**
 
 | File | Change |
 |---|---|
-| `src/test/kotlin/.../SarContractIntegrationTest.kt` — `setupTestData()` | Remove `pniResult`, `oasysPniResult`, `person` fixture stanzas. Remove the corresponding companion `object` consts (`PNI_RESULT_ID`, `OASYS_PNI_RESULT_ID`, `PERSON_ID` — whichever are only used for these). Remove the `createPerson(...)` call (helper stays; other tests use it). |
-| `src/test/kotlin/.../SarContractIntegrationTest.kt` — expectations | The snapshot goldens are the primary assertion — no explicit field-by-field expectations should need touching. Verify. |
-| Snapshot goldens | Regenerated by `script/local-scripts/regenerate-sar-snapshots.sh` after the code changes. Expected diff: three whole sections deleted from both `sar-api-response.json` and `sar-expected-render-result.html`; `entity-schema.json` unchanged. |
+| `src/test/kotlin/.../SarContractIntegrationTest.kt` — `setupTestData()` around line 177 | Remove `persistenceHelper.createPniResult(...)`, `persistenceHelper.createOasysPniResult(...)`, `persistenceHelper.createPerson(...)` calls. Remove `PNI_RESULT_ID`, `OASYS_PNI_RESULT_ID`, `PERSON_ID` companion consts. |
+| `src/test/kotlin/.../SubjectAccessRequestServiceTest.kt` | Remove mock setups at lines **184, 208, 216** (`every { … findAllByPrisonNumber … }` for pni / oasys / staff) and verification calls at lines **311, 312, 313, 314**. Note line 216/314 belong to PR-11 (staff) — this PR only removes lines 184, 208 (pniResults), 311, 313 (verify calls), and line 192, 312 (personRepository mock/verify). |
+| Snapshot goldens | Regenerated by `script/local-scripts/regenerate-sar-snapshots.sh`. Expected diff: three whole sections deleted from both `sar-api-response.json` and `sar-expected-render-result.html`; `entity-schema.json` shrinks by three nested class definitions. |
 
 ## Non-obvious things
 
