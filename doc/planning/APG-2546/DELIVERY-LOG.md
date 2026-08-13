@@ -1102,3 +1102,83 @@ short plan then, with fresh context.
 
 
 
+
+---
+
+# Round 2 — 2026-08-13 kickoff
+
+## Context
+
+Round 1 closed 2026-08-11 with PR #1115 merged (widened fixture + SAR-collection `ORDER BY` hygiene). The 2026-08-12 sample PDF generated from preprod CRN A9648CH via Cameron's SAR dev-service (Option 1, full-chrome) was sent to Branston (OSAR) for round-2 review.
+
+On 2026-08-13 (13:25) Deborah (SDM, Cameron's SAR product team) came back with a follow-up action list from the review meeting. Verbatim:
+
+1. Remove NOMIS IDs and CRNs as they are in the header.
+2. Remove PNI data and this is retrieved from ARNs via the Probation Hub request.
+3. Remove Personal Data section.
+4. Add organisation field to the referral rather than list separately so it is in context.
+5. Add staff name field to the referral rather than list separately so it is in context.
+
+Raby DM'd Deborah to clarify #5: the referral already carries `primaryPomStaffSurname` + `secondaryPomStaffSurname` inline (added in PR-5). Options: (a) drop the redundant top-level `staff[]` list, keep the inline surname fields; or (b) upgrade the two surname fields to full names (forename + surname) and remove the top-level list. **Deborah confirmed (a).** Locked.
+
+Round-2 delivery scaffolded on this planning branch as PRs 8–12 (continuation of the PR-1…PR-7 sequence). New overview: [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md). Round-2 working docs:
+
+- [`PR-8-remove-pni-oasys-person.md`](./PR-8-remove-pni-oasys-person.md) — three-section removal, fully drafted, agent-executable
+- [`PR-9-scrub-nomis-and-crn.md`](./PR-9-scrub-nomis-and-crn.md) — skeleton
+- [`PR-10-organisation-into-referral.md`](./PR-10-organisation-into-referral.md) — skeleton
+- [`PR-11-remove-top-level-staff.md`](./PR-11-remove-top-level-staff.md) — skeleton
+- [`PR-12-round-2-docs-and-handover.md`](./PR-12-round-2-docs-and-handover.md) — skeleton
+
+## DD row 139 override
+
+Roxanne's Digital Data review row 139 (`pni_result . pni_result_json`, SAR=Yes, In SAR API=Yes, note *"these are in SAR report hence H should be Yes. Updated"* dated 2026-07-10) is **superseded** by Deborah's 2026-08-13 meeting outcome.
+
+Rationale: PNI data (both `pniResults[]` and `oasysPniResults[]`) is now sourced by SAR consumers via the ARNs Probation Hub feed, so replicating it in the Accredited Programmes SAR report is duplicative and confusing for redaction reviewers.
+
+Deborah aware; may loop Roxanne to annotate row 139 for future DD refreshes so nobody re-adds `pni_result_json` on a subsequent sweep. Recorded here + in [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md) §"DD spreadsheet override".
+
+## Impact on PR #1115 (recorded up front)
+
+Two queries + one persistence-helper stanza from PR #1115 become dead code as round-2 sections are deleted:
+
+| From PR #1115 | Fate | Handled in |
+|---|---|---|
+| `PniResultRepository.findAllByPrisonNumber` `@Query` + ORDER BY | Query becomes orphan (PNI section deleted); orphan-audit + delete if unused | PR-8 |
+| `OasysPniResultEntityRepository.findAllByPrisonNumber` `@Query` + ORDER BY | Same fate | PR-8 |
+| `PersistenceHelper.createPerson` `LocalDate` bind fix | Dead in SAR fixture (person section gone). Helper serves other tests — leave fix in place, only remove the SAR-fixture call site. | PR-8 |
+| `StaffRepository.findByPrisonNumber` surname-sort `@Query` | Query becomes orphan (top-level `staff[]` deleted); orphan-audit + delete if unused | PR-11 |
+| `V145__add_staff_last_name_index.sql` | Stays. Flyway is forward-only; additive + reversible; costs nothing to leave in place. | — |
+| `ReferralRepository.getSarReferrals` ORDER BY | **Stays useful** (referrals retained) | — |
+| `CourseParticipationRepository.getSarParticipations` ORDER BY | **Stays useful** (courseParticipation retained) | — |
+| Fixture widening: `originalReferral` sub-block + second-POM seed | Mostly stays useful | — |
+| Fixture widening: `person` widening + PNI widening stanzas | Deleted along with their sections | PR-8 |
+
+Two dead queries + one dead helper call is the total sunk-cost from PR #1115. Cheap. Paper trail here.
+
+## Timeline (round 2)
+
+- **2026-08-13 13:25** — Deborah's action list received (Slack).
+- **2026-08-13 pm** — Raby DM'd (a) vs (b) clarification for ask #5; Deborah confirmed (a).
+- **2026-08-13 pm** — Round-2 planning docs scaffolded on `APG-2546/planning-sar-field-removals`:
+  - `ROUND-2-PLAN.md` created
+  - `PR-8-remove-pni-oasys-person.md` fully drafted, agent-executable
+  - `PR-9…PR-12` skeletons created for later expansion
+  - This DELIVERY-LOG round-2 section appended
+
+## Round 2 — PR outcomes
+
+_(To be filled in as PRs land.)_
+
+| PR | Working doc | Branch | PR # | Merged | SHA | Notes |
+|---|---|---|---|---|---|---|
+| PR-8 | `PR-8-remove-pni-oasys-person.md` | `APG-2546/remove-pni-oasys-person` | _pending_ | _pending_ | _pending_ | — |
+| PR-9 | `PR-9-scrub-nomis-and-crn.md` | `APG-2546/scrub-nomis-and-crn` | _pending_ | _pending_ | _pending_ | — |
+| PR-10 | `PR-10-organisation-into-referral.md` | `APG-2546/organisation-into-referral` | _pending_ | _pending_ | _pending_ | — |
+| PR-11 | `PR-11-remove-top-level-staff.md` | `APG-2546/remove-top-level-staff` | _pending_ | _pending_ | _pending_ | — |
+| PR-12 | `PR-12-round-2-docs-and-handover.md` | `APG-2546/round-2-docs-handover` | _pending_ | _pending_ | _pending_ | — |
+
+## Handover artefacts (round 2)
+
+- Sample PDF sent to Branston round 2 (2026-08-12, from preprod CRN A9648CH): **superseded** by Deborah's round-2 asks.
+- Sample PDF for round 3 (post PR-8…PR-11 merge): _pending — generated in PR-12_.
+
