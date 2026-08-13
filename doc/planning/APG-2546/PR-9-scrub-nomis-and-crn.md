@@ -19,14 +19,29 @@ gone by cascade from PR-8. Sanity-grep confirms.
 
 ## Scope (verified against `origin/main` @ `0cf89850`, 2026-08-13 pm)
 
+**Product code — all inside `src/main/kotlin/.../service/SubjectAccessRequestService.kt`:**
+
 - Remove `prisonerNumber: String` field from nested `data class SarReferral(...)` (line 175 on main)
 - Remove `prisonNumber: String` field from nested `data class SarCourseParticipation(...)` (line 214)
-- Remove corresponding template rows:
-  - `sar_template.mustache` line 6 (`<tr><td>Prisoner number</td>...</tr>` inside referrals block)
-  - `sar_template.mustache` line 43 (`<tr><td>Prisoner number</td>...</tr>` inside courseParticipation block)
-- Remove population statements in `toSarReferral(...)` and `toSarParticipation(...)` mappers
-- Verify no test-side assertions on these fields break — the golden is the primary assertion; if `SarContractIntegrationTest` or `SubjectAccessRequestServiceTest` reference `.prisonerNumber` / `.prisonNumber` explicitly, update.
-- Regenerate snapshots
+- Remove corresponding population statements in `toSarReferral(...)` mapper (line 296+) and `toSarParticipation(...)` mapper (line 275+)
+
+**Template — `src/main/resources/sar_template.mustache`:**
+
+- Delete line 6 (`<tr><td>Prisoner number</td><td>{{ optionalValue prisonerNumber }}</td></tr>` inside referrals block)
+- Delete line 43 (`<tr><td>Prisoner number</td><td>{{ optionalValue prisonNumber }}</td></tr>` inside courseParticipation block)
+
+**Test code — pre-verified 2026-08-13:**
+
+`src/test/kotlin/.../integration/SubjectAccessRequestServiceIntegrationTest.kt`:
+
+| Lines | Change |
+|---|---|
+| 124 | Remove `assertThat(prisonerNumber).isEqualTo(prisonNumber)` inside `with(content.referrals[0]) { … }` block |
+| 133 | Remove `assertThat(prisonNumber).isEqualTo(prisonNumber)` inside `with(content.courseParticipation[0]) { … }` block |
+
+No other test files reference `.prisonerNumber` / `.prisonNumber` on the removed DTO fields (grep-verified against `SubjectAccessRequestServiceTest.kt` and `SarContractIntegrationTest.kt`; the latter uses snapshot goldens rather than field-level assertions).
+
+**Snapshot goldens**: regenerated. Expected diff: `prisonerNumber` field removed from every `referrals[*]` object in JSON; `prisonNumber` field removed from every `courseParticipation[*]` object. Two template rows removed from HTML per referral / per courseParticipation.
 
 ## Not in scope
 

@@ -56,6 +56,27 @@ referrals = filteredReferrals.toSarReferral(staffSurnames, originalsById, organi
 
 So the parent `SarReferral` mapper **already has `organisationNamesByCode` in scope**. We just wire the lookup in and add the field to the DTO — no `getSarReferrals` JPQL change, no new query, no schema check. The "JPQL JOIN vs post-fetch" design question from an earlier version of this doc is moot: post-fetch is already the implementation and it's correct.
 
+## Test code — pre-verified 2026-08-13
+
+`src/test/kotlin/.../service/SubjectAccessRequestServiceTest.kt`:
+
+| Lines | Change |
+|---|---|
+| 225–230 | Leave alone — `organisationRepository.findAllByCodeIn(...)` mock still needed (SarOriginalReferral resolution) |
+| 302 | Remove `assertThat(organisations).hasSize(1)` |
+| 303–305 | Remove `val organisation = organisations[0]` + two `assertThat` lines (code, name) |
+| **new** | Add an assertion on `referral.organisationName` inside the existing `with(result!!.content as SubjectAccessRequestService.Content) { … val referral = referrals[0] … }` block. Pattern to mirror: the `SarOriginalReferral.organisationName` assertion at line 258. |
+
+`src/test/kotlin/.../integration/SubjectAccessRequestServiceIntegrationTest.kt`:
+
+- No mandatory test-code change (test doesn't reference `content.organisations`; grep-verified).
+- **Recommended add**: an `assertThat(organisationName).isEqualTo("HMP Moorland")` inside the existing `with(content.referrals[0]) { … }` block (currently at lines 123–130), to lock the field end-to-end in the integration test too.
+
+`src/test/kotlin/.../integration/SarContractIntegrationTest.kt`:
+
+- Fixture already seeds an organisation via `persistenceHelper.createOrganisation(...)` at line 104 — no fixture change needed.
+- Snapshot goldens regenerated: adds `organisationName` field to each `referrals[*]` object in JSON + one `<tr><td>Organisation></td>` row per referral in HTML; removes top-level `organisations[]` array in JSON + `<h2>Organisation></h2>` block in HTML.
+
 ## Verification checklist
 
 - [ ] `grep -rn 'organisations\b\|SarOrganisation\|toSarOrganisation' src/main` — expect zero hits post-change

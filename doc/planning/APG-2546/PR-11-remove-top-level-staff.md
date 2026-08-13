@@ -37,11 +37,25 @@ redundant top-level `staff[]` list, keep the inline surname fields.
 
 - `V145__add_staff_last_name_index.sql` — **STAYS.** Flyway forward-only. The index on `staff.last_name` costs nothing to leave in place even without a query that uses it.
 
-**Test code:**
+**Test code — pre-verified 2026-08-13:**
 
-- `src/test/kotlin/.../SarContractIntegrationTest.kt` — the second-POM staff seed added in PR #1115 partly stays useful (the referral's `secondaryPomStaffId` still gets exercised via the inline surname field on the referral). Keep the seed. Consider removing whichever companion const only feeds the top-level `staff[]` list — but if all staff consts also feed the referral's POM fields (they do), keep them.
-- `src/test/kotlin/.../SubjectAccessRequestServiceTest.kt` — remove mock setup at line 216 (`every { staffRepository.findByPrisonNumber(prn) } returns ...`) and verify call at line 314. Note: PR-8 removes lines 184/208/311/312/313; PR-11 removes 216/314.
-- Snapshot goldens regenerated.
+`src/test/kotlin/.../service/SubjectAccessRequestServiceTest.kt`:
+
+| Lines | Change |
+|---|---|
+| 216–224 | Remove mock `every { staffRepository.findByPrisonNumber(prn) } returns listOf(...)` (StaffEntityFactory-built list) |
+| 244 | Remove `assertThat(staff).hasSize(1)` inside `with(result!!.content as SubjectAccessRequestService.Content) { … }` block |
+| 299–300 | Remove `val staffMember = staff[0]` + `assertThat(staffMember.lastName).isEqualTo("River")` |
+| 314 | Remove `verify { staffRepository.findByPrisonNumber(prn) }` |
+
+`src/test/kotlin/.../integration/SubjectAccessRequestServiceIntegrationTest.kt`:
+
+- No test-code change (test doesn't reference `content.staff`; grep-verified). `persistenceHelper.createStaff(...)` seed at line 103 stays because it feeds `referral.primaryPomStaffId` which still gets exercised via the inline `primaryPomStaffSurname` field.
+
+`src/test/kotlin/.../integration/SarContractIntegrationTest.kt`:
+
+- Second-POM staff seed (`persistenceHelper.createStaff(...)` at lines 219–225 on main) **stays** — still exercises `referral.secondaryPomStaffId` → inline `secondaryPomStaffSurname` field. Companion consts `SECONDARY_STAFF_ID` and `SECONDARY_STAFF_ROW_ID` stay.
+- Snapshot goldens regenerated: removes top-level `staff[]` array in JSON + `<h2>Staff></h2>` block in HTML. Inline `primaryPomStaffSurname` / `secondaryPomStaffSurname` fields on each referral **stay** — sanity-check they're still present in the goldens.
 
 ## Impact on PR #1115 hygiene fix
 

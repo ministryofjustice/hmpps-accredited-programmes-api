@@ -1173,6 +1173,7 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   4. **PR-11 orphan-audit outcome locked in** — `StaffRepository.findByPrisonNumber` is prod-orphan after PR-11; delete the SAR-only query. V145 index stays.
   5. **PR-8, PR-11 test-caller impact called out** — `SubjectAccessRequestServiceTest.kt` mock setups at lines 184/192/208/216/311/312/313/314 need explicit removal in the relevant PR.
   6. Parallelisation claim tightened — PR-9/10/11 all touch `SubjectAccessRequestService.kt` + mustache; recommend serial over parallel to avoid merge conflicts.
+- **2026-08-13 pm (third-pass exhaustive review)** — Third and final validation pass surfaced **major missed test impact** in the round-2 docs. `SubjectAccessRequestServiceIntegrationTest.kt` (integration test with real fixture + field-level DTO assertions) and `SubjectAccessRequestServiceTest.kt` (unit test with `with(content) { assertThat(pniResults.size) … }` style assertions) both have compile-breaking assertions on the fields PR-8 removes. Same class of issue for PR-9 (2 lines), PR-10 (4 lines + one recommended add), and PR-11 (4 lines). PR-8/9/10/11 docs updated with **exact line-number-per-file tables** so agents don't need to re-derive. Also verified: `DomainEventsListenerTest.kt` and `CourseParticipationControllerIntegrationTest.kt` are NOT affected (grep-confirmed).
 
 ## Round 2 — PR outcomes
 
