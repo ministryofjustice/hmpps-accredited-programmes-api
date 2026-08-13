@@ -1182,6 +1182,18 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   Meaning: the SAR wrapper injects NOMIS ID (from a NOMIS API) and nDelius CRN (from a separate nDelius API) into the wrapper header from its own upstream sources — it does **not** consume those keys from the Accredited Programmes SAR payload. Safe to strip.
 
   Covers both PR-8 (person block, NOMIS ID) and PR-9 (CRN + prisonerNumber). PR-8's "Non-obvious #3" and PR-9's "Notes for the agent" both updated to reference this confirmation; ROUND-2-PLAN R1 row flipped to ✅ RESOLVED. No further wrapper-team confirmation needed for round-2 execution.
+- **2026-08-13 pm** — **Round-3 review scoped OUT of APG-2546.** Decision: any further OSAR feedback from Branston after PR-13's sample PDF lands — whether during the round-2 sprint or after close-out — is handled as a **separate ticket** (working name APG-25xx-round-3), not folded into APG-2546. Rationale: APG-2546 already spans two rounds and multiple weeks; a third round mid-flight would blur close-out signals, muddy the DD paper trail, and delay OSAR sign-off on the round-2 deliverable. Round-2 close-out signal is *feedback received*, not *feedback with zero further asks*. Process baked into `ROUND-2-PLAN.md` §"Out of scope (round 3+)" (verbatim-log path, new-ticket path, escalation path for security/compliance hard blocks). PR-13 "Not in scope" + "Close-out condition" sections updated to reflect. R5 mitigation flipped from "open PR-8b/PR-9b" (was: fold into APG-2546 as sub-PRs) to "spin new ticket" (out-of-scope).
+
+  **Estimate for round-2 delivery** (recorded here as the paper-trail forecast before PR-8 opens):
+
+  | Scenario | Working days |
+  |---|---|
+  | Pure dev-time (from PR estimates) | ~4½ days (PR-8 1½ + PR-9 ½ + PR-10 ½ + PR-11 ½ + PR-12 ½ + PR-13 1) |
+  | Optimistic calendar (focused dev, same-day reviews) | ~6 working days (~1¼ weeks) |
+  | Realistic calendar (round-1's actual cadence, one small rebase / review cycle per PR) | **8–10 working days (~2 sprint weeks)** |
+  | Pessimistic (rework on one of PR-9/10/11, or slow reviews) | ~3 weeks |
+
+  Not included: OSAR round-3 review turnaround from Branston (budget 3–5 working days after PR-13 ships) — which per the out-of-scope decision above closes APG-2546 on *reply received* regardless of round-3 asks.
 
 ## Round 2 — PR outcomes
 

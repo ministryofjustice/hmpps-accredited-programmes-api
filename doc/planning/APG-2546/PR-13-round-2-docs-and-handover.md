@@ -57,6 +57,36 @@ Deliverables:
 
 - No product code changes in this PR. Docs + generated artefacts
   only.
+- **Round-3 feedback handling is out of scope for APG-2546.** If
+  Branston responds to the sample PDF with further change requests
+  (add / remove / rearrange fields, template layout, header-owner
+  re-negotiation, etc.), the process is:
+  1. Log Branston's reply verbatim in
+     `doc/planning/APG-2546/round-3-branston-feedback.md` (paper
+     trail only — do **not** edit any other APG-2546 planning
+     doc).
+  2. Open a new Jira ticket (working name APG-25xx-round-3) with
+     the verbatim feedback + scope reading; assign per team
+     capacity.
+  3. Close APG-2546 with the round-2 outcome regardless of
+     whether round-3 asks exist.
+  4. If any round-3 ask is a security / compliance hard block,
+     escalate to Deborah + Sharon separately as a hot-fix
+     (still not a scope change on this ticket).
+
+  See [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md) §"Out of scope
+  (round 3+)" for the full rationale.
+
+## Close-out condition
+
+APG-2546 closes on:
+
+- All six PRs (PR-8…PR-13) merged.
+- Sample PDF delivered to Branston (email + Slack draft sent).
+- DELIVERY-LOG round-2 section closed with SHAs + timings.
+- **Not** on "zero further asks from Branston." Feedback received
+  is the close-out signal; whatever Branston asks next is a fresh
+  ticket per the process above.
 
 ## Verification checklist skeleton
 

@@ -142,7 +142,7 @@ refreshes so nobody re-adds `pni_result_json` on a subsequent sweep.
 | R2 | An organisation-related field is populated somewhere we didn't spot. | PR-10: full grep for `organisationName` / `organisations` before deleting the top-level block. Verify DB has a resolvable `organisation_id` on every referral row (nullable OK). |
 | R3 | Repository queries removed in PR-8 / PR-11 turn out to have other callers. | Each PR: `grep -r <queryName>` across `src/main` before deletion. If any non-SAR caller hit, leave the query alive (cheap) and just remove the SAR-service call site. |
 | R4 | Fixture regen produces surprising side-effects (as it did in #1115 with Postgres date-binding). | Same guardrail: run `./gradlew ktlintCheck test` on top of every PR, use `script/local-scripts/regenerate-sar-snapshots.sh` (not raw gradle + copy), UUID-leak grep on both goldens post-regen. |
-| R5 | Round-3 review lands mid-sprint from Branston asking for further cuts. | Land PR-8 + PR-9 first (biggest wins). Open round-3 changes as PR-8b / PR-9b rather than re-scoping. |
+| R5 | Round-3 review lands mid-sprint from Branston asking for further cuts. | ✅ **Scoped out 2026-08-13** — any round-3 change requests are handled as a **new ticket** (APG-25xx-round-3), not folded into APG-2546. Rationale: APG-2546 already carries two rounds of scope; a third round mid-flight would blur close-out signals for reviewers, DD paper trail, and OSAR sign-off. See §"Out of scope (round 3+)" below. |
 | R6 | Fresh agent reads the *planning branch's* working tree and thinks every code line-ref is wrong. | Planning branch was cut from merge-base `106e27d2` (pre-round-1) and only adds docs. Its `src/` tree is behind `origin/main`. Every PR prereq **must** say "start from a fresh checkout of `origin/main` (currently `0cf89850`), NOT this planning branch's working tree". PR-8 prereqs updated accordingly; propagate as PR-9/10/11 are picked up. |
 | R7 | `.snyk` + `Copy of *.xlsx` untracked files reappear in `git status` on every planning session and risk being accidentally staged. | Add to `.gitignore` (or the ticket's `.git/info/exclude`) as a permanent hygiene fix in PR-12 or PR-13. Interim: every PR checklist includes `git status --short` gate before commit. |
 
@@ -151,8 +151,58 @@ refreshes so nobody re-adds `pni_result_json` on a subsequent sweep.
 - All 5 asks from Deborah's action list delivered
 - All 6 PRs (PR-8…PR-13) merged to main
 - Fresh sample PDF generated from a preprod CRN + shared with Branston via PR-13
-- OSAR round-3 sign-off received
+- OSAR round-3 sign-off received (or, if Branston comes back with change requests, those are logged and handed off to a **new ticket** per §"Out of scope" below — APG-2546 closes on *feedback received*, not on *feedback with zero further asks*)
 - `DELIVERY-LOG.md` closed out with final SHAs + timings
+
+## Out of scope (round 3+)
+
+**APG-2546 is a two-round ticket.** Round-1 shipped PR #1107–#1115;
+round-2 ships PR-8–PR-13. Any further OSAR review feedback from
+Branston after PR-13's sample PDF lands — regardless of whether it
+arrives during the round-2 sprint or after close-out — is handled as
+a **separate ticket**, not folded into APG-2546. This includes:
+
+- Requests for additional field/section removals not on Deborah's
+  2026-08-13 list
+- Requests to *re-add* fields we removed
+- Cosmetic / template layout feedback (APG-2547 already scoped for
+  appearance work under Cameron's team)
+- Header-owner scope re-negotiation
+- Any change to the DD row 139 override outcome
+
+**Rationale:**
+
+- APG-2546 already spans two rounds and multiple weeks; a third
+  round mid-flight blurs close-out signals for reviewers, muddies
+  the DD paper trail, and delays OSAR sign-off on the deliverable
+  we've committed to.
+- Deborah's 2026-08-13 asks are unambiguous, in-scope, and locked.
+  Widening scope again risks re-opening resolved questions
+  (Q1 Option B, Q2 is_national, DD row 139 override, option (a) vs
+  (b) for staff).
+- A fresh ticket carries its own DD-sweep, plan doc, delivery-log,
+  and OSAR round of review — reproducing round-1 / round-2 discipline
+  from a clean start is cheaper than retrofitting scope creep onto
+  a ticket already in close-out.
+
+**Process if round-3 feedback lands:**
+
+1. Log Branston's feedback verbatim in a new file
+   `doc/planning/APG-2546/round-3-branston-feedback.md` for paper
+   trail (do **not** edit APG-2546 planning docs).
+2. Open a new Jira ticket (working name APG-25xx-round-3) with the
+   verbatim feedback + scope reading; assign per team capacity.
+3. Close APG-2546 with the current round-2 outcome regardless.
+4. If any round-3 ask is deemed critical (e.g. a security /
+   compliance hard block), escalate to Deborah + Sharon separately;
+   a critical finding is a hot-fix, not a round-2 scope change.
+
+**What still counts as round-2 in-scope after PR-13 opens:**
+
+- Bug-fixes on any of PR-8/9/10/11/12/13 spotted during their own
+  review cycle (that's just PR review, not scope creep).
+- Rebase / merge-conflict resolution as the six PRs land serially.
+- Doc drift corrections (like the polish commit `9268f180`).
 
 ## Working directory index
 
