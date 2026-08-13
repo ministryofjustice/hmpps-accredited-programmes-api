@@ -76,8 +76,11 @@ PR-8's doc — the skeleton has scope + notes but you'll need to
 flesh out "Files to change" and the verification checklist),
 follow it, and open a PR using a similar description template.
 
-Assumed starting point: tip of main after PR-8 has merged. If
-PR-8 hasn't merged yet, stop and tell me before touching anything.
+Assumed starting point: tip of main after PR-8 has merged. PR-10
+and PR-11 must be serialised with this PR (not parallel) — all
+three touch SubjectAccessRequestService.kt + sar_template.mustache
+and will merge-conflict otherwise. If PR-8 hasn't merged yet, stop
+and tell me before touching anything.
 
 Also worth reading before you start:
   - doc/planning/APG-2546/ROUND-2-PLAN.md §"Round-2 PR breakdown"
@@ -95,20 +98,28 @@ count from the regenerated sample, and any surprises.
 ```text
 Pick up APG-2546 PR-10. The working doc is at
 doc/planning/APG-2546/PR-10-organisation-into-referral.md — read
-it end to end, expand the skeleton into a full working doc (see
-the "Backend design decision to confirm" section — verify option
-A is the right call before committing to the JPQL change), and
-open a PR using a similar description template to PR-8's.
+it end to end and follow it. The design decision (JPQL JOIN vs
+post-fetch) is already resolved in the doc: post-fetch is what
+the service already does for SarOriginalReferral.organisationName,
+and PR-10 just wires the parent SarReferral through the same map.
+No new query, no schema check. Scope is smaller than the original
+skeleton suggested (½ day, not 1 day).
+
+Open a PR using a similar description template to PR-8's.
 
 Assumed starting point: tip of main after PR-8 has merged. PR-9
-and PR-11 may be in-flight in parallel — if they cause a merge
-conflict at review time, rebase and flag.
+and PR-11 must be serialised (not parallel) with PR-10 — all three
+touch SubjectAccessRequestService.kt + sar_template.mustache and
+will merge-conflict otherwise. If you're picking this up mid-flight,
+check with the human which of PR-9/10/11 is currently in review
+before opening yours.
 
 Also worth reading before you start:
   - doc/planning/APG-2546/ROUND-2-PLAN.md §"Round-2 PR breakdown"
   - The existing originalReferral sub-block in
-    sar_template.mustache (line 24 on main) already carries
-    organisationName — same shape applies to the parent referral
+    sar_template.mustache (line 26 on origin/main @ 0cf89850)
+    already carries organisationName — same shape applies to the
+    parent referral.
 
 When you're done, report back the PR number, merge SHA, PDF page
 count, and any surprises.
@@ -125,7 +136,8 @@ end to end, expand the skeleton into a full working doc, follow
 it, and open a PR using a similar description template to PR-8's.
 
 Assumed starting point: tip of main after PR-8 has merged. PR-9
-and PR-10 may be in-flight in parallel.
+and PR-10 must be serialised with this PR (not parallel) — all
+three touch SubjectAccessRequestService.kt + sar_template.mustache.
 
 Option (a) is locked (Deborah confirmed 2026-08-13 pm — see
 DELIVERY-LOG round-2 kickoff): just delete the top-level staff[]
@@ -222,6 +234,15 @@ the round-3 sample-PDF artefact path.
 - **Fresh chat session per PR.** Round-1 PR-7 was executed cleanly
   in a fresh session and the discipline held. Cross-context
   contamination is the main risk.
+- **Always start from a fresh checkout of `origin/main`, NOT the
+  planning branch.** The planning branch (`APG-2546/planning-sar-field-removals`)
+  was cut from merge-base `106e27d2` (pre-round-1) and only adds
+  docs — its `src/` tree is behind `origin/main`. Every line-number
+  in the working docs is anchored to `origin/main @ 0cf89850`; if
+  the agent reads files from the planning-branch working tree it
+  will see wildly different line numbers and think everything is
+  wrong. First command in every fresh session should be
+  `git fetch origin && git checkout origin/main`.
 - **Confirm the starting-point SHA** in the prompt before pasting.
   The templates above hard-code `0cf89850` (main tip after
   PR #1115) as PR-8's starting point — update as later PRs merge.

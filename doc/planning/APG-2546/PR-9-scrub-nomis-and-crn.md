@@ -1,7 +1,8 @@
-# PR-9 — Scrub `prisonerNumber` from surviving sections
+# PR-9 — Scrub `prisonerNumber` from surviving sections (CRN cascades from PR-8)
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/scrub-nomis-and-crn`
-> • **Est.:** ½ dev day • **Depends on:** PR-8 merged (three sections gone; simplifies grep surface)
+> • **Est.:** ½ dev day
+> • **Sequencing:** must merge **after** PR-8 (not because of a code dep — PR-9 touches different fields — but because PR-9 and PR-8 both edit `SubjectAccessRequestService.kt` + `sar_template.mustache` and would merge-conflict if parallel). PR-9 must **also** be serialised with PR-10 and PR-11 for the same reason.
 > • **Status:** skeleton — expand before execution
 
 ## Purpose

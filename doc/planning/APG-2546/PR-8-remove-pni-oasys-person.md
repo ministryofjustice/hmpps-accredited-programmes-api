@@ -1,7 +1,8 @@
 # PR-8 — Remove `pniResults`, `oasysPniResults` and `person` sections
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/remove-pni-oasys-person`
-> • **Est.:** 1½ dev days • **Blocks:** PR-12 (hygiene tidy) and PR-13 (round-2 handover)
+> • **Est.:** 1½ dev days • **Blocks:** PR-12 (hygiene tidy); transitively PR-13 via PR-12
+> • **Sequencing:** must merge **first** in the round-2 sequence; PR-9/10/11 must all be serialised after it (shared edits to `SubjectAccessRequestService.kt` + `sar_template.mustache`).
 > • **Depends on:** clean `main` after PR #1115 (`0cf89850`)
 
 ## Purpose
@@ -36,12 +37,31 @@ explicitly kept in scope (SAR=Yes, In SAR API=Yes) with the note
 
 ## Prerequisites for a fresh agent
 
+**Start from a fresh checkout of `origin/main` (currently `0cf89850`),
+NOT this planning branch.** The planning branch
+(`APG-2546/planning-sar-field-removals`) only adds docs — its `src/`
+tree is at merge-base `106e27d2` (pre-round-1) so every line-number
+below will look wrong if you read files from the planning-branch
+worktree. First command in your session:
+
+```sh
+git fetch origin && git checkout origin/main  # should be 0cf89850
+```
+
 Read in this order:
 
 1. [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md) — round-2 overview + PR breakdown + PR #1115 impact matrix
 2. [`DELIVERY-LOG.md`](./DELIVERY-LOG.md) — round-2 kickoff entry (2026-08-13) captures the meeting, the (a)/(b) clarification outcome, and the DD row 139 override
 3. This file end to end
-4. Aug-12 sample PDF (last artefact sent to Branston) at `build/test-generated/sar-generated-report.pdf` if still on disk, else regenerate via `script/local-scripts/regenerate-sar-snapshots.sh` — helpful for visualising what goes away
+4. Aug-12 sample PDF (last artefact sent to Branston) — **that's
+   Cameron's SAR dev-service output, NOT the local test-generated
+   PDF.** If you still have the Aug-12 copy on disk from PR-6
+   handover, open it for context. The local
+   `build/test-generated/sar-generated-report.pdf` (produced by
+   `script/local-scripts/regenerate-sar-snapshots.sh`) is a
+   separate contract-test artefact, useful as an internal
+   before/after readability sanity-check but **not** the Branston
+   deliverable.
 
 No external questions gate this PR. Deborah's ask is unambiguous;
 DD row 139 is explicitly superseded.
@@ -96,7 +116,7 @@ data class Content(
 )
 ```
 
-`Content` construction on `origin/main` (lines 108-118):
+`Content` construction on `origin/main` (lines 107-119):
 
 ```kotlin
 return HmppsSubjectAccessRequestContent(
@@ -230,22 +250,27 @@ Run in order, tick each:
 
 - [ ] `grep -rn 'pniResults\|oasysPniResults\|person' src/main | grep -v test` returns only expected remnants (e.g. Kotlin `Person` unrelated classes — inspect any hit)
 - [ ] `grep -rn 'PniResult\|OasysPniResult\|SarPerson' src/main` returns zero SAR-DTO/service hits (product code cleanup complete)
+- [ ] **PACT contract check** — `grep -rn 'sar\|subjectAccessRequest' src/test/**/pact 2>/dev/null` — expect **zero PACT contracts** on the SAR endpoint (SAR API is the HMPPS SAR wrapper contract, not a PACT-covered consumer surface). If any hit, stop and flag — deleting fields would break a documented consumer contract.
+- [ ] **OpenAPI/Swagger check** — if the repo publishes an OpenAPI schema for the SAR endpoint (grep for `@Operation`/`@Schema` on the SAR controller), regenerate it and confirm removed fields disappear from the schema cleanly. Likely N/A (SAR is server-owned contract with the HMPPS SAR wrapper, not a REST-consumer contract) — confirm and record.
 - [ ] `./gradlew ktlintCheck` clean
-- [ ] `./gradlew test` — expect **678 tests → same or fewer count** (dropped assertions, if any); zero failures
+- [ ] `./gradlew test` — record actual pre-change test count in DELIVERY-LOG round-2 entry; expect **same or fewer** post-change (only assertion removals); zero failures
 - [ ] Snapshot regen: `./script/local-scripts/regenerate-sar-snapshots.sh` — commit the resulting `sar-api-response.json` + `sar-expected-render-result.html` diffs
 - [ ] Post-regen: `./gradlew test --tests '*SarContractIntegrationTest*'` clean without `SAR_GENERATE_ACTUAL`
 - [ ] UUID-leak grep on both goldens returns **0 matches** (regression guard from APG-2546 round 1)
-- [ ] Sample PDF page count noted for delivery-log (expect **fewer pages than round-1** — three whole sections gone)
+- [ ] Sample PDF page count noted for delivery-log (expect **fewer pages than round-1** — three whole sections gone). **Reminder:** the delivery-facing PDF comes from Cameron's SAR dev-service (Option 1, full-chrome); the local `build/test-generated/sar-generated-report.pdf` is the contract-test artefact, not the deliverable.
 - [ ] `entity-schema.json` — either unchanged, or if changed only via removed classes, diff makes sense
-- [ ] `git status --short` before commit — no `.snyk` / xlsx staged (recurring paper-cut from PR #1115)
+- [ ] `git status --short` before commit — no `.snyk` / xlsx staged (recurring paper-cut from PR #1115; see ROUND-2-PLAN R7 for the permanent-fix task)
 
 ## Rollback
 
 `git revert <sha>` restores three whole sections. No migration; no
-API contract addition (only removals). Consumers that were consuming
-the removed keys would break on revert — but Deborah's ask
-explicitly authorises the removal so no consumer should be relying
-on those keys post-merge.
+new API contract addition (revert only re-adds fields, which is
+backward-compatible for consumers). The concerning direction is the
+*forward* removal potentially breaking consumers that still read
+these keys — Deborah's 2026-08-13 ask explicitly authorises the
+removal on the basis that redaction reviewers now source PNI /
+personal data from the SAR wrapper header + ARNs Probation Hub, so
+no consumer post-merge should be relying on them.
 
 ## Description template
 

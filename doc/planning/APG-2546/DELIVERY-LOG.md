@@ -1121,7 +1121,7 @@ On 2026-08-13 (13:25) Deborah (SDM, Cameron's SAR product team) came back with a
 
 Raby DM'd Deborah to clarify #5: the referral already carries `primaryPomStaffSurname` + `secondaryPomStaffSurname` inline (added in PR-5). Options: (a) drop the redundant top-level `staff[]` list, keep the inline surname fields; or (b) upgrade the two surname fields to full names (forename + surname) and remove the top-level list. **Deborah confirmed (a).** Locked.
 
-Round-2 delivery scaffolded on this planning branch as PRs 8–12 (continuation of the PR-1…PR-7 sequence). New overview: [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md). Round-2 working docs:
+Round-2 delivery scaffolded on this planning branch as PRs 8–13 (continuation of the PR-1…PR-7 sequence). New overview: [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md). Round-2 working docs:
 
 - [`PR-8-remove-pni-oasys-person.md`](./PR-8-remove-pni-oasys-person.md) — three-section removal, fully drafted, agent-executable
 - [`PR-9-scrub-nomis-and-crn.md`](./PR-9-scrub-nomis-and-crn.md) — skeleton
@@ -1166,7 +1166,7 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   - `PR-9…PR-12` skeletons created for later expansion
   - This DELIVERY-LOG round-2 section appended
 - **2026-08-13 pm** — Structural revision: PR-12 split into hygiene (PR-12) + docs handover (PR-13). `AGENT-PROMPT-TEMPLATE.md` added.
-- **2026-08-13 pm** — Nine-lens deep validation review executed against `origin/main` @ `0cf89850`. Five corrections applied:
+- **2026-08-13 pm** — Nine-lens deep validation review executed against `origin/main` @ `0cf89850`. Six corrections applied:
   1. **PR-8 doc DTO location fixed** — top-level SAR response class is `Content` (nested in `SubjectAccessRequestService.kt`), not `SarResponse` in a separate file. All SAR DTOs are nested classes in the same file.
   2. **PR-8 orphan-audit outcomes locked in** — `PniResultRepository.findAllByPrisonNumber` **stays** (prod caller in `PersonService.kt:287` — prisoner-merge handler); `OasysPniResultEntityRepository.findAllByPrisonNumber` **deletes** (prod-orphan after PR-8); `PersistenceHelper.createPerson` LocalDate fix **stays** (other test callers). This corrects a dangerous "delete if grep-empty in src/main" instruction that could have caused a production regression.
   3. **PR-10 design decision superseded** — the "JPQL JOIN vs post-fetch" choice is moot; the service already uses `organisationRepository.findAllByCodeIn(...)` + `organisationNamesByCode` map threaded into `toSarReferral(...)` (line 109 on main) for `SarOriginalReferral` resolution. PR-10 scope is much smaller than the original doc suggested (½ day vs 1 day).
@@ -1191,5 +1191,5 @@ _(To be filled in as PRs land.)_
 ## Handover artefacts (round 2)
 
 - Sample PDF sent to Branston round 2 (2026-08-12, from preprod CRN A9648CH): **superseded** by Deborah's round-2 asks.
-- Sample PDF for round 3 (post PR-8…PR-11 merge): _pending — generated in PR-12_.
+- Sample PDF for round 3 (post PR-8…PR-11 merge): _pending — generated in PR-13_.
 

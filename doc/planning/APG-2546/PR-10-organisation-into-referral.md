@@ -2,7 +2,7 @@
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/organisation-into-referral`
 > • **Est.:** ½ dev day (revised down from 1 day after 2026-08-13 pm plan review — the backend plumbing already exists on `origin/main`; scope is much smaller than the original skeleton suggested)
-> • **Depends on:** PR-8 merged
+> • **Sequencing:** must merge **after** PR-8 and be **serialised** with PR-9 and PR-11 (all three touch `SubjectAccessRequestService.kt` + `sar_template.mustache` and would merge-conflict if parallel — no logical code dep on PR-8's cuts).
 > • **Status:** skeleton — expand before execution
 
 ## Purpose

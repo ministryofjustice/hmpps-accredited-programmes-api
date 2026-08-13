@@ -1,7 +1,8 @@
 # PR-11 — Remove top-level `staff[]` list (option (a))
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/remove-top-level-staff`
-> • **Est.:** ½ dev day • **Depends on:** PR-8 merged
+> • **Est.:** ½ dev day
+> • **Sequencing:** must merge **after** PR-8 and be **serialised** with PR-9 and PR-10 (all three touch `SubjectAccessRequestService.kt` + `sar_template.mustache` and would merge-conflict if parallel — no logical code dep on PR-8's cuts).
 > • **Status:** skeleton — expand before execution
 
 ## Purpose

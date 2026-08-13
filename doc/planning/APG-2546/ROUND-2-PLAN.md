@@ -1,7 +1,7 @@
 # APG-2546 — Round 2 SAR cuts (post-Aug-13 OSAR review)
 
 > **Ticket:** APG-2546 (continuation) • **Round-1 close date:** 2026-08-11 (PR #1115 merged)
-> • **Round-2 kickoff:** 2026-08-13 • **Est.:** ~1 sprint / 5 thin PRs
+> • **Round-2 kickoff:** 2026-08-13 • **Est.:** ~1 sprint / 6 thin PRs (PR-8…PR-13)
 > • **Owner:** Raby • **Reviewer chain:** Cameron's SAR team / Deborah SDM / Roxanne (DD) / Branston (OSAR)
 
 ## Why round 2 exists
@@ -81,18 +81,19 @@ PR removes / moves. Same discipline as round-1.
 |---|---|---|---|
 | **PR-8** | Remove `pniResults[]`, `oasysPniResults[]`, `person{}` — three whole sections, one coherent theme "sourced elsewhere in the SAR bundle". Cleans up now-dead PR #1115 wiring in the same PR. | [`PR-8-remove-pni-oasys-person.md`](./PR-8-remove-pni-oasys-person.md) | 1½ days |
 | **PR-9** | Drop `prisonerNumber` from `referrals[]` + `courseParticipation[]` (surviving sections). | [`PR-9-scrub-nomis-and-crn.md`](./PR-9-scrub-nomis-and-crn.md) | ½ day |
-| **PR-10** | Add `organisationName` field to each referral; delete top-level `organisations[]`. | [`PR-10-organisation-into-referral.md`](./PR-10-organisation-into-referral.md) | 1 day |
+| **PR-10** | Add `organisationName` field to each referral; delete top-level `organisations[]`. | [`PR-10-organisation-into-referral.md`](./PR-10-organisation-into-referral.md) | ½ day |
 | **PR-11** | Delete top-level `staff[]` list per **option (a)**. Keep inline surname fields. | [`PR-11-remove-top-level-staff.md`](./PR-11-remove-top-level-staff.md) | ½ day |
 | **PR-12** | Round-2 code hygiene / test tidy — final orphan-query audit across the combined post-PR-8/9/10/11 state, dead-DTO scan, KDoc cross-reference fixup (siblings deleted by PR-8/PR-11), fixture companion-const cleanup, `expectedFlywaySchemaVersion` verify, full-suite regression. No observable behaviour change. | [`PR-12-round-2-hygiene-tidy.md`](./PR-12-round-2-hygiene-tidy.md) | ½ day |
 | **PR-13** | Round-2 docs handover: DELIVERY-LOG closeout, DD row 139 override recorded, fresh sample PDF from a preprod CRN + email/Slack templates to Branston. | [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) | ½ day |
 
-**Total ~4½ days.** Ordering: PR-8 first (biggest cut, reduces surface
-for everything downstream), then PR-9 / PR-10 / PR-11 in **serial or
-lightly-overlapping** — they all touch `SubjectAccessRequestService.kt`
-and `sar_template.mustache`, so parallel drafts will conflict on
-merge. Recommend serial unless the reviewer signals bandwidth to
-rebase-and-merge quickly. **PR-12 after all four merge** (needs the
-combined state to sanity-grep), PR-13 last.
+**Total ~4 days.** Ordering: PR-8 first (biggest cut, reduces surface
+for everything downstream), then PR-9 / PR-10 / PR-11 **serial** —
+they all touch `SubjectAccessRequestService.kt` and
+`sar_template.mustache`, so parallel drafts *will* merge-conflict.
+(They have no logical dependency on PR-8's cuts — PR-8 just shrinks
+the sanity-grep surface. Serial is a merge-conflict-avoidance
+decision, not a code-dependency one.) **PR-12 after all four merge**
+(needs the combined state to sanity-grep), PR-13 last.
 
 ## Impact on PR #1115 (recently merged)
 
@@ -142,6 +143,8 @@ refreshes so nobody re-adds `pni_result_json` on a subsequent sweep.
 | R3 | Repository queries removed in PR-8 / PR-11 turn out to have other callers. | Each PR: `grep -r <queryName>` across `src/main` before deletion. If any non-SAR caller hit, leave the query alive (cheap) and just remove the SAR-service call site. |
 | R4 | Fixture regen produces surprising side-effects (as it did in #1115 with Postgres date-binding). | Same guardrail: run `./gradlew ktlintCheck test` on top of every PR, use `script/local-scripts/regenerate-sar-snapshots.sh` (not raw gradle + copy), UUID-leak grep on both goldens post-regen. |
 | R5 | Round-3 review lands mid-sprint from Branston asking for further cuts. | Land PR-8 + PR-9 first (biggest wins). Open round-3 changes as PR-8b / PR-9b rather than re-scoping. |
+| R6 | Fresh agent reads the *planning branch's* working tree and thinks every code line-ref is wrong. | Planning branch was cut from merge-base `106e27d2` (pre-round-1) and only adds docs. Its `src/` tree is behind `origin/main`. Every PR prereq **must** say "start from a fresh checkout of `origin/main` (currently `0cf89850`), NOT this planning branch's working tree". PR-8 prereqs updated accordingly; propagate as PR-9/10/11 are picked up. |
+| R7 | `.snyk` + `Copy of *.xlsx` untracked files reappear in `git status` on every planning session and risk being accidentally staged. | Add to `.gitignore` (or the ticket's `.git/info/exclude`) as a permanent hygiene fix in PR-12 or PR-13. Interim: every PR checklist includes `git status --short` gate before commit. |
 
 ## Success criteria
 
