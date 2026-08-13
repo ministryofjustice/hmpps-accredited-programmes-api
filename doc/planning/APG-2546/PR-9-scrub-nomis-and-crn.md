@@ -59,7 +59,16 @@ No other test files reference `.prisonerNumber` / `.prisonNumber` on the removed
 
 ## Notes for the agent
 
-The header-owner claim in Deborah's ask needs a one-line Slack
-confirmation from Cameron / HAA if PR-8's agent hasn't already done
-it. If confirmed there, mark it here and proceed.
+Header-ownership claim in Deborah's ask (NOMIS ID + CRN sourced by
+the SAR wrapper header, not our payload) — **✅ CONFIRMED 2026-08-13
+by SAR wrapper team (Cameron's team)**, covering both PR-8 (person +
+NOMIS ID) and PR-9 (CRN + prisonerNumber). Verbatim:
+
+> *"Yes — confirm we retrieve the information for the header from
+> two APIs — one for NOMIS IDs and one for nDelius CRNs. We do not
+> in any way retrieve that data from their product — so it's safe
+> to remove it as the OSAR team requested."*
+
+Full paper trail in DELIVERY-LOG round-2 timeline. No further
+confirmation needed to proceed.
 

@@ -1174,6 +1174,14 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   5. **PR-8, PR-11 test-caller impact called out** — `SubjectAccessRequestServiceTest.kt` mock setups at lines 184/192/208/216/311/312/313/314 need explicit removal in the relevant PR.
   6. Parallelisation claim tightened — PR-9/10/11 all touch `SubjectAccessRequestService.kt` + mustache; recommend serial over parallel to avoid merge conflicts.
 - **2026-08-13 pm (third-pass exhaustive review)** — Third and final validation pass surfaced **major missed test impact** in the round-2 docs. `SubjectAccessRequestServiceIntegrationTest.kt` (integration test with real fixture + field-level DTO assertions) and `SubjectAccessRequestServiceTest.kt` (unit test with `with(content) { assertThat(pniResults.size) … }` style assertions) both have compile-breaking assertions on the fields PR-8 removes. Same class of issue for PR-9 (2 lines), PR-10 (4 lines + one recommended add), and PR-11 (4 lines). PR-8/9/10/11 docs updated with **exact line-number-per-file tables** so agents don't need to re-derive. Also verified: `DomainEventsListenerTest.kt` and `CourseParticipationControllerIntegrationTest.kt` are NOT affected (grep-confirmed).
+- **2026-08-13 pm** — Nine-lens post-review polish commit landed (drift/wording only; zero code-fact changes). Fixed PR-12→PR-12/PR-13 split fallout across `ROUND-2-PLAN` / `DELIVERY-LOG` / `PR-13` / `AGENT-PROMPT-TEMPLATE`; clarified PR-9/10/11 sequencing is merge-conflict avoidance not a code dep; corrected PR-8 rollback reversed-logic wording; added PACT + OpenAPI verification steps; added fresh-checkout warnings (R6) and .snyk/xlsx paper-cut (R7) to risk register. Full paper trail in the commit message.
+- **2026-08-13 pm** — **R1 CLOSED.** SAR wrapper team (Cameron's team) responded to the header-ownership check that PR-8 non-obvious #3 and PR-9 notes had flagged as needing Slack confirmation. Verbatim reply:
+
+  > *"Yes — confirm we retrieve the information for the header from two APIs — one for NOMIS IDs and one for nDelius CRNs. We do not in any way retrieve that data from their product — so it's safe to remove it as the OSAR team requested."*
+
+  Meaning: the SAR wrapper injects NOMIS ID (from a NOMIS API) and nDelius CRN (from a separate nDelius API) into the wrapper header from its own upstream sources — it does **not** consume those keys from the Accredited Programmes SAR payload. Safe to strip.
+
+  Covers both PR-8 (person block, NOMIS ID) and PR-9 (CRN + prisonerNumber). PR-8's "Non-obvious #3" and PR-9's "Notes for the agent" both updated to reference this confirmation; ROUND-2-PLAN R1 row flipped to ✅ RESOLVED. No further wrapper-team confirmation needed for round-2 execution.
 
 ## Round 2 — PR outcomes
 

@@ -232,13 +232,21 @@ Then regenerate goldens with `script/local-scripts/regenerate-sar-snapshots.sh`.
    PR #1115** that we're rendering dead here. Leave the helper as-is
    — the fix is generically useful and the helper is called by other
    tests. Just delete the SAR-fixture call site.
-3. **Header ownership check** — before deleting `person.forename` /
-   `person.surname` verify with Cameron / HAA that the SAR wrapper
-   header injects name from its own context (prisoner-search /
-   delius), so redaction reviewers won't lose the subject name from
-   the report. Deborah's ask implies this is the case ("in the
-   header") but a one-line Slack confirmation avoids a nasty
-   round-3 surprise.
+3. **Header ownership check — ✅ CONFIRMED 2026-08-13 by SAR wrapper team (Cameron's team).** Before deleting `person.forename` /
+   `person.surname` we needed confirmation the SAR wrapper header
+   injects name from its own context so redaction reviewers won't
+   lose the subject name from the report. Deborah's ask implied
+   this ("in the header"); the SAR wrapper team confirmed
+   verbatim:
+
+   > *"Yes — confirm we retrieve the information for the header
+   > from two APIs — one for NOMIS IDs and one for nDelius CRNs.
+   > We do not in any way retrieve that data from their product —
+   > so it's safe to remove it as the OSAR team requested."*
+
+   Covers PR-8 (person block, NOMIS ID in header) **and** PR-9
+   (CRN + prisonerNumber scrub). No further Slack confirmation
+   needed for PR-9. Recorded in DELIVERY-LOG round-2 timeline.
 4. **`SarOriginalReferral` on the parent referral survives.** PR-7
    stripped the UUID from it; PR-8 does NOT touch it. Sanity-check
    the goldens still contain the `originalReferral{…}` sub-object

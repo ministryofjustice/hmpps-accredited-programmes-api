@@ -138,7 +138,7 @@ refreshes so nobody re-adds `pni_result_json` on a subsequent sweep.
 
 | # | Risk | Mitigation |
 |---|---|---|
-| R1 | We delete a field the SAR wrapper header-owner still relies on. | PR-8 verification: confirm with Cameron / HAA that NOMIS ID + CRN + name come from the SAR wrapper header context, not our payload body. |
+| R1 | We delete a field the SAR wrapper header-owner still relies on. | ✅ **RESOLVED 2026-08-13** — SAR wrapper team (Cameron's team) confirmed verbatim: *"we retrieve the information for the header from two APIs — one for NOMIS IDs and one for nDelius CRNs. We do not in any way retrieve that data from their product — so it's safe to remove it as the OSAR team requested."* Covers PR-8 (person + NOMIS ID) and PR-9 (CRN + prisonerNumber). Full quote in DELIVERY-LOG round-2 timeline. |
 | R2 | An organisation-related field is populated somewhere we didn't spot. | PR-10: full grep for `organisationName` / `organisations` before deleting the top-level block. Verify DB has a resolvable `organisation_id` on every referral row (nullable OK). |
 | R3 | Repository queries removed in PR-8 / PR-11 turn out to have other callers. | Each PR: `grep -r <queryName>` across `src/main` before deletion. If any non-SAR caller hit, leave the query alive (cheap) and just remove the SAR-service call site. |
 | R4 | Fixture regen produces surprising side-effects (as it did in #1115 with Postgres date-binding). | Same guardrail: run `./gradlew ktlintCheck test` on top of every PR, use `script/local-scripts/regenerate-sar-snapshots.sh` (not raw gradle + copy), UUID-leak grep on both goldens post-regen. |
