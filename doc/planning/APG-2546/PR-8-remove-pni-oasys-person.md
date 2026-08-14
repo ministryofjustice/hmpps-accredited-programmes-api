@@ -229,9 +229,20 @@ Then regenerate goldens with `script/local-scripts/regenerate-sar-snapshots.sh`.
    OASys-PNI-result row so the sections would render. Those seed rows
    go away with the section removal.
 2. **`PersistenceHelper.createPerson` has a `LocalDate` bind fix from
-   PR #1115** that we're rendering dead here. Leave the helper as-is
-   — the fix is generically useful and the helper is called by other
-   tests. Just delete the SAR-fixture call site.
+   PR #1115** — **⚠️ SUPERSEDED 2026-08-14 by PR-8 nine-lens self-review.**
+   Original claim: *"Leave the helper as-is — the fix is generically
+   useful and the helper is called by other tests. Just delete the
+   SAR-fixture call site."* Actual state at `origin/main @
+   0cf89850`: **both `createPerson` AND `createOasysPniResult` were
+   only called from the two SAR-side call sites PR-8 removed** —
+   both helpers are genuinely orphaned once PR-8 merges. For PR-8's
+   own scope this doesn't change anything (still just delete the
+   call sites — leaving the helper methods alone is safe, they
+   just become dead code). Cleanup of the orphaned helper methods
+   themselves has been added to PR-12's scope
+   ([`PR-12-round-2-hygiene-tidy.md`](./PR-12-round-2-hygiene-tidy.md) §"Does"
+   "`PersistenceHelper` orphaned-method sweep"). Full paper trail in
+   DELIVERY-LOG 2026-08-14 entry §Finding 2.
 3. **Header ownership check — ✅ CONFIRMED 2026-08-13 by SAR wrapper team (Cameron's team).** Before deleting `person.forename` /
    `person.surname` we needed confirmation the SAR wrapper header
    injects name from its own context so redaction reviewers won't
@@ -307,10 +318,18 @@ reviewers.
 ### Not touched
 
 - `V145__add_staff_last_name_index.sql` — Flyway is forward-only.
-- `PersistenceHelper.createPerson` — helper serves other tests;
-  only the SAR-fixture call site removed.
+- `PersistenceHelper.createPerson` / `createOasysPniResult` —
+  method bodies left in place in this PR (only their SAR-fixture
+  call sites removed). **Note:** these helpers are actually now
+  orphaned across the whole test suite (see PR-8 Non-obvious #2
+  correction, DELIVERY-LOG 2026-08-14 §Finding 2). Deletion of
+  the orphaned method bodies is deferred to PR-12 hygiene.
 - `originalReferral{…}` sub-block on referrals — PR-7's UUID strip
   stands; block still renders.
+- `OasysPniResultEntityRepository.kt` — kept as empty
+  `JpaRepository<OasysPniResultEntity, UUID>` shell to match
+  round-1 `AuditRepository` precedent (PR-1). Entity + table
+  survive; future-writer optionality preserved.
 
 ### Overrides recorded
 

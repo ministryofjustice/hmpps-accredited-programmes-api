@@ -59,6 +59,27 @@ that surface only when everything is together.
   the parts that seeded PNI / OASys PNI / person go with PR-8; the
   second-POM staff seed decision was left ambiguous in PR-11 — this
   PR is the last chance to trim it if it's clearly dead.
+- **`PersistenceHelper` orphaned-method sweep.** Flagged by the
+  PR-8 nine-lens self-review (2026-08-14, DELIVERY-LOG entry):
+  after PR-8 merges, `PersistenceHelper.createOasysPniResult`
+  and `PersistenceHelper.createPerson` are **genuinely orphaned**
+  — both were only called from the two SAR-side sites PR-8
+  removed. This supersedes PR-8's "Non-obvious #2" claim
+  (*"leave the helper as-is — helper is called by other tests"*),
+  which grep proved stale on `origin/main @ 0cf89850`. Verify with
+  a fresh grep across all `src/test` once PR-8/9/10/11 have
+  merged (some other round-2 PR might legitimately re-introduce a
+  caller — unlikely but check); delete both methods if no other
+  callers surface. `createPerson`'s `LocalDate` bind fix from
+  PR #1115 goes with the deletion — it was generically useful in
+  theory but has no consumer left in practice.
+- **Fixture companion-const scan (round-2 additions).**
+  `SarContractIntegrationTest`'s companion object accumulated
+  `PNI_RESULT_ID`, `OASYS_PNI_RESULT_ID`, `PERSON_ID` (and possibly
+  more) during round-1 and PR #1115. Any that are no longer
+  referenced from `setupTestData()` after the round-2 removals —
+  delete. (Already listed above but calling out these three
+  specific consts as the PR-8-driven expected deletions.)
 - **Full-suite regression run.** `./gradlew ktlintCheck test` on the
   merged tip — 678 (or whatever the post-round-2 count is) tests
   green with the four PR-8/9/10/11 heads combined.
@@ -109,6 +130,15 @@ Run in order:
       broken `[...]` links to deleted siblings
 - [ ] `SarContractIntegrationTest` companion object — no unreferenced
       `_ID` consts
+- [ ] **`PersistenceHelper.createOasysPniResult` + `createPerson`
+      orphan sweep** (flagged by PR-8 nine-lens self-review,
+      2026-08-14): `grep -rn 'createOasysPniResult\|createPerson' src/test` —
+      expect **zero hits** post PR-8/9/10/11 merge. If zero, delete
+      both methods from `PersistenceHelper.kt` (including the
+      `createPerson` `LocalDate` bind fix from PR #1115 — dead
+      without a consumer). If any hit surfaces, leave both alive
+      and record in the PR-12 body which round-2 PR re-introduced
+      the caller.
 - [ ] `./gradlew ktlintCheck test` — clean, all tests green
 - [ ] `entity-schema.json` — diff makes sense (removals only, no
       additions)
@@ -156,9 +186,15 @@ ties off any orphaned pieces the per-PR audits couldn't see.
 ### Not touched
 
 - V145 index (Flyway forward-only)
-- `PersistenceHelper.createPerson` LocalDate bind fix (helper serves
-  other tests)
 - Any surviving KDoc that reads sensibly without the deleted
   siblings
+
+_(Note: the previous "`PersistenceHelper.createPerson` LocalDate
+bind fix — helper serves other tests" bullet is **superseded** by
+the PR-8 nine-lens self-review finding — grep at `origin/main @
+0cf89850` proved zero other callers, so `createPerson` +
+`createOasysPniResult` are on the deletion candidate list per the
+"Does" section above. Retain the wording only if the pre-merge
+grep surfaces an unexpected caller from a round-2 PR.)_
 ```
 
