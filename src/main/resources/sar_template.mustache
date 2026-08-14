@@ -76,62 +76,6 @@
         <p>No Data Held</p>
     {{/courses}}
 
-    <h2>PNI results</h2>
-    {{#pniResults}}
-        <h3>PNI result {{ optionalValue (getIndexPlusOne @index) }}</h3>
-        <table class="summary-list">
-            <tr><td>Prisoner number</td><td>{{ optionalValue prisonNumber }}</td></tr>
-            <tr><td>CRN</td><td>{{ optionalValue crn }}</td></tr>
-            <tr><td>Programme pathway</td><td>{{ optionalValue programmePathway }}</td></tr>
-            <tr><td>Needs classification</td><td>{{ optionalValue needsClassification }}</td></tr>
-            <tr><td>Overall needs score</td><td>{{ optionalValue overallNeedsScore }}</td></tr>
-            <tr><td>Risk classification</td><td>{{ optionalValue riskClassification }}</td></tr>
-            <tr><td>OASys assessment completed date</td><td>{{ optionalValue (formatDate oasysAssessmentCompletedDate) }}</td></tr>
-            <tr><td>PNI assessment date</td><td>{{ optionalValue (formatDate pniAssessmentDate) }}</td></tr>
-            <tr><td>PNI valid</td><td>{{ convertBoolean pniValid }}</td></tr>
-            <tr><td>Basic skills score</td><td>{{ optionalValue basicSkillsScore }}</td></tr>
-            <tr><td>PNI result JSON</td><td>{{ optionalValue pniResultJson }}</td></tr>
-        </table>
-        <br>
-    {{/pniResults}}
-    {{^pniResults}}
-        <p>No Data Held</p>
-    {{/pniResults}}
-
-    <h2>Person</h2>
-    {{#person}}
-        <table class="summary-list">
-            <tr><td>Prison number</td><td>{{ optionalValue prisonNumber }}</td></tr>
-            <tr><td>Forename</td><td>{{ optionalValue forename }}</td></tr>
-            <tr><td>Surname</td><td>{{ optionalValue surname }}</td></tr>
-            <tr><td>Location</td><td>{{ optionalValue location }}</td></tr>
-            <tr><td>Gender</td><td>{{ optionalValue gender }}</td></tr>
-            <tr><td>Conditional release date</td><td>{{ optionalValue conditionalReleaseDate }}</td></tr>
-            <tr><td>Parole eligibility date</td><td>{{ optionalValue paroleEligibilityDate }}</td></tr>
-            <tr><td>Tariff expiry date</td><td>{{ optionalValue tariffExpiryDate }}</td></tr>
-            <tr><td>Earliest release date</td><td>{{ optionalValue earliestReleaseDate }}</td></tr>
-            <tr><td>Earliest release date type</td><td>{{ optionalValue earliestReleaseDateType }}</td></tr>
-            <tr><td>Sentence type</td><td>{{ optionalValue sentenceType }}</td></tr>
-            <tr><td>Indeterminate sentence</td><td>{{ convertBoolean indeterminateSentence }}</td></tr>
-            <tr><td>Non DTO release date type</td><td>{{ optionalValue nonDtoReleaseDateType }}</td></tr>
-        </table>
-    {{/person}}
-    {{^person}}
-        <p>No Data Held</p>
-    {{/person}}
-
-    <h2>OASys PNI results</h2>
-    {{#oasysPniResults}}
-        <h3>OASys PNI result {{ optionalValue (getIndexPlusOne @index) }}</h3>
-        <table class="summary-list">
-            <tr><td>Prison number</td><td>{{ optionalValue prisonNumber }}</td></tr>
-            <tr><td>Programme pathway</td><td>{{ optionalValue programmePathway }}</td></tr>
-        </table>
-        <br>
-    {{/oasysPniResults}}
-    {{^oasysPniResults}}
-        <p>No Data Held</p>
-    {{/oasysPniResults}}
 
      <h2>Organisation</h2>
         {{#organisations}}

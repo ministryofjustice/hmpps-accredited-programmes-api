@@ -5,18 +5,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OasysPniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OasysPniResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
@@ -32,9 +26,6 @@ class SubjectAccessRequestService(
   private val referralRepository: ReferralRepository,
   private val courseParticipationRepository: CourseParticipationRepository,
   private val courseRepository: CourseRepository,
-  private val pniResultRepository: PniResultRepository,
-  private val personRepository: PersonRepository,
-  private val oasysPniResultEntityRepository: OasysPniResultEntityRepository,
   private val staffRepository: StaffRepository,
   private val organisationRepository: OrganisationRepository,
   private val staffLookupService: StaffLookupService,
@@ -109,9 +100,6 @@ class SubjectAccessRequestService(
         referrals = filteredReferrals.toSarReferral(staffSurnames, originalsById, organisationNamesByCode),
         courseParticipation = filteredParticipations.toSarParticipation(staffSurnames),
         courses = courseRepository.getSarCourses(prn).toSarCourse(),
-        pniResults = pniResultRepository.findAllByPrisonNumber(prn).toSarPniResult(),
-        person = personRepository.findPersonEntityByPrisonNumber(prn)?.toSarPerson(),
-        oasysPniResults = oasysPniResultEntityRepository.findAllByPrisonNumber(prn).toSarOasysPniResult(),
         staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() },
         organisations = codesFromFiltered.mapNotNull { organisationsByCode[it]?.toSarOrganisation() },
       ),
@@ -164,9 +152,6 @@ class SubjectAccessRequestService(
     val referrals: List<SarReferral>,
     val courseParticipation: List<SarCourseParticipation>,
     val courses: List<SarCourse>,
-    val pniResults: List<SarPniResult>,
-    val person: SarPerson?,
-    val oasysPniResults: List<SarOasysPniResult>,
     val staff: List<SarStaff>,
     val organisations: List<SarOrganisation>,
   )
@@ -231,41 +216,6 @@ class SubjectAccessRequestService(
 
   data class SarCourse(
     val name: String,
-  )
-
-  data class SarPniResult(
-    val prisonNumber: String,
-    val crn: String?,
-    val oasysAssessmentCompletedDate: LocalDateTime?,
-    val programmePathway: String?,
-    val needsClassification: String?,
-    val overallNeedsScore: Int?,
-    val riskClassification: String?,
-    val pniAssessmentDate: LocalDateTime?,
-    val pniValid: Boolean,
-    val pniResultJson: String?, // should be here
-    val basicSkillsScore: Int?,
-  )
-
-  data class SarPerson(
-    val prisonNumber: String,
-    val forename: String,
-    val surname: String,
-    val conditionalReleaseDate: LocalDate?,
-    val paroleEligibilityDate: LocalDate?,
-    val tariffExpiryDate: LocalDate?,
-    val earliestReleaseDate: LocalDate?,
-    val earliestReleaseDateType: String?,
-    val indeterminateSentence: Boolean?,
-    val nonDtoReleaseDateType: String?,
-    val sentenceType: String?,
-    val location: String?,
-    val gender: String?,
-  )
-
-  data class SarOasysPniResult(
-    val prisonNumber: String,
-    val programmePathway: String?,
   )
 
   data class SarStaff(
@@ -335,45 +285,6 @@ class SubjectAccessRequestService(
   private fun List<CourseEntity>.toSarCourse(): List<SarCourse> = map {
     SarCourse(
       name = it.name,
-    )
-  }
-
-  private fun List<PniResultEntity>.toSarPniResult(): List<SarPniResult> = map {
-    SarPniResult(
-      prisonNumber = it.prisonNumber,
-      crn = it.crn,
-      oasysAssessmentCompletedDate = it.oasysAssessmentCompletedDate,
-      programmePathway = it.programmePathway,
-      needsClassification = it.needsClassification,
-      overallNeedsScore = it.overallNeedsScore,
-      riskClassification = it.riskClassification,
-      pniAssessmentDate = it.pniAssessmentDate,
-      pniValid = it.pniValid,
-      pniResultJson = it.pniResultJson,
-      basicSkillsScore = it.basicSkillsScore,
-    )
-  }
-
-  private fun PersonEntity.toSarPerson(): SarPerson = SarPerson(
-    prisonNumber = prisonNumber,
-    forename = forename,
-    surname = surname,
-    conditionalReleaseDate = conditionalReleaseDate,
-    paroleEligibilityDate = paroleEligibilityDate,
-    tariffExpiryDate = tariffExpiryDate,
-    earliestReleaseDate = earliestReleaseDate,
-    earliestReleaseDateType = earliestReleaseDateType,
-    indeterminateSentence = indeterminateSentence,
-    nonDtoReleaseDateType = nonDtoReleaseDateType,
-    sentenceType = sentenceType,
-    location = location,
-    gender = gender,
-  )
-
-  private fun List<OasysPniResultEntity>.toSarOasysPniResult(): List<SarOasysPniResult> = map {
-    SarOasysPniResult(
-      prisonNumber = it.prisonNumber,
-      programmePathway = it.programmePathway,
     )
   }
 

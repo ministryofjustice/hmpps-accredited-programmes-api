@@ -80,26 +80,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       otherCourseName = "Other course",
       outcomeDetail = "No information to evidence",
     )
-    persistenceHelper.createPniResult(
-      prisonNumber = prisonNumber,
-      pniResultJson = "{\"result\": \"success\"}",
-      crn = "X1234YZ",
-      programmePathway = "ALTERNATIVE_PATHWAY",
-    )
-    persistenceHelper.createOasysPniResult(
-      prisonNumber = prisonNumber,
-      oasysAssessmentId = 1234,
-      programmePathway = "HIGH_INTENSITY_BC",
-    )
-    persistenceHelper.createPerson(
-      prisonNumber = prisonNumber,
-      forename = "John",
-      surname = "Doe",
-      earliestReleaseDateType = "CRD",
-      sentenceType = "Determinate",
-      location = "HMP Moorland",
-      gender = "Male",
-    )
     persistenceHelper.createStaff(
       staffId = staffId,
       firstName = "John",
@@ -116,9 +96,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     assertThat(content.referrals).hasSize(1)
     assertThat(content.courseParticipation).hasSize(1)
     assertThat(content.courses).hasSize(1)
-    assertThat(content.pniResults).hasSize(1)
-    assertThat(content.person).isNotNull
-    assertThat(content.oasysPniResults).hasSize(1)
 
     with(content.referrals[0]) {
       assertThat(prisonerNumber).isEqualTo(prisonNumber)
@@ -139,22 +116,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
 
     with(content.courses[0]) {
       assertThat(name).isEqualTo("Course 1")
-    }
-
-    with(content.pniResults[0]) {
-      assertThat(crn).isEqualTo("X1234YZ")
-      assertThat(pniResultJson).isEqualTo("{\"result\": \"success\"}")
-    }
-
-    with(content.person!!) {
-      assertThat(forename).isEqualTo("John")
-      assertThat(surname).isEqualTo("Doe")
-      assertThat(location).isEqualTo("HMP Moorland")
-    }
-
-    with(content.oasysPniResults[0]) {
-      assertThat(prisonNumber).isEqualTo("A1234BC")
-      assertThat(programmePathway).isEqualTo("HIGH_INTENSITY_BC")
     }
   }
 }

@@ -7,15 +7,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OasysPniResultEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OasysPniResultEntityRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PniResultRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
@@ -23,7 +18,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.ent
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.PniResultEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.math.BigInteger
@@ -37,9 +31,6 @@ class SubjectAccessRequestServiceTest {
   private val referralRepository: ReferralRepository = mockk()
   private val courseParticipationRepository: CourseParticipationRepository = mockk()
   private val courseRepository: CourseRepository = mockk()
-  private val pniResultRepository: PniResultRepository = mockk()
-  private val personRepository: PersonRepository = mockk()
-  private val oasysPniResultEntityRepository: OasysPniResultEntityRepository = mockk()
   private val staffRepository: StaffRepository = mockk()
   private val organisationRepository: OrganisationRepository = mockk()
   private val staffLookupService: StaffLookupService = mockk()
@@ -52,9 +43,6 @@ class SubjectAccessRequestServiceTest {
       referralRepository,
       courseParticipationRepository,
       courseRepository,
-      pniResultRepository,
-      personRepository,
-      oasysPniResultEntityRepository,
       staffRepository,
       organisationRepository,
       staffLookupService,
@@ -181,38 +169,6 @@ class SubjectAccessRequestServiceTest {
         .produce(),
     )
 
-    every { pniResultRepository.findAllByPrisonNumber(prn) } returns listOf(
-      PniResultEntityFactory()
-        .withPrisonNumber(prn)
-        .withCrn("X1234")
-        .withProgrammePathway("HIGH_INTENSITY")
-        .withPniResultJson("{ \"status\": \"accepted\",}")
-        .produce(),
-    )
-    every { personRepository.findPersonEntityByPrisonNumber(prn) } returns PersonEntity(
-      id = UUID.randomUUID(),
-      prisonNumber = prn,
-      forename = "John",
-      surname = "Doe",
-      conditionalReleaseDate = LocalDate.of(2026, 1, 1),
-      paroleEligibilityDate = LocalDate.of(2025, 1, 1),
-      tariffExpiryDate = LocalDate.of(2027, 1, 1),
-      earliestReleaseDate = LocalDate.of(2025, 1, 1),
-      earliestReleaseDateType = "CRD",
-      indeterminateSentence = false,
-      nonDtoReleaseDateType = "CRD",
-      sentenceType = "Determinate",
-      location = "HMP Test",
-      gender = "Male",
-    )
-    every { oasysPniResultEntityRepository.findAllByPrisonNumber(prn) } returns listOf(
-      OasysPniResultEntity(
-        pniResultId = UUID.randomUUID(),
-        prisonNumber = prn,
-        oasysAssessmentId = 123L,
-        programmePathway = "ALTERNATIVE_PATHWAY",
-      ),
-    )
     every { staffRepository.findByPrisonNumber(prn) } returns listOf(
       StaffEntityFactory()
         .withStaffId("12345".toBigInteger())
@@ -238,9 +194,6 @@ class SubjectAccessRequestServiceTest {
       assertThat(referrals.size).isEqualTo(3)
       assertThat(courseParticipation.size).isEqualTo(1)
       assertThat(courses.size).isEqualTo(1)
-      assertThat(pniResults.size).isEqualTo(1)
-      assertThat(person).isNotNull
-      assertThat(oasysPniResults.size).isEqualTo(1)
       assertThat(staff).hasSize(1)
 
       val referral = referrals[0]
@@ -285,17 +238,6 @@ class SubjectAccessRequestServiceTest {
       val course = courses[0]
       assertThat(course.name).isEqualTo("Course Name")
 
-      val pniResult = pniResults[0]
-      assertThat(pniResult.crn).isEqualTo("X1234")
-      assertThat(pniResult.pniResultJson).isEqualTo("{ \"status\": \"accepted\",}")
-
-      val person = person!!
-      assertThat(person.prisonNumber).isEqualTo(prn)
-      assertThat(person.forename).isEqualTo("John")
-
-      val oasysPniResult = oasysPniResults[0]
-      assertThat(oasysPniResult.prisonNumber).isEqualTo(prn)
-
       val staffMember = staff[0]
       assertThat(staffMember.lastName).isEqualTo("River")
 
@@ -308,9 +250,6 @@ class SubjectAccessRequestServiceTest {
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
     verify { courseRepository.getSarCourses(prn) }
-    verify { pniResultRepository.findAllByPrisonNumber(prn) }
-    verify { personRepository.findPersonEntityByPrisonNumber(prn) }
-    verify { oasysPniResultEntityRepository.findAllByPrisonNumber(prn) }
     verify { staffRepository.findByPrisonNumber(prn) }
   }
 }
