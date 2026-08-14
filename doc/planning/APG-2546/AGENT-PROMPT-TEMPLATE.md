@@ -254,3 +254,34 @@ the round-3 sample-PDF artefact path.
   read `doc/planning/APG-2546/DELIVERY-LOG.md` PR-7 outcome entry
   for what a well-executed round looks like.
 
+## Session-hygiene tips (learned from PR-8 execution, 2026-08-14)
+
+Tell the agent up-front, either by adding to the prompt or as a
+first message once the session starts:
+
+- **Do not use inline zsh heredocs for commit messages.** Multi-line
+  quoted strings containing `{`, `#`, backticks, or em-dashes get
+  mangled by zsh and produce corrupted history / stuck `dquote>`
+  prompts. **Do this instead:** write the full commit message to a
+  scratch file via the workspace file-write tool (e.g.
+  `/tmp/apg2546-pr-<N>-msg.txt`), then `git commit -F /tmp/…`. PR-8
+  hit this on the first commit attempt; recovered cleanly with
+  `-F`. This paper-cut has cost us minutes on more than one PR now;
+  bake it into the workflow.
+- **After a `git checkout`, verify file reads with the terminal.**
+  If `read_file` returns content that doesn't match the working
+  tree (stale editor / tool cache after a branch switch), cross-check
+  with `sed -n 'A,Bp' <file>` or `git show <sha>:<file>` before
+  acting on it. PR-8 hit a stale-cache `read_file` on
+  `SubjectAccessRequestService.kt` immediately after switching from
+  the planning branch to `origin/main`; terminal-verified content
+  confirmed the doc's line-refs were correct against the actual
+  on-disk file. Nothing broke, but the failure mode is worth
+  explicit warning to save the next agent a confused half-hour.
+- **Docker Desktop pre-requisite** — Testcontainers-backed
+  `SarContractIntegrationTest` / `regenerate-sar-snapshots.sh`
+  needs Docker running locally. If the agent's first snapshot-regen
+  attempt fails with "Cannot connect to the Docker daemon", have
+  them run `open -a Docker` (macOS) and wait ~15 s before retrying.
+  Not a code issue; standard local-dev prerequisite.
+
