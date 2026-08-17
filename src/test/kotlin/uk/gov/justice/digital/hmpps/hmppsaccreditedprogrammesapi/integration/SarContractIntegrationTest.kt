@@ -174,41 +174,6 @@ class SarContractIntegrationTest :
       otherCourseName = "Other course",
       outcomeDetail = "No information to evidence",
     )
-    persistenceHelper.createPniResult(
-      pniResultId = PNI_RESULT_ID,
-      prisonNumber = PRISON_NUMBER,
-      pniResultJson = "{\"result\": \"success\"}",
-      crn = "X1234YZ",
-      programmePathway = "ALTERNATIVE_PATHWAY",
-      oasysAssessmentCompletedDate = LocalDateTime.of(2026, 4, 15, 9, 0, 0),
-      needsClassification = "HIGH_NEED",
-      overallNeedsScore = 12,
-      riskClassification = "HIGH_RISK",
-      pniAssessmentDate = LocalDateTime.of(2026, 4, 20, 14, 0, 0),
-      basicSkillsScore = 3,
-    )
-    persistenceHelper.createOasysPniResult(
-      pniResultId = OASYS_PNI_RESULT_ID,
-      prisonNumber = PRISON_NUMBER,
-      oasysAssessmentId = 1234,
-      programmePathway = "HIGH_INTENSITY_BC",
-    )
-    persistenceHelper.createPerson(
-      personId = PERSON_ID,
-      prisonNumber = PRISON_NUMBER,
-      forename = "John",
-      surname = "Doe",
-      conditionalReleaseDate = "2026-11-15",
-      paroleEligibilityDate = "2027-03-01",
-      tariffExpiryDate = "2028-06-30",
-      earliestReleaseDate = "2026-09-10",
-      earliestReleaseDateType = "CRD",
-      indeterminateSentence = false,
-      nonDtoReleaseDateType = "Standard",
-      sentenceType = "Determinate",
-      location = "HMP Moorland",
-      gender = "Male",
-    )
     persistenceHelper.createStaff(
       staffId = "12345".toBigInteger(),
       firstName = "John",
@@ -239,9 +204,6 @@ class SarContractIntegrationTest :
     val OFFERING_ID: UUID = UUID.fromString("33333333-3333-3333-3333-333333333333")
     val REFERRAL_ID: UUID = UUID.fromString("44444444-4444-4444-4444-444444444444")
     val PARTICIPATION_ID: UUID = UUID.fromString("55555555-5555-5555-5555-555555555555")
-    val PNI_RESULT_ID: UUID = UUID.fromString("77777777-7777-7777-7777-777777777777")
-    val OASYS_PNI_RESULT_ID: UUID = UUID.fromString("88888888-8888-8888-8888-888888888888")
-    val PERSON_ID: UUID = UUID.fromString("99999999-9999-9999-9999-999999999999")
     val ORIGINAL_REFERRAL_ID: UUID = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd")
     val SECONDARY_STAFF_ID: BigInteger = "67890".toBigInteger()
     val SECONDARY_STAFF_ROW_ID: UUID = UUID.fromString("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")
