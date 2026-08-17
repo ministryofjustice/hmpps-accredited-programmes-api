@@ -1248,6 +1248,23 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   PR-10 doc "Scope" section fully rewritten with `f8e04ab0`-anchored refs + explicit call-outs for the "pattern to mirror" lines (e.g. `SarOriginalReferral` mapper body line 272 is now the exact template for the parent `SarReferral` wiring). Status flipped from "skeleton — expand before execution" to "ready for execution — line refs re-verified against `origin/main @ f8e04ab0`". `AGENT-PROMPT-TEMPLATE.md` PR-10 prompt to be updated with `f8e04ab0` anchor + doc-ready state.
 
   **PR-11 still deliberately deferred** — its refs still point at `0cf89850`; PR-10 will shift the SAR service + template again when it merges. PR-11 will be re-anchored when picked up.
+- **2026-08-17 (late)** — **PR-10 opened as (likely) #1118** on branch `APG-2546/organisation-into-referral`, head `08c05432`. Auto-merge queued — will land on first reviewer approval. Base: `origin/main @ f8e04ab0` (post PR-9). Executing agent did a full **nine-lens self-review** before pushing, all 9 lenses ✅ pass. Doc followed literally against the re-anchored `f8e04ab0` refs. Third same-day PR execution (PR-8 morning, PR-9 afternoon, PR-10 late) — round-2 pace remains well ahead of the ~2-week realistic-calendar estimate.
+
+  **What changed** (paper-trail for closeout):
+
+  - Added `SarReferral.organisationName: String?`, populated in the existing `toSarReferral(...)` mapper via the same `organisationNamesByCode` map that `SarOriginalReferral.organisationName` already reads (post-fetch pattern, no JPQL change, no new query).
+  - Deleted `Content.organisations` field, nested `data class SarOrganisation`, and the `OrganisationEntity.toSarOrganisation()` extension.
+  - `<h2>Organisation></h2>` block removed from `sar_template.mustache`; new `<tr>Organisation name</tr>` row added inside the referrals table (mirrors line 23's `originalReferral.organisationName` row shape).
+  - `organisationRepository.findAllByCodeIn(...)` **stays live** — still resolving `SarOriginalReferral.organisationName`. **PR-8 empty-shell precedent did NOT apply**: PR-8's `OasysPniResultEntityRepository` was an all-round SAR orphan, whereas `organisationRepository` still has an active in-file consumer. Agent explicitly called this out in the PR body under "Not touched" so reviewers don't ask why the shell pattern wasn't applied.
+  - `PersistenceHelper.createOasysPniResult` / `createPerson` **not touched** (PR-8 Finding 2 guidance held — still deferred to PR-12).
+  - `entity-schema.json` **genuinely unchanged** (byte-identical). Agent noted the PR-10 doc's verification bullet ("added `SarReferral.organisationName`, removed `SarOrganisation` class") was **leftover text from an earlier doc revision** — `entity-schema.json` tracks only JPA entities not SAR DTOs, and no JPA entity was touched in PR-10. Called out in the PR body so reviewers don't waste time re-reading a byte-identical file.
+
+  **Two non-blocking observations from self-review** — logged here + folded into PR-12 hygiene scope:
+
+  1. **Fixture-hardening backlog: per-referral variance not yet demonstrable.** PR-10 working doc verification-checklist item 6 asked for the fixture to render **different** `organisationName` per referral so the field is demonstrably per-referral. The `SarContractIntegrationTest` fixture currently seeds only one offering (`MDI → HMP Moorland`), so both referrals in the regenerated JSON/HTML show the same `organisationName`. Wiring is verified per-referral in the mapper + in the unit test's single-row assertion — the gap is only in the contract-test golden's ability to demonstrate the shape visually. Would need a second offering (e.g. `BXI`) wired into one of the two referrals. Same shape as the fixture-hardening backlog item after PR-7 (already tracked). **Recommendation from executing agent: fold into PR-12 hygiene rather than back-patching PR-10.** Accepted — PR-12 scope updated in this same commit. PR-10 verification-checklist item 6 flipped to SUPERSEDED with pointer.
+  2. **Cosmetic mustache double-blank** between the Courses and Staff sections in `sar_template.mustache` — one line of trailing whitespace, absorbed into the golden without incident. Non-functional. **Recommendation: clean up whenever the template next gets a real edit** (PR-11 is next; add to PR-11 verification checklist as a one-line "while you're in the file" fix, or defer to PR-12 hygiene). Folded into PR-11 doc + PR-12 checklist as belt-and-braces.
+
+  PR-11 to be re-anchored against `origin/main` HEAD once PR-10 merges (same pattern as PR-9 → PR-10 handoff).
 
 ## Round 2 — PR outcomes
 

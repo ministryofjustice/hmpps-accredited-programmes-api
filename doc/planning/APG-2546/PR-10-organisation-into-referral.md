@@ -86,9 +86,9 @@ So the parent `SarReferral` mapper **already has `organisationNamesByCode` in sc
 - [ ] `grep -rn '\.organisations\b\|SarOrganisation' src/test` — expect only fixture-seed hits; no top-level mock-setup or assertion hits
 - [ ] `./gradlew ktlintCheck test` clean
 - [ ] Snapshot regen: **added** one row per referral in JSON + HTML; **removed** the whole `<h2>Organisation</h2>` block and top-level `organisations` array in JSON
-- [ ] `entity-schema.json` reflects: added `SarReferral.organisationName` field, removed `SarOrganisation` class
+- [ ] ~~`entity-schema.json` reflects: added `SarReferral.organisationName` field, removed `SarOrganisation` class~~ **⚠️ CORRECTED 2026-08-17 by PR-10 nine-lens self-review** — `entity-schema.json` tracks only JPA entities, not SAR DTOs. PR-10 touches no JPA entity (only nested DTOs inside `SubjectAccessRequestService`), so `entity-schema.json` should be **byte-identical**. Actual verification: `entity-schema.json` unchanged. Correct expectation: **zero diff** on this file.
 - [ ] UUID-leak grep still 0
-- [ ] Confirm the two referrals in the fixture render different organisation names so the field is demonstrably per-referral (not global)
+- [ ] ~~Confirm the two referrals in the fixture render different organisation names so the field is demonstrably per-referral (not global)~~ **⚠️ SUPERSEDED 2026-08-17 by PR-10 nine-lens self-review** — fixture currently seeds only one offering (`MDI → HMP Moorland`), so both referrals render identical `organisationName`. Per-referral wiring is verified in the mapper + in the unit test (single-row assertion). Fixture-level demonstration of variance requires a second offering seed (e.g. `BXI`) wired into one of the referrals — **deferred to PR-12 hygiene** per executing agent's recommendation and DELIVERY-LOG 2026-08-17 (late) entry. Not a PR-10 blocker.
 
 ## Notes for the agent
 

@@ -80,6 +80,24 @@ that surface only when everything is together.
   referenced from `setupTestData()` after the round-2 removals —
   delete. (Already listed above but calling out these three
   specific consts as the PR-8-driven expected deletions.)
+- **Fixture-hardening: seed a second offering for demonstrable
+  per-referral variance.** Flagged by PR-10 nine-lens self-review
+  (2026-08-17, DELIVERY-LOG entry). The `SarContractIntegrationTest`
+  fixture currently seeds only one offering (`MDI → HMP Moorland`),
+  so the two referrals in the regenerated goldens both render the
+  same `organisationName`. Per-referral wiring is verified in the
+  mapper + unit test; this item is about making the contract-test
+  golden **visually demonstrate** variance. Wire a second offering
+  (e.g. `BXI → HMP Brixton`) into one of the two referrals, regen
+  snapshots, confirm the two referrals render different
+  `organisationName` values in the golden JSON/HTML. Same shape as
+  the fixture-hardening backlog item deferred after PR-7.
+- **Cosmetic mustache double-blank.** Flagged by PR-10 nine-lens
+  self-review — one line of trailing whitespace between the
+  Courses and Staff sections in `sar_template.mustache`
+  (harmlessly absorbed into the goldens). May already be tidied
+  by PR-11 as a "while you're in the file" fix; if still present
+  post-PR-11 merge, clean up here.
 - **Full-suite regression run.** `./gradlew ktlintCheck test` on the
   merged tip — 678 (or whatever the post-round-2 count is) tests
   green with the four PR-8/9/10/11 heads combined.

@@ -83,3 +83,12 @@ Do not touch V145. Flyway is forward-only; the index it added on
 `staff.last_name` costs nothing to leave in place even if the query
 that used it is gone.
 
+**Optional "while you're in the file" tidy** (flagged by PR-10
+nine-lens self-review 2026-08-17): `sar_template.mustache` has a
+cosmetic double-blank line between the Courses and Staff sections
+— one line of trailing whitespace, harmlessly absorbed into the
+goldens. Since PR-11 deletes the `<h2>Staff></h2>` block, this
+double-blank may end up cleaned or worsened depending on where
+exactly it sits. If cleaning it is a one-line no-op, do it in this
+PR; otherwise leave for PR-12 hygiene. Not a blocker either way.
+
