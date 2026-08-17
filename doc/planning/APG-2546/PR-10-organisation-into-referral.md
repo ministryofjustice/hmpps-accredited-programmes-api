@@ -2,8 +2,9 @@
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/organisation-into-referral`
 > • **Est.:** ½ dev day (revised down from 1 day after 2026-08-13 pm plan review — the backend plumbing already exists on `origin/main`; scope is much smaller than the original skeleton suggested)
-> • **Sequencing:** must merge **after** PR-8 and be **serialised** with PR-9 and PR-11 (all three touch `SubjectAccessRequestService.kt` + `sar_template.mustache` and would merge-conflict if parallel — no logical code dep on PR-8's cuts).
+> • **Sequencing:** must merge **after PR-8** (**merged 2026-08-17 as `b7b05283`** ✅) and **after PR-9** (must be serialised — merge-conflict avoidance on `SubjectAccessRequestService.kt` + `sar_template.mustache`).
 > • **Status:** skeleton — expand before execution
+> • **⚠️ Line-ref re-anchoring required before execution.** Line references below are anchored to `origin/main @ 0cf89850` (pre-PR-8). PR-8's merge deleted content from the middle of `SubjectAccessRequestService.kt` (fields at lines 167/168/169) and the middle of `sar_template.mustache` (three `<h2>` blocks between the surviving Referrals and Organisation blocks). Downstream line refs (e.g. `organisations` field at Content L171 → shifted; `SarOrganisation` decl at L384 → shifted; `<h2>Organisation>` at template L136 → shifted). PR-9 will also merge before this PR, causing a further ~2-line shift. **Re-verify every line ref in this doc against the current `origin/main` HEAD before opening the PR**, using the pattern the PR-9 doc followed (git show `<HEAD>:<file>` + grep). Same rule as R6: fresh checkout of `origin/main` first.
 
 ## Purpose
 

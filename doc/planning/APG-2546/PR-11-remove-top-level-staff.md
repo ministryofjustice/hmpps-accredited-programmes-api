@@ -2,8 +2,9 @@
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/remove-top-level-staff`
 > • **Est.:** ½ dev day
-> • **Sequencing:** must merge **after** PR-8 and be **serialised** with PR-9 and PR-10 (all three touch `SubjectAccessRequestService.kt` + `sar_template.mustache` and would merge-conflict if parallel — no logical code dep on PR-8's cuts).
+> • **Sequencing:** must merge **after PR-8** (**merged 2026-08-17 as `b7b05283`** ✅), PR-9 and PR-10 (all three touch `SubjectAccessRequestService.kt` + `sar_template.mustache` — serial only, no parallel).
 > • **Status:** skeleton — expand before execution
+> • **⚠️ Line-ref re-anchoring required before execution.** Line references below are anchored to `origin/main @ 0cf89850` (pre-PR-8). PR-8's merge shifted downstream refs (e.g. `staff` field at Content L170 → shifted; `SarStaff` decl at L271 → shifted; `<h2>Staff>` at template L148 → shifted). PR-9 and PR-10 will also merge before this PR, causing further shifts. **Re-verify every line ref in this doc against the current `origin/main` HEAD before opening the PR**, using the pattern the PR-9 doc followed (git show `<HEAD>:<file>` + grep). Same rule as R6: fresh checkout of `origin/main` first.
 
 ## Purpose
 

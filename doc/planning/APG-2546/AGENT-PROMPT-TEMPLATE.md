@@ -71,21 +71,36 @@ update DELIVERY-LOG.md.
 ```text
 Pick up APG-2546 PR-9. The working doc is at
 doc/planning/APG-2546/PR-9-scrub-nomis-and-crn.md — read it end to
-end, expand the skeleton into a full working doc (same shape as
-PR-8's doc — the skeleton has scope + notes but you'll need to
-flesh out "Files to change" and the verification checklist),
-follow it, and open a PR using a similar description template.
+end, follow the "Files to change" section literally (all line refs
+were re-verified against origin/main @ b7b05283 on 2026-08-17
+after PR-8 merged), and open a PR using a similar description
+template to PR-8's.
 
-Assumed starting point: tip of main after PR-8 has merged. PR-10
-and PR-11 must be serialised with this PR (not parallel) — all
-three touch SubjectAccessRequestService.kt + sar_template.mustache
-and will merge-conflict otherwise. If PR-8 hasn't merged yet, stop
-and tell me before touching anything.
+FIRST COMMAND IN YOUR SESSION must be:
+  git fetch origin && git checkout origin/main
+Verify HEAD is b7b05283 (the anchor SHA every line-number in the
+PR-9 doc is measured against — this is PR-8's merge commit on
+main). If main has moved on to a newer SHA (someone else merged
+between now and your session), stop and tell me before touching
+anything — line refs may need spot-checking.
+
+Assumed starting point: tip of main after PR-8 has merged
+(SHA b7b05283, merged 2026-08-17). PR-8 is confirmed merged.
 
 Also worth reading before you start:
   - doc/planning/APG-2546/ROUND-2-PLAN.md §"Round-2 PR breakdown"
   - doc/planning/APG-2546/PR-8-remove-pni-oasys-person.md — you're
     working on the surface PR-8 leaves behind
+  - doc/planning/APG-2546/DELIVERY-LOG.md 2026-08-14 PR-8 outcome
+    entry — captures Findings 1 (empty JpaRepository shell for
+    PR-1 precedent — pattern to follow if this PR orphans a
+    repository) and 2 (PersistenceHelper method-body cleanup
+    deferred to PR-12 — do NOT delete these in PR-9)
+
+Header-ownership claim in Deborah's ask (NOMIS ID + CRN sourced
+by SAR wrapper header, not our payload) is CONFIRMED — see
+2026-08-13 DELIVERY-LOG entry, no further Slack ping needed to
+proceed.
 
 When you're done, report back the PR number, merge SHA, PDF page
 count from the regenerated sample, and any surprises.
