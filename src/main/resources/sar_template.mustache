@@ -3,7 +3,6 @@
     {{#referrals}}
         <h3>Referral {{ optionalValue (getIndexPlusOne @index) }}</h3>
         <table class="summary-list">
-            <tr><td>Prisoner number</td><td>{{ optionalValue prisonerNumber }}</td></tr>
             <tr><td>Status</td><td>{{ optionalValue statusCode }}</td></tr>
             <tr><td>Submitted on</td><td>{{ optionalValue (formatDate submittedOn) }}</td></tr>
             <tr><td>Referrer</td><td>{{ optionalValue referrerUsername }}</td></tr>
@@ -40,7 +39,6 @@
     {{#courseParticipation}}
         <h3>Course {{ optionalValue (getIndexPlusOne @index) }}</h3>
         <table class="summary-list">
-            <tr><td>Prisoner number</td><td>{{ optionalValue prisonNumber }}</td></tr>
             <tr><td>Course name</td><td>{{ optionalValue courseName }}</td></tr>
             <tr><td>Created date-time</td><td>{{ optionalValue (formatDate createdDateTime) }}</td></tr>
             <tr><td>Is draft</td><td>{{ convertBoolean isDraft }}</td></tr>

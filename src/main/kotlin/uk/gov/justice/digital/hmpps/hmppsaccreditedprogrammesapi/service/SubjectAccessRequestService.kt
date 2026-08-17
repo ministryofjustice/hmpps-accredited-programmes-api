@@ -157,7 +157,6 @@ class SubjectAccessRequestService(
   )
 
   data class SarReferral(
-    val prisonerNumber: String,
     val oasysConfirmed: Boolean,
     val statusCode: String?,
     val hasReviewedProgrammeHistory: Boolean?,
@@ -196,7 +195,6 @@ class SubjectAccessRequestService(
   )
 
   data class SarCourseParticipation(
-    val prisonNumber: String,
     val isDraft: Boolean?, // should be here
     val otherCourseName: String?,
     val yearStarted: Int?,
@@ -224,7 +222,6 @@ class SubjectAccessRequestService(
 
   private fun List<CourseParticipationEntity>.toSarParticipation(surnames: StaffSurnames): List<SarCourseParticipation> = map {
     SarCourseParticipation(
-      prisonNumber = it.prisonNumber,
       isDraft = it.isDraft,
       otherCourseName = it.otherCourseName,
       source = it.source,
@@ -249,7 +246,6 @@ class SubjectAccessRequestService(
     organisationNamesByCode: Map<String, String>,
   ): List<SarReferral> = map {
     SarReferral(
-      it.prisonNumber,
       it.oasysConfirmed,
       it.status,
       it.hasReviewedProgrammeHistory,

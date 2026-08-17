@@ -98,7 +98,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     assertThat(content.courses).hasSize(1)
 
     with(content.referrals[0]) {
-      assertThat(prisonerNumber).isEqualTo(prisonNumber)
       assertThat(referrerUsername).isEqualTo("Doe")
       assertThat(primaryPomStaffSurname).isEqualTo("Doe")
       assertThat(secondaryPomStaffSurname).isNull()
@@ -107,7 +106,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     }
 
     with(content.courseParticipation[0]) {
-      assertThat(prisonNumber).isEqualTo(prisonNumber)
       assertThat(courseName).isEqualTo("Course 1")
       assertThat(outcomeStatus).isEqualTo("INCOMPLETE")
       assertThat(otherCourseName).isEqualTo("Other course")
