@@ -103,6 +103,7 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(secondaryPomStaffSurname).isNull()
       assertThat(hasLdc).isTrue()
       assertThat(hasLdcBeenOverriddenByProgrammeTeam).isTrue()
+      assertThat(organisationName).isEqualTo("HMP Moorland")
     }
 
     with(content.courseParticipation[0]) {

@@ -6,6 +6,7 @@
             <tr><td>Status</td><td>{{ optionalValue statusCode }}</td></tr>
             <tr><td>Submitted on</td><td>{{ optionalValue (formatDate submittedOn) }}</td></tr>
             <tr><td>Referrer</td><td>{{ optionalValue referrerUsername }}</td></tr>
+            <tr><td>Organisation name</td><td>{{ optionalValue organisationName }}</td></tr>
             <tr><td>OASys confirmed</td><td>{{ convertBoolean oasysConfirmed }}</td></tr>
             <tr><td>Has reviewed programme history</td><td>{{ convertBoolean hasReviewedProgrammeHistory }}</td></tr>
             <tr><td>Primary POM staff surname</td><td>{{ optionalValue primaryPomStaffSurname }}</td></tr>
@@ -74,18 +75,6 @@
         <p>No Data Held</p>
     {{/courses}}
 
-
-     <h2>Organisation</h2>
-        {{#organisations}}
-            <h3>Organisation {{ optionalValue (getIndexPlusOne @index) }}</h3>
-            <table class="summary-list">
-                <tr><td>Name</td><td>{{ optionalValue name }}</td></tr>
-            </table>
-            <br>
-        {{/organisations}}
-        {{^organisations}}
-            <p>No Data Held</p>
-        {{/organisations}}
 
     <h2>Staff</h2>
         {{#staff}}

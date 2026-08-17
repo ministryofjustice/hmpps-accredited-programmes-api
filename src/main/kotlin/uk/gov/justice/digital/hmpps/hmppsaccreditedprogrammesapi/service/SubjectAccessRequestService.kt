@@ -79,13 +79,13 @@ class SubjectAccessRequestService(
     )
 
     // Resolve organisations across the current *and* original referrals in a
-    // single `WHERE code IN (?)` query. `organisationsByCode` is reused for
-    // both the top-level `Content.organisations` list (order preserved from
-    // the filtered referrals only, matching the previous per-code behaviour)
-    // and every `SarOriginalReferral.organisationName` lookup below.
-    val codesFromFiltered = filteredReferrals.mapNotNull { it.offering?.organisationId }.distinct()
+    // single `WHERE code IN (?)` query. The resulting `organisationNamesByCode`
+    // map is reused for both `SarReferral.organisationName` (populated on
+    // every parent referral) and `SarOriginalReferral.organisationName` (on
+    // the nested block), so subjects see the resolving prison name in the
+    // referral's own context rather than as a disconnected top-level list.
     val allOrgCodes = buildSet {
-      addAll(codesFromFiltered)
+      filteredReferrals.forEach { it.offering?.organisationId?.let(::add) }
       originalsById.values.forEach { it.offering?.organisationId?.let(::add) }
     }
     val organisationsByCode: Map<String, OrganisationEntity> = if (allOrgCodes.isEmpty()) {
@@ -101,7 +101,6 @@ class SubjectAccessRequestService(
         courseParticipation = filteredParticipations.toSarParticipation(staffSurnames),
         courses = courseRepository.getSarCourses(prn).toSarCourse(),
         staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() },
-        organisations = codesFromFiltered.mapNotNull { organisationsByCode[it]?.toSarOrganisation() },
       ),
 
     )
@@ -153,7 +152,6 @@ class SubjectAccessRequestService(
     val courseParticipation: List<SarCourseParticipation>,
     val courses: List<SarCourse>,
     val staff: List<SarStaff>,
-    val organisations: List<SarOrganisation>,
   )
 
   data class SarReferral(
@@ -169,6 +167,7 @@ class SubjectAccessRequestService(
     val hasLdc: Boolean?,
     val hasLdcBeenOverriddenByProgrammeTeam: Boolean,
     val hasReviewedAdditionalInformation: Boolean?,
+    val organisationName: String?,
     val originalReferral: SarOriginalReferral?,
   )
 
@@ -258,6 +257,7 @@ class SubjectAccessRequestService(
       it.hasLdc,
       it.hasLdcBeenOverriddenByProgrammeTeam,
       it.hasReviewedAdditionalInformation,
+      organisationName = it.offering?.organisationId?.let { code -> organisationNamesByCode[code] },
       originalReferral = it.originalReferralId?.let { originalId ->
         originalsById[originalId]?.toSarOriginalReferral(surnames, organisationNamesByCode)
       },
@@ -286,17 +286,5 @@ class SubjectAccessRequestService(
 
   private fun StaffEntity.toSarStaff() = SarStaff(
     lastName = lastName,
-  )
-
-  data class SarOrganisation(
-    val code: String,
-    val name: String,
-    val gender: String,
-  )
-
-  private fun OrganisationEntity.toSarOrganisation() = SarOrganisation(
-    code = code,
-    name = name,
-    gender = gender.name,
   )
 }
