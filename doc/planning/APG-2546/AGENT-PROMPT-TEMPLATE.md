@@ -113,28 +113,49 @@ count from the regenerated sample, and any surprises.
 ```text
 Pick up APG-2546 PR-10. The working doc is at
 doc/planning/APG-2546/PR-10-organisation-into-referral.md — read
-it end to end and follow it. The design decision (JPQL JOIN vs
-post-fetch) is already resolved in the doc: post-fetch is what
-the service already does for SarOriginalReferral.organisationName,
-and PR-10 just wires the parent SarReferral through the same map.
-No new query, no schema check. Scope is smaller than the original
-skeleton suggested (½ day, not 1 day).
+it end to end and follow it (all line refs were re-verified
+against origin/main @ f8e04ab0 on 2026-08-17 after PR-9 merged).
+The design decision (JPQL JOIN vs post-fetch) is already resolved
+in the doc: post-fetch is what the service already does for
+SarOriginalReferral.organisationName, and PR-10 just wires the
+parent SarReferral through the same map. No new query, no schema
+check. Scope is smaller than the original skeleton suggested (½
+day, not 1 day).
 
-Open a PR using a similar description template to PR-8's.
+Open a PR using a similar description template to PR-8's / PR-9's.
 
-Assumed starting point: tip of main after PR-8 has merged. PR-9
-and PR-11 must be serialised (not parallel) with PR-10 — all three
-touch SubjectAccessRequestService.kt + sar_template.mustache and
-will merge-conflict otherwise. If you're picking this up mid-flight,
-check with the human which of PR-9/10/11 is currently in review
-before opening yours.
+FIRST COMMAND IN YOUR SESSION must be:
+  git fetch origin && git checkout origin/main
+Verify HEAD is f8e04ab0 (the anchor SHA every line-number in the
+PR-10 doc is measured against — this is PR-9's merge commit on
+main). If main has moved on to a newer SHA, stop and tell me
+before touching anything — line refs may need spot-checking.
+
+Assumed starting point: tip of main after PR-9 has merged
+(SHA f8e04ab0, merged 2026-08-17). PR-8 (b7b05283) and PR-9
+(f8e04ab0) both confirmed merged.
 
 Also worth reading before you start:
   - doc/planning/APG-2546/ROUND-2-PLAN.md §"Round-2 PR breakdown"
+  - doc/planning/APG-2546/DELIVERY-LOG.md 2026-08-17 PR-9 merge
+    entry — captures the full PR-10 line-drift map from 0cf89850
+    to f8e04ab0
   - The existing originalReferral sub-block in
-    sar_template.mustache (line 26 on origin/main @ 0cf89850)
-    already carries organisationName — same shape applies to the
-    parent referral.
+    sar_template.mustache (line 23 on f8e04ab0) already carries
+    organisationName — same shape applies to the parent referral.
+  - The existing SarOriginalReferral mapper body in
+    SubjectAccessRequestService.kt (line 272 on f8e04ab0) does
+    `organisationName = offering?.organisationId?.let { organisationNamesByCode[it] }` —
+    that's the exact wiring to copy onto SarReferral.
+
+Pattern learned from PR-8: if this PR ends up orphaning a
+repository interface, keep it alive as an empty JpaRepository
+shell (round-1 AuditRepository / PR-8's OasysPniResultEntity-
+Repository precedent). Don't delete the interface file.
+
+Pattern learned from PR-8 Finding 2: do NOT delete
+PersistenceHelper.createOasysPniResult or createPerson — those are
+already scoped to PR-12 hygiene, don't fold into this PR.
 
 When you're done, report back the PR number, merge SHA, PDF page
 count, and any surprises.
