@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.r
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.PniResultEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.restapi.model.CourseIntensity
 import java.math.BigInteger
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -151,54 +150,6 @@ class PersistenceHelper {
       .setParameter("createdDateTime", createdDateTime)
       .setParameter("lastModifiedByUsername", lastModifiedByUsername)
       .setParameter("lastModifiedDateTime", lastModifiedDateTime)
-      .executeUpdate()
-  }
-
-  fun createPerson(
-    personId: UUID = UUID.randomUUID(),
-    prisonNumber: String,
-    forename: String,
-    surname: String,
-    conditionalReleaseDate: String? = null,
-    paroleEligibilityDate: String? = null,
-    tariffExpiryDate: String? = null,
-    earliestReleaseDate: String? = null,
-    earliestReleaseDateType: String? = null,
-    indeterminateSentence: Boolean? = null,
-    nonDtoReleaseDateType: String? = null,
-    sentenceType: String? = null,
-    location: String? = null,
-    gender: String? = null,
-  ) {
-    entityManager.createNativeQuery("INSERT INTO person (person_id, prison_number, forename, surname, conditional_release_date, parole_eligibility_date, tariff_expiry_date, earliest_release_date, earliest_release_date_type, indeterminate_sentence, non_dto_release_date_type, sentence_type, location, gender) VALUES (:personId, :prisonNumber, :forename, :surname, :conditionalReleaseDate, :paroleEligibilityDate, :tariffExpiryDate, :earliestReleaseDate, :earliestReleaseDateType, :indeterminateSentence, :nonDtoReleaseDateType, :sentenceType, :location, :gender)")
-      .setParameter("personId", personId)
-      .setParameter("prisonNumber", prisonNumber)
-      .setParameter("forename", forename)
-      .setParameter("surname", surname)
-      .setParameter("conditionalReleaseDate", conditionalReleaseDate?.let { LocalDate.parse(it) })
-      .setParameter("paroleEligibilityDate", paroleEligibilityDate?.let { LocalDate.parse(it) })
-      .setParameter("tariffExpiryDate", tariffExpiryDate?.let { LocalDate.parse(it) })
-      .setParameter("earliestReleaseDate", earliestReleaseDate?.let { LocalDate.parse(it) })
-      .setParameter("earliestReleaseDateType", earliestReleaseDateType)
-      .setParameter("indeterminateSentence", indeterminateSentence)
-      .setParameter("nonDtoReleaseDateType", nonDtoReleaseDateType)
-      .setParameter("sentenceType", sentenceType)
-      .setParameter("location", location)
-      .setParameter("gender", gender)
-      .executeUpdate()
-  }
-
-  fun createOasysPniResult(
-    pniResultId: UUID = UUID.randomUUID(),
-    prisonNumber: String,
-    oasysAssessmentId: Long? = null,
-    programmePathway: String? = null,
-  ) {
-    entityManager.createNativeQuery("INSERT INTO oasys_pni_result (pni_result_id, prison_number, oasys_assessment_id, programme_pathway) VALUES (:pniResultId, :prisonNumber, :oasysAssessmentId, :programmePathway)")
-      .setParameter("pniResultId", pniResultId)
-      .setParameter("prisonNumber", prisonNumber)
-      .setParameter("oasysAssessmentId", oasysAssessmentId)
-      .setParameter("programmePathway", programmePathway)
       .executeUpdate()
   }
 
