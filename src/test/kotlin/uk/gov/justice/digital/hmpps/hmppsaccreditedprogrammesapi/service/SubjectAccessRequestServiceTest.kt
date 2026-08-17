@@ -201,6 +201,11 @@ class SubjectAccessRequestServiceTest {
       assertThat(referral.primaryPomStaffSurname).isNull()
       assertThat(referral.secondaryPomStaffSurname).isNull()
       assertThat(referral.hasReviewedAdditionalInformation).isNull()
+      // Parent-referral organisation is resolved from the same batch map that
+      // powers SarOriginalReferral.organisationName, proving the field is
+      // populated per-referral from `offering.organisationId` rather than a
+      // separately fetched top-level list.
+      assertThat(referral.organisationName).isEqualTo("HMP Moorland")
 
       // SarOriginalReferral – every field is sourced from the seeded original,
       // proving the mapper reads through `originalsById` rather than leaking
@@ -240,11 +245,6 @@ class SubjectAccessRequestServiceTest {
 
       val staffMember = staff[0]
       assertThat(staffMember.lastName).isEqualTo("River")
-
-      assertThat(organisations).hasSize(1)
-      val organisation = organisations[0]
-      assertThat(organisation.code).isEqualTo("MDI")
-      assertThat(organisation.name).isEqualTo("HMP Moorland")
     }
 
     verify { referralRepository.getSarReferrals(prn) }
