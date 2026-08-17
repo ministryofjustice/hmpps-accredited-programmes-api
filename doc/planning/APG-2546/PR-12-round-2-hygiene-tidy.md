@@ -1,9 +1,40 @@
 # PR-12 — Round-2 code hygiene + test tidy
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/round-2-hygiene-tidy`
-> • **Est.:** ½ dev day • **Depends on:** PR-8 + PR-9 + PR-10 + PR-11 merged
+> • **Est.:** ½ dev day • **Depends on:** PR-8 (`b7b05283`) + PR-9 (`f8e04ab0`) + PR-10 (`d710fa7f`) + PR-11 (`47488c8a`) — **all merged 2026-08-17** ✅
 > • **Blocks:** PR-13 (docs handover expects a clean state)
-> • **Status:** skeleton — expand before execution
+> • **Status:** **ready for execution — anchored to `origin/main @ 47488c8a`.** Most sweeps CONFIRMED CLEAN pre-execution (see DELIVERY-LOG 2026-08-17 late evening entry for the full pre-verification grep table). Effective delta shrunk to five bullets — see "Effective delta after pre-verification" below.
+
+## Pre-verification summary (against `origin/main @ 47488c8a`)
+
+Ten of thirteen verification-checklist greps were run pre-execution and CONFIRMED CLEAN — the executing agent should re-run them as a sanity check but expect zero findings on:
+
+- `StaffRepository.findByPrisonNumber` — 0 hits in `src/main/kotlin` (only V144/V145 SQL migration comments still name-drop it)
+- Deleted SAR-DTO names (`SarPniResult` / `SarOasysPniResult` / `SarPerson` / `SarOrganisation` / `SarStaff`) — 0 hits anywhere in `src`, incl. `entity-schema.json`
+- Orphan ctor-param sweep on `SubjectAccessRequestService.kt` — 4 repos remain (`referralRepository`, `courseParticipationRepository`, `courseRepository`, `organisationRepository`), all in-use
+- KDoc dangling `[...]` refs to deleted siblings — 0 hits
+- `SarContractIntegrationTest` companion-const scan — only `PRISON_NUMBER` remains
+- `expectedFlywaySchemaVersion` — still `"145"` (correct)
+- UUID-leak grep on both goldens — 0 hits
+
+**Genuine work remaining** (see "Effective delta" below):
+
+1. Delete two `PersistenceHelper` methods (`createPerson`, `createOasysPniResult` — 0 test callers confirmed; `createPniResult` stays alive — 1 caller in `DomainEventsListenerTest.kt:222`).
+2. Add a second offering to the `SarContractIntegrationTest` fixture for per-referral organisation variance + regen goldens.
+3. Optional strip trailing `\n` from `sar-api-response.json`.
+4. Document the V145 `idx_staff_last_name` keep-vs-drop decision (recommend keep).
+5. Full-suite regression + snapshot check + zero-diff regen.
+
+## Effective delta after pre-verification
+
+1. **Delete `PersistenceHelper.createPerson`** (`src/test/.../common/config/PersistenceHelper.kt` L157) — `LocalDate` bind fix from PR #1115 goes with it.
+2. **Delete `PersistenceHelper.createOasysPniResult`** (`src/test/.../common/config/PersistenceHelper.kt` L191).
+3. **Add second offering to fixture** — `SarContractIntegrationTest` `setupTestData()` currently only seeds `MDI` / HMP Moorland. Wire `BXI` / HMP Brixton into one of the two referrals so `organisationName` renders differently in the golden.
+4. **Regen goldens** via `script/local-scripts/regenerate-sar-snapshots.sh`; verify the two referrals show different `organisationName` values in JSON/HTML.
+5. **Optional trailing-newline strip** on `sar-api-response.json` (or update the regen script to write without one — pick per file's siblings).
+6. **V145 decision (docs only unless dropped)** — recommend keep; document reasoning in PR body. Only ship a `V146__drop_staff_last_name_index.sql` if profile data justifies (unlikely).
+7. **V144/V145 SQL comment cleanup** — conditional on V146. If V145 stays, leave the comments (editing Flyway-applied SQL for comment hygiene isn't idiomatic).
+8. **Full-suite regression** — `./gradlew ktlintCheck test`, snapshot regen zero-diff after (3)+(4), UUID-leak grep, `entity-schema.json` diff sanity.
 
 ## Purpose
 

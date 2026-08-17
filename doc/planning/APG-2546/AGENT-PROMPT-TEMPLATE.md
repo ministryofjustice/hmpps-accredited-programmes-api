@@ -235,34 +235,70 @@ doc/planning/APG-2546/PR-12-round-2-hygiene-tidy.md — read it end
 to end, follow it, and open a PR using the description template
 at the bottom of the doc.
 
-Assumed starting point: tip of main after ALL of PR-8, PR-9,
-PR-10 and PR-11 have merged. If any of those are still open, stop
-and tell me — this PR needs the combined post-PR-11 state to
-sanity-grep for cross-PR interactions.
+FIRST-COMMAND fresh-checkout guard (R6):
+    git fetch origin && git checkout origin/main
+Verify you are on 47488c8a (PR-11 merge commit) or later. If
+main is behind that, stop — PR-12 depends on all four sibling
+PRs (PR-8 b7b05283, PR-9 f8e04ab0, PR-10 d710fa7f, PR-11
+47488c8a) being merged. All four merged 2026-08-17.
 
-This is a NO-BEHAVIOUR-CHANGE PR. If your grep sweep finds
-something that would change API shape, snapshot output, or
-observable service behaviour, that is out of scope for PR-12 —
-flag it back to me and I'll decide whether to hot-fix on the
-offending round-2 PR or open a follow-on.
+The planning doc's "Pre-verification summary" section + the
+DELIVERY-LOG 2026-08-17 late-evening entry contain a full grep
+table pre-run against 47488c8a. Ten of thirteen verification
+sweeps are already CONFIRMED CLEAN — the executing agent's job
+has shrunk to five bullets (see "Effective delta after
+pre-verification" in the doc). Re-run every grep as a sanity
+check; expect the pre-verified sweeps to still be clean.
 
-Deliverables per the doc:
-  - Final orphan-query audit (whole-src/main grep, not per-PR)
-  - Dead-DTO scan (SarPniResult, SarOasysPniResult, SarPerson,
-    SarOrganisation, SarStaff — all should be gone; flag any
-    ghost references)
-  - KDoc cross-reference fixup on the surviving SAR-collection
-    getters (ReferralRepository.getSarReferrals,
-    CourseParticipationRepository.getSarParticipations)
-  - SarContractIntegrationTest companion-const cleanup
-  - expectedFlywaySchemaVersion still "145" verify
-  - Full-suite regression, snapshot regen produces zero diff,
-    UUID-leak grep = 0
+This is a NO-BEHAVIOUR-CHANGE PR (except fixture #3 below,
+which changes snapshot output ONLY because a new organisation
+was seeded — expected diff, not a bug). If any other grep
+finding would change API shape or observable service behaviour,
+that is out of scope — flag it back to me.
 
-When you're done, report back the PR number, merge SHA, and
-whether anything cross-PR was found (empty PR body is a valid
-outcome — the PR still has value as the confirmed-clean
-checkpoint before Branston sees the new PDF).
+Effective delta (from doc's "Effective delta" section):
+  1. Delete PersistenceHelper.createPerson (L157) — 0 test
+     callers confirmed on 47488c8a
+  2. Delete PersistenceHelper.createOasysPniResult (L191) — 0
+     test callers confirmed on 47488c8a
+     (Note: createPniResult stays alive — 1 caller at
+     DomainEventsListenerTest.kt:222 for the NOMIS prisoner-merge
+     flow)
+  3. Add BXI / HMP Brixton offering to SarContractIntegrationTest
+     fixture and wire to one of the two referrals; regen goldens.
+     Confirm both referrals render DIFFERENT organisationName
+     values in the JSON + HTML goldens.
+  4. Optional: strip trailing \n from sar-api-response.json OR
+     update regenerate-sar-snapshots.sh to write without one.
+     Pick per the file's siblings; document.
+  5. Document V145 idx_staff_last_name keep-vs-drop decision in
+     PR body. Recommend keep (Flyway forward-only default; write
+     cost not measurable on background reference table). Only
+     ship V146__drop_staff_last_name_index.sql if profile data
+     justifies (unlikely). If V145 stays, leave the V144/V145
+     SQL comment name-drops of findByPrisonNumber alone — editing
+     Flyway-applied SQL for comment hygiene isn't idiomatic.
+  6. Full-suite regression: ./gradlew ktlintCheck test — expect
+     N tests green (record actual N in PR body; will differ from
+     round-2 baseline because fixture #3 adds test data).
+     Snapshot regen zero-diff on second run. UUID-leak grep = 0.
+     entity-schema.json diff sanity (unchanged expected — no
+     JPA entity touched).
+
+Session-hygiene reminders (from prior PR-8/9/10/11 executions):
+  - Do NOT use zsh heredocs for commit messages — write to a
+    file and use `git commit -F /tmp/msg.txt`.
+  - Docker Desktop must be running for
+    regenerate-sar-snapshots.sh (Testcontainers backing).
+  - After git checkout, cross-check stale read_file cache with
+    sed / git show if content doesn't match working tree.
+  - PR-11 self-review pattern (ship-it verdict + non-blocking
+    observations) is the model: worth a nine-lens self-review
+    before pushing.
+
+When you're done, report back the PR number, merge SHA, tests
+green count, and whether the V145 decision landed as keep or
+drop (with reasoning).
 ```
 
 ---
