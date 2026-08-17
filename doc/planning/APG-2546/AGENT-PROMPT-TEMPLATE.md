@@ -168,12 +168,24 @@ count, and any surprises.
 ```text
 Pick up APG-2546 PR-11. The working doc is at
 doc/planning/APG-2546/PR-11-remove-top-level-staff.md — read it
-end to end, expand the skeleton into a full working doc, follow
-it, and open a PR using a similar description template to PR-8's.
+end to end and follow it (all line refs were re-verified against
+origin/main @ d710fa7f on 2026-08-17 after PR-10 merged).
+Open a PR using a similar description template to PR-8/9/10's.
 
-Assumed starting point: tip of main after PR-8 has merged. PR-9
-and PR-10 must be serialised with this PR (not parallel) — all
-three touch SubjectAccessRequestService.kt + sar_template.mustache.
+FIRST COMMAND IN YOUR SESSION must be:
+  git fetch origin && git checkout origin/main
+Verify HEAD is d710fa7f (the anchor SHA every line-number in the
+PR-11 doc is measured against — this is PR-10's merge commit on
+main). If main has moved on to a newer SHA, stop and tell me
+before touching anything.
+
+Assumed starting point: tip of main after PR-10 has merged
+(SHA d710fa7f, merged 2026-08-17). PR-8 (b7b05283), PR-9
+(f8e04ab0), and PR-10 (d710fa7f) all confirmed merged.
+
+PR-11 is the LAST of the four sibling PRs touching
+SubjectAccessRequestService.kt + sar_template.mustache. No
+parallel-serial concern; you're clear to execute.
 
 Option (a) is locked (Deborah confirmed 2026-08-13 pm — see
 DELIVERY-LOG round-2 kickoff): just delete the top-level staff[]
@@ -184,6 +196,30 @@ Also worth reading before you start:
   - doc/planning/APG-2546/ROUND-2-PLAN.md §"Round-2 PR breakdown"
     and §"Impact on PR #1115 (recently merged)" (StaffRepository
     surname-sort query becomes orphaned here)
+  - doc/planning/APG-2546/DELIVERY-LOG.md 2026-08-17 PR-10 merge
+    entry — captures the full PR-11 line-drift map from 0cf89850
+    to d710fa7f
+
+Pattern learned from PR-8: if this PR ends up orphaning a whole
+repository interface, keep it alive as an empty JpaRepository
+shell (round-1 AuditRepository / PR-8's OasysPniResultEntity-
+Repository precedent). BUT this PR does NOT hit that case:
+StaffRepository has multiple other in-use methods
+(findByStaffId, findLastNameByUsername, findLastNameByStaffId,
+findSurnamesByUsernames, findSurnamesByStaffIds). Only the
+specific findByPrisonNumber method definition is deleted from
+the interface — the interface itself stays as-is. Doc calls
+this out explicitly under "Repositories".
+
+Pattern learned from PR-8 Finding 2: do NOT delete
+PersistenceHelper.createOasysPniResult or createPerson - those
+are already scoped to PR-12 hygiene.
+
+Optional "while you're in the file" tidy from PR-10 self-review:
+cosmetic mustache double-blank line between Courses and Staff
+sections. Since PR-11 deletes the <h2>Staff> block right below
+this gap, offered as a nice-to-have if cleaning is a one-line
+no-op. Not a blocker; PR-12 will catch it otherwise.
 
 When you're done, report back the PR number, merge SHA, PDF page
 count, and any surprises.
