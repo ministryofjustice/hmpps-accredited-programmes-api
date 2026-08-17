@@ -95,9 +95,55 @@ that surface only when everything is together.
 - **Cosmetic mustache double-blank.** Flagged by PR-10 nine-lens
   self-review — one line of trailing whitespace between the
   Courses and Staff sections in `sar_template.mustache`
-  (harmlessly absorbed into the goldens). May already be tidied
-  by PR-11 as a "while you're in the file" fix; if still present
-  post-PR-11 merge, clean up here.
+  (harmlessly absorbed into the goldens). **✅ HANDLED IN PR-11
+  2026-08-17** as a one-line no-op when the Staff block was
+  deleted — no action needed here. Sanity-verify at pickup time
+  that the double-blank is indeed gone from the on-main template.
+- **JSON golden trailing-newline fix** (flagged by PR-11
+  self-review 2026-08-17). `sar-api-response.json` gained a
+  trailing newline during PR-11 regen (was
+  `\ No newline at end of file`). Harmless today; brittle to a
+  future strict-bytes comparator upgrade. **Optional one-line
+  fix in PR-12** — either strip the trailing newline in the
+  golden or update `regenerate-sar-snapshots.sh` to write
+  without one, whichever is idiomatic for the file's other
+  siblings. Non-blocking.
+- **V145 `idx_staff_last_name` orphan status** (flagged by PR-11
+  self-review 2026-08-17). PR-11 deleted the
+  `StaffRepository.findByPrisonNumber` query that used this
+  index; the index now costs write-path (every `staff.last_name`
+  update pays for it) with zero read-path benefit. **Proposal
+  for PR-12 (weigh + decide)**: either
+  (a) leave in place (Flyway forward-only default — the write
+  cost is not measurable in profile data, and additive indices
+  are cheap institutional history), or
+  (b) drop via a new `V146__drop_staff_last_name_index.sql`
+  (only justified if there's a measurable write-hot-path — this
+  is a background reference table, so unlikely). **Recommend
+  (a) unless profile data says otherwise.** Document the
+  decision either way in PR-12 body so a future DBA sweep sees
+  the reasoning.
+- **SQL migration comment cleanup — `V144__` / `V145__` still
+  name-drop `findByPrisonNumber`** (flagged by PR-11 self-review
+  2026-08-17). Both migration SQL headers reference the
+  now-deleted `StaffRepository.findByPrisonNumber` method by
+  name in code comments. Grep-clean elsewhere. **Optional
+  cleanup in PR-12**: if a follow-up `V146__` lands per the
+  V145-drop decision above, tidy the V144/V145 comments in the
+  same PR for a coherent SQL history. If V145 is retained,
+  leave the comments — editing Flyway-applied SQL just for
+  comment hygiene isn't idiomatic.
+- **Round-2 learning pattern — orphaned ctor param sweep**
+  (formalised from PR-10 + PR-11 precedent). When any round-2
+  PR removes a top-level `Content` collection field, the
+  matching repository constructor param + import in
+  `SubjectAccessRequestService.kt` become dead code that
+  ktlint's no-unused-imports rule will catch on the import but
+  will silently linger on the ctor param. **Sanity-grep item
+  for PR-12**: `grep -n 'private val.*Repository' src/main/…/SubjectAccessRequestService.kt` —
+  expect only repos still referenced elsewhere in the file. If
+  any orphan survives (unlikely — PR-10/11 handled theirs
+  in-flight), delete + mirror on the unit test's `setup()`.
 - **Full-suite regression run.** `./gradlew ktlintCheck test` on the
   merged tip — 678 (or whatever the post-round-2 count is) tests
   green with the four PR-8/9/10/11 heads combined.
@@ -157,10 +203,41 @@ Run in order:
       without a consumer). If any hit surfaces, leave both alive
       and record in the PR-12 body which round-2 PR re-introduced
       the caller.
+- [ ] **Orphaned ctor-param sweep on `SubjectAccessRequestService.kt`**
+      (round-2 learning pattern from PR-10 + PR-11):
+      `grep -nE 'private val [a-zA-Z]+Repository' src/main/kotlin/**/service/SubjectAccessRequestService.kt` —
+      each remaining repository injection should be traceable to
+      at least one call site inside the class. Any orphan → delete
+      + mirror the removal on the unit test's `setup()` (drop the
+      `mockk()` decl + ctor arg). PR-10 and PR-11 handled theirs
+      in-flight so this is expected to be a null-check, but the
+      sweep is cheap.
+- [ ] **Fixture per-referral organisation variance** (flagged by
+      PR-10 self-review 2026-08-17): once implemented per "Does"
+      section above, confirm the two referrals in the regenerated
+      golden JSON/HTML render **different** `organisationName`
+      values.
+- [ ] **JSON golden trailing newline** (flagged by PR-11
+      self-review 2026-08-17): `sar-api-response.json` should end
+      **without** a trailing newline (consistent with the file's
+      pre-round-2 state) OR the regen script should be updated to
+      write trailing newlines consistently across all goldens.
+      Pick one and document.
+- [ ] **V145 index drop decision** (flagged by PR-11 self-review
+      2026-08-17): document in PR-12 body whether `idx_staff_last_name`
+      stays (Flyway forward-only default, recommended) or is
+      dropped via new `V146__drop_staff_last_name_index.sql`
+      (only if profile data shows measurable write-hot-path cost).
+      If dropped, also tidy the V144/V145 SQL comments that
+      still name-drop `findByPrisonNumber` for a coherent
+      migration history.
 - [ ] `./gradlew ktlintCheck test` — clean, all tests green
 - [ ] `entity-schema.json` — diff makes sense (removals only, no
       additions)
-- [ ] `expectedFlywaySchemaVersion` still `"145"`
+- [ ] `expectedFlywaySchemaVersion` — expected `"145"` unless
+      the V145 index-drop decision above ships a new
+      `V146__drop_staff_last_name_index.sql`, in which case flip
+      to `"146"` in the same PR
 - [ ] Snapshot goldens unchanged from post-PR-11 state (verify
       `regenerate-sar-snapshots.sh` produces zero diff)
 - [ ] UUID-leak grep on both goldens returns 0
