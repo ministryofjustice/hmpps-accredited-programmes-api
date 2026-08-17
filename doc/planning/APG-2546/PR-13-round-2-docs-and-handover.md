@@ -2,8 +2,9 @@
 
 > **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/round-2-docs-handover`
 > • **Est.:** 1 dev day (drafting emails + Slack + generating a fresh preprod PDF + committing the artefact + wrapping DELIVERY-LOG rarely fits in ½ day in practice)
-> • **Depends on:** PR-8 + PR-9 + PR-10 + PR-11 + PR-12 merged
-> • **Status:** skeleton — expand before execution
+> • **Depends on:** PR-8 (`b7b05283`) + PR-9 (`f8e04ab0`) + PR-10 (`d710fa7f`) + PR-11 (`47488c8a`) merged; **PR-12 (#1120, head `1d49a7f3`) auto-merge queued 2026-08-17 night** — anchor to PR-12's merge SHA at pickup (re-anchor pattern from PR-8→9→10→11→12).
+> • **Blocks:** ticket close-out
+> • **Status:** skeleton — re-anchor to PR-12 merge SHA + expand before execution. Four scope items already folded in from PR-12 self-review (see "Folded in from PR-12 self-review" under §Scope).
 
 ## Purpose
 
@@ -24,6 +25,36 @@ round-1.
   round-2 asks
 - If desired, update the top-level `README.md` to note round-2 as
   delivered
+
+### Folded in from PR-12 self-review (2026-08-17 night — see DELIVERY-LOG entry)
+
+- **Per-referral organisation variance walkthrough beat.** PR-12's
+  fixture add (BXI / HMP Brixton wired to the withdrawn referral +
+  its `originalReferral` sub-block, HMP Moorland on the main
+  `REFERRAL_STARTED` referral) means the round-2 goldens now render
+  **two distinct organisation names across three referral rows**.
+  Worth a *"here's how per-referral wiring looks under two-
+  organisation load"* beat in the Branston-facing PDF walkthrough
+  — closes Deborah's round-2 ask #4 (organisation into referral)
+  with visible variance, not just wiring-verified variance.
+- **V145 keep-with-reasoning — link, don't re-litigate.** The
+  drop-vs-keep decision for `idx_staff_last_name` landed as KEEP
+  in PR #1120 with rationale (Flyway forward-only default, write
+  cost not measurable on background reference table, additive
+  indices are cheap institutional history). Reference PR #1120
+  from the docs handover — do NOT re-open the debate in the PDF or
+  the DD note. Single-source-of-truth on the PR body.
+- **`PersistenceHelper` helper-method inventory refresh.** PR-12
+  deleted `createPerson` + `createOasysPniResult`. If the handover
+  PDF anywhere enumerates helper-method inventory or fixture-
+  authoring recipes (unlikely at that level of detail — check),
+  refresh. Otherwise no action.
+- **R7 close-out — `.gitignore` sweep.** Untracked `.snyk` +
+  `Copy of 2026.07.08_copy_Probation Digital Data review December 251.xlsx`
+  under `doc/` have persisted across all six round-2 PRs. Add a
+  one-line `.gitignore` (or `.git/info/exclude`) entry for both as
+  part of this docs PR. Closes R7 in the ROUND-2-PLAN risk
+  register.
 
 ## Docs to touch
 
