@@ -12,14 +12,12 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OfferingEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.OrganisationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.StaffEntityFactory
 import java.math.BigInteger
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -31,7 +29,6 @@ class SubjectAccessRequestServiceTest {
   private val referralRepository: ReferralRepository = mockk()
   private val courseParticipationRepository: CourseParticipationRepository = mockk()
   private val courseRepository: CourseRepository = mockk()
-  private val staffRepository: StaffRepository = mockk()
   private val organisationRepository: OrganisationRepository = mockk()
   private val staffLookupService: StaffLookupService = mockk()
 
@@ -43,7 +40,6 @@ class SubjectAccessRequestServiceTest {
       referralRepository,
       courseParticipationRepository,
       courseRepository,
-      staffRepository,
       organisationRepository,
       staffLookupService,
     )
@@ -169,15 +165,6 @@ class SubjectAccessRequestServiceTest {
         .produce(),
     )
 
-    every { staffRepository.findByPrisonNumber(prn) } returns listOf(
-      StaffEntityFactory()
-        .withStaffId("12345".toBigInteger())
-        .withFirstName("Alex")
-        .withLastName("River")
-        .withPrimaryEmail("alex.river@justice.gov.uk")
-        .withUsername("ARIVER")
-        .produce(),
-    )
     every { organisationRepository.findAllByCodeIn(match { it.toSet() == setOf("MDI") }) } returns listOf(
       OrganisationEntityFactory()
         .withCode("MDI")
@@ -194,7 +181,6 @@ class SubjectAccessRequestServiceTest {
       assertThat(referrals.size).isEqualTo(3)
       assertThat(courseParticipation.size).isEqualTo(1)
       assertThat(courses.size).isEqualTo(1)
-      assertThat(staff).hasSize(1)
 
       val referral = referrals[0]
       assertThat(referral.referrerUsername).isEqualTo("River")
@@ -242,14 +228,10 @@ class SubjectAccessRequestServiceTest {
 
       val course = courses[0]
       assertThat(course.name).isEqualTo("Course Name")
-
-      val staffMember = staff[0]
-      assertThat(staffMember.lastName).isEqualTo("River")
     }
 
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
     verify { courseRepository.getSarCourses(prn) }
-    verify { staffRepository.findByPrisonNumber(prn) }
   }
 }
