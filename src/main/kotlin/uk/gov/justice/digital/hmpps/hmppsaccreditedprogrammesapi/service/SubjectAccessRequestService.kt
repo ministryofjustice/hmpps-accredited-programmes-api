@@ -7,12 +7,10 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseParticipationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OrganisationEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferralEntity
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.StaffEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.StaffRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.math.BigInteger
@@ -26,7 +24,6 @@ class SubjectAccessRequestService(
   private val referralRepository: ReferralRepository,
   private val courseParticipationRepository: CourseParticipationRepository,
   private val courseRepository: CourseRepository,
-  private val staffRepository: StaffRepository,
   private val organisationRepository: OrganisationRepository,
   private val staffLookupService: StaffLookupService,
 
@@ -100,7 +97,6 @@ class SubjectAccessRequestService(
         referrals = filteredReferrals.toSarReferral(staffSurnames, originalsById, organisationNamesByCode),
         courseParticipation = filteredParticipations.toSarParticipation(staffSurnames),
         courses = courseRepository.getSarCourses(prn).toSarCourse(),
-        staff = staffRepository.findByPrisonNumber(prn).distinctBy { it.username }.map { it.toSarStaff() },
       ),
 
     )
@@ -151,7 +147,6 @@ class SubjectAccessRequestService(
     val referrals: List<SarReferral>,
     val courseParticipation: List<SarCourseParticipation>,
     val courses: List<SarCourse>,
-    val staff: List<SarStaff>,
   )
 
   data class SarReferral(
@@ -213,10 +208,6 @@ class SubjectAccessRequestService(
 
   data class SarCourse(
     val name: String,
-  )
-
-  data class SarStaff(
-    val lastName: String,
   )
 
   private fun List<CourseParticipationEntity>.toSarParticipation(surnames: StaffSurnames): List<SarCourseParticipation> = map {
@@ -283,8 +274,4 @@ class SubjectAccessRequestService(
       name = it.name,
     )
   }
-
-  private fun StaffEntity.toSarStaff() = SarStaff(
-    lastName = lastName,
-  )
 }
