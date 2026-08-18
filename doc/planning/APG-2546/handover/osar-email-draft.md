@@ -1,16 +1,12 @@
 # OSAR round-2 email draft
 
-> **Status:** template committed 2026-08-18 pm as part of PR-13b.
-> Bracketed values (`[CRN]`, `[date]`) get filled in by Raby at 13d
-> send time — after 13c commits the sample PDF and Raby knows the
-> concrete CRN + generation date.
->
-> **To send:** Raby, in the planning-agent chat, after 13c PDF is
-> committed on the planning branch. DELIVERY-LOG gets a send-timestamp
-> entry after Raby confirms send.
->
+> **Status:** ✅ bracket-filled 2026-08-18 pm (post-13c). Ready to send.
 > Attach `round-2-sample.pdf` (committed at
-> `doc/planning/APG-2546/handover/round-2-sample.pdf`).
+> `doc/planning/APG-2546/handover/round-2-sample.pdf`, 47 pages, 139,732 bytes,
+> generated against preprod CRN A8610DY / JONES, Tim).
+>
+> **To send:** Raby, in the planning-agent chat. DELIVERY-LOG gets a
+> send-timestamp entry after Raby confirms send.
 
 ---
 
@@ -22,7 +18,7 @@ Hi all,
 
 APG-2546 round-2 is complete on main (final merge #1120, 2026-08-18)
 and deployed to dev. Attached is the round-2 SAR review PDF,
-generated via the SAR dev service against CRN [CRN] on [date] —
+generated via the SAR dev service against CRN A8610DY on 2026-08-18 —
 full standard cover-sheet + top-and-tail pages.
 
 This is a direct response to Deborah's 2026-08-13 review-meeting
@@ -40,8 +36,10 @@ action list. All five asks delivered:
 4. Organisation is now inline on each referral (`organisationName`
    field), replacing the previous top-level `organisations[]` list —
    organisation now sits in the same context as its referral.
-   Demonstrated in the attached PDF by [distinct organisation
-   names across the referrals for CRN [CRN]]. PR #1118.
+   Demonstrated in the attached PDF by ~30 distinct organisation
+   names across A8610DY's 74 referrals (Ashfield, Aylesbury, Belmarsh,
+   Dovegate, Whatton, Wymott, and many more — rich per-referral
+   variance). PR #1118.
 5. Top-level `staff[]` list removed; POM staff surnames continue to
    render inline on each referral (`primaryPomStaffSurname` /
    `secondaryPomStaffSurname`) per Deborah's option (a) decision.

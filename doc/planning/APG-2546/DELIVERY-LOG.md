@@ -1495,6 +1495,61 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   - **Close-out signal:** APG-2546 closes on **feedback received** from Branston round-2 review, not on "zero further asks". Round-3 asks handled as a fresh ticket per the OOS decision. Jira transitions to "content-review in-flight" after 13d send (**not** Done — Jira Done fires on Branston's reply).
 
   **Handover to planning agent (Raby):** paper trail closes here for the 13b docs pass. Next moves are (a) Raby (or Deborah's dev) runs the SAR dev-service against a preprod CRN and commits the resulting PDF at `doc/planning/APG-2546/handover/round-2-sample.pdf` (13c); (b) Raby fills the `[CRN]` / `[date]` brackets in the two comms drafts and sends OSAR email + Deborah DM (13d); (c) planning agent records send timestamps + the outcome of Branston's reply here to close APG-2546.
+- **2026-08-18 (afternoon → evening) — Pre-13c A + B + 13c all landed same day. Branston-facing PDF committed.** Rapid execution of all three planning-agent-tracked pre-comms steps in one working afternoon after PR-13b close-out landed. Full paper trail:
+
+  **Pre-13c step A — local Option 2 eyeball ✅.** Raby ran `./script/local-scripts/regenerate-sar-snapshots.sh` on `main @ 99264496` and opened `build/test-generated/sar-generated-report.pdf` — 2-page chrome-less render, all round-2 removals verified absent, `Organisation name` row present per referral in the fixture (Brixton × 2 + Moorland × 1), no UUID leaks. Verdict: local render structurally correct → cleared to proceed with the template re-registration ping.
+
+  **Pre-13c step B — template re-registration on Slack ✅.** Raby posted `doc/planning/APG-2546/handover/cameron-template-registration-slack-draft.md` (verbatim) to `#haa-sar-functionality-change-request`. Cameron's team confirmed same-day: **"that's done in dev"** — template re-registered at `99264496` on the SAR dev-service. SARBT001 role on the test nDelius account confirmed present (no rotation needed). Turnaround: same working day. Notable — no pipeline stall this round (contrast round 1's multi-day block that motivated Option 2 fallback existing at all).
+
+  **Correction to earlier PR-13 draft (recorded for the paper trail):** the previous "no re-registration required for round-2" claim (in the 2026-08-18 morning entry's PR-13 doc rewrite) was wrong. The mustache template file DID change materially round-1 → round-2 (five `<h2>` block removals, `Organisation name` row added inline per referral, `Prisoner number` rows scrubbed), and Cameron's team's dev-service serves the registered revision — so re-registration was required, not a courtesy. Committed the correction 2026-08-18 pm as `e9e58fa2` (new `cameron-template-registration-slack-draft.md`, PR-13 doc §"Pre-13c steps" section added, handover README pre-13c step B marker flipped to REQUIRED, PR-13 "Not in scope" bullet flipped). Fresh executing agent's decision to stop at the target-branch + PDF-can't-fabricate + comms-can't-send blockers earlier in the afternoon indirectly surfaced this: shape-correction commit `3127e266` didn't include the re-registration correction because the assumption was still tentative at that point; correction fell out of the subsequent pre-13c conversation.
+
+  **13c — Branston-facing sample PDF committed on planning branch ✅.** Merge commit **`539bcdb0`** on `APG-2546/planning-sar-field-removals`. Single file added: `doc/planning/APG-2546/handover/round-2-sample.pdf`, 139,732 bytes, 47 pages.
+
+  **CRN selection paper trail** (recorded because it deviates from PR-13's default recommendation of A9648CH):
+
+  | CRN | File size | Pages | Referrals | Course participations | Verdict |
+  |---|---|---|---|---|---|
+  | A9648CH (round-1's pick) | 5,750 B | 5 | 0 (No Data Held) | 0 | ❌ Empty in current dev. Preprod DB has been reset since round 1 — round-1's PDF pick is not reusable. |
+  | A7416EA | 6,100 B | 5 | 0 | 0 (2 courses on the catalogue only) | ❌ Too sparse. Insufficient to demonstrate any round-2 change in context. |
+  | **A8610DY (JONES, Tim) — selected** | **139,732 B** | **47** | **74** | **18** | ✅ Rich vettor-training exemplar. ~30 distinct organisation names across 74 referrals. All round-2 changes clearly demonstrated. |
+
+  **Round-2 sanity validation against A8610DY PDF (all 9 items PASS)** — done via `pdftotext -layout` + grep on the committed PDF, before commit:
+
+  - `Prisoner number` / `Prison number` row anywhere in body: **0 hits** ✅ (PR-9 held)
+  - Top-level `Staff` `<h2>` section: **0 hits** ✅ (PR-11 held)
+  - Top-level `Organisation` / `Organisations` `<h2>` section: **0 hits** ✅ (PR-10 held)
+  - `Person` / `Personal data` `<h2>` section: **0 hits** ✅ (PR-8 held)
+  - `PNI results` `<h2>` section: **0 hits** ✅ (PR-8 held)
+  - `OASys PNI results` `<h2>` section: **0 hits** ✅ (PR-8 held)
+  - Raw ACP-payload UUID leak (36-char UUID regex): **0 hits** ✅ (PR-5 + PR-7 held)
+  - `Organisation name` row inline per referral: **74 hits** ✅ (PR-10 — one per referral, perfect)
+  - `Primary POM staff` + `Secondary POM staff` rows inline per referral: **74 + 74 hits** ✅ (option (a) retention — Deborah 2026-08-13 pm)
+
+  Three surviving `<h2>` sections rendered: **Referrals**, **Course participation**, **Courses**. Three, no more.
+
+  **Vettor-exemplar quality note:** A8610DY delivers rich per-referral organisation variance — Ashfield, Aylesbury, Belmarsh, Bristol, Buckley Hall, Dovegate, Drake Hall, Elmley, Erlestoke, Five Wells, Forest Bank, Fosse Way, Frankland, Garth, Gartree, High Down, Humber, Isis, Lancaster Farms, Long Lartin, Lowdham Grange, Onley, Stafford, Stocken, Stoke Heath, Wakefield, Wealstun, Whatton, Wymott, plus one seed-quirk ("United Kingdom" — see deferred follow-ups below). Real POM staff surnames render inline (Pobee-norris, Robertson) alongside referrer surnames (ELANGOVAN). This is a genuinely stronger vettor-training exemplar than round-1's PDF was — Deborah's rationale for the round-1 fixture widening explicitly cited "rich enough to be a genuine vettor training exemplar", and A8610DY nails it in live preprod data.
+
+  **13d — comms drafts bracket-filled ✅.** Both drafts under `doc/planning/APG-2546/handover/` had their `[CRN]` (→ `A8610DY`) and `[date]` (→ `2026-08-18`) brackets filled in the same 13c commit sequence. The OSAR email also gained a concrete list of the ~30 organisation names for ask #4's "visibly variant" claim. Drafts ready to paste-and-send; awaiting Raby.
+
+  **Deferred follow-ups (post round-2 close-out — NOT scoped to APG-2546):**
+
+  1. **Preprod DB fixture health — A9648CH empty in current dev.** Round-1's canonical PDF pick has been reset. Whoever owns preprod ACP fixtures should re-seed A9648CH (or explicitly deprecate it) so future SAR handovers have a stable canonical CRN. Not APG-2546 scope; a next-DB-refresh item.
+  2. **Bad organisation seed — one org named "United Kingdom".** Cosmetic; the DB has one `OrganisationEntity` with `name = "United Kingdom"` seeded somewhere and it renders through `SarReferral.organisationName`. Not a round-2 defect (the round-2 wiring is correct — it renders whatever's in the DB). Flag to whoever owns preprod ACP fixtures for cleanup. Not APG-2546 scope.
+
+  Both follow-ups are logged here for future reference so they aren't lost, and are explicitly OUT of APG-2546. Neither blocks close-out; neither triggers a round-3 ticket (they're not Branston-review feedback — they're internal fixture hygiene).
+
+  **State on planning branch after 13c push:**
+
+  - Branch tip: `539bcdb0` (PR-13c PDF commit).
+  - Trail across the day: `3127e266` (shape correction) → `815e2d8f` (13b close-out) → `8ba82cc5` (13b outcomes-row fold-in) → `e9e58fa2` (pre-13c template re-registration correction) → `539bcdb0` (13c PDF commit) → **this timeline entry commit** (in flight).
+  - `git status --short` on planning branch worktree shows only `?? .snyk` (R7 deferred paper-cut; won't be committed).
+
+  **Remaining APG-2546 close-out steps (Raby-owned; planning agent logs outcomes):**
+
+  1. Raby sends OSAR email (`handover/osar-email-draft.md`, attach `handover/round-2-sample.pdf`). Planning agent logs send timestamp.
+  2. Raby sends Deborah Slack DM (`handover/deborah-slack-dm-draft.md`). Planning agent logs send timestamp.
+  3. Jira APG-2546 transitions to "content-review in-flight" (**not** Done — Jira Done fires on Branston's reply per round-2 close-out signal).
+  4. When Branston reply lands: planning agent logs outcome + APG-2546 closes. Any round-3 asks spin a fresh ticket per the OOS decision (paper trail: `doc/planning/APG-2546/round-3-branston-feedback.md` for verbatim reply capture).
 
 ## Round 2 — PR outcomes
 
