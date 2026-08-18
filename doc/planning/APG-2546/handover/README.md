@@ -11,26 +11,34 @@ alongside the rest of `doc/planning/APG-2546/`.
 | File | State | Owner | Purpose |
 |---|---|---|---|
 | `README.md` | ✅ committed | fresh agent (PR-13b) | This file. |
+| `cameron-template-registration-slack-draft.md` | ✅ committed (ready to send) | Raby sends **first**, before 13c PDF run | Pre-13c Slack ping to Cameron's SAR product team (`#haa-sar-functionality-change-request`) — **template changed round-1 → round-2 (five `<h2>` blocks removed, `Organisation name` row added inline, `Prisoner number` rows removed), so re-registration is REQUIRED, not a courtesy check**. Also confirms SARBT001 still on the test nDelius account. |
 | `osar-email-draft.md` | ✅ committed (template, brackets unfilled) | Raby fills `[CRN]` / `[date]` at 13d send time | OSAR round-2 review email template. To: David Evans, Sharon Hepworth, Roxanne Stephenson, William Falconer, QAT. CC: Cameron Farquhar, Deborah, Naseem Ashraf, Kiril Kolev. |
 | `deborah-slack-dm-draft.md` | ✅ committed (template, brackets unfilled) | Raby fills `[CRN]` at 13d send time | Slack DM to Deborah (SDM, Cameron's SAR product team) confirming round-2 delivery + previewing the Branston-review kickoff. |
 | `round-2-sample.pdf` | ⏳ **pending — Raby (13c)** | Raby (or Deborah's dev) generates via Cameron's SAR dev-service (Option 1, full-chrome) against a preprod CRN | Branston-facing full-chrome PDF for round-2 content sign-off. See PR-13 doc §13c for the recipe + eyeball-check list. |
 | `roxanne-dd-drift-nudge-draft.md` | 🚫 **not committed** | Raby (only if PR-6's original P.S. didn't already close her records) | Optional DD-drift nudge to Roxanne re rows 109 + 224. Check DELIVERY-LOG PR-6 outcome first; skip if closed. |
 
-## Sequencing (13c → 13d)
+## Sequencing (updated 2026-08-18 pm — pre-13c steps added)
 
-1. **13c — PDF drop (Raby):** log in to the SAR dev-service with the
-   test nDelius account (SARBT001 role), enter preprod CRN
-   `A9648CH` (round-1's pick — swap for a comparable rich CRN if
-   A9648CH is no longer viable), select **Accredited Programmes
-   only**, generate + download, eyeball-check against the sanity
-   list in PR-13 §13c, then `cp` into this directory, commit +
-   push. Update the DELIVERY-LOG placeholder from `<PDF: pending>`
-   to concrete file size + CRN + generation date + verdict.
-2. **13d — comms send (Raby, planning-agent chat):** fill in the
-   `[CRN]` and `[date]` brackets in `osar-email-draft.md` and
-   `deborah-slack-dm-draft.md` from 13c's outcome. Send email +
-   DM. Planning agent updates DELIVERY-LOG with send timestamps
-   after Raby confirms.
+Order matters. Round-1 saw multi-day pipeline blocks; give Option 1 as much lead time as possible.
+
+1. **Pre-13c step A — local eyeball (Raby, no external asks).** Regenerate the Option 2 chrome-less test-harness PDF locally on `main @ 99264496` to sanity-check content shape before engaging Cameron's team:
+
+   ```zsh
+   git fetch origin --prune && git checkout main && git pull --ff-only
+   git --no-pager log --oneline -1   # expect 99264496 at top
+   # Docker Desktop must be running for Testcontainers-backed regen
+   open -a Docker   # macOS; skip if already up
+   ./script/local-scripts/regenerate-sar-snapshots.sh
+   open build/test-generated/sar-generated-report.pdf
+   ```
+
+   Eyeball against the sanity list below. If the local PDF looks structurally wrong (missing/extra sections, orphan headings), **stop** — diff `sar-api-response.json` / `sar-expected-render-result.html` against `origin/main` (should be byte-identical). Don't proceed to step B on a broken local render.
+
+2. **Pre-13c step B — template re-registration (Raby, REQUIRED).** Send `cameron-template-registration-slack-draft.md` to `#haa-sar-functionality-change-request`. The mustache template changed materially between round-1 and round-2 (five `<h2>` blocks removed, `Organisation name` row added inline in each referral, `Prisoner number` rows removed) — if the SAR dev-service still holds the round-1 revision, the round-2 PDF will render the exact sections Deborah asked us to remove. Cameron's team re-registers at `99264496`. Also flushes any SARBT001-role rotation before you need it. Give it up to 24h; chase in-channel if silent.
+
+3. **13c — PDF drop (Raby, after Cameron's team confirms).** Log in to the SAR dev-service with the test nDelius account (SARBT001 role), enter preprod CRN `A9648CH` (round-1's pick — swap for a comparable rich CRN if A9648CH is no longer viable), select **Accredited Programmes only**, generate + download, eyeball-check against the sanity list below, then `cp` into this directory, commit + push. Update the DELIVERY-LOG placeholder from `<PDF: pending>` to concrete file size + CRN + generation date + verdict.
+
+4. **13d — comms send (Raby, planning-agent chat).** Fill in the `[CRN]` and `[date]` brackets in `osar-email-draft.md` and `deborah-slack-dm-draft.md` from 13c's outcome. Send email + DM. Planning agent updates DELIVERY-LOG with send timestamps after Raby confirms.
 
 ## Eyeball-check list for `round-2-sample.pdf` (13c)
 

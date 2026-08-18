@@ -140,6 +140,44 @@ Create `doc/planning/APG-2546/handover/README.md` explaining what belongs in tha
 
 Create both draft files under `doc/planning/APG-2546/handover/` with the templates from §"13d — comms drafts (to be sent by Raby)" below. Leave the `[CRN]` / `[date]` brackets unfilled — Raby fills them at 13c/13d time.
 
+## Pre-13c steps (Raby, before touching the SAR dev-service)
+
+Order matters. Both steps are documented at `doc/planning/APG-2546/handover/README.md` and staged as commit-ready drafts under `handover/`.
+
+### Pre-13c step A — local Option 2 eyeball
+
+Regenerate the chrome-less test-harness PDF locally on `main @ 99264496` to sanity-check the round-2 content shape *before* engaging Cameron's team. Cheap, no external asks, catches structural rendering bugs early.
+
+```zsh
+git fetch origin --prune && git checkout main && git pull --ff-only
+git --no-pager log --oneline -1        # expect 99264496 at top
+open -a Docker                         # macOS; skip if already up
+./script/local-scripts/regenerate-sar-snapshots.sh
+open build/test-generated/sar-generated-report.pdf
+```
+
+Eyeball against the sanity list in §13c step 5 below. Expected: 2 pages, three surviving `<h2>` sections (Referrals / Course participation / Courses), `organisationName` present per referral, inline POM staff surnames, no residual UUIDs. If the local PDF looks structurally wrong, **stop** — diff `sar-api-response.json` / `sar-expected-render-result.html` against `origin/main` (both should be byte-identical). Do NOT proceed to step B on a broken local render.
+
+### Pre-13c step B — template re-registration on Slack (REQUIRED)
+
+Post `doc/planning/APG-2546/handover/cameron-template-registration-slack-draft.md` to `#haa-sar-functionality-change-request`. **The template file changed materially between round-1 and round-2:**
+
+- Five `<h2>` blocks removed: `PNI results`, `Person`, `OASys PNI results`, `Organisations`, `Staff`.
+- `Organisation name` `<tr>` row added inline inside each referral's summary-list.
+- `Prisoner number` `<tr>` row removed from every referral and every course-participation row.
+
+Verify locally with:
+
+```zsh
+git --no-pager diff baee4510..99264496 -- src/main/resources/sar_template.mustache
+```
+
+If the SAR dev-service still holds the round-1-registered template, the round-2 review PDF will render the sections Deborah asked us to remove. So re-registration is **required**, not a courtesy — this revises earlier assumption in the previous PR-13 draft that dev-service dynamically reads main.
+
+The Slack draft is a straight "please re-register at `99264496`" ping, not a "please confirm if needed" ping. Also asks Cameron's team to confirm the test nDelius account still has SARBT001 (round-1 saw the identity route take longer than the template registration, so parallelise if it's been rotated).
+
+**Gate for proceeding to 13c:** Cameron's team confirms re-registration + SARBT001 available. Record confirmation timestamp in DELIVERY-LOG for the paper trail. Silence after 24h → chase in-channel. Do NOT proceed to 13c on an unconfirmed dev-service state.
+
 ## 13c — Branston-facing PDF drop (Raby step)
 
 Follows PR-6's proven Option 1 recipe. Not fabricatable by an agent — needs interactive `sign-in-dev.hmpps.service.justice.gov.uk` access.
@@ -284,7 +322,7 @@ Only commit if PR-6's original P.S. (rows 109 + 224) didn't already close her re
   2. Spin new Jira ticket (APG-25xx-round-3).
   3. Close APG-2546 with round-2 outcome regardless.
   4. Escalate hard blocks to Deborah + Sharon separately.
-- **No `sar_template.mustache` re-registration.** Section-removal doesn't require it; courtesy ping optional in `#haa-sar-functionality-change-request` at 13d time.
+- **Template re-registration IS in scope** — see §"Pre-13c step B — template re-registration on Slack (REQUIRED)". Corrects the earlier PR-13 draft's incorrect "not required, courtesy only" claim: the template file changed materially round-1 → round-2, and the SAR dev-service serves the registered revision, so re-registration must happen before the Option 1 PDF run.
 
 ## Close-out condition
 
