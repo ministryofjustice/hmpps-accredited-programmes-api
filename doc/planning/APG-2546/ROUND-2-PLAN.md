@@ -228,7 +228,7 @@ a **separate ticket**, not folded into APG-2546. This includes:
 - [`PR-10-organisation-into-referral.md`](./PR-10-organisation-into-referral.md) — skeleton
 - [`PR-11-remove-top-level-staff.md`](./PR-11-remove-top-level-staff.md) — skeleton
 - [`PR-12-round-2-hygiene-tidy.md`](./PR-12-round-2-hygiene-tidy.md) — skeleton, expand after PR-8/9/10/11 merge (needs post-merge state)
-- [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) — skeleton
+- [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) — ✅ fully agent-executable (13b delivered 2026-08-18 pm); 13c pending Raby PDF drop; 13d comms drafts committed at [`handover/`](./handover/)
 
 **Both rounds share:**
 - [`DELIVERY-LOG.md`](./DELIVERY-LOG.md) — single running log (round-2 section appended)

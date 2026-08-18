@@ -5,7 +5,7 @@
 > • **Depends on:** PR-8 (`b7b05283`) + PR-9 (`f8e04ab0`) + PR-10 (`d710fa7f`) + PR-11 (`47488c8a`) + **PR-12 (`99264496`, #1120, merged 2026-08-18)** all on `main`. ✅ **all satisfied.**
 > • **Anchor SHA for code ground truth:** `origin/main @ 99264496` (post-PR-12). Code refs in this doc were verified against `99264496`; we consult main for truth but *commit to the planning branch*.
 > • **Blocks:** APG-2546 ticket close-out.
-> • **Status:** ✅ **13b fully agent-executable.** 13c waits on human PDF drop. 13d comms handled by planning agent (Raby) after 13c lands.
+> • **Status:** ✅ **13b delivered** (planning-branch close-out docs + `handover/` scaffolding + comms drafts committed 2026-08-18 pm); ⏳ **13c pending PDF** (Raby drop via Cameron's SAR dev-service, Option 1); ✅ **13d comms drafted** — awaiting Raby send after 13c lands.
 
 ## Shape correction — read this first
 
