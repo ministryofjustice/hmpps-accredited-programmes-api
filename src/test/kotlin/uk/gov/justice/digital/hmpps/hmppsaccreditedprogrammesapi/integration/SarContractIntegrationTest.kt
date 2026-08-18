@@ -102,6 +102,7 @@ class SarContractIntegrationTest :
     persistenceHelper.clearAllTableContent()
 
     persistenceHelper.createOrganisation(orgId = ORGANISATION_ID, code = "MDI", name = "HMP Moorland")
+    persistenceHelper.createOrganisation(orgId = SECONDARY_ORGANISATION_ID, code = "BXI", name = "HMP Brixton")
     persistenceHelper.createCourse(
       courseId = COURSE_ID,
       identifier = "C1",
@@ -120,10 +121,21 @@ class SarContractIntegrationTest :
       secondaryContactEmail = "test2@example.com",
       referable = true,
     )
+    // Second offering at HMP Brixton, wired to the original (withdrawn) referral so the two
+    // referrals in the golden snapshots render different organisationName values -- demonstrable
+    // per-referral variance flagged by PR-10 nine-lens self-review.
+    persistenceHelper.createOffering(
+      offeringId = SECONDARY_OFFERING_ID,
+      courseId = COURSE_ID,
+      orgId = "BXI",
+      contactEmail = "brixton@example.com",
+      secondaryContactEmail = "brixton2@example.com",
+      referable = true,
+    )
     persistenceHelper.createReferrerUser("TEST_USER")
     persistenceHelper.createReferral(
       referralId = ORIGINAL_REFERRAL_ID,
-      offeringId = OFFERING_ID,
+      offeringId = SECONDARY_OFFERING_ID,
       prisonNumber = PRISON_NUMBER,
       referrerUsername = "TEST_USER",
       additionalInformation = "Initial referral — subsequently withdrawn following OSP re-scoring",
@@ -200,8 +212,10 @@ class SarContractIntegrationTest :
     val ORIGINAL_REFERRAL_SUBMITTED_ON: LocalDateTime = LocalDateTime.of(2024, 1, 15, 9, 30, 0)
 
     val ORGANISATION_ID: UUID = UUID.fromString("11111111-1111-1111-1111-111111111111")
+    val SECONDARY_ORGANISATION_ID: UUID = UUID.fromString("11111111-1111-1111-1111-111111111112")
     val COURSE_ID: UUID = UUID.fromString("22222222-2222-2222-2222-222222222222")
     val OFFERING_ID: UUID = UUID.fromString("33333333-3333-3333-3333-333333333333")
+    val SECONDARY_OFFERING_ID: UUID = UUID.fromString("33333333-3333-3333-3333-333333333334")
     val REFERRAL_ID: UUID = UUID.fromString("44444444-4444-4444-4444-444444444444")
     val PARTICIPATION_ID: UUID = UUID.fromString("55555555-5555-5555-5555-555555555555")
     val ORIGINAL_REFERRAL_ID: UUID = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd")
