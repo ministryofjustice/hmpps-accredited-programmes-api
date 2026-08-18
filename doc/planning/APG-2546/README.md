@@ -20,14 +20,19 @@ history in context. Read these alongside the top-level plan at
 
 ## Suggested sequencing
 
-> **State as of 2026-08-10:** all six code PRs merged
-> (PR-7 merged `baee4510` 2026-08-07). PR-6 (docs-only OSAR
-> round-2 handover) is now unblocked and next in line — post
-> the template-registration on `#haa-sar-functionality-change-request`
-> today. Deborah's fixture-interest thread from 2026-08-06 is
-> a live parallel conversation feeding into PR-6's Option 2
-> readiness (see DELIVERY-LOG 2026-08-06 entry + "Deferred
-> follow-ups").
+> **State as of 2026-08-18:** round-1 fully closed (PR-6 handover
+> shipped 2026-08-11 with sample PDF sent to Branston 2026-08-12).
+> Round-2 also delivered end-to-end on code: **all five round-2
+> code PRs merged to `main`** — PR-8 `b7b05283`, PR-9 `f8e04ab0`,
+> PR-10 `d710fa7f`, PR-11 `47488c8a`, PR-12 `99264496` (#1120,
+> merged 2026-08-18 morning). Only **PR-13** (docs handover +
+> Branston-facing sample PDF for round-3 review) remains — fully
+> agent-executable per [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md),
+> anchored to `origin/main @ 99264496`. Round-2 elapsed to
+> five-of-six merges: **5 calendar days** from 2026-08-13 kickoff
+> — dramatically ahead of the 8–10 working-day realistic-calendar
+> estimate. See [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md) and
+> [`DELIVERY-LOG.md`](./DELIVERY-LOG.md) for full paper trail.
 
 1. Send `00-roxanne-followup.md` to Roxanne. ✅ done 2026-08-03.
 2. Start **PR-1** immediately (blocks nothing). ✅ merged 2026-08-03.

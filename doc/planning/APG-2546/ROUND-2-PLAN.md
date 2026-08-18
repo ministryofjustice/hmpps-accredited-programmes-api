@@ -1,5 +1,8 @@
 # APG-2546 — Round 2 SAR cuts (post-Aug-13 OSAR review)
 
+> **✅ Round-2 code delivery complete 2026-08-18.**
+> All five code PRs merged to `main`: PR-8 `b7b05283` • PR-9 `f8e04ab0` • PR-10 `d710fa7f` • PR-11 `47488c8a` • PR-12 `99264496` (#1120). Only PR-13 (docs handover + Branston-facing sample PDF) remains — see [`PR-13-round-2-docs-and-handover.md`](./PR-13-round-2-docs-and-handover.md) (fully agent-executable, anchored to `99264496`). Total round-2 elapsed to five-of-six merges: **5 calendar days** from 2026-08-13 kickoff — dramatically ahead of the 8–10 working-day realistic-calendar estimate.
+
 > **Ticket:** APG-2546 (continuation) • **Round-1 close date:** 2026-08-11 (PR #1115 merged)
 > • **Round-2 kickoff:** 2026-08-13 • **Est.:** ~1 sprint / 6 thin PRs (PR-8…PR-13)
 > • **Owner:** Raby • **Reviewer chain:** Cameron's SAR team / Deborah SDM / Roxanne (DD) / Branston (OSAR)
@@ -230,4 +233,3 @@ a **separate ticket**, not folded into APG-2546. This includes:
 **Both rounds share:**
 - [`DELIVERY-LOG.md`](./DELIVERY-LOG.md) — single running log (round-2 section appended)
 - [`scripts/dd-notes-sweep.py`](./scripts/dd-notes-sweep.py) — DD row-note auditor
-
