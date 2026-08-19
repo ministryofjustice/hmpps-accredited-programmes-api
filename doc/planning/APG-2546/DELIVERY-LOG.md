@@ -1551,6 +1551,35 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   3. Jira APG-2546 transitions to "content-review in-flight" (**not** Done — Jira Done fires on Branston's reply per round-2 close-out signal).
   4. When Branston reply lands: planning agent logs outcome + APG-2546 closes. Any round-3 asks spin a fresh ticket per the OOS decision (paper trail: `doc/planning/APG-2546/round-3-branston-feedback.md` for verbatim reply capture).
 
+- **2026-08-19 — OSAR passed round-2 for preprod; preprod ACP deploy validated end-to-end; preprod SAR-service template re-registration drafted.** Branston / OSAR signed off the round-2 content review (paper trail lives in the Branston reply thread; verbatim capture to be committed at `round-3-branston-feedback.md` if any residual asks surface, else a short send-timestamp confirmation appended here). Round-2 close-out condition met.
+
+  **Preprod ACP deploy validation (done 2026-08-19 in this planning-agent chat, cast-iron):**
+
+  | Check | Method | Outcome |
+  |---|---|---|
+  | Preprod deployment image tag | `kubectl -n hmpps-accredited-programmes-preprod get deploy hmpps-accredited-programmes-api -o jsonpath='{.spec.template.spec.containers[0].image}'` | `ghcr.io/ministryofjustice/hmpps-accredited-programmes-api:2026-08-18.532.9926449` |
+  | Preprod pod image (sanity — same as deployment) | `kubectl … get pod … -o jsonpath='{.spec.containers[0].image}'` on `hmpps-accredited-programmes-api-8854f8d87-44tzw` | matches — `2026-08-18.532.9926449` |
+  | Preprod pod count + status | `kubectl … get pods` | 4/4 Running, all on ReplicaSet `8854f8d87`, ages 25h + 29m (older two = original rollout, newer two = post-rollout reschedule; identical image) |
+  | Runtime `/info` (pod-local, via `kubectl port-forward`) | `curl http://localhost:18080/info` | `git.branch=main`, `git.commit.id=9926449`, `git.commit.time=2026-08-18T09:47:38Z`, `build.version=2026-08-18.532.9926449` |
+  | Runtime `/health` | as above, `/health` endpoint | `UP` on all components (allocation-manager, audit, etc.) |
+  | Deployed SHA = tip of `main`? | `git log origin/main --oneline -1` | `99264496` → short `9926449` — exact match ✅ |
+  | All five round-2 merge SHAs ancestors of deployed image commit? | `git merge-base --is-ancestor <sha> 9926449` for each | ✅ PR-8 `b7b05283`, ✅ PR-9 `f8e04ab0`, ✅ PR-10 `d710fa7f`, ✅ PR-11 `47488c8a`, ✅ PR-12 `99264496` — **all five deployed, cast-iron via git ancestry** |
+
+  **Reassurance for Raby's "worried I missed a PR" concern:** you cannot have missed a PR on preprod. Even if you never approved the CircleCI `deploy_preprod` hold on any of PR-8/9/10/11 individually, PR-12's approval promoted an image built from the tip of `main` (`99264496`) which by construction contains every prior merge as a git ancestor. The image tag encodes the short SHA (`9926449`) directly and the runtime `/info` endpoint confirms it. Nothing to backfill, nothing to redeploy.
+
+  **Prod status (for the record, not APG-2546 scope):** prod still on `dfa27a1` from 2026-07-21 (pre-round-2, in fact pre-most-of-round-1 too). Prod promotion runs on the normal CircleCI `deploy_prod` manual-approval gate whenever the team decides — APG-2546 close-out does not require prod.
+
+  **Preprod SAR-service template re-registration ping — drafted, awaiting Raby send.** Draft committed at `doc/planning/APG-2546/handover/cameron-template-registration-preprod-slack-draft.md`. Same channel (`#haa-sar-functionality-change-request`), same template revision (`99264496`), same diff (five `<h2>` deletions + one row added + two rows removed vs the round-1 registered revision `baee4510`) as the dev re-registration ping already actioned 2026-08-18. Distinct action because the SAR service maintains a per-environment template registration; dev was done 2026-08-18, preprod is next.
+
+  Post preprod re-registration, prod-side registration is the only outstanding SAR-service-environment step — schedule alongside prod ACP promotion whenever the team's ready. Not APG-2546 scope; recorded here so the paper trail stays complete.
+
+  **State on planning branch after this entry:**
+
+  - Branch tip: this timeline entry's commit (SHA folded in post-push).
+  - `handover/` now contains a distinct preprod-registration draft alongside the dev one (dev flipped to "sent + confirmed 2026-08-18"). `handover/README.md` inventory updated.
+  - APG-2546 Jira: transition to Done once the preprod SAR-service re-registration confirmation lands (feedback received closed the code-side condition; the two SAR-service registrations are follow-through housekeeping, not blockers on Done).
+
+
 ## Round 2 — PR outcomes
 
 _(Filled as PRs land. PR-8/9/10/11 all shipped 2026-08-17; PR-12/PR-13 pending.)_
