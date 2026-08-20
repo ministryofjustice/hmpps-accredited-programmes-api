@@ -42,6 +42,11 @@ class OasysApiClientIntegrationTest : IntegrationTestBase() {
         assertThat(pniResponse.pniCalculation?.totalDomainScore).isEqualTo(5)
         assertThat(pniResponse.assessment?.id).isEqualTo(10082385)
         assertThat(pniResponse.assessment?.ovpRisk).isEqualTo(RiskScoreLevel.MEDIUM)
+        assertThat(pniResponse.assessment?.staticAllReoffendingPredictor?.score).isEqualTo(35.98)
+        assertThat(pniResponse.assessment?.staticAllReoffendingPredictor?.level).isEqualTo(RiskScoreLevel.LOW)
+        assertThat(pniResponse.assessment?.staticViolentReoffendingPredictor?.score).isEqualTo(32.29)
+        assertThat(pniResponse.assessment?.staticViolentReoffendingPredictor?.level).isEqualTo(RiskScoreLevel.MEDIUM)
+        assertThat(pniResponse.assessment?.staticSeriousViolentReoffendingPredictor).isNull()
       }
       is ClientResult.Failure.Other<*> -> fail("Unexpected client result: ${response::class.simpleName}")
       is ClientResult.Failure.StatusCode<*> -> {
