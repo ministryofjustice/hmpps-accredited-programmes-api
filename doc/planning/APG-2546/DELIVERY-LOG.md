@@ -1623,6 +1623,8 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
 
   **Independence from prod / preprod re-registration threads:** this DD-column-H update is a docs-only correction on Roxanne's paper trail; it's independent from the preprod SAR-service template re-registration (still pending Raby send per the 2026-08-19 entry above) and from prod ACP promotion. All three can close on independent timelines; APG-2546 Jira Done fires once (a) Branston/OSAR feedback received [✅ 2026-08-19] AND (b) Roxanne's DD-review side is closed [pending her reply to today's email].
 
+- **2026-08-20 15:37 BST — Reply email to Roxanne sent.** Raby sent the drafted reply (`handover/roxanne-dd-update-email-draft.md`) with the updated xlsx (`~/Downloads/Copy of 2026.07.08_copy_Probation Digital Data review December 251_APG-2546-round-2-update.xlsx`, 207 KB, 69 col-H changes) attached. Awaiting Roxanne's response. Post-send follow-through steps from the 2026-08-20 morning entry remain the plan (Jira → Done once she confirms DD-review closed).
+
 
 
 ## Round 2 — PR outcomes
