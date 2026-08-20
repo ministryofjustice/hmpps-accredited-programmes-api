@@ -57,6 +57,21 @@
       "temperControl" : "SIGNIFICANT",
       "problemSolvingSkills" : "NONE",
       "difficultiesCoping" : "MISSING"
+    },
+    "staticAllReoffendingPredictor": {
+      "score": 35.98,
+      "level": "LOW"
+    },
+    "dynamicAllReoffendingPredictor": null,
+    "staticViolentReoffendingPredictor": {
+      "score": 32.29,
+      "level": "MEDIUM"
+    },
+    "dynamicViolentReoffendingPredictor": null,
+    "staticSeriousViolentReoffendingPredictor": null,
+    "dynamicSeriousViolentReoffendingPredictor": {
+      "score": 36.44,
+      "level": "VERY_HIGH"
     }
   }
 }

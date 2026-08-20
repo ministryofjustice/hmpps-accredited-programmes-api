@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.oasysApi.model
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -22,9 +23,9 @@ data class PniAssessment(
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Predictor(val score: Double?, val level: ScoreLevel?) {
+data class Predictor(val score: Double?, val level: RiskScoreLevel?) {
   companion object {
-    fun from(score: Double?, level: ScoreLevel?): Predictor? = if (score == null && level == null) null else Predictor(score, level)
+    fun from(score: Double?, level: RiskScoreLevel?): Predictor? = if (score == null && level == null) null else Predictor(score, level)
   }
 }
 
@@ -34,6 +35,15 @@ enum class RiskScoreLevel(val type: String) {
   HIGH("High"),
   VERY_HIGH("Very High"),
   NOT_APPLICABLE("Not Applicable"),
+  ;
+
+  companion object {
+    @JvmStatic
+    @JsonCreator
+    fun fromString(value: String?): RiskScoreLevel? = RiskScoreLevel.entries.find {
+      it.type.equals(value, ignoreCase = true) || it.name.equals(value, ignoreCase = true)
+    }
+  }
 }
 
 data class Ldc(val score: Int, val subTotal: Int)
