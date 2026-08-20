@@ -1579,6 +1579,51 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
   - `handover/` now contains a distinct preprod-registration draft alongside the dev one (dev flipped to "sent + confirmed 2026-08-18"). `handover/README.md` inventory updated.
   - APG-2546 Jira: transition to Done once the preprod SAR-service re-registration confirmation lands (feedback received closed the code-side condition; the two SAR-service registrations are follow-through housekeeping, not blockers on Done).
 
+- **2026-08-20 — Roxanne DD-column-H update prepared + reply drafted.** Roxanne emailed 2026-08-19 asking for the DD's "In SAR API - Y/N or N/A" column (col H on `Accredited Programmes Custody`) to be brought up to date with the round-1 + round-2 removals; her working copy is the 2026-07-08 baseline she originally distributed. Handled same-day (2026-08-20 am):
+
+  **Updated DD prepared.** Ran a fresh full-sheet dump against her 2026-07-08 copy at `~/Downloads/Copy of 2026.07.08_copy_Probation Digital Data review December 251.xlsx` and computed the exact column-H delta caused by every merged round-1 + round-2 PR. Updater script committed at `doc/planning/APG-2546/scripts/dd-column-h-update.py` so any future DD refresh (or a repeat request against a newer baseline) can re-run non-interactively.
+
+  **69 changes applied** (all baseline values matched expectations — no drift surprises; output "safe to send" verdict from the updater):
+
+  - **67 rows flipped Yes → No** (fields removed from SAR API by round-1 + round-2 code):
+    - `audit_record` (9 rows: R22, R23, R24, R25, R27, R28, R29, R30, R31) — PR-1
+    - `course_participation.prison_number` (R47) — PR-9
+    - `oasys_pni_result` (4 rows: R85, R86, R87, R88) — PR-4 + PR-8
+    - `organisation` (3 rows: R105, R106, R108 — R109 covered under DD-drift below) — PR-5 + PR-10
+    - `person` (14 rows: R111–R124) — PR-5 + PR-8
+    - `pni_result` (11 rows: R129, R130, R132–R140) — PR-8 (R139 `pni_result_json` supersedes Roxanne's 10.07 flip per Deborah's 2026-08-13 "PNI now sourced via ARNs Probation Hub" decision — recorded in `ROUND-2-PLAN.md` §"DD spreadsheet override"; flagged tactfully in the reply email so Roxanne sees the paper trail)
+    - `referral` (2 rows: R153 prison_number, R165 original_referral_id) — PR-9 + PR-5/PR-7
+    - `referral_status_history` (11 rows: R192–R202) — PR-2
+    - `referral_status_reason` (5 rows: R205–R209) — PR-2
+    - `selected_sexual_offence_details` (3 rows: R226, R227, R228) — PR-3
+    - `sexual_offence_details` (4 rows: R233, R234, R235, R237) — PR-3
+  - **2 rows flipped as DD-drift corrections** (code truth vs baseline, not APG-2546 removals):
+    - **R109 `organisation.is_national`**: Yes → No. Code has always been No; Roxanne's 10.07 flip to Yes was based on a dev's earlier indication; Q2 closed 2026-08-04 on "leave off" default (per this log's 2026-08-04 pm end-of-day entry). Flip brings the DD in line with the code.
+    - **R224 `referrer_user.referrer_username`**: No → Yes. Row 224's own note reads *"Yes if we can provide surname"*; we do — APG-2492 resolves the referrer username to a surname before it's returned. Flip closes the *"if"* condition Roxanne wrote into her own note.
+
+  **Rows deliberately kept as Yes** (verified in the reply email so Roxanne can sanity-check that these are intentional, not gaps):
+
+  - R107 `organisation.name` — surfaces as `organisationName` inline on each referral (PR-10). Reply email offers to also add a dedicated `referral.organisation_name` row on the referral entity if Roxanne would rather see it there in the DD.
+  - R159 `referral.referrer_username` — resolved to surname (APG-2492), still in SAR API.
+  - R162 / R163 `referral.{primary,secondary}_pom_staff_id` — resolved to surname, still inline on referral (retained per option (a) — Deborah 2026-08-13 pm).
+  - R242 `staff.last_name` — top-level `staff[]` list gone (PR-11), but the surname still surfaces via the resolved POM staff fields above, so the field itself is still in the SAR API.
+
+  **Output artefact** (untracked per repo convention): `~/Downloads/Copy of 2026.07.08_copy_Probation Digital Data review December 251_APG-2546-round-2-update.xlsx` (207 KB). Sanity spot-check of 9 rows (6 flipped + 3 kept) all passed.
+
+  **Reply email drafted** at `doc/planning/APG-2546/handover/roxanne-dd-update-email-draft.md`. Ready to paste + attach. Includes: (a) direct answer to Roxanne's ask, (b) five-point summary of what's now absent from the SAR API matched against Deborah's 2026-08-13 action list, (c) the full row-by-row delta table above grouped by causing PR, (d) tactful call-out of the two DD-drift corrections (rows 109 + 224), (e) an optional "new row on `referral` for `organisation_name`?" offer for Roxanne's DD-shape preference, (f) sanity-check pointer at the A8610DY Branston-review PDF she can eyeball independently.
+
+  **Handover-README updated** to add the new draft to the artefacts inventory.
+
+  **Post-send follow-through** (Raby-owned):
+
+  1. Send the reply (paste `roxanne-dd-update-email-draft.md`; attach the xlsx from `~/Downloads/`). Confirm send here so I log the timestamp.
+  2. If Roxanne responds with the DD-column-H review closed / no more asks → APG-2546 close-out condition is fully satisfied (feedback received + DD annotated). Transition APG-2546 to Done at that point.
+  3. If Roxanne wants row 139 (`pni_result_json`) reconsidered → loop Deborah + Cameron's team; the "PNI via ARNs Probation Hub" decision is theirs to authoritatively confirm.
+  4. If she asks for a highlighted / filtered view of the 69 changes inside the xlsx rather than a text-table in the email → same updater script, add an `openpyxl.styles.PatternFill` on column H for the DELTAS row list; one-line change. No new working doc needed.
+
+  **Independence from prod / preprod re-registration threads:** this DD-column-H update is a docs-only correction on Roxanne's paper trail; it's independent from the preprod SAR-service template re-registration (still pending Raby send per the 2026-08-19 entry above) and from prod ACP promotion. All three can close on independent timelines; APG-2546 Jira Done fires once (a) Branston/OSAR feedback received [✅ 2026-08-19] AND (b) Roxanne's DD-review side is closed [pending her reply to today's email].
+
+
 
 ## Round 2 — PR outcomes
 
