@@ -13,7 +13,20 @@ data class PniAssessment(
   val rsrPercentage: Double?,
   val offenderAge: Int,
   val questions: Questions,
+  val staticAllReoffendingPredictor: Predictor? = null,
+  val dynamicAllReoffendingPredictor: Predictor? = null,
+  val staticViolentReoffendingPredictor: Predictor? = null,
+  val dynamicViolentReoffendingPredictor: Predictor? = null,
+  val staticSeriousViolentReoffendingPredictor: Predictor? = null,
+  val dynamicSeriousViolentReoffendingPredictor: Predictor? = null,
 )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Predictor(val score: Double?, val level: ScoreLevel?) {
+  companion object {
+    fun from(score: Double?, level: ScoreLevel?): Predictor? = if (score == null && level == null) null else Predictor(score, level)
+  }
+}
 
 enum class RiskScoreLevel(val type: String) {
   LOW("Low"),

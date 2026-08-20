@@ -659,6 +659,12 @@ class OasysServiceTest {
           problemSolvingSkills = ScoredAnswer.Problem.NONE,
           difficultiesCoping = ScoredAnswer.Problem.MISSING,
         ),
+        staticAllReoffendingPredictor = null,
+        dynamicAllReoffendingPredictor = null,
+        staticViolentReoffendingPredictor = null,
+        dynamicViolentReoffendingPredictor = null,
+        staticSeriousViolentReoffendingPredictor = null,
+        dynamicSeriousViolentReoffendingPredictor = null,
       ),
     )
 
