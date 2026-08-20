@@ -1625,6 +1625,39 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
 
 - **2026-08-20 15:37 BST — Reply email to Roxanne sent.** Raby sent the drafted reply (`handover/roxanne-dd-update-email-draft.md`) with the updated xlsx (`~/Downloads/Copy of 2026.07.08_copy_Probation Digital Data review December 251_APG-2546-round-2-update.xlsx`, 207 KB, 69 col-H changes) attached. Awaiting Roxanne's response. Post-send follow-through steps from the 2026-08-20 morning entry remain the plan (Jira → Done once she confirms DD-review closed).
 
+- **2026-08-20 (afternoon) — Preprod SAR-service template registered by Cameron's team; ACP prod promoted to round-2 same day; two OSAR-facing environments now fully aligned.** Same-day close-out on two of the three remaining follow-through threads.
+
+  **Preprod SAR-service template registration ✅** (`#haa-sar-functionality-change-request` thread):
+
+  - Raby posted the preprod-registration draft (`handover/cameron-template-registration-preprod-slack-draft.md`) at ~12:30 BST.
+  - **Dave Llewellyn** picked it up. Slack ↔ Jira sync misfired first attempt, so two mirror tickets were created — **HAAR-5939** (the real one, thread-synced) and **HAAR-5940** (accidental duplicate from the retry). Dave has confirmed 5940 is a dupe of 5939; cleanup is his side. No paper-trail action for us.
+  - Dave asked two things: (a) attach OSAR sign-off to the ticket, (b) confirm the code is actually deployed on preprod so he can enable the service (it was disabled in preprod until now because no template had ever been registered).
+  - **Deborah handled the sign-off attachment**, using Naseem's Teams message as a temporary receipt while the official email is in flight.
+  - Raby's answer on the preprod-deploy question was already covered by yesterday's `2026-08-19` validation entry above (image `2026-08-18.532.9926449`, pod `/info` = `9926449`, all 5 round-2 SHAs ancestors — cast iron).
+  - **Dave enabled preprod + confirmed at ~13:58 BST.** The SAR preprod service now (a) has the round-2 mustache template registered, (b) is enabled for the Accredited Programmes payload. So real preprod SAR requests targeting the Accredited Programmes Custody payload will now render the round-2 shape.
+
+  **Prod ACP promoted to round-2 ✅** — noticed today during a follow-up validation triggered by Deborah's 14:27 BST DM asking Raby to confirm preprod *and* prod have the latest template/code:
+
+  | Env | Image tag | Short SHA | Round-2 SHAs ancestors? | Notes |
+  |---|---|---|---|---|
+  | Preprod ACP | `2026-08-18.532.9926449` | `9926449` = `99264496` (PR-12) | ✅ all 5 | Unchanged since 2026-08-19 validation |
+  | **Prod ACP** | **`2026-08-20.546.f84f41b`** | **`f84f41b2`** on `origin/main` | ✅ all 5 | **Newly promoted ~13:07 BST today.** Pods 154 min old. Includes PR #1122 ("Add support for static and dynamic violent/offending predictors to `PniAssessment` and update related tests") which merged to `main` between yesterday's snapshot and today's promotion. PR #1122 is unrelated to APG-2546 SAR work — it's an ARNs Probation Hub / PNI-assessment feature — so from a SAR-content perspective, prod carries the same round-2 payload shape as preprod. |
+
+  Raby's 15:38 BST reply to Deborah — *"Yes pre-prod and prod have the latest template/code changes"* — is factually correct on both environments as verified in this validation. Deborah relaying that to OSAR so they don't inadvertently check an old version → cleaner close-out signal.
+
+  **Prod-side SAR-service template registration** is now the ONLY outstanding SAR follow-through step. Dev ✅ (2026-08-18), preprod ✅ (today, Dave), prod ⏳ (Cameron's team will need the same registration on their prod SAR service before real prod SAR requests targeting the Accredited Programmes payload render the round-2 shape). Not scoped to APG-2546 close-out; scheduled alongside OSAR's real-prod-run readiness whenever they're ready.
+
+  **APG-2546 Jira → Done gating**:
+
+  | Condition | Status |
+  |---|---|
+  | Branston / OSAR round-2 content sign-off received | ✅ 2026-08-19 |
+  | Roxanne DD-column-H review closed | ⏳ pending her reply to today's email (sent 15:37 BST) |
+
+  Nothing else on the code / deploy / SAR-service side blocks APG-2546 close-out. Prod-side SAR-service template registration + OSAR's independent prod-side check happen on their own timeline post-close.
+
+  **Also worth noting** (paper-trail hygiene): Deborah offered to escalate the OSAR sign-off through the official-email route once it arrives — the ticket currently attaches Naseem's Teams-message screenshot as an interim receipt. If any auditor later reviews HAAR-5939 they'll see the Teams-message → official-email progression, so the paper trail is intact.
+
 
 
 ## Round 2 — PR outcomes
