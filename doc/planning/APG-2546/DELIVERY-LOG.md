@@ -1765,6 +1765,43 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
 
   **Handover-README updated** to reflect the corrected draft (same filename, superseded content, same channel).
 
+- **2026-08-24 (afternoon) — Roxanne asked for a PR-14 ETA; concrete "end of week" commitment drafted.** Roxanne replied to the Thursday-sent courseName confirmation, asking whether to hold off on her testing:
+
+  > *"Thank you, that would be great. When do you think that is likely to be done? If its going to be relatively soon, I will hold off on completing the testing until this is updated."*
+
+  **ETA analysis** (recorded here so it's the same estimate Raby sends her — no drift):
+
+  - **Round-2 precedent**: PR-8/9/10/11 all shipped in a single working day (2026-08-17); PR-12 landed the next morning.
+  - **PR-14 scope**: ~10-line diff (`SarReferral` data class + `toSarReferral` mapper + one mustache `<tr>` + one unit-test assertion + snapshot regen). Simpler than PR-10 because no batch pre-fetch is needed — `offering.course.name` is already resolvable via the eager-loaded path.
+  - **Working doc ready**: `PR-14-course-name-into-referral.md` is fully agent-executable, anchored at `origin/main @ f84f41b2` (still the tip today).
+  - **Post-merge pipeline**: PR-14 merges → CircleCI auto-deploy dev → `deploy_preprod` hold → HAAR-team SAR-preprod re-registration (single Slack ping for both preprod + prod at the new SHA, per the discipline captured in PR-14 doc §7) → approve `deploy_preprod` after HAAR confirms preprod → preprod PDF regenerable against a rich CRN.
+  - **Best case**: PR-14 kicked off today (Monday 2026-08-24 pm), merged Tuesday am, preprod deploy + HAAR re-registration Tue pm/Wed am, fresh preprod PDF ready **Wednesday 2026-08-26 afternoon**.
+  - **Worst case (no snags, just sprint pressure)**: Thursday 2026-08-27 or Friday 2026-08-28 morning.
+  - **Realistic commitment to Roxanne**: end of this week, with a stretch of "possibly Wednesday afternoon". Honest without over-promising.
+
+  **Reply drafted** as a new section (`# ETA follow-up reply — 2026-08-24`) appended to the existing `roxanne-followup-course-name-reply-draft.md` — keeps the whole Roxanne courseName exchange contiguous in a single file. Draft:
+  - Commits to "end of this week", stretch of Wednesday afternoon.
+  - Confirms "yes, worth holding off testing".
+  - Offers to ping her the moment the fresh preprod PDF is available.
+  - Sender-notes flag the pre-conditions ("kick off PR-14 today", "single HAAR ping for both envs", "hold `deploy_preprod` until HAAR confirms preprod registration") so Raby doesn't need to re-derive.
+
+  **Sender-note also clarifies the DD side**: the final Roxanne email post-merge does NOT need a fresh xlsx attachment. Column H for `course.name` (row 34) is already `Yes` in the DD (top-level Courses list has always been in the SAR API). PR-14 only surfaces it *additionally* inline on each referral; the DD column-H answer is unchanged. Roxanne agreed on 2026-08-20 not to add a dedicated `referral.course_name` row on the DD (same rationale as `organisationName` on row 107). So the close-out email is PDF-only.
+
+  **Critical dependency**: this ETA assumes PR-14 execution starts today. Delivery-log notes this explicitly so Raby doesn't send the ETA and then let the PR drift. If PR-14 doesn't kick off today, Raby needs to either (a) send Roxanne a revised ETA before she holds up her testing on a delayed timeline or (b) accept the drift and take ownership of the extended hold.
+
+  **APG-2546 close-out gating** (recap on today's message):
+
+  | Condition | Status |
+  |---|---|
+  | Branston / OSAR round-2 sign-off | ✅ 2026-08-19 |
+  | Preprod + Prod SAR-service template registered | ✅ 2026-08-20 (Dave, Thursday thread) — SHA-pointer housekeeping alert being cleared by the corrected 2026-08-21 draft |
+  | Preprod + Prod ACP code deployed | ✅ 2026-08-20 |
+  | Roxanne DD-column-H review (initial) | ✅ 2026-08-20 |
+  | **PR-14 (courseName inline) merged** | ⏳ execution to start 2026-08-24; ETA Tue merge, Wed preprod PDF |
+  | **Preprod + Prod SAR re-registration post-PR-14** | ⏳ single ping post-merge (mustache bytes DO change; genuine re-registrations, not pointer bumps) |
+  | **Roxanne final DD sign-off** | ⏳ pending fresh preprod PDF post-PR-14 |
+
+
 
 
 
