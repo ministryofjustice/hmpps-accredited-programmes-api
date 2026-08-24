@@ -1,6 +1,6 @@
 # PR-14 — fold `courseName` inline on `SarReferral`
 
-**Status:** **PR [#1123](https://github.com/ministryofjustice/hmpps-accredited-programmes-api/pull/1123) OPEN** (2026-08-24) on branch `APG-2546/course-name-into-referral`, commit `ef376824`. Agent-reviewed twice (both LGTM). CI all green (Kotlin build, CodeQL, helm lint dev/preprod/prod). Mergeable. Awaiting team review. Anchored against `origin/main @ f84f41b2` (still tip on 2026-08-24 pm).
+**Status:** ✅ **MERGED** 2026-08-24 11:13 BST as [`#1123`](https://github.com/ministryofjustice/hmpps-accredited-programmes-api/pull/1123) → main commit **`6d713186`**. Branch `APG-2546/course-name-into-referral` auto-deleted on merge. Post-merge CircleCI pipeline running (dev auto-deploy → `deploy_preprod` hold). **Next actions on Raby: (1) single Slack ping to `#haa-sar-functionality-change-request` for both SAR-preprod + SAR-prod at SHA `6d713186` — mustache bytes DO change so this is a genuine re-registration; (2) hold `deploy_preprod` approval until HAAR confirms preprod registration; (3) then approve preprod and regenerate preprod PDF against a rich CRN for Roxanne's final DD sign-off.**
 
 **Origin:** Roxanne's 2026-08-20 email follow-up after the DD-column-H update. She confirmed she's happy with the DD-side placement of `organisationName` (row 107 stays as canonical) and asked for `courseName` to also be surfaced inline on each referral. Verbatim ask:
 
