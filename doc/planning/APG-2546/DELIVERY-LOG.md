@@ -1658,6 +1658,115 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
 
   **Also worth noting** (paper-trail hygiene): Deborah offered to escalate the OSAR sign-off through the official-email route once it arrives — the ticket currently attaches Naseem's Teams-message screenshot as an interim receipt. If any auditor later reviews HAAR-5939 they'll see the Teams-message → official-email progression, so the paper trail is intact.
 
+- **2026-08-20 (afternoon, later) — Roxanne DD-review positive; one follow-up ask surfaces PR-14 (courseName inline on referral); reply drafted.** Roxanne replied to today's 15:37 DD-update email. Two substantive points:
+
+  1. **DD placement for `organisationName` locked in on row 107** — verbatim: *"this is fine where it is. We have it documented in case any issues arise in the future."* No new `referral.organisation_name` row needed on her side; row 107 stays canonical.
+
+  2. **New ask — `courseName` inline on each referral**, mirroring the `organisationName` fold-in from PR-10. Her rationale: *"the referral doesn't reference what it is for, and if there are multiple we feel like this may increase communication from offenders wanting clarification."* She correctly intuited that courses link to referrals via the `offering` join.
+
+  **Code shape validated against `origin/main @ f84f41b2`** before drafting a reply:
+
+  - `SarOriginalReferral.courseName` already exists on the nested block and is populated via `offering?.course?.name` at `SubjectAccessRequestService.kt:262`.
+  - The parent `SarReferral` uses the identical entity path — same source, no batch pre-fetch needed (unlike PR-10 which required an `organisationRepository.findAllByCodeIn` call).
+  - PR-10 pattern applies verbatim: one field on `SarReferral` data class, one line in `toSarReferral` mapper, one `<tr>` row in `sar_template.mustache`, one unit-test assertion, snapshot regen.
+  - ~10-line diff.
+
+  **Scoping call: fold in as PR-14 under APG-2546** rather than spinning a fresh ticket. Rationale:
+
+  - The 2026-08-13 OOS decision covered OSAR/Branston asks after PR-13's sample PDF landed. Roxanne's DD-review side has always been a distinct APG-2546 close-out condition, and this ask is a one-field consistency completion of PR-10's inline-context pattern — same reviewer, same "in context" story Deborah and Roxanne kicked off on 2026-08-13.
+  - Knocking it out same-week means Roxanne can review the DD + the fresh field in a single sitting → clean close-out signal.
+  - Precedent: PR-7 was spun off PR-5's nine-lens review as a same-round follow-on rather than a new ticket, for the same "one field / one pattern completion" reason. PR-14 is that shape.
+
+  **Working doc scaffolded** at `doc/planning/APG-2546/PR-14-course-name-into-referral.md`. Fully agent-executable: anchor SHA `f84f41b2`, files-to-change table, verification checklist, six non-obvious notes (including the "preprod SAR-service re-registration required post-merge because the mustache changes" gotcha — same shape as HAAR-5939 registered by Dave Llewellyn this afternoon, so Dave already knows the pattern and the second registration should be quicker).
+
+  **Reply drafted** at `doc/planning/APG-2546/handover/roxanne-followup-course-name-reply-draft.md`. Ready to paste-and-send. Commits to "aiming to have it merged this week"; if Raby wants softer language re: timing, one-line edit before sending.
+
+  **Handover README updated** to list the new reply-draft artefact.
+
+  **APG-2546 close-out re-gating**:
+
+  | Condition | Status |
+  |---|---|
+  | Branston / OSAR round-2 content sign-off | ✅ 2026-08-19 |
+  | Preprod SAR-service template registered (HAAR-5939) | ✅ 2026-08-20 |
+  | Preprod + Prod ACP code deployed | ✅ 2026-08-20 (both verified) |
+  | Roxanne DD-column-H review (initial) | ✅ 2026-08-20 (69-change delta accepted; row 107 placement confirmed) |
+  | **PR-14 (courseName inline on referral) merged** | ⏳ working doc scaffolded, execution pending |
+  | **Preprod SAR-service re-registration post-PR-14** | ⏳ triggered on PR-14 merge (mustache changes) |
+  | **Roxanne final DD sign-off after PR-14 lands** | ⏳ pending — one email including a note on `course.name` inline + updated preprod PDF |
+
+  Non-blocker for the code work: prod-side SAR-service template registration (still ⏳ — will need the same when a real prod SAR request is due; not gating). If PR-14 lands before that registration, we'll batch the prod re-registration ping with the PR-14 update to save Cameron's team a round-trip.
+
+- **2026-08-21 (morning) — HAAR-team monitoring fired a prod SAR-template mismatch alert; response drafted → re-framed 2026-08-24 after re-reading the Thursday 2026-08-20 registration thread.** The alert message on the HAAR alert channel to `@Dillon`, `@Liam`, `@Kiril`, `@Raby`:
+
+  > *"we've had an alert in the HAAR team for your service indicating that the SAR template deployed in prod doesn't match the version that's been registered. Could you let us know: Whether this was an intentional change (for example, related to recent UAT work)? Whether the updated template was registered before deployment? If the template wasn't registered, could you please update the registration so it matches what's deployed in prod?"*
+
+  **First-draft framing (2026-08-21 am) was wrong** and is superseded here. That draft owned the miss as *"SAR-prod registration was queued as 'batch with the first real prod SAR request' and never fired — that's on us"*. Re-reading the Thursday 2026-08-20 registration thread on 2026-08-24 shows Dave Llewellyn actually registered **both** preprod AND prod on Thursday, in the same channel where the alert later fired:
+
+  - **~15:47 BST Thursday** — Dave: *"Template is registered and enabled in preprod but [not] in prod. Just checking that is the expected state of things."*
+  - **~15:49 BST Thursday** — Deborah: *"Could you do Prod as well please Dave? OSAR aren't using Prod but it would be good to have the latest template registered when we run the backlog process (it shouldn't matter — but just in case)."*
+  - **~15:49 BST Thursday** — Dave: *"Sure give me 5mins."*
+  - **~16:06 BST Thursday** — Dave: *"registered/enabled in prod."*
+  - **~16:31 BST Thursday** — Raby: *"Thank you."*
+
+  So the correct framing is: **prod registration WAS done Thursday 16:06 BST** (via Deborah's in-thread ask, not via a Raby-drafted ping), and Friday's alert then fired on a real-but-not-content mismatch — see next block.
+
+  **Actual root cause of Friday's alert (verified 2026-08-24 am against `origin/main`)**:
+
+  ```zsh
+  git diff 99264496..f84f41b2 -- src/main/resources/sar_template.mustache
+  # zero-diff — template byte-identical
+  git log --oneline 99264496..f84f41b2
+  #   f84f41b2 PR #1122 PNI-assessment predictors
+  #   418b6950 PR #1121 PNI-assessment model changes
+  #   (both unrelated to SAR template)
+  ```
+
+  Dave registered the SHA the Thursday-drafted preprod-registration ping pointed at (`99264496`). Prod ACP had already been promoted Thursday ~13:07 BST to `f84f41b2`. The two SHAs are different strings but the mustache is byte-identical between them (only PR #1121 + #1122 sit in between, both unrelated PNI-assessment predictor work).
+
+  **HAAR's monitoring compares registered-SHA to deployed-SHA (strings), not template bytes.** So the alert legitimately fired on the string comparison and is a false positive on template content. Nothing to fix on our side; two ways to clear:
+
+  - **(a)** Dave bumps prod registration pointer to `f84f41b2` — same bytes, silences alert.
+  - **(b)** HAAR ack the alert (accepting they'll need to re-check on a future template-touching prod deploy, which we're about to have with PR-14 anyway).
+
+  Choice belongs to HAAR — either fine for us. Draft framed accordingly.
+
+  **Re-framed reply drafted** at `doc/planning/APG-2546/handover/haar-team-prod-registration-slack-reply-draft.md` — Friday's first draft was overwritten in-place with the correct framing. Highlights:
+
+  - Cites the byte-identical zero-diff verification.
+  - Offers (a)/(b) without pushing.
+  - Pre-empts the identical situation post-PR-14 by promising a single ping asking for both preprod + prod registration at the new merge SHA, with `deploy_prod` approval held until confirmation.
+  - Does NOT own the Thursday registration ("that's on us") because it was already done Thursday.
+
+  **State on 2026-08-24 am (confirmed via kubectl + git before drafting):**
+  - Prod image: `2026-08-20.546.f84f41b` (unchanged since Thursday 13:07 BST rollout; some pods 3d19h old, some 60m from routine reschedules).
+  - Preprod image: same tag as prod.
+  - `origin/main` tip: `f84f41b2` — no new merges since Thursday.
+  - Nothing has moved that would affect the analysis.
+
+  **Root cause of the mis-framing** (paper-trail hygiene — Friday's session had a genuine gap in the input we were working from):
+
+  - On Friday morning the HAAR alert dropped into a channel where the Thursday registration thread was NOT immediately visible in-context; the alert channel and the registration channel might well be the same channel but the alert was a fresh top-level message, so the Thursday 16:06 registration confirmation wasn't scrolled into view.
+  - Friday's session drafted a response from the incoming alert alone, without cross-referencing the Thursday thread. Under that partial context, "we never asked for prod registration" was a reasonable-looking explanation that fit the alert wording.
+  - Raby caught it on 2026-08-24 by re-reading the Thursday thread from the top ("what about this thread tho? confused") — good catch; kept the wrong-framed draft off the wire.
+
+  **Process-improvement candidates** (out of APG-2546 scope, logged so it isn't lost):
+
+  1. **Cheap:** add a checklist item to `doc/how-to/perform-a-release.md`: *"If the SAR mustache has changed since the last prod deploy (`git log <last-prod-sha>..HEAD -- src/main/resources/sar_template.mustache`), post a registration request to `#haa-sar-functionality-change-request` before or at the CircleCI `deploy_prod` approval."* One-liner doc PR after APG-2546 closes.
+  2. **Middle:** wire a CircleCI post-`deploy_prod` Slack hook to `#haa-sar-functionality-change-request` when the deployed SHA differs from the last-known registered SHA.
+  3. **Expensive / cross-team:** HAAR-side change to byte-comparison instead of SHA-string comparison — would eliminate false-positive alerts like Friday's but is HAAR-team scope, not ours.
+  4. **New, from Friday's session hygiene:** when drafting a reply to an alert, cross-reference the same channel's recent history before drafting, not just the alert text — the missing Thursday-thread context is what caused Friday's mis-framing. Personal workflow note, not a repo doc.
+
+  **Recommended:** ship (1) as a follow-up ticket after APG-2546 closes. Don't ship (2) or (3) — cost/benefit doesn't hold yet.
+
+  **Impact on PR-14** — the PR-14 doc's non-obvious note §7 (added Friday) is being tightened at the same time as this correction. Same core discipline stands ("ping HAAR for registration on BOTH SAR-preprod AND SAR-prod when PR-14 merges") but the wording no longer characterises the Friday alert as evidence that "we missed a step" — the reference is retained but recontextualised as a SHA-pointer-vs-bytes lesson.
+
+  **APG-2546 close-out impact:** none. Prod-side SAR-service registration was already done Thursday 16:06 (Dave via Deborah's ask). Friday's alert was a housekeeping SHA-pointer notification. Close-out gating unchanged.
+
+  **Handover-README updated** to reflect the corrected draft (same filename, superseded content, same channel).
+
+
+
 
 
 ## Round 2 — PR outcomes
