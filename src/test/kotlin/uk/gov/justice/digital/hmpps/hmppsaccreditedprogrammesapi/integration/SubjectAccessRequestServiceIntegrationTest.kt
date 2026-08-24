@@ -104,6 +104,7 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(hasLdc).isTrue()
       assertThat(hasLdcBeenOverriddenByProgrammeTeam).isTrue()
       assertThat(organisationName).isEqualTo("HMP Moorland")
+      assertThat(courseName).isEqualTo("Course 1")
     }
 
     with(content.courseParticipation[0]) {

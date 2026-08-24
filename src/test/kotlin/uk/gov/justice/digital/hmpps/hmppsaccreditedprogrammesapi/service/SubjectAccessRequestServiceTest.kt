@@ -192,6 +192,11 @@ class SubjectAccessRequestServiceTest {
       // populated per-referral from `offering.organisationId` rather than a
       // separately fetched top-level list.
       assertThat(referral.organisationName).isEqualTo("HMP Moorland")
+      // Parent-referral course name is sourced from the eagerly-loaded
+      // `offering.course.name` chain (same path SarOriginalReferral.courseName
+      // already relies on), surfacing the "what" of the referral inline so a
+      // subject can see the course without cross-referencing the courses list.
+      assertThat(referral.courseName).isEqualTo("Anger Management")
 
       // SarOriginalReferral – every field is sourced from the seeded original,
       // proving the mapper reads through `originalsById` rather than leaking
