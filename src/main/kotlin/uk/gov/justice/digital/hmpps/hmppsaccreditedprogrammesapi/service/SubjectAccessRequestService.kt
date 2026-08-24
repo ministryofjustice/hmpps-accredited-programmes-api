@@ -162,6 +162,7 @@ class SubjectAccessRequestService(
     val hasLdc: Boolean?,
     val hasLdcBeenOverriddenByProgrammeTeam: Boolean,
     val hasReviewedAdditionalInformation: Boolean?,
+    val courseName: String?,
     val organisationName: String?,
     val originalReferral: SarOriginalReferral?,
   )
@@ -248,6 +249,7 @@ class SubjectAccessRequestService(
       it.hasLdc,
       it.hasLdcBeenOverriddenByProgrammeTeam,
       it.hasReviewedAdditionalInformation,
+      courseName = it.offering?.course?.name,
       organisationName = it.offering?.organisationId?.let { code -> organisationNamesByCode[code] },
       originalReferral = it.originalReferralId?.let { originalId ->
         originalsById[originalId]?.toSarOriginalReferral(surnames, organisationNamesByCode)
