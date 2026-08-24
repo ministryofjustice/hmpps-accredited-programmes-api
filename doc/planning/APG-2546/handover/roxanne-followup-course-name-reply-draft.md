@@ -123,3 +123,58 @@ Raby
 4. Once she signs off: APG-2546 → Done.
 
 
+---
+
+# Post-merge close-out reply — 2026-08-24 (send AFTER preprod PDF regen)
+
+> **Status:** ⏳ draft ready; DO NOT send until: (1) HAAR-team confirms SAR-preprod re-registration at SHA `6d713186`, (2) `deploy_preprod` approved in CircleCI and completed green, (3) fresh preprod PDF regenerated against a rich CRN and eyeballed for the new `Course name` row.
+>
+> **Context:** PR-14 merged 2026-08-24 11:13 BST as `#1123` → main commit `6d713186`. Landed same-day as opened — well inside the "stretch: Wednesday afternoon" end of the ETA committed to Roxanne earlier this morning. Best case: fresh preprod PDF ready to send **Tuesday 25/8 pm** if HAAR turns around today; worst case Wednesday 26/8 am — both inside the "end of week" bound.
+>
+> **What Roxanne needs to see in the PDF** (sanity-check before sending):
+>
+> 1. Inside each referral's summary table (top-level `referrals[]`): a new `Course name` row, populated with the offering's course name (e.g. "Kaizen", "Building Better Relationships", "Horizon"). Should sit directly below the `Organisation name` row.
+> 2. Inside the `originalReferral` sub-block (only present on withdrawn/re-submitted referrals): `Course name` now appears *above* `Organisation name` — a small re-order for cross-block consistency with the parent referral. If the CRN you regen against has no withdrawn referrals, this sub-block won't render — that's fine, don't force it.
+> 3. No other visual changes — the round-2 removals (PNI/OASys-PNI sections, top-level `staff[]`, top-level `organisations[]`, `prisonerNumber`, internal IDs) all stayed removed.
+>
+> **CRN choice:** same rich CRN Branston used for the round-2 sample (A8610DY, or equivalent). If that CRN doesn't happen to have an offering with a populated course name, pick another — cross-check via the API before regenerating.
+>
+> **Attachment:** PDF only. No fresh xlsx — DD row 34 `course.name = Yes` was already the case (top-level Courses list has always been in SAR), and Roxanne agreed on 2026-08-20 not to add a dedicated `referral.course_name` row (same rationale as `organisation.name`).
+
+---
+
+## Draft
+
+**Subject:** Re: APG-2546 — updated DD (In SAR API column) attached
+
+Hi Roxanne,
+
+PR-14 landed on Monday and preprod is now serving the updated template — fresh PDF attached (regenerated against `<CRN>` on preprod so you're seeing exactly what a subject would receive).
+
+Course name is now inline on each referral, sitting right below "Organisation name" as we discussed. On any referral with a withdrawn `originalReferral` sub-block, "Course name" now also appears above "Organisation name" inside that sub-block, so the two blocks are consistent when you read them side by side.
+
+No DD changes needed on your side for this — row 34 (`course.name`) was already `Yes` in the "In SAR API" column via the top-level Courses list, and per your 2026-08-20 note we didn't add a separate `referral.course_name` row (same rationale as `organisation.name` on row 107).
+
+Happy for you to pick testing back up whenever suits. Let me know if anything looks off — otherwise, if you're happy with this and the DD-review side, I'll take that as the final APG-2546 close-out signal and prod deploys today/tomorrow.
+
+Cheers,
+Raby
+
+---
+
+## Notes for Raby before sending
+
+- **Fill the `<CRN>` placeholder** with the CRN you actually regenerated against. Naming the CRN lets Roxanne cross-reference against her own testing if she wants.
+- **Attachment:** the freshly-regenerated preprod PDF. File-name convention consistent with the round-2 sample (e.g. `sar-<CRN>-<YYYY-MM-DD>.pdf`). If you want to keep the paper trail tight, drop a copy into `doc/planning/APG-2546/handover/` too (git-ignored PDF is fine — mirror the round-2 sample handling).
+- **Prod deploy timing** — the message says "prod deploys today/tomorrow", which frames it as a natural consequence of her sign-off rather than as a request for approval. If you'd rather explicitly wait for her acknowledgement before approving `deploy_prod` in CircleCI, either (a) approve it now (HAAR's single ping already covered prod-side registration; she's only reviewing the artefact not the deploy) or (b) leave it holding and approve after she replies. Either is fine — pick whichever matches your cadence with her.
+- **If Roxanne asks for something extra** (e.g. one more field, a wording change): reply-and-scope-check before agreeing. The bar for round-3 was set with Branston's post-PR-13 asks; anything beyond a same-shape one-field addition should be a fresh ticket.
+- **Log the send** in DELIVERY-LOG.md the moment you send it — new timeline entry mirroring the "2026-08-24 (11:13 BST) PR-14 merged" entry.
+
+## Post-send follow-through
+
+1. **If she signs off** → approve `deploy_prod` in CircleCI (if not already done) → verify prod pod on `6d713186` → close APG-2546 in Jira → update `DELIVERY-LOG.md` and `ROUND-2-PLAN.md` with the final ✅ close-out row.
+2. **If she flags something** → triage same-day; loop back with next steps or a revised timeline. Don't let it drift silently.
+3. **Once APG-2546 is closed**: send Deborah the Slack DM from `handover/deborah-slack-dm-draft.md` (final round-2 close-out heads-up).
+4. **Follow-up hygiene ticket** (out of APG-2546 scope, but don't lose it): the cheap `perform-a-release.md` checklist item from the 2026-08-24 am HAAR post-mortem — one-liner doc PR after APG-2546 closes.
+
+
