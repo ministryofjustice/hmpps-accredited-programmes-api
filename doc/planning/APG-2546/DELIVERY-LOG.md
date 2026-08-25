@@ -1916,6 +1916,75 @@ One dead query (OasysPniResult) + one dead SAR-only query (StaffRepository.findB
 
   **Verdict: patched doc is execution-ready.** The missed integration-test file (lens #3) was the only pre-execution finding; caught + fixed in the same review pass and reflected in all three planning artefacts (working doc, agent-prompt template, DELIVERY-LOG). Zero remaining unknowns. Anchor SHA still `6d713186`.
 
+- **2026-08-25 (afternoon) — PR-15 opened as [#1124](https://github.com/ministryofjustice/hmpps-accredited-programmes-api/pull/1124) as DRAFT; execution agent report received.** Fresh agent fired against the nine-lens-reviewed working doc + agent prompt. Delivered exactly to spec: **7 files changed, +1 / −64 lines** (matches doc prediction of ~7 files, net ~−63). Branch `APG-2546/remove-top-level-courses` @ `b22528d1` (post-amend, see Surprise #1 below).
+
+  **PR state at reporting time (`gh pr view 1124`):**
+
+  - `state=OPEN, isDraft=true, mergeStateStatus=BLOCKED` (draft-blocking; expected)
+  - CI: helm lint dev/preprod/prod ✅, app_version ✅, check-jira-prefix ✅, CodeQL analyze `IN_PROGRESS`, Kotlin build `IN_PROGRESS`
+  - No GH-side reviews (agent's two nine-lens self-review passes were internal, matching PR-8/9/14 precedent)
+  - Next step: mark ready-for-review once CI green, then team review → merge → HAAR ping
+
+  **Verification checklist — all green per agent report:**
+
+  - `./gradlew ktlintCheck test` = **678 tests green** after golden regen
+  - `grep 'SarCourse\|getSarCourses' src/` → **0**
+  - `grep '"courses"' sar-api-response.json` → **0** (was 1)
+  - `grep '<h2>Courses</h2>' src/` → **0** (was 1)
+  - `courseName` occurrences in JSON golden → **4** (≥2 threshold ✅ — inline field on every referral from PR-14 stays intact)
+  - `<tr><td>Course name</td>` occurrences in HTML golden → **4** (≥2 threshold ✅)
+  - UUID-leak grep on both goldens → **0**
+  - `entity-schema.json` byte-identical vs main ✅ (JPA-derived; no JPA entity touched — matches lens #5 prediction)
+  - **PDF page count = 2 pages, unchanged from PR-14 preprod.** Both 1 and 2 were flagged correct in the doc; result is 2.
+  - All five hard guardrails held: no `<h2>Organisation</h2>` scope creep, `SarCourseParticipation` untouched, `persistenceHelper.createCourse(...)` seeds preserved in both integration tests, `CourseEntityFactory` import retained in unit test, `CourseRepository` sibling methods untouched.
+
+  **Merge-diff shape (7 files, +1 / −64):**
+
+  ```
+  CourseRepository.kt                              | −10
+  SubjectAccessRequestService.kt                   | −15
+  sar_template.mustache                            | −11
+  SubjectAccessRequestServiceIntegrationTest.kt    |  −5
+  SubjectAccessRequestServiceTest.kt               | −13
+  sar-api-response.json                            | +1 / −1
+  sar-expected-render-result.html                  |  −9
+  ```
+
+  **Four surprises captured for future PR discipline:**
+
+  **Surprise #1 — auto-generated `.snyk` file caught the initial commit.** The `hmpps-gradle-spring-boot` plugin writes a `.snyk` file at build time (file header explicitly says regenerated on each build). It's not tracked on `main` and not in `.gitignore`, so `git add -A` after the test run picked it up on the first commit. Agent amended with `git rm --cached .snyk` + `--amend` and force-pushed with `--force-with-lease`; post-amend diff matches the doc exactly. **Recommendation: add `.snyk` to `.gitignore` in a separate hygiene PR** (call it PR-16-gitignore-snyk-hygiene, or fold into any future non-SAR hygiene PR). This trap will bite anyone running `git add -A` after a build; a one-line `.gitignore` addition permanently defuses it. Not a blocker for PR-15 or APG-2546 close-out — logged as tech-debt. **This planning agent verified independently on the working tree post-switch:** local checkout on the execution branch shows `?? .snyk` in `git status` after a build, confirming the trap is live.
+
+  **Surprise #2 — planning-branch stale-src drift on `expectedFlywaySchemaVersion`.** The PR-15 doc + AGENT-PROMPT-TEMPLATE both said "unchanged from `144`". Actual on `origin/main @ 6d713186` is `"145"` (V145 `add_staff_lookup_indexes.sql` was added post-PR-12 and is present on main). The docs were bitten by reading the **planning branch's** stale `src/` tree at scoping time — the planning branch was cut from merge-base `106e27d2` (pre-round-1) and only carries doc commits; its `src/` never syncs with `main` past round-1 baseline. Execution agent correctly worked against actual `origin/main @ 6d713186` and did not touch the test file, so no deviation was introduced. **Discipline reminder for future round-2-style addendum PRs:** always cross-check version-strings via `git show origin/main:src/…` rather than the workspace-tree `src/`. AGENT-PROMPT-TEMPLATE already warns about this — the "stale read_file cache after a git checkout" tip is the same class of problem.
+
+  **Surprise #3 — planning-branch stale-src drift on `SubjectAccessRequestService.kt` line numbers.** Agent reported the file is 280 lines total on `6d713186`, not 546 as the doc's anchors implied (L437-441 for `.toSarCourse()`). Semantic anchors (`data class SarCourse`, `.toSarCourse()`, `courseRepository ctor param`, etc.) matched perfectly, so agent proceeded without incident. **Discipline reminder for future scoping:** line-number anchors verified against the planning-branch working tree drift from `origin/main` reality more than we expected. The "first command: `git checkout origin/main` + `git log --oneline -1` == expected SHA" guard covers the case where `main` has moved; it does NOT cover the case where the planning-branch `src/` diverged from `main` at merge-base but you're reading `src/` while on the planning branch. **Two mitigations for future PRs:**
+    - Prefer semantic markers (`data class SarCourse` / `.toSarCourse()`) over raw line numbers as the primary anchor; leave line numbers as a secondary hint.
+    - Or: run the initial line-ref scoping while on `origin/main` (not the planning branch) — which is exactly what the execution-agent session does, but the doc-scoping session did not.
+    Not a delivery blocker (semantic match was sufficient), but worth folding into the AGENT-PROMPT-TEMPLATE tips section for any future addendum PRs.
+
+  **Surprise #4 — PDF page count held at 2 (not 1).** Doc allowed both. The removed content was small enough (`<h2>` + `<h3>` + one `<tr>` + wrapping whitespace) that the layout stayed on 2 pages. Roxanne's fresh preprod PDF will look identical in page count to the PR-14 preprod PDF she already reviewed — no page-count-change to flag in her close-out email.
+
+  **HAAR-team Slack draft delivered by agent** (verbatim in the agent's report; adapt to Raby's voice, insert merge SHA into `<INSERT-MERGE-SHA-ONCE-MERGED>` slot + SHA-pinned template permalink). Single ping covers both envs, same discipline as PR-14 corrected 2026-08-21 shape.
+
+  **Outstanding follow-ups on Raby's side** (Raby-executed, not agent-executed):
+
+  1. Mark PR #1124 ready-for-review once CI green (draft → open).
+  2. Team review + merge #1124 → capture merge SHA.
+  3. Fill merge SHA into the agent's Slack draft + send to `#haa-sar-functionality-change-request` (single ping, both envs).
+  4. Hold CircleCI `deploy_preprod` approval until HAAR confirms preprod re-registration.
+  5. Approve `deploy_preprod` → verify preprod pod picks up new image → regenerate preprod PDF (2 pages expected) → send Roxanne close-out reply (PDF-only, no xlsx — same shape as the PR-14 close-out draft).
+  6. Approve `deploy_prod` after preprod is verified.
+  7. Optional: open a small hygiene PR adding `.snyk` to `.gitignore` (Surprise #1). Not APG-2546-scoped; can be a separate ticket.
+
+  **APG-2546 close-out gating table** — PR-15 code delivered ✅. Remaining gates:
+
+  - Team review + merge of PR #1124 — ⏳ next action; CI polling in progress
+  - Post-merge HAAR re-registration — ⏳ single ping for both envs at PR-15 merge SHA
+  - `deploy_preprod` (held until HAAR confirms) → preprod PDF regen → Roxanne close-out reply
+  - `deploy_prod` after preprod verified
+  - Roxanne final DD sign-off — ⏳ pending Roxanne's reply to the close-out email
+
+  **APG-2546 code work is COMPLETE.** PR-15 is the final code deliverable. Everything after this is comms + release ops.
+
 
 ## Round 2 — PR outcomes
 
