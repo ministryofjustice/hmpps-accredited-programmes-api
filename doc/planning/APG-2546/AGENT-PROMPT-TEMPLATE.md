@@ -337,6 +337,77 @@ the round-3 sample-PDF artefact path.
 
 ---
 
+## PR-15 — remove duplicate top-level `<h2>Courses</h2>` section
+
+```text
+Pick up APG-2546 PR-15. The working doc is at
+doc/planning/APG-2546/PR-15-remove-top-level-courses.md — read
+it end to end, follow the "Files to change" section literally,
+run the verification checklist, and open a PR using the
+description shape at the bottom of the doc. Do not deviate from
+the doc without flagging it back to me first.
+
+Assumed starting point: tip of origin/main after PR-14 has
+merged. PR-14 landed 2026-08-24 as `6d713186`. First commands in
+this fresh session should be:
+
+  git fetch origin
+  git checkout origin/main
+  git log --oneline -1   # expect 6d713186 (or later main tip)
+  git checkout -b APG-2546/remove-top-level-courses
+
+If HEAD isn't 6d713186 (or a descendant on main), stop and tell
+me — line refs in the working doc are anchored to 6d713186 and
+will need re-anchoring if main has moved past that.
+
+This PR is a mirror of PR-11 in shape: remove a top-level list
+whose content is now covered by an inline field on each
+SarReferral. PR-11 removed the Staff block (once inline surnames
+covered it); PR-15 removes the Courses block (once inline
+courseName from PR-14 covered it). Roxanne's 2026-08-25 email
+after PR-14's preprod PDF explicitly asked for this — verbatim
+quote is at the top of the working doc.
+
+Pre-verified anchors on 6d713186:
+  - SubjectAccessRequestService.kt: courseRepository ctor param
+    L42, `courses = ...` line L129, Content.courses field L196,
+    SarCourse data class L280-282, .toSarCourse() ext L437-441
+  - CourseRepository.kt: getSarCourses @Query at L46-54
+  - sar_template.mustache: <h2>Courses</h2> block at L88-98
+  - SubjectAccessRequestServiceTest.kt: mock decl L44, ctor arg
+    L61, stub L198-202, assertions L262 + L321-322, verify L351
+  - sar-api-response.json: `"courses":[{"name":"Course 1"}],`
+    substring inside the top-level JSON object
+  - sar-expected-render-result.html: <h2>Courses</h2> rendered
+    block at L291-297
+
+The working doc's non-obvious items #1-7 are the discipline
+guardrails — read them all, especially #1 (SarCourse vs
+SarCourseParticipation are DIFFERENT, do not touch
+courseParticipation) and #6 (HAAR ping required post-merge,
+same discipline as PR-14, single ping covers both envs).
+
+Nine-lens self-review is required before push, matching PR-8
+through PR-14. Both self-review passes must ship-it before you
+open the PR. Two agent-side self-reviews then human-side team
+review, same discipline PR-14 landed under.
+
+When you're done, report back:
+  - PR number + merge SHA (once merged)
+  - PDF page count from the regen (1 or 2 both fine — flag which)
+  - Any surprises so I can update DELIVERY-LOG in the tracking chat
+  - The exact HAAR-team Slack draft text you'd suggest (I'll edit
+    to voice and send once merge lands)
+```
+
+Session-hygiene reminders same as previous PRs: no zsh heredocs
+for commit messages (use `git commit -F /tmp/…`), Docker Desktop
+must be running for Testcontainers-backed snapshot regen, stale
+`read_file` cache after `git checkout` — cross-check with `sed`
+or `git show` if line refs don't match.
+
+---
+
 ## Tips for the human running the prompt
 
 - **Fresh chat session per PR.** Round-1 PR-7 was executed cleanly
