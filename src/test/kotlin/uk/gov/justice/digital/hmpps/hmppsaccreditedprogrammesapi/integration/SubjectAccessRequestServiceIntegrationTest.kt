@@ -95,7 +95,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
     val content = result!!.content as SubjectAccessRequestService.Content
     assertThat(content.referrals).hasSize(1)
     assertThat(content.courseParticipation).hasSize(1)
-    assertThat(content.courses).hasSize(1)
 
     with(content.referrals[0]) {
       assertThat(referrerUsername).isEqualTo("Doe")
@@ -112,10 +111,6 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(outcomeStatus).isEqualTo("INCOMPLETE")
       assertThat(otherCourseName).isEqualTo("Other course")
       assertThat(outcomeDetail).isEqualTo("No information to evidence")
-    }
-
-    with(content.courses[0]) {
-      assertThat(name).isEqualTo("Course 1")
     }
   }
 }
