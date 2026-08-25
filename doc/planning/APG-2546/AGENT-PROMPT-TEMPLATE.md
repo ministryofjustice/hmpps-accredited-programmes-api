@@ -376,6 +376,10 @@ Pre-verified anchors on 6d713186:
   - sar_template.mustache: <h2>Courses</h2> block at L88-98
   - SubjectAccessRequestServiceTest.kt: mock decl L44, ctor arg
     L61, stub L198-202, assertions L262 + L321-322, verify L351
+  - SubjectAccessRequestServiceIntegrationTest.kt: size assertion
+    L147, `with(content.courses[0]) { ... }` block L178-180
+    (integration test — caught in nine-lens review 2026-08-25;
+    initial scoping missed it, now correctly listed)
   - sar-api-response.json: `"courses":[{"name":"Course 1"}],`
     substring inside the top-level JSON object
   - sar-expected-render-result.html: <h2>Courses</h2> rendered

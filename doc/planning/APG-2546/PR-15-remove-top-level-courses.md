@@ -71,6 +71,15 @@ PR-11 removed the top-level `staff[]` list once inline `primaryPomStaffSurname` 
 
 **Keep** `CourseEntityFactory` import (L24) — it's used at L106, L127, L147, L160 to seed `.withCourse(...)` on offerings so referral `courseName` resolution still works. Grep-verified: five in-file uses; only the L199 use goes away with the mock block.
 
+`src/test/kotlin/uk/gov/justice/digital/hmpps/hmppsaccreditedprogrammesapi/integration/SubjectAccessRequestServiceIntegrationTest.kt` — **caught in nine-lens review 2026-08-25 (was missed in initial scoping)**:
+
+| Line (`@ 6d713186`) | Change |
+|---|---|
+| L147 | Remove `assertThat(content.courses).hasSize(1)` |
+| L178-180 | Remove the `with(content.courses[0]) { assertThat(name).isEqualTo("Course 1") }` block (three lines including braces) |
+
+**Do NOT touch** `persistenceHelper.createCourse(...)` at L35-44 or `persistenceHelper.createCourseParticipation(...)` at L68-86 — both feed live inline paths (`SarReferral.courseName` via `offering.course.name`, and `SarCourseParticipation.courseName`) that stay after PR-15. Same rationale as `SarContractIntegrationTest.kt` (which has zero code changes — snapshot regen only).
+
 `src/test/kotlin/uk/gov/justice/digital/hmpps/hmppsaccreditedprogrammesapi/integration/SarContractIntegrationTest.kt`:
 
 - **No test-code change.** The seed `persistenceHelper.createCourse(...)` at L111 stays because it feeds the offering that supplies `SarReferral.courseName` (inline, added in PR-14) — still exercised.
@@ -146,10 +155,11 @@ Currently 2 pages (post-PR-14 preprod). Removing the trailing Courses section re
 | `CourseRepository.kt` | Remove `getSarCourses` @Query method | −10 |
 | `sar_template.mustache` | Remove `<h2>Courses</h2>` block (lines 88-98) | −11 |
 | `SubjectAccessRequestServiceTest.kt` | Remove `courseRepository` mock/import/ctor-arg + `getSarCourses` stub + two `courses` assertions + `verify` | −12 |
+| `SubjectAccessRequestServiceIntegrationTest.kt` | Remove `assertThat(content.courses).hasSize(1)` (L147) + `with(content.courses[0]) { ... }` block (L178-180) | −4 |
 | `sar-api-response.json` (golden) | Regen — remove `"courses":[...]` substring | −1 (JSON) |
 | `sar-expected-render-result.html` (golden) | Regen — remove `<h2>Courses</h2>` rendered block | −7 |
 
-Total: net **−59-ish** lines (deletion-heavy), zero additions.
+Total: net **−63-ish** lines (deletion-heavy), zero additions.
 
 ## Rollback
 
