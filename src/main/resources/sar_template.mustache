@@ -64,15 +64,4 @@
     {{/courseParticipation}}
 
 
-    <h2>Courses</h2>
-    {{#courses}}
-        <h3>Course {{ optionalValue (getIndexPlusOne @index) }}</h3>
-        <table class="summary-list">
-            <tr><td>Name</td><td>{{ optionalValue name }}</td></tr>
-        </table>
-        <br>
-    {{/courses}}
-    {{^courses}}
-        <p>No Data Held</p>
-    {{/courses}}
 

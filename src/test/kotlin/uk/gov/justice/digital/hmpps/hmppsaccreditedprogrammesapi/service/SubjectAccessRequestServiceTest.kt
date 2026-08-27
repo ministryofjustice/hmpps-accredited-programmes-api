@@ -9,7 +9,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.ReferrerUserEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
@@ -28,7 +27,6 @@ class SubjectAccessRequestServiceTest {
 
   private val referralRepository: ReferralRepository = mockk()
   private val courseParticipationRepository: CourseParticipationRepository = mockk()
-  private val courseRepository: CourseRepository = mockk()
   private val organisationRepository: OrganisationRepository = mockk()
   private val staffLookupService: StaffLookupService = mockk()
 
@@ -39,7 +37,6 @@ class SubjectAccessRequestServiceTest {
     service = SubjectAccessRequestService(
       referralRepository,
       courseParticipationRepository,
-      courseRepository,
       organisationRepository,
       staffLookupService,
     )
@@ -159,11 +156,6 @@ class SubjectAccessRequestServiceTest {
     // out of the returned list (mirrors production IN-clause behaviour).
     every { referralRepository.findAllById(setOf(originalReferralId, orphanedOriginalId)) } returns listOf(originalReferralEntity)
     every { courseParticipationRepository.getSarParticipations(prn) } returns listOf(participationEntity)
-    every { courseRepository.getSarCourses(prn) } returns listOf(
-      CourseEntityFactory()
-        .withName("Course Name")
-        .produce(),
-    )
 
     every { organisationRepository.findAllByCodeIn(match { it.toSet() == setOf("MDI") }) } returns listOf(
       OrganisationEntityFactory()
@@ -180,7 +172,6 @@ class SubjectAccessRequestServiceTest {
     with(result!!.content as SubjectAccessRequestService.Content) {
       assertThat(referrals.size).isEqualTo(3)
       assertThat(courseParticipation.size).isEqualTo(1)
-      assertThat(courses.size).isEqualTo(1)
 
       val referral = referrals[0]
       assertThat(referral.referrerUsername).isEqualTo("River")
@@ -230,13 +221,9 @@ class SubjectAccessRequestServiceTest {
       assertThat(participation.outcomeDetail).isEqualTo("Outcome details")
       assertThat(participation.createdByUser).isEqualTo("River")
       assertThat(participation.updatedByUser).isEqualTo("River")
-
-      val course = courses[0]
-      assertThat(course.name).isEqualTo("Course Name")
     }
 
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
-    verify { courseRepository.getSarCourses(prn) }
   }
 }
