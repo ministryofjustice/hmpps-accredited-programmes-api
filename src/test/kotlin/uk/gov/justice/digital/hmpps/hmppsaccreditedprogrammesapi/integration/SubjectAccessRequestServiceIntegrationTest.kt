@@ -111,6 +111,7 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(outcomeStatus).isEqualTo("INCOMPLETE")
       assertThat(otherCourseName).isEqualTo("Other course")
       assertThat(outcomeDetail).isEqualTo("No information to evidence")
+      assertThat(source).isEqualTo("Source")
     }
   }
 }

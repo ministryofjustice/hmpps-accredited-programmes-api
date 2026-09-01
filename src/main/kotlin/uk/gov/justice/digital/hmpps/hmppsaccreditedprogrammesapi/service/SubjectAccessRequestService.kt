@@ -112,6 +112,7 @@ class SubjectAccessRequestService(
       participations.forEach {
         add(it.createdByUsername)
         it.lastModifiedByUsername?.let(::add)
+        it.source?.let(::add)
       }
     }
     val staffIds = buildSet {
@@ -206,7 +207,7 @@ class SubjectAccessRequestService(
     SarCourseParticipation(
       isDraft = it.isDraft,
       otherCourseName = it.otherCourseName,
-      source = it.source,
+      source = surnames.forUsername(it.source) ?: it.source,
       type = it.setting?.type?.name,
       outcomeStatus = it.outcome?.status?.name,
       outcomeDetail = it.outcomeDetail,
