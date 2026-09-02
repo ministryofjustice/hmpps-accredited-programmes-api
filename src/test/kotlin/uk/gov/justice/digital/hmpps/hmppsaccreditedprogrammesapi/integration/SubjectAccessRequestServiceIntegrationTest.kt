@@ -4,8 +4,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.CourseSetting
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.service.SubjectAccessRequestService
+import uk.gov.justice.hmpps.test.kotlin.auth.JwtAuthorisationHelper
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -14,6 +19,9 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   private lateinit var subjectAccessRequestService: SubjectAccessRequestService
+
+  @Autowired
+  private lateinit var jwtAuthorisationHelper: JwtAuthorisationHelper
 
   @Test
   fun `should return all fields in SAR content`() {
@@ -112,5 +120,57 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(otherCourseName).isEqualTo("Other course")
       assertThat(outcomeDetail).isEqualTo("No information to evidence")
     }
+  }
+
+  @Test
+  fun `should return null when no data is held for the prisoner`() {
+    // Given: a prisoner with no seeded referrals and no course participations.
+    // No `persistenceHelper.createReferral` / `createCourseParticipation` calls
+    // are made for this PRN, so both queries return empty lists.
+    val prisonNumber = "Z9999ZZ"
+    persistenceHelper.clearAllTableContent()
+
+    // When
+    val content = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
+
+    // Then: per the HMPPS SAR component API spec, a recognised identifier
+    // with no held data must produce a 204 response at the HTTP layer. That
+    // is driven by the service returning `null`, so we assert that contract
+    // here at the service boundary.
+    assertThat(content).isNull()
+  }
+
+  @Test
+  fun `should return HTTP 204 from GET subject-access-request when no data is held for the PRN`() {
+    // Given: no seeded data for this prisoner. The service short-circuits
+    // to `null` and the hmpps-kotlin starter's SAR controller converts that
+    // to HTTP 204. This test locks the contract end-to-end at the HTTP
+    // layer -- symmetric with the sibling Community API PR -- so that a
+    // future starter-library change to the null -> 204 convention would
+    // fail here rather than silently regress in production.
+    val prisonNumber = "Z9999ZZ"
+    persistenceHelper.clearAllTableContent()
+
+    // Issue a token with ROLE_SAR_DATA_ACCESS (plus this service's own
+    // ROLE_ACCREDITED_PROGRAMMES_API) so the request is authorised. Token
+    // creation is delegated to the framework-provided helper to reuse the
+    // application's configured signing key pair.
+    val token = jwtAuthorisationHelper.createJwtAccessToken(
+      username = "sar-test",
+      clientId = "sar-client",
+      roles = listOf("ROLE_SAR_DATA_ACCESS", "ROLE_ACCREDITED_PROGRAMMES_API"),
+      scope = emptyList(),
+      expiryTime = Duration.ofHours(1),
+    )
+
+    // When / Then
+    webTestClient
+      .get()
+      .uri("/subject-access-request?prn=$prisonNumber")
+      .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.NO_CONTENT)
+      .expectBody().isEmpty
   }
 }
