@@ -41,6 +41,18 @@ class SubjectAccessRequestService(
       afterFromDate && beforeToDate
     }
 
+    // Per the HMPPS SAR component API spec, respond with HTTP 204 (no content)
+    // when we recognise the identifier type but hold no data for the subject in
+    // the requested window. Returning `null` here signals the starter's SAR
+    // controller to emit 204, which lets the SAR collator render its single
+    // top-level "no data held" section instead of our mustache template
+    // rendering every empty sub-section. Short-circuiting here also avoids the
+    // downstream batch queries (`findAllById`, staff-surname lookups,
+    // organisation lookups) which would all be no-ops on empty inputs.
+    if (filteredReferrals.isEmpty() && filteredParticipations.isEmpty()) {
+      return null
+    }
+
     // Batch-load every referral referenced by an `originalReferralId` on the
     // filtered set in a single `WHERE referral_id IN (?)` query. Missing IDs
     // (referential-integrity drift – e.g. an original hard-deleted outside

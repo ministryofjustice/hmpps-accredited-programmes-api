@@ -226,4 +226,66 @@ class SubjectAccessRequestServiceTest {
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
   }
+
+  @Test
+  fun `should return null when no referrals or participations exist so the controller emits HTTP 204`() {
+    // Given: the identifier type is recognised (we are a prison-domain SAR
+    // service, PRN is our type) but no referrals and no course participations
+    // exist for this prisoner in the requested window.
+    val prn = "A0000ZZ"
+    every { referralRepository.getSarReferrals(prn) } returns emptyList()
+    every { courseParticipationRepository.getSarParticipations(prn) } returns emptyList()
+
+    // When
+    val result = service.getPrisonContentFor(prn, null, null)
+
+    // Then: `null` signals the HMPPS SAR starter controller to respond with
+    // HTTP 204 (No Content), per the SAR component API spec. Previously we
+    // returned a populated `HmppsSubjectAccessRequestContent` with empty
+    // referrals + courseParticipation lists which produced a 200 with an
+    // effectively empty body and caused the SAR collator to render every
+    // template section header instead of the single top-level
+    // "no data held" message.
+    assertThat(result).isNull()
+
+    // Short-circuit contract: none of the downstream batch queries (staff
+    // surnames, organisations, original-referral IDs) run when both filtered
+    // lists are empty, so we only verify the two entry-point repository calls.
+    verify { referralRepository.getSarReferrals(prn) }
+    verify { courseParticipationRepository.getSarParticipations(prn) }
+  }
+
+  @Test
+  fun `should return null when all data falls outside the fromDate to toDate window`() {
+    // Given: referrals and participations exist for the prisoner but every
+    // one is outside the requested window, so effectively no data is held
+    // for this SAR request.
+    val prn = "A0000ZZ"
+    val fromDate = LocalDate.of(2022, 1, 1)
+    val toDate = LocalDate.of(2023, 1, 1)
+
+    val outOfWindowReferral = ReferralEntityFactory()
+      .withPrisonNumber(prn)
+      .withStatus("REFERRAL_STARTED")
+      .withSubmittedOn(LocalDateTime.of(2024, 6, 1, 10, 0)) // after toDate
+      .withReferrer(ReferrerUserEntity(username = "user1"))
+      .produce()
+    val outOfWindowParticipation = CourseParticipationEntityFactory()
+      .withPrisonNumber(prn)
+      .withCreatedDateTime(LocalDateTime.of(2021, 1, 1, 10, 0)) // before fromDate
+      .withCreatedByUsername("creator")
+      .produce()
+
+    every { referralRepository.getSarReferrals(prn) } returns listOf(outOfWindowReferral)
+    every { courseParticipationRepository.getSarParticipations(prn) } returns listOf(outOfWindowParticipation)
+
+    // When
+    val result = service.getPrisonContentFor(prn, fromDate, toDate)
+
+    // Then
+    assertThat(result).isNull()
+
+    verify { referralRepository.getSarReferrals(prn) }
+    verify { courseParticipationRepository.getSarParticipations(prn) }
+  }
 }

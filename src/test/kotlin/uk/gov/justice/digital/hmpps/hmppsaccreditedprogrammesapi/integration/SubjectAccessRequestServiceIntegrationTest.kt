@@ -113,4 +113,22 @@ class SubjectAccessRequestServiceIntegrationTest : IntegrationTestBase() {
       assertThat(outcomeDetail).isEqualTo("No information to evidence")
     }
   }
+
+  @Test
+  fun `should return null when no data is held for the prisoner`() {
+    // Given: a prisoner with no seeded referrals and no course participations.
+    // No `persistenceHelper.createReferral` / `createCourseParticipation` calls
+    // are made for this PRN, so both queries return empty lists.
+    val prisonNumber = "Z9999ZZ"
+    persistenceHelper.clearAllTableContent()
+
+    // When
+    val content = subjectAccessRequestService.getPrisonContentFor(prisonNumber, null, null)
+
+    // Then: per the HMPPS SAR component API spec, a recognised identifier
+    // with no held data must produce a 204 response at the HTTP layer. That
+    // is driven by the service returning `null`, so we assert that contract
+    // here at the service boundary.
+    assertThat(content).isNull()
+  }
 }
