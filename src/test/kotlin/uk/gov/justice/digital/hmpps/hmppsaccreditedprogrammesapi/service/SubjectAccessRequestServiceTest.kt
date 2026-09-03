@@ -221,9 +221,57 @@ class SubjectAccessRequestServiceTest {
       assertThat(participation.outcomeDetail).isEqualTo("Outcome details")
       assertThat(participation.createdByUser).isEqualTo("River")
       assertThat(participation.updatedByUser).isEqualTo("River")
+      assertThat(participation.source).isEqualTo("River")
     }
 
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
+  }
+
+  @Test
+  fun `should preserve free-text source when it does not match any staff row`() {
+    // Given: participation seeded with a non-username source, and the batch
+    // lookup returns an empty result for that specific value while resolving
+    // any other username as usual. This exercises path 2 (free-text) of the
+    // dual-purpose `CourseParticipationEntity.source` column and proves the
+    // `forUsername(x) ?: x` fallback preserves the raw value.
+    val prn = "A1234BC"
+    every { staffLookupService.resolveSurnamesByUsername(any()) } answers {
+      val usernames = firstArg<Collection<String?>>()
+      usernames.asSequence()
+        .filterNotNull()
+        .filter { it.isNotBlank() && it != "OASys" } // "OASys" deliberately unresolvable
+        .toSet()
+        .associateWith { "River" }
+    }
+
+    val participationEntity = CourseParticipationEntityFactory()
+      .withPrisonNumber(prn)
+      .withSource("OASys")
+      .withSetting(CourseParticipationSetting("REMOTE", CourseSetting.COMMUNITY))
+      .withOutcome(CourseParticipationOutcomeFactory().produce())
+      .withCourseName("Drug Awareness")
+      .withCreatedByUsername("creator")
+      .withCreatedDateTime(LocalDateTime.of(2022, 7, 1, 10, 0))
+      .withLastModifiedByUsername("modifier")
+      .withLastModifiedDateTime(LocalDateTime.of(2022, 8, 1, 10, 0))
+      .produce()
+
+    every { referralRepository.getSarReferrals(prn) } returns emptyList()
+    every { courseParticipationRepository.getSarParticipations(prn) } returns listOf(participationEntity)
+
+    // When
+    val result = service.getPrisonContentFor(prn, null, null)
+
+    // Then: raw free-text preserved via the `forUsername(x) ?: x` fallback.
+    assertThat(result).isNotNull()
+    with(result!!.content as SubjectAccessRequestService.Content) {
+      assertThat(courseParticipation).hasSize(1)
+      val participation = courseParticipation[0]
+      assertThat(participation.source).isEqualTo("OASys")
+      // createdByUser / updatedByUser still resolve via the stub (they are not "OASys").
+      assertThat(participation.createdByUser).isEqualTo("River")
+      assertThat(participation.updatedByUser).isEqualTo("River")
+    }
   }
 }
