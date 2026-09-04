@@ -1,0 +1,326 @@
+# PR-12 — Round-2 code hygiene + test tidy
+
+> **Ticket:** APG-2546 (round 2) • **Branch:** `APG-2546/round-2-hygiene-tidy`
+> • **Est.:** ½ dev day • **Depends on:** PR-8 (`b7b05283`) + PR-9 (`f8e04ab0`) + PR-10 (`d710fa7f`) + PR-11 (`47488c8a`) — **all merged 2026-08-17** ✅
+> • **Blocks:** PR-13 (docs handover expects a clean state)
+> • **Status:** **ready for execution — anchored to `origin/main @ 47488c8a`.** Most sweeps CONFIRMED CLEAN pre-execution (see DELIVERY-LOG 2026-08-17 late evening entry for the full pre-verification grep table). Effective delta shrunk to five bullets — see "Effective delta after pre-verification" below.
+
+## Pre-verification summary (against `origin/main @ 47488c8a`)
+
+Ten of thirteen verification-checklist greps were run pre-execution and CONFIRMED CLEAN — the executing agent should re-run them as a sanity check but expect zero findings on:
+
+- `StaffRepository.findByPrisonNumber` — 0 hits in `src/main/kotlin` (only V144/V145 SQL migration comments still name-drop it)
+- Deleted SAR-DTO names (`SarPniResult` / `SarOasysPniResult` / `SarPerson` / `SarOrganisation` / `SarStaff`) — 0 hits anywhere in `src`, incl. `entity-schema.json`
+- Orphan ctor-param sweep on `SubjectAccessRequestService.kt` — 4 repos remain (`referralRepository`, `courseParticipationRepository`, `courseRepository`, `organisationRepository`), all in-use
+- KDoc dangling `[...]` refs to deleted siblings — 0 hits
+- `SarContractIntegrationTest` companion-const scan — only `PRISON_NUMBER` remains
+- `expectedFlywaySchemaVersion` — still `"145"` (correct)
+- UUID-leak grep on both goldens — 0 hits
+
+**Genuine work remaining** (see "Effective delta" below):
+
+1. Delete two `PersistenceHelper` methods (`createPerson`, `createOasysPniResult` — 0 test callers confirmed; `createPniResult` stays alive — 1 caller in `DomainEventsListenerTest.kt:222`).
+2. Add a second offering to the `SarContractIntegrationTest` fixture for per-referral organisation variance + regen goldens.
+3. Optional strip trailing `\n` from `sar-api-response.json`.
+4. Document the V145 `idx_staff_last_name` keep-vs-drop decision (recommend keep).
+5. Full-suite regression + snapshot check + zero-diff regen.
+
+## Effective delta after pre-verification
+
+1. **Delete `PersistenceHelper.createPerson`** (`src/test/.../common/config/PersistenceHelper.kt` L157) — `LocalDate` bind fix from PR #1115 goes with it.
+2. **Delete `PersistenceHelper.createOasysPniResult`** (`src/test/.../common/config/PersistenceHelper.kt` L191).
+3. **Add second offering to fixture** — `SarContractIntegrationTest` `setupTestData()` currently only seeds `MDI` / HMP Moorland. Wire `BXI` / HMP Brixton into one of the two referrals so `organisationName` renders differently in the golden.
+4. **Regen goldens** via `script/local-scripts/regenerate-sar-snapshots.sh`; verify the two referrals show different `organisationName` values in JSON/HTML.
+5. **Optional trailing-newline strip** on `sar-api-response.json` (or update the regen script to write without one — pick per file's siblings).
+6. **V145 decision (docs only unless dropped)** — recommend keep; document reasoning in PR body. Only ship a `V146__drop_staff_last_name_index.sql` if profile data justifies (unlikely).
+7. **V144/V145 SQL comment cleanup** — conditional on V146. If V145 stays, leave the comments (editing Flyway-applied SQL for comment hygiene isn't idiomatic).
+8. **Full-suite regression** — `./gradlew ktlintCheck test`, snapshot regen zero-diff after (3)+(4), UUID-leak grep, `entity-schema.json` diff sanity.
+
+## Purpose
+
+Standalone hygiene pass after the four round-2 removals land. Same
+rationale as the PR #1115 follow-on hygiene sweep in round 1 — a
+distinct "everything's-clean-now" review before the handover PDF is
+generated is cheap signal for reviewers and Branston.
+
+Scope is deliberately narrow: nothing PR-8/9/10/11 should have caught
+themselves. This PR only exists to catch **cross-PR interactions**
+that surface only when everything is together.
+
+## What this PR does (and does not do)
+
+### Does
+
+- **Final orphan-query audit.** Each of PR-8/10/11 removed the SAR
+  call site for its section's repository query and did a local
+  orphan-check. This PR does a **whole-`src/main` grep** for each of
+  the query names to catch anything a per-PR audit could miss (e.g.
+  test-code callers, comment references, KDoc cross-references).
+  Delete stragglers.
+- **Dead-DTO scan.** `SarPniResult`, `SarOasysPniResult`, `SarPerson`,
+  `SarOrganisation`, `SarStaff` — each deleted in its own PR. Verify
+  no orphaned imports / spring-doc `@Schema` references / mapper
+  helpers survive.
+- **KDoc cross-reference fixup.** PR #1115 added KDoc on the four
+  SAR-collection getters that cross-referenced each other (e.g.
+  *"sibling getters are [PniResultRepository.findAllByPrisonNumber],
+  [OasysPniResultEntityRepository.findAllByPrisonNumber] and
+  [StaffRepository.findByPrisonNumber]"*). If any of those siblings
+  are deleted in PR-8/PR-11, the remaining KDocs on the surviving
+  getters (`ReferralRepository.getSarReferrals` and
+  `CourseParticipationRepository.getSarParticipations`) will have
+  dangling `[...]` links. Fix them up so the code compiles clean and
+  KDoc renders correctly.
+- **Fixture companion-const scan.** `SarContractIntegrationTest`'s
+  companion object accumulated a lot of `_ID` consts during round 1
+  and PR #1115. Any that are no longer referenced from
+  `setupTestData()` after the round-2 removals — delete.
+- **`entity-schema.json` sanity-check.** The schema golden should
+  reflect only removed classes / fields, no additions. If any
+  round-2 PR accidentally left an addition (e.g. a rogue `?` making
+  a field nullable, or a new field crept in), catch it here.
+- **`expectedFlywaySchemaVersion` sanity-check.** Should still be
+  `145` — round 2 adds no migrations. If any round-2 PR drifted
+  this, revert.
+- **Fixture unused-import cleanup.** After stanzas are removed,
+  `SarContractIntegrationTest.kt` may have unused imports. `ktlint`
+  should catch these but a manual look is cheap.
+- **Widened fixture unwind for genuinely dead pieces.** PR #1115's
+  fixture widening added a lot to `setupTestData()`. Most stays;
+  the parts that seeded PNI / OASys PNI / person go with PR-8; the
+  second-POM staff seed decision was left ambiguous in PR-11 — this
+  PR is the last chance to trim it if it's clearly dead.
+- **`PersistenceHelper` orphaned-method sweep.** Flagged by the
+  PR-8 nine-lens self-review (2026-08-14, DELIVERY-LOG entry):
+  after PR-8 merges, `PersistenceHelper.createOasysPniResult`
+  and `PersistenceHelper.createPerson` are **genuinely orphaned**
+  — both were only called from the two SAR-side sites PR-8
+  removed. This supersedes PR-8's "Non-obvious #2" claim
+  (*"leave the helper as-is — helper is called by other tests"*),
+  which grep proved stale on `origin/main @ 0cf89850`. Verify with
+  a fresh grep across all `src/test` once PR-8/9/10/11 have
+  merged (some other round-2 PR might legitimately re-introduce a
+  caller — unlikely but check); delete both methods if no other
+  callers surface. `createPerson`'s `LocalDate` bind fix from
+  PR #1115 goes with the deletion — it was generically useful in
+  theory but has no consumer left in practice.
+- **Fixture companion-const scan (round-2 additions).**
+  `SarContractIntegrationTest`'s companion object accumulated
+  `PNI_RESULT_ID`, `OASYS_PNI_RESULT_ID`, `PERSON_ID` (and possibly
+  more) during round-1 and PR #1115. Any that are no longer
+  referenced from `setupTestData()` after the round-2 removals —
+  delete. (Already listed above but calling out these three
+  specific consts as the PR-8-driven expected deletions.)
+- **Fixture-hardening: seed a second offering for demonstrable
+  per-referral variance.** Flagged by PR-10 nine-lens self-review
+  (2026-08-17, DELIVERY-LOG entry). The `SarContractIntegrationTest`
+  fixture currently seeds only one offering (`MDI → HMP Moorland`),
+  so the two referrals in the regenerated goldens both render the
+  same `organisationName`. Per-referral wiring is verified in the
+  mapper + unit test; this item is about making the contract-test
+  golden **visually demonstrate** variance. Wire a second offering
+  (e.g. `BXI → HMP Brixton`) into one of the two referrals, regen
+  snapshots, confirm the two referrals render different
+  `organisationName` values in the golden JSON/HTML. Same shape as
+  the fixture-hardening backlog item deferred after PR-7.
+- **Cosmetic mustache double-blank.** Flagged by PR-10 nine-lens
+  self-review — one line of trailing whitespace between the
+  Courses and Staff sections in `sar_template.mustache`
+  (harmlessly absorbed into the goldens). **✅ HANDLED IN PR-11
+  2026-08-17** as a one-line no-op when the Staff block was
+  deleted — no action needed here. Sanity-verify at pickup time
+  that the double-blank is indeed gone from the on-main template.
+- **JSON golden trailing-newline fix** (flagged by PR-11
+  self-review 2026-08-17). `sar-api-response.json` gained a
+  trailing newline during PR-11 regen (was
+  `\ No newline at end of file`). Harmless today; brittle to a
+  future strict-bytes comparator upgrade. **Optional one-line
+  fix in PR-12** — either strip the trailing newline in the
+  golden or update `regenerate-sar-snapshots.sh` to write
+  without one, whichever is idiomatic for the file's other
+  siblings. Non-blocking.
+- **V145 `idx_staff_last_name` orphan status** (flagged by PR-11
+  self-review 2026-08-17). PR-11 deleted the
+  `StaffRepository.findByPrisonNumber` query that used this
+  index; the index now costs write-path (every `staff.last_name`
+  update pays for it) with zero read-path benefit. **Proposal
+  for PR-12 (weigh + decide)**: either
+  (a) leave in place (Flyway forward-only default — the write
+  cost is not measurable in profile data, and additive indices
+  are cheap institutional history), or
+  (b) drop via a new `V146__drop_staff_last_name_index.sql`
+  (only justified if there's a measurable write-hot-path — this
+  is a background reference table, so unlikely). **Recommend
+  (a) unless profile data says otherwise.** Document the
+  decision either way in PR-12 body so a future DBA sweep sees
+  the reasoning.
+- **SQL migration comment cleanup — `V144__` / `V145__` still
+  name-drop `findByPrisonNumber`** (flagged by PR-11 self-review
+  2026-08-17). Both migration SQL headers reference the
+  now-deleted `StaffRepository.findByPrisonNumber` method by
+  name in code comments. Grep-clean elsewhere. **Optional
+  cleanup in PR-12**: if a follow-up `V146__` lands per the
+  V145-drop decision above, tidy the V144/V145 comments in the
+  same PR for a coherent SQL history. If V145 is retained,
+  leave the comments — editing Flyway-applied SQL just for
+  comment hygiene isn't idiomatic.
+- **Round-2 learning pattern — orphaned ctor param sweep**
+  (formalised from PR-10 + PR-11 precedent). When any round-2
+  PR removes a top-level `Content` collection field, the
+  matching repository constructor param + import in
+  `SubjectAccessRequestService.kt` become dead code that
+  ktlint's no-unused-imports rule will catch on the import but
+  will silently linger on the ctor param. **Sanity-grep item
+  for PR-12**: `grep -n 'private val.*Repository' src/main/…/SubjectAccessRequestService.kt` —
+  expect only repos still referenced elsewhere in the file. If
+  any orphan survives (unlikely — PR-10/11 handled theirs
+  in-flight), delete + mirror on the unit test's `setup()`.
+- **Full-suite regression run.** `./gradlew ktlintCheck test` on the
+  merged tip — 678 (or whatever the post-round-2 count is) tests
+  green with the four PR-8/9/10/11 heads combined.
+- **UUID-leak grep** across both goldens (defensive; nothing in
+  round 2 should have re-added UUIDs, but the grep is cheap).
+
+### Does not
+
+- **No product-behaviour changes.** If a hygiene finding here would
+  change API shape, snapshot output, or observable service
+  behaviour, that finding is scoped to a fresh PR (call it PR-14 or
+  a hot-fix on the offending round-2 PR) — not this one.
+- **No new migrations.** V145 stays; nothing gets added.
+- **No further section removals or additions.** Locked to the
+  scope PR-8/9/10/11 established.
+
+## Prerequisites for a fresh agent
+
+Read in this order:
+
+1. [`ROUND-2-PLAN.md`](./ROUND-2-PLAN.md) §"Round-2 PR breakdown" +
+   §"Impact on PR #1115 (recently merged)" — understand what should
+   have been cleaned up already
+2. `DELIVERY-LOG.md` round-2 section — the "PR outcomes" table
+   should list SHAs for PR-8/9/10/11. Note anything flagged in
+   their "Notes" column as deferred to this PR.
+3. Each of PR-8/9/10/11 working docs + their merged commits — you
+   need to know what was deleted to know what to sanity-grep for.
+4. This file end-to-end.
+
+## Verification checklist skeleton
+
+Run in order:
+
+- [ ] `git checkout` a merge-commit that includes all four of
+      PR-8/9/10/11 merged into main
+- [ ] `grep -rn 'findAllByPrisonNumber' src/main` — expect zero
+      hits for PNI-related repositories (deleted in PR-8), zero
+      for `StaffRepository` (deleted in PR-11)
+- [ ] `grep -rn 'SarPniResult\|SarOasysPniResult\|SarPerson\|SarOrganisation\|SarStaff' src` —
+      expect zero hits (all DTOs deleted in their respective PRs)
+- [ ] `grep -rn 'pniResults\|oasysPniResults\|\.person\b' src/main` —
+      expect zero SAR-DTO hits (`Person` unrelated classes may exist,
+      inspect any hit)
+- [ ] KDoc dangling-reference scan on the two surviving
+      SAR-collection getters — `ReferralRepository.getSarReferrals`
+      and `CourseParticipationRepository.getSarParticipations` — no
+      broken `[...]` links to deleted siblings
+- [ ] `SarContractIntegrationTest` companion object — no unreferenced
+      `_ID` consts
+- [ ] **`PersistenceHelper.createOasysPniResult` + `createPerson`
+      orphan sweep** (flagged by PR-8 nine-lens self-review,
+      2026-08-14): `grep -rn 'createOasysPniResult\|createPerson' src/test` —
+      expect **zero hits** post PR-8/9/10/11 merge. If zero, delete
+      both methods from `PersistenceHelper.kt` (including the
+      `createPerson` `LocalDate` bind fix from PR #1115 — dead
+      without a consumer). If any hit surfaces, leave both alive
+      and record in the PR-12 body which round-2 PR re-introduced
+      the caller.
+- [ ] **Orphaned ctor-param sweep on `SubjectAccessRequestService.kt`**
+      (round-2 learning pattern from PR-10 + PR-11):
+      `grep -nE 'private val [a-zA-Z]+Repository' src/main/kotlin/**/service/SubjectAccessRequestService.kt` —
+      each remaining repository injection should be traceable to
+      at least one call site inside the class. Any orphan → delete
+      + mirror the removal on the unit test's `setup()` (drop the
+      `mockk()` decl + ctor arg). PR-10 and PR-11 handled theirs
+      in-flight so this is expected to be a null-check, but the
+      sweep is cheap.
+- [ ] **Fixture per-referral organisation variance** (flagged by
+      PR-10 self-review 2026-08-17): once implemented per "Does"
+      section above, confirm the two referrals in the regenerated
+      golden JSON/HTML render **different** `organisationName`
+      values.
+- [ ] **JSON golden trailing newline** (flagged by PR-11
+      self-review 2026-08-17): `sar-api-response.json` should end
+      **without** a trailing newline (consistent with the file's
+      pre-round-2 state) OR the regen script should be updated to
+      write trailing newlines consistently across all goldens.
+      Pick one and document.
+- [ ] **V145 index drop decision** (flagged by PR-11 self-review
+      2026-08-17): document in PR-12 body whether `idx_staff_last_name`
+      stays (Flyway forward-only default, recommended) or is
+      dropped via new `V146__drop_staff_last_name_index.sql`
+      (only if profile data shows measurable write-hot-path cost).
+      If dropped, also tidy the V144/V145 SQL comments that
+      still name-drop `findByPrisonNumber` for a coherent
+      migration history.
+- [ ] `./gradlew ktlintCheck test` — clean, all tests green
+- [ ] `entity-schema.json` — diff makes sense (removals only, no
+      additions)
+- [ ] `expectedFlywaySchemaVersion` — expected `"145"` unless
+      the V145 index-drop decision above ships a new
+      `V146__drop_staff_last_name_index.sql`, in which case flip
+      to `"146"` in the same PR
+- [ ] Snapshot goldens unchanged from post-PR-11 state (verify
+      `regenerate-sar-snapshots.sh` produces zero diff)
+- [ ] UUID-leak grep on both goldens returns 0
+- [ ] `git status --short` — no accidentally staged `.snyk` /
+      xlsx / other untracked files
+
+## Deliverables
+
+- Cleanup commit(s) on `APG-2546/round-2-hygiene-tidy`
+- PR body: bullet list of every stray thing removed (empty is fine
+  if the four PRs cleaned everything up — the PR still has value as
+  the "confirmed clean" checkpoint before Branston sees the new PDF)
+- Merged to `main` before PR-13 (docs handover) opens
+
+## Description template
+
+```markdown
+## Round-2 code hygiene + test tidy
+
+Standalone cleanup pass after PRs #<8>, #<9>, #<10>, #<11> land the
+four round-2 removals. Nothing here changes observable behaviour or
+snapshot output — this PR only catches cross-PR interactions and
+ties off any orphaned pieces the per-PR audits couldn't see.
+
+### What this removes
+
+- < enumerate: orphaned queries, dead DTOs, unused companion consts,
+  dangling KDoc references, unused imports, dead fixture stanzas >
+- < or "None found — all four round-2 PRs cleaned up their own
+  scope; this PR stands as the confirmed-clean checkpoint" >
+
+### Verification
+
+- `./gradlew ktlintCheck test` — N tests pass (unchanged from
+  post-PR-11), ktlint clean
+- Snapshot regen produces zero diff
+- UUID-leak grep returns 0
+- `expectedFlywaySchemaVersion` still `"145"`, `entity-schema.json`
+  unchanged from post-PR-11
+
+### Not touched
+
+- V145 index (Flyway forward-only)
+- Any surviving KDoc that reads sensibly without the deleted
+  siblings
+
+_(Note: the previous "`PersistenceHelper.createPerson` LocalDate
+bind fix — helper serves other tests" bullet is **superseded** by
+the PR-8 nine-lens self-review finding — grep at `origin/main @
+0cf89850` proved zero other callers, so `createPerson` +
+`createOasysPniResult` are on the deletion candidate list per the
+"Does" section above. Retain the wording only if the pre-merge
+grep surfaces an unexpected caller from a round-2 PR.)_
+```
+
