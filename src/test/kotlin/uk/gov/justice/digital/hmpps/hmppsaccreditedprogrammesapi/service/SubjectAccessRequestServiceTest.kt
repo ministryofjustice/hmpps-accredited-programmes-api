@@ -288,6 +288,9 @@ class SubjectAccessRequestServiceTest {
 
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
+  }
+
+  @Test
   fun `should preserve free-text source when it does not match any staff row`() {
     // Given: participation seeded with a non-username source, and the batch
     // lookup returns an empty result for that specific value while resolving
