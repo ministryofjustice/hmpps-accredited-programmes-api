@@ -65,6 +65,11 @@ constructor(
     existingParticipation.apply {
       referralId = referral.id
       courseId = referral.offering.course.id
+      // `source` is dual-purpose: when auto-populated here it holds the
+      // referrer's NOMIS username; the SAR read layer relies on the
+      // `referrer_user` table to recognise that shape and replace it
+      // with `No Data Held` on the report. Keep this write and the SAR
+      // mapper in step.
       source = referral.referrer.username
       detail = referral.additionalInformation
       lastModifiedDateTime = LocalDateTime.now()
@@ -87,6 +92,8 @@ constructor(
     prisonNumber = referralEntity.prisonNumber,
     courseId = referralEntity.offering.course.id,
     courseName = referralEntity.offering.course.name,
+    // See updateExistingParticipation for the SAR read-side coupling on
+    // this value.
     source = referralEntity.referrer.username,
     detail = referralEntity.additionalInformation,
     createdDateTime = LocalDateTime.now(),
