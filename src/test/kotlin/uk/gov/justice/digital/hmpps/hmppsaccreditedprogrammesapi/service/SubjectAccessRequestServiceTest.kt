@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationEntityFactory
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.CourseParticipationOutcomeFactory
@@ -30,7 +29,6 @@ class SubjectAccessRequestServiceTest {
   private val courseParticipationRepository: CourseParticipationRepository = mockk()
   private val organisationRepository: OrganisationRepository = mockk()
   private val staffLookupService: StaffLookupService = mockk()
-  private val referrerUserRepository: ReferrerUserRepository = mockk()
 
   private lateinit var service: SubjectAccessRequestService
 
@@ -41,7 +39,6 @@ class SubjectAccessRequestServiceTest {
       courseParticipationRepository,
       organisationRepository,
       staffLookupService,
-      referrerUserRepository,
     )
     // By default resolve every username to "River" and every staff ID to an empty
     // result; individual tests can override. This mirrors the batch-lookup contract
@@ -57,9 +54,6 @@ class SubjectAccessRequestServiceTest {
         .associateWith { "River" }
     }
     every { staffLookupService.resolveSurnamesByStaffId(any()) } returns emptyMap<BigInteger, String>()
-    // By default no `source` value matches a `referrer_user` row --
-    // individual tests override to exercise the referrer-username case.
-    every { referrerUserRepository.findExistingUsernamesIn(any()) } returns emptyList()
   }
 
   @Test
@@ -227,7 +221,6 @@ class SubjectAccessRequestServiceTest {
       assertThat(participation.outcomeDetail).isEqualTo("Outcome details")
       assertThat(participation.createdByUser).isEqualTo("River")
       assertThat(participation.updatedByUser).isEqualTo("River")
-      assertThat(participation.source).isEqualTo("River")
     }
 
     verify { referralRepository.getSarReferrals(prn) }
@@ -294,102 +287,5 @@ class SubjectAccessRequestServiceTest {
 
     verify { referralRepository.getSarReferrals(prn) }
     verify { courseParticipationRepository.getSarParticipations(prn) }
-  }
-
-  @Test
-  fun `should preserve free-text source when it does not match any staff row`() {
-    // Given: a participation whose `source` is a free-text label rather
-    // than a username, and the batch staff lookup returns no match for
-    // that specific value. Proves the `forUsername(x) ?: x` fallback
-    // preserves the raw value on the report.
-    val prn = "A1234BC"
-    every { staffLookupService.resolveSurnamesByUsername(any()) } answers {
-      val usernames = firstArg<Collection<String?>>()
-      usernames.asSequence()
-        .filterNotNull()
-        .filter { it.isNotBlank() && it != "OASys" } // "OASys" deliberately unresolvable
-        .toSet()
-        .associateWith { "River" }
-    }
-
-    val participationEntity = CourseParticipationEntityFactory()
-      .withPrisonNumber(prn)
-      .withSource("OASys")
-      .withSetting(CourseParticipationSetting("REMOTE", CourseSetting.COMMUNITY))
-      .withOutcome(CourseParticipationOutcomeFactory().produce())
-      .withCourseName("Drug Awareness")
-      .withCreatedByUsername("creator")
-      .withCreatedDateTime(LocalDateTime.of(2022, 7, 1, 10, 0))
-      .withLastModifiedByUsername("modifier")
-      .withLastModifiedDateTime(LocalDateTime.of(2022, 8, 1, 10, 0))
-      .produce()
-
-    every { referralRepository.getSarReferrals(prn) } returns emptyList()
-    every { courseParticipationRepository.getSarParticipations(prn) } returns listOf(participationEntity)
-
-    // When
-    val result = service.getPrisonContentFor(prn, null, null)
-
-    // Then: raw free-text preserved via the `forUsername(x) ?: x` fallback.
-    assertThat(result).isNotNull()
-    with(result!!.content as SubjectAccessRequestService.Content) {
-      assertThat(courseParticipation).hasSize(1)
-      val participation = courseParticipation[0]
-      assertThat(participation.source).isEqualTo("OASys")
-      // createdByUser / updatedByUser still resolve via the stub.
-      assertThat(participation.createdByUser).isEqualTo("River")
-      assertThat(participation.updatedByUser).isEqualTo("River")
-    }
-  }
-
-  @Test
-  fun `should null out source when it is a known referrer_user and staff lookup misses`() {
-    // A participation whose `source` was auto-populated from a
-    // referrer's NOMIS username and whose referrer is not a POM (so no
-    // matching `staff` row exists). The `referrer_user` prefetch
-    // recognises the value and the mapper nulls it out, so the report
-    // renders `No Data Held` instead of the raw username.
-    val prn = "A1234BC"
-    val referrerUsername = "ABC123"
-    every { staffLookupService.resolveSurnamesByUsername(any()) } answers {
-      val usernames = firstArg<Collection<String?>>()
-      usernames.asSequence()
-        .filterNotNull()
-        .filter { it.isNotBlank() && it != referrerUsername } // referrer misses staff lookup
-        .toSet()
-        .associateWith { "River" }
-    }
-    every { referrerUserRepository.findExistingUsernamesIn(any()) } answers {
-      val values = firstArg<Collection<String>>()
-      values.filter { it == referrerUsername }
-    }
-
-    val participationEntity = CourseParticipationEntityFactory()
-      .withPrisonNumber(prn)
-      .withSource(referrerUsername)
-      .withSetting(CourseParticipationSetting("REMOTE", CourseSetting.COMMUNITY))
-      .withOutcome(CourseParticipationOutcomeFactory().produce())
-      .withCourseName("Drug Awareness")
-      .withCreatedByUsername("creator")
-      .withCreatedDateTime(LocalDateTime.of(2022, 7, 1, 10, 0))
-      .withLastModifiedByUsername("modifier")
-      .withLastModifiedDateTime(LocalDateTime.of(2022, 8, 1, 10, 0))
-      .produce()
-
-    every { referralRepository.getSarReferrals(prn) } returns emptyList()
-    every { courseParticipationRepository.getSarParticipations(prn) } returns listOf(participationEntity)
-
-    val result = service.getPrisonContentFor(prn, null, null)
-
-    assertThat(result).isNotNull()
-    with(result!!.content as SubjectAccessRequestService.Content) {
-      assertThat(courseParticipation).hasSize(1)
-      val participation = courseParticipation[0]
-      // Raw referrer username must not surface on the report.
-      assertThat(participation.source).isNull()
-      // Sibling created/updated-by usernames still resolve via the stub.
-      assertThat(participation.createdByUser).isEqualTo("River")
-      assertThat(participation.updatedByUser).isEqualTo("River")
-    }
   }
 }
