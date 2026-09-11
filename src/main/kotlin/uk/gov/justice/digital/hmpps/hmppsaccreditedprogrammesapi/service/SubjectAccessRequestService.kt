@@ -9,7 +9,6 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.c
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.OrganisationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
-import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferrerUserRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.math.BigInteger
@@ -24,7 +23,6 @@ class SubjectAccessRequestService(
   private val courseParticipationRepository: CourseParticipationRepository,
   private val organisationRepository: OrganisationRepository,
   private val staffLookupService: StaffLookupService,
-  private val referrerUserRepository: ReferrerUserRepository,
 
 ) : HmppsPrisonSubjectAccessRequestService {
 
@@ -126,7 +124,6 @@ class SubjectAccessRequestService(
       participations.forEach {
         add(it.createdByUsername)
         it.lastModifiedByUsername?.let(::add)
-        it.source?.let(::add)
       }
     }
     val staffIds = buildSet {
@@ -135,22 +132,9 @@ class SubjectAccessRequestService(
         it.secondaryPomStaffId?.let(::add)
       }
     }
-    // `CourseParticipationEntity.source` is dual-purpose: it may hold a
-    // referrer's NOMIS username (auto-populated from
-    // `referral.referrer.username`) or a free-text label typed via the
-    // UI (e.g. "OASys"). Prefetch which candidate values exist in the
-    // `referrer_user` table so the mapper can null-out the former and
-    // pass the latter through to the report.
-    val candidateSources = participations.mapNotNull { it.source }.toSet()
-    val referrerUsernames: Set<String> = if (candidateSources.isEmpty()) {
-      emptySet()
-    } else {
-      referrerUserRepository.findExistingUsernamesIn(candidateSources).toSet()
-    }
     return StaffSurnames(
       byUsername = staffLookupService.resolveSurnamesByUsername(usernames),
       byStaffId = staffLookupService.resolveSurnamesByStaffId(staffIds),
-      referrerUsernames = referrerUsernames,
     )
   }
 
@@ -158,20 +142,13 @@ class SubjectAccessRequestService(
    * In-memory view of the two staff-surname maps built once per SAR request.
    * Both lookup helpers short-circuit on null so mappers can consult them
    * uniformly regardless of whether the source column is nullable.
-   *
-   * [referrerUsernames] is the prefetched set of
-   * `CourseParticipationEntity.source` values that match a `referrer_user`
-   * row -- i.e. auto-populated referrer usernames that must not be
-   * rendered verbatim on the report.
    */
   private data class StaffSurnames(
     val byUsername: Map<String, String>,
     val byStaffId: Map<BigInteger, String>,
-    val referrerUsernames: Set<String> = emptySet(),
   ) {
     fun forUsername(username: String?): String? = username?.let { byUsername[it] }
     fun forStaffId(staffId: BigInteger?): String? = staffId?.let { byStaffId[it] }
-    fun isKnownReferrerUsername(value: String?): Boolean = value != null && value in referrerUsernames
   }
 
   data class Content(
@@ -220,10 +197,9 @@ class SubjectAccessRequestService(
   )
 
   data class SarCourseParticipation(
-    val isDraft: Boolean?, // should be here
+    val isDraft: Boolean?,
     val otherCourseName: String?,
     val yearStarted: Int?,
-    val source: String?,
     val type: String?,
     val outcomeStatus: String?,
     val outcomeDetail: String?,
@@ -231,9 +207,9 @@ class SubjectAccessRequestService(
     val location: String?,
     val detail: String?,
     val courseName: String?,
-    val createdByUser: String?, // should be here
+    val createdByUser: String?,
     val createdDateTime: LocalDateTime?,
-    val updatedByUser: String?, // should be here
+    val updatedByUser: String?,
     val updatedDateTime: LocalDateTime?,
   )
 
@@ -241,12 +217,6 @@ class SubjectAccessRequestService(
     SarCourseParticipation(
       isDraft = it.isDraft,
       otherCourseName = it.otherCourseName,
-      // Resolve `source` in three tiers:
-      //   1. staff surname resolves           -> use the surname
-      //   2. value is a known referrer_user   -> null (renders `No Data Held`)
-      //   3. otherwise                         -> raw value (free-text label, e.g. "OASys")
-      source = surnames.forUsername(it.source)
-        ?: it.source?.takeUnless { s -> surnames.isKnownReferrerUsername(s) },
       type = it.setting?.type?.name,
       outcomeStatus = it.outcome?.status?.name,
       outcomeDetail = it.outcomeDetail,
