@@ -58,7 +58,7 @@ class StaffServiceTest {
     every { allocationManagerService.getOffenderAllocation(any()) } returns offenderAllocation
     every { nomisUserRolesService.getStaffDetail("1") } returns primaryPomDetail
     every { nomisUserRolesService.getStaffDetail("2") } returns secondaryPomDetail
-    every { staffRepository.findByStaffId("1".toBigInteger()) } returns StaffEntityFactory()
+    every { staffRepository.findFirstByStaffIdOrderByIdAsc("1".toBigInteger()) } returns StaffEntityFactory()
       .withStaffId(primaryPomDetail.staffId)
       .withFirstName(primaryPomDetail.firstName)
       .withLastName(primaryPomDetail.lastName)
@@ -67,7 +67,7 @@ class StaffServiceTest {
       .withAccountType(AccountType.GENERAL)
       .produce()
 
-    every { staffRepository.findByStaffId("2".toBigInteger()) } returns StaffEntityFactory()
+    every { staffRepository.findFirstByStaffIdOrderByIdAsc("2".toBigInteger()) } returns StaffEntityFactory()
       .withStaffId(secondaryPomDetail.staffId)
       .withFirstName(secondaryPomDetail.firstName)
       .withLastName(secondaryPomDetail.lastName)
@@ -130,7 +130,7 @@ class StaffServiceTest {
     val result = service.fetchPomDetailsIfNotAlreadyExists(null, prisonNumber, pomType)
 
     assertNull(result)
-    verify(exactly = 0) { staffRepository.findByStaffId(any()) }
+    verify(exactly = 0) { staffRepository.findFirstByStaffIdOrderByIdAsc(any()) }
   }
 
   @Test
@@ -141,14 +141,14 @@ class StaffServiceTest {
     val pomType = PomType.PRIMARY
     val existingStaffEntity = mockk<StaffEntity>()
 
-    every { staffRepository.findByStaffId(staffId) } returns existingStaffEntity
+    every { staffRepository.findFirstByStaffIdOrderByIdAsc(staffId) } returns existingStaffEntity
 
     // Act
     val result = service.fetchPomDetailsIfNotAlreadyExists(staffId, prisonNumber, pomType)
 
     // Assert
     assertEquals(existingStaffEntity, result)
-    verify { staffRepository.findByStaffId(staffId) }
+    verify { staffRepository.findFirstByStaffIdOrderByIdAsc(staffId) }
     verify(exactly = 0) { nomisUserRolesService.getStaffDetail(any()) }
     verify(exactly = 0) { staffRepository.save(any()) }
   }
