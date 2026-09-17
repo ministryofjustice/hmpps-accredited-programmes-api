@@ -262,4 +262,67 @@ class StaffRepositoryIntegrationTest : IntegrationTestBase() {
     // Then
     result.map { it.lastName } shouldBe listOf("Alpha", "Bravo")
   }
+
+  // -------------------------------------------------------------------------
+  // Regression coverage for findFirstByStaffIdOrderByIdAsc.
+  //
+  // The predecessor `findByStaffId` used Spring Data's single-result derivation
+  // and threw IncorrectResultSizeDataAccessException when it hit one of the
+  // duplicated staff_ids known to exist in prod (see V144). That surfaced as
+  // HTTP 500 / "something went wrong" on `GET /referrals/{id}` because
+  // `StaffService.getStaffDetail` calls into this method.
+  // -------------------------------------------------------------------------
+
+  @Test
+  fun `findFirstByStaffIdOrderByIdAsc returns the single row when staffId is unique`() {
+    // Given
+    seedStaffRow()
+
+    // When
+    val result = staffRepository.findFirstByStaffIdOrderByIdAsc(seededStaffId)
+
+    // Then
+    result?.lastName shouldBe "River"
+  }
+
+  @Test
+  fun `findFirstByStaffIdOrderByIdAsc returns null when staffId is not found`() {
+    // Given
+    persistenceHelper.clearAllTableContent()
+
+    // When
+    val result = staffRepository.findFirstByStaffIdOrderByIdAsc(BigInteger.valueOf(9_999_999))
+
+    // Then
+    result shouldBe null
+  }
+
+  @Test
+  fun `findFirstByStaffIdOrderByIdAsc returns the row with the lowest UUID when staffId has duplicates`() {
+    // Given – two rows share staffId 42, distinct UUIDs. alpha's UUID sorts first.
+    persistenceHelper.clearAllTableContent()
+    persistenceHelper.createStaff(
+      id = idBravo,
+      staffId = "42".toBigInteger(),
+      firstName = "Bea",
+      lastName = "Bravo",
+      username = "BB",
+      primaryEmail = "b@justice.gov.uk",
+    )
+    persistenceHelper.createStaff(
+      id = idAlpha,
+      staffId = "42".toBigInteger(),
+      firstName = "Alex",
+      lastName = "Alpha",
+      username = "AA",
+      primaryEmail = "a@justice.gov.uk",
+    )
+
+    // When – must not throw IncorrectResultSizeDataAccessException.
+    val result = staffRepository.findFirstByStaffIdOrderByIdAsc("42".toBigInteger())
+
+    // Then – deterministic winner is Alpha.
+    result?.lastName shouldBe "Alpha"
+    result?.username shouldBe "AA"
+  }
 }

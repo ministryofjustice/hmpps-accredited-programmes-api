@@ -37,7 +37,7 @@ class StaffService(
       return null
     }
 
-    val staff = staffRepository.findByStaffId(staffId)
+    val staff = staffRepository.findFirstByStaffIdOrderByIdAsc(staffId)
     return if (staff == null) {
       val primaryPom = nomisUserRolesService.getStaffDetail(staffId.toString())
       staffRepository.save(buildStaffEntity(primaryPom))
@@ -46,7 +46,7 @@ class StaffService(
     }
   }
 
-  fun getStaffDetail(staffId: BigInteger?): StaffEntity? = staffId?.let { staffRepository.findByStaffId(it) }
+  fun getStaffDetail(staffId: BigInteger?): StaffEntity? = staffId?.let { staffRepository.findFirstByStaffIdOrderByIdAsc(it) }
 
   fun buildStaffEntity(staffDetailResponse: StaffDetailResponse?): StaffEntity = StaffEntity(
     staffId = staffDetailResponse?.staffId,

@@ -28,7 +28,20 @@ interface StaffIdSurnameProjection {
 @Repository
 interface StaffRepository : JpaRepository<StaffEntity, UUID> {
 
-  fun findByStaffId(staffId: BigInteger): StaffEntity?
+  /**
+   * Look up a staff row by `staff_id`.
+   *
+   * Production data is known to contain multiple staff rows sharing the same
+   * `staff_id` (see V144). Using Spring Data's plain `findByStaffId` therefore
+   * throws `IncorrectResultSizeDataAccessException` when it hits one of those
+   * duplicated ids — which surfaced as a 500 / "something went wrong" on
+   * `GET /referrals/{id}` (see `StaffService.getStaffDetail`).
+   *
+   * `findFirst…OrderByIdAsc` picks the deterministic winner (lowest `id`),
+   * matching the pattern used by [findLastNameByStaffId] /
+   * [findSurnamesByStaffIds].
+   */
+  fun findFirstByStaffIdOrderByIdAsc(staffId: BigInteger): StaffEntity?
 
   @Query("SELECT s.lastName FROM StaffEntity s WHERE s.username = :username ORDER BY s.id")
   fun findLastNameByUsername(username: String): List<String>
