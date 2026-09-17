@@ -6,15 +6,16 @@
 -- Background
 -- ----------
 -- V121 defined the view with a plain
---   LEFT OUTER JOIN staff st ON st.staff_id = r.primary_pom_staff_id
+--   left outer join staff st on st.staff_id = r.primary_pom_staff_id
 -- Production data is known to contain multiple staff rows sharing the
 -- same `staff_id` (see V144 for the same finding on the surname
 -- projections). Because `staff_id` is not unique, every referral whose
 -- POM has N duplicates was returning N rows from the view. Hibernate
--- returns a `List<ReferralViewEntity>` and does not dedupe by `@Id`, so
--- the same referral appeared N times on the caselist. INC4684438 (A2519CZ)
--- reproduced this: the prisoner's POM has 2 rows in `staff`, and both
--- referrals for that prisoner rendered twice on the Assess caselist.
+-- returns a `List<ReferralViewEntity>` and does not dedupe by `@Id`,
+-- so the same referral appeared N times on the caselist. INC4684438
+-- (A2519CZ) reproduced this: the prisoner's POM has 2 rows in `staff`
+-- and both referrals for that prisoner rendered twice on the Assess
+-- caselist.
 --
 -- Fix
 -- ---
@@ -22,15 +23,27 @@
 -- at most one row per referral, ordered by the staff `id` so the
 -- winner is deterministic (same rule the application code uses in
 -- `StaffRepository.findFirstByStaffIdOrderByIdAsc`, sibling PR
--- APG-2679/fix-staff-lookup-500-on-duplicate-staff-id).
+-- APG-2679/fix-staff-lookup-500-on-duplicate-staff-id). V144's
+-- `idx_staff_staff_id` makes each lookup an index scan.
 --
 -- Nothing else about the view changes: same columns, same types, same
--- order, same `where r.deleted = false` filter.
+-- order, same `where r.deleted = false` filter. The SELECT list is
+-- kept character-identical to V121 (lowercase keywords) so the diff
+-- between V121 and V146 highlights only the semantic change.
+--
+-- Positive side effect
+-- --------------------
+-- `Page<>.totalElements` for callers of
+-- `ReferralViewRepository.getReferralsByOrganisationId` /
+-- `getReferralsByUsername` now reports the true unique referral count
+-- rather than a fan-out-inflated count. Pagination page counts and
+-- next/prev button state therefore become correct for prisoners whose
+-- POM has duplicate `staff_id` rows.
 
 DROP VIEW IF EXISTS referral_view;
 
-CREATE OR REPLACE VIEW referral_view AS
-SELECT r.referral_id,
+create or replace view referral_view as
+select r.referral_id,
        r.prison_number,
        p.forename,
        p.surname,
@@ -42,34 +55,34 @@ SELECT r.referral_id,
        p.non_dto_release_date_type,
        p.location,
        o.organisation_id,
-       org.name AS organisation_name,
+       org.name as organisation_name,
        r.status,
-       rs.description AS status_description,
-       rs.colour AS status_colour,
+       rs.description as status_description,
+       rs.colour as status_colour,
        r.referrer_username,
-       c.name AS course_name,
+       c.name as course_name,
        c.audience,
        r.submitted_on,
        p.sentence_type,
-       st.username AS primary_pom_username,
+       st.username as primary_pom_username,
        r.has_ldc,
-       CASE
-           WHEN c.list_display_name IS NOT NULL THEN c.list_display_name
-           ELSE c.name
-           END AS list_display_name
+       case
+           when c.list_display_name is not null then c.list_display_name
+           else c.name
+           end as list_display_name
 
-FROM referral r
-         LEFT OUTER JOIN person p ON r.prison_number = p.prison_number
-         LEFT OUTER JOIN offering o ON o.offering_id = r.offering_id
-         LEFT OUTER JOIN course c ON c.course_id = o.course_id
-         LEFT OUTER JOIN organisation org ON org.code = o.organisation_id
-         LEFT OUTER JOIN referral_status rs ON rs.code = r.status
-         LEFT JOIN LATERAL (
-             SELECT username
-             FROM staff
-             WHERE staff_id = r.primary_pom_staff_id
-             ORDER BY id
-             LIMIT 1
-             ) st ON TRUE
-WHERE r.deleted = false;
+from referral r
+         left outer join person p on r.prison_number = p.prison_number
+         left outer join offering o on o.offering_id = r.offering_id
+         left outer join course c on c.course_id = o.course_id
+         left outer join organisation org on org.code = o.organisation_id
+         left outer join referral_status rs on rs.code = r.status
+         left join lateral (
+             select username
+             from staff
+             where staff_id = r.primary_pom_staff_id
+             order by id
+             limit 1
+             ) st on true
+where r.deleted = false;
 

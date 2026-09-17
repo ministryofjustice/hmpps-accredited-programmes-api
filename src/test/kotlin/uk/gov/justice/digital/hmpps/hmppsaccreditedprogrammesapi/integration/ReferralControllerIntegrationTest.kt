@@ -1711,6 +1711,62 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     matches.size shouldBe 1
   }
 
+  /**
+   * APG-2679 mirror regression: the same `referral_view` also backs
+   * `GET /referrals/view/me/dashboard`, so the fan-out fixed by V146
+   * must be gone for the by-username caller too. Same seed shape as
+   * the by-organisation test above.
+   */
+  @Test
+  fun `My referrals view returns a referral exactly once when its POM has duplicate staff rows (APG-2679)`() {
+    val referrerUsername = "APG_2679_POM_REFERRER"
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken(referrerUsername))
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralId = UUID.randomUUID()
+    val duplicatedStaffId = "1184611".toBigInteger()
+
+    persistenceHelper.createStaff(
+      id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+      staffId = duplicatedStaffId,
+      firstName = "Alex",
+      lastName = "Alpha",
+      username = "APG_2679_POM_ALPHA",
+      primaryEmail = "alpha@justice.gov.uk",
+    )
+    persistenceHelper.createStaff(
+      id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+      staffId = duplicatedStaffId,
+      firstName = "Bea",
+      lastName = "Bravo",
+      username = "APG_2679_POM_BRAVO",
+      primaryEmail = "bravo@justice.gov.uk",
+    )
+    persistenceHelper.createReferrerUser(referrerUsername)
+    persistenceHelper.createReferral(
+      referralId = referralId,
+      offeringId = offering.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = referrerUsername,
+      additionalInformation = "APG-2679 by-username fan-out regression",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "REFERRAL_SUBMITTED",
+      submittedOn = LocalDateTime.parse("2025-04-07T12:00:00"),
+      primaryPomStaffId = duplicatedStaffId,
+      hasLdc = false,
+    )
+
+    val summary = getReferralViewsByUsername(
+      statusFilter = listOf("REFERRAL_SUBMITTED"),
+      token = jwtAuthHelper.bearerToken(referrerUsername),
+    )
+
+    // Pre-V146 the same referral was returned twice for the caller.
+    val matches = summary.content?.filter { it.id == referralId }.orEmpty()
+    matches.size shouldBe 1
+  }
+
   @Test
   fun `Retrieving a list of filtered referral views for the current user should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
