@@ -1646,6 +1646,127 @@ class ReferralControllerIntegrationTest : IntegrationTestBase() {
     summary1.content.shouldNotBeEmpty()
   }
 
+  /**
+   * APG-2679 regression: when a POM has multiple `staff` rows sharing
+   * the same `staff_id` (a known DQ issue documented in V144), the
+   * caselist used to return the same referral once per duplicated
+   * staff row because `referral_view` did a naive
+   * `LEFT JOIN staff ... ON staff_id = primary_pom_staff_id` and
+   * Hibernate does not dedupe on `@Id` when hydrating a `List` from a
+   * DB view. V146 rewrites that join as a LATERAL `LIMIT 1` so at most
+   * one staff row can ever match per referral.
+   *
+   * Reproduces INC4684438: A2519CZ's POM had 2 staff rows sharing
+   * `staff_id = 1184611`, causing both referrals to appear twice on
+   * the Assess caselist.
+   */
+  @Test
+  fun `Assess caselist returns a referral exactly once when its POM has duplicate staff rows (APG-2679)`() {
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralId = UUID.randomUUID()
+    val duplicatedStaffId = "1184611".toBigInteger()
+
+    // Two staff rows sharing the same staff_id — different UUIDs so
+    // the LATERAL's `ORDER BY id LIMIT 1` has something to pick.
+    persistenceHelper.createStaff(
+      id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+      staffId = duplicatedStaffId,
+      firstName = "Alex",
+      lastName = "Alpha",
+      username = "APG_2679_ALPHA",
+      primaryEmail = "alpha@justice.gov.uk",
+    )
+    persistenceHelper.createStaff(
+      id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+      staffId = duplicatedStaffId,
+      firstName = "Bea",
+      lastName = "Bravo",
+      username = "APG_2679_BRAVO",
+      primaryEmail = "bravo@justice.gov.uk",
+    )
+    persistenceHelper.createReferrerUser("APG_2679_REFERRER")
+    persistenceHelper.createReferral(
+      referralId = referralId,
+      offeringId = offering.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = "APG_2679_REFERRER",
+      additionalInformation = "APG-2679 fan-out regression",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "REFERRAL_SUBMITTED",
+      submittedOn = LocalDateTime.parse("2025-04-07T12:00:00"),
+      primaryPomStaffId = duplicatedStaffId,
+      hasLdc = false,
+    )
+
+    val summary = getReferralViewsByOrganisationId(
+      organisationId = offering.organisationId,
+      statusFilter = listOf("REFERRAL_SUBMITTED"),
+    )
+
+    // Pre-V146 this was 2; V146's LATERAL LIMIT 1 makes it 1.
+    val matches = summary.content?.filter { it.id == referralId }.orEmpty()
+    matches.size shouldBe 1
+  }
+
+  /**
+   * APG-2679 mirror regression: the same `referral_view` also backs
+   * `GET /referrals/view/me/dashboard`, so the fan-out fixed by V146
+   * must be gone for the by-username caller too. Same seed shape as
+   * the by-organisation test above.
+   */
+  @Test
+  fun `My referrals view returns a referral exactly once when its POM has duplicate staff rows (APG-2679)`() {
+    val referrerUsername = "APG_2679_POM_REFERRER"
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken(referrerUsername))
+    val course = getAllCourses().first()
+    val offering = getAllOfferingsForCourse(course.id).first()
+    val referralId = UUID.randomUUID()
+    val duplicatedStaffId = "1184611".toBigInteger()
+
+    persistenceHelper.createStaff(
+      id = UUID.fromString("00000000-0000-0000-0000-000000000001"),
+      staffId = duplicatedStaffId,
+      firstName = "Alex",
+      lastName = "Alpha",
+      username = "APG_2679_POM_ALPHA",
+      primaryEmail = "alpha@justice.gov.uk",
+    )
+    persistenceHelper.createStaff(
+      id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+      staffId = duplicatedStaffId,
+      firstName = "Bea",
+      lastName = "Bravo",
+      username = "APG_2679_POM_BRAVO",
+      primaryEmail = "bravo@justice.gov.uk",
+    )
+    persistenceHelper.createReferrerUser(referrerUsername)
+    persistenceHelper.createReferral(
+      referralId = referralId,
+      offeringId = offering.id!!,
+      prisonNumber = PRISON_NUMBER_1,
+      referrerUsername = referrerUsername,
+      additionalInformation = "APG-2679 by-username fan-out regression",
+      oasysConfirmed = true,
+      hasReviewedProgrammeHistory = true,
+      status = "REFERRAL_SUBMITTED",
+      submittedOn = LocalDateTime.parse("2025-04-07T12:00:00"),
+      primaryPomStaffId = duplicatedStaffId,
+      hasLdc = false,
+    )
+
+    val summary = getReferralViewsByUsername(
+      statusFilter = listOf("REFERRAL_SUBMITTED"),
+      token = jwtAuthHelper.bearerToken(referrerUsername),
+    )
+
+    // Pre-V146 the same referral was returned twice for the caller.
+    val matches = summary.content?.filter { it.id == referralId }.orEmpty()
+    matches.size shouldBe 1
+  }
+
   @Test
   fun `Retrieving a list of filtered referral views for the current user should return 200 with correct body`() {
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
