@@ -17,6 +17,8 @@ ready to be released once merged.
 
 - [ ] There are changes required to the Accredited Programmes UI for this change to work...
   - [ ] ... and they been released to production already
+- [ ] This PR modifies `src/main/resources/sar_template.mustache`...
+  - [ ] ... and I will [register the new template](../doc/how-to/register-sar-template.md) with the SAR team **before deploying** to each environment (dev, preprod, prod). Registering ahead of time stores the new template as `PENDING` and it is auto-promoted to `PUBLISHED` when the worker first fetches it, avoiding any ERRORED SARs during the release.
 
 ### Post-merge
 
