@@ -28,6 +28,19 @@
     },
     {
       "request": {
+        "url": "/assessments/id/2516194818/risk/predictors/all",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "arns-ogrs4-predictors-with-assessment-type.json"
+      }
+    },
+    {
+      "request": {
         "url": "/assessments/id/99999999/risk/predictors/all",
         "method": "GET"
       },

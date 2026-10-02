@@ -129,6 +129,40 @@ class AssessRiskAndNeedsApiClientIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should tolerate unknown fields anywhere in the predictors response (e g new ARNS assessmentType and nested fields)`() {
+    // Given an assessment whose 200 response carries fields our DTOs don't model yet,
+    // both at the top level and nested inside predictor objects
+    val assessmentPk = 2516194818L
+
+    // When
+    when (val response = assessRiskAndNeedsApiClient.getRiskPredictors(assessmentPk)) {
+      // Then deserialisation must succeed rather than throw UnrecognizedPropertyException
+      is ClientResult.Success -> {
+        assertThat(response.status).isEqualTo(HttpStatus.OK)
+        val body = response.body
+        assertThat(body.outputVersion).isEqualTo("2")
+        assertThat(body.status).isEqualTo(AssessmentStatus.COMPLETE)
+
+        val versioned = body as AllPredictorVersionedDto
+        assertThat(versioned.output?.combinedSeriousReoffendingPredictor?.algorithmVersion).isEqualTo("2.0")
+      }
+      is ClientResult.Failure.Other<*> -> {
+        response.exception.printStackTrace()
+        fail("Unknown field should be ignored, but deserialisation failed: ${response::class.simpleName}")
+      }
+      is ClientResult.Failure.StatusCode<*> -> fail(
+        """
+          Unexpected status code result:
+          Method: ${response.method}
+          Path: ${response.path}
+          Status: ${response.status}
+          Body: ${response.body}
+        """.trimIndent(),
+      )
+    }
+  }
+
+  @Test
   fun `should return NOT FOUND for unknown assessment id`() {
     // Given
     val unknownAssessmentPk = 99999999L
