@@ -1,0 +1,23 @@
+{
+  "completedDate": "2024-01-22T12:16:44",
+  "status": "COMPLETE",
+  "outputVersion": "2",
+  "assessmentType": "LAYER3",
+  "output": {
+    "assessmentType": "LAYER3",
+    "allReoffendingPredictor": {
+      "staticOrDynamic": "STATIC",
+      "score": 0.12,
+      "band": "LOW",
+      "someFutureNestedField": "ignore-me"
+    },
+    "combinedSeriousReoffendingPredictor": {
+      "algorithmVersion": "2.0",
+      "staticOrDynamic": "STATIC",
+      "score": 0.15,
+      "band": "MEDIUM",
+      "anotherFutureNestedField": 123
+    }
+  }
+}
+

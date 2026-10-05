@@ -15,8 +15,12 @@ class AssessRiskAndNeedsService(
 
   fun getRiskPredictors(assessmentId: Long): AllPredictorVersioned<Any>? = when (val result = assessRiskAndNeedsApiClient.getRiskPredictors(assessmentId)) {
     is ClientResult.Failure -> {
+      // Degrade gracefully: a failure retrieving ARNS risk predictors for a single assessment
+      // must not 500 the whole risks-and-alerts endpoint. Log and return null so the caller
+      // (OasysService.getRisks) can build a partial Risks response. This also covers transient
+      // ARNS connection drops, not just unknown-field deserialisation failures.
       log.error("Failure when retrieving risk predictors for assessment id : $assessmentId", result.toException())
-      result.throwException()
+      null
     }
 
     is ClientResult.Success -> result.body
