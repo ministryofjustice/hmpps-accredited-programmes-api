@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocati
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client.allocationManagerApi.model.PomDetail
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.util.PRISON_NUMBER_1
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.OfferingEntity
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.create.PersonEntity
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.entity.view.ReferralViewRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.CourseParticipationRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.PersonRepository
@@ -264,6 +265,84 @@ class DomainEventsListenerTest : IntegrationTestBase() {
     pniResultRepository.findAllByPrisonNumber(removedNomsNumber).shouldBeEmpty()
     val updatedPniResult = pniResultRepository.findAllByPrisonNumber(nomsNumber).firstOrNull()
     assertThat(updatedPniResult?.prisonNumber).isEqualTo(nomsNumber)
+  }
+
+  @Test
+  fun `should handle prisoner merged message when a person record already exists for the new prisoner number`() {
+    // Given - a referral (and person cache row) exists for the old number, AND a person cache row
+    // already exists for the new number (e.g. independently cached after the NOMIS merge). This
+    // previously caused a unique constraint violation on person.prison_number.
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+
+    val nomsNumber = "A1234AA"
+    val removedNomsNumber = "C6666DD"
+    val createdReferral = createReferral(offeringEntity.id!!, removedNomsNumber)
+
+    persistenceHelper.createCourseParticipation(
+      CourseParticipationEntityFactory()
+        .withReferralId(createdReferral.id)
+        .withPrisonNumber(removedNomsNumber)
+        .produce(),
+    )
+
+    persistenceHelper.createPniResult(
+      PniResultEntityFactory()
+        .withPrisonNumber(removedNomsNumber)
+        .withReferralId(createdReferral.id)
+        .produce(),
+    )
+
+    // a pre-existing, authoritative person cache row for the new number, flagged via a distinctive forename
+    personRepository.save(
+      PersonEntity(
+        surname = "Smith",
+        forename = "PreExisting",
+        prisonNumber = nomsNumber,
+        conditionalReleaseDate = null,
+        paroleEligibilityDate = null,
+        tariffExpiryDate = null,
+        earliestReleaseDate = null,
+        earliestReleaseDateType = null,
+        indeterminateSentence = null,
+        nonDtoReleaseDateType = null,
+        sentenceType = null,
+        location = null,
+        gender = null,
+      ),
+    )
+
+    // When
+    val eventType = "prison-offender-events.prisoner.merged"
+    sendDomainEvent(
+      DomainEventsMessage(
+        eventType,
+        additionalInformation = mapOf(
+          "nomsNumber" to nomsNumber,
+          "removedNomsNumber" to removedNomsNumber,
+        ),
+      ),
+    )
+
+    // Then - the message is consumed successfully (no constraint violation / infinite retry)
+    await untilCallTo {
+      domainEventQueueClient.countMessagesOnQueue(domainEventQueue.queueUrl).get()
+    } matches { it == 0 }
+
+    // the referral is updated to the new number
+    assertThat(referralRepository.findAllByPrisonNumber(removedNomsNumber)).isEmpty()
+    assertThat(referralRepository.findAllByPrisonNumber(nomsNumber)).hasSize(1)
+
+    // the stale old-number person row is removed, and the pre-existing new-number row is preserved
+    personRepository.findPersonEntityByPrisonNumber(removedNomsNumber).shouldBeNull()
+    val survivingPerson = personRepository.findPersonEntityByPrisonNumber(nomsNumber)
+    assertThat(survivingPerson?.prisonNumber).isEqualTo(nomsNumber)
+    assertThat(survivingPerson?.forename).isEqualTo("PreExisting")
+
+    // course participation and pni result are updated to the new number
+    courseParticipationRepository.findByPrisonNumber(removedNomsNumber).shouldBeEmpty()
+    assertThat(courseParticipationRepository.findByPrisonNumber(nomsNumber).firstOrNull()?.prisonNumber).isEqualTo(nomsNumber)
+    pniResultRepository.findAllByPrisonNumber(removedNomsNumber).shouldBeEmpty()
+    assertThat(pniResultRepository.findAllByPrisonNumber(nomsNumber).firstOrNull()?.prisonNumber).isEqualTo(nomsNumber)
   }
 
   fun createReferral(offeringId: UUID, prisonNumber: String = PRISON_NUMBER_1) = webTestClient
