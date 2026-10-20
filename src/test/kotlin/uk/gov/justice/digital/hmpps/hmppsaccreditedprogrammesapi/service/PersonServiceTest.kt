@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.reposito
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.ReferralRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.domain.repository.SentenceCategoryRepository
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.testutil.SentenceInformationFactory
+import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.unit.domain.entity.factory.ReferralEntityFactory
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -271,6 +272,93 @@ class PersonServiceTest {
     verify(personRepository).save(personEntityCaptor.capture())
     val personEntity = personEntityCaptor.value
     personEntity.sentenceType shouldBe "Determinate and Indeterminate"
+  }
+
+  @Test
+  fun `updatePrisonNumberForPrisoner updates the existing person record when no person record exists for the new number`() {
+    // Given
+    val oldNumber = "A8937EX"
+    val newNumber = "A5800CN"
+    val referral = ReferralEntityFactory().withPrisonNumber(oldNumber).produce()
+    val existingPerson = PersonEntity(
+      surname = "Doe",
+      forename = "John",
+      prisonNumber = oldNumber,
+      conditionalReleaseDate = null,
+      paroleEligibilityDate = null,
+      tariffExpiryDate = null,
+      earliestReleaseDate = null,
+      earliestReleaseDateType = null,
+      indeterminateSentence = null,
+      nonDtoReleaseDateType = null,
+      sentenceType = null,
+      location = null,
+      gender = null,
+    )
+    whenever(referralRepository.findAllByPrisonNumberIncludingDeleted(oldNumber)).thenReturn(listOf(referral))
+    whenever(personRepository.findPersonEntityByPrisonNumber(oldNumber)).thenReturn(existingPerson)
+    whenever(personRepository.findPersonEntityByPrisonNumber(newNumber)).thenReturn(null)
+    whenever(courseParticipationRepository.findByPrisonNumber(oldNumber)).thenReturn(emptyList())
+    whenever(pniResultRepository.findAllByPrisonNumber(oldNumber)).thenReturn(emptyList())
+
+    // When
+    personService.updatePrisonNumberForPrisoner(newNumber, oldNumber)
+
+    // Then
+    existingPerson.prisonNumber shouldBe newNumber
+    referral.prisonNumber shouldBe newNumber
+    verify(personRepository, org.mockito.Mockito.never()).delete(org.mockito.kotlin.any())
+  }
+
+  @Test
+  fun `updatePrisonNumberForPrisoner deletes the stale old person record when a person record already exists for the new number`() {
+    // Given
+    val oldNumber = "A8937EX"
+    val newNumber = "A5800CN"
+    val referral = ReferralEntityFactory().withPrisonNumber(oldNumber).produce()
+    val stalePerson = PersonEntity(
+      surname = "Doe",
+      forename = "John",
+      prisonNumber = oldNumber,
+      conditionalReleaseDate = null,
+      paroleEligibilityDate = null,
+      tariffExpiryDate = null,
+      earliestReleaseDate = null,
+      earliestReleaseDateType = null,
+      indeterminateSentence = null,
+      nonDtoReleaseDateType = null,
+      sentenceType = null,
+      location = null,
+      gender = null,
+    )
+    val existingPersonForNewNumber = PersonEntity(
+      surname = "Doe",
+      forename = "John",
+      prisonNumber = newNumber,
+      conditionalReleaseDate = null,
+      paroleEligibilityDate = null,
+      tariffExpiryDate = null,
+      earliestReleaseDate = null,
+      earliestReleaseDateType = null,
+      indeterminateSentence = null,
+      nonDtoReleaseDateType = null,
+      sentenceType = null,
+      location = null,
+      gender = null,
+    )
+    whenever(referralRepository.findAllByPrisonNumberIncludingDeleted(oldNumber)).thenReturn(listOf(referral))
+    whenever(personRepository.findPersonEntityByPrisonNumber(oldNumber)).thenReturn(stalePerson)
+    whenever(personRepository.findPersonEntityByPrisonNumber(newNumber)).thenReturn(existingPersonForNewNumber)
+    whenever(courseParticipationRepository.findByPrisonNumber(oldNumber)).thenReturn(emptyList())
+    whenever(pniResultRepository.findAllByPrisonNumber(oldNumber)).thenReturn(emptyList())
+
+    // When
+    personService.updatePrisonNumberForPrisoner(newNumber, oldNumber)
+
+    // Then
+    verify(personRepository).delete(stalePerson)
+    existingPersonForNewNumber.prisonNumber shouldBe newNumber
+    referral.prisonNumber shouldBe newNumber
   }
 
   @Test

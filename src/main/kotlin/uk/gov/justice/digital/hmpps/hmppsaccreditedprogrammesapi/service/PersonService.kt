@@ -270,24 +270,38 @@ class PersonService(
       return
     }
 
+    // Update the prison number on the referral table
     referrals.forEach { referral ->
-      // update the prison number on the referral table
       referral.prisonNumber = newPrisonerNumber
       log.info("Updated prison number on referral record from $removedPrisonerNumber to $newPrisonerNumber")
-      // update the prison number on the person table
-      val person = personRepository.findPersonEntityByPrisonNumber(removedPrisonerNumber)
-      log.info("Updated prison number on person record from $removedPrisonerNumber to $newPrisonerNumber")
-      person?.prisonNumber = newPrisonerNumber
-      // update the prison number on the course participation table
-      courseParticipationRepository.findByPrisonNumber(removedPrisonerNumber).forEach {
-        it.prisonNumber = newPrisonerNumber
-        log.info("Updated prison number on course participation record from $removedPrisonerNumber to $newPrisonerNumber")
+    }
+
+    // Update the prison number on the person table.
+    // The person cache table has a UNIQUE constraint on prison_number. If a person record already
+    // exists for the new prisoner number (e.g. it was independently cached after the NOMIS merge
+    // but before this ran), renaming the old record would violate that constraint. In that case the
+    // existing new-number record is authoritative, so the stale old-number record is deleted instead.
+    // No other table references person by id, so deleting the stale record is safe.
+    personRepository.findPersonEntityByPrisonNumber(removedPrisonerNumber)?.let { stalePerson ->
+      if (personRepository.findPersonEntityByPrisonNumber(newPrisonerNumber) == null) {
+        stalePerson.prisonNumber = newPrisonerNumber
+        log.info("Updated prison number on person record from $removedPrisonerNumber to $newPrisonerNumber")
+      } else {
+        log.warn("Person record already exists for new prisoner number $newPrisonerNumber. Deleting stale person record for $removedPrisonerNumber")
+        personRepository.delete(stalePerson)
       }
-      // update the prison number on the pni result table
-      pniResultRepository.findAllByPrisonNumber(removedPrisonerNumber).forEach {
-        it.prisonNumber = newPrisonerNumber
-        log.info("Updated prison number on pni result record from $removedPrisonerNumber to $newPrisonerNumber")
-      }
+    }
+
+    // Update the prison number on the course participation table
+    courseParticipationRepository.findByPrisonNumber(removedPrisonerNumber).forEach {
+      it.prisonNumber = newPrisonerNumber
+      log.info("Updated prison number on course participation record from $removedPrisonerNumber to $newPrisonerNumber")
+    }
+
+    // Update the prison number on the pni result table
+    pniResultRepository.findAllByPrisonNumber(removedPrisonerNumber).forEach {
+      it.prisonNumber = newPrisonerNumber
+      log.info("Updated prison number on pni result record from $removedPrisonerNumber to $newPrisonerNumber")
     }
   }
 
