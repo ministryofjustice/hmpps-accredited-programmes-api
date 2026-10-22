@@ -15,6 +15,8 @@ configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
 }
 
+ext["netty.version"] = "4.2.18.Final"
+
 dependencies {
   val kotestVersion = "6.2.5"
   val springdocVersion = "3.0.3"
