@@ -18,13 +18,15 @@ configurations {
 ext["netty.version"] = "4.2.18.Final"
 // CVE-2026-47884 / CVE-2026-47890
 ext["spring-framework.version"] = "7.0.10"
+// CVE-2026-59270
+ext["spring-security.version"] = "7.0.8"
 
 dependencies {
   val kotestVersion = "6.2.5"
   val springdocVersion = "3.0.3"
   val sentryVersion = "8.41.0"
   val jsonWebtokenVersion = "0.13.0"
-  val springSecurityVersion = "7.0.5"
+  val springSecurityVersion = "7.0.8"
   val flywayVersion = "13.10.0"
 
   runtimeOnly("org.postgresql:postgresql:42.7.11")
