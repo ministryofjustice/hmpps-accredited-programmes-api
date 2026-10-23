@@ -16,8 +16,7 @@ configurations {
 }
 
 ext["netty.version"] = "4.2.18.Final"
-// Override Spring Framework (Spring Boot BOM pins 7.0.7) to patch CVE-2026-47884 / CVE-2026-47890
-// (and the other 7.0.8 CVEs). OSS fix is 7.0.9+; pinning to latest 7.0.x patch.
+// CVE-2026-47884 / CVE-2026-47890
 ext["spring-framework.version"] = "7.0.10"
 
 dependencies {
