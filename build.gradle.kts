@@ -20,6 +20,8 @@ ext["netty.version"] = "4.2.18.Final"
 ext["spring-framework.version"] = "7.0.10"
 // CVE-2026-59270
 ext["spring-security.version"] = "7.0.8"
+// CVE-2026-68525
+ext["tomcat.version"] = "11.0.27"
 
 dependencies {
   val kotestVersion = "6.2.5"
@@ -52,8 +54,8 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.2.2")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.22")
-  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:11.0.22")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.27")
+  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:11.0.27")
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:5.0.1")
