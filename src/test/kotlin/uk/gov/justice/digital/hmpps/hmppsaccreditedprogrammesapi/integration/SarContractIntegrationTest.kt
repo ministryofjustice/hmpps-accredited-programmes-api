@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarFlywaySchemaTest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelper
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarJpaEntitiesTest
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarReportTest
+import uk.gov.justice.hmpps.kotlin.auth.AuthSource
 import uk.gov.justice.hmpps.test.kotlin.auth.JwtAuthorisationHelper
 import java.math.BigInteger
 import java.time.Duration
@@ -54,6 +55,7 @@ class SarContractIntegrationTest :
       attachmentsExpected = false,
       expectedFlywaySchemaVersion = "146",
       expectedJpaEntitySchemaPath = "/sar/entity-schema.json",
+      objectMapper = objectMapper,
     )
   }
 
@@ -78,6 +80,7 @@ class SarContractIntegrationTest :
       username: String?,
       scope: List<String>,
       roles: List<String>,
+      authSource: AuthSource,
     ): (HttpHeaders) -> Unit {
       val token = delegate.createJwtAccessToken(
         username = username,
@@ -85,6 +88,7 @@ class SarContractIntegrationTest :
         roles = (roles + "ROLE_ACCREDITED_PROGRAMMES_API").distinct(),
         scope = scope,
         expiryTime = Duration.ofHours(1),
+        authSource = authSource.source,
       )
       return { headers -> headers.setBearerAuth(token) }
     }
