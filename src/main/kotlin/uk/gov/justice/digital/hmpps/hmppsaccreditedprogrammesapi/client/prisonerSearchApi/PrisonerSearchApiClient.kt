@@ -24,6 +24,16 @@ class PrisonerSearchApiClient(
     path = "/prisoner-search/prisoner-numbers"
     body = PrisonerNumbers(prisonNumbers)
   }
+
+  /**
+   * Exact lookup by prison number returning the full people-search projection. Uses the same
+   * prisoner-search document as [peopleSearch] so no fields are lost, but is a reliable exact match
+   * (unlike the match-prisoners search, which can return no results for a valid prison number).
+   */
+  fun getPeopleByPrisonNumbers(prisonNumbers: List<String>) = postRequest<List<PeopleSearchResponse>>(PRISONER_SEARCH_API) {
+    path = "/prisoner-search/prisoner-numbers"
+    body = PrisonerNumbers(prisonNumbers)
+  }
   fun prisonerSearch(prisonerSearchRequest: PrisonerSearchRequest) = postRequest<List<PrisonerSearchResponse>>(PRISONER_SEARCH_API) {
     path = "/prisoner-search/match-prisoners"
     body = prisonerSearchRequest
