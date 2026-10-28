@@ -1,0 +1,31 @@
+[
+  {
+    "prisonerNumber": "A6299FL",
+    "bookingId": "1300001",
+    "bookNumber": "48001A",
+    "firstName": "JANE",
+    "lastName": "DOE",
+    "dateOfBirth": "1982-04-17",
+    "gender": "Female",
+    "ethnicity": "White: Eng./Welsh/Scot./N.Irish/British",
+    "youthOffender": false,
+    "status": "ACTIVE IN",
+    "lastMovementTypeCode": "ADM",
+    "lastMovementReasonCode": "N",
+    "inOutStatus": "IN",
+    "prisonId": "MDI",
+    "prisonName": "Moorland (HMP)",
+    "cellLocation": "A-1-001",
+    "aliases": [],
+    "alerts": [],
+    "legalStatus": "SENTENCED",
+    "imprisonmentStatus": "SENT",
+    "imprisonmentStatusDescription": "Adult Imprisonment Without Option",
+    "recall": false,
+    "indeterminateSentence": false,
+    "receptionDate": "2023-02-01",
+    "locationDescription": "Moorland (HMP)",
+    "restrictedPatient": false
+  }
+]
+

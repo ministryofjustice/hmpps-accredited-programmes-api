@@ -137,6 +137,39 @@ class PeopleControllerIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `search by prison number falls back to the exact prisoner-numbers lookup when match-prisoners finds nothing`() {
+    // Given match-prisoners returns no matches for this prison number, but the exact
+    // prisoner-numbers lookup resolves the person (the APG-2764 "cannot be found" scenario).
+    mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())
+    val peopleSearchRequest = PeopleSearchRequest(prisonerIdentifier = "A6299FL")
+
+    // When
+    val response = searchPrisoners(peopleSearchRequest)
+
+    // Then
+    response.shouldNotBeNull()
+    response.first() shouldBeEqual PeopleSearchResponse(
+      bookingId = "1300001",
+      conditionalReleaseDate = null,
+      prisonId = "MDI",
+      prisonName = "Moorland (HMP)",
+      dateOfBirth = LocalDate.of(1982, 4, 17),
+      ethnicity = "White: Eng./Welsh/Scot./N.Irish/British",
+      gender = "Female",
+      homeDetentionCurfewEligibilityDate = null,
+      indeterminateSentence = false,
+      firstName = "JANE",
+      lastName = "DOE",
+      paroleEligibilityDate = null,
+      prisonerNumber = "A6299FL",
+      religion = null,
+      sentenceExpiryDate = null,
+      sentenceStartDate = null,
+      tariffDate = null,
+    )
+  }
+
+  @Test
   fun `should return course participation history with a 200 success code`() {
     // Given
     mockClientCredentialsJwtRequest(jwt = jwtAuthHelper.bearerToken())

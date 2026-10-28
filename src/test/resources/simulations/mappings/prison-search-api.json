@@ -2,6 +2,38 @@
   "mappings": [
     {
       "request": {
+        "urlPattern": "/prisoner-search/match-prisoners",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "A6299FL"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "[]"
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/prisoner-search/prisoner-numbers",
+        "method": "POST",
+        "bodyPatterns" : [ {
+          "contains" : "A6299FL"
+        } ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyFileName": "prison-search-results-A6299FL.json"
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/prisoner-search/prisoner-numbers",
         "method": "POST",
         "bodyPatterns" : [ {
