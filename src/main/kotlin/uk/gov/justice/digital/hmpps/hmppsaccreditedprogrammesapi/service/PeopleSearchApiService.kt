@@ -74,11 +74,22 @@ constructor(
       )
 
       is ClientResult.Failure -> {
-        log.warn("Failure to retrieve data for prisonNumbers ${peopleSearchRequest.prisonIds} Reason ${response.toException().message} ")
+        log.warn("Failure to retrieve data for ${peopleSearchRequest.describeCriteria()} Reason ${response.toException().message} ")
         AuthorisableActionResult.Success(emptyList())
       }
     }
 
-    return peoples.entity
+    val results = peoples.entity
+    // A successful (200) response from prisoner-search that contains no matches is indistinguishable
+    // from "person not found" to the end user. Log it explicitly so empty results are visible in
+    // Application Insights (previously they produced no telemetry at all). See APG-2764.
+    if (results.isEmpty()) {
+      log.warn("People search returned no matches for ${peopleSearchRequest.describeCriteria()}")
+    } else {
+      log.debug("People search returned {} match(es) for {}", results.size, peopleSearchRequest.describeCriteria())
+    }
+    return results
   }
+
+  private fun PeopleSearchRequest.describeCriteria(): String = "prisonerIdentifier=$prisonerIdentifier, prisonIds=$prisonIds, firstName=$firstName, lastName=$lastName"
 }
