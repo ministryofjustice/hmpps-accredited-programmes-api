@@ -29,7 +29,7 @@ dependencies {
   val sentryVersion = "8.62.0"
   val jsonWebtokenVersion = "0.13.0"
   val springSecurityVersion = "7.1.2"
-  val flywayVersion = "13.11.1"
+  val flywayVersion = "13.12.0"
 
   runtimeOnly("org.postgresql:postgresql:42.7.14")
   implementation("org.flywaydb:flyway-core:$flywayVersion")
