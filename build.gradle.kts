@@ -62,7 +62,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.7.5")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.7.6")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -76,7 +76,7 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-localstack:2.0.5")
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.5")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.6")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.3")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
