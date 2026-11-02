@@ -13,6 +13,14 @@ plugins {
 
 configurations {
   testImplementation { exclude(group = "org.junit.vintage") }
+
+  all {
+    resolutionStrategy {
+      // APG-2773: swagger-ui 5.34.0 (pulled in transitively via springdoc) bundles a
+      // vulnerable dompurify (<3.4.17, multiple CVEs). 5.34.1 bundles dompurify ^3.4.17.
+      force("org.webjars:swagger-ui:5.34.1")
+    }
+  }
 }
 
 ext["netty.version"] = "4.2.18.Final"
