@@ -188,7 +188,7 @@ constructor(
     referral.hasReviewedProgrammeHistory = update.hasReviewedProgrammeHistory
     referral.referrerOverrideReason = update.referrerOverrideReason ?: referral.referrerOverrideReason
     referral.hasLdc = update.hasLdc ?: referral.hasLdc
-    referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: false
+    referral.hasLdcBeenOverriddenByProgrammeTeam = update.hasLdcBeenOverriddenByProgrammeTeam ?: referral.hasLdcBeenOverriddenByProgrammeTeam
     referral.hasReviewedAdditionalInformation = update.hasReviewedAdditionalInformation ?: referral.hasReviewedAdditionalInformation
   }
 

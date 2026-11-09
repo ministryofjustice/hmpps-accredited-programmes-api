@@ -464,6 +464,8 @@ class ReferralServiceTest {
       .withOasysConfirmed(false)
       .withReferrerOverrideReason("The override reason")
       .withAdditionalInformation("The additional information")
+      .withLdc(true)
+      .withHasLdcBeenOverwrittenByProgrammeTeam(true)
       .produce()
 
     every { referralRepository.getReferenceById(any()) } returns referral
@@ -481,6 +483,8 @@ class ReferralServiceTest {
     // Then
     assertThat(referral.referrerOverrideReason).isEqualTo("The override reason")
     assertThat(referral.additionalInformation).isEqualTo("The additional information")
+    assertThat(referral.hasLdc).isTrue()
+    assertThat(referral.hasLdcBeenOverriddenByProgrammeTeam).isTrue()
   }
 
   @Test
