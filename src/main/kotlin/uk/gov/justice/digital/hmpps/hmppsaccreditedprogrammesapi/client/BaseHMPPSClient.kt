@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.client
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -18,6 +19,14 @@ abstract class BaseHMPPSClient(
 ) {
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
+  }
+
+  init {
+    // Tolerate unknown fields across all HMPPS upstreams. Upstream services evolve their
+    // schemas independently of us (e.g. APG-2707's ARNS "assessmentType" field), so a new
+    // field must never fail deserialisation and 500 our endpoints. Applied centrally so
+    // every client is resilient, not just the one that previously incurred an incident.
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
   }
 
   protected inline fun <reified ResponseType : Any> getRequest(
