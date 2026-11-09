@@ -108,13 +108,9 @@ class AssessRiskAndNeedsApiClientIntegrationTest : IntegrationTestBase() {
         assertThat(output?.sexualPredictorScore?.ospIndecentScoreLevel).isEqualTo(ScoreLevel.LOW)
         assertThat(output?.sexualPredictorScore?.ospContactScoreLevel).isEqualTo(ScoreLevel.HIGH)
       }
-      is ClientResult.Failure.Other<*> -> {
-        response.exception.printStackTrace()
-        fail("Unexpected client result: ${response::class.simpleName}")
-      }
+      is ClientResult.Failure.Other<*> -> fail("Unexpected client result: ${response::class.simpleName}")
 
       is ClientResult.Failure.StatusCode<*> -> {
-        println("Failed with status code ${response.status}")
         fail(
           """
             Unexpected status code result:
@@ -146,10 +142,9 @@ class AssessRiskAndNeedsApiClientIntegrationTest : IntegrationTestBase() {
         val versioned = body as AllPredictorVersionedDto
         assertThat(versioned.output?.combinedSeriousReoffendingPredictor?.algorithmVersion).isEqualTo("2.0")
       }
-      is ClientResult.Failure.Other<*> -> {
-        response.exception.printStackTrace()
-        fail("Unknown field should be ignored, but deserialisation failed: ${response::class.simpleName}")
-      }
+      is ClientResult.Failure.Other<*> -> fail(
+        "Unknown field should be ignored, but deserialisation failed: ${response.exception.message}",
+      )
       is ClientResult.Failure.StatusCode<*> -> fail(
         """
           Unexpected status code result:

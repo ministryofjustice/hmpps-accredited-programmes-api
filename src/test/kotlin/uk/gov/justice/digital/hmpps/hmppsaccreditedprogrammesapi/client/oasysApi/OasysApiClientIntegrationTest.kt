@@ -63,6 +63,38 @@ class OasysApiClientIntegrationTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `should tolerate unknown fields in the pni response (BaseHMPPSClient centrally ignores unknown upstream fields)`() {
+    // Given an OASys response that carries fields our DTOs don't model yet, both at the
+    // top level and nested inside a sub-object, proving the FAIL_ON_UNKNOWN_PROPERTIES
+    // default applied centrally in BaseHMPPSClient covers clients beyond ARNS (APG-2714)
+    val prisonNumber = "A6666CC"
+
+    // When
+    when (val response = oasysApiClient.getPniCalculation(prisonNumber)) {
+      // Then deserialisation must succeed rather than throw UnrecognizedPropertyException
+      is ClientResult.Success -> {
+        assertThat(response.status).isEqualTo(HttpStatus.OK)
+        val pniResponse = response.body
+        assertThat(pniResponse.pniCalculation?.pni).isEqualTo(Type.H)
+        assertThat(pniResponse.assessment?.id).isEqualTo(10082385)
+      }
+      is ClientResult.Failure.Other<*> -> fail(
+        "Unknown field should be ignored, but deserialisation failed: ${response.exception.message}",
+      )
+      is ClientResult.Failure.StatusCode<*> -> {
+        val message = """
+                   Unexpected status code result:
+                   Method: ${response.method}
+                   Path: ${response.path}
+                   Status: ${response.status}
+                   Body: ${response.body}
+        """.trimIndent()
+        fail(message)
+      }
+    }
+  }
+
+  @Test
   fun `should return NOT FOUND for unknown prison number`() {
     // Given
     val prisonNumber = "A9876BB"

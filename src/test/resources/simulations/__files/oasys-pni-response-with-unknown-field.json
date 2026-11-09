@@ -1,0 +1,79 @@
+{
+  "pniCalculation" : {
+    "sexDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "thinkingDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "relationshipDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "selfManagementDomain" : {
+      "level" : "H",
+      "score" : 10
+    },
+    "riskLevel" : "H",
+    "needLevel" : "H",
+    "totalDomainScore" : 5,
+    "pni" : "H",
+    "saraRiskLevel" : {
+      "toPartner" : 1,
+      "toOther" : 3
+    },
+    "missingFields" : [ ],
+    "newUnmodelledField" : "unexpected value from an upstream schema change"
+  },
+  "assessment" : {
+    "id" : 10082385,
+    "ldc" : {
+      "score" : 10,
+      "subTotal" : 10
+    },
+    "ldcMessage" : "LDC message",
+    "ogrs3Risk" : "HIGH",
+    "ovpRisk" : "MEDIUM",
+    "osp" : {
+      "cdc" : "LOW",
+      "iiic" : "LOW",
+      "anotherNewField" : 123
+    },
+    "rsrPercentage" : 3.5,
+    "offenderAge" : 32,
+    "questions" : {
+      "everCommittedSexualOffence" : "Unknown",
+      "openSexualOffendingQuestions" : "NO",
+      "sexualPreOccupation" : "SIGNIFICANT",
+      "offenceRelatedSexualInterests" : "SOME",
+      "emotionalCongruence" : "MISSING",
+      "proCriminalAttitudes" : "SOME",
+      "hostileOrientation" : "SOME",
+      "relCloseFamily" : "NONE",
+      "prevCloseRelationships" : "SOME",
+      "easilyInfluenced" : "NONE",
+      "aggressiveControllingBehaviour" : "NONE",
+      "impulsivity" : "NONE",
+      "temperControl" : "SIGNIFICANT",
+      "problemSolvingSkills" : "NONE",
+      "difficultiesCoping" : "MISSING"
+    },
+    "staticAllReoffendingPredictor": {
+      "score": 35.98,
+      "level": "LOW"
+    },
+    "dynamicAllReoffendingPredictor": null,
+    "staticViolentReoffendingPredictor": {
+      "score": 32.29,
+      "level": "MEDIUM"
+    },
+    "dynamicViolentReoffendingPredictor": null,
+    "staticSeriousViolentReoffendingPredictor": null,
+    "dynamicSeriousViolentReoffendingPredictor": {
+      "score": 36.44,
+      "level": "VERY_HIGH"
+    }
+  }
+}
