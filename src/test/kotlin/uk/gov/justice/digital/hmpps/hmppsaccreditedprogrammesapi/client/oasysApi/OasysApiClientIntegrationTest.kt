@@ -78,10 +78,9 @@ class OasysApiClientIntegrationTest : IntegrationTestBase() {
         assertThat(pniResponse.pniCalculation?.pni).isEqualTo(Type.H)
         assertThat(pniResponse.assessment?.id).isEqualTo(10082385)
       }
-      is ClientResult.Failure.Other<*> -> {
-        response.exception.printStackTrace()
-        fail("Unknown field should be ignored, but deserialisation failed: ${response::class.simpleName}")
-      }
+      is ClientResult.Failure.Other<*> -> fail(
+        "Unknown field should be ignored, but deserialisation failed: ${response.exception.message}",
+      )
       is ClientResult.Failure.StatusCode<*> -> {
         val message = """
                    Unexpected status code result:
