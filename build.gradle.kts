@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.14"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.15"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.4.21"
   kotlin("plugin.jpa") version "2.4.21"
@@ -34,14 +34,14 @@ ext["tomcat.version"] = "11.0.27"
 dependencies {
   val kotestVersion = "6.2.6"
   val springdocVersion = "3.2.0"
-  val sentryVersion = "8.62.0"
+  val sentryVersion = "8.63.0"
   val jsonWebtokenVersion = "0.13.0"
   val springSecurityVersion = "7.1.2"
-  val flywayVersion = "13.12.0"
+  val flywayVersion = "13.12.1"
 
   runtimeOnly("org.postgresql:postgresql:42.7.14")
   implementation("org.flywaydb:flyway-core:$flywayVersion")
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.0.3")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.1.0")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.4.1")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -70,7 +70,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-api:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-impl:$jsonWebtokenVersion")
   testImplementation("io.jsonwebtoken:jjwt-orgjson:$jsonWebtokenVersion")
-  testImplementation("au.com.dius.pact.provider:junit5spring:4.7.6")
+  testImplementation("au.com.dius.pact.provider:junit5spring:4.7.7")
   testImplementation("org.springframework.security:spring-security-test:$springSecurityVersion")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -85,7 +85,7 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.6")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.3")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.1.0")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
 }
