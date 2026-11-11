@@ -5,18 +5,34 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.netty.channel.ConnectTimeoutException
+import io.netty.handler.timeout.ReadTimeoutException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import reactor.netty.http.client.PrematureCloseException
+import reactor.util.retry.Retry
 import uk.gov.justice.digital.hmpps.hmppsaccreditedprogrammesapi.common.exception.ServiceUnavailableException
+import java.io.IOException
+import java.time.Duration
 
 abstract class BaseHMPPSClient(
   private val webClient: WebClient,
   private val objectMapper: ObjectMapper,
 ) {
+  // Bounded retry-with-backoff for transient, pre-response connection drops (e.g. ARNS
+  // "Connection prematurely closed BEFORE response", connection resets). Only safe (GET) requests
+  // are retried. We deliberately do NOT retry read/connect timeouts: those burn the full upstream
+  // timeout, so retrying them would exceed the caller's (UI) deadline and stack with its own
+  // retries, hammering a struggling upstream. 4xx/5xx are WebClientResponseException and so are
+  // never retried here. `open` so tests can shorten the backoff; production clients inherit these.
+  protected open val maxRetryAttempts: Long = 2
+  protected open val retryBackoff: Duration = Duration.ofMillis(500)
+
   companion object {
     private val log = LoggerFactory.getLogger(this::class.java)
   }
@@ -82,7 +98,15 @@ abstract class BaseHMPPSClient(
         request.bodyValue(requestBuilder.body!!)
       }
 
-      val result = request.retrieve().toEntity(String::class.java).block()!!
+      val result = request.retrieve()
+        .toEntity(String::class.java)
+        .retryWhen(
+          Retry.backoff(maxRetryAttempts, retryBackoff)
+            .jitter(0.5)
+            .filter { method == HttpMethod.GET && isTransientConnectionDrop(it) }
+            .onRetryExhaustedThrow { _, retrySignal -> retrySignal.failure() },
+        )
+        .block()!!
 
       objectMapper.apply { registerModule((JavaTimeModule())) }
       val deserialized = objectMapper.readValue(result.body, typeReference)
@@ -106,6 +130,15 @@ abstract class BaseHMPPSClient(
     } catch (exception: Exception) {
       return ClientResult.Failure.Other(method, requestBuilder.path ?: "", exception, serviceName)
     }
+  }
+
+  private fun isTransientConnectionDrop(throwable: Throwable): Boolean {
+    if (throwable !is WebClientRequestException) return false
+    val cause = throwable.cause
+    // Read/connect timeouts consume the full upstream timeout, so retrying them would blow the
+    // caller's deadline and compound with its own retries. Only retry fast connection drops.
+    if (cause is ReadTimeoutException || cause is ConnectTimeoutException) return false
+    return cause is PrematureCloseException || cause is IOException
   }
 
   class HMPPSRequestConfiguration {
