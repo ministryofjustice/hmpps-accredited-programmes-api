@@ -32,12 +32,12 @@ ext["spring-security.version"] = "7.0.8"
 ext["tomcat.version"] = "11.0.27"
 
 dependencies {
-  val kotestVersion = "6.2.6"
+  val kotestVersion = "6.2.7"
   val springdocVersion = "3.2.0"
-  val sentryVersion = "8.63.0"
+  val sentryVersion = "8.64.0"
   val jsonWebtokenVersion = "0.13.0"
   val springSecurityVersion = "7.1.2"
-  val flywayVersion = "13.12.1"
+  val flywayVersion = "13.12.2"
 
   runtimeOnly("org.postgresql:postgresql:42.7.14")
   implementation("org.flywaydb:flyway-core:$flywayVersion")
@@ -62,8 +62,8 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
   implementation("org.openfolder:kotlin-asyncapi-spring-web:3.2.4")
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.27")
-  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:11.0.27")
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:11.0.29")
+  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:11.0.29")
 
   testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
   testImplementation("com.ninja-squad:springmockk:5.0.1")
@@ -84,7 +84,7 @@ dependencies {
   testImplementation("org.testcontainers:testcontainers-localstack:2.0.5")
   testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
   testImplementation("org.jetbrains.kotlin:kotlin-test")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.6")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.9.0")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.1.0")
 
   runtimeOnly("org.flywaydb:flyway-database-postgresql:$flywayVersion")
