@@ -1,6 +1,6 @@
 # Pinned to a digest that includes apt 2.4.15ubuntu0.1, which fixes CVE-2026-109518
 # (SNYK-UBUNTU2204-APT-22204274). Digest covers linux/amd64 and linux/arm64.
-ARG BASE_IMAGE=ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy@sha256:f8b6979d25b9cadd78d72b45b41cd9cbe9ff0f8b750c657dd3cdb5650ba6f888
+ARG BASE_IMAGE=ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy@sha256:b0d39c9faa8c58792515bd4c26d3b563372734c01e54027199c9cddc46fba430
 FROM --platform=$BUILDPLATFORM ${BASE_IMAGE} AS builder
 
 ARG BUILD_NUMBER
