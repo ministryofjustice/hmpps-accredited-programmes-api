@@ -22,6 +22,27 @@ instructions.
 | 5 | Datahub | Configure logical replication (manual slot on replica) |
 | 6 | Datahub | Configure DMS source endpoint |
 
+## Stage by stage (what to do next)
+
+Terraform for steps 0-2 is in
+[cloud-platform-environments#48567](https://github.com/ministryofjustice/cloud-platform-environments/pull/48567)
+(`namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-accredited-programmes-prod/resources/rds-postgresql.tf`).
+
+| Stage | Owner | What to do | Status |
+|-------|-------|------------|--------|
+| A. Terraform PR | Us | Add replica, Datahub SG, parameter groups (steps 0-2). | Done - draft PR open, GitHub checks and `plan-live` pass |
+| B. Review plan | Us | Confirm plan: replica created, primary updated in place (no destroy/replace), static params `pending-reboot`, `hot_standby_feedback` on replica only. | Done - plan: 9 add, 2 change, 1 destroy (old unused `-upgrade` parameter group) |
+| C. Approval | Cloud Platform team | OPA auto-approve fails the allowlist check for a read replica, so request manual approval in #ask-cloud-platform. Mark PR ready for review. | To do |
+| D. Merge and apply | Us / Cloud Platform | Merge PR. Apply creates the replica and attaches the new parameter group to the primary. | To do |
+| E. Reboot primary | Us | Primary parameter group moves from `default.postgres16` to the custom group. Reboot in an agreed window so `rds.logical_replication` and `shared_preload_libraries` take effect. Then reboot replica if it shows `pending-reboot`. | To do |
+| F. Verify parameters | Us | Check `SHOW rds.logical_replication;`, `SHOW shared_preload_libraries;`, replica `SHOW hot_standby_feedback;`, and that the replica is in sync. | To do |
+| G. Postgres user | Us (DB admin) | On the primary: create `digital_prison_reporting`, grant `rds_superuser` and `rds_replication`; verify grants. | To do |
+| H. Share credentials | Us | Send the credentials to Datahub per "Password Management for Datahub Onboarding". Never commit them. | To do |
+| I. Extract contracts | Datahub | Extract data contracts using the new user via the DPR jump server. | Waiting on H |
+| J. Logical replication | Datahub | `create extension pglogical;` on the primary. Create `dpr_replication_slot` (`test_decoding`) on the replica just before the DMS task starts. | Waiting on I |
+| K. DMS endpoint | Datahub | Configure the source endpoint with the replica host and `PluginName=test_decoding;slotName=dpr_replication_slot`. | Waiting on J |
+| L. Monitor | Us | Watch replica lag, WAL/disk usage and RDS alerts after ingestion starts. | After K |
+
 ## Prerequisites
 
 - [ ] Data Assessment completed with Datahub.
