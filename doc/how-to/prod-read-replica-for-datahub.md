@@ -25,8 +25,9 @@ instructions.
 ## Stage by stage (what to do next)
 
 Terraform for steps 0-2 is in
-[cloud-platform-environments#48567](https://github.com/ministryofjustice/cloud-platform-environments/pull/48567)
-(`namespaces/live.cloud-platform.service.justice.gov.uk/hmpps-accredited-programmes-prod/resources/rds-postgresql.tf`).
+[cloud-platform-environments#48567](https://github.com/ministryofjustice/cloud-platform-environments/pull/48567) (Prod)
+and [#48606](https://github.com/ministryofjustice/cloud-platform-environments/pull/48606) (Preprod, separate PR as only one namespace per PR is allowed; do Preprod first to test)
+(`namespaces/live.cloud-platform.service.justice.gov.uk/<namespace>/resources/rds-postgresql.tf`).
 
 | Stage | Owner | What to do | Status |
 |-------|-------|------------|--------|
