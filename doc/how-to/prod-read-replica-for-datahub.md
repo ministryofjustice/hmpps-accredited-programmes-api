@@ -119,6 +119,6 @@ Plaintext JSON in `external/dpr-dps-<service>-source-secrets`:
 - Replica adds cost.
 
 ## Open questions
-- Which environments get a replica (Prod only vs Pre-Prod too)?
+- Which environments get a replica? Decision: Prod and Preprod. Dev is skipped unless Datahub asks for it (it would be a primary-only PR: SG + parameters, no replica; `endpoint` and `heartbeat_endpoint` both the primary).
 - Current Prod engine version?
 - Who holds the DB admin access to run the user grants?
