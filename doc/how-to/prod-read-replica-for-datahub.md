@@ -37,7 +37,8 @@ Terraform for steps 0-2 is in
 | E. Reboot primary | Us | Primary parameter group moves from `default.postgres16` to the custom group. Reboot in an agreed window so `rds.logical_replication` and `shared_preload_libraries` take effect. Then reboot replica if it shows `pending-reboot`. | To do |
 | F. Verify parameters | Us | Check `SHOW rds.logical_replication;`, `SHOW shared_preload_libraries;`, replica `SHOW hot_standby_feedback;`, and that the replica is in sync. | To do |
 | G. Postgres user | Us (DB admin) | On the primary: create `digital_prison_reporting`, grant `rds_superuser` and `rds_replication`; verify grants. | To do |
-| H. Share credentials | Us | Send the credentials to Datahub per "Password Management for Datahub Onboarding". Never commit them. | To do |
+| H1. Request Datahub AWS access | Us | Email/Slack Datahub a single point-of-contact email. Datahub raise a ticket, add us to the `hmpps-digital-prison-reporting` GitHub team and create the Terraform-managed placeholder secrets (Prod placeholder may lag non-Prod). | To do |
+| H2. Share credentials | Us | In the Datahub AWS account (eu-west-2, role `modernisation-platform-developer`), edit secret `external/dpr-dps-<service>-source-secrets` (see "Datahub secret format"). Never commit credentials. | To do (after H1) |
 | I. Extract contracts | Datahub | Extract data contracts using the new user via the DPR jump server. | Waiting on H |
 | J. Logical replication | Datahub | `create extension pglogical;` on the primary. Create `dpr_replication_slot` (`test_decoding`) on the replica just before the DMS task starts. | Waiting on I |
 | K. DMS endpoint | Datahub | Configure the source endpoint with the replica host and `PluginName=test_decoding;slotName=dpr_replication_slot`. | Waiting on J |
@@ -83,6 +84,26 @@ Terraform for steps 0-2 is in
 - [ ] 4. Contract extraction (can use `dpr-dps-data-contract-schema-generation`); via DPR jump server using the new user.
 - [ ] 5. Replica slot: Datahub creates `dpr_replication_slot` (`test_decoding`) on the replica **just before** starting the DMS task (otherwise it may be invalidated, `wal_status = lost`). `create extension pglogical;` on the primary.
 - [ ] 6. DMS source endpoint using the replica host with extra attributes `PluginName=test_decoding;slotName=dpr_replication_slot`.
+
+## Datahub secret format (step H2)
+
+Plaintext JSON in `external/dpr-dps-<service>-source-secrets`:
+
+```json
+{"db_name":"<DB_NAME>","endpoint":"<REPLICA_ENDPOINT>","heartbeat_endpoint":"<PRIMARY_ENDPOINT>","password":"<PASSWORD>","port":"5432","user":"digital_prison_reporting","username":"digital_prison_reporting"}
+```
+
+- `endpoint` is the **read replica** host; `heartbeat_endpoint` is the **primary** host (only used with a replica).
+- `user` and `username` must both be set (known duplication on Datahub's side).
+- Datahub environments are dev, test, pre-prod, prod. With only 3 environments our lowest maps to both Datahub dev and test.
+- If no secrets are listed, check the console region is Europe London (eu-west-2).
+
+## Datahub-run detail (for reference)
+
+- Contracts (step 4): from the DPR jump server (SSM session), `psql` as `digital_prison_reporting`, run the Datahub table-extraction and primary-key queries, save the output.
+- Slot (step 5, replica): drop any old slot first (`select pg_drop_replication_slot('dpr_replication_slot');`), then `select * from pg_create_logical_replication_slot('dpr_replication_slot', 'test_decoding');` and confirm in `pg_replication_slots`. Create it only just before the DMS task starts (needs DMS >= 3.6.1).
+- Extension (step 5, primary): `create extension pglogical;` then confirm in `pg_extension`.
+- DMS endpoint (step 6): `CaptureDdls=false`, `HeartbeatEnable=true`, port 5432, `Username=digital_prison_reporting`, server is the replica host, extra attributes `PluginName=test_decoding;slotName=dpr_replication_slot`.
 
 ## Verification
 - [ ] Replica reachable from Datahub (port 5432 via SG).
