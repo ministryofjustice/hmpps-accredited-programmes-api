@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.15"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.1.2"
   `jvm-test-suite`
   kotlin("plugin.spring") version "2.4.21"
   kotlin("plugin.jpa") version "2.4.21"
@@ -18,28 +18,20 @@ configurations {
     resolutionStrategy {
       // APG-2773: swagger-ui 5.34.0 (pulled in transitively via springdoc) bundles a
       // vulnerable dompurify (<3.4.17, multiple CVEs). 5.34.1 bundles dompurify ^3.4.17.
-      force("org.webjars:swagger-ui:5.35.0")
+      force("org.webjars:swagger-ui:5.36.0")
     }
   }
 }
 
-ext["netty.version"] = "4.2.18.Final"
-// CVE-2026-47884 / CVE-2026-47890
-ext["spring-framework.version"] = "7.0.10"
-// CVE-2026-59270
-ext["spring-security.version"] = "7.0.8"
-// CVE-2026-68525
-ext["tomcat.version"] = "11.0.27"
-
 dependencies {
   val kotestVersion = "6.2.7"
-  val springdocVersion = "3.2.0"
-  val sentryVersion = "8.64.0"
+  val springdocVersion = "3.2.1"
+  val sentryVersion = "8.65.1"
   val jsonWebtokenVersion = "0.13.0"
-  val springSecurityVersion = "7.1.2"
-  val flywayVersion = "13.12.2"
+  val springSecurityVersion = "7.2.0"
+  val flywayVersion = "13.13.0"
 
-  runtimeOnly("org.postgresql:postgresql:42.7.14")
+  runtimeOnly("org.postgresql:postgresql:42.7.15")
   implementation("org.flywaydb:flyway-core:$flywayVersion")
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.1.0")
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.6.0")

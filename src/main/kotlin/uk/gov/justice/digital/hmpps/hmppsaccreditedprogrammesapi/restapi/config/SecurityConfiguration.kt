@@ -126,12 +126,12 @@ class LoggingInMemoryOAuth2AuthorizedClientService(
   private val backingImplementation = InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository)
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  override fun <T : OAuth2AuthorizedClient?> loadAuthorizedClient(
-    clientRegistrationId: String?,
-    principalName: String?,
-  ): T = backingImplementation.loadAuthorizedClient(clientRegistrationId, principalName)
+  override fun <T : OAuth2AuthorizedClient> loadAuthorizedClient(
+    clientRegistrationId: String,
+    principalName: String,
+  ): T? = backingImplementation.loadAuthorizedClient(clientRegistrationId, principalName)
 
-  override fun saveAuthorizedClient(authorizedClient: OAuth2AuthorizedClient?, principal: Authentication?) {
+  override fun saveAuthorizedClient(authorizedClient: OAuth2AuthorizedClient, principal: Authentication) {
     authorizedClient?.accessToken?.tokenValue?.let { tokenValue ->
       try {
         val tokenBodyBase64 = tokenValue.split(".")[1]
@@ -154,7 +154,7 @@ class LoggingInMemoryOAuth2AuthorizedClientService(
     val exp: Long,
   )
 
-  override fun removeAuthorizedClient(clientRegistrationId: String?, principalName: String?) = backingImplementation.removeAuthorizedClient(clientRegistrationId, principalName)
+  override fun removeAuthorizedClient(clientRegistrationId: String, principalName: String) = backingImplementation.removeAuthorizedClient(clientRegistrationId, principalName)
 }
 
 class AuthAwareAuthenticationToken(
