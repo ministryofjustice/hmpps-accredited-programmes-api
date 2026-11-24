@@ -23,13 +23,6 @@ configurations {
   }
 }
 
-ext["netty.version"] = "4.2.18.Final"
-// CVE-2026-47884 / CVE-2026-47890
-ext["spring-framework.version"] = "7.0.10"
-// CVE-2026-59270
-ext["spring-security.version"] = "7.0.8"
-// CVE-2026-68525
-ext["tomcat.version"] = "11.0.27"
 
 dependencies {
   val kotestVersion = "6.2.7"
