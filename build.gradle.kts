@@ -23,7 +23,6 @@ configurations {
   }
 }
 
-
 dependencies {
   val kotestVersion = "6.2.7"
   val springdocVersion = "3.2.1"
